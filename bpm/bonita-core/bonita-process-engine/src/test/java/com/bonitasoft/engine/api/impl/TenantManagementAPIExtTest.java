@@ -32,7 +32,7 @@ import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.work.WorkException;
+import org.bonitasoft.engine.work.SWorkException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
@@ -151,7 +151,7 @@ public class TenantManagementAPIExtTest {
 
     @Test(expected = UpdateException.class)
     public void resumeTenant_should_throwExceptionWhenWorkserviceFail() throws Exception {
-        doThrow(WorkException.class).when(workService).resume();
+        doThrow(SWorkException.class).when(workService).resume();
 
         // given a tenant moved to available mode
         tenantManagementAPI.resume();

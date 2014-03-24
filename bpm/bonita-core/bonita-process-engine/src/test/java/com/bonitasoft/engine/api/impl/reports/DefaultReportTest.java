@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -24,101 +24,108 @@ import org.junit.Test;
  */
 public class DefaultReportTest {
 
-	public static final String RESOURCES_PATH = "src/test/resources/reports";
+    public static final String RESOURCES_PATH = "src/test/resources/reports";
 
-	private ReportDeployer emptyDeployer = new ReportDeployer() {
+    private final ReportDeployer emptyDeployer = new ReportDeployer() {
 
-		@Override
-		public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-		}
-	};
+        @SuppressWarnings("unused")
+        @Override
+        public void deploy(String name, String description, byte[] screenShot, byte[] content) {
+        }
+    };
 
-	@Test(expected = FileNotFoundException.class)
-	public void should_fail_to_deploy_non_existing_report_content() throws Exception {
-		DefaultReport report = new DefaultReport("notexistingreport");
+    @Test(expected = FileNotFoundException.class)
+    public void should_fail_to_deploy_non_existing_report_content() throws Exception {
+        DefaultReport report = new DefaultReport("notexistingreport");
 
-		report.deploy(RESOURCES_PATH, emptyDeployer);
-	}
+        report.deploy(RESOURCES_PATH, emptyDeployer);
+    }
 
-	@Test
-	public void should_provide_name_to_deployer() throws Exception {
-		DefaultReport report = new DefaultReport("myreport");
+    @Test
+    public void should_provide_name_to_deployer() throws Exception {
+        DefaultReport report = new DefaultReport("myreport");
 
-		report.deploy(RESOURCES_PATH, new ReportDeployer() {
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
-			@Override
-			public void deploy(String name, String description, byte[] screenShot, byte[] content) {
+            @SuppressWarnings("unused")
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) {
 				assertThat(name).isEqualTo("myreport");
-			}
-		});
-	}
+            }
+        });
+    }
 
-	@Test
-	public void should_provide_report_content_to_deployer() throws Exception {
-		DefaultReport report = new DefaultReport("myreport");
-		final File zip = new File(RESOURCES_PATH, "myreport-content.zip");
+    @Test
+    public void should_provide_report_content_to_deployer() throws Exception {
+        DefaultReport report = new DefaultReport("myreport");
+        final File zip = new File(RESOURCES_PATH, "myreport-content.zip");
 
-		report.deploy(RESOURCES_PATH, new ReportDeployer() {
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
-			@Override
-			public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
+            @SuppressWarnings("unused")
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
 				assertThat(content).isEqualTo(IOUtil.getAllContentFrom(zip));
-			}
-		});
-	}
+            }
+        });
+    }
 
-	@Test
-	public void should_provide_description_to_deployer() throws Exception {
-		DefaultReport report = new DefaultReport("myreport");
+    @Test
+    public void should_provide_description_to_deployer() throws Exception {
+        DefaultReport report = new DefaultReport("myreport");
 
-		report.deploy(RESOURCES_PATH, new ReportDeployer() {
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
-			@Override
-			public void deploy(String name, String description, byte[] screenShot, byte[] content) {
+            @SuppressWarnings("unused")
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) {
 				assertThat(description).isEqualTo("My report description");
-			}
-		});
-	}
+            }
+        });
+    }
 
-	@Test
-	public void should_fail_quietly_if_no_description_found() throws Exception {
-		DefaultReport report = new DefaultReport("myemptyreport");
+    @Test
+    public void should_fail_quietly_if_no_description_found() throws Exception {
+        DefaultReport report = new DefaultReport("myemptyreport");
 
-		report.deploy(RESOURCES_PATH, new ReportDeployer() {
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
-			@Override
-			public void deploy(String name, String description, byte[] screenShot, byte[] content) {
+            @SuppressWarnings("unused")
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) {
 				assertThat(description).isNull();
-			}
-		});
-	}
+            }
+        });
+    }
 
-	@Test
-	public void should_fail_quietly_if_no_screen_shot_found() throws Exception {
-		DefaultReport report = new DefaultReport("myemptyreport");
+    @Test
+    public void should_fail_quietly_if_no_screen_shot_found() throws Exception {
+        DefaultReport report = new DefaultReport("myemptyreport");
 
-		report.deploy(RESOURCES_PATH, new ReportDeployer() {
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
-			@Override
-			public void deploy(String name, String description, byte[] screenShot, byte[] content) {
+            @SuppressWarnings("unused")
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) {
 				assertThat(screenShot).isNull();
-			}
-		});
-	}
+            }
+        });
+    }
 
-	@Test
-	public void DefaultReport_should_provide_screenshot_if_existing() throws Exception {
-		DefaultReport report = new DefaultReport("myreport");
-		final File file = new File(RESOURCES_PATH, "myreport-screenshot.png");
-		assert file.exists();
+    @Test
+    public void DefaultReport_should_provide_screenshot_if_existing() throws Exception {
+        DefaultReport report = new DefaultReport("myreport");
+        final File file = new File(RESOURCES_PATH, "myreport-screenshot.png");
+        assert file.exists();
 
-		report.deploy(RESOURCES_PATH, new ReportDeployer() {
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
-			@Override
-			public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
+            @SuppressWarnings("unused")
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
 				assertThat(screenShot).isEqualTo(IOUtil.getAllContentFrom(file));
-			}
-		});
-	}
+            }
+        });
+    }
 
 }

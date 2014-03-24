@@ -57,7 +57,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.bdm.Entity;
@@ -90,13 +89,12 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final TokenService tokenService, final EventsHandler eventsHandler, final TransactionService transactionService,
-            final FlowNodeStateManager flowNodeStateManager, final BusinessDataRepository businessDataRepository,
-            final RefBusinessDataService refBusinessDataService) {
+            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
+            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, eventService, handlers, processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
-                tokenService, eventsHandler, transactionService, flowNodeStateManager);
+                tokenService, eventsHandler, flowNodeStateManager);
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
     }
@@ -116,7 +114,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             try {
                 initializeStringIndexes(sInstance, sDefinition);
             } catch (final SBonitaException e) {
-                throw new SProcessInstanceCreationException("unable to initialize string index on process instance", e);
+                throw new SProcessInstanceCreationException("Unable to initialize string index on process instance.", e);
             }
 
             final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
@@ -142,7 +140,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
 
-            return executeConnectors(sDefinition, sInstance, ConnectorEvent.ON_ENTER, connectorService);
+            return executeConnectors(sDefinition, sInstance, ConnectorEvent.ON_ENTER);
         } catch (final SProcessInstanceCreationException e) {
             throw e;
         } catch (final SBonitaException e) {

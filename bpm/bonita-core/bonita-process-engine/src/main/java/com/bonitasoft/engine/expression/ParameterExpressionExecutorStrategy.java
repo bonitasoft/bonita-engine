@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -29,6 +29,7 @@ import com.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
  * 
  * @see {@link ParameterService}
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -40,35 +41,39 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
         this.parameterService = parameterService;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         long processDefinitionId;
         final String expressionContent = expression.getContent();
         try {
-            Object result = null;
             if (dependencyValues != null && !dependencyValues.isEmpty()) {
                 if (dependencyValues.containsKey(PROCESS_DEFINITION_ID)) {
                     processDefinitionId = (Long) dependencyValues.get(PROCESS_DEFINITION_ID);
                     final SParameter para = parameterService.get(processDefinitionId, expressionContent);
-                    final String returnType = expression.getReturnType();
-                    if (Boolean.class.getName().equals(returnType)) {
-                        result = Boolean.parseBoolean(para.getValue());
-                    } else if (Double.class.getName().equals(returnType)) {
-                        result = Double.parseDouble(para.getValue());
-                    } else if (Integer.class.getName().equals(returnType)) {
-                        result = Integer.parseInt(para.getValue());
-                    } else if (String.class.getName().equals(returnType)) {
-                        result = para.getValue();
+                    try {
+                        final String returnType = expression.getReturnType();
+                        if (Boolean.class.getName().equals(returnType)) {
+                            return Boolean.parseBoolean(para.getValue());
+                        } else if (Double.class.getName().equals(returnType)) {
+                            return Double.parseDouble(para.getValue());
+                        } else if (Integer.class.getName().equals(returnType)) {
+                            return Integer.parseInt(para.getValue());
+                        } else if (String.class.getName().equals(returnType)) {
+                            return para.getValue();
+                        }
+                    } catch (final NumberFormatException e) {
+                        throw new SExpressionEvaluationException("Can't convert value = " + para.getValue() + " in type = returnType", e, expression.getName());
                     }
                 } else {
                     throw new SExpressionDependencyMissingException("Mandatory dependency processDefinitionId is missing.");
                 }
             }
-            return result;
         } catch (final SParameterProcessNotFoundException e) {
-            throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", e);
+            throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", e, expression.getName());
         }
+        return null;
     }
 
     @Override
@@ -76,7 +81,8 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
         super.validate(expression);
         // $ can be part of variable name
         if (!expression.getContent().matches("(^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]*")) {
-            throw new SInvalidExpressionException("The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: " + expression);
+            throw new SInvalidExpressionException("The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: " + expression,
+                    expression.getName());
         }
 
     }

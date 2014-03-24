@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
@@ -37,11 +36,12 @@ import com.bonitasoft.manager.Features;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ParameterProcessDependencyResolver implements ProcessDependencyResolver {
 
     @Override
-    public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
+    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
             final SProcessDefinition sDefinition) throws ParameterProcessNotFoundException {
         final Set<SParameterDefinition> parameters = sDefinition.getParameters();
         boolean resolved = true;
@@ -73,7 +73,6 @@ public class ParameterProcessDependencyResolver implements ProcessDependencyReso
 
     @Override
     public List<Problem> checkResolution(final TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition) {
-
         if (processDefinition.getParameters().isEmpty()) {
             return Collections.emptyList();
         }

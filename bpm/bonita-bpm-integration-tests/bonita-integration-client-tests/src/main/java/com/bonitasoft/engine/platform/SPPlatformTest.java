@@ -271,7 +271,7 @@ public class SPPlatformTest {
         try {
             platformAPI.getTenantByName("test");
         } catch (final TenantNotFoundException e) {
-            assertTrue(e.getMessage().startsWith("No tenant exists with name: test"));
+            assertTrue(e.getMessage().contains("No tenant exists with name: test"));
             throw e;
         }
     }
@@ -295,7 +295,7 @@ public class SPPlatformTest {
         try {
             platformAPI.getTenantById(-3);
         } catch (final TenantNotFoundException e) {
-            assertTrue(e.getMessage().startsWith("No tenant exists with id: -3"));
+            assertTrue(e.getMessage().contains("No tenant exists with id: -3"));
             throw e;
         }
     }

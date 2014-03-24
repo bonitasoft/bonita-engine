@@ -60,6 +60,7 @@ public class SPPlatformLoginTest {
             LOGGER.info("Starting test: " + getClass().getName() + "." + d.getMethodName());
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void failed(final Throwable cause, final Description d) {
             LOGGER.info("Failed test: " + getClass().getName() + "." + d.getMethodName());
