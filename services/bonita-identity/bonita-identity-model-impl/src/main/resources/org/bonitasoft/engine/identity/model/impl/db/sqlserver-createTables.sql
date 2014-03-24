@@ -97,7 +97,7 @@ CREATE TABLE custom_usr_inf_def (
 )
 GO
 
-CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name)
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name)
 GO
 
 CREATE TABLE custom_usr_inf_val (

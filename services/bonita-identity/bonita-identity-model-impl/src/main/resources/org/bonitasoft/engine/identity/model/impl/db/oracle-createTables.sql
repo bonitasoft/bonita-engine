@@ -85,7 +85,7 @@ CREATE TABLE custom_usr_inf_def (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name);
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name);
 
 CREATE TABLE custom_usr_inf_val (
   id NUMBER(19, 0) NOT NULL,
