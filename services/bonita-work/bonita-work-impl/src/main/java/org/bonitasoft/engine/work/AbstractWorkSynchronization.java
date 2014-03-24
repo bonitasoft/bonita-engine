@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
 
@@ -43,7 +43,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         try {
             // Instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
             tenantId = sessionAccessor.getTenantId();
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             // We are not in a tenant
             tenantId = -1L;
         }

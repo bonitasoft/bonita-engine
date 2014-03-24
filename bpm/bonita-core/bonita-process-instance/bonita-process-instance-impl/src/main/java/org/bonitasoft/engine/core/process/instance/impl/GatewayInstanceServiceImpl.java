@@ -96,16 +96,11 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             StringBuilder stb = new StringBuilder();
-            stb.append("Created gateway instance [name: <");
-            stb.append(gatewayInstance.getName());
-            stb.append(">, id: <");
-            stb.append(gatewayInstance.getId());
-            stb.append(">, parent process instance: <");
-            stb.append(gatewayInstance.getParentProcessInstanceId());
-            stb.append(">, root process instance: <");
-            stb.append(gatewayInstance.getRootProcessInstanceId());
-            stb.append(">, process definition: <");
-            stb.append(gatewayInstance.getRootProcessInstanceId());
+            stb.append("Created gateway instance [name = <" + gatewayInstance.getName());
+            stb.append(">, id = <" + gatewayInstance.getId());
+            stb.append(">, parent process instance id = <" + gatewayInstance.getParentProcessInstanceId());
+            stb.append(">, root process instance id = <" + gatewayInstance.getRootProcessInstanceId());
+            stb.append(">, process definition id = <" + gatewayInstance.getRootProcessInstanceId());
             stb.append(">]");
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
                     stb.toString());

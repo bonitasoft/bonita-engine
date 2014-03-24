@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -33,7 +33,6 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -56,8 +55,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     private final Map<String, Long> lastUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
 
-    public PlatformDependencyServiceImpl(final PersistenceService platformPersistenceService, final TechnicalLoggerService logger,
-            final ClassLoaderService classLoaderService) {
+    public PlatformDependencyServiceImpl(final PersistenceService platformPersistenceService, final ClassLoaderService classLoaderService) {
         super();
         this.platformPersistenceService = platformPersistenceService;
         this.classLoaderService = classLoaderService;
@@ -389,12 +387,13 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = getDependenciesResources();
         try {
             classLoaderService.refreshGlobalClassLoader(resources);
-        } catch (final ClassLoaderException e) {
+        } catch (final SClassLoaderException e) {
             throw new SDependencyException("can't refresh global classLoader", e);
         }
     }
@@ -420,9 +419,10 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         return resources;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
-        throw new UnsupportedOperationException("only one artifact at platform level, no need to update in batch all dependencies");
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) {
+        throw new UnsupportedOperationException("Only one artifact at platform level. No need to update in batch all dependencies.");
     }
 
 }

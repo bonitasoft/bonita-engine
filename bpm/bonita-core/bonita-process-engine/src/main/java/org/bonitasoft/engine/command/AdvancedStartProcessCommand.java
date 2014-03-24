@@ -75,6 +75,8 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
             validateInputs(serviceAccessor, processDefinitionId, activityNames);
 
             processInstance = startProcess(processDefinitionId, activityNames, startedBy, context, operations);
+        } catch (final SCommandExecutionException e) {
+            throw e;
         } catch (final Exception e) {
             throw new SCommandExecutionException(e);
         }
@@ -84,10 +86,8 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
     private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
             final Map<String, Serializable> context, final List<Operation> operations) throws ProcessDefinitionNotFoundException, ProcessActivationException,
             ProcessExecutionException {
-        ProcessInstance processInstance;
         final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
-        processInstance = starter.start();
-        return processInstance;
+        return starter.start();
     }
 
     private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId, final List<String> activityNames)

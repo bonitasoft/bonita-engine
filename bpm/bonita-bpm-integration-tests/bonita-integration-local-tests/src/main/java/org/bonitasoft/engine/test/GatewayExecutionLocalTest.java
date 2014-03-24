@@ -71,8 +71,9 @@ public class GatewayExecutionLocalTest extends CommonAPITest {
         }
         final String logs = myOut.toString();
         System.out.println(logs);
-        assertTrue("Should have written in logs : SFlowNodeExecutionException",
-                logs.contains("fzdfsdfsdfsdfsdf depends on fzdfsdfsdfsdfsdf is neither defined in the script nor in dependencies"));
+        assertTrue(
+                "Should have written in logs : SExpressionEvaluationException",
+                logs.contains("Expression mycondition with content = <fzdfsdfsdfsdfsdf> depends on fzdfsdfsdfsdfsdf is neither defined in the script nor in dependencies."));
     }
 
 }

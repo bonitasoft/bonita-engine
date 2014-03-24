@@ -215,7 +215,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     @Override
-    public void setProcessExecutor(ProcessExecutor processExecutor) {
+    public void setProcessExecutor(final ProcessExecutor processExecutor) {
         stateBehaviors.setProcessExecutor(processExecutor);
     }
 
@@ -333,7 +333,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void initStates(final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
             final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService, final DataInstanceService dataInstanceService,
-            final EventInstanceService eventInstanceService, 
+            final EventInstanceService eventInstanceService,
             final OperationService operationService, final ActivityInstanceService activityInstanceService, final BPMInstancesCreator bpmInstancesCreator,
             final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
@@ -493,20 +493,33 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         return currentState;
     }
 
-    private FlowNodeState getNextStateToHandle(final SFlowNodeInstance flowNodeInstance, FlowNodeState currentState) throws SActivityExecutionException {
+    private FlowNodeState getNextStateToHandle(final SFlowNodeInstance flowNodeInstance, final FlowNodeState flowNodeStateToExecute)
+            throws SActivityExecutionException {
+        FlowNodeState nextStateToHandle = null;
         switch (flowNodeInstance.getStateCategory()) {
             case ABORTING:
-                ExceptionalStateTransitionsManager abortStateTransitionsManager = new ExceptionalStateTransitionsManager(abortTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
-                return abortStateTransitionsManager.getNextState(currentState);
+                ExceptionalStateTransitionsManager abortStateTransitionsManager = new ExceptionalStateTransitionsManager(abortTransitions.get(flowNodeInstance
+                        .getType()), flowNodeInstance);
+                nextStateToHandle = abortStateTransitionsManager.getNextState(flowNodeStateToExecute);
+                break;
 
             case CANCELLING:
-                ExceptionalStateTransitionsManager cancelStateTransitionsManager = new ExceptionalStateTransitionsManager(cancelTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
-                return cancelStateTransitionsManager.getNextState(currentState);
+                ExceptionalStateTransitionsManager cancelStateTransitionsManager = new ExceptionalStateTransitionsManager(
+                        cancelTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
+                nextStateToHandle = cancelStateTransitionsManager.getNextState(flowNodeStateToExecute);
+                break;
 
             default:
-                NormalStateTransitionsManager normalStateTransitionsManager = new NormalStateTransitionsManager(normalTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
-                return normalStateTransitionsManager.getNextState(currentState);
+                NormalStateTransitionsManager normalStateTransitionsManager = new NormalStateTransitionsManager(normalTransitions.get(flowNodeInstance
+                        .getType()), flowNodeInstance);
+                nextStateToHandle =  normalStateTransitionsManager.getNextState(flowNodeStateToExecute);
         }
+        if (nextStateToHandle == null) {
+            throw new SActivityExecutionException("no state found after " + states.get(flowNodeStateToExecute.getId()).getClass() + " for "
+                    + flowNodeInstance.getClass()
+                    + " in state category " + flowNodeInstance.getStateCategory() + " activity id=" + flowNodeInstance.getId());
+        }
+        return nextStateToHandle;
     }
 
     @Override
@@ -519,21 +532,25 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         return states.get(stateId);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public FlowNodeState getNormalFinalState(final SFlowNodeInstance flowNodeInstance) {
         return completed;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public FlowNodeState getSkippedState(final SFlowNodeInstance flownNodeInstance) {
         return skipped;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public FlowNodeState getCanceledState(final SFlowNodeInstance flownNodeInstance) {
         return cancelled;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public FlowNodeState getInitialState(final SFlowNodeInstance flowNodeInstance) {
         return initializing;

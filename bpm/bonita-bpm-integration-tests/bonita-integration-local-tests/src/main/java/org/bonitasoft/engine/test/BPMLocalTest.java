@@ -434,13 +434,6 @@ public class BPMLocalTest extends CommonAPILocalTest {
         logout();
         final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        new WaitUntil(10, 15000) {
-
-            @Override
-            protected boolean check() {
-                return BlockingConnector.semaphore.hasQueuedThreads() && semaphore1.hasQueuedThreads() && semaphore2.hasQueuedThreads();
-            }
-        };
         // stop node and in the same time release the semaphores to unlock works
         final Thread thread = new Thread(new Runnable() {
 

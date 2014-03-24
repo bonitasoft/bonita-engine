@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -25,6 +25,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * Parameter keys: ENTITY_MEMBER_ID_KEY: entity member id to remove.
  * 
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class RemoveEntityMemberCommand extends EntityMemberCommand {
 
@@ -42,6 +43,8 @@ public class RemoveEntityMemberCommand extends EntityMemberCommand {
             removeExternalIdentityMapping(entityMemberId);
             // everything went right:
             return Boolean.TRUE;
+        } catch (SCommandExecutionException e) {
+            throw e;
         } catch (SBonitaException e) {
             throw new SCommandExecutionException("Error executing command 'RemoveEntityMemberCommand'", e);
         }

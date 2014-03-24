@@ -22,7 +22,6 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.entitymember.EntityMember;
 import org.bonitasoft.engine.entitymember.impl.EntityMemberImpl;
-import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingCreationException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilder;
@@ -72,21 +71,13 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
                 .setGroupId(groupId);
         builder.setKind(kind).setRoleId(roleId).setUserId(userId);
         final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
-        try {
-            transactionContent.execute();
-        } catch (final SBonitaException e) {
-            throw new SExternalIdentityMappingCreationException(e);
-        }
+        transactionContent.execute();
         return transactionContent.getResult();
     }
 
-    protected void removeExternalIdentityMapping(final long sExtIdentityMappingId) throws SExternalIdentityMappingDeletionException {
+    protected void removeExternalIdentityMapping(final long sExtIdentityMappingId) throws SBonitaException {
         final RemoveExternalIdentityMapping transactionContent = new RemoveExternalIdentityMapping(sExtIdentityMappingId);
-        try {
-            transactionContent.execute();
-        } catch (final SBonitaException e) {
-            throw new SExternalIdentityMappingDeletionException(e);
-        }
+        transactionContent.execute();
     }
 
     /**

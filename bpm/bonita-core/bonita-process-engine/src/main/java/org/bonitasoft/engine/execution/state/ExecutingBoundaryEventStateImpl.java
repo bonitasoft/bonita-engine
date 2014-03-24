@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
@@ -31,6 +30,7 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
 
@@ -43,21 +43,25 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
         this.containerRegistry = containerRegistry;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "executing boundary event";
     }
 
+    @SuppressWarnings("unused")
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) instance;
@@ -76,13 +80,8 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
                 activityInstanceService.setStateCategory(relatedActivityInst, SStateCategory.ABORTING);
                 activityInstanceService.setAbortedByBoundaryEvent(relatedActivityInst, boundaryEventInstance.getId());
                 if (relatedActivityInst.isStable() || relatedActivityInst.isStateExecuting()) {
-                    String containerType = SFlowElementsContainerType.PROCESS.name();
-                    final long parentActivityInstanceId = relatedActivityInst.getParentActivityInstanceId();
-                    if (parentActivityInstanceId > 0) {
-                        containerType = SFlowElementsContainerType.FLOWNODE.name();
-                    }
-                    containerRegistry.executeFlowNode(relatedActivityInst.getId(), null, null, containerType,
-                            boundaryEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()));
+                    containerRegistry.executeFlowNode(relatedActivityInst.getProcessDefinitionId(), boundaryEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()), relatedActivityInst.getId(), null,
+                            null);
                 }
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
@@ -90,6 +89,7 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;

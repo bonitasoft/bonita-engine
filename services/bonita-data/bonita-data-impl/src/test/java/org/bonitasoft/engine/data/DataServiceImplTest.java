@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -49,8 +48,6 @@ public class DataServiceImplTest {
 
     private ReadPersistenceService persistence;
 
-    private EventService eventService;
-
     private TechnicalLoggerService logger;
 
     private QueriableLoggerService queriableLoggerService;
@@ -63,11 +60,9 @@ public class DataServiceImplTest {
         dataSourceConfigurations = new ArrayList<DataSourceConfiguration>();
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
-        eventService = mock(EventService.class);
         logger = mock(TechnicalLoggerService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
-        dataServiceImpl = new DataServiceImpl(recorder, persistence, classLoaderService, eventService, dataSourceConfigurations, logger,
-                queriableLoggerService);
+        dataServiceImpl = new DataServiceImpl(recorder, persistence, classLoaderService, dataSourceConfigurations, logger, queriableLoggerService);
     }
 
     /**

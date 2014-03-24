@@ -32,10 +32,10 @@ public interface ReadSessionAccessor {
      * Get the tenant id
      * 
      * @return the identifier of the tenant
-     * @throws TenantIdNotSetException
+     * @throws STenantIdNotSetException
      *             if no tenant exists for the given id, throw exception
      * @since 6.0
      */
-    long getTenantId() throws TenantIdNotSetException;
+    long getTenantId() throws STenantIdNotSetException;
 
 }

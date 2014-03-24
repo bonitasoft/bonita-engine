@@ -43,9 +43,8 @@ public class MultiThreadCallsTest extends CommonAPITest {
         public String getMessage() {
             if (exception != null) {
                 return exception.getMessage();
-            } else {
-                return "";
             }
+            return "";
         }
 
     }

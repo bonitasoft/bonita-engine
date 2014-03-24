@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,23 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile.exception.profilemember;
+package org.bonitasoft.engine.sessionaccessor;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Elias Ricken de Medeiros
+ * @author Feng Hui
+ * @author Celine Souchet
  */
-public class SProfileMemberReadException extends SBonitaException {
+public class STenantIdNotSetException extends SBonitaException {
 
-    private static final long serialVersionUID = 799472045606191342L;
+    private static final long serialVersionUID = -1685313313239629361L;
 
-    public SProfileMemberReadException(final String message, final Throwable cause) {
-        super(message, cause);
+    public STenantIdNotSetException(final String message) {
+        super(message);
     }
 
-    public SProfileMemberReadException(final Throwable cause) {
-        super(cause);
+    public STenantIdNotSetException(final Throwable e) {
+        super(e);
+    }
+
+    public STenantIdNotSetException(final String message, final Throwable e) {
+        super(message, e);
     }
 
 }

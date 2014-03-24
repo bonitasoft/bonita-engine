@@ -37,8 +37,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
-import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
+import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.jobs.TriggerTimerEventJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -85,7 +85,6 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     protected Trigger getTrigger(final STimerEventTriggerDefinition timerTrigger, final SCatchEventInstance eventInstance, final long processDefinitionId)
             throws SBonitaException {
-
         final SExpressionContext expressionContext;
         if (eventInstance != null) {
             expressionContext = new SExpressionContext(eventInstance.getParentProcessInstanceId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
@@ -94,11 +93,12 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             expressionContext = new SExpressionContext();
             expressionContext.setProcessDefinitionId(processDefinitionId);
         }
-        final Object result = expressionResolverService.evaluate(timerTrigger.getTimerExpression(), expressionContext);
+        final SExpression timerExpression = timerTrigger.getTimerExpression();
+        final Object result = expressionResolverService.evaluate(timerExpression, expressionContext);
         Date startDate = null;
         Trigger trigger = null;
         if (result == null) {
-            throw new SInvalidExpressionException("The duration cannot be null");
+            throw new SInvalidExpressionException("The duration cannot be null.", timerExpression.getName());
         }
         switch (timerTrigger.getTimerType()) {
             case DURATION:
@@ -190,25 +190,25 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     @Override
     public void unregisterCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessIsnstance)
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
             throws SBonitaException {
-        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessIsnstance.getId(), subProcessId);
+        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessInstance.getId(), subProcessId);
         final boolean delete = schedulerService.delete(jobName);
         if (!delete) {
-            if (logger.isLoggable(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.DEBUG)) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 final StringBuilder stb = new StringBuilder();
                 stb.append("No job found with name '");
                 stb.append(jobName);
                 stb.append("' when interrupting timer catch event named '");
                 stb.append(eventDefinition.getName());
-                stb.append(". In process [name: ");
+                stb.append(". In process definition [name = <");
                 stb.append(processDefinition.getName());
-                stb.append(", version: ");
+                stb.append(">, version = <");
                 stb.append(processDefinition.getVersion());
-                stb.append("]");
+                stb.append(">]");
                 stb.append("'. It was probably already triggered.");
                 final String message = stb.toString();
-                logger.log(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.DEBUG, message);
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
             }
         }
 

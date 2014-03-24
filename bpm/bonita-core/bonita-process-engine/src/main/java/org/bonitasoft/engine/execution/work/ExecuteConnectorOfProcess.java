@@ -21,11 +21,10 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -81,14 +80,13 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     @Override
     protected void continueFlow(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
 
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent, connectorService);
+        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
                 FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartFlowNodeFilter());
@@ -126,7 +124,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         setConnectorOnlyToFailed(context, throwable);
         // create a fake definition
         final String errorCode = sConnectorDefinition.getErrorCode();
-        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class).createNewInstance(errorCode).done();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
+                .createNewInstance(errorCode).done();
         // event definition as the error code as name, this way we don't need to find the connector that throw this error
         final SEndEventDefinition eventDefinition = BuilderFactory.get(SEndEventDefinitionBuilderFactory.class).createNewInstance(errorCode)
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();

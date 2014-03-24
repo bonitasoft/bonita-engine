@@ -16,7 +16,7 @@ import org.junit.Test;
 public class StackTraceTransformerTest {
 
     @Test
-    public void merge_stack_keep_only_current_exception() throws Exception {
+    public void merge_stack_keep_only_current_exception() {
         ServerWrappedException e = new ServerWrappedException(new IllegalStateException(new NoClassDefFoundError("org.Unknown")));
 
         ServerWrappedException newE = StackTraceTransformer.mergeStackTraces(e);
@@ -25,7 +25,7 @@ public class StackTraceTransformerTest {
     }
 
     @Test
-    public void merge_stack_keep_stack_of_cause() throws Exception {
+    public void merge_stack_keep_stack_of_cause() {
         ProcessInstanceNotFoundException cause3 = new ProcessInstanceNotFoundException("the process");
         BonitaRuntimeException cause2 = new BonitaRuntimeException("org.Unknown", cause3);
         IllegalStateException cause = new IllegalStateException(cause2);
@@ -69,7 +69,7 @@ public class StackTraceTransformerTest {
     }
 
     @Test
-    public void merge_stack_keep_message_of_cause() throws Exception {
+    public void merge_stack_keep_message_of_cause() {
         ProcessInstanceNotFoundException cause3 = new ProcessInstanceNotFoundException("the process");
         BonitaRuntimeException cause2 = new BonitaRuntimeException("org.Unknown", cause3);
         IllegalStateException cause = new IllegalStateException(cause2);
@@ -82,7 +82,7 @@ public class StackTraceTransformerTest {
     }
 
     @Test
-    public void merge_stack_when_no_cause() throws Exception {
+    public void merge_stack_when_no_cause() {
         ProcessInstanceNotFoundException cause = new ProcessInstanceNotFoundException("the process");
         ServerWrappedException e = new ServerWrappedException(cause);
 
@@ -93,7 +93,7 @@ public class StackTraceTransformerTest {
     }
 
     @Test
-    public void merge_stack_work_even_with_security_restriction() throws Exception {
+    public void merge_stack_work_even_with_security_restriction() {
         ProcessInstanceNotFoundException cause3 = new ProcessInstanceNotFoundException("the process");
         BonitaRuntimeException cause2 = new BonitaRuntimeException("org.Unknown", cause3);
         IllegalStateException cause = new IllegalStateException(cause2);

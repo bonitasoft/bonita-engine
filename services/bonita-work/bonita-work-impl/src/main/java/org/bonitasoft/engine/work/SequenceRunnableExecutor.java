@@ -24,6 +24,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class SequenceRunnableExecutor extends BonitaRunnable {
 
+    private static final long serialVersionUID = -2502579611570147194L;
+
     private final Collection<BonitaWork> works;
 
     private boolean cancelled = false;
@@ -46,7 +48,7 @@ public class SequenceRunnableExecutor extends BonitaRunnable {
                 } catch (final Exception t) {
                     if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
                         loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                                "Error while executing one work in the list of works: " + work.getDescription(), t);
+                                "Error while executing one work in the list of works : " + work.getDescription(), t);
                     }
                 }
             }

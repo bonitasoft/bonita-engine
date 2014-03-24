@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.ReflectException;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -27,21 +27,21 @@ import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final SExpression dependency = expression.getDependencies().get(0);
         final Object object = resolvedExpressions.get(dependency.getDiscriminant());
-        Object callResult = null;
         try {
-            callResult = ClassReflector.invokeGetter(object, expression.getContent());
-        } catch (final ReflectException e) {
-            throw new SExpressionEvaluationException(e);
+            return ClassReflector.invokeGetter(object, expression.getContent());
+        } catch (final SReflectException e) {
+            throw new SExpressionEvaluationException(e, expression.getName());
         }
-        return callResult;
     }
 
     @Override
@@ -49,7 +49,8 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
         super.validate(expression);
         if (expression.getDependencies() == null || expression.getDependencies().size() != 1) {
             throw new SInvalidExpressionException("An expression of type " + TYPE_JAVA_METHOD_CALL
-                    + " must have exactly one dependency. This dependency represents the object where the method will be called. Expression:" + expression);
+                    + " must have exactly one dependency. This dependency represents the object where the method will be called. Expression :" + expression,
+                    expression.getName());
         }
     }
 

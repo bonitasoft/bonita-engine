@@ -205,6 +205,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
+    @Deprecated
     @Override
     public boolean isTransactionActive() throws STransactionException {
         try {
@@ -250,7 +251,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new STransactionNotFoundException(e);
         }
     }
-    
+
     @Override
     public void registerBeforeCommitCallable(final Callable<Void> callable) throws STransactionNotFoundException {
         try {
@@ -270,7 +271,6 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new STransactionNotFoundException(e.getMessage());
         }
     }
-
 
     @Override
     public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
@@ -306,6 +306,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             // Nothing to do
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final int status) {
             // Whatever the tx status, reset the context
@@ -326,6 +327,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             // Nothing to do
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final int status) {
             // Whatever the status, decrement the number of active transactions

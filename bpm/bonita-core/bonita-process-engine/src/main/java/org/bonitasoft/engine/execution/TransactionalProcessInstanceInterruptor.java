@@ -21,6 +21,8 @@ import org.bonitasoft.engine.api.impl.transaction.process.SetProcessStateCategor
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -54,7 +56,8 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
     }
 
     @Override
-    protected void resumeChildExecution(final long flowNodeInstanceId, final long processInstanceId, final long userId) throws SBonitaException {
+    protected void resumeChildExecution(final long flowNodeInstanceId, final long processInstanceId, final long userId) throws SFlowNodeReadException,
+            SFlowNodeExecutionException {
         // no need to handle failed state, all is in the same tx
         processExecutor.executeFlowNode(flowNodeInstanceId, null, null, processInstanceId, userId, userId);
     }
@@ -79,11 +82,13 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
         return children;
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected long getNumberOfChildren(final long processInstanceId) {
         return count;
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected long getNumberOfChildrenExcept(final long processInstanceId, final long childExceptionId) {
         return count;

@@ -97,14 +97,14 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event", "call activity" }, jira = "ENGINE-501")
-    public void testErrorBoundaryEventTriggeredNamedError() throws Exception {
+    public void errorBoundaryEventTriggeredNamedError() throws Exception {
         executionWitherrorEventTriggered("error1");
     }
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event", "call activity" }, jira = "ENGINE-501")
-    public void testErrorBoundaryEventTriggeredCatchAllError() throws Exception {
+    public void errorBoundaryEventTriggeredCatchAllError() throws Exception {
         executionWitherrorEventTriggered(null);
     }
 
@@ -148,7 +148,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event", "call activity" }, jira = "ENGINE-501")
-    public void testErrorBoundaryEventNotTriggered() throws Exception {
+    public void errorBoundaryEventNotTriggered() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1", "delivery");
         final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
                 "error1", "delivery");
@@ -203,7 +203,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event" }, jira = "ENGINE-501")
-    public void testErrorEventCaughtAtParentLevel2() throws Exception {
+    public void errorEventCaughtAtParentLevel2() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1", "delivery");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
                 "error2", "delivery");
@@ -238,7 +238,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event" }, jira = "ENGINE-501")
-    public void testErrorEventTwoCatchErrorMatching() throws Exception {
+    public void errorEventTwoCatchErrorMatching() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1", "delivery");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
                 "error1", "delivery");

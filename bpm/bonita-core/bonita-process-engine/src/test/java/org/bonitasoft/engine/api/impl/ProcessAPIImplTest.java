@@ -30,7 +30,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
@@ -137,7 +137,7 @@ public class ProcessAPIImplTest {
         doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
         doReturn(dataInstanceService).when(tenantAccessor).getDataInstanceService();
 
-        doThrow(new SDataInstanceException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
 
         // Then update the data instances
         Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();

@@ -25,20 +25,19 @@ import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 public interface WorkService extends ServiceWithLifecycle {
 
     /**
-     * This operation MUST be called with an active transaction. If no active transaction is found, a WorkRegisterException is thrown
-     * 
+     * This operation MUST be called with an active transaction. If no active transaction is found, a SWorkRegisterException is thrown
      * @param work
-     * @throws WorkRegisterException
+     * @throws SWorkRegisterException
      * @since 6.0
      */
-    void registerWork(final BonitaWork work) throws WorkRegisterException;
+    void registerWork(final BonitaWork work) throws SWorkRegisterException;
 
     /**
      * @param work
-     * @throws WorkRegisterException
+     * @throws SWorkRegisterException
      * @since 6.0
      */
-    void executeWork(final BonitaWork work) throws WorkRegisterException;
+    void executeWork(final BonitaWork work) throws SWorkRegisterException;
 
     /**
      * @return

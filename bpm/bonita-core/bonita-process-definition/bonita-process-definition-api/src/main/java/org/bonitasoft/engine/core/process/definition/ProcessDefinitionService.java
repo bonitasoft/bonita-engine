@@ -19,6 +19,8 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;

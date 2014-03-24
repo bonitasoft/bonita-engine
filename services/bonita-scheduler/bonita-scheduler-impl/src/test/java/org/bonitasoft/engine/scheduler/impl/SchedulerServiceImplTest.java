@@ -22,7 +22,6 @@ import java.util.Random;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
@@ -38,8 +37,6 @@ import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -263,11 +260,12 @@ public class SchedulerServiceImplTest {
         }
 
         @Override
-        public void execute() throws SJobExecutionException, FireEventException {
+        public void execute() {
         }
 
+        @SuppressWarnings("unused")
         @Override
-        public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+        public void setAttributes(final Map<String, Serializable> attributes) {
         }
     }
 }

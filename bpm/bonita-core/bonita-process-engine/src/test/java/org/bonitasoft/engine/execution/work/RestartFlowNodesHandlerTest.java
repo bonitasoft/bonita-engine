@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +81,8 @@ public class RestartFlowNodesHandlerTest {
         restartFlowNodesHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
 
         PowerMockito.verifyStatic(times(1));
-        WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance.getParentProcessInstanceId());
+        WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getParentProcessInstanceId(),
+                sFlowNodeInstance.getId(), null, null);
     }
 
     @Test
@@ -114,8 +115,7 @@ public class RestartFlowNodesHandlerTest {
 
         PowerMockito.verifyStatic(times(1));
         WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getParentProcessInstanceId(),
-                sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(),
-                sFlowNodeInstance.getStateId());
+                sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name());
     }
 
     @Test
@@ -144,7 +144,7 @@ public class RestartFlowNodesHandlerTest {
     public final void throw_exception_if_error_when_registers_work() throws Exception {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
-        doThrow(new WorkRegisterException("plop")).when(workService).registerWork(any(BonitaWork.class));
+        doThrow(new SWorkRegisterException("plop")).when(workService).registerWork(any(BonitaWork.class));
 
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);

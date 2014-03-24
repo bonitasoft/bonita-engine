@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution;
 
 import java.util.List;
 
+import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -83,7 +84,7 @@ public interface FlowNodeExecutor extends ContainerExecutor {
      *             in case an error occurs
      * @since 6.1
      */
-    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, long processDefinitionId) throws SActivityExecutionException;
+    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, long processDefinitionId) throws SArchivingException;
 
     /**
      * @param processDefinition

@@ -69,9 +69,9 @@ public class SMappingOperationBinding extends ElementBinding {
         return XMLSMigrationPlan.MAPPING_OPERATION_NODE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
-
     }
 
     @Override

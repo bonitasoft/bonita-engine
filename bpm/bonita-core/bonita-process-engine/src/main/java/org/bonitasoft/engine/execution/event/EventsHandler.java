@@ -172,8 +172,7 @@ public class EventsHandler {
      * @throws SBonitaException
      */
     private void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final long subProcessId,
-            final SProcessInstance parentProcessInstance) throws SBonitaException {
+            final long subProcessId, final SProcessInstance parentProcessInstance) throws SBonitaException {
         final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
         for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
             final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
@@ -398,8 +397,8 @@ public class EventsHandler {
             throws SFlowNodeReadException, SFlowNodeExecutionException {
         // in same thread because we delete the message instance after triggering the catch event. The data is of the message
         // is deleted so we will be unable to execute the flow node instance
-        containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
-                processInstanceId);
+        containerRegistry.executeFlowNodeInSameThread(processInstanceId, flowNodeInstanceId, operations.getContext(), operations.getOperations(),
+                operations.getContainerType());
     }
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)

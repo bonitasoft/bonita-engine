@@ -45,7 +45,6 @@ import org.bonitasoft.engine.profile.builder.impl.SProfileEntryUpdateBuilderImpl
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryReadException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -206,7 +205,7 @@ public class ProfileServiceImplForProfileEntryTest {
      * @throws SProfileEntryReadException
      */
     @Test
-    public final void getEntriesOfProfileByParentId() throws SBonitaReadException, SProfileEntryReadException {
+    public final void getEntriesOfProfileByParentId() throws SBonitaReadException {
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
         final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
         sProfileEntries.add(sProfileEntry);
@@ -217,7 +216,7 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     @Test
-    public final void getNoEntriesOfProfileByParentId() throws SBonitaReadException, SProfileEntryReadException {
+    public final void getNoEntriesOfProfileByParentId() throws SBonitaReadException {
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
 
         doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
@@ -225,8 +224,8 @@ public class ProfileServiceImplForProfileEntryTest {
         assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, OrderByType.ASC));
     }
 
-    @Test(expected = SProfileEntryReadException.class)
-    public final void getEntriesOfProfileByParentIdThrowException() throws SBonitaReadException, SProfileEntryReadException {
+    @Test(expected = SBonitaReadException.class)
+    public final void getEntriesOfProfileByParentIdThrowException() throws SBonitaReadException {
         doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
 
         profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, null);
@@ -240,7 +239,7 @@ public class ProfileServiceImplForProfileEntryTest {
      * @throws SBonitaReadException
      */
     @Test
-    public final void getEntriesOfProfile() throws SProfileEntryReadException, SBonitaReadException {
+    public final void getEntriesOfProfile() throws SBonitaReadException {
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
         final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
         sProfileEntries.add(sProfileEntry);
@@ -251,7 +250,7 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     @Test
-    public final void getNoEntriesOfProfile() throws SBonitaReadException, SProfileEntryReadException {
+    public final void getNoEntriesOfProfile() throws SBonitaReadException {
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
 
         doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
@@ -259,8 +258,8 @@ public class ProfileServiceImplForProfileEntryTest {
         assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, OrderByType.ASC));
     }
 
-    @Test(expected = SProfileEntryReadException.class)
-    public final void getEntriesOfProfileThrowException() throws SBonitaReadException, SProfileEntryReadException {
+    @Test(expected = SBonitaReadException.class)
+    public final void getEntriesOfProfileThrowException() throws SBonitaReadException {
         doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
 
         profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, null);
