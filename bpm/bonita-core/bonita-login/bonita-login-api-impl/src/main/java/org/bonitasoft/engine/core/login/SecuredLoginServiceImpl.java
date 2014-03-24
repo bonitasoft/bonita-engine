@@ -68,7 +68,7 @@ public class SecuredLoginServiceImpl implements LoginService {
         this.sessionAccessor = sessionAccessor;
         this.identityService = identityService;
     }
-    
+
     @Override
     public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
@@ -101,14 +101,14 @@ public class SecuredLoginServiceImpl implements LoginService {
                 isTechnicalUser = true;
                 userId = -1;
             } else {
-                    userName = loginChoosingAppropriateAuthenticationService(credentials);
-                    if (StringUtils.isNotBlank(userName)) {
-                        final SUser user = identityService.getUserByUserName(userName);
-                        userId = user.getId();
-                    } else {
-                        // now we are sure authentication Failed
-                        authenticationFailed();
-                    }
+                userName = loginChoosingAppropriateAuthenticationService(credentials);
+                if (StringUtils.isNotBlank(userName)) {
+                    final SUser user = identityService.getUserByUserName(userName);
+                    userId = user.getId();
+                } else {
+                    // now we are sure authentication Failed
+                    authenticationFailed();
+                }
             }
         } catch (final AuthenticationException ae) {
             throw new SLoginException(ae);
@@ -134,29 +134,28 @@ public class SecuredLoginServiceImpl implements LoginService {
      *             the appropriate exception
      */
     protected void authenticationFailed() throws SLoginException {
-            try {
-                Thread.sleep(3000);
-            } catch (final InterruptedException e) {
-                throw new SLoginException("User name or password is not valid!");
-            }
+        try {
+            Thread.sleep(3000);
+        } catch (final InterruptedException e) {
             throw new SLoginException("User name or password is not valid!");
+        }
+        throw new SLoginException("User name or password is not valid!");
     }
 
     /**
      * login to the internal authentication service if it is not null or to the Generic Authentication Service
      * 
      * @since 6.3
-     * Ensure backward compatibility with previous version
+     *        Ensure backward compatibility with previous version
      * 
      * @param credentials
      *            the credentials to use to login
      * @return the username of the logged in user
      */
-    protected String loginChoosingAppropriateAuthenticationService(Map<String, Serializable> credentials) throws AuthenticationException, SLoginException {
+    protected String loginChoosingAppropriateAuthenticationService(final Map<String, Serializable> credentials) throws AuthenticationException, SLoginException {
         if (authenticationService != null) {
-            String userName = null, password = null;
-            userName = retrieveUsernameFromCredentials(credentials);
-            password = retrievePasswordFromCredentials(credentials);
+            final String userName = retrieveUsernameFromCredentials(credentials);
+            final String password = retrievePasswordFromCredentials(credentials);
             if (authenticationService.checkUserCredentials(userName, password)) {
                 return userName;
             }
@@ -176,14 +175,12 @@ public class SecuredLoginServiceImpl implements LoginService {
      * @throws SLoginException
      *             if password is absent or if credentials is null
      */
-    protected String retrievePasswordFromCredentials(Map<String, Serializable> credentials) throws SLoginException {
-        String password;
+    protected String retrievePasswordFromCredentials(final Map<String, Serializable> credentials) throws SLoginException {
         if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_PASSWORD)
                 || credentials.get(AuthenticationConstants.BASIC_PASSWORD) == null) {
             throw new SLoginException("invalid credentials, password is absent");
         }
-        password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
-        return password;
+        return String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
     }
 
     /**
@@ -195,7 +192,7 @@ public class SecuredLoginServiceImpl implements LoginService {
      * @throws SLoginException
      *             if username is absent, blank or if credentials is null
      */
-    protected String retrieveUsernameFromCredentials(Map<String, Serializable> credentials) throws SLoginException {
+    protected String retrieveUsernameFromCredentials(final Map<String, Serializable> credentials) throws SLoginException {
         String userName;
         if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_USERNAME)
                 || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null

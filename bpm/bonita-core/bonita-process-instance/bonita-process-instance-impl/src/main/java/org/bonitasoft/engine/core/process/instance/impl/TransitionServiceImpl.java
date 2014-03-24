@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -44,7 +44,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Zhao Na
@@ -57,8 +56,7 @@ public class TransitionServiceImpl implements TransitionService {
 
     private final ArchiveService archiveService;
 
-    public TransitionServiceImpl(final ReadPersistenceService persistenceRead,
-            final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService) {
+    public TransitionServiceImpl(final ReadPersistenceService persistenceRead, final ArchiveService archiveService) {
         this.persistenceRead = persistenceRead;
         this.archiveService = archiveService;
     }

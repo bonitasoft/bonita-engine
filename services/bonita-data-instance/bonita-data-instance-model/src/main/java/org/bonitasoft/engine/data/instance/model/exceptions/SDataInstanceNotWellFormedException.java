@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2011 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -18,9 +18,13 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 /**
  * This exception is thrown if a SDataInstance is not well formed.
  * For example: when a string gets a too long value.
+ * 
  * @Author: Frederic Bouquet
  */
 public class SDataInstanceNotWellFormedException extends SBonitaException {
+
+    private static final long serialVersionUID = 8447390597638287376L;
+
     public SDataInstanceNotWellFormedException(String message) {
         super(message);
     }
