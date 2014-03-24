@@ -41,7 +41,7 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
-public class BPMEventHandlingJob extends InternalJob implements Serializable {
+public class BPMEventHandlingJob extends InternalJob {
 
     /**
      * List of BPMN Event types that can be triggered multiple times for a single instance

@@ -177,16 +177,15 @@ public class APITestUtil {
     public static final int DEFAULT_REPEAT_EACH = 500;
 
     public static final int DEFAULT_TIMEOUT;
-    
+
     static {
         String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
-        if(strTimeout != null) {
+        if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
             DEFAULT_TIMEOUT = 7 * 60 * 1000;
         }
     }
-
 
     @After
     public void clearSynchroRepository() {
@@ -833,7 +832,7 @@ public class APITestUtil {
     @Deprecated
     private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
         final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
-        assertTrue("process was not finished", waitUntil);
+        assertTrue("Process was not finished", waitUntil);
         return waitUntil;
     }
 

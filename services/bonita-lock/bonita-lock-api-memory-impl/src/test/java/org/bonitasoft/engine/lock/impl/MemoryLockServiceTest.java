@@ -197,7 +197,6 @@ public class MemoryLockServiceTest {
         // now it should be able to have it
         assertTrue(t3.isLockObtained());
         s3.release();
-
     }
 
 }

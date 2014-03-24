@@ -6,7 +6,6 @@
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="eventService" ref="eventService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
@@ -54,7 +53,6 @@
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 

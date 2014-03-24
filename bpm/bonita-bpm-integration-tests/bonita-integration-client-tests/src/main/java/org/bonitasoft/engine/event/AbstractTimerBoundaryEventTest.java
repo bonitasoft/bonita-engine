@@ -42,8 +42,6 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
 
     protected User donaBenta;
 
-    protected final String ACTOR_NAME = "delivery";
-
     @Before
     public void beforeTest() throws BonitaException {
         login();
@@ -227,24 +225,22 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
      */
     protected ProcessDefinition deployProcessMultiInstanceWithBoundaryEvent(final long timerValue, final boolean interrupting, final String multiTaskName,
             final int loopCardinality, final boolean isSequential, final String normalFlowTaskName, final String exceptionFlowTaskName) throws BonitaException {
-
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
-        final String actorName = "delivery";
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithMultiInstanceAndBoundaryEvent", "1.0");
-        processBuilder.addActor(actorName).addStartEvent("start");
+        processBuilder.addActor(ACTOR_NAME).addStartEvent("start");
 
-        final UserTaskDefinitionBuilder userTaskBuilder = processBuilder.addUserTask(multiTaskName, actorName);
+        final UserTaskDefinitionBuilder userTaskBuilder = processBuilder.addUserTask(multiTaskName, ACTOR_NAME);
         userTaskBuilder.addMultiInstance(isSequential, new ExpressionBuilder().createConstantIntegerExpression(loopCardinality));
         userTaskBuilder.addBoundaryEvent("timer", interrupting).addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
 
-        processBuilder.addUserTask(normalFlowTaskName, actorName).addUserTask(exceptionFlowTaskName, actorName).addEndEvent("end");
+        processBuilder.addUserTask(normalFlowTaskName, ACTOR_NAME).addUserTask(exceptionFlowTaskName, ACTOR_NAME).addEndEvent("end");
         processBuilder.addTransition("start", multiTaskName);
         processBuilder.addTransition(multiTaskName, normalFlowTaskName);
         processBuilder.addTransition(normalFlowTaskName, "end");
         processBuilder.addTransition("timer", exceptionFlowTaskName);
 
-        return deployAndEnableWithActor(processBuilder.done(), actorName, getUser());
+        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
@@ -269,23 +265,21 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
      */
     protected ProcessDefinition deployProcessWithBoundaryEventOnLoopActivity(final long timerValue, final boolean interrupting, final int loopMax,
             final String loopActivityName, final String normalFlowStepName, final String exceptionFlowStepName) throws BonitaException {
-
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
-        final String actorName = "delivery";
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithMultiInstanceAndBoundaryEvent", "1.0");
-        processBuilder.addActor(actorName).addStartEvent("start");
+        processBuilder.addActor(ACTOR_NAME).addStartEvent("start");
 
-        final UserTaskDefinitionBuilder userTaskBuilder = processBuilder.addUserTask(loopActivityName, actorName);
+        final UserTaskDefinitionBuilder userTaskBuilder = processBuilder.addUserTask(loopActivityName, ACTOR_NAME);
         userTaskBuilder.addLoop(false, condition, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         userTaskBuilder.addBoundaryEvent("timer", interrupting).addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
 
-        processBuilder.addUserTask(normalFlowStepName, actorName).addUserTask(exceptionFlowStepName, actorName).addEndEvent("end")
+        processBuilder.addUserTask(normalFlowStepName, ACTOR_NAME).addUserTask(exceptionFlowStepName, ACTOR_NAME).addEndEvent("end")
                 .addTransition("start", loopActivityName).addTransition(loopActivityName, normalFlowStepName).addTransition(normalFlowStepName, "end")
                 .addTransition("timer", exceptionFlowStepName);
 
-        return deployAndEnableWithActor(processBuilder.done(), actorName, getUser());
+        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events
@@ -299,15 +293,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
-
-        // remove comments when boundary events are archived
-        // final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        // searchOptionsBuilder.filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
-        // searchOptionsBuilder.filter(FlowNodeInstanceSearchDescriptor.NAME, "timer");
-        // searchOptionsBuilder.filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
-        // final SearchResult<ArchivedFlowNodeInstance> flowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(searchOptionsBuilder.done());
-        // assertEquals(1, flowNodeInstances.getCount());
+        waitProcessToFinishAndBeArchived(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -357,7 +343,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 500); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        waitProcessToFinishAndBeArchived(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -418,8 +404,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        waitProcessToFinishAndBeArchived(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
         disableAndDeleteProcess(processDefinition);
