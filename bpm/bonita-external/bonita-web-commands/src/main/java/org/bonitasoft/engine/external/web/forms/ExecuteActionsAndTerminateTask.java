@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
+import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -103,17 +105,17 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             final long activityInstanceId, final Long processDefinitionID) throws SOperationExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final OperationService operationService = tenantAccessor.getOperationService();
-        final Iterator<Operation> iterator = operations.iterator();
         final SExpressionContext sExpressionContext = new SExpressionContext();
         sExpressionContext.setSerializableInputValues(operationsContext);
         sExpressionContext.setContainerId(activityInstanceId);
         sExpressionContext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
         sExpressionContext.setProcessDefinitionId(processDefinitionID);
-        while (iterator.hasNext()) {
-            final Operation entry = iterator.next();
-            operationService.execute(ModelConvertor.constructSOperation(entry), activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
+        ArrayList<SOperation> list = new ArrayList<SOperation>();
+        for (Operation operation : operations) {
+            list.add(ModelConvertor.constructSOperation(operation));
         }
+            operationService.execute(list, activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
     }
 
     protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger) throws SFlowNodeReadException,
