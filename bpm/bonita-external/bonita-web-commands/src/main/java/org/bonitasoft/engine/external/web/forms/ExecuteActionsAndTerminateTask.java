@@ -15,8 +15,6 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -103,19 +101,24 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     protected void updateActivityInstanceVariables(final List<Operation> operations, final Map<String, Serializable> operationsContext,
             final long activityInstanceId, final Long processDefinitionID) throws SOperationExecutionException {
-        final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
-        final OperationService operationService = tenantAccessor.getOperationService();
-        final SExpressionContext sExpressionContext = new SExpressionContext();
+        SExpressionContext sExpressionContext = buildExpressionContext(operationsContext, activityInstanceId, processDefinitionID);
+        List<SOperation> sOperations = ModelConvertor.constructSOperations(operations);
+        getOperationService().execute(sOperations, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
+    }
+
+    private SExpressionContext buildExpressionContext(final Map<String, Serializable> operationsContext, final long activityInstanceId,
+            final Long processDefinitionID) {
+        SExpressionContext sExpressionContext = new SExpressionContext();
         sExpressionContext.setSerializableInputValues(operationsContext);
         sExpressionContext.setContainerId(activityInstanceId);
         sExpressionContext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
         sExpressionContext.setProcessDefinitionId(processDefinitionID);
-        ArrayList<SOperation> list = new ArrayList<SOperation>();
-        for (Operation operation : operations) {
-            list.add(ModelConvertor.constructSOperation(operation));
-        }
-            operationService.execute(list, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
+        return sExpressionContext;
+    }
+
+    private OperationService getOperationService() {
+        TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
+        return tenantAccessor.getOperationService();
     }
 
     protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger) throws SFlowNodeReadException,

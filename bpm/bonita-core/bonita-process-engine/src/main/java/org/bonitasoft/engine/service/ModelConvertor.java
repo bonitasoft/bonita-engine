@@ -1680,7 +1680,15 @@ public class ModelConvertor {
         return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
                 .setType(operatorType).setLeftOperand(sLeftOperand).done();
     }
-
+    
+    public static List<SOperation> constructSOperations(List<Operation> operations) {
+        ArrayList<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
+        for (Operation operation : operations) {
+            sOperations.add(ModelConvertor.constructSOperation(operation));
+        }
+        return sOperations;
+    }
+    
     private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName())
                 .setExternal(variableToSet.isExternal()).done();
