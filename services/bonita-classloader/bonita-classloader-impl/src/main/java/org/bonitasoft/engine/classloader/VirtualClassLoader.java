@@ -81,20 +81,20 @@ public class VirtualClassLoader extends ClassLoader {
 
     @Override
     public URL getResource(final String name) {
-    	if (this.classloader != null) {
+        if (this.classloader != null) {
             return this.classloader.getResource(name);
         }
         return getParent().getResource(name);
     }
-    
+
     @Override
     public Enumeration<URL> getResources(final String name) throws IOException {
-    	if (this.classloader != null) {
+        if (this.classloader != null) {
             return this.classloader.getResources(name);
         }
         return getParent().getResources(name);
     }
-    
+
     public void release() {
         if (this.classloader != null) {
             this.classloader.release();

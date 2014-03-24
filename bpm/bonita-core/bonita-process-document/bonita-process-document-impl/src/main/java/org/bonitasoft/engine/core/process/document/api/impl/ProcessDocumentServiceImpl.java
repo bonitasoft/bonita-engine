@@ -134,14 +134,14 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
 
     private String getDocumentUrl(SDocumentMapping docMapping) {
         if(docMapping.documentHasContent()) {
-            return generateDocumentURL(docMapping.getDocumentName(), docMapping.getContentStorageId());
+            return generateDocumentURL(docMapping.getDocumentContentFileName(), docMapping.getContentStorageId());
         }
         return docMapping.getDocumentURL();
     }
 
     private String getDocumentUrl(SADocumentMapping docMapping) {
         if(docMapping.documentHasContent()) {
-            return generateDocumentURL(docMapping.getDocumentName(), docMapping.getContentStorageId());
+            return generateDocumentURL(docMapping.getDocumentContentFileName(), docMapping.getContentStorageId());
         }
         return docMapping.getDocumentURL();
     }

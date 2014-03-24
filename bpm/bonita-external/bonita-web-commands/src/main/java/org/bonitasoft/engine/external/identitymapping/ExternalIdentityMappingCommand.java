@@ -236,6 +236,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
                 builder.setDisplayNamePart2(group.getName());
                 builder.setDisplayNamePart3(group.getParentPath());
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 

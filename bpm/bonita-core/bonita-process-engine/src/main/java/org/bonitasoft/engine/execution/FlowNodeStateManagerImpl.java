@@ -215,7 +215,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     @Override
-    public void setProcessExecutor(ProcessExecutor processExecutor) {
+    public void setProcessExecutor(final ProcessExecutor processExecutor) {
         stateBehaviors.setProcessExecutor(processExecutor);
     }
 
@@ -493,26 +493,26 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         return currentState;
     }
 
-    private FlowNodeState getNextStateToHandle(final SFlowNodeInstance flowNodeInstance, FlowNodeState flowNodeStateToExecute)
+    private FlowNodeState getNextStateToHandle(final SFlowNodeInstance flowNodeInstance, final FlowNodeState flowNodeStateToExecute)
             throws SActivityExecutionException {
         FlowNodeState nextStateToHandle = null;
         switch (flowNodeInstance.getStateCategory()) {
             case ABORTING:
                 ExceptionalStateTransitionsManager abortStateTransitionsManager = new ExceptionalStateTransitionsManager(abortTransitions.get(flowNodeInstance
-                        .getType()));
+                        .getType()), flowNodeInstance);
                 nextStateToHandle = abortStateTransitionsManager.getNextState(flowNodeStateToExecute);
-
                 break;
+
             case CANCELLING:
                 ExceptionalStateTransitionsManager cancelStateTransitionsManager = new ExceptionalStateTransitionsManager(
-                        cancelTransitions.get(flowNodeInstance.getType()));
+                        cancelTransitions.get(flowNodeInstance.getType()), flowNodeInstance);
                 nextStateToHandle = cancelStateTransitionsManager.getNextState(flowNodeStateToExecute);
                 break;
 
             default:
-                final Map<Integer, FlowNodeState> normalTransition = normalTransitions.get(flowNodeInstance.getType());
-                nextStateToHandle = normalTransition.get(flowNodeStateToExecute.getId());
-                break;
+                NormalStateTransitionsManager normalStateTransitionsManager = new NormalStateTransitionsManager(normalTransitions.get(flowNodeInstance
+                        .getType()), flowNodeInstance);
+                nextStateToHandle =  normalStateTransitionsManager.getNextState(flowNodeStateToExecute);
         }
         if (nextStateToHandle == null) {
             throw new SActivityExecutionException("no state found after " + states.get(flowNodeStateToExecute.getId()).getClass() + " for "

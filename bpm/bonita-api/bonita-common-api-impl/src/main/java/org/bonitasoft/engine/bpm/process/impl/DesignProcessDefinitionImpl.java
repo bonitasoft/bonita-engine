@@ -19,6 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
@@ -213,162 +217,38 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((actorInitiator == null) ? 0 : actorInitiator.hashCode());
-        result = prime * result + ((actors == null) ? 0 : actors.hashCode());
-        result = prime * result + ((displayDescription == null) ? 0 : displayDescription.hashCode());
-        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
-        result = prime * result + ((flowElementContainer == null) ? 0 : flowElementContainer.hashCode());
-        result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
-        result = prime * result + ((stringIndexLabel1 == null) ? 0 : stringIndexLabel1.hashCode());
-        result = prime * result + ((stringIndexLabel2 == null) ? 0 : stringIndexLabel2.hashCode());
-        result = prime * result + ((stringIndexLabel3 == null) ? 0 : stringIndexLabel3.hashCode());
-        result = prime * result + ((stringIndexLabel4 == null) ? 0 : stringIndexLabel4.hashCode());
-        result = prime * result + ((stringIndexLabel5 == null) ? 0 : stringIndexLabel5.hashCode());
-        result = prime * result + ((stringIndexValue1 == null) ? 0 : stringIndexValue1.hashCode());
-        result = prime * result + ((stringIndexValue2 == null) ? 0 : stringIndexValue2.hashCode());
-        result = prime * result + ((stringIndexValue3 == null) ? 0 : stringIndexValue3.hashCode());
-        result = prime * result + ((stringIndexValue4 == null) ? 0 : stringIndexValue4.hashCode());
-        result = prime * result + ((stringIndexValue5 == null) ? 0 : stringIndexValue5.hashCode());
-        return result;
+        return new HashCodeBuilder().append(displayName).append(displayDescription).append(parameters).append(actors).append(actorInitiator)
+                .append(flowElementContainer).append(stringIndexLabel1).append(stringIndexLabel2).append(stringIndexLabel3).append(stringIndexLabel4)
+                .append(stringIndexLabel5).append(stringIndexValue1).append(stringIndexValue2).append(stringIndexValue3).append(stringIndexValue4)
+                .append(stringIndexValue5).build();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(final Object obj) {
+        if (this == obj)
             return true;
-        }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj))
             return false;
-        }
-        if (!(obj instanceof DesignProcessDefinitionImpl)) {
+        if (getClass() != obj.getClass())
             return false;
-        }
         DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
-        if (actorInitiator == null) {
-            if (other.actorInitiator != null) {
-                return false;
-            }
-        } else if (!actorInitiator.equals(other.actorInitiator)) {
-            return false;
-        }
-        if (actors == null) {
-            if (other.actors != null) {
-                return false;
-            }
-        } else if (!actors.equals(other.actors)) {
-            return false;
-        }
-        if (displayDescription == null) {
-            if (other.displayDescription != null) {
-                return false;
-            }
-        } else if (!displayDescription.equals(other.displayDescription)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (flowElementContainer == null) {
-            if (other.flowElementContainer != null) {
-                return false;
-            }
-        } else if (!flowElementContainer.equals(other.flowElementContainer)) {
-            return false;
-        }
-        if (parameters == null) {
-            if (other.parameters != null) {
-                return false;
-            }
-        } else if (!parameters.equals(other.parameters)) {
-            return false;
-        }
-        if (stringIndexLabel1 == null) {
-            if (other.stringIndexLabel1 != null) {
-                return false;
-            }
-        } else if (!stringIndexLabel1.equals(other.stringIndexLabel1)) {
-            return false;
-        }
-        if (stringIndexLabel2 == null) {
-            if (other.stringIndexLabel2 != null) {
-                return false;
-            }
-        } else if (!stringIndexLabel2.equals(other.stringIndexLabel2)) {
-            return false;
-        }
-        if (stringIndexLabel3 == null) {
-            if (other.stringIndexLabel3 != null) {
-                return false;
-            }
-        } else if (!stringIndexLabel3.equals(other.stringIndexLabel3)) {
-            return false;
-        }
-        if (stringIndexLabel4 == null) {
-            if (other.stringIndexLabel4 != null) {
-                return false;
-            }
-        } else if (!stringIndexLabel4.equals(other.stringIndexLabel4)) {
-            return false;
-        }
-        if (stringIndexLabel5 == null) {
-            if (other.stringIndexLabel5 != null) {
-                return false;
-            }
-        } else if (!stringIndexLabel5.equals(other.stringIndexLabel5)) {
-            return false;
-        }
-        if (stringIndexValue1 == null) {
-            if (other.stringIndexValue1 != null) {
-                return false;
-            }
-        } else if (!stringIndexValue1.equals(other.stringIndexValue1)) {
-            return false;
-        }
-        if (stringIndexValue2 == null) {
-            if (other.stringIndexValue2 != null) {
-                return false;
-            }
-        } else if (!stringIndexValue2.equals(other.stringIndexValue2)) {
-            return false;
-        }
-        if (stringIndexValue3 == null) {
-            if (other.stringIndexValue3 != null) {
-                return false;
-            }
-        } else if (!stringIndexValue3.equals(other.stringIndexValue3)) {
-            return false;
-        }
-        if (stringIndexValue4 == null) {
-            if (other.stringIndexValue4 != null) {
-                return false;
-            }
-        } else if (!stringIndexValue4.equals(other.stringIndexValue4)) {
-            return false;
-        }
-        if (stringIndexValue5 == null) {
-            if (other.stringIndexValue5 != null) {
-                return false;
-            }
-        } else if (!stringIndexValue5.equals(other.stringIndexValue5)) {
-            return false;
-        }
-        return true;
+        return new EqualsBuilder().append(displayName, other.displayName).append(displayDescription, other.displayDescription)
+                .append(parameters, other.parameters).append(actors, other.actors).append(actorInitiator, other.actorInitiator)
+                .append(flowElementContainer, other.flowElementContainer).append(stringIndexLabel1, other.stringIndexLabel1)
+                .append(stringIndexLabel2, other.stringIndexLabel2).append(stringIndexLabel3, other.stringIndexLabel3)
+                .append(stringIndexLabel4, other.stringIndexLabel4).append(stringIndexLabel5, other.stringIndexLabel5)
+                .append(stringIndexValue1, other.stringIndexValue1).append(stringIndexValue2, other.stringIndexValue2)
+                .append(stringIndexValue3, other.stringIndexValue3).append(stringIndexValue4, other.stringIndexValue4)
+                .append(stringIndexValue5, other.stringIndexValue5).build();
+
     }
 
     @Override
     public String toString() {
-        return "DesignProcessDefinitionImpl [displayName=" + displayName + ", displayDescription=" + displayDescription + ", parameters=" + parameters
-                + ", actors=" + actors + ", actorInitiator=" + actorInitiator + ", flowElementContainer=" + flowElementContainer + ", stringIndexLabel1="
-                + stringIndexLabel1 + ", stringIndexLabel2=" + stringIndexLabel2 + ", stringIndexLabel3=" + stringIndexLabel3 + ", stringIndexLabel4="
-                + stringIndexLabel4 + ", stringIndexLabel5=" + stringIndexLabel5 + ", stringIndexValue1=" + stringIndexValue1 + ", stringIndexValue2="
-                + stringIndexValue2 + ", stringIndexValue3=" + stringIndexValue3 + ", stringIndexValue4=" + stringIndexValue4 + ", stringIndexValue5="
-                + stringIndexValue5 + "]";
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append(getName()).append(getVersion()).append(displayName)
+                .append(displayDescription).append(parameters).append(actors).append(actorInitiator).append(flowElementContainer).append(stringIndexLabel1)
+                .append(stringIndexLabel2).append(stringIndexLabel3).append(stringIndexLabel4).append(stringIndexLabel5).append(stringIndexValue1)
+                .append(stringIndexValue2).append(stringIndexValue3).append(stringIndexValue4).append(stringIndexValue5).build();
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
@@ -22,10 +23,12 @@ import org.bonitasoft.engine.transaction.TransactionState;
  * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class BatchArchiveSynchronization implements BonitaTransactionSynchronization {
 
     private final PersistenceService persistenceService;
+
     private final BatchArchiveCallable batchArchiveCallable;
 
     public BatchArchiveSynchronization(final PersistenceService persistenceService, final BatchArchiveCallable batchArchiveCallable) {
@@ -34,6 +37,7 @@ public class BatchArchiveSynchronization implements BonitaTransactionSynchroniza
         this.batchArchiveCallable = batchArchiveCallable;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void afterCompletion(final TransactionState status) {
         // NOTHING
@@ -46,7 +50,7 @@ public class BatchArchiveSynchronization implements BonitaTransactionSynchroniza
                 this.batchArchiveCallable.call();
                 this.persistenceService.flushStatements();
             } catch (final Exception e) {
-                throw new RuntimeException(e);
+                throw new SBonitaRuntimeException(e);
             }
         }
     }

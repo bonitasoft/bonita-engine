@@ -63,6 +63,12 @@ public class SLoopActivityInstanceImpl extends SActivityInstanceImpl implements 
     public void setLoopMax(final int loopMax) {
         this.loopMax = loopMax;
     }
+    
+    @Override
+    public boolean mustExecuteOnAbortOrCancelProcess() {
+        // it's not necessary to execute it because this will be done when the child reaches the aborted state
+        return false;
+    }
 
     @Override
     public int hashCode() {
