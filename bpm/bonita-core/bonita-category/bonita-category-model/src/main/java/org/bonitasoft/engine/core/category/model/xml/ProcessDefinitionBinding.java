@@ -26,10 +26,12 @@ public class ProcessDefinitionBinding extends ElementBinding {
 
     private final List<String> processDefinitionIds = new ArrayList<String>();
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLCategoryMapping.PROCESS_DEFINITION.equals(name)) {
@@ -37,6 +39,7 @@ public class ProcessDefinitionBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

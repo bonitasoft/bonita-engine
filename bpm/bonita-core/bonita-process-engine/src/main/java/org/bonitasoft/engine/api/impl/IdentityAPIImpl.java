@@ -24,6 +24,7 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMemberships;
@@ -62,6 +63,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -132,6 +134,7 @@ import org.bonitasoft.engine.identity.xml.ExportOrganization;
 import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -278,9 +281,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             }
             userUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
             return userUpdateBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private EntityUpdateDescriptor getUserContactInfoUpdateDescriptor(final ContactDataUpdater updater) {
@@ -328,9 +330,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 }
             }
             return updateBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -891,8 +892,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor)
-            throws UpdateException {
+    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor) throws UpdateException {
         final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class).createNewInstance();
         final Map<GroupField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<GroupField, Serializable> field : fields.entrySet()) {
@@ -1107,14 +1107,30 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private List<User> getUsersWithOrder(final int startIndex, final int maxResults, final UserCriterion pagingCriterion, final IdentityService identityService) throws SIdentityException {
+    /**
+     * Check / update process resolution information, for all processes in a list of actor IDs.
+     */
+    private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        List<Long> processDefinitionIds;
+        final ActorProcessDependencyResolver dependencyResolver = new ActorProcessDependencyResolver();
+        do {
+            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            for (final Long processDefinitionId : processDefinitionIds) {
+                tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor, dependencyResolver);
+            }
+        } while (processDefinitionIds.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+
+    }
+
+    private List<User> getUsersWithOrder(final int startIndex, final int maxResults, final UserCriterion pagingCriterion, final IdentityService identityService)
+            throws SIdentityException {
         final String field = getUserFieldKey(pagingCriterion);
         final OrderByType order = getUserOrderByType(pagingCriterion);
         if (field == null) {
             return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults));
-        } else {
-            return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults, field, order));
         }
+        return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults, field, order));
     }
 
     private OrderByType getUserOrderByType(final UserCriterion pagingCriterion) {
@@ -1212,8 +1228,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserMembershipUpdateBuilderFactory.class).createNewInstance()
-                .updateGroupId(newGroupId)
-                .updateRoleId(newRoleId).done();
+                .updateGroupId(newGroupId).updateRoleId(newRoleId).done();
         try {
             final TransactionContent transactionContent = new UpdateMembershipByRoleIdAndGroupId(userMembershipId, identityService, changeDescriptor);
             transactionContent.execute();
@@ -1379,7 +1394,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public void deleteOrganization() throws DeletionException {
-        OrganizationAPIImpl organizationAPIImpl = new OrganizationAPIImpl(getTenantAccessor(), 100);
+        final OrganizationAPIImpl organizationAPIImpl = new OrganizationAPIImpl(getTenantAccessor(), 100);
         organizationAPIImpl.deleteOrganization();
     }
 
@@ -1392,9 +1407,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void importOrganization(final String organizationContent, final ImportPolicy policy) throws OrganizationImportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            SCustomUserInfoValueBuilderFactory creatorFactory = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
-            SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class);
-            SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(), creatorFactory, updaterFactor);
+            final SCustomUserInfoValueBuilderFactory creatorFactory = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
+            final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class);
+            final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(), creatorFactory,
+                    updaterFactor);
             new ImportOrganization(tenantAccessor, organizationContent, policy, customUserInfoValueAPI).execute();
         } catch (final SBonitaException e) {
             throw new OrganizationImportException(e);
@@ -1404,7 +1420,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public String exportOrganization() throws OrganizationExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        int maxResults = 100;
+        final int maxResults = 100;
         final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults);
         try {
             exportOrganization.execute();
@@ -1415,14 +1431,13 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException, AlreadyExistsException {
-        return createCustomUserInfoDefinitionAPI().create(
-                BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class),
-                creator);
+    public CustomUserInfoDefinition createCustomUserInfoDefinition(final CustomUserInfoDefinitionCreator creator) throws CreationException,
+            AlreadyExistsException {
+        return createCustomUserInfoDefinitionAPI().create(BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class), creator);
     }
 
     @Override
-    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws RetrieveException {
+    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(final int startIndex, final int maxResult) throws RetrieveException {
         return createCustomUserInfoDefinitionAPI().list(startIndex, maxResult);
     }
 
@@ -1432,36 +1447,33 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public void deleteCustomUserInfoDefinition(long id) throws DeletionException {
+    public void deleteCustomUserInfoDefinition(final long id) throws DeletionException {
         createCustomUserInfoDefinitionAPI().delete(id);
     }
 
     @Override
-    public List<CustomUserInfo> getCustomUserInfo(long userId, int startIndex, int maxResult) {
+    public List<CustomUserInfo> getCustomUserInfo(final long userId, final int startIndex, final int maxResult) {
         try {
             return createCustomUserInfoAPI().list(userId, startIndex, maxResult);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
     }
 
     @Override
-    public SearchResult<CustomUserInfoValue> searchCustomUserInfoValues(SearchOptions options) {
+    public SearchResult<CustomUserInfoValue> searchCustomUserInfoValues(final SearchOptions options) {
         try {
-            return createCustomUserInfoValueAPI().search(
-                    getTenantAccessor().getSearchEntitiesDescriptor().getSearchCustomUserInfoValueDescriptor(),
-                    options);
-        } catch (SBonitaException e) {
+            return createCustomUserInfoValueAPI().search(getTenantAccessor().getSearchEntitiesDescriptor().getSearchCustomUserInfoValueDescriptor(), options);
+        } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
     }
 
     @Override
-    public CustomUserInfoValue setCustomUserInfoValue(long definitionId, long userId, String value) throws UpdateException {
+    public CustomUserInfoValue setCustomUserInfoValue(final long definitionId, final long userId, final String value) throws UpdateException {
         try {
-            return new CustomUserInfoConverter().convert(
-                    createCustomUserInfoValueAPI().set(definitionId, userId, value));
-        } catch (SBonitaException e) {
+            return new CustomUserInfoConverter().convert(createCustomUserInfoValueAPI().set(definitionId, userId, value));
+        } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
     }
@@ -1475,8 +1487,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     private SCustomUserInfoValueAPI createCustomUserInfoValueAPI() {
-        return new SCustomUserInfoValueAPI(getTenantAccessor().getIdentityService(),
-                BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class),
+        return new SCustomUserInfoValueAPI(getTenantAccessor().getIdentityService(), BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class),
                 BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class));
     }
 }

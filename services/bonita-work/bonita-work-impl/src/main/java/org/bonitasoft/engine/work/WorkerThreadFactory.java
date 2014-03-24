@@ -49,8 +49,7 @@ public class WorkerThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(final Runnable runnable) {
-
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append(name);
         builder.append("-");
         builder.append(tenantId);
@@ -58,10 +57,7 @@ public class WorkerThreadFactory implements ThreadFactory {
         builder.append("%0");
         builder.append(padding);
         builder.append("d");
-
-        String format = String.format(builder.toString()
-                , nbThread.getAndIncrement());
+        final String format = String.format(builder.toString(), nbThread.getAndIncrement());
         return new Thread(runnable, format);
     }
-
 }

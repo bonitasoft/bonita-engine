@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -718,7 +718,7 @@ public class DependencyServiceImpl implements DependencyService {
         final Map<String, byte[]> resources = getDependenciesResources(type, id);
         try {
             classLoaderService.refreshLocalClassLoader(type.name(), id, resources);
-        } catch (final ClassLoaderException e) {
+        } catch (final SClassLoaderException e) {
             throw new SDependencyException("Cannot refresh classLoader with type'" + type + "' and id " + id, e);
         }
     }

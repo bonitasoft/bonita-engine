@@ -71,12 +71,11 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     @Override
     public void work(final Map<String, Object> context) throws Exception {
-
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
-
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();

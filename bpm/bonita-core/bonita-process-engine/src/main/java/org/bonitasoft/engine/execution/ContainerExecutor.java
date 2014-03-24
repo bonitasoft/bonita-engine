@@ -29,17 +29,17 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 public interface ContainerExecutor {
 
     /**
-     * method called to notify this container executor that a child reached the given state
+     * Method called to notify this container executor that a child reached the given state
      * 
      * @param processDefinitionId
-     *            The identifier of the process instance
+     *            The identifier of the process definition
      * @param flowNodeInstanceId
      *            The identifier of the flow node instance
-     * @param stateId
      * @param parentId
+     *            The identifier of the parent of the flow node
      * @throws SBonitaException
      */
-    void childFinished(long processDefinitionId, long flowNodeInstanceId, int stateId, long parentId) throws SBonitaException;
+    void childFinished(long processDefinitionId, long flowNodeInstanceId, long parentId) throws SBonitaException;
 
     /**
      * Execute a flow node in the context of this container executor

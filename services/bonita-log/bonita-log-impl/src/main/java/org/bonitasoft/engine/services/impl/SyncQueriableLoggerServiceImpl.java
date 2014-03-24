@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -45,17 +45,17 @@ public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl 
     protected void log(final List<SQueriableLog> loggableLogs) {
         try {
             if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "persisting log");
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Persisting log...");
             }
             for (final SQueriableLog log : loggableLogs) {
                 getPersitenceService().insert(log);
             }
             if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "log persisted");
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Log persisted !!");
             }
 
         } catch (final SPersistenceException e) {
-            final String message = "Error while persisting logs transaction: \n Logs" + loggableLogs;
+            final String message = "Error while persisting logs transaction :" + System.getProperty("line.separator") + "Logs " + loggableLogs;
             if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, message, e);
             }

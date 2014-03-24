@@ -61,6 +61,7 @@ public class SOperationBinding extends ElementBinding {
         return XMLSProcessDefinition.OPERATION_NODE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
 

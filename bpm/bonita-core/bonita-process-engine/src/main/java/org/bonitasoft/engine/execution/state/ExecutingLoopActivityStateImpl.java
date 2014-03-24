@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -45,6 +45,7 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ExecutingLoopActivityStateImpl implements FlowNodeState {
 
@@ -127,7 +128,7 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
                         loopCounter + 1, SStateCategory.NORMAL, -1, null);
                 activityInstanceService.incrementLoopCounter(loopActivity);
                 activityInstanceService.setTokenCount(loopActivity, loopActivity.getTokenCount() + 1);
-                containerRegistry.executeFlowNode(child.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(), parentProcessInstanceId);
+                containerRegistry.executeFlowNode(processDefinition.getId(), parentProcessInstanceId, child.getId(), null, null);
             }
             return !loop;
         } catch (final SBonitaException e) {
@@ -141,8 +142,8 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
         try {
             childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), 0, 1);
             if (!childrenOfAnActivity.isEmpty()) {
-                containerRegistry.executeFlowNode(childrenOfAnActivity.get(0).getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                        flowNodeInstance.getLogicalGroup(3));
+                containerRegistry.executeFlowNode(processDefinition.getId(), flowNodeInstance.getLogicalGroup(3), childrenOfAnActivity.get(0).getId(), null,
+                        null);
             }
             return !childrenOfAnActivity.isEmpty();
         } catch (final SBonitaException e) {

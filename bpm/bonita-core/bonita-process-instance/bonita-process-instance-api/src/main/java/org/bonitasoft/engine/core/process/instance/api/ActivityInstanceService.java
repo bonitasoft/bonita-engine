@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SUnhideableTaskException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
@@ -362,7 +361,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws STaskVisibilityException
      * @since 6.0
      */
-    List<SHiddenTaskInstance> searchHiddenTasksForActivity(long activityInstanceId, QueryOptions searchOptions) throws STaskVisibilityException;
+    List<SHiddenTaskInstance> searchHiddenTasksForActivity(long activityInstanceId) throws STaskVisibilityException;
 
     /**
      * Get the number of UserTask instances assigned to a specific user

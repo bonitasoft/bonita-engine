@@ -51,6 +51,7 @@ public class SMigrationMappingBinding extends ElementBinding {
         targetState = attributes.get(XMLSMigrationPlan.TARGET_STATE);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

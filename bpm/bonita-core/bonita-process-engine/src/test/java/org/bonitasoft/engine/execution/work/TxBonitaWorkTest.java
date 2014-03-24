@@ -56,7 +56,7 @@ public class TxBonitaWorkTest {
     }
 
     @Test
-    public void handleFailure() throws Exception {
+    public void handleFailure() throws Throwable {
         Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         Exception e = new Exception();
         txBonitawork.handleFailure(e, context);

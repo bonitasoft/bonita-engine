@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011,2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013-2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,11 +27,12 @@ public abstract class QuartzJob implements org.quartz.Job {
 
     private StatelessJob bosJob;
 
+    @SuppressWarnings("unused")
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
             bosJob.execute();
-        } catch (final Exception e) {
+        } catch (final SBonitaException e) {
             throw new JobExecutionException(e);
         }
     }

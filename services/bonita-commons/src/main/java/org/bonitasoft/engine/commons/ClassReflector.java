@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -46,63 +48,63 @@ public class ClassReflector {
         return methods;
     }
 
-    public static <T> Class<T> getClass(final Class<T> clazz, final String className) throws ReflectException {
+    public static <T> Class<T> getClass(final Class<T> clazz, final String className) throws SReflectException {
         try {
             return (Class<T>) Class.forName(className);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
-    public static <T> T getObject(final Class<T> clazz, final String className) throws ReflectException {
+    public static <T> T getObject(final Class<T> clazz, final String className) throws SReflectException {
         try {
             return getClass(clazz, className).newInstance();
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
-    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final Class<?>... parameterTypes) throws ReflectException {
+    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final Class<?>... parameterTypes) throws SReflectException {
         try {
             return clazz.getConstructor(parameterTypes);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
-    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final String className, final Class<?>... parameterTypes) throws ReflectException {
+    public static <T> Constructor<T> getConstructor(final Class<T> clazz, final String className, final Class<?>... parameterTypes) throws SReflectException {
         try {
             return getClass(clazz, className).getConstructor(parameterTypes);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
-    public static <T> T getInstance(final Constructor<T> constructor, final Object... parameters) throws ReflectException {
+    public static <T> T getInstance(final Constructor<T> constructor, final Object... parameters) throws SReflectException {
         try {
             return constructor.newInstance(parameters);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T invokeGetter(final Object entity, final String getterName) throws ReflectException {
+    public static <T> T invokeGetter(final Object entity, final String getterName) throws SReflectException {
         try {
             final Method getter = getMethod(entity.getClass(), getterName);
             return (T) getter.invoke(entity, (Object[]) null);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
     public static void invokeSetter(final Object entity, final String setterName, final Class<?> parameterType, final Object parameterValue)
-            throws ReflectException {
+            throws SReflectException {
         try {
             final Method setter = getMethod(entity.getClass(), setterName, new Class[] { parameterType });
             setter.invoke(entity, new Object[] { parameterValue });
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
@@ -144,17 +146,17 @@ public class ClassReflector {
         return methods.get(key);
     }
 
-    public static void invokeMethodByName(final Object entity, final String methodName, final Object... parameterValues) throws ReflectException {
+    public static void invokeMethodByName(final Object entity, final String methodName, final Object... parameterValues) throws SReflectException {
         final Class<?> clazz = entity.getClass();
         // no check on parameters
         final Method methodToInvoke = getMethodByName(clazz, methodName);
         if (methodToInvoke == null) {
-            throw new ReflectException("unable to find a method with name '" + methodName + "' within class " + clazz.getName());
+            throw new SReflectException("unable to find a method with name '" + methodName + "' within class " + clazz.getName());
         }
         try {
             methodToInvoke.invoke(entity, parameterValues);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
@@ -177,7 +179,7 @@ public class ClassReflector {
                 && b.equals(Byte.class);
     }
 
-    public static Method getCompatibleMethod(final Class<?> clazz, final String methodName, final Class<?>... paramTypes) throws ReflectException {
+    public static Method getCompatibleMethod(final Class<?> clazz, final String methodName, final Class<?>... paramTypes) throws SReflectException {
         try {
             return clazz.getMethod(methodName, paramTypes);
         } catch (final Exception e) {
@@ -199,16 +201,16 @@ public class ClassReflector {
                     }
                 }
             }
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
     }
 
-    public static Type getGetterReturnType(final Class<?> classConnector, final String getterName) throws ReflectException {
+    public static Type getGetterReturnType(final Class<?> classConnector, final String getterName) throws SReflectException {
         Method m;
         try {
             m = getMethod(classConnector, getterName, (Class<?>) null);
         } catch (final Exception e) {
-            throw new ReflectException(e);
+            throw new SReflectException(e);
         }
         return m.getGenericReturnType();
     }

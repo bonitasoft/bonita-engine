@@ -15,6 +15,7 @@ public class PersonBinding extends ElementBinding {
 
     private String phone;
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("firstname".equals(name)) {
@@ -28,10 +29,12 @@ public class PersonBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }

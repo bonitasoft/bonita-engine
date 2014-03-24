@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.process;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,11 +44,11 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -132,6 +133,9 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final Expression integerExpression = new ExpressionBuilder().createGroovyScriptExpression("IntegerScript", "String.valueOf(integerData) + \"plop\"",
                 String.class.getName(), integerDependencies);
 
+        final Expression constantStringExpression = new ExpressionBuilder().createNewInstance("Word").setContent("")
+                .setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
+
         expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(stringExpression, fieldValues);
         expressions.put(dateExpression, new HashMap<String, Serializable>());
@@ -140,6 +144,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         expressions.put(booleanExpression, new HashMap<String, Serializable>());
         expressions.put(floatExpression, new HashMap<String, Serializable>());
         expressions.put(integerExpression, new HashMap<String, Serializable>());
+        expressions.put(constantStringExpression, new HashMap<String, Serializable>());
     }
 
     @After
@@ -211,13 +216,13 @@ public class EvaluateExpressionTest extends CommonAPITest {
         waitForPendingTasks(getSession().getUserId(), 1);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions);
-        Assert.assertEquals("Word-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("Word-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Wrong process instance id" }, jira = "ENGINE-1160")
@@ -231,13 +236,13 @@ public class EvaluateExpressionTest extends CommonAPITest {
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
         final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTaskInstance.getId(), expressions);
-        Assert.assertEquals("Word-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("Word-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Wrong activity instance id" }, story = "Execute form expression command with wrong activity instance id", jira = "ENGINE-1160")
@@ -254,13 +259,13 @@ public class EvaluateExpressionTest extends CommonAPITest {
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
-        Assert.assertEquals("Word-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("Word-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance", "Updated data" }, story = "Evaluate an expression on completed process instance with variable update.", jira = "ENGINE-1160")
@@ -272,15 +277,15 @@ public class EvaluateExpressionTest extends CommonAPITest {
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
-        Assert.assertEquals(
+        assertEquals(
                 "if Word-Excel is returned, it means the values of the variable used are the latest ones whereas it should be the ones of when the activity was submited",
                 "Plop-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Activity instance" }, story = "Evaluate expression on activity instance.", jira = "ENGINE-1160")
@@ -288,13 +293,14 @@ public class EvaluateExpressionTest extends CommonAPITest {
     public void evaluateExpressionsOnActivityInstance() throws Exception {
         final HumanTaskInstance userTaskInstance = waitForUserTask(STEP1_NAME, processInstance);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskInstance.getId(), expressions);
-        Assert.assertEquals("Word-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("Word-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("", result.get("Word"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Wrong activity instance id" }, story = "Execute form expression command with wrong activity instance id", jira = "ENGINE-1160")
@@ -315,8 +321,8 @@ public class EvaluateExpressionTest extends CommonAPITest {
         engineExpresssions.put(engineExecContextExpr, Collections.<String, Serializable> emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskInstance.getId(), engineExpresssions);
-        Assert.assertEquals(user.getId(), result.get(taskAssigneeExpr.getContent()));
-        Assert.assertEquals(user.getId(), ((EngineExecutionContext) result.get(engineExecContextExpr.getContent())).getTaskAssigneeId());
+        assertEquals(user.getId(), result.get(taskAssigneeExpr.getContent()));
+        assertEquals(user.getId(), ((EngineExecutionContext) result.get(engineExecContextExpr.getContent())).getTaskAssigneeId());
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Initial value" }, story = "Evalute an expression on process intance with initial values.", jira = "ENGINE-1160")
@@ -326,14 +332,14 @@ public class EvaluateExpressionTest extends CommonAPITest {
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
-        Assert.assertFalse("Result should not be empty", result.isEmpty());
-        Assert.assertEquals("Excel-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertFalse("Result should not be empty", result.isEmpty());
+        assertEquals("Excel-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Current value" }, story = "Evalute an expression on process intance with current values.", jira = "ENGINE-1160")
@@ -343,13 +349,13 @@ public class EvaluateExpressionTest extends CommonAPITest {
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
-        Assert.assertEquals("Excel-Excel", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("Excel-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Wrong process instance id" }, jira = "ENGINE-1160")
@@ -368,14 +374,14 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnProcessDefinition() throws Exception {
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
-        Assert.assertFalse("Result should not be empty", result.isEmpty());
-        Assert.assertEquals("Word", result.get("StringScript"));
-        Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
-        Assert.assertEquals("1plop", result.get("LongScript"));
-        Assert.assertEquals("2.0plop", result.get("DoubleScript"));
-        Assert.assertEquals(false, result.get("BooleanScript"));
-        Assert.assertEquals("100.0plop", result.get("FloatScript"));
-        Assert.assertEquals("4plop", result.get("IntegerScript"));
+        assertFalse("Result should not be empty", result.isEmpty());
+        assertEquals("Word", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Wrong process definition id" }, jira = "ENGINE-1160")

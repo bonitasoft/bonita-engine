@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,7 +20,10 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
+ * @deprecated since 6.3.0
  */
+@Deprecated
 public class GetActivityInstance implements TransactionContentWithResult<SActivityInstance> {
 
     private SActivityInstance activity;

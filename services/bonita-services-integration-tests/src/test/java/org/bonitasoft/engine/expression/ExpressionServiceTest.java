@@ -100,7 +100,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         evaluateAndCheckResult(strExpr, strContent, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
-    @Test(expected = SInvalidExpressionException.class)
+    @Test(expected = SExpressionEvaluationException.class)
     public void evaluateWrongTypeIntegerExpression() throws Exception {
         SExpression dataExpr = null;
         final long containerId = 987456L;
@@ -120,7 +120,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         evaluate(dataExpr, dependencyValues, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
-    @Test(expected = SInvalidExpressionException.class)
+    @Test(expected = SExpressionEvaluationException.class)
     public void evaluateWrongTypeGroovyExpression() throws Exception {
         final String strContent = "return new ArrayList();";
         final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, Boolean.class.getName(), SExpression.GROOVY, null);

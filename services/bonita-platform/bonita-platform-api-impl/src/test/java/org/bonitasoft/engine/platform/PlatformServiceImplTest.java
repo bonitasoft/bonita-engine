@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -150,25 +150,25 @@ public class PlatformServiceImplTest {
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getPlatform()}.
      * 
-     * @throws CacheException
+     * @throws SCacheException
      */
     @Test
-    public final void getPlatform() throws SPlatformNotFoundException, CacheException {
+    public final void getPlatform() throws SPlatformNotFoundException, SCacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
         when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
         Assert.assertEquals(sPlatform, platformServiceImpl.getPlatform());
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformNotExists() throws SPlatformNotFoundException, CacheException {
+    public final void getPlatformNotExists() throws SPlatformNotFoundException, SCacheException {
         when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         platformServiceImpl.getPlatform();
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformThrowException() throws SPlatformNotFoundException, CacheException {
-        doThrow(new CacheException("")).when(platformCacheService).get(anyString(), anyString());
+    public final void getPlatformThrowException() throws SPlatformNotFoundException, SCacheException {
+        doThrow(new SCacheException("")).when(platformCacheService).get(anyString(), anyString());
         platformServiceImpl.getPlatform();
     }
 
@@ -281,25 +281,25 @@ public class PlatformServiceImplTest {
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#isPlatformCreated()}.
      * 
-     * @throws CacheException
+     * @throws SCacheException
      */
     @Test
-    public final void isPlatformCreated() throws CacheException {
+    public final void isPlatformCreated() throws SCacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
         when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
         Assert.assertTrue(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreated() throws CacheException {
+    public final void isPlatformNotCreated() throws SCacheException {
         when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         Assert.assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreatedThrowException() throws CacheException {
-        doThrow(new CacheException("")).when(platformCacheService).get(anyString(), anyString());
+    public final void isPlatformNotCreatedThrowException() throws SCacheException {
+        doThrow(new SCacheException("")).when(platformCacheService).get(anyString(), anyString());
         Assert.assertFalse(platformServiceImpl.isPlatformCreated());
     }
 

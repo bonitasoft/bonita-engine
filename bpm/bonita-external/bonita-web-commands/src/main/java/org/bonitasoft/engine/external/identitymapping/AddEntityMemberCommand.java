@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,6 +28,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * GROUP_ID_KEY: -1 is not needed, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions.
  * 
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class AddEntityMemberCommand extends EntityMemberCommand {
 
@@ -42,7 +43,7 @@ public class AddEntityMemberCommand extends EntityMemberCommand {
         final Long roleId = getRoleIdParameter(parameters);
 
         if (userId == null && groupId == null && roleId == null) {
-            throw new SCommandParameterizationException("At least one of the following parameters must be set: userId, groupId, roleId");
+            throw new SCommandParameterizationException("At least one of the following parameters must be set : userId, groupId, roleId");
         }
 
         final long lUserId = userId != null ? userId : -1;
@@ -53,6 +54,8 @@ public class AddEntityMemberCommand extends EntityMemberCommand {
             final MemberType memberType = getMemberType(userId, groupId, roleId);
             SExternalIdentityMapping mapp = addExternalIdentityMapping(externalId, lUserId, lRoleId, lGroupId, kind, memberType);
             return toEntityMember(mapp);
+        } catch (SCommandExecutionException e) {
+            throw e;
         } catch (SBonitaException e) {
             throw new SCommandExecutionException("Error executing command 'AddEntityMemberCommand'", e);
         }

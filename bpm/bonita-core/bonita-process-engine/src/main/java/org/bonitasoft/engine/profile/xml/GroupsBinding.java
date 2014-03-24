@@ -30,10 +30,12 @@ public class GroupsBinding extends ElementBinding {
         groups = new ArrayList<String>();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("group".equals(name)) {
@@ -41,6 +43,7 @@ public class GroupsBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }
