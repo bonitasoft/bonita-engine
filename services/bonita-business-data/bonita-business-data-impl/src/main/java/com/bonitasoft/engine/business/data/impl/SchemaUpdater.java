@@ -72,7 +72,7 @@ public class SchemaUpdater {
         } finally {
             try {
                 if (connection != null) {
-                    // Sybase fails if we don't do that
+                    // Sybase fails if not called
                     connection.clearWarnings();
                     connection.close();
                 }

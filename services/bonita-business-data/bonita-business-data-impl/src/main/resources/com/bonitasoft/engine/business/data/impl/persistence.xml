@@ -4,9 +4,7 @@
 
 	<persistence-unit name="BDR" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<properties>
-			<property name="hibernate.ejb.resource_scanner" value="com.bonitasoft.engine.business.data.impl.InactiveScanner" />
-		</properties>
+		<properties />
 	</persistence-unit>
 
 </persistence>

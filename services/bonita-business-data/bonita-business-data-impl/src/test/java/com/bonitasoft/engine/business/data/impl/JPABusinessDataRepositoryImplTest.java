@@ -15,6 +15,7 @@ import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,12 +27,15 @@ public class JPABusinessDataRepositoryImplTest {
 
     private DependencyService dependencyService;
 
+    private TechnicalLoggerService loggerService;
+
     private JPABusinessDataRepositoryImpl repository;
 
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        repository = new JPABusinessDataRepositoryImpl(dependencyService, Collections.<String, Object> emptyMap());
+        loggerService = mock(TechnicalLoggerService.class);
+        repository = new JPABusinessDataRepositoryImpl(dependencyService, loggerService, Collections.<String, Object> emptyMap());
     }
 
     @Test

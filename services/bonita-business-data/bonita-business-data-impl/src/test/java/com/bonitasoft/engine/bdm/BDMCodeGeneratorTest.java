@@ -194,6 +194,28 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
+    public void shouldAddBooleanAccessors_AddAccessorMethods_InDefinedClass() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final Field foundField = new Field();
+        foundField.setName("found");
+        foundField.setType(FieldType.BOOLEAN);
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        final JFieldVar basicField = bdmCodeGenerator.addBasicField(definedClass, foundField);
+
+        bdmCodeGenerator.addAccessors(definedClass, basicField);
+
+        assertThat(definedClass.methods()).hasSize(2);
+        final JMethod setter = (JMethod) definedClass.methods().toArray()[0];
+        assertThat(setter.name()).isEqualTo("setFound");
+
+        final JMethod getter = (JMethod) definedClass.methods().toArray()[1];
+        assertThat(getter.name()).isEqualTo("isFound");
+
+        assertGenerationAndCompilationWork();
+    }
+
+    @Test
     public void shouldToJavaType_ReturnIntegerClass() throws Exception {
         assertThat(bdmCodeGenerator.toJavaType(FieldType.INTEGER).name()).isEqualTo(Integer.class.getSimpleName());
     }

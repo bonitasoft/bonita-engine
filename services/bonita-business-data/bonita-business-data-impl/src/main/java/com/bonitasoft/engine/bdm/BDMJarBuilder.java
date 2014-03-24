@@ -84,7 +84,7 @@ public class BDMJarBuilder {
 
     protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
             ParserConfigurationException, SAXException {
-        final List<BusinessObject> entities = bom.getEntities();
+        final List<BusinessObject> entities = bom.getBusinessObjects();
         final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
         for (final BusinessObject businessObject : entities) {
             builder.addClass(businessObject.getQualifiedName());

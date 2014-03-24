@@ -3,6 +3,7 @@
 
 	<bean id="businessDataRepository" class="com.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
 		<constructor-arg name="dependencyService" ref="dependencyService" />
+		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="configuration">
 			<map>
 				<!-- platform -->

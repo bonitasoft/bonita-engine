@@ -21,6 +21,7 @@ import javax.transaction.UserTransaction;
 
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.dbunit.DataSourceDatabaseTester;
 import org.dbunit.IDatabaseTester;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
@@ -46,6 +47,8 @@ public class JPABusinessDataRepositoryImplIT {
     private IDatabaseTester databaseTester;
 
     private DependencyService dependencyService;
+
+    private TechnicalLoggerService loggerService;
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
@@ -102,11 +105,12 @@ public class JPABusinessDataRepositoryImplIT {
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
+        loggerService = mock(TechnicalLoggerService.class);
         final Map<String, Object> configuration = new HashMap<String, Object>();
         configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
 
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, configuration));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration));
         doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
         doReturn(true).when(businessDataRepository).isDBMDeployed();
@@ -248,19 +252,19 @@ public class JPABusinessDataRepositoryImplIT {
     @Test
     public void entityClassNames_is_an_empty_set_if_bdr_is_not_started() throws Exception {
 
-        Set<String> classNames = businessDataRepository.getEntityClassNames();
+        final Set<String> classNames = businessDataRepository.getEntityClassNames();
 
         assertThat(classNames).isEmpty();
     }
 
     @Test
     public void entityClassNames_contains_all_entities_class_names() throws Exception {
-        UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
         try {
             ut.begin();
             businessDataRepository.start();
 
-            Set<String> classNames = businessDataRepository.getEntityClassNames();
+            final Set<String> classNames = businessDataRepository.getEntityClassNames();
 
             assertThat(classNames).containsOnly("com.bonitasoft.pojo.Employee");
         } finally {
