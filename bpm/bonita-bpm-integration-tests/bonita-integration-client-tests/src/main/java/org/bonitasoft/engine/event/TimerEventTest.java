@@ -124,13 +124,7 @@ public class TimerEventTest extends CommonAPITest {
         assertTrue(processInstances.isEmpty());
 
         // wait for process instance creation
-        Thread.sleep(1500);
-
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertEquals(1, processInstances.size());
-
-        final ProcessInstance processInstance = processInstances.get(0);
-        waitForUserTask(stepName, processInstance);
+        waitForUserTask(stepName);
 
         disableAndDeleteProcess(definition);
     }
