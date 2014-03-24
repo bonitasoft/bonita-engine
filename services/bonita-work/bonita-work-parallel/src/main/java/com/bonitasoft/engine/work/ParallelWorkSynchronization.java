@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
 import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.ExecutorWorkService;
 
 /**
  * @author Charles Souillard
@@ -22,9 +21,8 @@ import org.bonitasoft.engine.work.ExecutorWorkService;
  */
 public class ParallelWorkSynchronization extends AbstractWorkSynchronization {
 
-    public ParallelWorkSynchronization(final ExecutorService executorService, final SessionAccessor sessionAccessor,
-            final ExecutorWorkService threadPoolWorkService) {
-        super(threadPoolWorkService, executorService, sessionAccessor);
+    public ParallelWorkSynchronization(final ExecutorService executorService, final SessionAccessor sessionAccessor) {
+        super(executorService, sessionAccessor);
     }
 
     @Override

@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
-import org.bonitasoft.engine.work.ExecutorWorkService;
 import org.bonitasoft.engine.work.WorkSynchronizationFactory;
 
 /**
@@ -25,8 +24,8 @@ public class ParallelWorkSynchronizationFactory implements WorkSynchronizationFa
     @SuppressWarnings("unused")
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor, final ExecutorWorkService threadPoolWorkService) {
-        return new ParallelWorkSynchronization(executorService, sessionAccessor, threadPoolWorkService);
+            final SessionAccessor sessionAccessor) {
+        return new ParallelWorkSynchronization(executorService, sessionAccessor);
     }
 
 }
