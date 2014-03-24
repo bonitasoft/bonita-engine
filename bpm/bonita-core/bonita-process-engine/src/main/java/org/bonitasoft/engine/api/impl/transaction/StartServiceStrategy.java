@@ -21,6 +21,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  */
 public class StartServiceStrategy implements ServiceStrategy {
 
+    private static final long serialVersionUID = 2841384612823734801L;
+
     @Override
     public String getStateName() {
         return "start";
