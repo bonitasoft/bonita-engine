@@ -32,7 +32,7 @@ public class BusinessObjectModel {
         businessObjects = new ArrayList<BusinessObject>();
     }
 
-    public List<BusinessObject> getEntities() {
+    public List<BusinessObject> getBusinessObjects() {
         return businessObjects;
     }
 

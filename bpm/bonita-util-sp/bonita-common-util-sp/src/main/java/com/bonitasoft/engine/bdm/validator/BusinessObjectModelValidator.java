@@ -53,7 +53,7 @@ public class BusinessObjectModelValidator {
 	private Set<Object> buildModelTree(BusinessObjectModel bom) {
 		Set<Object> objectsToValidate = new HashSet<Object>();
 		objectsToValidate.add(bom);
-		for(BusinessObject bo : bom.getEntities()){
+		for(BusinessObject bo : bom.getBusinessObjects()){
 			objectsToValidate.add(bo);
 			for(Field f : bo.getFields()){
 				objectsToValidate.add(f);

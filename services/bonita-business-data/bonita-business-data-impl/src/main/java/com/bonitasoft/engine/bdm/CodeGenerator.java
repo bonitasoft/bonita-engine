@@ -130,7 +130,15 @@ public class CodeGenerator {
     }
 
     public String getGetterName(final JFieldVar field) {
-        return "get" + StringUtil.firstCharToUpperCase(field.name());
+        final JType type = field.type();
+        final StringBuilder builder = new StringBuilder();
+        if (Boolean.class.getName().equals(type.fullName())) {
+            builder.append("is");
+        } else {
+            builder.append("get");
+        }
+        builder.append(StringUtil.firstCharToUpperCase(field.name()));
+        return builder.toString();
     }
 
     public String getSetterName(final JFieldVar field) {

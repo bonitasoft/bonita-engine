@@ -11,8 +11,6 @@
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
 			<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.BitronixJtaPlatform" />
-
-			<property name="hibernate.ejb.resource_scanner" value="com.bonitasoft.engine.business.data.impl.InactiveScanner" />
 		</properties>
 	</persistence-unit>
 </persistence>

@@ -65,7 +65,7 @@ public class BusinessObjectModelValidatorTest {
 		Field nameField = new Field();
 		nameField.setName("bmw 5");
 		bo.getFields().add(nameField);
-		bom.getEntities().add(bo);
+		bom.addBusinessObject(bo);
 		ValidationStatus validationStatus = validator.validate(bom);
 		assertThat(validationStatus.isOk()).isFalse();
 		assertThat(validationStatus.getErrors()).hasSize(1);

@@ -27,7 +27,7 @@ public class BusinessObjectModelValidationRule implements ValidationRule {
 		}
 		BusinessObjectModel bom = (BusinessObjectModel) modelElement;
 		ValidationStatus status = new ValidationStatus();
-		if(bom.getEntities().isEmpty()){
+		if(bom.getBusinessObjects().isEmpty()){
 			status.addError("Business object model must have at least one business object declared");
 		}
 		return status;

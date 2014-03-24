@@ -48,7 +48,7 @@ public class BDMCodeGenerator extends CodeGenerator {
     }
 
     protected void buildASTFromBom() throws JClassAlreadyExistsException {
-        for (final BusinessObject bo : bom.getEntities()) {
+        for (final BusinessObject bo : bom.getBusinessObjects()) {
             addEntity(bo);
         }
     }
@@ -84,11 +84,9 @@ public class BDMCodeGenerator extends CodeGenerator {
         addPersistenceIdFieldAndAccessors(entityClass);
         addPersistenceVersionFieldAndAccessors(entityClass);
 
-        if (bo.getFields() != null) {
-            for (final Field field : bo.getFields()) {
-                final JFieldVar basicField = addBasicField(entityClass, field);
-                addAccessors(entityClass, basicField);
-            }
+        for (final Field field : bo.getFields()) {
+            final JFieldVar basicField = addBasicField(entityClass, field);
+            addAccessors(entityClass, basicField);
         }
 
         addEqualsMethod(entityClass);

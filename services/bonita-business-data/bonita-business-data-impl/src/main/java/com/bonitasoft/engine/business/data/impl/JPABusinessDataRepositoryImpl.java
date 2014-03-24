@@ -10,6 +10,7 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.hibernate.cfg.Configuration;
@@ -58,13 +61,23 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private final Map<String, Object> configuration;
 
-    private final DependencyService dependencyService;
-
     private EntityManagerFactory entityManagerFactory;
 
-    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final Map<String, Object> configuration) {
+    private final TechnicalLoggerService loggerService;
+
+    private final DependencyService dependencyService;
+
+    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final TechnicalLoggerService loggerService,
+            final Map<String, Object> configuration) {
         this.dependencyService = dependencyService;
-        this.configuration = configuration;
+        this.loggerService = loggerService;
+        this.configuration = new HashMap<String, Object>(configuration);
+        final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
+        if (remove != null && loggerService.isLoggable(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO)) {
+            this.loggerService.log(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO,
+                    "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
+        }
+        this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
     }
 
     @Override
@@ -73,25 +86,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
             updateSchema();
         }
-    }
-
-    private void updateSchema() {
-        final Properties properties = new Properties();
-        properties.putAll(entityManagerFactory.getProperties());
-
-        final Configuration cfg = new Configuration();
-        cfg.setProperties(properties);
-        cfg.getProperties().remove("hibernate.hbm2ddl.auto");
-        cfg.setProperty("hibernate.current_session_context_class", "jta");
-        cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
-
-        final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
-        for (final EntityType<?> entity : entities) {
-            cfg.addAnnotatedClass(entity.getJavaType());
-        }
-
-        final SchemaUpdater updater = new SchemaUpdater(cfg);
-        updater.execute();
     }
 
     @Override
@@ -110,6 +104,23 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     @Override
     public void resume() throws SBonitaException {
         start();
+    }
+
+    private void updateSchema() {
+        final Configuration cfg = new Configuration();
+        final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
+        for (final EntityType<?> entity : entities) {
+            cfg.addAnnotatedClass(entity.getJavaType());
+        }
+
+        final Properties properties = new Properties();
+        properties.putAll(entityManagerFactory.getProperties());
+        cfg.setProperties(properties);
+        cfg.setProperty("hibernate.current_session_context_class", "jta");
+        cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
+
+        final SchemaUpdater updater = new SchemaUpdater(cfg);
+        updater.execute();
     }
 
     @Override
