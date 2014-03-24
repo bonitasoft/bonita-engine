@@ -130,11 +130,6 @@
 		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 		                </artifactItem>
 		                <artifactItem>
-		                  <groupId>org.slf4j</groupId>
-		                  <artifactId>slf4j-jdk14</artifactId>
-		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-		                </artifactItem>
-		                <artifactItem>
 		                  <groupId>org.codehaus.btm</groupId>
 		                  <artifactId>btm-tomcat55-lifecycle</artifactId>
 		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
@@ -292,10 +287,10 @@
 		                </executions>
 		                <configuration>
 		                    <container>
-		            <containerId>tomcat6x</containerId>
-		            <home>${tomcat.home}</home>
-		            <systemProperties>
-		              <bonita.home>${bonita.home}</bonita.home>
+								<containerId>tomcat6x</containerId>
+								<home>${tomcat.home}</home>
+								<systemProperties>
+									<bonita.home>${bonita.home}</bonita.home>
 									<sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
 									<db.vendor>${db.vendor}</db.vendor>
 
