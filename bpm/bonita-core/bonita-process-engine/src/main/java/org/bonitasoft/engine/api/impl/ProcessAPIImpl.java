@@ -351,7 +351,6 @@ import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandType;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -3257,7 +3256,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 operationService.execute(sOperation, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
                 // return the value of the data if it's an external data
                 final LeftOperand leftOperand = operation.getLeftOperand();
-                if (LeftOperandType.EXTERNAL_DATA.equals(leftOperand.getType())) {
+                if (LeftOperand.EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
                 }
             }

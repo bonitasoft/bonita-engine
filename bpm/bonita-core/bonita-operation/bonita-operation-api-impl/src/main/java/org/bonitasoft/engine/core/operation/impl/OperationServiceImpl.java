@@ -114,7 +114,7 @@ public class OperationServiceImpl implements OperationService {
         // retrieve all left operand to set and put it in context
         // TODO implement batch retrieve in leftOperandHandlers
         try {
-            retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, expressionContext);
+            retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, dataContainerId, dataContainerType, expressionContext);
         } catch (SBonitaReadException e) {
             throw new SOperationExecutionException("Unable to retrieve value for all operations", e);
         }
@@ -169,18 +169,18 @@ public class OperationServiceImpl implements OperationService {
         return leftOperandHandler;
     }
 
-    private void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final SExpressionContext expressionContext)
+    private void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long dataContainerId,
+            final String dataContainerType, final SExpressionContext expressionContext)
             throws SOperationExecutionException, SBonitaReadException {
-        if (expressionContext.getContainerId() != null) {
-            final Map<String, Object> inputValues = expressionContext.getInputValues();
+        final Map<String, Object> inputValues = expressionContext.getInputValues();
 
-            for (final SOperation operation : operations) {
-                // this operation will set a data, we retrieve it and put it in context
-                SLeftOperand leftOperand = operation.getLeftOperand();
-                Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand, expressionContext);
-                if (retrieve != null /* some left operand don't retrieve it, e.g. document, it's heavy */&& !inputValues.containsKey(leftOperand.getName())) {
-                    inputValues.put(leftOperand.getName(), retrieve);
-                }
+        for (final SOperation operation : operations) {
+            // this operation will set a data, we retrieve it and put it in context
+            SLeftOperand leftOperand = operation.getLeftOperand();
+            Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
+                    new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
+            if (retrieve != null /* some left operand don't retrieve it, e.g. document, it's heavy */&& !inputValues.containsKey(leftOperand.getName())) {
+                inputValues.put(leftOperand.getName(), retrieve);
             }
         }
     }

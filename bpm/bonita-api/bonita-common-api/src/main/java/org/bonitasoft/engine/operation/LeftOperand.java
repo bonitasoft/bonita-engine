@@ -23,6 +23,16 @@ import java.io.Serializable;
  */
 public interface LeftOperand extends Serializable {
 
+    static String DATA = "DATA";
+
+    static String SEARCH_INDEX = "SEARCH_INDEX";
+
+    static String DOCUMENT = "DOCUMENT";
+
+    static String EXTERNAL_DATA = "EXTERNAL_DATA";
+
+    static String TRANSIENT_DATA = "TRANSIENT_DATA";
+
     String getName();
 
     /**

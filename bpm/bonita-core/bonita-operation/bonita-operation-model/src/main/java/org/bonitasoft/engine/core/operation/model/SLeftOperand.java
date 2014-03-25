@@ -21,6 +21,14 @@ import java.io.Serializable;
  */
 public interface SLeftOperand extends Serializable {
 
+    public static String EXTERNAL_DATA = "EXTERNAL_DATA";
+
+    public static String DOCUMENT = "DOCUMENT";
+
+    public static String SEARCH_INDEX = "SEARCH_INDEX";
+
+    public static String DATA = "DATA";
+
     String getName();
 
     String getType();

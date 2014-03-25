@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.operation.impl;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
+import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 
 /**
@@ -47,7 +47,7 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         // do not check if value is external, see ENGINE-1739
-        if (operation.getLeftOperand().getType().equals(SLeftOperandType.DATA)) {
+        if (operation.getLeftOperand().getType().equals(SLeftOperand.DATA)) {
             checkReturnType(value, operation, expressionContext);
         }
         // no processing on the value, just return it

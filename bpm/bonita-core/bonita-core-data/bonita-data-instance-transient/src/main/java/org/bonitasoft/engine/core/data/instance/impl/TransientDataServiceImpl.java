@@ -25,7 +25,6 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
@@ -58,12 +57,6 @@ public class TransientDataServiceImpl implements TransientDataService {
             data.add(getDataInstance(dataName, containerId, containerType));
         }
         return data;
-    }
-
-    @Override
-    public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType) throws SDataInstanceException {
-        // TODO get it from definition
-        return 0;
     }
 
     private String getKey(final String dataInstanceName, final long containerId, final String containerType) {

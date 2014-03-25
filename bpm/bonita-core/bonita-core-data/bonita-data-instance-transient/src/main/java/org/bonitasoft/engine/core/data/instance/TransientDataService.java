@@ -2,7 +2,6 @@ package org.bonitasoft.engine.core.data.instance;
 
 import java.util.List;
 
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -17,14 +16,6 @@ public interface TransientDataService {
      * @throws SDataInstanceException
      */
     List<SDataInstance> getDataInstances(List<String> dataNames, long containerId, String containerType) throws SDataInstanceException;
-
-    /**
-     * @param containerId
-     * @param containerType
-     * @return
-     * @throws SDataInstanceException
-     */
-    long getNumberOfDataInstances(long containerId, DataInstanceContainer containerType) throws SDataInstanceException;
 
     /**
      * @param dataInstance

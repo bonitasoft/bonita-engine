@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.operation.impl;
 
 import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandType;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -32,7 +31,7 @@ public class LeftOperandImpl implements LeftOperand {
 
     public LeftOperandImpl() {
         // default when not set
-        type = LeftOperandType.DATA;
+        type = LeftOperand.DATA;
     }
 
     public void setName(final String name) {
@@ -63,7 +62,7 @@ public class LeftOperandImpl implements LeftOperand {
 
     @Override
     public boolean isExternal() {
-        return LeftOperandType.EXTERNAL_DATA.equals(type);
+        return LeftOperand.EXTERNAL_DATA.equals(type);
     }
 
     @Override
@@ -103,7 +102,11 @@ public class LeftOperandImpl implements LeftOperand {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (type != other.type) {
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
             return false;
         }
         return true;

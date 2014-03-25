@@ -43,8 +43,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  */
 public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
-    public static final String TYPE_DOCUMENT = "DOCUMENT";
-
     ProcessDocumentService processDocumentService;
 
     private final ActivityInstanceService activityInstanceService;
@@ -142,7 +140,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     @Override
     public String getType() {
-        return TYPE_DOCUMENT;
+        return LeftOperand.DOCUMENT;
     }
 
     @Override

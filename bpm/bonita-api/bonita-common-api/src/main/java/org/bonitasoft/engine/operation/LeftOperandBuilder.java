@@ -58,25 +58,42 @@ public class LeftOperandBuilder {
         return this;
     }
 
+    /**
+     * 
+     * @param type
+     * @return
+     */
     public LeftOperandBuilder setType(final String type) {
         leftOperand.setType(type);
         return this;
     }
 
     /**
-     * @deprecated use setType(LeftOperandType.INPUT) instead
+     * @deprecated use setType(String)
+     * 
+     * @param type
+     * @return
+     */
+    @Deprecated
+    public LeftOperandBuilder setType(final LeftOperandType type) {
+        leftOperand.setType(type.name());
+        return this;
+    }
+
+    /**
+     * @deprecated use setType(LeftOperand.EXTERNAL_DATA) instead
      * 
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
     @Deprecated
     public LeftOperandBuilder setExternal(final boolean external) {
-        if (leftOperand.getType() != null && !LeftOperandType.DATA.equals(leftOperand.getType())
-                && !LeftOperandType.EXTERNAL_DATA.equals(leftOperand.getType())) {
+        if (leftOperand.getType() != null && !LeftOperand.DATA.equals(leftOperand.getType())
+                && !LeftOperand.EXTERNAL_DATA.equals(leftOperand.getType())) {
             throw new IllegalStateException(
                     "Can't set left operand to external when the type is not input or data this method is deprecated, it's not usefull to use it anymore");
         }
-        leftOperand.setType(external ? LeftOperandType.EXTERNAL_DATA : LeftOperandType.DATA);
+        leftOperand.setType(external ? LeftOperand.EXTERNAL_DATA : LeftOperand.DATA);
         return this;
     }
 
@@ -85,7 +102,7 @@ public class LeftOperandBuilder {
     }
 
     public LeftOperand createSearchIndexLeftOperand(final int index) {
-        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperandType.SEARCH_INDEX).done();
+        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperand.SEARCH_INDEX).done();
     }
 
     /**
@@ -97,9 +114,9 @@ public class LeftOperandBuilder {
     @Deprecated
     public LeftOperand createDataLeftOperand(final String dataName, final boolean external) {
         if (external) {
-            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.EXTERNAL_DATA).done();
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.EXTERNAL_DATA).done();
         } else {
-            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).done();
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.DATA).done();
         }
     }
 
@@ -111,7 +128,7 @@ public class LeftOperandBuilder {
      * @return the newly created <code>LeftOperand</code> object
      */
     public LeftOperand createDataLeftOperand(final String dataName) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.DATA).done();
     }
 
 }

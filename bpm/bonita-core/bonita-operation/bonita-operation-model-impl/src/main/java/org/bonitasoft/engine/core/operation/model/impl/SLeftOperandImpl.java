@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.operation.model.impl;
 
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -29,7 +28,7 @@ public class SLeftOperandImpl implements SLeftOperand {
     private String type;
 
     public SLeftOperandImpl() {
-        type = SLeftOperandType.DATA;
+        type = SLeftOperand.DATA;
     }
 
     @Override

@@ -92,6 +92,16 @@ public class SExpressionContext implements Serializable {
         this.time = time;
     }
 
+    public SExpressionContext(final long containerId, final String containerType, final Map<String, Object> inputValues) {
+        this.containerId = containerId;
+        this.containerType = containerType;
+        if (inputValues == null) {
+            this.inputValues = new HashMap<String, Object>();
+        } else {
+            this.inputValues = new HashMap<String, Object>(inputValues);
+        }
+    }
+
     public Long getProcessDefinitionId() {
         return processDefinitionId;
     }
