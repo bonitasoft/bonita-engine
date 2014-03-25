@@ -32,18 +32,21 @@ public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderReso
     @Override
     public ClassLoader getParent(final ClassLoaderService classLoaderService, final String childClassLoaderType, final long childClassLoaderId)
             throws SClassLoaderException {
+        ClassLoader parent = null;
         if (ScopeType.PROCESS.name().equals(childClassLoaderType)) {
             try {
                 final Long tenantId = this.sessionAccessor.getTenantId();
-                return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
+                parent = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
             } catch (STenantIdNotSetException e) {
-                return classLoaderService.getGlobalClassLoader();
+                parent = classLoaderService.getGlobalClassLoader();
             }
         } else if (ScopeType.TENANT.name().equals(childClassLoaderType)) {
-            return classLoaderService.getGlobalClassLoader();
+            parent = classLoaderService.getGlobalClassLoader();
         } else if ("___datasource___".equals(childClassLoaderType)) {
-            return classLoaderService.getGlobalClassLoader();
+            parent = classLoaderService.getGlobalClassLoader();
+        } else {
+            throw new BonitaRuntimeException("unable to find a parent for type: " + childClassLoaderType);
         }
-        throw new BonitaRuntimeException("unable to find a parent for type: " + childClassLoaderType);
+        return parent;
     }
 }
