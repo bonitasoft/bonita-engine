@@ -83,12 +83,14 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
 
         Pair<List<Long>, List<SDependencyMapping>> pair;
         pair = userTransactionService.executeInTransaction(new Callable<Pair<List<Long>, List<SDependencyMapping>>>() {
+
             @Override
             public Pair<List<Long>, List<SDependencyMapping>> call() throws Exception {
                 List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
-                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS,
+                        QueryOptions.defaultQueryOptions());
                 return new Pair<List<Long>, List<SDependencyMapping>>(dependencyIds, dependencyMappings);
-            };
+            }
         });
         assertEquals(2, pair._1.size());
         assertEquals(2, pair._2.size());
@@ -101,21 +103,25 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
 
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         pair = userTransactionService.executeInTransaction(new Callable<Pair<List<Long>, List<SDependencyMapping>>>() {
+
             @Override
             public Pair<List<Long>, List<SDependencyMapping>> call() throws Exception {
                 List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
-                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS,
+                        QueryOptions.defaultQueryOptions());
                 return new Pair<List<Long>, List<SDependencyMapping>>(dependencyIds, dependencyMappings);
-            };
+            }
         });
         assertEquals(1, pair._1.size());
         assertEquals(1, pair._2.size());
 
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
     }
 
     private static class Pair<T, V> {
+
         T _1;
+
         V _2;
 
         Pair(final T _1, final V _2) {

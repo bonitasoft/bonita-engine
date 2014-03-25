@@ -48,13 +48,14 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+            final SExpressionContext expressionContext) {
         return value;
     }
 

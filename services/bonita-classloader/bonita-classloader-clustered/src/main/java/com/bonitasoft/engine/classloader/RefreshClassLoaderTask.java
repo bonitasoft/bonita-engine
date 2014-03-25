@@ -57,7 +57,7 @@ final class RefreshClassLoaderTask implements Callable<TaskStatus>,
     }
 
     @Override
-    public TaskStatus call() throws Exception {
+    public TaskStatus call() {
         String localUuid = ClusteredClassLoaderService.hazelcastInstance
                 .getCluster().getLocalMember().getUuid();
         try {
@@ -69,13 +69,13 @@ final class RefreshClassLoaderTask implements Callable<TaskStatus>,
             }
             long after = System.currentTimeMillis();
             TaskStatus taskStatus = new TaskStatus(origin, localUuid, null, false, after - before, isLocal, type, id);
-            ClusteredClassLoaderService.loggerService.log(ClusteredClassLoaderService.class, TechnicalLogSeverity.INFO, "executed refresh triggered by "
+            ClusteredClassLoaderService.loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "executed refresh triggered by "
                     + origin + " result: " + taskStatus.toString());
             return taskStatus;
         } catch (Throwable t) {
-            ClusteredClassLoaderService.loggerService.log(ClusteredClassLoaderService.class, TechnicalLogSeverity.ERROR,
+            ClusteredClassLoaderService.loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR,
                     "error refreshing classloader: " + t.getMessage());
-            ClusteredClassLoaderService.loggerService.log(ClusteredClassLoaderService.class, TechnicalLogSeverity.DEBUG, t);
+            ClusteredClassLoaderService.loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, t);
             return new TaskStatus(origin, localUuid, t, true, 0, isLocal, type, id);
         }
 

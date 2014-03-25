@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,19 +8,20 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import com.bonitasoft.engine.service.impl.LicenseChecker;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+
 /**
  * @author Vincent Elcrin
- *
+ * @author Celine Souchet
+ * 
  */
 public class ProtectedReportTest {
 
@@ -28,7 +29,7 @@ public class ProtectedReportTest {
     private LicenseChecker checker;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         initMocks(this);
     }
 
@@ -46,6 +47,7 @@ public class ProtectedReportTest {
 
         report.deploy("src/test/resources/reports", new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws Exception {
                 assertEquals("myreport", name);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,14 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import org.bonitasoft.engine.io.IOUtil;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import static junit.framework.Assert.*;
+import org.bonitasoft.engine.io.IOUtil;
+import org.junit.Test;
 
 /**
  * Created by Vincent Elcrin
@@ -26,8 +28,9 @@ public class DefaultReportTest {
 
     public static final String RESOURCES_PATH = "src/test/resources/reports";
 
-    private ReportDeployer emptyDeployer = new ReportDeployer() {
+    private final ReportDeployer emptyDeployer = new ReportDeployer() {
 
+        @SuppressWarnings("unused")
         @Override
         public void deploy(String name, String description, byte[] screenShot, byte[] content) {
         }
@@ -46,6 +49,7 @@ public class DefaultReportTest {
 
         report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
                 assertEquals("myreport", name);
@@ -60,6 +64,7 @@ public class DefaultReportTest {
 
         report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
                 assertTrue(areEquals(IOUtil.getAllContentFrom(zip), content));
@@ -73,6 +78,7 @@ public class DefaultReportTest {
 
         report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
                 assertEquals("My report description", description);
@@ -86,6 +92,7 @@ public class DefaultReportTest {
 
         report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
                 assertNull(description);
@@ -99,6 +106,7 @@ public class DefaultReportTest {
 
         report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
                 assertNull(screenShot);
@@ -114,6 +122,7 @@ public class DefaultReportTest {
 
         report.deploy(RESOURCES_PATH, new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
                 assertTrue(areEquals(IOUtil.getAllContentFrom(file), screenShot));
@@ -122,8 +131,8 @@ public class DefaultReportTest {
     }
 
     private boolean areEquals(byte[] expected, byte[] actual) {
-        for(int i = 0; i < expected.length; i++) {
-            if(expected[i] != actual[i]) {
+        for (int i = 0; i < expected.length; i++) {
+            if (expected[i] != actual[i]) {
                 return false;
             }
         }

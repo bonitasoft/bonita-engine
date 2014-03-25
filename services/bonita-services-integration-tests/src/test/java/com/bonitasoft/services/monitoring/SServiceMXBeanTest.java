@@ -97,7 +97,7 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
         TestUtil.stopScheduler(schedulerService, getTransactionService());
     }
 
-    public SServiceMXBean getServiceMXBean() throws Exception {
+    public SServiceMXBean getServiceMXBean() {
         return new SServiceMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getSessionService());
     }
 

@@ -176,8 +176,8 @@ public class TenantTest {
         // login with normal user: not working
         try {
             loginAPI.login(tenantId, "john", "bpm");
-            fail("should not be able to login using other user than technical");
-        } catch (TenantIsPausedException e) {
+            fail("Should not be able to login using other user than technical");
+        } catch (final TenantIsPausedException e) {
             // ok, can't login with user that is not technical
         }
         // login with normal user: not working
@@ -200,18 +200,19 @@ public class TenantTest {
     public void maintenanceAnnotatedAPIMethodShouldBePossibleOnMaintenanceTenant() throws Exception {
         APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
+        apiTestSPUtil.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);
         TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
         tenantManagementAPI.pause();
         try {
             tenantManagementAPI.isPaused();
-            // test with bos accessor
-            org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
-            org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
-            org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
             // test with sp accessor
             apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
             apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
             apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
+            // test with bos accessor
+            org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
+            org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
+            org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
         } finally {
             tenantManagementAPI.resume();
             apiTestSPUtil.logoutTenant(apiTestSPUtil.getSession());

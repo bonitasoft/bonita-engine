@@ -10,14 +10,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
@@ -29,7 +26,7 @@ import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.work.WorkException;
+import org.bonitasoft.engine.work.SWorkException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,8 +83,7 @@ public class TenantManagementAPIExtTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            PlatformServiceAccessor getPlatformAccessor() {
                 return platformServiceAccessor;
             }
         }).when(tenantManagementAPI).createPauseServicesTask(anyLong());
@@ -96,8 +92,7 @@ public class TenantManagementAPIExtTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            PlatformServiceAccessor getPlatformAccessor() {
                 return platformServiceAccessor;
             }
         }).when(tenantManagementAPI).createResumeServicesTask(anyLong());
@@ -139,7 +134,7 @@ public class TenantManagementAPIExtTest {
 
     @Test(expected = UpdateException.class)
     public void should_setMaintenanceMode_to_AVAILLABLE_throw_exception_when_workservice_fail() throws Exception {
-        doThrow(WorkException.class).when(workService).resume();
+        doThrow(SWorkException.class).when(workService).resume();
 
         // given a tenant moved to available mode
         tenantManagementAPI.resume();
