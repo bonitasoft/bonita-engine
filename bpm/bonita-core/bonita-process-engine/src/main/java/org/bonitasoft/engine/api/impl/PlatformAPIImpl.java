@@ -41,7 +41,7 @@ import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshTenantClassLoaders;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
@@ -261,13 +261,16 @@ public class PlatformAPIImpl implements PlatformAPI {
                     throw new StartNodeException(checkPlatformVersion.getErrorMessage());
                 }
                 for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform:" + serviceWithLifecycle.getClass().getName());
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform : " + serviceWithLifecycle.getClass().getName());
+                    }
                     // scheduler my be already running
                     // skip service start
                     if (!serviceWithLifecycle.getClass().isInstance(schedulerService) || !schedulerService.isStarted()) {
                         serviceWithLifecycle.start();
                     }
                 }
+
                 // set tenant classloader
                 final SessionService sessionService = platformAccessor.getSessionService();
                 final List<STenant> tenants = getTenants(platformService, transactionService);
@@ -331,7 +334,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         platformAccessor.getTransactionService().executeInTransaction(callable);
                     }
                 }
-            } catch (final ClassLoaderException e) {
+            } catch (final SClassLoaderException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
             } catch (final SDependencyException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
@@ -347,6 +350,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             // If an exception is thrown, stop the platform that was started.
             try {
                 shutdownScheduler(schedulerService);
+            } catch (final StartNodeException sne) {
+                throw sne;
             } catch (final Exception exp) {
                 throw new StartNodeException("Platform stoping failed : " + exp.getMessage(), e);
             }
@@ -362,8 +367,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         // start the connector executor thread pool
         // TODO should be like the platform services to start...
         final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant " + tenantId + ": "
-                + connectorExecutor.getClass().getName());
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant " + tenantId + " : "
+                    + connectorExecutor.getClass().getName());
+        }
         connectorExecutor.start();
     }
 
@@ -416,16 +423,16 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionService transactionService = platformAccessor.getTransactionService();
-            final List<ServiceWithLifecycle> otherServicesToStart = plaformConfiguration.getServicesToStart();
+            final List<ServiceWithLifecycle> otherServicesToStart = nodeConfiguration.getServicesToStart();
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-            if (plaformConfiguration.shouldStartScheduler()) {
+            if (nodeConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(schedulerService);
             }
-            if (plaformConfiguration.shouldClearSessions()) {
+            if (nodeConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
             for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
@@ -437,9 +444,16 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // stop the connector executor thread pool
                 final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
                 final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": " + connectorExecutor.getClass().getName());
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
+                            + connectorExecutor.getClass().getName());
+                }
                 WorkService workService = tenantServiceAccessor.getWorkService();
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": " + workService.getClass().getName());
+
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + " : "
+                            + connectorExecutor.getClass().getName());
+                }
                 workService.stop();
             }
             isNodeStarted = false;
@@ -457,6 +471,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new StopNodeException(e);
         } catch (final BonitaHomeConfigurationException e) {
             throw new StopNodeException(e.getMessage());
+        } catch (final StopNodeException e) {
+            throw e;
         } catch (final Exception e) {
             throw new StopNodeException(e);
         }
@@ -499,6 +515,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                     return null;
                 }
             });
+        } catch (final DeletionException e) {
+            throw e;
         } catch (final Exception e) {
             throw new DeletionException(e);
         }
@@ -571,7 +589,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
         try {
-
             // add tenant to database
             final String createdBy = "defaultUser";
             final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
@@ -580,33 +597,9 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             transactionService.complete();
             transactionService.begin();
-            // add tenant folder
-            String targetDir;
-            String sourceDir;
-            try {
-                final BonitaHomeServer home = BonitaHomeServer.getInstance();
-                targetDir = home.getTenantsFolder() + File.separator + tenant.getId();
-                sourceDir = home.getTenantTemplateFolder();
-            } catch (final Exception e) {
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Bonita home not set!");
-            }
-            // copy configuration file
-            try {
-                FileUtils.copyDirectory(new File(sourceDir), new File(targetDir));
-            } catch (final IOException e) {
-                IOUtil.deleteDir(new File(targetDir));
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Copy File Exception!");
-            }
+            final String targetDir = createTenantFolderInBonitaHome(tenant);
             // Get user name
-            try {
-                userName = getUserName(tenantId);
-            } catch (final Exception e) {
-                IOUtil.deleteDir(new File(targetDir));
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Access File Exception!");
-            }
+            userName = getUserName(tenant, tenantId, targetDir);
 
             // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
@@ -630,11 +623,48 @@ public class PlatformAPIImpl implements PlatformAPI {
             getDelegate().createDefaultThemes(tenantServiceAccessor);
 
             sessionService.deleteSession(session.getId());
+        } catch (final STenantCreationException e) {
+            throw e;
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
+    }
+
+    private String getUserName(final STenant tenant, final Long tenantId, final String targetDir) throws IOException, STenantDeletionException,
+            STenantCreationException {
+        try {
+            return getUserName(tenantId);
+        } catch (final Exception e) {
+            IOUtil.deleteDir(new File(targetDir));
+            deleteTenant(tenant.getId());
+            throw new STenantCreationException("Access File Exception !!");
+        }
+    }
+
+    private String createTenantFolderInBonitaHome(final STenant tenant) throws STenantDeletionException, STenantCreationException, IOException {
+        // add tenant folder
+        String targetDir;
+        String sourceDir;
+        try {
+            final BonitaHomeServer home = BonitaHomeServer.getInstance();
+            targetDir = home.getTenantsFolder() + File.separator + tenant.getId();
+            sourceDir = home.getTenantTemplateFolder();
+        } catch (final BonitaHomeNotSetException e) {
+            deleteTenant(tenant.getId());
+            throw new STenantCreationException("Bonita home not set !!");
+        }
+
+        // copy configuration file
+        try {
+            FileUtils.copyDirectory(new File(sourceDir), new File(targetDir));
+        } catch (final IOException e) {
+            IOUtil.deleteDir(new File(targetDir));
+            deleteTenant(tenant.getId());
+            throw new STenantCreationException("Copy File Exception !!");
+        }
+        return targetDir;
     }
 
     @SuppressWarnings("unchecked")
@@ -735,6 +765,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final SDeletingActivatedTenantException e) {
             log(platformAccessor, e);
             throw new STenantDeletionException("Unable to delete an activated tenant " + tenantId);
+        } catch (final STenantDeletionException e) {
+            log(platformAccessor, e);
+            throw e;
         } catch (final Exception e) {
             log(platformAccessor, e);
             throw new STenantDeletionException(e);
@@ -745,7 +778,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
-        SchedulerService schedulerService = null;
         long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
@@ -753,7 +785,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final STenant tenant = getDefaultTenant();
             final long tenantId = tenant.getId();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            schedulerService = platformAccessor.getSchedulerService();
+            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
 
@@ -883,12 +915,12 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             return platformService.getDefaultTenant();
-        } catch (final SBonitaException e) {
+        } catch (final STenantNotFoundException e) {
             log(platformAccessor, e);
-            throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
+            throw e;
         } catch (final Exception e) {
             log(platformAccessor, e);
-            throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
+            throw new STenantNotFoundException("Unable to retrieve the defaultTenant.", e);
         }
     }
 

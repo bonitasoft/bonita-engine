@@ -29,7 +29,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.TenantPersistenceService;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * Common implementation to persistence services relying on a database
@@ -157,7 +157,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     @Override
     public void initializeStructure(final Map<String, String> replacements) throws SPersistenceException, IOException {
         for (final String sqlResource : initTablesFiles) {
-            executeSQL(sqlResource, statementDelimiter, replacements, false); // Are we obliged to use the Hibernate connection ?
+            // FIXME Are we obliged to use the Hibernate connection ?
+            executeSQL(sqlResource, statementDelimiter, replacements, false);
         }
     }
 
@@ -173,7 +174,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     private void executeSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
             final boolean useDataSourceConnection) throws SPersistenceException, IOException {
         if (replacements != null) {
-            final HashMap<String, String> replacementsWithVarDelimiters = new HashMap<String, String>();
+            final Map<String, String> replacementsWithVarDelimiters = new HashMap<String, String>();
             for (final Entry<String, String> entry : replacements.entrySet()) {
                 if (entry.getKey().charAt(0) == '$') {
                     replacementsWithVarDelimiters.put(entry.getKey(), entry.getValue());
@@ -239,15 +240,14 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         for (final FilterOption filter : filters) {
             // if filter is just an operator, PersistentClass is not defined:
             if (filter.getPersistentClass() != null) {
-                final String name = filter.getPersistentClass().getSimpleName();
-                query.add(name);
+                query.add(filter.getPersistentClass().getSimpleName());
             }
         }
         final String searchOnClassName = entityClass.getSimpleName();
         query.remove(searchOnClassName);
         final StringBuilder builder = new StringBuilder(prefix);
         builder.append(searchOnClassName);
-        if (query.size() > 0) {
+        if (!query.isEmpty()) {
             builder.append("with");
         }
         for (final String entity : query) {
@@ -261,9 +261,9 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     /**
      * @return
-     * @throws TenantIdNotSetException
+     * @throws STenantIdNotSetException
      */
-    protected abstract long getTenantId() throws TenantIdNotSetException;
+    protected abstract long getTenantId() throws STenantIdNotSetException;
 
     protected SequenceManager getSequenceManager() {
         return sequenceManager;

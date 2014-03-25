@@ -19,6 +19,8 @@ import javax.naming.NamingException;
  */
 public class SimpleMemoryContext implements Context {
 
+    private static final String NOT_SUPPORTED_YET = "Not supported yet.";
+
     private final Map<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
 
     public void clear() {
@@ -32,7 +34,6 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public Object lookup(final String name) throws NamingException {
-        // System.out.println(toString() + " ~~~~ lookup " + name + " contains ? " + dictionary.containsKey(name));
         if (dictionary.containsKey(name)) {
             return dictionary.get(name);
         }
@@ -46,7 +47,6 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public void bind(final String name, final Object o) throws NamingException {
-        // System.out.println(toString() + " ~~~~ binding " + name + " with " + o + " already bound ? " + dictionary.containsKey(name));
         if (dictionary.containsKey(name)) {
             throw new NameAlreadyBoundException("Name " + name + " already bound!");
         }
@@ -90,22 +90,22 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public NamingEnumeration<NameClassPair> list(final Name name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public NamingEnumeration<NameClassPair> list(final String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public NamingEnumeration<Binding> listBindings(final Name name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public NamingEnumeration<Binding> listBindings(final String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
@@ -132,17 +132,17 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public Object lookupLink(final Name name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Object lookupLink(final String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public NameParser getNameParser(final Name name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
@@ -152,38 +152,37 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public Name composeName(final Name name, final Name name1) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public String composeName(final String string, final String string1) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Object addToEnvironment(final String string, final Object o) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Object removeFromEnvironment(final String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Hashtable<?, ?> getEnvironment() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void close() {
-        // System.out.println("Closing SimpleMemoryContext");
         // Thread.dumpStack();
         // clear();
     }
 
     @Override
     public String getNameInNamespace() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 }

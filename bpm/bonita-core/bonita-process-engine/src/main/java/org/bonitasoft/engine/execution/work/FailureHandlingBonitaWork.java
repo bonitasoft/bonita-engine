@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,9 +15,11 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.execution.SIllegalStateTransition;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -35,10 +37,6 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     private static final long serialVersionUID = 1L;
 
-    protected transient TechnicalLoggerService loggerService;
-
-    private transient SessionAccessor sessionAccessor;
-
     public FailureHandlingBonitaWork(final BonitaWork work) {
         super(work);
     }
@@ -49,7 +47,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         incidentService.report(getTenantId(), incident);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    TenantServiceAccessor getTenantAccessor() {
         try {
             return TenantServiceSingleton.getInstance(getTenantId());
         } catch (final Exception e) {
@@ -60,8 +58,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     @Override
     public void work(final Map<String, Object> context) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        loggerService = tenantAccessor.getTechnicalLoggerService();
-        sessionAccessor = tenantAccessor.getSessionAccessor();
+        final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
+        final SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
         context.put(TENANT_ACCESSOR, tenantAccessor);
         try {
             sessionAccessor.setTenantId(getTenantId());
@@ -70,35 +68,78 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.TRACE, "Starting work: " + getDescription());
             }
             getWrappedWork().work(context);
-        } catch (final Throwable e) {
-            Throwable cause = e.getCause();
-            if (e instanceof SFlowNodeNotFoundException || e instanceof SProcessInstanceNotFoundException || e instanceof SProcessDefinitionNotFoundException) {
-                logFailureCause(e);
-            } else if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
-                    || cause instanceof SProcessDefinitionNotFoundException) {
-                logFailureCause(cause);
-            } else {
-                // final Edge case we cannot manage
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Work " + getDescription() + " failed. The failure will be handled.");
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage(), e);
-
-                try {
-                    getWrappedWork().handleFailure(e, context);
-                } catch (final Throwable e1) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
-                            + ". You may consider restarting the system. This will restart all works.", e);
-                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure", e);
-                    logIncident(e, e1);
-                }
-            }
+        } catch (final SExpressionEvaluationException e) {
+            // To do before log, because we want to set the context of the exception.
+            handleFailureWrappedWork(loggerService, e, context);
+            logException(loggerService, e);
+        } catch (final Exception e) {
+            handleFailure(e, context);
         } finally {
             sessionAccessor.deleteTenantId();
         }
     }
 
-    protected void logFailureCause(final Throwable e) {
+    @Override
+    public void handleFailure(final Throwable e, final Map<String, Object> context) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
+        final Throwable cause = e.getCause();
+        if (mustNotPutInFailedState(e)) {
+            logFailureCause(loggerService, e);
+        } else if (mustNotPutInFailedState(cause)) {
+            logFailureCause(loggerService, cause);
+        } else {
+            // final Edge case we cannot manage
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "The work [" + getDescription() + "] failed. The failure will be handled.");
+            }
+            // To do before log, because we want to set the context of the exception.
+            handleFailureWrappedWork(loggerService, e, context);
+            logException(loggerService, e);
+        }
+    }
+
+    private void logException(final TechnicalLoggerService loggerService, final Throwable e) {
         if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work '" + getDescription() + "' failed to execute due to: ", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : " + e);
+        } else {
+            String message = e.getMessage();
+            if (message == null || message.isEmpty()) {
+                message = "No message";
+            }
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getClass().getName() + " : \"" + message + "\"");
+        }
+    }
+
+    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Throwable e, final Map<String, Object> context) {
+        try {
+            getWrappedWork().handleFailure(e, context);
+        } catch (final Throwable e1) {
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work [" + getDescription() + "]"
+                    + ". You may consider restarting the system. This will restart all works.", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure. ", e1);
+            logIncident(e, e1);
+        }
+    }
+
+    private boolean mustNotPutInFailedState(final Throwable e) {
+        return e instanceof SFlowNodeNotFoundException
+                || e instanceof SProcessInstanceNotFoundException
+                || e instanceof SProcessDefinitionNotFoundException
+                || isTransitionFromTerminalState(e);
+    }
+
+    boolean isTransitionFromTerminalState(final Throwable t) {
+        if (!(t instanceof SIllegalStateTransition)) {
+            return false;
+        }
+        SIllegalStateTransition e = (SIllegalStateTransition) t;
+        return e.isTransitionFromTerminalState();
+    }
+
+    protected void logFailureCause(final TechnicalLoggerService loggerService, final Throwable e) {
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", e);
         }
     }
 }

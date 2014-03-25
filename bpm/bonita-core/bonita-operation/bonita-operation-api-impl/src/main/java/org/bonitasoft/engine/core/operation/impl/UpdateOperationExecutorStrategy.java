@@ -42,7 +42,8 @@ public abstract class UpdateOperationExecutorStrategy implements OperationExecut
         dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
     }
 
-    protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceException {
+    protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType)
+            throws SDataInstanceException {
         return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
     }
 
@@ -56,7 +57,7 @@ public abstract class UpdateOperationExecutorStrategy implements OperationExecut
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return true;
     }
 

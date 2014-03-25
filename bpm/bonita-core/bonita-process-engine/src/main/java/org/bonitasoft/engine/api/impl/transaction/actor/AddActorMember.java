@@ -65,6 +65,8 @@ public class AddActorMember implements TransactionContent {
             case MEMBERSHIP:
                 actorMember = actorMappingService.addRoleAndGroupToActor(actorId, roleId, groupId);
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 

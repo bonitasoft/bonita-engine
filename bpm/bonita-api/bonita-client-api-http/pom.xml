@@ -42,11 +42,6 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.httpcomponents</groupId> -->
-		<!-- <artifactId>httpnio</artifactId> -->
-		<!-- <version>${httpclient.version}</version> -->
-		<!-- </dependency> -->
 
 		<!-- Tests -->
 		<dependency>

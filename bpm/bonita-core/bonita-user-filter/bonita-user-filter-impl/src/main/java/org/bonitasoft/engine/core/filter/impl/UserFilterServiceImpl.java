@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -104,6 +104,8 @@ public class UserFilterServiceImpl implements UserFilterService {
             filterResult = executeFilterInClassloader(implementationClassName, inputs, classLoader, expressionContext, actorName);
         } catch (final SConnectorException e) {
             throw new SUserFilterExecutionException(e.getCause());// Usergit chec FilterException wrapped in a connectorException
+        } catch (final SUserFilterExecutionException e) {
+            throw e;
         } catch (final Throwable e) {// catch throwable because we might have NoClassDefFound... see ENGINE-1333
             throw new SUserFilterExecutionException(e);
         }
@@ -119,14 +121,14 @@ public class UserFilterServiceImpl implements UserFilterService {
             stb.append(">] on flow node instance with id: <");
             stb.append(expressionContext.getContainerId());
             stb.append(">");
-            
+
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
         return filterResult;
     }
 
     private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition)
-            throws CacheException {
+            throws SCacheException {
         UserFilterImplementationDescriptor descriptor;
         descriptor = (UserFilterImplementationDescriptor) cacheService.get(FILTER_CACHE_NAME,
                 getUserFilterImplementationIdInCache(processDefinitionId, sUserFilterDefinition.getUserFilterId(), sUserFilterDefinition.getVersion()));
@@ -141,7 +143,6 @@ public class UserFilterServiceImpl implements UserFilterService {
             final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws InstantiationException,
             IllegalAccessException, ClassNotFoundException, SUserFilterExecutionException, SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException {
-
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
@@ -191,14 +192,14 @@ public class UserFilterServiceImpl implements UserFilterService {
                         throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
                     } catch (final SXMLParseException e) {
                         throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
-                    } catch (final CacheException e) {
+                    } catch (final SCacheException e) {
                         throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);
                     }
                     resolved = true;
                 }
             }
         } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home is not set");
+            throw new BonitaRuntimeException("Bonita home is not set.");
         }
         return resolved;
     }

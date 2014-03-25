@@ -188,15 +188,14 @@ public class ExpressionBuilder {
     }
 
     private void validateConditionExpression(final String content, final List<Expression> dependencies) throws InvalidExpressionException {
-
         if (!validOperators.contains(content)) {
             throw new InvalidExpressionException("Invalid content for expression of type " + ExpressionType.TYPE_CONDITION + ". The possible values are: "
                     + validOperators);
         }
         if (!NOT_COMPARATOR.equals(content)) {
-            if (dependencies.size() != 2) {
+            if (dependencies.size() != 2 && dependencies.get(0) != null && dependencies.get(1) != null) {
                 throw new InvalidExpressionException("The comparator " + content
-                        + " must have exactly two dependencies. The first one is the left oparand and the second one the right operand.");
+                        + " must have exactly two dependencies. The first one is the left operand and the second one the right operand.");
             }
 
             final String r1 = dependencies.get(0).getReturnType();
@@ -372,6 +371,8 @@ public class ExpressionBuilder {
             case NOT_EQUALS:
                 strOperator = NOT_EQUALS_COMPARATOR;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return createComparisonExpression(name, leftOperand, strOperator, rightOperand);
     }

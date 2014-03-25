@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,15 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-
 /**
  * @author Baptiste Mesta
  * @author Nicolas Chabanoles
+ * @author Celine Souchet
  *         An unexpected error happened during the execution of the activity
  *         The activity might be in an inconsistent state
  */
-public class SActivityExecutionException extends SBonitaException {
+public class SActivityExecutionException extends SFlowNodeExecutionException {
 
     private static final long serialVersionUID = -1134776910207667894L;
 

@@ -68,20 +68,17 @@ public class JobExecutionTest extends CommonAPITest {
         }
     }
 
-
     private List<FailedJob> waitForFailedJobs(final int numberOfFailedJobs) throws Exception {
-
-        new WaitUntil(100, 10000) {
+        new WaitUntil(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getFailedJobs(0, 100).size() == numberOfFailedJobs;
             }
         }.waitUntil();
-        List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
+        final List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
         assertEquals(numberOfFailedJobs, failedJobs.size());
         return failedJobs;
     }
-
 
 }

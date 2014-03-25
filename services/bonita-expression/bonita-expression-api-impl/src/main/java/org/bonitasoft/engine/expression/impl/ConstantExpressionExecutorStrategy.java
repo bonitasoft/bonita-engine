@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -41,7 +41,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (expression.getContent().trim().equals("")) {
-            throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression: " + expression);
+            throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression : " + expression, expression.getName());
         }
     }
 
@@ -50,6 +50,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
         return KIND_CONSTANT;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
@@ -73,10 +74,12 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
             } else if (Date.class.getName().equals(returnType)) { // "2013-01-02T02:42:12.17+02:00"
                 result = parseDate(expressionContent);
             } else {
-                throw new SExpressionEvaluationException("unknown return type: " + returnType + " for expression " + expression.getName() + " : " + expressionContent);
+                throw new SExpressionEvaluationException("Unknown return type: " + returnType + " for expression " + expression.getName() + " : "
+                        + expressionContent, expression.getName());
             }
         } catch (final NumberFormatException e) {
-            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent);
+            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent,
+                    expression.getName());
         }
         return result;
     }

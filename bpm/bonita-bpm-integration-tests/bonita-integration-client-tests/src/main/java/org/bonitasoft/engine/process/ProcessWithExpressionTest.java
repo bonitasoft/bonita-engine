@@ -45,7 +45,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,22 +54,20 @@ import org.junit.Test;
  */
 public class ProcessWithExpressionTest extends CommonAPITest {
 
-    private static final String JOHN = "john";
-
     private User john;
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
+        deleteUser(USERNAME);
         logout();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        john = createUser(JOHN, "bpm");
+        john = createUser(USERNAME, PASSWORD);
         logout();
-        loginWith(JOHN, "bpm");
+        loginWith(USERNAME, PASSWORD);
     }
 
     @Test
@@ -109,23 +106,22 @@ public class ProcessWithExpressionTest extends CommonAPITest {
 
     private Serializable executeProcessAndGetResultOfExpression(final Expression expression, final String dataType, final String extraDataName,
             final String extraDataType, final Expression extraDataValue) throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithExpression", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
         designProcessDefinition.addData("data1", dataType, null);
         if (extraDataName != null) {
             designProcessDefinition.addData(extraDataName, extraDataType, extraDataValue);
         }
         designProcessDefinition.addAutomaticTask("step1").addOperation(new LeftOperandBuilder().createNewInstance("data1").done(), OperatorType.ASSIGNMENT,
                 "=", null, expression);
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance);
 
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 2500, false, 1, john).waitUntil());
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("data1", processInstance.getId());
         final Serializable value = processDataInstance.getValue();
         disableAndDeleteProcess(processDefinition);
@@ -136,8 +132,8 @@ public class ProcessWithExpressionTest extends CommonAPITest {
     public void evaluateGroovyScriptWithConnectorHavingDependencies() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
-        pBuilder.addActor("actor")
-                .addUserTask("step1", "actor")
+        pBuilder.addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
                         new ExpressionBuilder().createGroovyScriptExpression("myScript",
                                 "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName()));
@@ -149,7 +145,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
         final BusinessArchive businessArchive = builder.done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser("actor", john.getId(), processDefinition);
+        addMappingOfActorsForUser(ACTOR_NAME, john.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -193,14 +189,14 @@ public class ProcessWithExpressionTest extends CommonAPITest {
     private ProcessDefinition deployProcessWithScriptAndLibrary(final BarResource myLibrary, final String script) throws BonitaException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
-        pBuilder.addActor("actor").addUserTask("step1", "actor")
+        pBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(new ExpressionBuilder().createGroovyScriptExpression("myScript", script, String.class.getName()));
         final DesignProcessDefinition done = pBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
         builder.addClasspathResource(myLibrary);
         final BusinessArchive businessArchive = builder.done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser("actor", john.getId(), processDefinition);
+        addMappingOfActorsForUser(ACTOR_NAME, john.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
@@ -571,11 +567,11 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithGroovy", "1.0");
         processBuilder.addAutomaticTask("activityThatFail").addData("data1", String.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("script", "throw new Exception()", String.class.getName()));
-        processBuilder.addUserTask("aTask", "john");
-        processBuilder.addActor("john");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), "john", john);
+        processBuilder.addUserTask("aTask", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForPendingTasks(john.getId(), 1);
+        waitForUserTask("aTask", processInstance);
         waitForTaskToFail(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -586,11 +582,11 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("XPathExpression", "1.0");
         processBuilder.addData("data", String.class.getName(), new ExpressionBuilder().createXPathExpression("xpath", "/root/element/@name",
                 XPathReturnType.STRING, "<root><element name='Alexander Corvinus' /></root>"));
-        processBuilder.addUserTask("aDummyTask", "john");
-        processBuilder.addActor("john");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), "john", john);
+        processBuilder.addUserTask("aDummyTask", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForPendingTasks(john.getId(), 1);
+        waitForUserTask("aDummyTask", processInstance);
 
         assertEquals("Alexander Corvinus", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         disableAndDeleteProcess(processDefinition);
@@ -600,8 +596,6 @@ public class ProcessWithExpressionTest extends CommonAPITest {
             "Transition", "State", "Failed" }, jira = "ENGINE-796")
     @Test
     public void executeProcessWithAutomaticTasksAndTransitionFailed() throws Exception {
-        final String delivery = "Delivery men";
-
         // Build condition
         final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("evaluateGroovyExpressionFromApi", "throw new Exception()",
                 Boolean.class.getName());
@@ -609,7 +603,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         // Build process
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnStartOfAnAutomaticActivity", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
         designProcessDefinition.addAutomaticTask("step2");
         designProcessDefinition.addAutomaticTask("default");
@@ -617,7 +611,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         designProcessDefinition.addDefaultTransition("step1", "default");
 
         // Start process
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
         getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(2000);
 
@@ -654,14 +648,14 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         designProcessDefinition.addData("adress", "org.bonitasoft.custom.Address", new ExpressionBuilder().createGroovyScriptExpression("create adress",
                 "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")", "org.bonitasoft.custom.Address"));
         designProcessDefinition
-                .addActor("Workers")
-                .addUserTask("step1", "Workers")
+                .addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
                         new ExpressionBuilder().createJavaMethodCallExpression("getNameOfAdress", "getName", String.class.getName(),
                                 new ExpressionBuilder().createDataExpression("adress", "org.bonitasoft.custom.Address")));
         designProcessDefinition.addAutomaticTask("start").addTransition("start", "step1");
         builder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(builder.done(), "Workers", john);
+        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         final ActivityInstance userTask = waitForUserTask("step1", processInstance1);
         assertEquals("name1", userTask.getDisplayName());
@@ -673,14 +667,14 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         designProcessDefinition2.addData("adress", "org.bonitasoft.custom.Address", new ExpressionBuilder().createGroovyScriptExpression("create adress",
                 "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")", "org.bonitasoft.custom.Address"));
         designProcessDefinition2
-                .addActor("Workers")
-                .addUserTask("step1", "Workers")
+                .addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME)
                 .addDisplayName(
                         new ExpressionBuilder().createJavaMethodCallExpression("getNameOfAdress", "getName", String.class.getName(),
                                 new ExpressionBuilder().createDataExpression("adress", "org.bonitasoft.custom.Address")));
         designProcessDefinition2.addAutomaticTask("start").addTransition("start", "step1");
         builder2.setProcessDefinition(designProcessDefinition2.done());
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(builder2.done(), "Workers", john);
+        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(builder2.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         final ActivityInstance userTask2 = waitForUserTask("step1", processInstance2);
         assertEquals("name1", userTask2.getDisplayName());

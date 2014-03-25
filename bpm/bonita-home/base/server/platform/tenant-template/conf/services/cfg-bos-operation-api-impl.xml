@@ -10,14 +10,14 @@
 	</bean>
 
 	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider">
-		<property name="expressionExecutors">
+		<constructor-arg>
 			<list>
 				<ref bean="assignmentOperationExecutorStrategy" />
 				<ref bean="javaMethodOperationExecutorStrategy" />
 				<ref bean="xpathUpdateQueryOperationExecutorStrategy" />
 				<ref bean="documentOperationExecutorStrategy" />
 			</list>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">

@@ -18,9 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -52,7 +51,6 @@ public class RestartProcessHandler implements TenantRestartHandler {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final WorkService workService = tenantServiceAccessor.getWorkService();
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-        final ConnectorService connectorService = tenantServiceAccessor.getConnectorService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         // get all process in initializing
         // call executeConnectors on enter on them (only case they can be in initializing)
@@ -70,7 +68,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     if (isInfo) {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "Executing 'on enter' connectors of process " + processInstance.getName());
                     }
-                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER, connectorService);
+                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER);
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
 
@@ -83,7 +81,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     if (isInfo) {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "Executing 'on finish' connectors of process " + processInstance.getName());
                     }
-                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_FINISH, connectorService);
+                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_FINISH);
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
 
@@ -106,8 +104,8 @@ public class RestartProcessHandler implements TenantRestartHandler {
                         // Should always be in a CallActivity:
                         if (callerId > 0) {
                             final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
-                            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getId(), null, null,
-                                    callActivityInstance.getParentProcessInstanceId()));
+                            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getProcessDefinitionId(),
+                                    callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId(), null, null));
                         }
                     }
                 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,7 +24,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
 import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
@@ -44,12 +43,13 @@ import org.bonitasoft.engine.xml.Parser;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ActorProcessDependencyResolver extends ProcessDependencyResolver {
 
     @Override
-    public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
-            final SProcessDefinition sDefinition) throws ActorMappingImportException {
+    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
+            throws ActorMappingImportException {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.getInstance().get(SActorBuilderFactory.class);
         final IdentityService identityService = tenantAccessor.getIdentityService();

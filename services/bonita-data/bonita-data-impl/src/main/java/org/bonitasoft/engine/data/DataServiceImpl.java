@@ -17,7 +17,7 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.data.model.SDataSource;
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.data.model.SDataSourceState;
 import org.bonitasoft.engine.data.model.builder.SDataSourceLogBuilder;
 import org.bonitasoft.engine.data.model.builder.SDataSourceLogBuilderFactory;
 import org.bonitasoft.engine.data.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
@@ -57,8 +56,6 @@ public class DataServiceImpl implements DataService {
 
     private final ClassLoaderService classLoaderService;
 
-    private final EventService eventService;
-
     private final List<DataSourceConfiguration> dataSourceConfigurations;
 
     private final TechnicalLoggerService logger;
@@ -67,13 +64,12 @@ public class DataServiceImpl implements DataService {
 
     protected static final String DATA_SOURCE_TYPE = "___datasource___";
 
-    public DataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final ClassLoaderService classLoaderService, final EventService eventService, final List<DataSourceConfiguration> dataSourceConfigurations,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+    public DataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final ClassLoaderService classLoaderService,
+            final List<DataSourceConfiguration> dataSourceConfigurations, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.classLoaderService = classLoaderService;
-        this.eventService = eventService;
         this.dataSourceConfigurations = dataSourceConfigurations;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
@@ -96,15 +92,15 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public <T extends DataSourceImplementation> T getDataSourceImplementation(final Class<T> dataSourceType, final long dataSourceId)
-            throws SDataSourceNotFoundException, SDataSourceInitializationException, SDataSourceInactiveException, SDataException {
+            throws SDataSourceNotFoundException, SDataSourceInitializationException, SDataSourceInactiveException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDataSourceImplementation"));
         }
         final SDataSource dataSource = getDataSource(dataSourceId);
 
         if (!dataSource.getState().equals(SDataSourceState.ACTIVE)) {
-            throw new SDataSourceInactiveException("Unable to retrieve datasource implementation for datasource: " + dataSource + " because it is not active: "
-                    + dataSource.getState(), dataSource.getState());
+            throw new SDataSourceInactiveException("Unable to retrieve datasource implementation for datasource <" + dataSource
+                    + ">, because it is not active <" + dataSource.getState() + ">", dataSource.getState());
         }
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -118,7 +114,7 @@ public class DataServiceImpl implements DataService {
             final DataSourceImplementationProxy dataSourceImplementationProxy = new DataSourceImplementationProxy(dataSourceImplementation);
             return (T) Proxy.newProxyInstance(dataSourceClassloader, new Class[] { dataSourceType }, dataSourceImplementationProxy);
 
-        } catch (final ClassLoaderException e) {
+        } catch (final SClassLoaderException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDataSourceImplementation", e));
             }
@@ -161,29 +157,30 @@ public class DataServiceImpl implements DataService {
     @Override
     public void createDataSource(final SDataSource dataSource) throws SDataSourceAlreadyExistException, SDataException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createDataSource"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "CreateDataSource"));
         }
-        final SDataSourceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new datasource");
+        final SDataSourceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new datasource.");
         try {
             final InsertRecord insertRecord = new InsertRecord(dataSource);
-            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATASOURCE).setObject(dataSource).done();
+            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATASOURCE).setObject(dataSource)
+                    .done();
             recorder.recordInsert(insertRecord, insertEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "CreateDataSource"));
             }
-            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_OK, logBuilder, "createDataSource");
+            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_OK, logBuilder, "CreateDataSource");
         } catch (final SRecorderException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createDataSource", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "CreateDataSource", e));
             }
-            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createDataSource");
+            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "CreateDataSource");
             try {
                 getDataSource(dataSource.getName(), dataSource.getVersion());
                 throw new SDataSourceAlreadyExistException(dataSource.getName(), dataSource.getVersion());
             } catch (final SDataSourceNotFoundException e1) {
                 // not because it exists
             }
-            throw new SDataException("can't add datasource " + dataSource, e);
+            throw new SDataException("Can't add datasource " + dataSource + ".", e);
         }
     }
 
@@ -191,19 +188,19 @@ public class DataServiceImpl implements DataService {
     public SDataSource getDataSource(final long dataSourceId) throws SDataSourceNotFoundException {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "GetDataSource"));
             }
             final SDataSource dataSource = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SDataSource.class, "DataSource", dataSourceId));
             if (dataSource == null) {
                 throw new SDataSourceNotFoundException("can't get the datasource with id " + dataSourceId, null);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "GetDataSource"));
             }
             return dataSource;
         } catch (final SBonitaReadException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDataSource", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "GetDataSource", e));
             }
             throw new SDataSourceNotFoundException("can't get the datasource with id " + dataSourceId, e);
         }
@@ -213,21 +210,21 @@ public class DataServiceImpl implements DataService {
     public SDataSource getDataSource(final String name, final String version) throws SDataSourceNotFoundException {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "GetDataSource"));
             }
             final SDataSource dataSource = persistenceService.selectOne(SelectDescriptorBuilder.getDataSource(name, version));
             if (dataSource == null) {
-                throw new SDataSourceNotFoundException("can't get the datasource with name: " + name + " and version: " + version, null);
+                throw new SDataSourceNotFoundException("Can't get the datasource with name = <" + name + "> and version = <" + version + ">", null);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "GetDataSource"));
             }
             return dataSource;
         } catch (final SBonitaReadException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDataSource", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "GetDataSource", e));
             }
-            throw new SDataSourceNotFoundException("can't get the datasource with name: " + name + " and version: " + version, e);
+            throw new SDataSourceNotFoundException("Can't get the datasource with name = <" + name + "> and version = <" + version + ">", e);
         }
     }
 
@@ -236,20 +233,21 @@ public class DataServiceImpl implements DataService {
         final SDataSourceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a DataSource");
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "RemoveDataSource"));
             }
             final DeleteRecord deleteRecord = new DeleteRecord(dataSource);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATASOURCE).setObject(dataSource).done();
+            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATASOURCE).setObject(dataSource)
+                    .done();
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeDataSource"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "RemoveDataSource"));
             }
-            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_OK, logBuilder, "removeDataSource");
+            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_OK, logBuilder, "RemoveDataSource");
         } catch (final SRecorderException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "removeDataSource", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "RemoveDataSource", e));
             }
-            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "removeDataSource");
+            initiateLogBuilder(dataSource.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "RemoveDataSource");
             throw new SDataSourceNotFoundException("can't delete datasource " + dataSource, e);
         }
     }

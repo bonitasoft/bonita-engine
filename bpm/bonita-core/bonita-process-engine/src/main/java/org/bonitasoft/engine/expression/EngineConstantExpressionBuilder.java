@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,6 +15,7 @@ package org.bonitasoft.engine.expression;
 
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -23,20 +24,31 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class EngineConstantExpressionBuilder {
 
-	public static SExpression getConnectorAPIAccessorExpression() throws SInvalidExpressionException {
+    public static SExpression getConnectorAPIAccessorExpression() {
         final SExpressionBuilder builder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         builder.setContent("connectorApiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(APIAccessor.class.getName());
-        return builder.done();
+        try {
+            return builder.done();
+        } catch (final SInvalidExpressionException e) {
+            // Never happens !!
+            throw new SBonitaRuntimeException(e);
+        }
     }
-	
-    public static SExpression getEngineExecutionContext() throws SInvalidExpressionException {
+
+    public static SExpression getEngineExecutionContext() {
         final SExpressionBuilder builder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         builder.setContent("engineExecutionContext").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name())
-                .setReturnType(EngineExecutionContext.class.getName()).done();
-        return builder.done();
+                .setReturnType(EngineExecutionContext.class.getName());
+        try {
+            return builder.done();
+        } catch (final SInvalidExpressionException e) {
+            // Never happens !!
+            throw new SBonitaRuntimeException(e);
+        }
     }
 
 }

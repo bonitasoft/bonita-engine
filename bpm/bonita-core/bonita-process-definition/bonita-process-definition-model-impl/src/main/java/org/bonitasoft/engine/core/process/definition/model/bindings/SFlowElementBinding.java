@@ -63,14 +63,14 @@ public class SFlowElementBinding extends ElementBinding {
 
     private final List<SConnectorDefinition> connectors = new ArrayList<SConnectorDefinition>();
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
-
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
-
     }
 
     @Override

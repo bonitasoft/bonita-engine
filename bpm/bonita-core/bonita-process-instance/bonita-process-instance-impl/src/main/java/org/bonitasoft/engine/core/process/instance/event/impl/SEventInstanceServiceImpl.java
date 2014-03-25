@@ -106,18 +106,17 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             stb.append(eventInstance.getType().getValue());
             stb.append(" <");
             stb.append(eventInstance.getName());
-            stb.append("> with id <");
+            stb.append("> with id = <");
             stb.append(eventInstance.getId());
-            stb.append(">, parent process instance: <");
+            stb.append(">, parent process instance id = <");
             stb.append(eventInstance.getParentProcessInstanceId());
-            stb.append(">, root process instance: <");
+            stb.append(">, root process instance id = <");
             stb.append(eventInstance.getRootProcessInstanceId());
-            stb.append(">, process definition: <");
+            stb.append(">, process definition id = <");
             stb.append(eventInstance.getProcessDefinitionId());
             stb.append(">");
             String message = stb.toString();
-            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    message);
+            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
     }
 
@@ -163,7 +162,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final InsertRecord insertRecord = new InsertRecord(eventTriggerInstance);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EVENT_TRIGGER_INSTANCE)
+                        .setObject(eventTriggerInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -215,7 +215,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final InsertRecord insertRecord = new InsertRecord(waitingEvent);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent)
+                        .done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -253,7 +254,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final InsertRecord insertRecord = new InsertRecord(messageInstance);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(MESSAGE_INSTANCE).setObject(messageInstance).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(MESSAGE_INSTANCE).setObject(messageInstance)
+                        .done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -266,7 +268,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         try {
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(MESSAGE_INSTANCE).setObject(messageInstance).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(MESSAGE_INSTANCE).setObject(messageInstance)
+                        .done();
             }
             getRecorder().recordDelete(new DeleteRecord(messageInstance), deleteEvent);
         } catch (final SRecorderException e) {
@@ -279,7 +282,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         try {
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent)
+                        .done();
             }
             final DeleteRecord deleteRecord = new DeleteRecord(waitingEvent);
             getRecorder().recordDelete(deleteRecord, deleteEvent);
@@ -331,11 +335,13 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
     public void updateWaitingMessage(final SWaitingMessageEvent waitingMessageEvent, final EntityUpdateDescriptor descriptor)
             throws SWaitingEventModificationException {
         try {
-            final SWaitingMessageEvent oldWaitingMessage = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewInstance(waitingMessageEvent).done();
+            final SWaitingMessageEvent oldWaitingMessage = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewInstance(waitingMessageEvent)
+                    .done();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(waitingMessageEvent, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(MESSAGE_INSTANCE).setObject(waitingMessageEvent).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(MESSAGE_INSTANCE).setObject(waitingMessageEvent)
+                        .done();
                 updateEvent.setOldObject(oldWaitingMessage);
             }
             getRecorder().recordUpdate(updateRecord, updateEvent);
@@ -489,7 +495,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
 
     @Override
     public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException {
-        final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getFlowNodeNameKey(),
+        final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
+                .getFlowNodeNameKey(),
                 OrderByType.ASC);
         final FilterOption filterOption = new FilterOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
                 .getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
@@ -524,7 +531,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final DeleteRecord deleteRecord = new DeleteRecord(eventTriggerInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EVENT_TRIGGER_INSTANCE)
+                        .setObject(eventTriggerInstance).done();
             }
             getRecorder().recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {

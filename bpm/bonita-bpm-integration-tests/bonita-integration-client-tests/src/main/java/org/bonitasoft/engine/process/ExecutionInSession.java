@@ -39,7 +39,7 @@ public abstract class ExecutionInSession {
     void executeInSession() throws Exception {
         final APISession session;
         if (username != null) {
-            session = apiTestUtil.loginDefaultTenant(username, password);
+            session = apiTestUtil.loginTenant(username, password);
         } else {
             session = apiTestUtil.loginDefaultTenant();
         }

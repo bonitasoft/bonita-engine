@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.bpm.classloader;
 
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.ParentClassLoaderResolver;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderResolver {
 
@@ -31,12 +31,12 @@ public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderReso
 
     @Override
     public ClassLoader getParent(final ClassLoaderService classLoaderService, final String childClassLoaderType, final long childClassLoaderId)
-            throws ClassLoaderException {
+            throws SClassLoaderException {
         if (ScopeType.PROCESS.name().equals(childClassLoaderType)) {
             try {
                 final Long tenantId = this.sessionAccessor.getTenantId();
                 return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
-            } catch (TenantIdNotSetException e) {
+            } catch (STenantIdNotSetException e) {
                 return classLoaderService.getGlobalClassLoader();
             }
         } else if (ScopeType.TENANT.name().equals(childClassLoaderType)) {

@@ -126,19 +126,14 @@ public class SQueriableLogImplTest {
         }
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testSetNumericIndexOutOfRange() {
-        final int numberOfNumericIndexes = 5;
-        for (int i = 0; i < numberOfNumericIndexes; i++) {
-            assertEquals(-1L, queriableLog.getNumericIndex(i));
-        }
-
         queriableLog.setNumericIndex(10, 10);
+    }
 
-        for (int i = 0; i < numberOfNumericIndexes; i++) {
-            assertEquals(-1L, queriableLog.getNumericIndex(i));
-        }
-        assertEquals(-1L, queriableLog.getNumericIndex(10));
+    @Test(expected = IllegalStateException.class)
+    public void getNumericIndexOutOfRange() {
+        queriableLog.getNumericIndex(10);
     }
 
     @Test

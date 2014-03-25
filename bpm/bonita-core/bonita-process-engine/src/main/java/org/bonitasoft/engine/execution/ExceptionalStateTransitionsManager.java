@@ -16,6 +16,7 @@ package org.bonitasoft.engine.execution;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 
 
@@ -23,15 +24,14 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  * @author Elias Ricken de Medeiros
  *
  */
-public class ExceptionalStateTransitionsManager {
+public class ExceptionalStateTransitionsManager extends NormalStateTransitionsManager {
     
-    private Map<Integer, FlowNodeState> stateTransitions;
-
-    public ExceptionalStateTransitionsManager(Map<Integer, FlowNodeState> stateTransitions) {
-        this.stateTransitions = stateTransitions;
+    public ExceptionalStateTransitionsManager(Map<Integer, FlowNodeState> stateTransitions, SFlowNodeInstance flowNodeInstance) {
+        super(stateTransitions, flowNodeInstance);
     }
     
-    public FlowNodeState getNextState(FlowNodeState currentState) {
+    @Override
+    protected FlowNodeState getNextStateFromMap(FlowNodeState currentState) {
         if(SStateCategory.NORMAL.equals(currentState.getStateCategory()) && !currentState.isTerminal()) {
             // is the first state in the category aborting or canceling
             return stateTransitions.get(-1);

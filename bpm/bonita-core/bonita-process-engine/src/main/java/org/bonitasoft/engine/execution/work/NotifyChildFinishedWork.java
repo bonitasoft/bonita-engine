@@ -42,18 +42,13 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private final String parentType;
 
-    private final int stateId;
-
     private final long parentId;
 
-    NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
-            final String parentType,
-            final int stateId) {
+    NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType) {
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.parentId = parentId;
         this.parentType = parentType;
-        this.stateId = stateId;
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
@@ -67,7 +62,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
             final ContainerRegistry containerRegistry = getTenantAccessor(context).getContainerRegistry();
-            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
+            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, parentId, parentType);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -68,7 +68,7 @@ public abstract class AbstractSynchroService implements SynchroService {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "No waiter found, storing event " + event);
                 try {
                     cacheService.store(SYNCHRO_SERVICE_CACHE, (Serializable) event, id);
-                } catch (CacheException e) {
+                } catch (SCacheException e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -115,7 +115,7 @@ public abstract class AbstractSynchroService implements SynchroService {
                     return firedEvent.get("id");
                 }
             }
-        } catch (CacheException e) {
+        } catch (SCacheException e) {
             throw new RuntimeException(e);
         }
         return null;
@@ -129,7 +129,7 @@ public abstract class AbstractSynchroService implements SynchroService {
     public void clearAllEvents() {
         try {
             cacheService.clear(SYNCHRO_SERVICE_CACHE);
-        } catch (CacheException e) {
+        } catch (SCacheException e) {
             throw new RuntimeException(e);
         }
         getWaitersMap().clear();

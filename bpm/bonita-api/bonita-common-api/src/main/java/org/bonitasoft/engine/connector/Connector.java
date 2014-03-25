@@ -15,7 +15,6 @@ package org.bonitasoft.engine.connector;
 
 import java.util.Map;
 
-
 /**
  * @author Feng Hui
  */
@@ -32,7 +31,7 @@ public interface Connector {
     /**
      * Validate the input parameters. Check the parameters types and boundaries.
      * 
-     * @throws SConnectorValidationException
+     * @throws ConnectorValidationException
      */
     void validateInputParameters() throws ConnectorValidationException;
 

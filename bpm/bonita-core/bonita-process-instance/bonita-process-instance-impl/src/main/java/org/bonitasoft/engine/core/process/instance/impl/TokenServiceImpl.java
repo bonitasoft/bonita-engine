@@ -78,8 +78,8 @@ public class TokenServiceImpl implements TokenService {
             throw new SObjectCreationException(sre);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "create token:id=" + token.getId() + ", pId=" + processInstanceId + ", refId=" + refId
-                    + ", parentRefId=" + parentRefId);
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Create token with id = <" + token.getId() + ">, process instance id = <"
+                    + processInstanceId + ">, refId = <" + refId + ">, parentRefId = <" + parentRefId + ">");
         }
         return token;
     }
@@ -111,12 +111,13 @@ public class TokenServiceImpl implements TokenService {
             final DeleteRecord deleteRecord = new DeleteRecord(token);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token)
+                        .done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "deleted token:id=" + token.getId() + ", pId=" + token.getProcessInstanceId()
-                        + ", refId=" + token.getRefId() + ", parentRefId=" + token.getParentRefId());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Delete token with id = <" + token.getId() + ">, process instance id = <"
+                        + token.getProcessInstanceId() + ">, refId = <" + token.getRefId() + ">, parentRefId = <" + token.getParentRefId() + ">");
             }
         } catch (final SBonitaException e) {
             throw new SObjectModificationException(e);
@@ -199,11 +200,12 @@ public class TokenServiceImpl implements TokenService {
         try {
             final List<SToken> selectList = persistenceRead.selectList(SelectDescriptorBuilder.getToken(processInstanceId, refId));
             if (selectList.isEmpty()) {
-                throw new SObjectNotFoundException("no token found for process " + processInstanceId + " and reference " + refId
-                        + " , the design may be invalid, check that all branches are correctly merged");
-            } else {
-                return selectList.get(0);
+                final SObjectNotFoundException exception = new SObjectNotFoundException("No token found for reference = <" + refId
+                        + "> . The design may be invalid. Check that all branches are correctly merged.");
+                exception.setProcessInstanceIdOnContext(processInstanceId);
+                throw exception;
             }
+            return selectList.get(0);
         } catch (final SBonitaReadException e) {
             throw new SObjectReadException(e);
         }

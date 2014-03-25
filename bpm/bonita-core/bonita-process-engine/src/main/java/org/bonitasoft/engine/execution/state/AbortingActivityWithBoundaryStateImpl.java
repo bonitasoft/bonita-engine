@@ -26,11 +26,13 @@ public class AbortingActivityWithBoundaryStateImpl extends EndingActivityWithBou
         super(stateBehaviors);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

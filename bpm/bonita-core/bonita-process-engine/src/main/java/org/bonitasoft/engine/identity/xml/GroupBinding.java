@@ -38,6 +38,7 @@ public class GroupBinding extends ElementBinding {
         groupCreator.setParentPath(parentPath);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.DISPLAY_NAME.equals(name)) {
@@ -51,6 +52,7 @@ public class GroupBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

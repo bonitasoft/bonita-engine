@@ -26,26 +26,27 @@ public class LogMessageBuilder {
      * process definition id)
      * 
      * @param flowNodeInstance
-     * @param initialMessage the initial message
+     * @param initialMessage
+     *            the initial message
      * @return the message log built using the flow node's context.
      */
     public static String buildFlowNodeContextMessage(final SFlowNodeInstance flowNodeInstance) {
         StringBuilder stb = new StringBuilder();
-        stb.append(" [name: <");
+        stb.append(" [name = <");
         stb.append(flowNodeInstance.getName());
-        stb.append(">, display name: <");
+        stb.append(">, display name = <");
         stb.append(flowNodeInstance.getDisplayName());
-        stb.append(">, id: <");
+        stb.append(">, id = <");
         stb.append(flowNodeInstance.getId());
         if (flowNodeInstance.getParentActivityInstanceId() > 0) {
-            stb.append(">, parent activity instance: <");
+            stb.append(">, parent activity instance = <");
             stb.append(flowNodeInstance.getParentActivityInstanceId());
         }
-        stb.append(">, parent process instance: <");
+        stb.append(">, parent process instance = <");
         stb.append(flowNodeInstance.getParentProcessInstanceId());
-        stb.append(">, root process instance: <");
+        stb.append(">, root process instance = <");
         stb.append(flowNodeInstance.getRootProcessInstanceId());
-        stb.append(">, process definition: <");
+        stb.append(">, process definition = <");
         stb.append(flowNodeInstance.getProcessDefinitionId());
         stb.append(">]");
         return stb.toString();
@@ -53,6 +54,7 @@ public class LogMessageBuilder {
 
     /**
      * Build message "The user <session.getUsername> (acting as delegate of user with id <starterId>)"
+     * 
      * @param session
      * @param starterId
      * @return
@@ -63,11 +65,11 @@ public class LogMessageBuilder {
         stb.append(session.getUserName());
         stb.append("> ");
         if (starterId != session.getUserId()) {
-            stb.append("acting as delegate of user with id <");
+            stb.append("acting as delegate of user with id = <");
             stb.append(starterId);
             stb.append("> ");
         }
         return stb.toString();
     }
-    
+
 }

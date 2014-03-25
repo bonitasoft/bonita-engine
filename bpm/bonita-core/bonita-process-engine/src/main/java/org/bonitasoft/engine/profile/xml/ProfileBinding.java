@@ -35,6 +35,7 @@ public class ProfileBinding extends ElementBinding {
         profileBuilder = new ExportedProfileBuilder(attributes.get("name"), Boolean.valueOf(attributes.get("isDefault")));
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {

@@ -39,6 +39,7 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
         mimeType = attributes.get(XMLSProcessDefinition.DOCUMENT_DEFINITION_MIME_TYPE);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DOCUMENT_DEFINITION_FILE_NAME.equals(name)) {
@@ -55,6 +56,7 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

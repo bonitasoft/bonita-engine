@@ -131,7 +131,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             final InsertRecord insertRecord = new InsertRecord(activityInstance);
             SInsertEvent insertEvent = null;
             if (getEventService().hasHandlers(ACTIVITYINSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance)
+                        .done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -143,17 +144,17 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             stb.append(activityInstance.getType().getValue());
             stb.append(" <");
             stb.append(activityInstance.getName());
-            stb.append("> with id <");
+            stb.append("> with id = <");
             stb.append(activityInstance.getId());
             if (activityInstance.getParentActivityInstanceId() > 0) {
-                stb.append(">, parent activity instance: <");
+                stb.append(">, parent activity instance id = <");
                 stb.append(activityInstance.getParentActivityInstanceId());
             }
-            stb.append(">, parent process instance: <");
+            stb.append(">, parent process instance id = <");
             stb.append(activityInstance.getParentProcessInstanceId());
-            stb.append(">, root process instance: <");
+            stb.append(">, root process instance id = <");
             stb.append(activityInstance.getRootProcessInstanceId());
-            stb.append(">, process definition: <");
+            stb.append(">, process definition id = <");
             stb.append(activityInstance.getProcessDefinitionId());
             stb.append(">");
             getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
@@ -217,7 +218,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 for (final SPendingActivityMapping mapping : mappings) {
                     SDeleteEvent deleteEvent = null;
                     if (createEvents) {
-                        deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
+                        deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PENDINGACTIVITYMAPPING)
+                                .setObject(mapping).done();
                     }
                     try {
                         getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
@@ -437,7 +439,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
             SUpdateEvent updateEvent = null;
             if (getEventService().hasHandlers(ACTIVITYINSTANCE_ASSIGNEE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_ASSIGNEE).setObject(flowNodeInstance)
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_ASSIGNEE)
+                        .setObject(flowNodeInstance)
                         .done();
             }
             try {
@@ -672,7 +675,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(loopInstance, descriptor);
         SUpdateEvent updateEvent = null;
         if (getEventService().hasHandlers(ACTIVITYINSTANCE_STATE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(loopInstance).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(loopInstance)
+                    .done();
         }
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
@@ -837,7 +841,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
         SUpdateEvent updateEvent = null;
         if (getEventService().hasHandlers(ACTIVITY_INSTANCE_TOKEN_COUNT, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITY_INSTANCE_TOKEN_COUNT).setObject(activityInstance)
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITY_INSTANCE_TOKEN_COUNT)
+                    .setObject(activityInstance)
                     .done();
         }
         try {
@@ -879,7 +884,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
-            throw new STaskVisibilityException(activityInstanceId, userId, "Creation");
+            throw new STaskVisibilityException("Can't hide the task.", activityInstanceId, userId);
         }
     }
 
@@ -901,7 +906,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             }
             getRecorder().recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
-            throw new STaskVisibilityException(hiddenTask.getActivityId(), hiddenTask.getUserId(), "deletion", e);
+            throw new STaskVisibilityException("Can't unhide the task.", hiddenTask.getActivityId(), hiddenTask.getUserId(), e);
         }
     }
 
@@ -910,11 +915,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         try {
             final SHiddenTaskInstance hiddenTask = getPersistenceRead().selectOne(SelectDescriptorBuilder.getSHiddenTask(userId, activityInstanceId));
             if (hiddenTask == null) {
-                throw new STaskVisibilityException("SHiddenTaskInstance not found with user id " + userId + " and activity id " + activityInstanceId);
+                throw new STaskVisibilityException("SHiddenTaskInstance not found.", activityInstanceId, userId);
             }
             return hiddenTask;
         } catch (final SBonitaReadException e) {
-            throw new STaskVisibilityException("SHiddenTaskInstance not found with user id " + userId + " and activity id " + activityInstanceId, e);
+            throw new STaskVisibilityException("SHiddenTaskInstance not found.", activityInstanceId, userId, e);
         }
     }
 
@@ -923,25 +928,24 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         final SHiddenTaskInstance hiddenTask = getPersistenceRead().selectById(
                 SelectDescriptorBuilder.getElementById(SHiddenTaskInstance.class, "SHiddenTaskInstance", id));
         if (hiddenTask == null) {
-            throw new STaskVisibilityException("SHiddenTaskInstance not found with id " + id);
+            throw new STaskVisibilityException("SHiddenTaskInstance not found.", id);
         }
         return hiddenTask;
     }
 
     @Override
-    public List<SHiddenTaskInstance> searchHiddenTasksForActivity(final long activityInstanceId, final QueryOptions searchOptions)
-            throws STaskVisibilityException {
+    public List<SHiddenTaskInstance> searchHiddenTasksForActivity(final long activityInstanceId) throws STaskVisibilityException {
         try {
             return getPersistenceRead().selectList(SelectDescriptorBuilder.getSHiddenTasksForActivity(activityInstanceId));
         } catch (final SBonitaReadException e) {
-            throw new STaskVisibilityException("Error searching for hidden tasks for activity with id " + activityInstanceId, e);
+            throw new STaskVisibilityException("Error searching for hidden tasks for the activity.", activityInstanceId, e);
         }
     }
 
     @Override
     public void deleteHiddenTasksForActivity(final long activityInstanceId) throws STaskVisibilityException {
         List<SHiddenTaskInstance> hiddenTasks;
-        while ((hiddenTasks = searchHiddenTasksForActivity(activityInstanceId, new QueryOptions(0, 500))).size() > 0) {
+        while ((hiddenTasks = searchHiddenTasksForActivity(activityInstanceId)).size() > 0) {
             for (final SHiddenTaskInstance sHiddenTask : hiddenTasks) {
                 unhideTasks(sHiddenTask.getUserId(), activityInstanceId);
             }
@@ -1040,7 +1044,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @Override
     public void deleteArchivedPendingMappings(final long flowNodeInstanceId) {
-        // TODO archived pending mapping... first we need to have archived pending mapping and so on
+        // FIXME : archived pending mapping... first we need to have archived pending mapping and so on
         // final SEventBuilder eventBuilder = BuilderFactory.get(SEventBuilderFactory.class);
         // List<SPendingActivityMapping> mappings = null;
         // try {
@@ -1068,7 +1072,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(STATE_CATEGORY).setObject(activityInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(STATE_CATEGORY)
+                .setObject(activityInstance)
                 .done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);

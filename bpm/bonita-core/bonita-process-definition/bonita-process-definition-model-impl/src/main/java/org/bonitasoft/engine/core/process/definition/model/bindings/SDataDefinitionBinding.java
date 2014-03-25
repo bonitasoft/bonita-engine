@@ -42,6 +42,7 @@ public class SDataDefinitionBinding extends SNamedElementBinding {
         isTransient = attributes.get(XMLSProcessDefinition.DATA_DEFINITION_TRANSIENT);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DESCRIPTION.equals(name)) {

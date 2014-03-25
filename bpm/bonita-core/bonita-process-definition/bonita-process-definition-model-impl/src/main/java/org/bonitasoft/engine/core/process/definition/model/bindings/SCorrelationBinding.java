@@ -37,10 +37,12 @@ public class SCorrelationBinding extends ElementBinding {
         return XMLSProcessDefinition.CORRELATION_NODE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

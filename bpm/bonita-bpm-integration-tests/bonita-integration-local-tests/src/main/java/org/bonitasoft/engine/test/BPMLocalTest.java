@@ -40,9 +40,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -57,8 +55,6 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,7 +127,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         // Check
-        List<SATransitionInstance> searchArchivedTransitions = transactionService.executeInTransaction(new Callable<List<SATransitionInstance>>() {
+        final List<SATransitionInstance> searchArchivedTransitions = transactionService.executeInTransaction(new Callable<List<SATransitionInstance>>() {
 
             @Override
             public List<SATransitionInstance> call() throws Exception {
@@ -161,14 +157,14 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processDef.addActor("delivery");
         final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        Callable<Long> getNumberOfComments = new Callable<Long>() {
+        final Callable<Long> getNumberOfComments = new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {
                 return commentService.getNumberOfComments(QueryOptions.defaultQueryOptions());
             }
         };
-        Callable<Long> getNumberOfArchivedComments = new Callable<Long>() {
+        final Callable<Long> getNumberOfArchivedComments = new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {
@@ -217,7 +213,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         final long taskId = waitForUserTask.getId();
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        Callable<List<SPendingActivityMapping>> getPendingMappings = new Callable<List<SPendingActivityMapping>>() {
+        final Callable<List<SPendingActivityMapping>> getPendingMappings = new Callable<List<SPendingActivityMapping>>() {
 
             @Override
             public List<SPendingActivityMapping> call() throws Exception {
@@ -438,13 +434,6 @@ public class BPMLocalTest extends CommonAPILocalTest {
         logout();
         final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        new WaitUntil(10, 15000) {
-
-            @Override
-            protected boolean check() {
-                return BlockingConnector.semaphore.hasQueuedThreads() && semaphore1.hasQueuedThreads() && semaphore2.hasQueuedThreads();
-            }
-        };
         // stop node and in the same time release the semaphores to unlock works
         final Thread thread = new Thread(new Runnable() {
 
@@ -499,9 +488,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @Test
     public void getPlatformVersion() throws BonitaException, IOException {
         logout();
-        PlatformSession platformSession = loginPlatform();
+        final PlatformSession platformSession = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        Platform platform = platformAPI.getPlatform();
+        final Platform platform = platformAPI.getPlatform();
         logoutPlatform(platformSession);
         loginWith(JOHN_USERNAME, JOHN_PASSWORD);
         final String platformVersionToTest = getBonitaVersion();
@@ -516,10 +505,10 @@ public class BPMLocalTest extends CommonAPILocalTest {
         String version = System.getProperty("bonita.version");// works in maven
         if (version == null) {
             // when running tests in eclipse get it from the pom.xml
-            File file = new File("pom.xml");
-            String pomContent = IOUtil.read(file);
-            Pattern pattern = Pattern.compile("<version>(.*)</version>");
-            Matcher matcher = pattern.matcher(pomContent);
+            final File file = new File("pom.xml");
+            final String pomContent = IOUtil.read(file);
+            final Pattern pattern = Pattern.compile("<version>(.*)</version>");
+            final Matcher matcher = pattern.matcher(pomContent);
             matcher.find();
             version = matcher.group(1);
         }
