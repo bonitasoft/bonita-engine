@@ -54,6 +54,6 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      *             since 6.0
      */
     @NoSessionRequired
-    APISession login(long tenantId, Map<String, Serializable> credentials) throws LoginException;
+    APISession login(long tenantId, Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException;
 
 }
