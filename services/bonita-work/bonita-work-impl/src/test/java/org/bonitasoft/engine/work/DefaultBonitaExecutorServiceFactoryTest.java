@@ -14,7 +14,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
     @Test
     public void ThreadNameInExecutorServiceShouldContainsTenantId() throws Exception {
         long tenantId = 999;
-        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(tenantId, 1,
+        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, tenantId, 1,
                 20, 15, 10);
 
         Pair<ExecutorService, Queue<Runnable>> createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();

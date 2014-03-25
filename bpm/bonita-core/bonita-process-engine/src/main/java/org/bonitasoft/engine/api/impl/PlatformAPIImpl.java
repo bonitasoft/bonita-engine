@@ -444,7 +444,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             for (final STenant tenant : tenantIds) {
                 // stop the connector executor thread pool
                 final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
-                stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
+                stopServicesOfTenant(logger, tenant, tenantServiceAccessor);
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -468,21 +468,21 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void stopServicesOfTenant(final TechnicalLoggerService logger, final long tenantId, final TenantServiceAccessor tenantServiceAccessor)
+    protected void stopServicesOfTenant(final TechnicalLoggerService logger, final STenant tenant, final TenantServiceAccessor tenantServiceAccessor)
             throws SBonitaException,
             TimeoutException {
-                final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
-                            + connectorExecutor.getClass().getName());
-                }
-                WorkService workService = tenantServiceAccessor.getWorkService();
+        final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
+                    + connectorExecutor.getClass().getName());
+        }
+        WorkService workService = tenantServiceAccessor.getWorkService();
 
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + " : "
-                            + connectorExecutor.getClass().getName());
-                }
-                workService.stop();
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + " : "
+                    + connectorExecutor.getClass().getName());
+        }
+        workService.stop();
     }
 
     private void shutdownScheduler(final SchedulerService schedulerService) throws Exception {
@@ -754,8 +754,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            TransactionService transactionService = platformAccessor.getTransactionService();
             TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+
+            STenant tenant = platformService.getTenant(tenantId);
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -767,7 +768,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // stop tenant services and clear the spring context
             TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
+            stopServicesOfTenant(logger, tenant, tenantServiceAccessor);
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
             tenantServiceAccessor.destroy();
 
