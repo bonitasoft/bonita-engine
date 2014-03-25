@@ -106,7 +106,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         start();
     }
 
-    private void updateSchema() {
+    private void updateSchema() throws SBusinessDataRepositoryDeploymentException {
         final Configuration cfg = new Configuration();
         final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
         for (final EntityType<?> entity : entities) {
@@ -119,8 +119,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         cfg.setProperty("hibernate.current_session_context_class", "jta");
         cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
 
-        final SchemaUpdater updater = new SchemaUpdater(cfg);
+        final SchemaUpdater updater = new SchemaUpdater(cfg, loggerService);
         updater.execute();
+        final List<Exception> exceptions = updater.getExceptions();
+        if (!exceptions.isEmpty()) {
+            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
+        }
     }
 
     @Override
@@ -208,18 +212,13 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Entity> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters)
-            throws SBusinessDataNotFoundException, NonUniqueResultException {
+    public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws SBusinessDataNotFoundException,
+            NonUniqueResultException {
         final EntityManager em = getEntityManager();
-        final TypedQuery<T> query = em.createQuery(qlString, resultClass);
-        if (parameters != null) {
-            for (final Entry<String, Object> parameter : parameters.entrySet()) {
-                query.setParameter(parameter.getKey(), parameter.getValue());
-            }
-        }
+        final TypedQuery<T> query = buildQuery(em, resultClass, qlString, parameters);
         try {
             final T entity = query.getSingleResult();
-            em.detach(entity);
+            detachEntity(em, resultClass, entity);
             return entity;
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
@@ -229,26 +228,29 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T> T select(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws SBusinessDataNotFoundException,
-            NonUniqueResultException {
+    public <T> List<T> findList(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) {
         final EntityManager em = getEntityManager();
+        final TypedQuery<T> query = buildQuery(em, resultClass, qlString, parameters);
+        final List<T> entities = query.getResultList();
+        for (final T entity : entities) {
+            detachEntity(em, resultClass, entity);
+        }
+        return entities;
+    }
+
+    private <T> TypedQuery<T> buildQuery(final EntityManager em, final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) {
         final TypedQuery<T> query = em.createQuery(qlString, resultClass);
         if (parameters != null) {
             for (final Entry<String, Object> parameter : parameters.entrySet()) {
                 query.setParameter(parameter.getKey(), parameter.getValue());
             }
         }
-        try {
-            final T entity = query.getSingleResult();
-            final Class<? extends Object> entityClass = entity.getClass();
-            if (!ClassUtils.isPrimitiveOrWrapper(entityClass)) {
-                em.detach(entity);
-            }
-            return entity;
-        } catch (final javax.persistence.NonUniqueResultException nure) {
-            throw new NonUniqueResultException(nure);
-        } catch (final NoResultException nre) {
-            throw new SBusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
+        return query;
+    }
+
+    private <T> void detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
+        if (!ClassUtils.isPrimitiveOrWrapper(resultClass)) {
+            em.detach(entity);
         }
     }
 

@@ -17,6 +17,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  */
 public class ResumeServiceStrategy implements ServiceStrategy {
 
+    private static final long serialVersionUID = -7207853911827859069L;
+
     @Override
     public String getStateName() {
         return "resume";
