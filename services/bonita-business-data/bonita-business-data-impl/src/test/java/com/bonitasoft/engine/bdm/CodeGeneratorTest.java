@@ -141,6 +141,16 @@ public class CodeGeneratorTest {
         assertThat(setter.name()).isEqualTo("getName");
         assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").methods()).contains(setter);
     }
+    
+    @Test
+    public void shouldAddGetter_AddAJMethodInDefinedClass_AndReturnIt_ForBoolean() throws Exception {
+        final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+        final JFieldVar privateField = codeGenerator.addField(definedClass, "married", Boolean.class);
+        final JMethod setter = codeGenerator.addGetter(definedClass, privateField);
+        assertThat(setter).isNotNull().isInstanceOf(JMethod.class);
+        assertThat(setter.name()).isEqualTo("isMarried");
+        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").methods()).contains(setter);
+    }
 
     @Test
     public void shouldCheckAnnotationTarget_IsValid() throws Exception {
