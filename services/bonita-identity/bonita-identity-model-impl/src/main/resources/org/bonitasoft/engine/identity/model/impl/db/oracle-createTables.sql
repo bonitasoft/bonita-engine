@@ -4,7 +4,7 @@ CREATE TABLE group_ (
   name VARCHAR2(50) NOT NULL,
   parentPath VARCHAR2(255),
   displayName VARCHAR2(75),
-  description VARCHAR22(1024),
+  description VARCHAR2(1024),
   iconName VARCHAR2(50),
   iconPath VARCHAR2(50),
   createdBy NUMBER(19, 0),
@@ -19,7 +19,7 @@ CREATE TABLE role (
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(50) NOT NULL,
   displayName VARCHAR2(75),
-  description VARCHAR22(1024),
+  description VARCHAR2(1024),
   iconName VARCHAR2(50),
   iconPath VARCHAR2(50),
   createdBy NUMBER(19, 0),
@@ -80,7 +80,7 @@ CREATE TABLE custom_usr_inf_def (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(75) NOT NULL,
-  description VARCHAR22(1024),
+  description VARCHAR2(1024),
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
