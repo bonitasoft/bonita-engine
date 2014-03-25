@@ -80,7 +80,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
             credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         }
         try {
-            return loginInternal(credentials);
+            return loginInternal(tenantId, credentials);
         } catch (final LoginException e) {
             throw e;
         } catch (final TenantIsPausedException e) {
