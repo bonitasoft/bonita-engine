@@ -39,7 +39,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @AvailableWhenTenantIsPaused
     public APISession login(final String userName, final String password) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started: " + LicenseChecker.getInstance().getErrorMessage());
+            throw new LoginException("The node is not started : " + LicenseChecker.getInstance().getErrorMessage());
         }
         try {
             return loginInternal(userName, password, null);
@@ -57,7 +57,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @AvailableWhenTenantIsPaused
     public APISession login(final long tenantId, final String userName, final String password) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started");
+            throw new LoginException("The node is not started !!");
         }
         try {
             return loginInternal(userName, password, tenantId);
@@ -73,8 +73,9 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @Override
     public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started");
+            throw new LoginException("The node is not started !!");
         }
+        checkCredentials(credentials);
         if (credentials != null) {
             credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         }
