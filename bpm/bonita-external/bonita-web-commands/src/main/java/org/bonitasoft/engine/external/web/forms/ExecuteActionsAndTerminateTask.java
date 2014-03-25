@@ -84,7 +84,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         return null;
     }
 
-    protected long getActivityInstanceId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    protected Long getActivityInstanceId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
         final String message = "Mandatory parameter " + ACTIVITY_INSTANCE_ID_KEY + " is missing or not convertible to long.";
         return getMandatoryParameter(parameters, ACTIVITY_INSTANCE_ID_KEY, message);
     }
