@@ -46,6 +46,8 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private final File temporaryFolder;
 
+    private boolean isActive = true;
+    
     /**
      * Logger
      */
@@ -93,6 +95,11 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public InputStream getResourceAsStream(final String name) {
+        /*
+        if (!isActive) {
+            throw new RuntimeException(this.toString() + " is not active anymore. Don't use it.");
+        }
+        */
         InputStream is = getInternalInputstream(name);
         if (is == null && name.length() > 0 && name.charAt(0) == '/') {
             is = getInternalInputstream(name.substring(1));
@@ -121,6 +128,11 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+        /*
+        if (!isActive) {
+            throw new RuntimeException(this.toString() + " is not active anymore. Don't use it.");
+        }
+        */
         Class<?> c = null;
         c = findLoadedClass(name);
         if (c == null) {
@@ -150,6 +162,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     public void release() {
         deleteQuietly(temporaryFolder);
+        isActive = false;
     }
 
     public long getId() {
@@ -166,6 +179,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + type + ", id=" + id;
+        return super.toString() + ", type=" + type + ", id=" + id + ", isActive: " + isActive + ", parent= " + getParent();
     }
 }
