@@ -476,6 +476,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
                     + connectorExecutor.getClass().getName());
         }
+        connectorExecutor.stop();
         WorkService workService = tenantServiceAccessor.getWorkService();
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
