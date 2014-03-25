@@ -16,14 +16,19 @@ import java.util.List;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 
 /**
  * @author Vincent Elcrin
- * 
  */
 public class DefaultReportListTest {
+
+    @BeforeClass
+    public static void setBonitaHome() {
+        System.setProperty("bonita.home", "target/home");
+    }
 
     @Mock
     private TechnicalLoggerService logger;
@@ -43,7 +48,7 @@ public class DefaultReportListTest {
 
             @SuppressWarnings("unused")
             @Override
-            public void deploy(String name, String description, byte[] screenShot, byte[] content) {
+            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) {
                 reports.add(name);
             }
         });
