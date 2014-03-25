@@ -85,8 +85,11 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     @Override
     @CustomTransactions
     public APISession login(final Map<String, Serializable> credentials) throws LoginException {
+        checkCredentials(credentials);
         try {
-            return loginInternal(credentials);
+            final Long tenantId = (NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))) ? NumberUtils.toLong(String
+                    .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
+            return loginInternal(tenantId, credentials);
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
@@ -96,19 +99,13 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     protected APISession loginInternal(final String userName, final String password, final Long tenantId) throws Exception {
         checkUsernameAndPassword(userName, password);
-        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        if (tenantId != null && tenantId > -1) {
-            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        }
-        return loginInternal(credentials);
+        return loginInternal(tenantId, credentials);
     }
 
-    protected APISession loginInternal(final Map<String, Serializable> credentials) throws Exception {
-        checkCredentials(credentials);
-        final Long tenantId = (NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))) ? NumberUtils.toLong(String
-                .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
+    protected APISession loginInternal(final Long tenantId, final Map<String, Serializable> credentials) throws Exception {
         final String userName = (credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) ? String.valueOf(credentials
                 .get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -140,16 +137,16 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     protected void checkUsernameAndPassword(final String userName, final String password) throws LoginException {
         if (userName == null || userName.isEmpty()) {
-            throw new LoginException("User name is null or empty");
+            throw new LoginException("User name is null or empty !! ");
         }
         if (password == null || password.isEmpty()) {
-            throw new LoginException("Password is null or empty");
+            throw new LoginException("Password is null or empty !!");
         }
     }
 
     protected void checkCredentials(final Map<String, Serializable> credentials) throws LoginException {
         if (CollectionUtils.isEmpty(credentials)) {
-            throw new LoginException("credentials are null or empty");
+            throw new LoginException("Credentials are null or empty !!");
         }
     }
 
