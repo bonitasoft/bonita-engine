@@ -29,7 +29,6 @@
   <query name="getTenants">
     SELECT tenant
     FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
-    ORDER BY tenant.id
   </query>
   
   <query name="getTenantsByIds">
