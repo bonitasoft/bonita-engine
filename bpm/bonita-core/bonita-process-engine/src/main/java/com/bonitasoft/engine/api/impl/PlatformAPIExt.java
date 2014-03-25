@@ -319,13 +319,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-                final ReportingService reportingService = tenantAccessor.getReportingService();
+            final ReportingService reportingService = tenantAccessor.getReportingService();
                 final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
                         description, screenShot);
-                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-                // Here we are already in a transaction, so we can call execute() directly:
-                addReport.execute();
-            }
+            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+            // Here we are already in a transaction, so we can call execute() directly:
+            addReport.execute();
+        }
         });
     }
 
@@ -354,6 +354,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -362,6 +363,12 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             // delete tenant in database
             final TransactionContent transactionContent = new DeleteTenant(tenantId, platformService);
             transactionExecutor.execute(transactionContent);
+
+            // stop tenant services and clear the spring context
+            TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
+            tenantServiceAccessor.destroy();
 
             // delete tenant folder
             final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;
