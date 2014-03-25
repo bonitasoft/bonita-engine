@@ -444,7 +444,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             for (final STenant tenant : tenantIds) {
                 // stop the connector executor thread pool
                 final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
-                stopServicesOfTenant(logger, tenant, tenantServiceAccessor);
+                stopServicesOfTenant(logger, tenant.getId(), tenantServiceAccessor);
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -468,19 +468,19 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void stopServicesOfTenant(final TechnicalLoggerService logger, final STenant tenant, final TenantServiceAccessor tenantServiceAccessor)
+    protected void stopServicesOfTenant(final TechnicalLoggerService logger, final long tenantId, final TenantServiceAccessor tenantServiceAccessor)
             throws SBonitaException,
             TimeoutException {
         final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + ": "
                     + connectorExecutor.getClass().getName());
         }
         connectorExecutor.stop();
         WorkService workService = tenantServiceAccessor.getWorkService();
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + " : "
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + " : "
                     + connectorExecutor.getClass().getName());
         }
         workService.stop();
@@ -757,8 +757,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
-            STenant tenant = platformService.getTenant(tenantId);
-
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
             transactionExecutor.execute(transactionContentForTenantObjects);
@@ -769,7 +767,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // stop tenant services and clear the spring context
             TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            stopServicesOfTenant(logger, tenant, tenantServiceAccessor);
+            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
             tenantServiceAccessor.destroy();
 
