@@ -356,8 +356,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
-            STenant tenant = platformService.getTenant(tenantId);
-
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
             transactionExecutor.execute(transactionContentForTenantObjects);
@@ -368,7 +366,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             // stop tenant services and clear the spring context
             TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            stopServicesOfTenant(logger, tenant, tenantServiceAccessor);
+            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
             tenantServiceAccessor.destroy();
 
