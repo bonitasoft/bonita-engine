@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction;
 
+import java.io.Serializable;
+
 import org.bonitasoft.engine.commons.LifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface ServiceStrategy {
+public interface ServiceStrategy extends Serializable {
 
     String getStateName();
 
