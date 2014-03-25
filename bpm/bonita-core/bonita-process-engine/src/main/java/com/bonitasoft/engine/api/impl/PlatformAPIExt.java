@@ -319,13 +319,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-            final ReportingService reportingService = tenantAccessor.getReportingService();
+                final ReportingService reportingService = tenantAccessor.getReportingService();
                 final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
                         description, screenShot);
-            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-            // Here we are already in a transaction, so we can call execute() directly:
-            addReport.execute();
-        }
+                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+                // Here we are already in a transaction, so we can call execute() directly:
+                addReport.execute();
+            }
         });
     }
 
@@ -356,6 +356,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
+            STenant tenant = platformService.getTenant(tenantId);
+
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
             transactionExecutor.execute(transactionContentForTenantObjects);
@@ -366,7 +368,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             // stop tenant services and clear the spring context
             TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
+            stopServicesOfTenant(logger, tenant, tenantServiceAccessor);
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
             tenantServiceAccessor.destroy();
 
