@@ -77,6 +77,14 @@
 			<xsd:element minOccurs="0" name="enabled" type="xsd:boolean" />
 			<xsd:element minOccurs="0" name="personalData" type="ContactData" />
 			<xsd:element minOccurs="0" name="professionalData" type="ContactData" />
+			<!-- the element metaDatas is deprecated, use customUserInfoDefinitions and customUserInfoValues instead -->
+			<xsd:element minOccurs="0" name="metaDatas">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element maxOccurs="unbounded" minOccurs="0" name="metaData" type="Metadata" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element minOccurs="0" name="customUserInfoValues">
 				<xsd:complexType>
 					<xsd:sequence>
@@ -103,6 +111,12 @@
 			<xsd:element minOccurs="0" name="country" type="xsd:string" />
 			<xsd:element minOccurs="0" name="website" type="xsd:string" />
 		</xsd:all>
+	</xsd:complexType>
+
+	<!-- the type MetaData is deprecated, use CustomUserInfoDefinition and CustomUserInfoValue instead -->
+	<xsd:complexType name="Metadata">
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="value" type="xsd:string" />
 	</xsd:complexType>
 
 	<xsd:complexType name="Role">

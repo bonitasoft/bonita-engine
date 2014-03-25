@@ -27,6 +27,11 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
+      <metaDatas>
+        <metaData name="Skype ID"/>
+        <metaData name="Twitter"/>
+        <metaData name="Facebook"/>
+      </metaDatas>
        <customUserInfoValues>
 	    <customUserInfoValue>
 	      <name>Office location</name>
