@@ -91,7 +91,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public STheme createTheme(final STheme theme) throws SThemeCreationException {
-        logBeforeMethod("createTheme");
+        final String methodName = "createTheme";
+        logBeforeMethod(methodName);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.CREATED, "Adding a new theme");
         final InsertRecord insertRecord = new InsertRecord(theme);
         SInsertEvent insertEvent = null;
@@ -100,19 +101,20 @@ public class ThemeServiceImpl implements ThemeService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, "createTheme");
-            logAfterMethod("createTheme");
+            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            logAfterMethod(methodName);
             return theme;
         } catch (final SRecorderException re) {
-            logOnExceptionMethod("createTheme", re);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createTheme");
+            logOnExceptionMethod(methodName, re);
+            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SThemeCreationException(re);
         }
     }
 
     @Override
     public void deleteTheme(final long id) throws SThemeNotFoundException, SThemeDeletionException {
-        logBeforeMethod("deleteTheme");
+        final String methodName = "deleteTheme";
+        logBeforeMethod(methodName);
         STheme theme;
         try {
             theme = getTheme(id);
@@ -120,12 +122,13 @@ public class ThemeServiceImpl implements ThemeService {
             throw new SThemeDeletionException(e);
         }
         deleteTheme(theme);
-        logAfterMethod("deleteTheme");
+        logAfterMethod(methodName);
     }
 
     @Override
     public void deleteTheme(final STheme theme) throws SThemeDeletionException {
-        logBeforeMethod("deleteTheme");
+        final String methodName = "deleteTheme";
+        logBeforeMethod(methodName);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.DELETED, "Deleting theme");
         final DeleteRecord deleteRecord = new DeleteRecord(theme);
         SDeleteEvent deleteEvent = null;
@@ -134,11 +137,11 @@ public class ThemeServiceImpl implements ThemeService {
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteTheme");
-            logAfterMethod("deleteTheme");
+            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            logAfterMethod(methodName);
         } catch (final SRecorderException re) {
-            logOnExceptionMethod("deleteTheme", re);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteTheme");
+            logOnExceptionMethod(methodName, re);
+            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SThemeDeletionException(re);
         }
     }
@@ -164,7 +167,7 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             final STheme theme = persistenceService.selectOne(selectDescriptor);
             if (theme == null) {
-                throw new SThemeNotFoundException("No theme exists with type = " + type + ", and isDefault = " + isDefault);
+                throw new SThemeNotFoundException(type, isDefault);
             }
             return theme;
         } catch (final SBonitaReadException e) {
@@ -174,17 +177,18 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public STheme getTheme(final long id) throws SThemeNotFoundException, SThemeReadException {
-        logBeforeMethod("getTheme");
+        final String methodName = "getTheme";
+        logBeforeMethod(methodName);
         try {
             final SelectByIdDescriptor<STheme> descriptor = SelectDescriptorBuilder.getElementById(STheme.class, "Theme", id);
             final STheme theme = persistenceService.selectById(descriptor);
             if (theme == null) {
-                throw new SThemeNotFoundException("No theme exists with id : " + id);
+                throw new SThemeNotFoundException(id);
             }
-            logAfterMethod("getTheme");
+            logAfterMethod(methodName);
             return theme;
         } catch (final SBonitaReadException e) {
-            logOnExceptionMethod("getTheme", e);
+            logOnExceptionMethod(methodName, e);
             throw new SThemeReadException(e);
         }
     }
@@ -195,7 +199,7 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             final STheme theme = persistenceService.selectOne(selectDescriptor);
             if (theme == null) {
-                throw new SThemeNotFoundException("No theme exists with type = " + type);
+                throw new SThemeNotFoundException(type);
             }
             return theme;
         } catch (final SBonitaReadException e) {
@@ -205,7 +209,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public STheme updateTheme(final STheme sTheme, final EntityUpdateDescriptor descriptor) throws SThemeUpdateException {
-        logBeforeMethod("updateTheme");
+        final String methodName = "updateTheme";
+        logBeforeMethod(methodName);
         NullCheckingUtil.checkArgsNotNull(sTheme);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.UPDATED, "Updating theme");
         final STheme oldUser = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(sTheme).done();
@@ -217,11 +222,11 @@ public class ThemeServiceImpl implements ThemeService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateTheme");
-            logAfterMethod("updateTheme");
+            initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            logAfterMethod(methodName);
         } catch (final SRecorderException re) {
-            logOnExceptionMethod("updateTheme", re);
-            initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateTheme");
+            logOnExceptionMethod(methodName, re);
+            initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SThemeUpdateException(re);
         }
         return sTheme;
