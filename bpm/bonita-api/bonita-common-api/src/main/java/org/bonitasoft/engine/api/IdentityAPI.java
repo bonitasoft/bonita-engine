@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.api;
 
-import java.util.List;
-
-import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 
 /**
  * The Interface IdentityAPI.
