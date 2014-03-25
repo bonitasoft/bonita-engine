@@ -123,7 +123,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         // Check
-        List<SATransitionInstance> searchArchivedTransitions = transactionService.executeInTransaction(new Callable<List<SATransitionInstance>>() {
+        final List<SATransitionInstance> searchArchivedTransitions = transactionService.executeInTransaction(new Callable<List<SATransitionInstance>>() {
 
             @Override
             public List<SATransitionInstance> call() throws Exception {
@@ -153,14 +153,14 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processDef.addActor("delivery");
         final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        Callable<Long> getNumberOfComments = new Callable<Long>() {
+        final Callable<Long> getNumberOfComments = new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {
                 return commentService.getNumberOfComments(QueryOptions.defaultQueryOptions());
             }
         };
-        Callable<Long> getNumberOfArchivedComments = new Callable<Long>() {
+        final Callable<Long> getNumberOfArchivedComments = new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {
@@ -209,7 +209,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         final long taskId = waitForUserTask.getId();
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        Callable<List<SPendingActivityMapping>> getPendingMappings = new Callable<List<SPendingActivityMapping>>() {
+        final Callable<List<SPendingActivityMapping>> getPendingMappings = new Callable<List<SPendingActivityMapping>>() {
 
             @Override
             public List<SPendingActivityMapping> call() throws Exception {
@@ -484,9 +484,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @Test
     public void getPlatformVersion() throws BonitaException, IOException {
         logout();
-        PlatformSession platformSession = loginPlatform();
+        final PlatformSession platformSession = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        Platform platform = platformAPI.getPlatform();
+        final Platform platform = platformAPI.getPlatform();
         logoutPlatform(platformSession);
         loginWith(USERNAME, PASSWORD);
         final String platformVersionToTest = getBonitaVersion();
@@ -501,10 +501,10 @@ public class BPMLocalTest extends CommonAPILocalTest {
         String version = System.getProperty("bonita.version");// works in maven
         if (version == null) {
             // when running tests in eclipse get it from the pom.xml
-            File file = new File("pom.xml");
-            String pomContent = IOUtil.read(file);
-            Pattern pattern = Pattern.compile("<version>(.*)</version>");
-            Matcher matcher = pattern.matcher(pomContent);
+            final File file = new File("pom.xml");
+            final String pomContent = IOUtil.read(file);
+            final Pattern pattern = Pattern.compile("<version>(.*)</version>");
+            final Matcher matcher = pattern.matcher(pomContent);
             matcher.find();
             version = matcher.group(1);
         }

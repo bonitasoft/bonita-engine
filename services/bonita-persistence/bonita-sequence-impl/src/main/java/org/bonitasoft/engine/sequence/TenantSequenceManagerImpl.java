@@ -53,7 +53,7 @@ public class TenantSequenceManagerImpl {
     private final Map<Long, Long> lastIdInRanges = new HashMap<Long, Long>();
 
     // Map of sequenceId, mutex
-    private static final Map<Long, Object> sequenceMutexs = new HashMap<Long, Object>();
+    private static final Map<Long, Object> SEQUENCE_MUTEXS = new HashMap<Long, Object>();
 
     private final int defaultRangeSize;
 
@@ -83,7 +83,7 @@ public class TenantSequenceManagerImpl {
         this.datasource = datasource;
 
         for (final Long sequenceId : sequencesMappings.values()) {
-            sequenceMutexs.put(sequenceId, new TenantSequenceManagerImplMutex());
+            SEQUENCE_MUTEXS.put(sequenceId, new TenantSequenceManagerImplMutex());
             nextAvailableIds.put(sequenceId, 0L);
             lastIdInRanges.put(sequenceId, -1L);
         }
@@ -98,25 +98,15 @@ public class TenantSequenceManagerImpl {
         if (sequenceId == null) {
             throw new SObjectNotFoundException("No sequence id found for " + entityName);
         }
-        final Object sequenceMutex = sequenceMutexs.get(sequenceId);
+        final Object sequenceMutex = SEQUENCE_MUTEXS.get(sequenceId);
         synchronized (sequenceMutex) {
             Long nextAvailableId = nextAvailableIds.get(sequenceId);
             final Long lastIdInRange = lastIdInRanges.get(sequenceId);
-            // System.err.println("***** getting new ID for sequence: " +
-            // sequenceId + ", nextAvailableId= " + nextAvailableId +
-            // ", lastIdInRange=" +
-            // lastIdInRange);
             if (nextAvailableId > lastIdInRange) {
-                // System.err.println("nextAvailableId > lastIdInRange, settingNewRange..");
-                // no available IF in the range this sequence can consume, we
-                // need to get a new range and calculate a new nextAvailableId
+                // No available IF in the range this sequence can consume, we need to get a new range and calculate a new nextAvailableId
                 setNewRange(sequenceId);
                 nextAvailableId = nextAvailableIds.get(sequenceId);
             }
-            // System.err.println("***** getting new ID for sequence: " +
-            // sequenceId + ", setting nextAvailableId to= " +
-            // (nextAvailableId+1) +
-            // " and returning: " + nextAvailableId);
             nextAvailableIds.put(sequenceId, nextAvailableId + 1);
 
             return nextAvailableId;
@@ -212,34 +202,42 @@ public class TenantSequenceManagerImpl {
             selectByIdPreparedStatement.setLong(1, tenantId);
             selectByIdPreparedStatement.setLong(2, id);
             final ResultSet resultSet = selectByIdPreparedStatement.executeQuery();
-            try {
-                if (resultSet.next()) {
-                    final long nextId = resultSet.getLong(NEXTID);
-
-                    if (resultSet.wasNull()) {
-                        throw new SQLException("Did not expect a null value for the column " + NEXTID);
-                    }
-
-                    if (resultSet.next()) {
-                        throw new SQLException("Did not expect more than one value for tenantId:" + tenantId + " id: " + id);
-                    }
-
-                    return nextId;
-                }
-            } finally {
-                try {
-                    if (resultSet != null) {
-                        resultSet.close();
-                    }
-                } catch (final SQLException e) {
-                    // can't do anything
-                }
-            }
-            throw new SObjectNotFoundException("Found no row for tenantId:" + tenantId + " id: " + id);
+            return getNextId(id, tenantId, resultSet);
         } finally {
             if (selectByIdPreparedStatement != null) {
                 selectByIdPreparedStatement.close();
             }
+        }
+    }
+
+    private long getNextId(final long id, final long tenantId, final ResultSet resultSet) throws SQLException, SObjectNotFoundException {
+        try {
+            if (resultSet.next()) {
+                final long nextId = resultSet.getLong(NEXTID);
+
+                if (resultSet.wasNull()) {
+                    throw new SQLException("Did not expect a null value for the column " + NEXTID);
+                }
+
+                if (resultSet.next()) {
+                    throw new SQLException("Did not expect more than one value for tenantId:" + tenantId + " id: " + id);
+                }
+
+                return nextId;
+            }
+        } finally {
+            closeResultSet(resultSet);
+        }
+        throw new SObjectNotFoundException("Found no row for tenantId:" + tenantId + " id: " + id);
+    }
+
+    private void closeResultSet(final ResultSet resultSet) {
+        try {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+        } catch (final SQLException e) {
+            // can't do anything
         }
     }
 

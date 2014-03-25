@@ -27,18 +27,15 @@ public class ProcessDefinitionBARContributionTest {
 
     private static final String ACTOR_NAME = "Actor Name";
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#serializeProcessDefinition(java.io.File, org.bonitasoft.engine.bpm.process.DesignProcessDefinition)}
-     * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#deserializeProcessDefinition(java.io.File)}.
-     */
     @Test
     public final void serializeDeserializeProcessDefinition() throws Exception {
         final DesignProcessDefinition designProcessDefinition = createDesignProcessDefinition();
 
         // Serialize designProcessDefinition
-        final File processDesignFolder = new File(System.getProperty("java.io.tmpdir"), "tmpDesignProcessDefinition");
+        final File processDesignFolder = File.createTempFile("serializeDeserialize", "ProcessDefinition");
+        processDesignFolder.delete();
         processDesignFolder.mkdir();
+        processDesignFolder.deleteOnExit();
         final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
         processDefinitionBARContribution.serializeProcessDefinition(processDesignFolder, designProcessDefinition);
 
@@ -48,7 +45,13 @@ public class ProcessDefinitionBARContributionTest {
         assertEquals(designProcessDefinition, resultDesignProcessDefinition);
 
         // Clean up
-        processDesignFolder.getParentFile().delete();
+        File[] listFiles = processDesignFolder.listFiles();
+        for (int i = 0; i < listFiles.length; i++) {
+            listFiles[i].delete();
+        }
+        if (!processDesignFolder.delete()) {
+            System.out.println("Could not delete temporary test folder");
+        }
     }
 
     private DesignProcessDefinition createDesignProcessDefinition() throws InvalidExpressionException, InvalidProcessDefinitionException {

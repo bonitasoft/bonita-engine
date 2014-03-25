@@ -11,12 +11,14 @@ import java.util.Properties;
 public class BuilderFactory {
 
     private static final String BUILDER_FACTORIES_DEFAULT_FILE = "builder-factories.properties";
+
     private static final String BUILDER_FACTORIES_EXTENSION_FILE = "builder-factories-ext.properties";
 
     private final Map<String, Object> factoryCache;
+
     private final Properties properties;
 
-    private static final Object mutex = new BuilderFactoryMutex();
+    private static final Object MUTEX = new BuilderFactoryMutex();
 
     private static BuilderFactory INSTANCE = null;
 
@@ -31,8 +33,8 @@ public class BuilderFactory {
 
     public static BuilderFactory getInstance() {
         if (INSTANCE == null) {
-            synchronized (mutex) {
-                //ensure we do not create many instances of this class
+            synchronized (MUTEX) {
+                // ensure we do not create many instances of this class
                 if (INSTANCE == null) {
                     URL defaultFileURL = null;
                     try {
@@ -43,13 +45,13 @@ public class BuilderFactory {
                         final URL extensionFileURL = BuilderFactory.class.getResource(BUILDER_FACTORIES_EXTENSION_FILE);
                         if (extensionFileURL != null) {
                             final Properties extensionProperties = getProperties(extensionFileURL);
-                            allProperties.putAll(extensionProperties);   
+                            allProperties.putAll(extensionProperties);
                         }
 
                         INSTANCE = new BuilderFactory(allProperties);
 
-                    } catch (Exception e) {
-                        throw new RuntimeException("Unable to load builder factories from: fileURL:" + defaultFileURL);
+                    } catch (final Exception e) {
+                        throw new RuntimeException("Unable to load builder factories from : fileURL=" + defaultFileURL);
                     }
                 }
             }
@@ -59,7 +61,7 @@ public class BuilderFactory {
 
     private synchronized void cacheFactory(final String interfaceName, final String className) {
         try {
-            if (className.equals("null")) {
+            if ("null".equals(className)) {
                 throw new Exception("Factory implementation of " + interfaceName + " is required.");
             }
             final Class<?> clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
@@ -80,7 +82,6 @@ public class BuilderFactory {
 
     @SuppressWarnings("unchecked")
     private <T extends Object> T getInternalBuilderFactory(final Class<T> clazz) {
-        //System.err.println("Looking for class: " + clazz.getName());
         if (!this.factoryCache.containsKey(clazz.getName())) {
             cacheFactory(clazz.getName(), properties.getProperty(clazz.getName()));
         }
@@ -101,6 +102,5 @@ public class BuilderFactory {
             reader.close();
         }
     }
-
 
 }

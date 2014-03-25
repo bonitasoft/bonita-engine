@@ -121,7 +121,7 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public CommandDescriptor register(final String name, final String description, final String implementation) throws AlreadyExistsException,
-    CreationException {
+            CreationException {
         CommandDescriptor existingCommandDescriptor = null;
         try {
             existingCommandDescriptor = getCommand(name);
@@ -144,7 +144,8 @@ public class CommandAPIImpl implements CommandAPI {
         }
     }
 
-    private TenantCommand fetchTenantCommand(final SCommandFetcher commandFetcher, final boolean transactionManagedManually) throws SCommandNotFoundException, SCommandParameterizationException {
+    private TenantCommand fetchTenantCommand(final SCommandFetcher commandFetcher, final boolean transactionManagedManually) throws SCommandNotFoundException,
+            SCommandParameterizationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         try {
@@ -169,42 +170,44 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public Serializable execute(final String commandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+            CommandParameterizationException, CommandExecutionException {
         return execute(new SCommandFetcherByName(commandName), parameters);
     }
 
     @Override
     public Serializable execute(final long commandId, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+            CommandParameterizationException, CommandExecutionException {
         return execute(new SCommandFetcherById(commandId), parameters);
     }
 
     private Serializable execute(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+            CommandParameterizationException, CommandExecutionException {
         return executeCommand(commandFetcher, parameters, false);
     }
 
     @Override
     @CustomTransactions
     public Serializable executeWithUserTransactions(final String commandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+            CommandParameterizationException, CommandExecutionException {
         return executeWithUserTransactions(new SCommandFetcherByName(commandName), parameters);
     }
 
     @Override
     @CustomTransactions
     public Serializable executeWithUserTransactions(final long commandId, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+            CommandParameterizationException, CommandExecutionException {
         return executeWithUserTransactions(new SCommandFetcherById(commandId), parameters);
     }
 
-    private Serializable executeWithUserTransactions(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+    private Serializable executeWithUserTransactions(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters)
+            throws CommandNotFoundException,
+            CommandParameterizationException, CommandExecutionException {
         return executeCommand(commandFetcher, parameters, true);
     }
 
-    private Serializable executeCommand(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters, final boolean transactionManagedManually) throws CommandNotFoundException,
-    CommandParameterizationException, CommandExecutionException {
+    private Serializable executeCommand(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters,
+            final boolean transactionManagedManually) throws CommandNotFoundException,
+            CommandParameterizationException, CommandExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         try {
@@ -324,23 +327,23 @@ public class CommandAPIImpl implements CommandAPI {
         }
     }
 
-
     private EntityUpdateDescriptor getCommandUpdateDescriptor(final CommandUpdater updateDescriptor, final SCommandUpdateBuilder commandUpdateBuilder) {
         final Map<CommandField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<CommandField, Serializable> field : fields.entrySet()) {
             final String value = (String) field.getValue();
             switch (field.getKey()) {
-            case NAME:
-                commandUpdateBuilder.updateName(value);
-                break;
-            case DESCRIPTION:
-                commandUpdateBuilder.updateDescription(value);
-                break;
+                case NAME:
+                    commandUpdateBuilder.updateName(value);
+                    break;
+                case DESCRIPTION:
+                    commandUpdateBuilder.updateDescription(value);
+                    break;
+                default:
+                    throw new IllegalStateException();
             }
         }
         return commandUpdateBuilder.done();
     }
-
 
     @Override
     public List<CommandDescriptor> getUserCommands(final int startIndex, final int maxResults, final CommandCriterion sort) {
@@ -376,6 +379,7 @@ public class CommandAPIImpl implements CommandAPI {
         SCommand fetchInTransaction(final UserTransactionService userTransactionService, final CommandService commandService) throws SCommandNotFoundException {
             try {
                 return userTransactionService.executeInTransaction(new Callable<SCommand>() {
+
                     @Override
                     public SCommand call() throws Exception {
                         return fetch(commandService);
@@ -389,6 +393,7 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     private static class SCommandFetcherByName extends SCommandFetcher {
+
         private final String commandName;
 
         public SCommandFetcherByName(final String commandName) {
@@ -401,8 +406,8 @@ public class CommandAPIImpl implements CommandAPI {
         }
     }
 
-
     private static class SCommandFetcherById extends SCommandFetcher {
+
         private final long commandId;
 
         public SCommandFetcherById(final long commandId) {

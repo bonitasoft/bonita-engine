@@ -52,7 +52,7 @@ public abstract class AbstractProcessInstanceInterruptor {
 		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory);
 		if (stableChildrenIds != null) {
 			for (final Long childId : stableChildrenIds) {
-				resumeStableChildExecution(childId, processInstanceId, userId);
+				resumeChildExecution(childId, processInstanceId, userId);
 			}
 		}
 	}
@@ -63,7 +63,7 @@ public abstract class AbstractProcessInstanceInterruptor {
 		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, exceptionChildId);
 		if (stableChildrenIds != null) {
 			for (final Long childId : stableChildrenIds) {
-				resumeStableChildExecution(childId, processInstanceId, userId);
+				resumeChildExecution(childId, processInstanceId, userId);
 			}
 		}
 	}
@@ -76,7 +76,7 @@ public abstract class AbstractProcessInstanceInterruptor {
 				if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
 					logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Resume child in stateCategory " + stateCategory + " id = " + childId);
 				}
-				resumeStableChildExecution(childId, processInstanceId, userId);
+				resumeChildExecution(childId, processInstanceId, userId);
 			}
 		}
 	}
@@ -84,37 +84,37 @@ public abstract class AbstractProcessInstanceInterruptor {
     protected abstract void setProcessStateCategory(long processInstanceId, SStateCategory stateCategory) throws SProcessInstanceNotFoundException,
             SBonitaException;
 
-	protected abstract void resumeStableChildExecution(long childId, long processInstanceId, long userId) throws SBonitaException;
+	protected abstract void resumeChildExecution(long childId, long processInstanceId, long userId) throws SBonitaException;
 
 	private List<Long> interruptChildrenFlowNodeInstances(final long processInstanceId, final SStateCategory stateCategory) throws SBonitaException {
-		final List<Long> stableChildrenIds = new ArrayList<Long>();
+		final List<Long> allChildrenToResume = new ArrayList<Long>();
 		List<SFlowNodeInstance> children;
 		long count = 0;
 		do {
 			children = getChildren(processInstanceId);
 			count = getNumberOfChildren(processInstanceId);
 
-			final List<Long> stableIds = interruptFlowNodeInstances(children, stateCategory);
-			stableChildrenIds.addAll(stableIds);
+			final List<Long> childrenToResume = interruptFlowNodeInstances(children, stateCategory);
+			allChildrenToResume.addAll(childrenToResume);
 		} while (count > children.size());
 
-		return stableChildrenIds;
+		return allChildrenToResume;
 	}
 
 	private List<Long> interruptChildrenFlowNodeInstances(final long processInstanceId, final SStateCategory stateCategory, final long exceptionChildId)
 			throws SBonitaException {
-		final List<Long> stableChildrenIds = new ArrayList<Long>();
+		final List<Long> allChildrenToResume = new ArrayList<Long>();
 		List<SFlowNodeInstance> children;
 		long count = 0;
 		do {
 			children = getChildrenExcept(processInstanceId, exceptionChildId);
 			count = getNumberOfChildrenExcept(processInstanceId, exceptionChildId);
 
-			final List<Long> childrenToBeExecutedIds = interruptFlowNodeInstances(children, stateCategory);
-			stableChildrenIds.addAll(childrenToBeExecutedIds);
+			final List<Long> childrenToResume = interruptFlowNodeInstances(children, stateCategory);
+			allChildrenToResume.addAll(childrenToResume);
 		} while (count > children.size());
 
-		return stableChildrenIds;
+		return allChildrenToResume;
 	}
 
 	protected abstract List<SFlowNodeInstance> getChildren(final long processInstanceId) throws SBonitaException;
@@ -126,7 +126,7 @@ public abstract class AbstractProcessInstanceInterruptor {
 	protected abstract long getNumberOfChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaSearchException;
 
 	private List<Long> interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory) throws SBonitaException {
-		final List<Long> childrenToBeExecutedIds = new ArrayList<Long>();
+		final List<Long> childrenToResume = new ArrayList<Long>();
 		for (final SFlowNodeInstance child : children) {
 			if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
 				logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
@@ -134,10 +134,10 @@ public abstract class AbstractProcessInstanceInterruptor {
 			}
 			setChildStateCategory(child.getId(), stateCategory);
 			if (child.mustExecuteOnAbortOrCancelProcess()) {
-				childrenToBeExecutedIds.add(child.getId());
+				childrenToResume.add(child.getId());
 			}
 		}
-		return childrenToBeExecutedIds;
+		return childrenToResume;
 	}
 
 	protected abstract void setChildStateCategory(long flowNodeInstanceId, SStateCategory stateCategory) throws SBonitaException;

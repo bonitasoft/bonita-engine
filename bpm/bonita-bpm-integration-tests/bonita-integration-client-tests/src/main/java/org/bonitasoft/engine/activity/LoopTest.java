@@ -15,7 +15,9 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -24,9 +26,11 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
@@ -220,6 +224,46 @@ public class LoopTest extends CommonAPITest {
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());
 
         disableAndDeleteProcess(processDefinition);
+    }
+    
+    @Test
+    public void abortProcessWithActiveLoopActivity() throws Exception {
+        // given
+        String loopName = "step1";
+        String userTaskName = "step2";
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(loopName, userTaskName);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTask(loopName, processInstance.getId());
+        // when
+        waitForUserTaskAndExecuteIt(userTaskName, processInstance.getId(), john.getId());
+
+        // then
+        // executing the user task will terminate the process: the loop activity must be aborted
+        waitForFlowNodeInState(processInstance, loopName, TestStates.getAbortedState(), true);
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(String loopName, String parallelTaskName)
+            throws InvalidExpressionException, BonitaException, InvalidProcessDefinitionException {
+        final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
+        final String delivery = "Delivery men";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My proc", "1.0");
+        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addStartEvent("start");
+        builder.addUserTask(loopName, delivery).addLoop(false, condition);
+        builder.addUserTask(parallelTaskName, delivery);
+        builder.addGateway("gateway", GatewayType.PARALLEL);
+        builder.addEndEvent("terminate").addTerminateEventTrigger();
+        builder.addTransition("start", "gateway");
+        builder.addTransition("gateway", loopName);
+        builder.addTransition("gateway", parallelTaskName);
+        builder.addTransition(loopName, "terminate");
+        builder.addTransition(parallelTaskName, "terminate");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        return processDefinition;
     }
 
 }

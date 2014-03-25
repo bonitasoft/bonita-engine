@@ -61,8 +61,7 @@ public final class ServiceAccessorFactory {
     }
 
     public synchronized PlatformServiceAccessor createPlatformServiceAccessor() throws BonitaHomeNotSetException, InstantiationException,
-            IllegalAccessException,
-            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         if (platformServiceAccessor == null) {
             initPropertiesIfNeeded();
             final String platformClassName = properties.getProperty("platformClassName");
@@ -99,8 +98,7 @@ public final class ServiceAccessorFactory {
     }
 
     public synchronized SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException,
-            IOException, BonitaHomeConfigurationException {
+            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         if (sessionAccessorAccessor == null) {
             initPropertiesIfNeeded();
             final String sessionAccessorStr = properties.getProperty("sessionAccessor");
@@ -113,8 +111,7 @@ public final class ServiceAccessorFactory {
     }
 
     public synchronized APIAccessResolver createAPIAccessResolver() throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
-            InstantiationException,
-            IllegalAccessException, ClassNotFoundException {
+            InstantiationException, IllegalAccessException, ClassNotFoundException {
         if (apiAccessResolver == null) {
             initPropertiesIfNeeded();
             final String sessionAccessorStr = properties.getProperty("apiAccessResolver");
@@ -130,7 +127,6 @@ public final class ServiceAccessorFactory {
         Set<Entry<Long, TenantServiceAccessor>> tenantAccessors = tenantServiceAccessor.entrySet();
         for (Entry<Long, TenantServiceAccessor> tenantAccessor : tenantAccessors) {
             tenantAccessor.getValue().destroy();
-
         }
         tenantServiceAccessor.clear();
         platformServiceAccessor.destroy();

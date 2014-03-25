@@ -2,6 +2,11 @@ package org.bonitasoft.engine;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import javax.naming.Context;
 
@@ -45,11 +50,51 @@ public class TestsInitializer {
         deleteTenantAndPlatform();
         closeSpringContext();
         cleanBonitaHome();
+        // wait for thread to stop
+        // FIXME To uncomment when fix BS-7731
+        // checkThreadsAreStopped();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
         new APITestUtil().stopAndCleanPlatformAndTenant(true);
         new APITestUtil().deletePlatformStructure();
+    }
+
+    private void checkThreadsAreStopped() throws InterruptedException {
+        Set<Thread> keySet = Thread.getAllStackTraces().keySet();
+        Iterator<Thread> iterator = keySet.iterator();
+        ArrayList<Thread> list = new ArrayList<Thread>();
+        while (iterator.hasNext()) {
+            Thread thread = iterator.next();
+            if (isEngine(thread)) {
+                // wait for the thread to die
+                thread.join(5000);
+                // if still alive print it
+                if (thread.isAlive()) {
+                    list.add(thread);
+                }
+            }
+        }
+        if (!list.isEmpty()) {
+            throw new IllegalStateException("Some threads are still active : " + list);
+        }
+    }
+
+    private boolean isEngine(final Thread thread) {
+        String name = thread.getName();
+        ThreadGroup threadGroup = thread.getThreadGroup();
+        if (threadGroup != null && threadGroup.getName().equals("system")) {
+            return false;
+        }
+        List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
+                "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
+                "Abandoned connection cleanup thread"/* bonecp related */, "hz."/* hazelcast related */);
+        for (String prefix : startWithFilter) {
+            if (name.startsWith(prefix)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void before() throws Exception {

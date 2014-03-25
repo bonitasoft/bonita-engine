@@ -56,13 +56,6 @@ public class JobServiceImplForFailedJobTest {
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getFailedJobs(int, int)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SFailedJobReadException
-     * @throws SSchedulerException
-     */
     @Test
     public final void getFailedJobs() throws SBonitaReadException, SFailedJobReadException {
         final SFailedJob sFailedJob = mock(SFailedJob.class);

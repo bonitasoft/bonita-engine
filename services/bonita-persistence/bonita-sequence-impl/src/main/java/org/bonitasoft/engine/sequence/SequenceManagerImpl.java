@@ -93,6 +93,7 @@ public class SequenceManagerImpl implements SequenceManager {
 
     @Override
     public void close() {
+        // Do nothing
     }
 
     @Override

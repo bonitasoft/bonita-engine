@@ -34,6 +34,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.execution.SIllegalStateTransition;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -220,6 +221,24 @@ public class FailureHandlingBonitaWorkTest {
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
+    }
+
+    public void doNotHandleFailureWhenIsIllegalTransitionFromTerminalState() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception e = new Exception(new SIllegalStateTransition("message", true));
+        doThrow(e).when(wrappedWork).work(context);
+        txBonitawork.work(context);
+        verify(wrappedWork, never()).handleFailure(e, context);
+        verify(loggerService).isLoggable(FailureHandlingBonitaWork.class, TechnicalLogSeverity.DEBUG);
+    }
+
+    @Test
+    public void handleFailureWhenIsIllegalTransitionFromNonTerminalState() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception e = new Exception(new SIllegalStateTransition("message", false));
+        doThrow(e).when(wrappedWork).work(context);
+        txBonitawork.work(context);
+        verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 
     @Test

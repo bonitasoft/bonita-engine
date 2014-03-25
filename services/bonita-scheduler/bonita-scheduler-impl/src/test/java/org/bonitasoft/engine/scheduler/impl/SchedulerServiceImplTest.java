@@ -48,7 +48,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -81,7 +80,7 @@ public class SchedulerServiceImplTest {
 
         final SEventBuilder sEventBuilder = mock(SEventBuilder.class);
         final SEventBuilderFactory sEventBuilderFactory = mock(SEventBuilderFactory.class);
-        Mockito.when(BuilderFactory.get(SEventBuilderFactory.class)).thenReturn(sEventBuilderFactory);
+        when(BuilderFactory.get(SEventBuilderFactory.class)).thenReturn(sEventBuilderFactory);
 
         when(sEventBuilderFactory.createNewInstance(anyString())).thenReturn(sEventBuilder);
         when(sEventBuilderFactory.createInsertEvent(anyString())).thenReturn(sEventBuilder);
@@ -111,36 +110,36 @@ public class SchedulerServiceImplTest {
     public void isStarted_return_true_if_schedulorExecutor_is_started() throws Exception {
         when(schedulerExecutor.isStarted()).thenReturn(true);
 
-        boolean started = schedulerService.isStarted();
+        final boolean started = schedulerService.isStarted();
 
-        assertTrue(started);
+        assertThat(started).isTrue();
     }
 
     @Test
     public void isStarted_return_false_if_schedulorExecutor_is_not_started() throws Exception {
         when(schedulerExecutor.isStarted()).thenReturn(false);
 
-        boolean started = schedulerService.isStarted();
+        final boolean started = schedulerService.isStarted();
 
-        assertFalse(started);
+        assertThat(started).isFalse();
     }
 
     @Test
     public void isStopped_return_true_if_executor_is_shutodown() throws Exception {
         when(schedulerExecutor.isShutdown()).thenReturn(true);
 
-        boolean stopped = schedulerService.isStopped();
+        final boolean stopped = schedulerService.isStopped();
 
-        assertTrue(stopped);
+        assertThat(stopped).isTrue();
     }
 
     @Test
     public void isStopped_return_false_if_executor_is_not_shutodown() throws Exception {
         when(schedulerExecutor.isShutdown()).thenReturn(false);
 
-        boolean stopped = schedulerService.isStopped();
+        final boolean stopped = schedulerService.isStopped();
 
-        assertFalse(stopped);
+        assertThat(stopped).isFalse();
     }
 
     @Test
@@ -161,7 +160,7 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void delete_delete_job_and_jobDescription() throws Exception {
-        String jobName = "aJobName";
+        final String jobName = "aJobName";
 
         schedulerService.delete(jobName);
 
@@ -171,19 +170,19 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void delete_return_schedulerexecutor_deletion_status() throws Exception {
-        boolean expectedDeletionStatus = new Random().nextBoolean();
-        String jobName = "jobName";
+        final boolean expectedDeletionStatus = new Random().nextBoolean();
+        final String jobName = "jobName";
         when(schedulerExecutor.delete(jobName)).thenReturn(expectedDeletionStatus);
 
-        boolean deletionStatus = schedulerExecutor.delete(jobName);
+        final boolean deletionStatus = schedulerExecutor.delete(jobName);
 
         assertThat(deletionStatus).isEqualTo(expectedDeletionStatus);
     }
 
     @Test(expected = SSchedulerException.class)
     public void cannot_execute_a_job_with_a_null_trigger() throws Exception {
-        SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
-        List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+        final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
+        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
 
         schedulerService.schedule(jobDescriptor, parameters, null);
     }

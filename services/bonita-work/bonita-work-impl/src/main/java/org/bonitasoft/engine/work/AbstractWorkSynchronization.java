@@ -37,11 +37,11 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         this.executorService = executorService;
         works = new HashSet<BonitaWork>();
         try {
-            // instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
+            // Instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
             tenantId = sessionAccessor.getTenantId();
         } catch (final STenantIdNotSetException e) {
-            // we are not in a tenant
-            tenantId = -1l;
+            // We are not in a tenant
+            tenantId = -1L;
         }
     }
 

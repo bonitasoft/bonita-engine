@@ -145,6 +145,8 @@ public class ProfileAPIImpl implements ProfileAPI {
             case MEMBERSHIP:
                 suffix = "ForRoleAndGroup";
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return suffix;
     }

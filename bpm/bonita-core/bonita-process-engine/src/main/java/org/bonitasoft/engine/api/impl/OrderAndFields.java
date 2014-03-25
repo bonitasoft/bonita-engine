@@ -79,9 +79,11 @@ public class OrderAndFields {
                 break;
             case IMPLEMENTATION_ID_ASC:
             case DEFAULT:
+            default:
                 filed = ConnectorImplementationDescriptor.ID;
                 orderBy = OrderByType.ASC;
                 break;
+
         }
         return new OrderAndField(orderBy, filed);
     }
@@ -278,6 +280,8 @@ public class OrderAndFields {
                 field = fact.getDocumentURLKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return new OrderAndField(order, field);
     }

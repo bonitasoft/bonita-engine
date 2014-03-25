@@ -70,7 +70,7 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     @Override
     public void recordInserts(final long time, final ArchiveInsertRecord... records) throws SRecorderException {
-        String methodName = "recordInsert";
+        final String methodName = "recordInserts";
         logBeforeMethod(TechnicalLogSeverity.TRACE, methodName);
         if (records != null) {
             final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();

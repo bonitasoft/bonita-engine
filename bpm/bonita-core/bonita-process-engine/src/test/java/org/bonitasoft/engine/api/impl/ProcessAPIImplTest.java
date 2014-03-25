@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -39,8 +38,6 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
@@ -57,10 +54,11 @@ public class ProcessAPIImplTest {
     @Mock
     private TenantServiceAccessor tenantAccessor;
 
-    final ProcessAPIImpl processAPI = spy(new ProcessAPIImpl());
+    private ProcessAPIImpl processAPI;
 
     @Before
     public void setup() {
+        processAPI = spy(new ProcessAPIImpl());
         doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
         when(tenantAccessor.getTenantId()).thenReturn(tenantId);
     }
@@ -199,25 +197,20 @@ public class ProcessAPIImplTest {
         verify(myProcessAPI).replayFailedJob(jobDescriptorId, null);
     }
 
+    @Test
     public void getJobParametersShouldConvertMapIntoList() {
         // given:
         Map<String, Serializable> parameters = new HashMap<String, Serializable>(2);
-        SJobParameter expectedValue1 = mockSJobParameter();
+        String key1 = "mon param 1";
+        String key2 = "my second param";
+        SJobParameter expectedValue1 = mockSJobParameter(key1);
         parameters.put(expectedValue1.getKey(), expectedValue1.getValue());
 
-        SJobParameter expectedValue2 = mockSJobParameter();
+        SJobParameter expectedValue2 = mockSJobParameter(key2);
         parameters.put(expectedValue2.getKey(), expectedValue2.getValue());
 
-        SJobParameterBuilderFactory jobParameterBuilderFactory = mock(SJobParameterBuilderFactory.class);
-        SJobParameterBuilder mock1 = mock(SJobParameterBuilder.class);
-        when(jobParameterBuilderFactory.createNewInstance(expectedValue1.getKey(), expectedValue1.getValue())).thenReturn(mock1);
-        when(mock1.done()).thenReturn(expectedValue1);
-
-        SJobParameterBuilder mock2 = mock(SJobParameterBuilder.class);
-        when(jobParameterBuilderFactory.createNewInstance(expectedValue2.getKey(), expectedValue2.getValue())).thenReturn(mock2);
-        when(mock2.done()).thenReturn(expectedValue2);
-
-        doReturn(jobParameterBuilderFactory).when(processAPI).getSJobParameterBuilderFactory();
+        doReturn(expectedValue1).when(processAPI).buildSJobParameter(eq(key1), any(Serializable.class));
+        doReturn(expectedValue2).when(processAPI).buildSJobParameter(eq(key2), any(Serializable.class));
 
         // when:
         List<SJobParameter> jobParameters = processAPI.getJobParameters(parameters);
@@ -226,10 +219,10 @@ public class ProcessAPIImplTest {
         assertThat(jobParameters).containsOnly(expectedValue1, expectedValue2);
     }
 
-    private SJobParameter mockSJobParameter() {
+    private SJobParameter mockSJobParameter(final String key) {
         SJobParameter jobParam = mock(SJobParameter.class);
-        when(jobParam.getKey()).thenReturn(String.valueOf(new Random(System.currentTimeMillis()).nextLong()));
-        when(jobParam.getValue()).thenReturn(Double.valueOf(new Random(System.currentTimeMillis()).nextDouble()));
+        when(jobParam.getKey()).thenReturn(key);
+        when(jobParam.getValue()).thenReturn(Integer.MAX_VALUE);
         return jobParam;
     }
 }

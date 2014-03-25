@@ -488,7 +488,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchHumanTaskInstances searchHumanTasksTransaction = new SearchHumanTaskInstances(activityInstanceService, flowNodeStateManager,
                 searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), searchOptions);
-        searchHumanTasksTransaction.execute();
+            searchHumanTasksTransaction.execute();
         return searchHumanTasksTransaction.getResult();
     }
 
@@ -1813,6 +1813,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 field = fact.getNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetCategories getCategories = new GetCategories(startIndex, maxResults, field, categoryService, order);
@@ -1973,6 +1975,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             case NAME_DESC:
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return order;
     }
@@ -2860,16 +2864,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
         if (userTaskInstances.size() != 0) {
-            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
                 final String stateName = userTaskInstance.getState();
-                try {
+            try {
                     final SProcessInstance sProcessInstance = getSProcessInstance(userTaskInstance.getRootContainerId());
                     if (stateName.equals(ActivityStates.READY_STATE) && sProcessInstance.getProcessDefinitionId() == processDefinitionId) {
                         return userTaskInstance.getId();
                     }
-                } catch (final SBonitaException e) {
-                    throw new RetrieveException(e);
-                }
+            } catch (final SBonitaException e) {
+                throw new RetrieveException(e);
+            }
             }
         }
         return -1;
@@ -3288,7 +3292,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationInputValues, expcontext, classLoader, tenantAccessor);
             }
-            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         } catch (final NotSerializableException e) {
@@ -3776,6 +3780,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     supervisorBuilder.setGroupId(groupId);
                     supervisorBuilder.setRoleId(roleId);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
 
             supervisor = supervisorBuilder.done();
@@ -4168,7 +4174,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
                 return result;
             }
-            return Collections.emptyList();
+                return Collections.emptyList();
         } catch (final SBonitaException sbe) {
             throw new DocumentException(sbe);
         }
@@ -5214,8 +5220,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, startIndex, maxResults,
                     HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
             if (humanTaskInstances == null) {
-                return Collections.emptyList();
-            }
+            return Collections.emptyList();
+        }
             return humanTaskInstances;
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -5242,7 +5248,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         builder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName);
         builder.sort(field, order);
         final SearchResult<HumanTaskInstance> searchHumanTasks = searchHumanTasksTransaction(builder.done());
-        return searchHumanTasks.getResult();
+            return searchHumanTasks.getResult();
     }
 
     @Override
@@ -5478,9 +5484,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected List<SJobParameter> getJobParameters(final Map<String, Serializable> parameters) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
-            jobParameters.add(getSJobParameterBuilderFactory().createNewInstance(parameter.getKey(), parameter.getValue()).done());
+            jobParameters.add(buildSJobParameter(parameter.getKey(), parameter.getValue()));
         }
         return jobParameters;
+    }
+
+    protected SJobParameter buildSJobParameter(final String parameterKey, final Serializable parameterValue) {
+        return getSJobParameterBuilderFactory().createNewInstance(parameterKey, parameterValue).done();
     }
 
     protected SJobParameterBuilderFactory getSJobParameterBuilderFactory() {

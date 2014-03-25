@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,9 +15,18 @@ package org.bonitasoft.engine.platform.authentication;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public interface PlatformAuthenticationService {
 
+    /**
+     * @param username
+     *            The username of the platform
+     * @param passwordHash
+     *            The hashed password of the platform
+     * @throws SInvalidUserException
+     * @throws SInvalidPasswordException
+     */
     void checkUserCredentials(final String username, final String passwordHash) throws SInvalidUserException, SInvalidPasswordException;
 
 }

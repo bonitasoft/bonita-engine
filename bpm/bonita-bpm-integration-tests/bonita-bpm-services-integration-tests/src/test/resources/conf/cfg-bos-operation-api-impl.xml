@@ -8,7 +8,7 @@
  		<constructor-arg name="logger" ref="technicalLoggerService" />
  	</bean>
 
-	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="byType" />
+	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor" />
 
 	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />

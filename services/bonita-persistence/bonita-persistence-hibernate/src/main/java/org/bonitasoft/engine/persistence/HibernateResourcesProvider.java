@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,7 @@ import java.util.Set;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class HibernateResourcesProvider {
 
@@ -30,7 +31,7 @@ public class HibernateResourcesProvider {
     private Map<? extends String, ? extends String> classAliasMappings = new HashMap<String, String>();
 
     public void setResources(final Set<String> resources) {
-        final HashSet<String> hashSet = new HashSet<String>(resources.size());
+        final Set<String> hashSet = new HashSet<String>(resources.size());
         for (final String resource : resources) {
             hashSet.add(resource.trim());
         }

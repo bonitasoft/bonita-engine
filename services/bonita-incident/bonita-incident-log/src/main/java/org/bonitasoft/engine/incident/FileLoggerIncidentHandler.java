@@ -70,5 +70,5 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
         }
         return logger;
     }
-    
+
 }

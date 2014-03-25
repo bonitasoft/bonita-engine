@@ -207,6 +207,8 @@ public class SQueriableLogImpl implements SQueriableLog {
             case 4:
                 result = numericIndex5;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return result;
     }
@@ -278,6 +280,8 @@ public class SQueriableLogImpl implements SQueriableLog {
             case 4:
                 numericIndex5 = value;
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 
