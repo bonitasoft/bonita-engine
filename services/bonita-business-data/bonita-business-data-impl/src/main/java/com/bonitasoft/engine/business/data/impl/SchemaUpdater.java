@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
@@ -31,13 +33,16 @@ import org.hibernate.tool.hbm2ddl.SchemaUpdateScript;
  */
 public class SchemaUpdater {
 
+    private final TechnicalLoggerService loggerService;
+
     private final Configuration configuration;
 
     private final Dialect dialect;
 
     private final List<Exception> exceptions = new ArrayList<Exception>();
 
-    public SchemaUpdater(final Configuration configuration) throws HibernateException {
+    public SchemaUpdater(final Configuration configuration, final TechnicalLoggerService loggerService) throws HibernateException {
+        this.loggerService = loggerService;
         this.configuration = configuration;
         dialect = Dialect.getDialect(configuration.getProperties());
     }
@@ -65,8 +70,17 @@ public class SchemaUpdater {
                 exceptions.add(sqle);
                 throw sqle;
             }
+
+            if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.INFO)) {
+                loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.INFO, "Updating schema");
+            }
+
             final List<SchemaUpdateScript> scripts = configuration.generateSchemaUpdateScriptList(dialect, meta);
             executeScripts(connection, scripts);
+
+            if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.INFO)) {
+                loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.INFO, "Schema updated");
+            }
         } catch (final Exception e) {
             exceptions.add(e);
         } finally {
@@ -86,15 +100,26 @@ public class SchemaUpdater {
     private void executeScripts(final Connection connection, final List<SchemaUpdateScript> scripts) throws SQLException {
         final Statement statement = connection.createStatement();
         for (final SchemaUpdateScript script : scripts) {
+            if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.DEBUG, "executing " + script);
+            }
+
             try {
                 statement.executeUpdate(script.getScript());
             } catch (final SQLException e) {
+                if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.WARNING)) {
+                    loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.WARNING, "Unsuccessful execution of " + script);
+                }
                 if (!script.isQuiet()) {
                     exceptions.add(e);
                 }
             }
         }
         statement.close();
+    }
+
+    public List<Exception> getExceptions() {
+        return exceptions;
     }
 
 }

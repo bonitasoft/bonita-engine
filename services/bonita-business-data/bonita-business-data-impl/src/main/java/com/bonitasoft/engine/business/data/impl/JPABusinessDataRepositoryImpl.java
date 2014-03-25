@@ -106,7 +106,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         start();
     }
 
-    private void updateSchema() {
+    private void updateSchema() throws SBusinessDataRepositoryDeploymentException {
         final Configuration cfg = new Configuration();
         final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
         for (final EntityType<?> entity : entities) {
@@ -119,8 +119,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         cfg.setProperty("hibernate.current_session_context_class", "jta");
         cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
 
-        final SchemaUpdater updater = new SchemaUpdater(cfg);
+        final SchemaUpdater updater = new SchemaUpdater(cfg, loggerService);
         updater.execute();
+        final List<Exception> exceptions = updater.getExceptions();
+        if (!exceptions.isEmpty()) {
+            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
+        }
     }
 
     @Override
@@ -223,6 +227,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         }
     }
 
+    @Override
     public <T> List<T> findList(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = buildQuery(em, resultClass, qlString, parameters);
