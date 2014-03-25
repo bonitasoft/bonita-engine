@@ -293,7 +293,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinishAndBeArchived(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -343,7 +343,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 500); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -384,7 +384,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -404,7 +404,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinishAndBeArchived(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
         disableAndDeleteProcess(processDefinition);

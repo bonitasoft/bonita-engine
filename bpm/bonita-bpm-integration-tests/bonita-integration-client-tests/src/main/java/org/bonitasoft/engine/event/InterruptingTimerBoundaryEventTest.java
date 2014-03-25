@@ -44,7 +44,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // wait timer trigger
         final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
 
         waitForArchivedActivity(waitForStep1.getId(), TestStates.getAbortedState());
 
@@ -103,7 +103,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // check that the exception flow was taken
         final WaitForStep waitForExceptionStep = waitForStep(exceptionFlowTaskName, processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
@@ -138,7 +138,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // check that the exception flow was taken
         final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
 
         waitForArchivedActivity(multiInstance.getId(), TestStates.getAbortedState());
 
@@ -172,7 +172,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // wait timer trigger
         final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
@@ -243,7 +243,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // Check that step1 is aborted
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
 
         disableAndDeleteProcess(processDefinition);
     }

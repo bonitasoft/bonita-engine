@@ -837,7 +837,7 @@ public class APITestUtil {
     }
 
     @Deprecated
-    protected boolean waitProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
+    protected boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
         return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
