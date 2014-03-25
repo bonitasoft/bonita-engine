@@ -91,7 +91,12 @@ public class ExecutorWorkService implements WorkService {
         this.executor.submit(work);
     }
 
-    private AbstractWorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
+    private synchronized AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
+        if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
+            loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Tried to register work " + work.getDescription()
+                    + " but the work service is shutdown. work will be restarted with the node");
+            return null;
+        }
         AbstractWorkSynchronization synchro = synchronizations.get();
         if (synchro == null || synchro.isExecuted()) {
             synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor, this);
