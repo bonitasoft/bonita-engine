@@ -23,7 +23,7 @@
             <props>
                 <prop key="user">root</prop>
                 <prop key="password">root</prop>
-                <prop key="URL">jdbc:mysql://${db.server.name}:${db.server.port}/${db.database.name}?useUnicode=true&characterEncoding=UTF-8</prop>
+                <prop key="URL">jdbc:mysql://${db.server.name}:${db.server.port}/${db.database.name}?useUnicode=true&amp;characterEncoding=UTF-8</prop>
             </props>
         </property>
     </bean>
