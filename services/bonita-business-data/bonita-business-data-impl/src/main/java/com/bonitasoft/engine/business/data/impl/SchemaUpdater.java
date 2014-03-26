@@ -101,14 +101,14 @@ public class SchemaUpdater {
         final Statement statement = connection.createStatement();
         for (final SchemaUpdateScript script : scripts) {
             if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.DEBUG, "executing " + script);
+                loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.DEBUG, "executing " + script.getScript());
             }
 
             try {
                 statement.executeUpdate(script.getScript());
             } catch (final SQLException e) {
                 if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.WARNING)) {
-                    loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.WARNING, "Unsuccessful execution of " + script);
+                    loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.WARNING, "Unsuccessful execution of " + script.getScript());
                 }
                 if (!script.isQuiet()) {
                     exceptions.add(e);
