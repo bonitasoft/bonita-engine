@@ -7,28 +7,19 @@
 	   http://www.springframework.org/schema/context/spring-context-3.0.xsd
 	   http://www.springframework.org/schema/util 
 	   http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+    
+    <import resource="classpath:/datasource/datasource-dependency-${sysprop.bonita.db.vendor:h2}.xml" />
 
-	<bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource"
-		init-method="init" destroy-method="close">
+	<bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
 		<property name="uniqueName" value="java:/comp/env/jdbc/PGDS1" />
-		<property name="className" value="org.h2.jdbcx.JdbcDataSource" />
+		<property name="className" value="${db.datasource.classname}" />
 		<property name="maxPoolSize" value="10" />
 		<property name="allowLocalTransactions" value="true" />
 		<property name="driverProperties" ref="driverProperties" />
 	</bean>
-
-	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-		<property name="properties">
-			<props>
-				<prop key="user">sa</prop>
-				<prop key="password"></prop>
-				<prop key="URL">jdbc:h2:mem:database;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTOCOMMIT=OFF;</prop>
-			</props>
-		</property>
-	</bean>
     
     <util:map id="jpa-configuration" scope="prototype" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object">
-	    <entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+	    <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
 	    <entry key="hibernate.connection.datasource" value-ref="businessDataDataSource" />
 	</util:map>
 	
