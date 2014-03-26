@@ -20,6 +20,7 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
@@ -93,6 +94,9 @@ public class TenantManagementAPIExtTest {
     @Mock
     private TenantRestartHandler tenantRestartHandler2;
 
+    @Mock
+    private ClassLoaderService classLoaderService;
+
     private long tenantId;
 
     private STenantImpl sTenant;
@@ -120,6 +124,7 @@ public class TenantManagementAPIExtTest {
         when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(tenantConfiguration);
         when(tenantConfiguration.getLifecycleServices()).thenReturn(Arrays.asList(workService, businessDataRepository));
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(tenantLogger);
+        when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
 
         when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
 
