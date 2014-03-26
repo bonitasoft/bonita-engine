@@ -82,6 +82,7 @@ public class JPABusinessDataRepositoryImplTest {
         repository.undeploy(45l);
     }
 
+    @SuppressWarnings("serial")
     class MyEntity implements Entity {
 
         @Override
