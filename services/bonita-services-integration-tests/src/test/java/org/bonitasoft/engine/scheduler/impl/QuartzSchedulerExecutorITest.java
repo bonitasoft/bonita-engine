@@ -443,8 +443,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         Thread.sleep(2000);
 
         final int newValue = IncrementItselfJob.getValue();
-        final int delta = newValue - value;
-        assertTrue("expected 1 or 2, 3 execution in 2 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
+        assertTrue("Cron job hasn't been started", newValue > value);
     }
 
     @Test
