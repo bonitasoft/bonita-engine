@@ -14,7 +14,6 @@ import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.bdr.BDRIT;
 import com.bonitasoft.engine.theme.ThemeTest;
 
 @RunWith(BonitaSuiteRunner.class)
@@ -25,8 +24,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         APIMethodSPTest.class,
         ConnectorExecutionTimeOutTest.class,
         ConnectorImplementationLocalSPTest.class,
-        ThemeTest.class,
-        BDRIT.class
+        ThemeTest.class
 })
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {

@@ -42,7 +42,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
@@ -107,7 +106,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
@@ -117,7 +115,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
-import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
 import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
@@ -127,11 +124,6 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.business.data.BusinessDataRepository;
-import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
-import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
@@ -707,7 +699,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         } catch (final NotSerializableException e) {
@@ -766,7 +758,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -823,7 +815,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -877,7 +869,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -933,7 +925,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -1025,31 +1017,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(e);
         }
         return ModelConvertor.toConnectorInstanceWithFailureInfo(serverObject);
-    }
-
-    // FIXME: the returned Business Data class is not visible on client side, so the retrieved object cannot be used:
-    @Override
-    public Serializable getBusinessDataInstance(final String dataName, final long processInstanceId) throws DataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
-        try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(dataName, processInstanceId);
-            final BusinessDataRepository businessDataRepository = tenantAccessor.getBusinessDataRepository();
-            if (refBusinessDataInstance.getDataId() == null) {
-                return null;
-            }
-            final Class<Entity> businessDataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
-                    .loadClass(refBusinessDataInstance.getDataClassName());
-            return businessDataRepository.findById(businessDataClass, refBusinessDataInstance.getDataId());
-        } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
-            throw new DataNotFoundException(srbdnfe);
-        } catch (final SBusinessDataNotFoundException bdnfe) {
-            throw new DataNotFoundException(bdnfe);
-        } catch (final SBonitaReadException sbe) {
-            throw new RetrieveException(sbe);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new RetrieveException(cnfe);
-        }
     }
 
 }

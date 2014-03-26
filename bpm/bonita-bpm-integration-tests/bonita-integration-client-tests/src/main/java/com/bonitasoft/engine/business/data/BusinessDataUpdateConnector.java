@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdr;
+package com.bonitasoft.engine.business.data;
 
 import java.lang.reflect.Method;
 
