@@ -52,7 +52,7 @@ public class TestsInitializer {
         cleanBonitaHome();
         // wait for thread to stop
         // FIXME To uncomment when fix BS-7731
-        // checkThreadsAreStopped();
+        checkThreadsAreStopped();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
@@ -61,6 +61,7 @@ public class TestsInitializer {
     }
 
     private void checkThreadsAreStopped() throws InterruptedException {
+        System.out.println("Checking if all Threads are stopped");
         Set<Thread> keySet = Thread.getAllStackTraces().keySet();
         Iterator<Thread> iterator = keySet.iterator();
         ArrayList<Thread> list = new ArrayList<Thread>();
@@ -78,6 +79,7 @@ public class TestsInitializer {
         if (!list.isEmpty()) {
             throw new IllegalStateException("Some threads are still active : " + list);
         }
+        System.out.println("All engine threads are stopped properly");
     }
 
     private boolean isEngine(final Thread thread) {
@@ -88,7 +90,7 @@ public class TestsInitializer {
         }
         List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread"/* bonecp related */, "hz."/* hazelcast related */);
+                "Abandoned connection cleanup thread"/* bonecp related */);
         for (String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return false;
@@ -142,8 +144,21 @@ public class TestsInitializer {
         springContext = new ClassPathXmlApplicationContext("datasource.xml", "jndi-setup.xml");
     }
 
-    private static void closeSpringContext() {
+    private void closeSpringContext() {
+        try {
+            // if in local we try to unload engine
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            Class<?> initializerClass = contextClassLoader.loadClass(getInitializerListenerClassName());
+            initializerClass.getMethod("unload").invoke(null);
+        } catch (Throwable e) {
+            System.out.println("Unable to execute the unload handler, maybe test are not local: " + e.getMessage());
+            // not in local, do nothing
+        }
         springContext.close();
+    }
+
+    protected String getInitializerListenerClassName() {
+        return "org.bonitasoft.engine.EngineInitializer";
     }
 
     private static void setSystemPropertyIfNotSet(final String property, final String value) {
