@@ -34,6 +34,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
@@ -42,6 +47,8 @@ import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.pojo.Employee;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/datasource.xml" })
 public class JPABusinessDataRepositoryImplIT {
 
     private static final String DATA_SOURCE_NAME = "java:/comp/env/jdbc/PGDS1";
@@ -54,38 +61,33 @@ public class JPABusinessDataRepositoryImplIT {
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
-    private static PoolingDataSource ds1;
+    @Autowired
+    @Qualifier("businessDataDataSource")
+    private PoolingDataSource ds1;
 
     @BeforeClass
-    public static void initDatasource() throws NamingException, SQLException {
+    public static void initializeBitronix() throws NamingException, SQLException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
         TransactionManagerServices.getConfiguration().setJournal(null);
-
-        ds1 = new PoolingDataSource();
-        ds1.setUniqueName(DATA_SOURCE_NAME);
-        ds1.setClassName("org.h2.jdbcx.JdbcDataSource");
-        ds1.setMaxPoolSize(10);
-        ds1.setAllowLocalTransactions(true);
-        ds1.getDriverProperties().put("URL", "jdbc:h2:mem:database;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTOCOMMIT=OFF;");
-        ds1.getDriverProperties().put("user", "sa");
-        ds1.getDriverProperties().put("password", "");
-        ds1.init();
     }
 
     @AfterClass
-    public static void closeDataSource() {
-        ds1.close();
+    public static void shutdownTransactionManager() {
         TransactionManagerServices.getTransactionManager().shutdown();
     }
 
-    public void setUpDatabase() throws Exception {
-        databaseTester = new DataSourceDatabaseTester(ds1);
-        final InputStream stream = JPABusinessDataRepositoryImplIT.class.getResourceAsStream("/dataset.xml");
-        final FlatXmlDataSet dataSet = new FlatXmlDataSetBuilder().build(stream);
-        stream.close();
-        databaseTester.setDataSet(dataSet);
-        databaseTester.setSetUpOperation(DatabaseOperation.CLEAN_INSERT);
-        databaseTester.onSetup();
+    @Before
+    public void setUp() throws Exception {
+        dependencyService = mock(DependencyService.class);
+        loggerService = mock(TechnicalLoggerService.class);
+        final Map<String, Object> configuration = new HashMap<String, Object>();
+        configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
+    
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration));
+        doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
+        doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
+        doReturn(true).when(businessDataRepository).isDBMDeployed();
     }
 
     @After
@@ -104,18 +106,14 @@ public class JPABusinessDataRepositoryImplIT {
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        dependencyService = mock(DependencyService.class);
-        loggerService = mock(TechnicalLoggerService.class);
-        final Map<String, Object> configuration = new HashMap<String, Object>();
-        configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
-
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration));
-        doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
-        doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
-        doReturn(true).when(businessDataRepository).isDBMDeployed();
+    public void setUpDatabase() throws Exception {
+        databaseTester = new DataSourceDatabaseTester(ds1);
+        final InputStream stream = JPABusinessDataRepositoryImplIT.class.getResourceAsStream("/dataset.xml");
+        final FlatXmlDataSet dataSet = new FlatXmlDataSetBuilder().build(stream);
+        stream.close();
+        databaseTester.setDataSet(dataSet);
+        databaseTester.setSetUpOperation(DatabaseOperation.CLEAN_INSERT);
+        databaseTester.onSetup();
     }
 
     @Test
