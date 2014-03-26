@@ -45,21 +45,21 @@ public class ServerAPIExt extends ServerAPIImpl {
     @Override
     protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session) {
         super.checkMethodAccessibility(apiImpl, apiInterfaceName, method, session);
-        // we don't check if tenant is in maintenance at platform level and when there is no session
+        // we don't check if tenant is in pause mode at platform level and when there is no session
         // when there is no session means that we are trying to log in, in this case it is the LoginApiExt that check if the user is the technical user
         // For tenant level method call:
         if (session instanceof APISession) {
             final long tenantId = ((APISession) session).getTenantId();
             if (!isTenantInAValidModeFor(apiImpl, method, tenantId, session)) {
-                logTenantInMaintenanceMessage(apiImpl, apiInterfaceName, method.getName());
-                throw new TenantIsPausedException("Tenant with ID " + tenantId + " is in maintenance, no API call on this tenant can be made for now.");
+                logTenantPausedMessage(apiImpl, apiInterfaceName, method.getName());
+                throw new TenantIsPausedException("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
             }
         }
     }
 
-    protected void logTenantInMaintenanceMessage(final Object apiImpl, final String apiInterfaceName, final String methodName) {
-        logTechnicalErrorMessage("Tenant in Maintenance. Method '" + apiInterfaceName + "." + methodName + "' of '" + apiImpl
-                + "' cannot be called until the tenant mode is RUNNING again (TenantManagementAPI.resume())");
+    protected void logTenantPausedMessage(final Object apiImpl, final String apiInterfaceName, final String methodName) {
+        logTechnicalErrorMessage("Tenant in pause. Method '" + apiInterfaceName + "." + methodName + "' on implementation '"
+                + apiImpl.getClass().getSimpleName() + "' cannot be called until the tenant mode is RUNNING again (call TenantManagementAPI.resume() first)");
     }
 
     private boolean isTenantInAValidModeFor(final Object apiImpl, final Method method, final long tenantId, final Session session) {
