@@ -20,7 +20,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -47,6 +46,7 @@ import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletio
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -88,13 +88,14 @@ public class ProfileServiceImplForProfileEntryTest {
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#createProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
      * 
+     * @param l
+     * 
      * @throws SRecorderException
      * @throws SProfileEntryCreationException
      */
     @Test
     public final void createProfileEntry() throws SRecorderException, SProfileEntryCreationException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(1L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(1l);
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
@@ -105,6 +106,12 @@ public class ProfileServiceImplForProfileEntryTest {
         assertEquals(sProfileEntry, result);
     }
 
+    private SProfileEntry createProfileEntry(final long id) {
+        SProfileEntryImpl entry = new SProfileEntryImpl();
+        entry.setId(id);
+        return entry;
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public final void createNullProfileEntry() throws Exception {
         profileServiceImpl.createProfileEntry(null);
@@ -112,8 +119,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     @Test(expected = SProfileEntryCreationException.class)
     public final void createProfileThrowException() throws SRecorderException, SProfileEntryCreationException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(1L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(1);
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
@@ -132,8 +138,7 @@ public class ProfileServiceImplForProfileEntryTest {
      */
     @Test
     public final void deleteProfileEntryById() throws SProfileEntryNotFoundException, SProfileEntryDeletionException, SBonitaReadException, SRecorderException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(6L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
@@ -152,8 +157,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     @Test(expected = SProfileEntryDeletionException.class)
     public void deleteProfileEntryByIdThrowException() throws Exception {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(6L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
@@ -170,8 +174,7 @@ public class ProfileServiceImplForProfileEntryTest {
      */
     @Test
     public final void deleteProfileEntryByObject() throws SRecorderException, SProfileEntryDeletionException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(6L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
@@ -187,8 +190,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     @Test(expected = SProfileEntryDeletionException.class)
     public void deleteProfileEntryByObjectThrowException() throws Exception {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(6L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
@@ -207,7 +209,7 @@ public class ProfileServiceImplForProfileEntryTest {
     @Test
     public final void getEntriesOfProfileByParentId() throws SBonitaReadException {
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        final SProfileEntry sProfileEntry = createProfileEntry(1);
         sProfileEntries.add(sProfileEntry);
 
         doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
@@ -241,7 +243,7 @@ public class ProfileServiceImplForProfileEntryTest {
     @Test
     public final void getEntriesOfProfile() throws SBonitaReadException {
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        final SProfileEntry sProfileEntry = createProfileEntry(1);
         sProfileEntries.add(sProfileEntry);
 
         doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
@@ -296,7 +298,7 @@ public class ProfileServiceImplForProfileEntryTest {
      */
     @Test
     public final void getProfileEntryById() throws SProfileEntryNotFoundException, SBonitaReadException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        final SProfileEntry sProfileEntry = createProfileEntry(1);
 
         doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
 
@@ -348,10 +350,10 @@ public class ProfileServiceImplForProfileEntryTest {
      */
     @Test
     public final void updateProfileEntry() throws SProfileEntryUpdateException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(3L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(3);
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
-        sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setPage("page").setParentId(5858).setProfileId(9)
+        sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setCustom(true).setPage("page").setParentId(5858)
+                .setProfileId(9)
                 .setType("type");
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
@@ -359,7 +361,6 @@ public class ProfileServiceImplForProfileEntryTest {
 
         final SProfileEntry result = profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
         assertNotNull(result);
-        assertEquals(sProfileEntry, result);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -371,16 +372,14 @@ public class ProfileServiceImplForProfileEntryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public final void updateProfileWithNullDescriptor() throws SProfileEntryUpdateException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(3L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(3);
 
         profileServiceImpl.updateProfileEntry(sProfileEntry, null);
     }
 
     @Test(expected = SProfileEntryUpdateException.class)
     public final void updateProfileEntryThrowException() throws SRecorderException, SProfileEntryUpdateException {
-        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
-        doReturn(3L).when(sProfileEntry).getId();
+        final SProfileEntry sProfileEntry = createProfileEntry(3);
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
         sProfileEntryUpdateBuilder.setDescription("newDescription").setName("newName");
 

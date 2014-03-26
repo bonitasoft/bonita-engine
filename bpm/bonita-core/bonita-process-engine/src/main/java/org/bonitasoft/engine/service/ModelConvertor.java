@@ -1920,6 +1920,7 @@ public class ModelConvertor {
         profileEntryImpl.setPage(sProfileEntry.getPage());
         profileEntryImpl.setParentId(sProfileEntry.getParentId());
         profileEntryImpl.setType(sProfileEntry.getType());
+        profileEntryImpl.setCustom(sProfileEntry.isCustom());
         return profileEntryImpl;
     }
 
@@ -1996,7 +1997,7 @@ public class ModelConvertor {
         final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
         return themeImpl;
     }
-    
+
     public static List<SOperation> toSOperation(final List<Operation> operations) {
         if (operations == null) {
             return null;
@@ -2019,7 +2020,6 @@ public class ModelConvertor {
         return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
                 .setType(operatorType).setLeftOperand(sLeftOperand).done();
     }
-    
 
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
