@@ -8,7 +8,8 @@
 	   http://www.springframework.org/schema/util 
 	   http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     
-    <import resource="classpath:/datasource/datasource-dependency-${sysprop.bonita.db.vendor:h2}.xml" />
+    <!-- <import resource="classpath:/datasource/datasource-dependency-${sysprop.bonita.db.vendor:h2}.xml" /> -->
+    <import resource="classpath:/datasource/datasource-dependency-h2.xml" />
 
 	<bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
 		<property name="uniqueName" value="java:/comp/env/jdbc/PGDS1" />
