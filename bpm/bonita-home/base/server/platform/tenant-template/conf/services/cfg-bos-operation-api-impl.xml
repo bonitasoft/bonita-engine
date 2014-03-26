@@ -22,6 +22,7 @@
 		<property name="leftOperandHandlers">
 			<list>
 				<ref bean="dataLeftOperandHandler" />
+				<ref bean="transientDataLeftOperandHandler" />
 				<ref bean="externalDataLeftOperandHandler" />
 				<ref bean="documentLeftOperandHandler" />
 				<ref bean="stringIndexLeftOperandHandler" />
@@ -33,6 +34,14 @@
 
 	<bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+	</bean>
+
+	<bean id="transientDataLeftOperandHandler" class="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">
+		<constructor-arg name="transientDataService" ref="transientDataService" />
+		<constructor-arg name="transientDataService" ref="transientDataService" />
+		<constructor-arg name="flownodeInstanceService" ref="flownodeInstanceService" />
+		<constructor-arg name="processDefinitionService" ref="processDefinitionService" />
+		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
 	</bean>
 
 	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
