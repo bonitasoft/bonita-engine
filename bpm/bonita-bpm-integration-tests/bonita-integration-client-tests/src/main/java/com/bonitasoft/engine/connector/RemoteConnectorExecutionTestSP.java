@@ -514,17 +514,20 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     public void executeConnectorOnActivityInstanceWithOperations() throws Exception {
         final Expression input1Expression = new ExpressionBuilder().createInputExpression("valueOfInput1", String.class.getName());
         final Expression input2Expression = new ExpressionBuilder().createInputExpression("valueOfInput2", String.class.getName());
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression("Mett");
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression("valueOfInput3", String.class.getName());
-        final Expression mainExp = new ExpressionBuilder().createExpression("param1", "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), ExpressionInterpreter.GROOVY.toString(),
-                Arrays.asList(input1Expression, input2Expression, input3Expression));
+        final Expression dataDefaultValueExpression = new ExpressionBuilder().createConstantStringExpression("Mett");
+        final String dataName = "dataName";
+        final Expression dataExpression = new ExpressionBuilder().createDataExpression(dataName, String.class.getName());
 
-        // process with data "Mett"
+        final String welcomeMessage = "param1";
+        final Expression welcomeMessageExpression = new ExpressionBuilder().createExpression(welcomeMessage,
+                "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+dataName",
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), ExpressionInterpreter.GROOVY.toString(),
+                Arrays.asList(input1Expression, input2Expression, dataExpression));
+
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addUserTask("step1", ACTOR_NAME).addShortTextData("valueOfInput3", input3DefaultExpression);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME).addShortTextData(dataName, dataDefaultValueExpression);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
@@ -534,23 +537,66 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // operations: put "Jack" in data valueOfInput3, param1 in "externalData" and "John" in "externalDataConst"
         // Create Operation map:
         final List<Operation> operations = new ArrayList<Operation>();
-        // set valueOfInput3
-        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        operations.add(new OperationBuilder().createSetDataOperation("valueOfInput3", new ExpressionBuilder().createConstantStringExpression("Jack")));
-        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
-                .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT).done());
+        operations.add(new OperationBuilder().createSetDataOperation(dataName, new ExpressionBuilder().createConstantStringExpression("Jack")));
+        operations
+                .add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+                        .setRightOperand(new ExpressionBuilder().createInputExpression(welcomeMessage, String.class.getName()))
+                        .setType(OperatorType.ASSIGNMENT).done());
         operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
                 .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done());
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters("param1", mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues("param1", Arrays.asList("valueOfInput1", "valueOfInput2"),
-                Arrays.asList("Lily", "Lucy"));
 
+        final Map<String, Expression> connectorInputParameters = new HashMap<String, Expression>();
+        connectorInputParameters.put(welcomeMessage, welcomeMessageExpression);
+
+        final Map<String, Map<String, Serializable>> inputValues = new HashMap<String, Map<String, Serializable>>();
+        final Map<String, Serializable> values = buildInputValues(Arrays.asList("valueOfInput1", "valueOfInput2"), Arrays.asList("Lily", "Lucy"));
+        inputValues.put(welcomeMessage, values);
+
+        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts, step1.getId());
 
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
-        assertEquals("Jack", getProcessAPI().getActivityDataInstance("valueOfInput3", step1.getId()).getValue());
+        assertEquals("Jack", getProcessAPI().getActivityDataInstance(dataName, step1.getId()).getValue());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation" }, story = "execute connector on activity instance and execute operations, with pattern expression and dependency data", jira = "BS-8049")
+    @Test
+    public void executeConnectorOnActivityInstanceWithOperationAndWithPatternExpression() throws Exception {
+        final String dataName = "dataName";
+        final Expression dataExpression = new ExpressionBuilder().createDataExpression(dataName, Long.class.getName());
+
+        final String patternName = "param1";
+        final Expression patternExpression = new ExpressionBuilder().createPatternExpression(patternName, "${dataName}", dataExpression);
+
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
+                PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME).addLongData(dataName, new ExpressionBuilder().createConstantLongExpression(5L));
+        final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+
+        final List<Operation> operations = new ArrayList<Operation>();
+        operations
+                .add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+                        .setRightOperand(new ExpressionBuilder().createInputExpression(patternName, String.class.getName()))
+                        .setType(OperatorType.ASSIGNMENT).done());
+
+        final Map<String, Expression> connectorInputParameters = new HashMap<String, Expression>();
+        connectorInputParameters.put(patternName, patternExpression);
+
+        final Map<String, Map<String, Serializable>> inputValues = new HashMap<String, Map<String, Serializable>>();
+        inputValues.put(patternName, Collections.<String, Serializable> emptyMap());
+
+        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
+        final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
+                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts, step1.getId());
+
+        assertEquals("5", res.get("externalData"));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -1126,6 +1172,16 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
         inputValues.put(mainName, values);
         return inputValues;
+    }
+
+    private Map<String, Serializable> buildInputValues(final List<String> names, final List<String> vars) {
+        final Map<String, Serializable> values = new HashMap<String, Serializable>();
+        if (names != null && !names.isEmpty() && vars != null && !vars.isEmpty() && names.size() == vars.size()) {
+            for (int i = 0; i < names.size(); i++) {
+                values.put(names.get(i), vars.get(i));
+            }
+        }
+        return values;
     }
 
     @Test
