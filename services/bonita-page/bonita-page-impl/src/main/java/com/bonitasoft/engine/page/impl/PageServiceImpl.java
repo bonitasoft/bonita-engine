@@ -8,12 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.page.impl;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -86,7 +90,10 @@ public class PageServiceImpl implements PageService {
         final String message = "Adding a new page with name " + page.getName();
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, message);
         try {
-            SPageWithContent pageContent = new SPageWithContentImpl(page, content);
+
+            checkContentIsValid(content);
+
+            final SPageWithContent pageContent = new SPageWithContentImpl(page, content);
             final InsertRecord insertContentRecord = new InsertRecord(pageContent);
             final SInsertEvent insertContentEvent = getInsertEvent(insertContentRecord, PAGE);
             recorder.recordInsert(insertContentRecord, insertContentEvent);
@@ -97,6 +104,9 @@ public class PageServiceImpl implements PageService {
         } catch (final SRecorderException re) {
             initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addPage");
             throw new SObjectCreationException(re);
+        } catch (final SBonitaReadException bre) {
+            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addPage");
+            throw new SObjectCreationException(bre);
         }
     }
 
@@ -133,7 +143,7 @@ public class PageServiceImpl implements PageService {
     public List<SPage> searchPages(final QueryOptions options) throws SBonitaSearchException {
         try {
             return persistenceService.searchEntity(SPage.class, options, null);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
     }
@@ -221,7 +231,7 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
         try {
 
-            SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId));
+            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
                     entityUpdateDescriptor);
 
@@ -233,7 +243,7 @@ public class PageServiceImpl implements PageService {
         } catch (final SRecorderException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
             throw new SObjectModificationException(re);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
             throw new SObjectModificationException(e);
         }
@@ -244,7 +254,9 @@ public class PageServiceImpl implements PageService {
     public void updatePageContent(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
         final String message = "Update a page with name " + pageId;
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
+
         try {
+            checkPageContentIsValid(entityUpdateDescriptor);
             final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>("getPageContent",
                     SPageContent.class, pageId));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageContent,
@@ -258,7 +270,7 @@ public class PageServiceImpl implements PageService {
         } catch (final SRecorderException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
             throw new SObjectModificationException(re);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
             throw new SObjectModificationException(e);
         }
@@ -348,4 +360,40 @@ public class PageServiceImpl implements PageService {
         // nothing to do
     }
 
+    protected void checkPageContentIsValid(final EntityUpdateDescriptor entityUpdateDescriptor)
+            throws SBonitaReadException {
+        if (null == entityUpdateDescriptor || !entityUpdateDescriptor.getFields().containsKey(SPageContentFields.PAGE_CONTENT)) {
+            throw new SBonitaReadException("page content error");
+        }
+
+        checkContentIsValid((byte[]) entityUpdateDescriptor.getFields().get(SPageContentFields.PAGE_CONTENT));
+
+    }
+
+    protected boolean checkContentIsValid(final byte[] content) throws SBonitaReadException {
+        final InputStream resourceAsStream = new ByteArrayInputStream(content);
+        final ZipInputStream zin = new ZipInputStream(new BufferedInputStream(resourceAsStream));
+        boolean zipIsValid = false;
+        ZipEntry entry;
+
+        try {
+            while ((entry = zin.getNextEntry()) != null) {
+                if (entry.getName().equalsIgnoreCase("index.groovy")) {
+                    zipIsValid = true;
+                }
+                if (entry.getName().equalsIgnoreCase("index.html")) {
+                    zipIsValid = true;
+                }
+
+            }
+            zin.close();
+        } catch (final IOException e) {
+            zipIsValid = false;
+        }
+
+        if (!zipIsValid) {
+            throw new SBonitaReadException("page content is not a valid zip file");
+        }
+        return zipIsValid;
+    }
 }

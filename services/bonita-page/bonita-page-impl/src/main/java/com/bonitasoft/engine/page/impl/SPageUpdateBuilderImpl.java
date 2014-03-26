@@ -14,26 +14,26 @@ public class SPageUpdateBuilderImpl implements SPageUpdateBuilder {
     }
 
     @Override
-    public SPageUpdateBuilder updateName(String value) {
-        descriptor.addField("name", value);
+    public SPageUpdateBuilder updateName(final String value) {
+        descriptor.addField(SPageFields.PAGE_NAME, value);
         return this;
     }
 
     @Override
-    public SPageUpdateBuilder updateDescription(String value) {
-        descriptor.addField("description", value);
+    public SPageUpdateBuilder updateDescription(final String value) {
+        descriptor.addField(SPageFields.PAGE_DESCRIPTION, value);
         return this;
     }
 
     @Override
-    public SPageUpdateBuilder updateDisplayName(String value) {
-        descriptor.addField("displayName", value);
+    public SPageUpdateBuilder updateDisplayName(final String value) {
+        descriptor.addField(SPageFields.PAGE_DISPLAY_NAME, value);
         return this;
     }
 
     @Override
-    public SPageUpdateBuilder updateLastModificationDate(long currentTimeMillis) {
-        descriptor.addField("lastModificationDate", currentTimeMillis);
+    public SPageUpdateBuilder updateLastModificationDate(final long currentTimeMillis) {
+        descriptor.addField(SPageFields.PAGE_LAST_MODIFICATION_DATE, currentTimeMillis);
         return this;
     }
 

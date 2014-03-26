@@ -3,6 +3,7 @@ package com.bonitasoft.engine.api.impl;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -97,7 +99,7 @@ public class PageAPIExtTest {
     @Test
     public void testGetPage() throws Exception {
         // given
-        long pageId = 123;
+        final long pageId = 123;
         doReturn(sPage).when(pageService).getPage(pageId);
 
         // when
@@ -110,7 +112,7 @@ public class PageAPIExtTest {
     @Test
     public void testGetPageByName() throws Exception {
         // given
-        String pageName = "name";
+        final String pageName = "name";
         doReturn(sPage).when(pageService).getPageByName(pageName);
 
         // when
@@ -132,7 +134,7 @@ public class PageAPIExtTest {
     @Test
     public void testGetPageContent() throws Exception {
         // given
-        long pageId = 123;
+        final long pageId = 123;
 
         // when
         pageAPIExt.getPageContent(pageId);
@@ -146,7 +148,7 @@ public class PageAPIExtTest {
         doReturn(searchPages).when(pageAPIExt).getSearchPages(any(SearchOptions.class), any(SearchEntitiesDescriptor.class), any(PageService.class));
 
         // when
-        SearchOptions searchOptions = new SearchOptionsBuilder(0, 5).searchTerm("search").done();
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 5).searchTerm("search").done();
         pageAPIExt.searchPages(searchOptions);
 
         // then
@@ -178,7 +180,7 @@ public class PageAPIExtTest {
         doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
 
         // given
-        Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
+        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         map.put(PageUpdateField.DISPLAY_NAME, "displayname");
         doReturn(map).when(pageUpdater).getFields();
 
@@ -196,7 +198,7 @@ public class PageAPIExtTest {
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
 
         // given
-        Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
+        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         doReturn(map).when(pageUpdater).getFields();
 
         // when
@@ -214,7 +216,7 @@ public class PageAPIExtTest {
 
         // given
         final byte[] content = "content".getBytes();
-        long pageId = 1;
+        final long pageId = 1;
 
         // when
         pageAPIExt.updatePageContent(pageId, content);
@@ -223,10 +225,28 @@ public class PageAPIExtTest {
         verify(pageService, times(1)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
     }
 
+    @Test(expected = UpdateException.class)
+    public void testUpdatePageContentWithWrongZip() throws Exception {
+        final SObjectModificationException exception = new SObjectModificationException("message");
+        doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
+        doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
+        doThrow(exception).when(pageService).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
+
+        // given
+        final byte[] content = "bad".getBytes();
+        final long pageId = 1;
+
+        // when
+        pageAPIExt.updatePageContent(pageId, content);
+
+        // then
+        // exception
+    }
+
     @Test
     public void testDeletePage() throws Exception {
         // given
-        long pageId = 123;
+        final long pageId = 123;
 
         // when
         pageAPIExt.deletePage(pageId);
@@ -238,7 +258,7 @@ public class PageAPIExtTest {
     @Test
     public void testDeletePages() throws Exception {
         // given
-        List<Long> pageIds = new ArrayList<Long>();
+        final List<Long> pageIds = new ArrayList<Long>();
         for (int pageId = 0; pageId < 10; pageId++) {
             pageIds.add(new Long(pageId));
         }

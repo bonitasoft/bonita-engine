@@ -47,11 +47,11 @@ public class PageAPIExt implements PageAPI {
         final PageService pageService = getTenantAccessor().getPageService();
 
         try {
-            SPage sPage = pageService.getPage(pageId);
-            return convertToPage(sPage);
-        } catch (SBonitaReadException e) {
+            return convertToPage(pageService.getPage(pageId));
+        } catch (final SBonitaReadException e) {
             throw new PageNotFoundException(e);
-        } catch (SObjectNotFoundException e) {
+
+        } catch (final SObjectNotFoundException e) {
             throw new PageNotFoundException(e);
         }
     }
@@ -61,11 +61,12 @@ public class PageAPIExt implements PageAPI {
         final PageService pageService = getTenantAccessor().getPageService();
 
         try {
-            byte[] content = pageService.getPageContent(pageId);
+            final byte[] content = pageService.getPageContent(pageId);
             return content;
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new PageNotFoundException(e);
-        } catch (SObjectNotFoundException e) {
+
+        } catch (final SObjectNotFoundException e) {
             throw new PageNotFoundException(e);
         }
     }
@@ -98,7 +99,7 @@ public class PageAPIExt implements PageAPI {
 
         checkPageAlreadyExists((String) pageCreator.getFields().get(PageCreator.PageField.NAME), getTenantAccessor());
         try {
-            SPage addPage = pageService.addPage(sPage, content);
+            final SPage addPage = pageService.addPage(sPage, content);
             return convertToPage(addPage);
         } catch (final SBonitaException sBonitaException) {
             throw new CreationException(sBonitaException);
@@ -133,7 +134,7 @@ public class PageAPIExt implements PageAPI {
     public void deletePages(final List<Long> pageIds) throws DeletionException {
         final PageService pageService = getTenantAccessor().getPageService();
         try {
-            for (Long pageId : pageIds) {
+            for (final Long pageId : pageIds) {
                 pageService.deletePage(pageId);
             }
         } catch (final SBonitaException sBonitaException) {
@@ -160,7 +161,7 @@ public class PageAPIExt implements PageAPI {
             if (sPage != null) {
                 throw new AlreadyExistsException("A report already exists with the name " + name);
             }
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             // ignore it
         }
     }
@@ -170,12 +171,12 @@ public class PageAPIExt implements PageAPI {
         final PageService pageService = getTenantAccessor().getPageService();
 
         try {
-            SPage sPage = pageService.getPageByName(name);
+            final SPage sPage = pageService.getPageByName(name);
             if (sPage == null) {
                 throw new PageNotFoundException(name);
             }
             return convertToPage(sPage);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new PageNotFoundException(e);
         }
     }
@@ -207,7 +208,7 @@ public class PageAPIExt implements PageAPI {
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
 
         try {
-            SPage updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());
+            final SPage updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());
             return convertToPage(updatedPage);
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
@@ -223,17 +224,15 @@ public class PageAPIExt implements PageAPI {
     @Override
     public void updatePageContent(final long pageId, final byte[] content) throws UpdateException {
         final PageService pageService = getTenantAccessor().getPageService();
-
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
-
         final SPageUpdateContentBuilder pageUpdateContentBuilder = getPageUpdateContentBuilder();
 
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateContentBuilder.updateContent(content);
 
         try {
-            pageService.updatePage(pageId, pageUpdateBuilder.done());
             pageService.updatePageContent(pageId, pageUpdateContentBuilder.done());
+            pageService.updatePage(pageId, pageUpdateBuilder.done());
 
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
