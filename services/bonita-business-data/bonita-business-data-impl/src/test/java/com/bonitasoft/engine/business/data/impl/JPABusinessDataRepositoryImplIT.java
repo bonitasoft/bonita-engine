@@ -5,17 +5,17 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -48,22 +49,25 @@ import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.pojo.Employee;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/datasource.xml" })
+@ContextConfiguration(locations = { "/testContext.xml" })
 public class JPABusinessDataRepositoryImplIT {
-
-    private static final String DATA_SOURCE_NAME = "java:/comp/env/jdbc/PGDS1";
 
     private IDatabaseTester databaseTester;
 
+    private JPABusinessDataRepositoryImpl businessDataRepository;
+
+    @Mock
     private DependencyService dependencyService;
 
+    @Mock
     private TechnicalLoggerService loggerService;
-
-    private JPABusinessDataRepositoryImpl businessDataRepository;
 
     @Autowired
     @Qualifier("businessDataDataSource")
-    private PoolingDataSource ds1;
+    private PoolingDataSource datasource;
+
+    @Resource(name = "jpa-configuration")
+    private Map<String, Object> configuration;
 
     @BeforeClass
     public static void initializeBitronix() throws NamingException, SQLException {
@@ -78,12 +82,8 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Before
     public void setUp() throws Exception {
-        dependencyService = mock(DependencyService.class);
-        loggerService = mock(TechnicalLoggerService.class);
-        final Map<String, Object> configuration = new HashMap<String, Object>();
-        configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
-    
+        initMocks(this);
+
         businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration));
         doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
@@ -107,7 +107,7 @@ public class JPABusinessDataRepositoryImplIT {
     }
 
     public void setUpDatabase() throws Exception {
-        databaseTester = new DataSourceDatabaseTester(ds1);
+        databaseTester = new DataSourceDatabaseTester(datasource);
         final InputStream stream = JPABusinessDataRepositoryImplIT.class.getResourceAsStream("/dataset.xml");
         final FlatXmlDataSet dataSet = new FlatXmlDataSetBuilder().build(stream);
         stream.close();
