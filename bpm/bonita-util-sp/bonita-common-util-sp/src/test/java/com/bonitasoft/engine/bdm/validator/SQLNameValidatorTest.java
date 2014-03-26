@@ -52,6 +52,7 @@ public class SQLNameValidatorTest {
 		assertThat(sqlNameValidator.isValid("EMPLOYEE")).isTrue();
 		assertThat(sqlNameValidator.isValid("employee")).isTrue();
 		assertThat(sqlNameValidator.isValid("employee_#")).isTrue();
+		assertThat(sqlNameValidator.isValid("name")).isTrue();
 	}
 	
 	@Test
