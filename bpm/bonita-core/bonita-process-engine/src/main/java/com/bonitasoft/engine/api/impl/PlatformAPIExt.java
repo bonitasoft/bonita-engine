@@ -740,4 +740,22 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return platformAccessor;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.api.impl.PlatformAPIImpl#startServices(org.bonitasoft.engine.log.technical.TechnicalLoggerService, long,
+     * org.bonitasoft.engine.service.TenantServiceAccessor)
+     */
+    @Override
+    protected void startServices(final TechnicalLoggerService logger, final long tenantId,
+            final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor)
+            throws SBonitaException {
+        super.startServices(logger, tenantId, tenantServiceAccessor);
+        tenantServiceAccessor.getTransactionExecutor().execute(new TransactionContent() {
+
+            @Override
+            public void execute() throws SBonitaException {
+                ((TenantServiceAccessor) tenantServiceAccessor).getPageService().start();
+            }
+        });
+    }
 }

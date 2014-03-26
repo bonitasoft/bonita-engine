@@ -8,22 +8,26 @@
  *******************************************************************************/
 package com.bonitasoft.engine.page.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -49,6 +53,8 @@ import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageContent;
 import com.bonitasoft.engine.page.SPageLogBuilder;
+import com.bonitasoft.engine.page.SPageUpdateBuilder;
+import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import com.bonitasoft.engine.page.SPageWithContent;
 
 /**
@@ -114,9 +120,6 @@ public class PageServiceImpl implements PageService {
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
         final SPage page = persistenceService.selectOne(new SelectOneDescriptor<SPage>("getPageByName", Collections.singletonMap("pageName",
                 (Object) pageName), SPage.class));
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPageByName"));
-        }
         return page;
     }
 
@@ -211,7 +214,7 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage updatePage(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+    public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
         // EntityUpdateDescriptor updateDescriptor;
         final String message = "Update a page with id " + pageId;
 
@@ -238,7 +241,7 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public void updatePageContent(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+    public void updatePageContent(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
         final String message = "Update a page with name " + pageId;
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
         try {
@@ -260,6 +263,89 @@ public class PageServiceImpl implements PageService {
             throw new SObjectModificationException(e);
         }
 
+    }
+
+    @Override
+    public void start() throws SBonitaException {
+        try {
+            // check if the provided pages are here or not up to date and import them from class path if needed
+            final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.properties");
+            if (inputStream == null) {
+                // no provided page
+                return;
+            }
+            Properties pageProperties = new Properties();
+            pageProperties.load(inputStream);
+
+            // provided pages name?
+            SPage pageByName = getPageByName(pageProperties.getProperty("name"));
+            if (pageByName == null) {
+                addPage(getProvidedPage(pageProperties), getProvidedPageContent());
+                return;
+            }
+            byte[] providedPageContent = getProvidedPageContent();
+            byte[] pageContent = getPageContent(pageByName.getId());
+            if (pageContent.length != providedPageContent.length) {
+                // think of a better way to check the content are the same or not, it will almost always be the same so....
+                updateProvidedPage(pageByName.getId(), pageProperties, providedPageContent);
+            }
+        } catch (IOException e) {
+            throw new SBonitaReadException("Unable to import the provided page", e);
+        }
+    }
+
+    /**
+     * @param id
+     * @param pageProperties
+     * @param providedPageContent
+     * @throws SObjectModificationException
+     */
+    private void updateProvidedPage(final long id, final Properties pageProperties, final byte[] providedPageContent) throws SObjectModificationException {
+        final SPageUpdateBuilder pageUpdateBuilder = new SPageUpdateBuilderImpl(new EntityUpdateDescriptor());
+
+        final SPageUpdateContentBuilder pageUpdateContentBuilder = new SPageUpdateContentBuilderImpl(new EntityUpdateDescriptor());
+
+        pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
+        pageUpdateContentBuilder.updateContent(providedPageContent);
+
+        updatePage(id, pageUpdateBuilder.done());
+        updatePageContent(id, pageUpdateContentBuilder.done());
+
+        pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
+    }
+
+    /**
+     * @param pageProperties
+     * @return
+     * @throws IOException
+     */
+    private byte[] getProvidedPageContent() throws IOException {
+        return IOUtil.getAllContentFrom(Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.zip"));
+    }
+
+    /**
+     * @param pageProperties
+     * @return
+     */
+    private SPage getProvidedPage(final Properties pageProperties) {
+        long now = System.currentTimeMillis();
+        return new SPageImpl(pageProperties.getProperty("name"), pageProperties.getProperty("description"), pageProperties.getProperty("displayName"), now, -1,
+                true, now);
+    }
+
+    @Override
+    public void stop() throws SBonitaException, TimeoutException {
+        // nothing to do
+    }
+
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do
     }
 
 }

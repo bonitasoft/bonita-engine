@@ -105,7 +105,7 @@ public class PageAPIExt implements PageAPI {
         }
     }
 
-    protected Page convertToPage(SPage addPage) {
+    protected Page convertToPage(final SPage addPage) {
         return SPModelConvertor.toPage(addPage);
     }
 
@@ -166,11 +166,14 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page getPageByName(String name) throws PageNotFoundException {
+    public Page getPageByName(final String name) throws PageNotFoundException {
         final PageService pageService = getTenantAccessor().getPageService();
 
         try {
             SPage sPage = pageService.getPageByName(name);
+            if (sPage == null) {
+                throw new PageNotFoundException(name);
+            }
             return convertToPage(sPage);
         } catch (SBonitaReadException e) {
             throw new PageNotFoundException(e);
@@ -178,7 +181,7 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page updatePage(long pageId, final PageUpdater pageUpdater) throws UpdateException {
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
         }
@@ -218,7 +221,7 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public void updatePageContent(long pageId, byte[] content) throws UpdateException {
+    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException {
         final PageService pageService = getTenantAccessor().getPageService();
 
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
@@ -242,7 +245,7 @@ public class PageAPIExt implements PageAPI {
                 .createNewInstance(new EntityUpdateDescriptor());
     }
 
-    protected SPage constructPage(PageUpdater pageUpdater, long userId) {
+    protected SPage constructPage(final PageUpdater pageUpdater, final long userId) {
         return SPModelConvertor.constructSPage(pageUpdater, userId);
     }
 

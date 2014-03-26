@@ -36,7 +36,9 @@ public class PageAPIIT extends CommonAPISPTest {
     public void after() throws BonitaException {
         SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
         for (Page page : searchPages.getResult()) {
-            getPageAPI().deletePage(page.getId());
+            if (!page.isProvided()) {
+                getPageAPI().deletePage(page.getId());
+            }
         }
         logout();
     }
@@ -177,7 +179,7 @@ public class PageAPIIT extends CommonAPISPTest {
 
     private String generateUniquePageName() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(("unique_page_name_"));
+        stringBuilder.append("unique_page_name_");
         stringBuilder.append(System.currentTimeMillis());
         return stringBuilder.toString();
     }

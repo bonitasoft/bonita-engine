@@ -17,8 +17,8 @@ public class PageNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = 2842457668242337487L;
 
-    public PageNotFoundException(long pageId) {
-        super("Unable to find page with id: " + pageId);
+    public PageNotFoundException(final String name) {
+        super("Unable to find page with name: " + name);
     }
 
     public PageNotFoundException(final Throwable cause) {

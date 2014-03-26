@@ -28,6 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
+import com.bonitasoft.engine.page.PageNotFoundException;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
@@ -117,6 +118,15 @@ public class PageAPIExtTest {
 
         // then
         verify(pageService, times(1)).getPageByName(pageName);
+    }
+
+    @Test(expected = PageNotFoundException.class)
+    public void testGetPageByNameNotFound() throws Exception {
+        // given
+        // when
+        pageAPIExt.getPageByName("unknown");
+
+        // then: exception
     }
 
     @Test

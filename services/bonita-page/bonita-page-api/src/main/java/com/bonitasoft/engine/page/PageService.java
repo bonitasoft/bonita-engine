@@ -10,6 +10,7 @@ package com.bonitasoft.engine.page;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -23,7 +24,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Baptiste Mesta
  */
-public interface PageService {
+public interface PageService extends ServiceWithLifecycle {
 
     String PAGE = "PAGE";
 
