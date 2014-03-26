@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>bonita-data-instance</artifactId>
 		<groupId>org.bonitasoft.engine.data.instance</groupId>
-		<version>6.2.6</version>
+		<version>6.2.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-data-instance-data-source</artifactId>
