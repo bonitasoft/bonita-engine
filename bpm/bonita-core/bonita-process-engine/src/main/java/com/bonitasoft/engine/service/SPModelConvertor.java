@@ -190,6 +190,10 @@ public final class SPModelConvertor extends ModelConvertor {
         if (type != null) {
             newSProfileEntryBuilder.setType(type);
         }
+        final Boolean custom = (Boolean) fields.get(ProfileEntryField.CUSTOM);
+        if (custom != null) {
+            newSProfileEntryBuilder.setCustom(custom);
+        }
         return newSProfileEntryBuilder.done();
     }
 

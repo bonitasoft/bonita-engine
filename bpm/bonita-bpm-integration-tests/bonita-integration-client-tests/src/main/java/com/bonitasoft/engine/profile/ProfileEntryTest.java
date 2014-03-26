@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.profile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -194,12 +195,12 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
         // Create Profile entry 2
         final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistingadmin")
-                .setParentId(folderProfileEntry.getId());
+                .setParentId(folderProfileEntry.getId()).setCustom(true);
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
 
         // Create Profile entry 3
         final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistinguser")
-                .setParentId(folderProfileEntry.getId());
+                .setParentId(folderProfileEntry.getId()).setCustom(false);
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
 
         // Create Profile entry 4
@@ -256,8 +257,11 @@ public class ProfileEntryTest extends AbstractProfileTest {
             assertEquals(profileEntries.get(resultProfileEntries.indexOf(resultProfileEntry)).getId(), resultProfileEntry.getId());
         }
         assertEquals(0L, resultProfileEntries.get(0).getIndex());
+        assertFalse(resultProfileEntries.get(0).isCustom());
         assertEquals(2L, resultProfileEntries.get(1).getIndex());
+        assertTrue(resultProfileEntries.get(1).isCustom());
         assertEquals(4L, resultProfileEntries.get(2).getIndex());
+        assertFalse(resultProfileEntries.get(2).isCustom());
         assertEquals(6L, resultProfileEntries.get(3).getIndex());
         assertEquals(8L, resultProfileEntries.get(4).getIndex());
         assertEquals(10L, resultProfileEntries.get(5).getIndex());
