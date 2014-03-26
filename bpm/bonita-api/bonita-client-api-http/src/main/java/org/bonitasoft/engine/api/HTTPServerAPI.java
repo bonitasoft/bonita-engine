@@ -46,6 +46,7 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.StackTraceTransformer;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
@@ -136,8 +137,8 @@ public class HTTPServerAPI implements ServerAPI {
             }
             throw new ServerWrappedException(e);
         } catch (final Throwable e) {
-            // StackTraceElement[] stackTrace = new Exception().getStackTrace();
-            // StackTraceTransformer.addStackTo(e, stackTrace);
+            final StackTraceElement[] stackTrace = new Exception().getStackTrace();
+            StackTraceTransformer.addStackTo(e, stackTrace);
             throw new ServerWrappedException(e.getMessage() + "response= " + response, e);
         }
     }
@@ -157,7 +158,14 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException,
             ClientProtocolException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
-        return httpclient.execute(httpost, responseHandler);
+        try {
+            return httpclient.execute(httpost, responseHandler);
+        } catch (final ClientProtocolException e) {
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.log(Level.SEVERE, e.getMessage() + System.getProperty("line.separator") + "httpost = <" + httpost + ">");
+            }
+            throw e;
+        }
     }
 
     private HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
@@ -170,10 +178,10 @@ public class HTTPServerAPI implements ServerAPI {
 
         // Basic authentication
         if (basicAuthenticationActive) {
-            StringBuilder credentials = new StringBuilder();
+            final StringBuilder credentials = new StringBuilder();
             credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
-            Base64 encoder = new Base64();
-            String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes());
+            final Base64 encoder = new Base64();
+            final String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes());
             httpost.setHeader("Authorization", "Basic " + encodedCredentials);
         }
 
