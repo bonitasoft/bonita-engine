@@ -702,16 +702,15 @@ public class BPMInstancesCreator {
     }
 
     public void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
-            final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TransientDataService transientDataService) throws SDataInstanceException,
+            final SExpressionContext expressionContext) throws SDataInstanceException,
             SExpressionException {
         createDataInstances(dataDefinitions, containerId, containerType, expressionContext, expressionResolverService, dataInstanceService,
                 transientDataService, null, -1, null, -1);
     }
 
-    private SDataInstance buildDataInstance(final SDataDefinition correlation, final long dataContainerId, final DataInstanceContainer dataContainerType,
+    private SDataInstance buildDataInstance(final SDataDefinition dataDefinition, final long dataContainerId, final DataInstanceContainer dataContainerType,
             final Serializable dataValue) throws SDataInstanceNotWellFormedException {
-        return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(correlation).setContainerId(dataContainerId)
+        return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition).setContainerId(dataContainerId)
                 .setContainerType(dataContainerType.name()).setValue(dataValue).done();
 
     }
@@ -738,8 +737,7 @@ public class BPMInstancesCreator {
                             expressionResolverService, dataInstanceService, transientDataService, miLoop.getLoopDataInputRef(),
                             flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(), flowNodeInstance.getParentContainerId());
                 } else {
-                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
-                            expressionResolverService, dataInstanceService, transientDataService);
+                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);
                 }
                 if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                     final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);

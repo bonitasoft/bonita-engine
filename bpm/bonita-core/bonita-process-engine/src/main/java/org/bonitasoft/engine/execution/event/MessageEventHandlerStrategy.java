@@ -213,7 +213,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         // create data
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
-                    expressionContext, expressionResolverService, dataInstanceService, transientDataService);
+                    expressionContext);
             dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name());
             TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {

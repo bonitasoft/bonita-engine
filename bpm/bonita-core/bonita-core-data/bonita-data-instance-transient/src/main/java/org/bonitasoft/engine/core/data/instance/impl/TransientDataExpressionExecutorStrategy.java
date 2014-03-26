@@ -24,12 +24,14 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
@@ -88,21 +90,29 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
                 // results.put(dataInstance.getName(), dataInstance.getValue());
                 // }
                 // }
-                final List<SDataInstance> dataInstances = transientDataService.getDataInstances(dataNames, containerId, containerType);
-                for (final SDataInstance dataInstance : dataInstances) {
-                    dataNames.remove(dataInstance.getName());
+                for (final String name : dataNames) {
+                    SDataInstance dataInstance;
+                    try {
+                        dataInstance = transientDataService.getDataInstance(name, containerId, containerType);
+                    } catch (SDataInstanceNotFoundException e) {
+                        dataInstance = handleDataNotFound(name, containerId, containerType, e);
+                    }
                     results.put(dataInstance.getName(), dataInstance.getValue());
                 }
-                if (!dataNames.isEmpty()) {
-                    throw new SExpressionEvaluationException("some data were not found " + dataNames);
-                }
                 return buildExpressionResultSameOrderAsInputList(expressions, results);
+            } catch (final SBonitaReadException e) {
+                throw new SExpressionEvaluationException(e);
             } catch (final SDataInstanceException e) {
                 throw new SExpressionEvaluationException(e);
             }
         } else {
             throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
         }
+    }
+
+    protected SDataInstance handleDataNotFound(final String name, final long containerId, final String containerType, final SDataInstanceNotFoundException e)
+            throws SDataInstanceNotFoundException, SBonitaReadException, SDataInstanceException {
+        throw e;
     }
 
     private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {

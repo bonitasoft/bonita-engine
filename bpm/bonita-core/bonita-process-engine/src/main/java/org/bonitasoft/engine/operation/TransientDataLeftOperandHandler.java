@@ -15,12 +15,30 @@
  */
 package org.bonitasoft.engine.operation;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -32,8 +50,18 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     private final TransientDataService transientDataService;
 
-    public TransientDataLeftOperandHandler(final TransientDataService transientDataService) {
+    private final FlowNodeInstanceService flownodeInstanceService;
+
+    private final ProcessDefinitionService processDefinitionService;
+
+    private final BPMInstancesCreator bpmInstancesCreator;
+
+    public TransientDataLeftOperandHandler(final TransientDataService transientDataService, final FlowNodeInstanceService flownodeInstanceService,
+            final ProcessDefinitionService processDefinitionService, final BPMInstancesCreator bpmInstancesCreator) {
         this.transientDataService = transientDataService;
+        this.flownodeInstanceService = flownodeInstanceService;
+        this.processDefinitionService = processDefinitionService;
+        this.bpmInstancesCreator = bpmInstancesCreator;
     }
 
     @Override
@@ -44,14 +72,84 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        SDataInstance dataInstance = transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
-        transientDataService.updateDataInstance(dataInstance, new EntityUpdateDescriptor().);
+        SDataInstance dataInstance;
+        try {
+            dataInstance = transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
+            EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+            descriptor.addField("value", newValue);
+
+            transientDataService.updateDataInstance(dataInstance, descriptor);
+        } catch (SDataInstanceException e) {
+            throw new SOperationExecutionException("Unable to update the transient data", e);
+        }
     }
 
     @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            // if not found reevaluate
+            return transientDataService.getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType());
+        } catch (SDataInstanceNotFoundException e) {
+            try {
+                reevaluateTransientData(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType(),
+                        flownodeInstanceService, processDefinitionService,
+                        bpmInstancesCreator);
+                return transientDataService.getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType());
+            } catch (SDataInstanceException e1) {
+                throw new SBonitaReadException("Unable to read the transient data", e);
+            }
+        } catch (SDataInstanceException e) {
+            throw new SBonitaReadException("Unable to read the transient data", e);
+        }
     }
 
+    /**
+     * @param name
+     * @param containerType
+     * @param expressionContext
+     */
+    public static void reevaluateTransientData(final String name, final long containerId,
+            final String containerType, final FlowNodeInstanceService flowbodeInstanceService, final ProcessDefinitionService processDefinitionService,
+            final BPMInstancesCreator bpmInstancesCreator) throws SBonitaReadException {
+
+        try {
+            SFlowNodeInstance flowNodeInstance = flowbodeInstanceService.getFlowNodeInstance(containerId);
+            long flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
+            long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            SActivityDefinition flowNode = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(flowNodeDefinitionId);
+            List<SDataDefinition> sDataDefinitions = flowNode.getSDataDefinitions();
+            SDataDefinition theTransientData = null;
+            for (SDataDefinition sDataDefinition : sDataDefinitions) {
+                if (sDataDefinition.getName().equals(name)) {
+                    theTransientData = sDataDefinition;
+                    break;
+                }
+            }
+            if (theTransientData == null) {
+                throw new SBonitaReadException(
+                        "Transient data was not found and we were unable to reevaluate it because it was not found in the definition, name=<" + name
+                                + "> process definition=<"
+                                + processDefinition.getName() + "," + processDefinition.getVersion() + "> flow node=<" + flowNode.getName() + ">");
+            }
+            bpmInstancesCreator.createDataInstances(Arrays.asList(theTransientData), containerId, DataInstanceContainer.ACTIVITY_INSTANCE,
+                    new SExpressionContext(containerId, containerType, processDefinitionId));
+        } catch (SDataInstanceException e) {
+            throwBonitaReadException(name, e);
+        } catch (SExpressionException e) {
+            throwBonitaReadException(name, e);
+        } catch (SFlowNodeNotFoundException e) {
+            throwBonitaReadException(name, e);
+        } catch (SFlowNodeReadException e) {
+            throwBonitaReadException(name, e);
+        } catch (SProcessDefinitionNotFoundException e) {
+            throwBonitaReadException(name, e);
+        } catch (SProcessDefinitionReadException e) {
+            throwBonitaReadException(name, e);
+        }
+    }
+
+    private static void throwBonitaReadException(final String name, final Exception e) throws SBonitaReadException {
+        throw new SBonitaReadException("Transient data was not found and we were unable to reevaluate it, name=<" + name + ">", e);
+    }
 }

@@ -8,8 +8,12 @@
 	</bean>
 
 	<bean id="transientDataExpressionExecutorStrategy"
-		class="org.bonitasoft.engine.core.data.instance.impl.TransientDataExpressionExecutorStrategy">
+		class="org.bonitasoft.engine.expression.ReevaluatingTransientDataExpressionExecutorStrategy" autowire="byType">
 		<constructor-arg name="transientDataService" ref="transientDataService" />
+		<property name="flownodeInstanceService" ref="activityInstanceService" />
+		<property name="processDefinitionService" ref="processDefinitionManager" />
+		<property name="bpmInstancesCreator" ref="bpmInstancesCreator" />
 	</bean>
+	
 
 </beans>

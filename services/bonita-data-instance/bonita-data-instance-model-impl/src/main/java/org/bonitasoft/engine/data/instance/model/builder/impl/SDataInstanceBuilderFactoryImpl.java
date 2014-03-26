@@ -42,7 +42,7 @@ public class SDataInstanceBuilderFactoryImpl implements SDataInstanceBuilderFact
     public SDataInstanceBuilder createNewInstance(final SDataDefinition dataDefinition) {
         final SExpression expression = dataDefinition.getDefaultValueExpression();
         final String className = dataDefinition.getClassName();
-        SDataInstanceImpl dataInstanceImpl = null; 
+        SDataInstanceImpl dataInstanceImpl = null;
         if (dataDefinition instanceof STextDataDefinition) {
             dataInstanceImpl = getTextDataInstance((STextDataDefinition) dataDefinition, expression);
         } else if (dataDefinition instanceof SXMLDataDefinition) {
