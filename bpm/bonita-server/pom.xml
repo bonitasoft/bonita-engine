@@ -626,7 +626,7 @@
 		<!-- Web Profile -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.profile</groupId>
-			<artifactId>bonita-profile-impl-hibernate</artifactId>
+			<artifactId>bonita-profile-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
@@ -895,7 +895,6 @@
 									<!-- Web Profile -->
 									<include>org.bonitasoft.engine.profile:bonita-profile-api</include>
 									<include>org.bonitasoft.engine.profile:bonita-profile-impl</include>
-									<include>org.bonitasoft.engine.profile:bonita-profile-impl-hibernate</include>
 									<!-- Web Theme -->
 									<include>org.bonitasoft.engine.theme:bonita-theme-api</include>
 									<include>org.bonitasoft.engine.theme:bonita-theme-impl</include>
