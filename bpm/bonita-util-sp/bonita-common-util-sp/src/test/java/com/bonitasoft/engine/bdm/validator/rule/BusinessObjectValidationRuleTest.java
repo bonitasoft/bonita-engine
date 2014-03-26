@@ -57,7 +57,7 @@ public class BusinessObjectValidationRuleTest {
 	@Test
 	public void shoudCheckRule_returns_valid_status() throws Exception {
 		BusinessObject bo = new BusinessObject();
-		bo.setQualifiedName("Bo");
+		bo.setQualifiedName("org.bonita.Bo");
 		Field field = new Field();
 		field.setName("firstName");
 		bo.addField(field);
@@ -72,18 +72,18 @@ public class BusinessObjectValidationRuleTest {
 	@Test
 	public void shoudCheckRule_returns_error_status() throws Exception {
 		BusinessObject bo = new BusinessObject();
-		bo.setQualifiedName("Bo2");
+		bo.setQualifiedName("org.bonita.Bo2");
 		ValidationStatus validationStatus = businessObjectValidationRule.checkRule(bo);
 		assertThat(validationStatus.isOk()).isFalse();
 		
-		bo.setQualifiedName("Bo 2");
+		bo.setQualifiedName("org.bonita.Bo 2");
 		Field field = new Field();
 		field.setName("firstName");
 		bo.addField(field);
 		validationStatus = businessObjectValidationRule.checkRule(bo);
 		assertThat(validationStatus.isOk()).isFalse();
 		
-		bo.setQualifiedName("Bo2");
+		bo.setQualifiedName("org.bonita.Bo2");
 		bo.addUniqueConstraint("_UC_1", "dontExists");
 		validationStatus = businessObjectValidationRule.checkRule(bo);
 		assertThat(validationStatus.isOk()).isFalse();

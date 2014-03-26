@@ -54,7 +54,7 @@ public class UniqueConstraintValidationRuleTest {
 	@Test
 	public void shoudCheckRule_returns_valid_status() throws Exception {
 		UniqueConstraint uc = new UniqueConstraint();
-		uc.setName("_MY_CONSTRAINT_");
+		uc.setName("MY_CONSTRAINT_");
 		uc.setFieldNames(Arrays.asList("f1"));
 		ValidationStatus validationStatus = uniqueConstraintValidationRule.checkRule(uc);
 		assertThat(validationStatus.isOk()).isTrue();
@@ -63,7 +63,7 @@ public class UniqueConstraintValidationRuleTest {
 	@Test
 	public void shoudCheckRule_returns_error_status() throws Exception {
 		UniqueConstraint uc = new UniqueConstraint();
-		uc.setName("_MY_CONSTRAINT_");
+		uc.setName("MY_CONSTRAINT_");
 		uc.setFieldNames(Collections.<String>emptyList());
 		ValidationStatus validationStatus = uniqueConstraintValidationRule.checkRule(uc);
 		assertThat(validationStatus.isOk()).isFalse();

@@ -16,14 +16,19 @@
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 public class UniqueConstraintValidationRule implements ValidationRule {
 
+	private static final int MAX_CONSTRAINTNAME_LENGTH = 25;
+	private SQLNameValidator sqlNameValidator;
+
+	public UniqueConstraintValidationRule(){
+		sqlNameValidator = new SQLNameValidator(MAX_CONSTRAINTNAME_LENGTH);
+	}
+	
 	@Override
 	public boolean appliesTo(Object modelElement) {
 		return modelElement instanceof UniqueConstraint;
@@ -41,9 +46,9 @@ public class UniqueConstraintValidationRule implements ValidationRule {
 			status.addError("A unique constraint must have name");
 			return status;
 		}
-		boolean hasWhitspaces = hasWhitespaces(name);
-		if(hasWhitspaces){
-			status.addError(name + " cannot have whitespaces");
+		boolean isValid = sqlNameValidator.isValid(name);
+		if(!isValid){
+			status.addError(name + " is not a valid SQL identifier");
 		}
 
 		if(uc.getFieldNames().isEmpty()){
@@ -53,12 +58,7 @@ public class UniqueConstraintValidationRule implements ValidationRule {
 		return status;
 	}
 
-	private boolean hasWhitespaces(String name) {
-		Pattern pattern = Pattern.compile("\\s");
-		Matcher matcher = pattern.matcher(name);
-		boolean hasWhitspaces = matcher.find();
-		return hasWhitspaces;
-	}
+
 
 
 }

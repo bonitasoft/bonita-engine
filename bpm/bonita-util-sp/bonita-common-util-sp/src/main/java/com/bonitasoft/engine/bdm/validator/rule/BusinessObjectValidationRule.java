@@ -11,6 +11,7 @@ import javax.lang.model.SourceVersion;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
@@ -18,6 +19,13 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
  */
 public class BusinessObjectValidationRule implements ValidationRule {
 
+	private static final int MAX_TABLENAME_LENGTH = 30;
+	private SQLNameValidator sqlNameValidator;
+
+	public BusinessObjectValidationRule() {
+		sqlNameValidator = new SQLNameValidator(MAX_TABLENAME_LENGTH);
+	}
+	
     @Override
     public boolean appliesTo(final Object modelElement) {
         return modelElement instanceof BusinessObject;
@@ -37,7 +45,7 @@ public class BusinessObjectValidationRule implements ValidationRule {
             status.addError("A Business Object must have a qualified name");
             return status;
         }
-        if (!SourceVersion.isName(qualifiedName)) {
+        if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(getSimpleName(qualifiedName))) {
             status.addError(qualifiedName + " is not a valid Java qualified name");
             return status;
         }
@@ -59,7 +67,16 @@ public class BusinessObjectValidationRule implements ValidationRule {
         return status;
     }
 
-    private Field getField(final BusinessObject bo, final String name) {
+    private String getSimpleName(String qualifiedName) {
+		String simpleName = qualifiedName;
+    	if(simpleName.indexOf(".") != -1){
+    		String[] split = simpleName.split("\\.");
+    		simpleName = split[split.length-1];
+		}
+		return simpleName;
+	}
+
+	private Field getField(final BusinessObject bo, final String name) {
         Field found = null;
         int index = 0;
         final List<Field> fields = bo.getFields();

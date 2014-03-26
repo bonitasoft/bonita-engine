@@ -8,6 +8,7 @@ package com.bonitasoft.engine.bdm.validator.rule;
 import javax.lang.model.SourceVersion;
 
 import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
@@ -17,6 +18,13 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
  */
 public class FieldValidationRule implements ValidationRule {
 
+	private static final int MAX_COLUMNAME_LENGTH = 50;
+	private SQLNameValidator sqlNameValidator;
+
+	public FieldValidationRule() {
+		sqlNameValidator = new SQLNameValidator(MAX_COLUMNAME_LENGTH);
+	}
+	
 	@Override
 	public boolean appliesTo(Object modelElement) {
 		return modelElement instanceof Field;
@@ -41,6 +49,6 @@ public class FieldValidationRule implements ValidationRule {
 	}
 
 	private boolean isForbiddenIdentifier(final String name) {
-		return Field.PERSISTENCE_ID.equalsIgnoreCase(name) || Field.PERSISTENCE_VERSION.equalsIgnoreCase(name);
+		return Field.PERSISTENCE_ID.equalsIgnoreCase(name) || Field.PERSISTENCE_VERSION.equalsIgnoreCase(name) || !sqlNameValidator.isValid(name);
 	}
 }
