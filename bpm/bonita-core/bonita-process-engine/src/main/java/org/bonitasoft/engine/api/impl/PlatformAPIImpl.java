@@ -360,7 +360,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startServices(final TechnicalLoggerService logger, final long tenantId, final TenantServiceAccessor tenantServiceAccessor)
+    protected void startServices(final TechnicalLoggerService logger, final long tenantId, final TenantServiceAccessor tenantServiceAccessor)
             throws SBonitaException {
         tenantServiceAccessor.getWorkService().start();
         final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
