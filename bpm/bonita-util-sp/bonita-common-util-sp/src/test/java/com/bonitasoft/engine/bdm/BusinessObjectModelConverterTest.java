@@ -31,6 +31,16 @@ public class BusinessObjectModelConverterTest {
 
         assertThat(actual).isEqualTo(bom);
     }
+    
+    @Test
+    public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithQuery() throws Exception {
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = new BOMBuilder().buildBOMWithQuery();
+        final byte[] zip = convertor.zip(bom);
+        final BusinessObjectModel actual = convertor.unzip(zip);
+
+        assertThat(actual).isEqualTo(bom);
+    }
 
     @Test(expected = JAXBException.class)
     public void zipAnEmptyBOMShouldThrowAnException() throws Exception {

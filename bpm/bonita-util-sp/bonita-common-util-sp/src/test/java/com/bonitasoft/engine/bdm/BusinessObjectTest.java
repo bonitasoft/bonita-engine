@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class BusinessObjectTest {
@@ -32,5 +34,12 @@ public class BusinessObjectTest {
         object.addField(field);
         object.addUniqueConstraint("unique", "field");
     }
+    
+    @Test
+	public void should_addQuery() throws Exception {
+		BusinessObject businessObject = new BusinessObject();
+		Query query = businessObject.addQuery("userByName","Select u FROM User u WHERE u.name='romain'");
+		assertThat(businessObject.getQueries()).containsExactly(query);
+	}
 
 }

@@ -8,27 +8,32 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Romain Bioteau
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class UniqueConstraint {
+public class Query {
 
     @XmlAttribute(required = true)
     private String name;
 
-    @XmlElementWrapper(name = "fieldNames", required = true)
-    @XmlElement(name = "fieldName", required = true)
-    private List<String> fieldNames;
+    @XmlAttribute(required = true)
+    private String content;
 
+    public Query(){
+    	
+    }
+    
+    public Query(String name,String content){
+    	this.name = name;
+    	this.content = content;
+    }
+    
     public String getName() {
         return name;
     }
@@ -37,20 +42,19 @@ public class UniqueConstraint {
         this.name = name;
     }
 
-    public List<String> getFieldNames() {
-        return fieldNames;
-    }
+	public String getContent() {
+		return content;
+	}
 
-    public void setFieldNames(final List<String> fieldNames) {
-        this.fieldNames = fieldNames;
-    }
+	public void setContent(String content) {
+		this.content = content;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((fieldNames == null) ? 0 : fieldNames.hashCode());
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -63,11 +67,11 @@ public class UniqueConstraint {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UniqueConstraint other = (UniqueConstraint) obj;
-		if (fieldNames == null) {
-			if (other.fieldNames != null)
+		Query other = (Query) obj;
+		if (content == null) {
+			if (other.content != null)
 				return false;
-		} else if (!fieldNames.equals(other.fieldNames))
+		} else if (!content.equals(other.content))
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -76,5 +80,6 @@ public class UniqueConstraint {
 			return false;
 		return true;
 	}
+
 
 }

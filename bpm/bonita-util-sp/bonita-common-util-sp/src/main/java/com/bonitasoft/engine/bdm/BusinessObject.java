@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "description", "fields", "uniqueConstraints" })
+@XmlType(propOrder = { "description", "fields", "uniqueConstraints","queries" })
 public class BusinessObject {
 
     @XmlAttribute(required = true)
@@ -39,10 +39,15 @@ public class BusinessObject {
     @XmlElementWrapper(name = "uniqueConstraints")
     @XmlElement(name = "uniqueConstraint")
     private List<UniqueConstraint> uniqueConstraints;
+    
+    @XmlElementWrapper(name = "queries")
+    @XmlElement(name = "query")
+    private List<Query> queries;
 
     public BusinessObject() {
         fields = new ArrayList<Field>();
         uniqueConstraints = new ArrayList<UniqueConstraint>();
+        queries = new ArrayList<Query>();
     }
 
     public String getQualifiedName() {
@@ -94,51 +99,74 @@ public class BusinessObject {
     public void setUniqueConstraints(List<UniqueConstraint> uniqueConstraints) {
 		this.uniqueConstraints = uniqueConstraints;
 	}
+    
+    public Query addQuery(final String name, final String queryContent) {
+    	Query query = new Query(name,queryContent);
+    	queries.add(query);
+    	return query;
+    }
+    
+    
+	public List<Query> getQueries() {
+		return queries;
+	}
+
+	public void setQueries(List<Query> queries) {
+		this.queries = queries;
+	}
 
 	@Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        result = prime * result + (qualifiedName == null ? 0 : qualifiedName.hashCode());
-        return result;
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((fields == null) ? 0 : fields.hashCode());
+		result = prime * result
+				+ ((qualifiedName == null) ? 0 : qualifiedName.hashCode());
+		result = prime * result + ((queries == null) ? 0 : queries.hashCode());
+		result = prime
+				* result
+				+ ((uniqueConstraints == null) ? 0 : uniqueConstraints
+						.hashCode());
+		return result;
+	}
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BusinessObject other = (BusinessObject) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        if (qualifiedName == null) {
-            if (other.qualifiedName != null) {
-                return false;
-            }
-        } else if (!qualifiedName.equals(other.qualifiedName)) {
-            return false;
-        }
-        return true;
-    }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BusinessObject other = (BusinessObject) obj;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (fields == null) {
+			if (other.fields != null)
+				return false;
+		} else if (!fields.equals(other.fields))
+			return false;
+		if (qualifiedName == null) {
+			if (other.qualifiedName != null)
+				return false;
+		} else if (!qualifiedName.equals(other.qualifiedName))
+			return false;
+		if (queries == null) {
+			if (other.queries != null)
+				return false;
+		} else if (!queries.equals(other.queries))
+			return false;
+		if (uniqueConstraints == null) {
+			if (other.uniqueConstraints != null)
+				return false;
+		} else if (!uniqueConstraints.equals(other.uniqueConstraints))
+			return false;
+		return true;
+	}
 
 }

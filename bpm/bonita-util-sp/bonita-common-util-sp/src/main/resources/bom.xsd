@@ -32,6 +32,13 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="queries" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="query" type="query" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
     <xs:attribute name="qualifiedName" type="xs:string" use="required"/>
   </xs:complexType>
@@ -54,6 +61,12 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="query">
+    <xs:sequence/>
+    <xs:attribute name="content" type="xs:string" use="required"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
 
