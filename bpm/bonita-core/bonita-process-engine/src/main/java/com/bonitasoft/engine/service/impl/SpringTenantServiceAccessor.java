@@ -15,11 +15,6 @@ import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
-
-/**
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
 public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ParameterService parameterService;
@@ -82,6 +77,9 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
         return getBeanAccessor().getService(clazz);
     }
 
+    /**
+     * might not be an available service
+     */
     @Override
     public PageService getPageService() {
         if (pageService == null) {

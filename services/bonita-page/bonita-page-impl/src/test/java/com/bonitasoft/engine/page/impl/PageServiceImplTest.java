@@ -57,6 +57,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.bonitasoft.engine.page.SPage;
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import com.bonitasoft.engine.page.SPageContent;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -84,6 +86,9 @@ public class PageServiceImplTest {
     private SPageContent sPageContent;
 
     @Mock
+    private Manager manager;
+
+    @Mock
     private EntityUpdateDescriptor entityUpdateDescriptor;
 
     private PageServiceImpl pageServiceImpl;
@@ -91,7 +96,7 @@ public class PageServiceImplTest {
     @Before
     public void before() {
 
-        when(technicalLoggerService.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
+        when(technicalLoggerService.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         when(queriableLoggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
         pageServiceImpl = spy(new PageServiceImpl(readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService));

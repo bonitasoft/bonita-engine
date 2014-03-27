@@ -41,6 +41,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -76,6 +77,7 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
+import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
@@ -740,11 +742,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return platformAccessor;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.api.impl.PlatformAPIImpl#startServices(org.bonitasoft.engine.log.technical.TechnicalLoggerService, long,
-     * org.bonitasoft.engine.service.TenantServiceAccessor)
-     */
     @Override
     protected void startServices(final TechnicalLoggerService logger, final long tenantId,
             final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor)
@@ -754,7 +751,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void execute() throws SBonitaException {
-                ((TenantServiceAccessor) tenantServiceAccessor).getPageService().start();
+                PageService pageService;
+                try {
+                    pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
+                } catch (MissingServiceException e) {
+                    // if not in the configuration just ignore it
+                    return;
+                }
+                pageService.start();
             }
         });
     }

@@ -32,6 +32,7 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -60,6 +61,8 @@ import com.bonitasoft.engine.page.SPageLogBuilder;
 import com.bonitasoft.engine.page.SPageUpdateBuilder;
 import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import com.bonitasoft.engine.page.SPageWithContent;
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 
 /**
  * @author Matthieu Chaffotte
@@ -78,6 +81,14 @@ public class PageServiceImpl implements PageService {
 
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+        this(Manager.getInstance(), persistenceService, recorder, eventService, logger, queriableLoggerService);
+    }
+
+    PageServiceImpl(final Manager manager, final ReadPersistenceService persistenceService, final Recorder recorder,
+            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+        if (!manager.isFeatureActive(Features.CUSTOM_PAGES)) {
+            throw new IllegalStateException("The custom pages is not an active feature.");
+        }
         this.persistenceService = persistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -284,6 +295,7 @@ public class PageServiceImpl implements PageService {
             final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.properties");
             if (inputStream == null) {
                 // no provided page
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-page.properties found in the class path, nothing will be imported");
                 return;
             }
             Properties pageProperties = new Properties();
@@ -292,14 +304,18 @@ public class PageServiceImpl implements PageService {
             // provided pages name?
             SPage pageByName = getPageByName(pageProperties.getProperty("name"));
             if (pageByName == null) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
                 addPage(getProvidedPage(pageProperties), getProvidedPageContent());
                 return;
             }
             byte[] providedPageContent = getProvidedPageContent();
             byte[] pageContent = getPageContent(pageByName.getId());
             if (pageContent.length != providedPageContent.length) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
                 // think of a better way to check the content are the same or not, it will almost always be the same so....
                 updateProvidedPage(pageByName.getId(), pageProperties, providedPageContent);
+            } else {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
             }
         } catch (IOException e) {
             throw new SBonitaReadException("Unable to import the provided page", e);
