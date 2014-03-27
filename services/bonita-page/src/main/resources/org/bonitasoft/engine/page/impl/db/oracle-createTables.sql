@@ -3,7 +3,7 @@ CREATE TABLE page (
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(50) NOT NULL,
   displayName VARCHAR2(255) NOT NULL,
-  description VARCHAR22(1024),
+  description VARCHAR2(1024),
   installationDate NUMBER(19, 0) NOT NULL,
   installedBy NUMBER(19, 0) NOT NULL,
   provided NUMBER(1),
