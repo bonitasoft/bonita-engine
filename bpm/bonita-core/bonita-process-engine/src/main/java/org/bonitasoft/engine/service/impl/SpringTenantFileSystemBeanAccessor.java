@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -72,7 +74,12 @@ public class SpringTenantFileSystemBeanAccessor {
     }
 
     public <T> T getService(final Class<T> serviceClass) {
-        return getContext().getBean(serviceClass);
+        try {
+
+            return getContext().getBean(serviceClass);
+        } catch (NoSuchBeanDefinitionException e) {
+            throw new MissingServiceException("Service not found: " + serviceClass.getName());
+        }
     }
 
     protected <T> T getService(final String name, final Class<T> serviceClass) {
