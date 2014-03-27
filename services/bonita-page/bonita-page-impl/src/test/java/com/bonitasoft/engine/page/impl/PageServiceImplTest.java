@@ -10,8 +10,11 @@ package com.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -30,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -42,6 +46,8 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -57,9 +63,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.bonitasoft.engine.page.SPage;
+import com.bonitasoft.engine.page.SPageContent;
+import com.bonitasoft.engine.page.SPageLogBuilder;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
-import com.bonitasoft.engine.page.SPageContent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageServiceImplTest {
@@ -89,17 +96,23 @@ public class PageServiceImplTest {
     private Manager manager;
 
     @Mock
+    private SPageLogBuilder pageLogBuilder;
+
+    @Mock
     private EntityUpdateDescriptor entityUpdateDescriptor;
 
     private PageServiceImpl pageServiceImpl;
 
     @Before
     public void before() {
+        doReturn(true).when(manager).isFeatureActive(Features.CUSTOM_PAGES);
 
         when(technicalLoggerService.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         when(queriableLoggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
-        pageServiceImpl = spy(new PageServiceImpl(readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService));
+        pageServiceImpl = spy(new PageServiceImpl(manager, readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService));
+        doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
+        doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class), anyString());
 
     }
 
@@ -120,34 +133,43 @@ public class PageServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfPagesThrowsException() throws SBonitaException {
         // given
-        final PageServiceImpl serviceImpl = new PageServiceImpl(readPersistenceService, null, eventService, technicalLoggerService, null);
-
         // when
         when(readPersistenceService.getNumberOfEntities(SPage.class, queryOptions, null)).thenThrow(new SBonitaReadException("ouch!"));
-        serviceImpl.getNumberOfPages(queryOptions);
+        pageServiceImpl.getNumberOfPages(queryOptions);
 
         // then
         // exception;
     }
 
     @Test
-    public void getPage() throws SBonitaException {
-        final PageServiceImpl serviceImpl = new PageServiceImpl(readPersistenceService, null, eventService, technicalLoggerService, null);
+    public void should_create_page_throw_exception_when_name_is_empty() throws SBonitaException {
 
+        final long pageId = 15;
+        final SPage pageWithEmptyName = new SPageImpl("", 123456, 45, true);
+        pageWithEmptyName.setId(pageId);
+        try {
+            pageServiceImpl.addPage(pageWithEmptyName, new byte[] { 1, 2, 3 });
+            fail("should not be able to create a page with empty name");
+        } catch (SObjectCreationException e) {
+            assertTrue(e.getMessage().contains("empty name"));
+        }
+
+    }
+
+    @Test
+    public void getPage() throws SBonitaException {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true);
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
         // when
-        final SPage page = serviceImpl.getPage(pageId);
+        final SPage page = pageServiceImpl.getPage(pageId);
         // then
         Assert.assertEquals(expected, page);
     }
 
     @Test(expected = SObjectNotFoundException.class)
     public void getPageThrowsPageNotFoundException() throws SBonitaException {
-
-        new PageServiceImpl(readPersistenceService, null, eventService, technicalLoggerService, null);
 
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true);
@@ -232,8 +254,6 @@ public class PageServiceImplTest {
     @Test
     public void deletePage() throws SBonitaException {
 
-        new PageServiceImpl(readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService);
-
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true);
         expected.setId(pageId);
@@ -252,13 +272,12 @@ public class PageServiceImplTest {
 
         pageServiceImpl.deletePage(pageId);
 
-        // FIXME assert ?
+        verify(recorder, times(1)).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
     }
 
     @Test(expected = SObjectModificationException.class)
     public void deletePageThrowsPageNotFoundException() throws SBonitaException {
-
-        new PageServiceImpl(readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService);
 
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true);
@@ -275,7 +294,6 @@ public class PageServiceImplTest {
         when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
 
         pageServiceImpl.deletePage(pageId);
-
     }
 
     @Test(expected = SBonitaException.class)

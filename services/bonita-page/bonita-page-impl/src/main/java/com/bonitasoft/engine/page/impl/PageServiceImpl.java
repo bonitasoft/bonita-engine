@@ -98,6 +98,9 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException {
+        if (page.getName() == null || page.getName().isEmpty()) {
+            throw new SObjectCreationException("Unable to create a page with null or empty name");
+        }
         final String message = "Adding a new page with name " + page.getName();
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, message);
         try {
@@ -121,7 +124,7 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private SPageLogBuilder getPageLog(final ActionType actionType, final String message) {
+    SPageLogBuilder getPageLog(final ActionType actionType, final String message) {
         final SPageLogBuilder logBuilder = new SPageLogBuilderImpl();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
@@ -214,7 +217,7 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
+    void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

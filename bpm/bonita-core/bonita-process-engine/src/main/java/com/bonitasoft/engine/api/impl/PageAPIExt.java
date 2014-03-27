@@ -159,7 +159,7 @@ public class PageAPIExt implements PageAPI {
         try {
             final SPage sPage = pageService.getPageByName(name);
             if (sPage != null) {
-                throw new AlreadyExistsException("A report already exists with the name " + name);
+                throw new AlreadyExistsException("A page already exists with the name " + name);
             }
         } catch (final SBonitaException e) {
             // ignore it
