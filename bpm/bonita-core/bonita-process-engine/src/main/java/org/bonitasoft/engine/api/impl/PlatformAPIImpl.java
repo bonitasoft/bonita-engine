@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -443,18 +444,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             for (final STenant tenant : tenantIds) {
                 // stop the connector executor thread pool
                 final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
-                final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
-                            + connectorExecutor.getClass().getName());
-                }
-                WorkService workService = tenantServiceAccessor.getWorkService();
-
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + " : "
-                            + workService.getClass().getName());
-                }
-                workService.stop();
+                stopServicesOfTenant(logger, tenant.getId(), tenantServiceAccessor);
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -476,6 +466,24 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new StopNodeException(e);
         }
+    }
+
+    protected void stopServicesOfTenant(final TechnicalLoggerService logger, final long tenantId, final TenantServiceAccessor tenantServiceAccessor)
+            throws SBonitaException,
+            TimeoutException {
+        final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + ": "
+                    + connectorExecutor.getClass().getName());
+        }
+        connectorExecutor.stop();
+        WorkService workService = tenantServiceAccessor.getWorkService();
+
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + " : "
+                    + connectorExecutor.getClass().getName());
+        }
+        workService.stop();
     }
 
     private void shutdownScheduler(final SchedulerService schedulerService) throws Exception {
@@ -747,6 +755,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -755,6 +764,12 @@ public class PlatformAPIImpl implements PlatformAPI {
             // delete tenant in database
             final TransactionContent transactionContentForTenant = new DeleteTenant(tenantId, platformService);
             transactionExecutor.execute(transactionContentForTenant);
+
+            // stop tenant services and clear the spring context
+            TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
+            tenantServiceAccessor.destroy();
 
             // delete tenant folder
             final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;

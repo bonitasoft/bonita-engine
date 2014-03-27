@@ -69,7 +69,7 @@ public class ExecutorWorkService implements WorkService {
                     + ", but the work service is stopped.");
             return;
         }
-        final AbstractWorkSynchronization synchro = getContinuationSynchronization();
+        final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
         if (synchro != null) {
             synchro.addWork(work);
         }
@@ -91,7 +91,12 @@ public class ExecutorWorkService implements WorkService {
         this.executor.submit(work);
     }
 
-    private AbstractWorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
+    private synchronized AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws SWorkRegisterException {
+        if (executor == null || executor.isShutdown()) {
+            loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Tried to register work " + work.getDescription()
+                    + " but the work service is shutdown. work will be restarted with the node");
+            return null;
+        }
         AbstractWorkSynchronization synchro = synchronizations.get();
         if (synchro == null || synchro.isExecuted()) {
             synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor);
