@@ -125,6 +125,18 @@
 											</fileset>
 										</copy>
 										
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+											<fileset dir="${distrib.dir}/resources/home/" />
+										</copy>
+																						
+										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
+										<replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
+										
+										<!-- Change Dialect of BDR -->
+										<replace file="${bonita.home}/server/platform/tenant-template/conf/services/cfg-bonita-business-data-impl.xml" token="org.hibernate.dialect.H2Dialect"
+											value="org.hibernate.dialect.PostgreSQL82Dialect" failOnNoReplacements="true" />
+										
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
 											<fileset dir="${user.home}/lic" includes="*.lic" />
 										</copy>
@@ -153,19 +165,11 @@
 												<include name="jbossall-client.jar" />
 											</fileset>
 										</path>
-		
-										<!-- Create default bonita.home folder -->
-										<copy todir="${bonita.home}" verbose="true">
-											<fileset dir="${distrib.dir}/resources/home/" />
-										</copy>
-																						
-										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
-										<replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
-		
+
 										<waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />
 										</waitfor>
-		
+
 										<mkdir dir="${report.xml}" />
 										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
 											<classpath refid="test.path" />
@@ -190,7 +194,6 @@
 					<plugin>
 						<groupId>org.codehaus.cargo</groupId>
 						<artifactId>cargo-maven2-plugin</artifactId>
-						<version>1.2.2</version>
 						<executions>
 							<execution>
 								<id>start-container</id>
