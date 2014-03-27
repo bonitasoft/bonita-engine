@@ -12,6 +12,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.bonitasoft.manager</groupId>
+			<artifactId>manager</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.bonitasoft.engine.page</groupId>
 			<artifactId>bonita-page-api</artifactId>
 			<version>${project.version}</version>
