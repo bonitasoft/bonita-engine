@@ -17,6 +17,7 @@ import com.bonitasoft.engine.bdm.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.QueryValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.UniqueConstraintValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
 
@@ -32,6 +33,7 @@ public class BusinessObjectModelValidator {
         rules.add(new BusinessObjectValidationRule());
         rules.add(new FieldValidationRule());
         rules.add(new UniqueConstraintValidationRule());
+        rules.add(new QueryValidationRule());
     }
 
     public ValidationStatus validate(final BusinessObjectModel bom) {
