@@ -105,6 +105,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             entityManagerFactory.close();
             entityManagerFactory = null;
         }
+        if (notManagedEntityManagerFactory != null) {
+            notManagedEntityManagerFactory.close();
+            notManagedEntityManagerFactory = null;
+        }
     }
 
     @Override
