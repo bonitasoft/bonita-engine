@@ -15,6 +15,8 @@
                 <prop key="db.server.name">localhost</prop>
                 <prop key="db.server.port">3306</prop>
                 <prop key="db.database.name">bonita</prop>
+                <prop key="db.user">root</prop>
+                <prop key="db.password">root</prop>
             </util:properties>
         </property>
     </bean>
@@ -22,8 +24,8 @@
     <bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="user">root</prop>
-                <prop key="password">root</prop>
+                <prop key="user">${db.user}</prop>
+                <prop key="password">${db.password}</prop>
                 <prop key="URL">jdbc:mysql://${db.server.name}:${db.server.port}/${db.database.name}?useUnicode=true&amp;characterEncoding=UTF-8</prop>
             </props>
         </property>
