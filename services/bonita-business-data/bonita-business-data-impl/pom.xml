@@ -122,6 +122,13 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.microsoft.jdbc</groupId>
+            <artifactId>sqlserver</artifactId>
+            <version>4.0.2206.100</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
+        </dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
