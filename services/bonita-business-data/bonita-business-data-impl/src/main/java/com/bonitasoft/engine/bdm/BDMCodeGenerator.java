@@ -18,6 +18,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -53,7 +55,7 @@ public class BDMCodeGenerator extends CodeGenerator {
         }
     }
 
-    protected void addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
+    protected JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
         final String qualifiedName = bo.getQualifiedName();
         validateClassNotExistsInRuntime(qualifiedName);
 
@@ -81,6 +83,17 @@ public class BDMCodeGenerator extends CodeGenerator {
             }
         }
 
+        final List<Query> queries = bo.getQueries();
+        if (!queries.isEmpty()) {
+            final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
+            final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
+            for (final Query query : queries) {
+                final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
+                nameQueryAnnotation.param("name", query.getName());
+                nameQueryAnnotation.param("query", query.getContent());
+            }
+        }
+
         addPersistenceIdFieldAndAccessors(entityClass);
         addPersistenceVersionFieldAndAccessors(entityClass);
 
@@ -91,6 +104,8 @@ public class BDMCodeGenerator extends CodeGenerator {
 
         addEqualsMethod(entityClass);
         addHashCodeMethod(entityClass);
+
+        return entityClass;
     }
 
     private void validateClassNotExistsInRuntime(final String qualifiedName) {

@@ -15,6 +15,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
@@ -299,6 +300,31 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Lob.class.getName());
+    }
+
+    public JAnnotationUse getAnnotation(final JDefinedClass definedClass, final String annotationClassName) {
+        final Iterator<JAnnotationUse> iterator = definedClass.annotations().iterator();
+        JAnnotationUse annotation = null;
+        while (annotation == null && iterator.hasNext()) {
+            final JAnnotationUse next = iterator.next();
+            if (next.getAnnotationClass().fullName().equals(annotationClassName)) {
+                annotation = next;
+            }
+        }
+        return annotation;
+    }
+
+    @Test
+    public void shouldAddNamedQueries_InDefinedClass() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        employeeBO.addQuery("getEmployees", "SELECT e FROM Employee e");
+        final JDefinedClass entity = bdmCodeGenerator.addEntity(employeeBO);
+
+        final JAnnotationUse namedQueriesAnnotation = getAnnotation(entity, NamedQueries.class.getName());
+        assertThat(namedQueriesAnnotation).isNotNull();
+        final Map<String, JAnnotationValue> annotationMembers = namedQueriesAnnotation.getAnnotationMembers();
+        assertThat(annotationMembers).hasSize(1);
     }
 
 }

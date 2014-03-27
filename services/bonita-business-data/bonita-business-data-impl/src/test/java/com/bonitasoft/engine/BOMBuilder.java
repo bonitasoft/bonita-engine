@@ -6,13 +6,12 @@ import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.FieldType;
 
-
 public class BOMBuilder {
 
     public static BOMBuilder aBOM() {
         return new BOMBuilder();
     }
-    
+
     public BusinessObjectModel build() {
         final Field firstName = new Field();
         firstName.setName("firstName");
@@ -28,13 +27,32 @@ public class BOMBuilder {
         bom.addBusinessObject(employee);
         return bom;
     }
-    
+
+    public BusinessObjectModel buildComplex() {
+        final Field firstName = new Field();
+        firstName.setName("firstName");
+        firstName.setType(FieldType.STRING);
+        final Field lastName = new Field();
+        lastName.setName("lastName");
+        lastName.setType(FieldType.STRING);
+        final BusinessObject employee = new BusinessObject();
+        employee.setQualifiedName("com.bonitasoft.Employee");
+        employee.addField(firstName);
+        employee.addField(lastName);
+
+        employee.addQuery("getEmployee", "SELECT e FROM Employee e");
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(employee);
+        return bom;
+    }
+
     public byte[] buildZip() {
-        BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         try {
-            return converter.zip(this.build());
-        } catch (Exception e) {
-           throw new RuntimeException("Unable to build BOM zip");
+            return converter.zip(build());
+        } catch (final Exception e) {
+            throw new RuntimeException("Unable to build BOM zip");
         }
     }
+
 }

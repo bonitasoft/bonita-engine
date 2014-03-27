@@ -67,6 +67,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.setDescription("Describe a simple employee");
         // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
+        employee.addQuery("getEmployees", "SELECT e FROM Employee e");
+        employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM Employee e WHERE e.firstName=:firstName AND e.lastName=:lastName");
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         return model;
