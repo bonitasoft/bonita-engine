@@ -20,8 +20,7 @@
 		</property>
 	</bean>
 
-	<bean id="driverProperties"
-		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
 				<prop key="user">${db.user}</prop>
