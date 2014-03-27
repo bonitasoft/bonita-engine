@@ -59,31 +59,42 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private static final String BDR = "BDR";
 
+    private static final String SCHEMA_CREATION_BDR = "notManagedBDR";
+
     private final Map<String, Object> configuration;
 
     private EntityManagerFactory entityManagerFactory;
+
+    private EntityManagerFactory notManagedEntityManagerFactory;
 
     private final TechnicalLoggerService loggerService;
 
     private final DependencyService dependencyService;
 
+    private final Map<String, Object> modelConfiguration;
+
     public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final TechnicalLoggerService loggerService,
-            final Map<String, Object> configuration) {
+            final Map<String, Object> configuration, final Map<String, Object> modelConfiguration) {
         this.dependencyService = dependencyService;
         this.loggerService = loggerService;
         this.configuration = new HashMap<String, Object>(configuration);
-        final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
+        this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
+
+        this.modelConfiguration = modelConfiguration;
+        this.modelConfiguration.remove("hibernate.hbm2ddl.auto");
+        final Object remove = this.modelConfiguration.remove("hibernate.hbm2ddl.auto");
         if (remove != null && loggerService.isLoggable(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO)) {
             this.loggerService.log(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO,
                     "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
         }
-        this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
+
     }
 
     @Override
     public void start() throws SBonitaException {
         if (isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
+            notManagedEntityManagerFactory = Persistence.createEntityManagerFactory(SCHEMA_CREATION_BDR, modelConfiguration);
             updateSchema();
         }
     }
@@ -114,13 +125,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         }
 
         final Properties properties = new Properties();
-        properties.putAll(entityManagerFactory.getProperties());
+        properties.putAll(notManagedEntityManagerFactory.getProperties());
         cfg.setProperties(properties);
-        cfg.setProperty("hibernate.current_session_context_class", "jta");
-        cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
 
         final SchemaUpdater updater = new SchemaUpdater(cfg, loggerService);
         updater.execute();
+
         final List<Exception> exceptions = updater.getExceptions();
         if (!exceptions.isEmpty()) {
             throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);

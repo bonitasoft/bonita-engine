@@ -84,7 +84,7 @@ public class JPABusinessDataRepositoryImplIT {
     public void setUp() throws Exception {
         initMocks(this);
 
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration, configuration));
         doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
         doReturn(true).when(businessDataRepository).isDBMDeployed();

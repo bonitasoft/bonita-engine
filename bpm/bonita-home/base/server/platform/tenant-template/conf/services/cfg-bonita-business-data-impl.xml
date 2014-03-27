@@ -6,11 +6,22 @@
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="configuration">
 			<map>
-				<!-- platform -->
 				<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 				<entry key="hibernate.connection.datasource" value="java:comp/env/BusinessDataDS" />
 				<entry key="hibernate.show_sql" value="false" />
 				<entry key="hibernate.format_sql" value="false" />
+				<entry key="hibernate.transaction.jta.platform" value="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform" />
+				<entry key="hibernate.validator.autoregister_listeners" value="false" />
+				<entry key="hibernate.validator.apply_to_ddl" value="false" />
+				<entry key="javax.persistence.validation.mode" value="NONE" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="modelConfiguration">
+			<map>
+				<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+				<entry key="hibernate.connection.datasource" value="java:comp/env/NotManagedBizDataDS" />
+				<entry key="hibernate.show_sql" value="true" />
+				<entry key="hibernate.format_sql" value="true" />
 				<entry key="hibernate.transaction.jta.platform" value="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform" />
 				<entry key="hibernate.validator.autoregister_listeners" value="false" />
 				<entry key="hibernate.validator.apply_to_ddl" value="false" />

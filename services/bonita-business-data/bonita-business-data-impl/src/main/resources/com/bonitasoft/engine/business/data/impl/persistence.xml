@@ -7,4 +7,9 @@
 		<properties />
 	</persistence-unit>
 
+	<persistence-unit name="notManagedBDR" transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<properties />
+	</persistence-unit>
+
 </persistence>

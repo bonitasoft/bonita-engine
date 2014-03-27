@@ -98,24 +98,26 @@ public class SchemaUpdater {
     }
 
     private void executeScripts(final Connection connection, final List<SchemaUpdateScript> scripts) throws SQLException {
-        final Statement statement = connection.createStatement();
-        for (final SchemaUpdateScript script : scripts) {
-            if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.DEBUG, "executing " + script.getScript());
-            }
+        if (scripts != null && !scripts.isEmpty()) {
+            final Statement statement = connection.createStatement();
+            for (final SchemaUpdateScript script : scripts) {
+                if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.DEBUG)) {
+                    loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.DEBUG, "Executing script: " + script.getScript());
+                }
 
-            try {
-                statement.executeUpdate(script.getScript());
-            } catch (final SQLException e) {
-                if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.WARNING)) {
-                    loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.WARNING, "Unsuccessful execution of " + script.getScript());
-                }
-                if (!script.isQuiet()) {
-                    exceptions.add(e);
+                try {
+                    statement.executeUpdate(script.getScript());
+                } catch (final SQLException e) {
+                    if (loggerService.isLoggable(SchemaUpdater.class, TechnicalLogSeverity.WARNING)) {
+                        loggerService.log(SchemaUpdater.class, TechnicalLogSeverity.WARNING, "Unsuccessful execution of script: " + script.getScript());
+                    }
+                    if (!script.isQuiet()) {
+                        exceptions.add(e);
+                    }
                 }
             }
+            statement.close();
         }
-        statement.close();
     }
 
     public List<Exception> getExceptions() {

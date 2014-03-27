@@ -141,7 +141,7 @@ public class CodeGeneratorTest {
         assertThat(setter.name()).isEqualTo("getName");
         assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").methods()).contains(setter);
     }
-    
+
     @Test
     public void shouldAddGetter_AddAJMethodInDefinedClass_AndReturnIt_ForBoolean() throws Exception {
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
@@ -214,7 +214,7 @@ public class CodeGeneratorTest {
     @Test
     public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() throws Exception {
         System.err
-                .println("Implement test com.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields()");
+                .println("***************** PLEASE Implement test com.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
     }
 
 }

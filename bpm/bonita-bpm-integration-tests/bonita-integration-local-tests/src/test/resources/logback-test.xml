@@ -9,6 +9,7 @@
 
 	<logger name="org.bonitasoft" level="INFO" />
 	<logger name="com.bonitasoft" level="INFO" />
+	<logger name="com.bonitasoft.engine.classloader" level="DEBUG" />
 	<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="INFO" />
 	<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="INFO" />
 	<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="INFO" /> 
