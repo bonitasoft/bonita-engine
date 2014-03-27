@@ -64,6 +64,14 @@ public class EngineInitializer {
         }
     }
 
+    public static void init() throws Exception {
+        new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
+    }
+
+    public static void unload() throws Exception {
+        new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
+    }
+
     public void initializeEngine() throws Exception {
         try {
             LOGGER.log(Level.INFO, "Initializing Bonita Engine...");

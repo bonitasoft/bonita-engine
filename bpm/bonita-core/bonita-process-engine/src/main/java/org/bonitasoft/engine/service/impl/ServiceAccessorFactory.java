@@ -129,10 +129,13 @@ public final class ServiceAccessorFactory {
             tenantAccessor.getValue().destroy();
         }
         tenantServiceAccessor.clear();
-        platformServiceAccessor.destroy();
-        platformServiceAccessor = null;
-        sessionAccessorAccessor.destroy();
-        sessionAccessorAccessor = null;
-
+        if (platformServiceAccessor != null) {
+            platformServiceAccessor.destroy();
+            platformServiceAccessor = null;
+        }
+        if (sessionAccessorAccessor != null) {
+            sessionAccessorAccessor.destroy();
+            sessionAccessorAccessor = null;
+        }
     }
 }
