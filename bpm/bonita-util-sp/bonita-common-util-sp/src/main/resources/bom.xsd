@@ -65,8 +65,22 @@
   </xs:complexType>
 
   <xs:complexType name="query">
-    <xs:sequence/>
+    <xs:sequence>
+      <xs:element name="queryParameters" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="queryParameter" type="queryParameter" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
     <xs:attribute name="content" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="queryParameter">
+    <xs:sequence/>
+    <xs:attribute name="className" type="xs:string" use="required"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
 
