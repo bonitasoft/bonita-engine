@@ -3,7 +3,6 @@ package com.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
@@ -65,21 +64,28 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
-    public void shouldAddEntity_CreateAValidEntityFromBusinessObject() throws Exception {
+    public void shouldAddEntity_Create_Interface_And_ImplClass_For_BusinessObject() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addEntity(employeeBO);
-        final JDefinedClass definedClass = bdmCodeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
-        assertThat(definedClass).isNotNull();
-        assertThat(definedClass._package().name()).isEqualTo("org.bonitasoft.hr");
-        assertThat(definedClass._implements()).hasSize(2);
-        final Iterator<JClass> it = definedClass._implements();
+       
+        final JDefinedClass interfaceClass = bdmCodeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
+        assertThat(interfaceClass).isNotNull();
+        assertThat(interfaceClass._package().name()).isEqualTo("org.bonitasoft.hr");
+        assertThat(interfaceClass._implements()).hasSize(1);
+        Iterator<JClass> it = interfaceClass._implements();
         JClass jClass = it.next();
-        assertThat(jClass.fullName()).isEqualTo(Serializable.class.getName());
-        jClass = it.next();
         assertThat(jClass.fullName()).isEqualTo(com.bonitasoft.engine.bdm.Entity.class.getName());
-        assertThat(definedClass.annotations()).hasSize(2);
-        final Iterator<JAnnotationUse> iterator = definedClass.annotations().iterator();
+        
+        final JDefinedClass implClass = bdmCodeGenerator.getModel()._getClass(employeeBO.getQualifiedName()+"Impl");
+        assertThat(implClass).isNotNull();
+        assertThat(implClass._package().name()).isEqualTo("org.bonitasoft.hr");
+        assertThat(implClass._implements()).hasSize(1);
+        it = implClass._implements();
+        jClass = it.next();
+        assertThat(jClass.fullName()).isEqualTo(interfaceClass.fullName());
+        assertThat(implClass.annotations()).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = implClass.annotations().iterator();
         final JAnnotationUse entityAnnotation = iterator.next();
         assertThat(entityAnnotation.getAnnotationClass().fullName()).isEqualTo(Entity.class.getName());
         assertThat(entityAnnotation.getAnnotationMembers()).hasSize(1);
@@ -88,8 +94,8 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(tableAnnotation.getAnnotationClass().fullName()).isEqualTo(Table.class.getName());
         assertThat(tableAnnotation.getAnnotationMembers()).hasSize(1);
 
-        assertThat(definedClass.getMethod("equals", new JType[] { definedClass.owner().ref(Object.class) })).isNotNull();
-        assertThat(definedClass.getMethod("hashCode", new JType[] {})).isNotNull();
+        assertThat(implClass.getMethod("equals", new JType[] { implClass.owner().ref(Object.class) })).isNotNull();
+        assertThat(implClass.getMethod("hashCode", new JType[] {})).isNotNull();
     }
 
     @Test(expected = IllegalArgumentException.class)
