@@ -123,7 +123,7 @@
             <type>link</type>
             <page>thememoredetailsadminext</page>
           </profileEntry>
-          <profileEntry name="Custom pages">
+          <profileEntry name="Custom Pages">
             <parentName>Portal</parentName>
             <index>4</index>
             <description>All custom pages</description>
