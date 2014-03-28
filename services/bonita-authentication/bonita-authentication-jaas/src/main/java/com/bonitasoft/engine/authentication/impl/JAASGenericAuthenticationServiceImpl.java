@@ -49,7 +49,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
     }
 
     @Override
-    public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
+    public String checkUserCredentials(final Map<String, Serializable> credentials) throws AuthenticationException {
         Map<String, Serializable> jaasCredentials = tryToAuthenticate(credentials);
         LoginContext loginContext = createContext(new AuthenticationCallbackHandler(jaasCredentials));
         login(loginContext);
@@ -59,12 +59,11 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
     /**
      * @param credentials
      */
-    protected Map<String, Serializable> tryToAuthenticate(Map<String, Serializable> credentials) {
+    protected Map<String, Serializable> tryToAuthenticate(final Map<String, Serializable> credentials) {
         if (authenticatorDelegate != null) {
             return authenticatorDelegate.authenticate(credentials);
-        } else {
-            return credentials;
         }
+        return credentials;
     }
 
     /**
@@ -75,7 +74,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
      * @throws AuthenticationException
      *             if the authentication fails
      */
-    protected void login(LoginContext loginContext) throws AuthenticationException {
+    protected void login(final LoginContext loginContext) throws AuthenticationException {
         try {
             loginContext.login();
         } catch (final LoginException e) {
@@ -95,7 +94,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
      * @throws AuthenticationException
      *             if a problem occurs during context creation
      */
-    protected LoginContext createContext(AuthenticationCallbackHandler authenticationCallbackHandler) throws AuthenticationException {
+    protected LoginContext createContext(final AuthenticationCallbackHandler authenticationCallbackHandler) throws AuthenticationException {
         try {
             return new LoginContext(getLoginContext(), authenticationCallbackHandler);
         } catch (final Exception e) {
@@ -117,7 +116,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
      *            the login context to extract user from
      * @return the user if it had succeed, null otherwise
      */
-    protected String extractUserFromSubjet(LoginContext loginContext) {
+    protected String extractUserFromSubjet(final LoginContext loginContext) {
         try {
             Subject subject = loginContext.getSubject();
             Set<Principal> principals = subject.getPrincipals();
@@ -145,7 +144,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
      * @param principal
      * @return
      */
-    protected boolean isGroupPrincipal(Principal principal) {
+    protected boolean isGroupPrincipal(final Principal principal) {
         return Group.class.isAssignableFrom(principal.getClass());
     }
 
