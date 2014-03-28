@@ -13,10 +13,13 @@ import java.util.Set;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.Query;
+import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.QueryValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.UniqueConstraintValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
@@ -34,6 +37,7 @@ public class BusinessObjectModelValidator {
         rules.add(new FieldValidationRule());
         rules.add(new UniqueConstraintValidationRule());
         rules.add(new QueryValidationRule());
+        rules.add(new QueryParameterValidationRule());
     }
 
     public ValidationStatus validate(final BusinessObjectModel bom) {
@@ -61,6 +65,13 @@ public class BusinessObjectModelValidator {
             final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
             for (final UniqueConstraint uc : uniqueConstraints) {
                 objectsToValidate.add(uc);
+            }
+            final List<Query> queries = bo.getQueries();
+            for (final Query q : queries) {
+                objectsToValidate.add(q);
+                for (final QueryParameter p : q.getQueryParameters()) {
+                    objectsToValidate.add(p);
+                }
             }
         }
         return objectsToValidate;

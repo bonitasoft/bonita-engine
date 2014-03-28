@@ -18,38 +18,34 @@ package com.bonitasoft.engine.bdm.validator.rule;
 
 import javax.lang.model.SourceVersion;
 
-import com.bonitasoft.engine.bdm.Query;
+import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class QueryValidationRule implements ValidationRule {
-
-	private static final int MAX_QUERY_NAME_LENGTH = 150;
-
+public class QueryParameterValidationRule implements ValidationRule {
+	
 	@Override
 	public boolean appliesTo(Object modelElement) {
-		return modelElement instanceof Query;
+		return modelElement instanceof QueryParameter;
 	}
 
 	@Override
 	public ValidationStatus checkRule(Object modelElement) {
 		if(!appliesTo(modelElement)){
-			throw new IllegalArgumentException(QueryValidationRule.class.getName() +" doesn't handle validation for "+modelElement.getClass().getName());
+			throw new IllegalArgumentException(QueryParameterValidationRule.class.getName() +" doesn't handle validation for "+modelElement.getClass().getName());
 		}
-		Query query = (Query) modelElement;
+		QueryParameter parameter = (QueryParameter) modelElement;
 		ValidationStatus status = new ValidationStatus();
-		String name = query.getName();
+		String name = parameter.getName();
 		if (name == null || name.isEmpty()) {
-			status.addError("A query must have name");
+			status.addError("A parameter must have name");
 			return status;
 		}
 		if(!SourceVersion.isIdentifier(name)){
 		    status.addError(name + " is not a valid Java identifier.");
 		}
-		if(name.length() > MAX_QUERY_NAME_LENGTH){
-			status.addError(name + " length must be lower than 150 characters.");
-		}
-		if(query.getContent() == null || query.getContent().isEmpty()){
-			status.addError(name + " query must have a content defined");
+
+		if(parameter.getClassName() == null || parameter.getClassName().isEmpty()){
+			status.addError(name + " query parameter must have a classname");
 		}
 		return status;
 	}
