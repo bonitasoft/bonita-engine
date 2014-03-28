@@ -79,8 +79,16 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
     /**
      * Default Constructor.
+     * 
+     * @param logger
      */
-    public CASAuthenticatorImpl(TechnicalLoggerService logger) {
+    public CASAuthenticatorImpl(final TechnicalLoggerService logger) {
+        // TODO : To uncomment when the licence key for CAS is created
+
+        // if (!Manager.getInstance().isFeatureActive(Features.)) {
+        // throw new IllegalStateException("The CAS authenticator is not an active feature.");
+        // }
+
         this.logger = logger;
     }
 
@@ -88,14 +96,14 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @see com.bonitasoft.engine.authentication.impl.AuthenticatorDelegate#authenticate(java.util.Map)
      */
     @Override
-    public Map<String, Serializable> authenticate(Map<String, Serializable> credentials) {
+    public Map<String, Serializable> authenticate(final Map<String, Serializable> credentials) {
         return loginToServiceViaCAS(credentials);
     }
 
     /**
      * login to a service with a CAS authentication
      */
-    protected Map<String, Serializable> loginToServiceViaCAS(Map<String, Serializable> credentials) {
+    protected Map<String, Serializable> loginToServiceViaCAS(final Map<String, Serializable> credentials) {
         String username;
         String password;
         try {
@@ -108,26 +116,25 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
             return credentials;
         }
         try {
-            DefaultHttpClient hc = createDefaultHttpClient();
-            String content = retrieveCASLoginPage(hc);
-            Document document = createDOMDocumentFromResponse(content);
-            String lt = extractLtInputFromDOMDocument(document);
-            String action = extractFormActionFromDOMDocument(document);
-            HttpPost postRequest = createCasAuthenticationHttpRequest(lt, action, username, password);
-            Header[] headers = authenticateOnCASAndRetrieveCookies(hc, postRequest);
-            HttpGet getRequest = createHttpRequestForTicketRetrieval(action, headers);
+            final DefaultHttpClient hc = createDefaultHttpClient();
+            final String content = retrieveCASLoginPage(hc);
+            final Document document = createDOMDocumentFromResponse(content);
+            final String lt = extractLtInputFromDOMDocument(document);
+            final String action = extractFormActionFromDOMDocument(document);
+            final HttpPost postRequest = createCasAuthenticationHttpRequest(lt, action, username, password);
+            final Header[] headers = authenticateOnCASAndRetrieveCookies(hc, postRequest);
+            final HttpGet getRequest = createHttpRequestForTicketRetrieval(action, headers);
 
             HttpClientParams.setRedirecting(getHttpParams(hc), false);
-            HttpResponse response = executeTicketRequest(hc, getRequest);
+            final HttpResponse response = executeTicketRequest(hc, getRequest);
             if (response != null && response.getStatusLine() != null && response.getStatusLine().getStatusCode() == 302) {
                 Map<String, Serializable> credentialResult = new HashMap<String, Serializable>();
                 credentialResult.put(AuthenticationConstants.CAS_TICKET, retrieveTicketFromRedirect(response));
                 credentialResult.put(AuthenticationConstants.BASIC_TENANT_ID, credentials.get(AuthenticationConstants.BASIC_TENANT_ID));
                 return credentialResult;
-            } else {
-                logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING,
-                        "impossible to login to {casServerUrlPrefix:" + this.getCasServerUrl() + " | casServiceUrl:" + this.getCasService() + "}");
             }
+            logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING,
+                    "impossible to login to {casServerUrlPrefix:" + this.getCasServerUrl() + " | casServiceUrl:" + this.getCasService() + "}");
         } catch (Exception e) {
             logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING,
                     "impossible to login to {casServerUrlPrefix:" + this.getCasServerUrl() + " | casServiceUrl:" + this.getCasService()
@@ -141,7 +148,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @param hc
      * @return
      */
-    protected HttpParams getHttpParams(DefaultHttpClient hc) {
+    protected HttpParams getHttpParams(final DefaultHttpClient hc) {
         return hc.getParams();
     }
 
@@ -152,7 +159,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @throws IOException
      * @throws ClientProtocolException
      */
-    protected HttpResponse executeTicketRequest(HttpClient hc, HttpGet getRequest) throws IOException, ClientProtocolException {
+    protected HttpResponse executeTicketRequest(final HttpClient hc, final HttpGet getRequest) throws IOException, ClientProtocolException {
         return hc.execute(getRequest);
     }
 
@@ -174,7 +181,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @throws SLoginException
      *             if password is absent or if credentials is null
      */
-    protected String retrievePasswordFromCredentials(Map<String, Serializable> credentials) throws LoginException {
+    protected String retrievePasswordFromCredentials(final Map<String, Serializable> credentials) throws LoginException {
         String password;
         if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_PASSWORD)
                 || credentials.get(AuthenticationConstants.BASIC_PASSWORD) == null) {
@@ -193,7 +200,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @throws SLoginException
      *             if username is absent, blank or if credentials is null
      */
-    protected String retrieveUsernameFromCredentials(Map<String, Serializable> credentials) throws LoginException {
+    protected String retrieveUsernameFromCredentials(final Map<String, Serializable> credentials) throws LoginException {
         String userName;
         if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_USERNAME)
                 || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null
@@ -211,18 +218,17 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @throws LoginException
      *             if ticket cannot be retrieved
      */
-    protected String retrieveTicketFromRedirect(HttpResponse response) throws LoginException {
-        Header h = response.getFirstHeader("Location");
+    protected String retrieveTicketFromRedirect(final HttpResponse response) throws LoginException {
+        final Header h = response.getFirstHeader("Location");
         if (logger.isLoggable(CASAuthenticatorImpl.class, TechnicalLogSeverity.DEBUG)) {
             logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.DEBUG, "redirection vers : " + h.getValue());
         }
-        Pattern pattern = Pattern.compile("ticket=([^\\&]*)(\\&|$)");
-        Matcher m = pattern.matcher(h.getValue());
+        final Pattern pattern = Pattern.compile("ticket=([^\\&]*)(\\&|$)");
+        final Matcher m = pattern.matcher(h.getValue());
         if (m.find()) {
             return m.group(1);
-        } else {
-            throw new LoginException("impossible to retrieve ticket from CAS redirection..." + h.getValue());
         }
+        throw new LoginException("impossible to retrieve ticket from CAS redirection..." + h.getValue());
     }
 
     /**
@@ -235,13 +241,13 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      *            the cookies to set on the request
      * @return the http request
      */
-    protected HttpGet createHttpRequestForTicketRetrieval(String action, Header[] headers) {
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+    protected HttpGet createHttpRequestForTicketRetrieval(final String action, Header[] headers) {
+        final List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("service", casService));
-        String params = URLEncodedUtils.format(nvps, "UTF8");
-        HttpGet getRequest = new HttpGet(casServerUrlPrefix + action + "?" + params);
+        final String params = URLEncodedUtils.format(nvps, "UTF8");
+        final HttpGet getRequest = new HttpGet(casServerUrlPrefix + action + "?" + params);
 
-        for (Header header : headers) {
+        for (final Header header : headers) {
             getRequest.addHeader("Cookie", header.getValue());
         }
         return getRequest;
@@ -256,12 +262,10 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      *            the request to send
      * @return the Set-Cookie headers
      */
-    protected Header[] authenticateOnCASAndRetrieveCookies(HttpClient hc, HttpPost postRequest) throws IOException, ClientProtocolException {
-        HttpResponse response;
-        response = hc.execute(postRequest);
+    protected Header[] authenticateOnCASAndRetrieveCookies(final HttpClient hc, final HttpPost postRequest) throws IOException, ClientProtocolException {
+        final HttpResponse response = hc.execute(postRequest);
         EntityUtils.consumeQuietly(response.getEntity());
-        Header[] headers = response.getHeaders("Set-Cookie");
-        return headers;
+        return response.getHeaders("Set-Cookie");
     }
 
     /**
@@ -272,16 +276,15 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @throws LoginException
      *             if no LT parameter has been found
      */
-    protected String extractLtInputFromDOMDocument(Document document) throws XPathExpressionException, LoginException {
+    protected String extractLtInputFromDOMDocument(final Document document) throws XPathExpressionException, LoginException {
         javax.xml.xpath.XPathFactory xpathFactory = javax.xml.xpath.XPathFactory.newInstance();
-        XPath xpath = xpathFactory.newXPath();
-        String result = xpath.evaluate("//input[@name='lt']/@value", document
+        final XPath xpath = xpathFactory.newXPath();
+        final String result = xpath.evaluate("//input[@name='lt']/@value", document
                 .getDocumentElement());
         if (StringUtils.isNotBlank(result)) {
             return result;
-        } else {
-            throw new LoginException("No LT parameter found in CAS login Form");
         }
+        throw new LoginException("No LT parameter found in CAS login Form");
     }
 
     /**
@@ -291,16 +294,15 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @throws LoginException
      *             if No Action attribute has been found
      */
-    protected String extractFormActionFromDOMDocument(Document document) throws XPathExpressionException, LoginException {
+    protected String extractFormActionFromDOMDocument(final Document document) throws XPathExpressionException, LoginException {
         javax.xml.xpath.XPathFactory xpathFactory = javax.xml.xpath.XPathFactory.newInstance();
-        XPath xpath = xpathFactory.newXPath();
-        String result = xpath.evaluate("//form/@action", document
+        final XPath xpath = xpathFactory.newXPath();
+        final String result = xpath.evaluate("//form/@action", document
                 .getDocumentElement());
         if (StringUtils.isNotBlank(result)) {
             return result;
-        } else {
-            throw new LoginException("No Action attribute found in CAS login Form");
         }
+        throw new LoginException("No Action attribute found in CAS login Form");
 
     }
 
@@ -313,10 +315,11 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      *            the form action to submit to
      * @return the request to send to an HttpClient
      */
-    protected HttpPost createCasAuthenticationHttpRequest(String lt, String action, String login, String password) throws UnsupportedEncodingException {
-        List<NameValuePair> nvps = createEntityContent(lt, login, password);
+    protected HttpPost createCasAuthenticationHttpRequest(final String lt, final String action, final String login, final String password)
+            throws UnsupportedEncodingException {
+        final List<NameValuePair> nvps = createEntityContent(lt, login, password);
 
-        HttpPost postRequest = new HttpPost(casServerUrlPrefix + action);
+        final HttpPost postRequest = new HttpPost(casServerUrlPrefix + action);
         postRequest.setEntity(new UrlEncodedFormEntity(nvps, "utf8"));
         return postRequest;
     }
@@ -332,8 +335,8 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      *            the CAS password associated to the login
      * @return the list of http parameter as name/value pair
      */
-    protected List<NameValuePair> createEntityContent(String lt, String login, String password) {
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+    protected List<NameValuePair> createEntityContent(final String lt, final String login, final String password) {
+        final List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("username", login));
         nvps.add(new BasicNameValuePair("password", password));
         nvps.add(new BasicNameValuePair("lt", lt));
@@ -379,11 +382,10 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * 
      * @return the result of the http call
      */
-    protected String retrieveCASLoginPage(HttpClient hc) throws IOException, ClientProtocolException {
-        HttpUriRequest request = new HttpGet(getCasServerUrl());
-        HttpResponse response = hc.execute(request);
-        String content = EntityUtils.toString(response.getEntity());
-        return content;
+    protected String retrieveCASLoginPage(final HttpClient hc) throws IOException, ClientProtocolException {
+        final HttpUriRequest request = new HttpGet(getCasServerUrl());
+        final HttpResponse response = hc.execute(request);
+        return EntityUtils.toString(response.getEntity());
     }
 
     /**

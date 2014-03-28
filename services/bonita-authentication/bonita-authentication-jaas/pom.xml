@@ -10,6 +10,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.bonitasoft.manager</groupId>
+			<artifactId>manager</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.authentication</groupId>
 			<artifactId>bonita-authentication-api</artifactId>
 			<version>${project.version}</version>
