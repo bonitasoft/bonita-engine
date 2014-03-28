@@ -32,4 +32,8 @@ public interface SPage extends PersistentObject {
      */
     long getLastModificationDate();
 
+    long getLastUpdatedBy();
+
+    String getContentName();
+
 }

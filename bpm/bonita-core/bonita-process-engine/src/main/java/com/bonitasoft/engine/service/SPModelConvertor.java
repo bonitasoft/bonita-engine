@@ -244,7 +244,7 @@ public final class SPModelConvertor extends ModelConvertor {
     public static Page toPage(final SPage sPage) {
         final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
                 sPage.getInstallationDate(),
-                sPage.getInstalledBy(), sPage.getLastModificationDate());
+                sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
         return page;
     }
 
@@ -285,9 +285,10 @@ public final class SPModelConvertor extends ModelConvertor {
         final String name = (String) fields.get(PageField.NAME);
         final String description = (String) fields.get(PageField.DESCRIPTION);
         final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
+        final String contentName = (String) fields.get(PageField.CONTENT_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
                 System.currentTimeMillis(), creatorUserId,
-                false, null);
+                false, contentName, null);
         return newSPageBuilder.done();
     }
 
@@ -296,9 +297,10 @@ public final class SPModelConvertor extends ModelConvertor {
         final String name = (String) fields.get(PageField.NAME);
         final String description = (String) fields.get(PageField.DESCRIPTION);
         final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
+        final String contentName = (String) fields.get(PageField.CONTENT_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
                 System.currentTimeMillis(), creatorUserId,
-                false, null);
+                false, contentName, null);
         return newSPageBuilder.done();
     }
 }

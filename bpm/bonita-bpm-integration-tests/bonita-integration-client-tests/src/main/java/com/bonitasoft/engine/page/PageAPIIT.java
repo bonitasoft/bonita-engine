@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -54,7 +55,7 @@ public class PageAPIIT extends CommonAPISPTest {
     public void should_getPage_return_the_page() throws BonitaException {
         // given
         final byte[] pageContent = getPageContent(INDEX_GROOVY);
-        final Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+        final Page page = getPageAPI().createPage(new PageCreator("mypage", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 pageContent);
 
         // when
@@ -67,27 +68,46 @@ public class PageAPIIT extends CommonAPISPTest {
     @Test
     public void should_update_return_the_modified_page() throws BonitaException {
         // given
+        User john = createUser("john", "bpm");
+        User jack = createUser("jack", "bpm");
+
+        logout();
+        loginWith("john", "bpm");
         final byte[] pageContent = getPageContent(INDEX_GROOVY);
         final String pageName = "mypage";
-        final Page page = getPageAPI().createPage(new PageCreator(pageName).setDescription("page description").setDisplayName("My Päge"),
+        final Page page = getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 pageContent);
+        assertThat(page.getInstalledBy()).isEqualTo(john.getId());
+        assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
+        logout();
+        loginWith("jack", "bpm");
         // when
         final PageUpdater pageUpdater = new PageUpdater();
         final String newDescription = "new description";
         final String newDisplayName = "new display name";
+        final String newContentName = "new_content.zip";
         pageUpdater.setDescription(newDescription);
         pageUpdater.setDisplayName(newDisplayName);
+        pageUpdater.setContentName(newContentName);
 
         final Page returnedPage = getPageAPI().updatePage(page.getId(), pageUpdater);
 
         // then
         assertThat(returnedPage).as("page should be returned").isNotNull();
+        assertThat(returnedPage.getInstalledBy()).isEqualTo(john.getId());
+        assertThat(returnedPage.getLastUpdatedBy()).isEqualTo(jack.getId());
         assertThat(returnedPage.getName()).as("page name not changed").isEqualTo(pageName);
         assertThat(returnedPage.getInstallationDate()).as("installation date not changed").isEqualTo(page.getInstallationDate());
         assertThat(returnedPage.getInstalledBy()).as("installed by not changed").isEqualTo(page.getInstalledBy());
         assertThat(returnedPage.getDisplayName()).as("display name should be:" + newDisplayName).isEqualTo(newDisplayName);
+        assertThat(returnedPage.getContentName()).as("content name should be:" + newContentName).isEqualTo(newContentName);
         assertThat(returnedPage.getDescription()).as("description should be:" + newDescription).isEqualTo(newDescription);
         assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated").isAfter(page.getLastModificationDate());
+
+        logout();
+        login();
+        deleteUser(john);
+        deleteUser(jack);
 
     }
 
@@ -96,7 +116,7 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final long currentTimeMillis = System.currentTimeMillis();
         final byte[] oldContent = getPageContent(INDEX_GROOVY);
-        final Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+        final Page page = getPageAPI().createPage(new PageCreator("mypage", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 oldContent);
         final long pageId = page.getId();
 
@@ -116,7 +136,7 @@ public class PageAPIIT extends CommonAPISPTest {
     public void should_getPage_by_name_return_the_page() throws BonitaException {
         // given
         final byte[] pageContent = getPageContent(INDEX_GROOVY);
-        final Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+        final Page page = getPageAPI().createPage(new PageCreator("mypage", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 pageContent);
 
         // when
@@ -128,13 +148,13 @@ public class PageAPIIT extends CommonAPISPTest {
 
     @Test(expected = AlreadyExistsException.class)
     public void should_createPage_with_same_name_throw_already_exists() throws BonitaException {
-        // given
+        // , "content.zip"given
         final byte[] pageContent = getPageContent(INDEX_GROOVY);
-        getPageAPI().createPage(new PageCreator("mypagedup").setDescription("page description").setDisplayName("My Päge"),
+        getPageAPI().createPage(new PageCreator("mypagedup", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator("mypagedup").setDescription("page description").setDisplayName("My Päge"),
+        getPageAPI().createPage(new PageCreator("mypagedup", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 pageContent);
 
         // then: expected exception
@@ -144,7 +164,8 @@ public class PageAPIIT extends CommonAPISPTest {
     public void should_getPageContent_return_the_content() throws BonitaException {
         // given
         final byte[] bytes = getPageContent(INDEX_GROOVY);
-        final Page page = getPageAPI().createPage(new PageCreator("mypagewithcontent").setDescription("page description").setDisplayName("My Päge"),
+        final Page page = getPageAPI().createPage(
+                new PageCreator("mypagewithcontent", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 bytes);
 
         // when
@@ -159,7 +180,8 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // given
         final byte[] bytes = getPageContent(INDEX_GROOVY);
-        final Page page = getPageAPI().createPage(new PageCreator("mypagetodelete").setDescription("page description").setDisplayName("My Päge"),
+        final Page page = getPageAPI().createPage(
+                new PageCreator("mypagetodelete", "content.zip").setDescription("page description").setDisplayName("My Päge"),
                 bytes);
 
         // when
@@ -183,11 +205,12 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int noneMatchingCount = 8;
         for (int i = 0; i < noneMatchingCount; i++) {
-            getPageAPI().createPage(new PageCreator(generateUniquePageName()).setDescription(description).setDisplayName(noneMatchingdisplayName),
+            getPageAPI().createPage(
+                    new PageCreator(generateUniquePageName(), "content.zip").setDescription(description).setDisplayName(noneMatchingdisplayName),
                     pageContent);
         }
         final Page pageWithMatchingSearchTerm = getPageAPI().createPage(
-                new PageCreator(generateUniquePageName()).setDescription(description).setDisplayName(matchingDisplayName),
+                new PageCreator(generateUniquePageName(), "content.zip").setDescription(description).setDisplayName(matchingDisplayName),
                 pageContent);
 
         // when
@@ -215,7 +238,8 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int expectedResultSize = 5;
         for (int i = 0; i < expectedResultSize + 3; i++) {
-            getPageAPI().createPage(new PageCreator(generateUniquePageName()).setDescription(description).setDisplayName(displayName), pageContent);
+            getPageAPI().createPage(new PageCreator(generateUniquePageName(), "content.zip").setDescription(description).setDisplayName(displayName),
+                    pageContent);
         }
 
         // when
@@ -242,10 +266,10 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int expectedMatchingResults = 3;
         for (int i = 0; i < expectedMatchingResults; i++) {
-            getPageAPI().createPage(new PageCreator(generateUniquePageName()).setDescription(description).setDisplayName(matchingDisplayName),
+            getPageAPI().createPage(new PageCreator(generateUniquePageName(), "content.zip").setDescription(description).setDisplayName(matchingDisplayName),
                     pageContent);
         }
-        getPageAPI().createPage(new PageCreator("anOtherName").setDescription("an awesome page!!!!!!!").setDisplayName(noneMatchingDisplayName),
+        getPageAPI().createPage(new PageCreator("anOtherName", "content.zip").setDescription("an awesome page!!!!!!!").setDisplayName(noneMatchingDisplayName),
                 pageContent);
 
         // when
@@ -268,10 +292,11 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int numberOfNonsMatchingPage = 5;
         for (int i = 0; i < numberOfNonsMatchingPage; i++) {
-            getPageAPI().createPage(new PageCreator(generateUniquePageName()).setDescription(description).setDisplayName(displayName), pageContent);
+            getPageAPI().createPage(new PageCreator(generateUniquePageName(), "content.zip").setDescription(description).setDisplayName(displayName),
+                    pageContent);
         }
         final Page expectedMatchingPage = getPageAPI().createPage(
-                new PageCreator(firstPageNameInDescOrder).setDescription(description).setDisplayName(displayName),
+                new PageCreator(firstPageNameInDescOrder, "content.zip").setDescription(description).setDisplayName(displayName),
                 pageContent);
 
         // when

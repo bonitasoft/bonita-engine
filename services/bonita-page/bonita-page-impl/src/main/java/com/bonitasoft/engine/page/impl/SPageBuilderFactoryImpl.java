@@ -18,14 +18,16 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
 
     @Override
     public SPageBuilder createNewInstance(final String name, final String description, final String displayName, final long installationDate,
-            final long installedBy, final boolean provided,
+            final long installedBy, final boolean provided, final String contentName,
             final byte[] content) {
-        return new SPageBuilderImpl(new SPageImpl(name, description, displayName, installationDate, installedBy, provided, installationDate));
+        return new SPageBuilderImpl(new SPageImpl(name, description, displayName, installationDate, installedBy, provided, installationDate, installedBy,
+                contentName));
     }
 
     @Override
-    public SPageBuilder createNewInstance(final String name, final long installationDate, final int installedBy, final boolean provided) {
-        return new SPageBuilderImpl(new SPageImpl(name, installationDate, installedBy, provided));
+    public SPageBuilder createNewInstance(final String name, final long installationDate, final int installedBy, final boolean provided,
+            final String contentName) {
+        return new SPageBuilderImpl(new SPageImpl(name, installationDate, installedBy, provided, contentName));
     }
 
     @Override
@@ -66,6 +68,11 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
     @Override
     public String getLastModificationDateKey() {
         return "lastModificationDate";
+    }
+
+    @Override
+    public String getLastUpdatedByKey() {
+        return "lastUpdateBy";
     }
 
 }

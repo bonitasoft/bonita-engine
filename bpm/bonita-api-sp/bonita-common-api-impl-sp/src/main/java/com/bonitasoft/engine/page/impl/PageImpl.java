@@ -37,14 +37,20 @@ public class PageImpl implements Page {
 
     private final String displayName;
 
+    private final long lastUpdatedBy;
+
+    private final String contentName;
+
     public PageImpl(final long pageId, final String name, final String displayName, final boolean provided, final String description,
             final long installationDate,
-            final long installedBy, final long lastModificationDate) {
+            final long installedBy, final long lastModificationDate, final long lastUpdatedBy, final String contentName) {
         this.pageId = pageId;
         this.name = name;
         this.displayName = displayName;
         this.provided = provided;
         this.description = description;
+        this.lastUpdatedBy = lastUpdatedBy;
+        this.contentName = contentName;
         this.installationDate = new Date(installationDate);
         this.installedBy = installedBy;
         this.lastModificationDate = new Date(lastModificationDate);
@@ -90,15 +96,31 @@ public class PageImpl implements Page {
         return displayName;
     }
 
+    public long getPageId() {
+        return pageId;
+    }
+
+    @Override
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    @Override
+    public String getContentName() {
+        return contentName;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (contentName == null ? 0 : contentName.hashCode());
         result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (installationDate == null ? 0 : installationDate.hashCode());
         result = prime * result + (int) (installedBy ^ installedBy >>> 32);
         result = prime * result + (lastModificationDate == null ? 0 : lastModificationDate.hashCode());
+        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (int) (pageId ^ pageId >>> 32);
         result = prime * result + (provided ? 1231 : 1237);
@@ -117,6 +139,13 @@ public class PageImpl implements Page {
             return false;
         }
         PageImpl other = (PageImpl) obj;
+        if (contentName == null) {
+            if (other.contentName != null) {
+                return false;
+            }
+        } else if (!contentName.equals(other.contentName)) {
+            return false;
+        }
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -148,6 +177,9 @@ public class PageImpl implements Page {
         } else if (!lastModificationDate.equals(other.lastModificationDate)) {
             return false;
         }
+        if (lastUpdatedBy != other.lastUpdatedBy) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -167,7 +199,8 @@ public class PageImpl implements Page {
     @Override
     public String toString() {
         return "PageImpl [pageId=" + pageId + ", name=" + name + ", provided=" + provided + ", description=" + description + ", installationDate="
-                + installationDate + ", installedBy=" + installedBy + ", lastModificationDate=" + lastModificationDate + ", displayName=" + displayName + "]";
+                + installationDate + ", installedBy=" + installedBy + ", lastModificationDate=" + lastModificationDate + ", displayName=" + displayName
+                + ", lastUpdatedBy=" + lastUpdatedBy + ", contentName=" + contentName + "]";
     }
 
 }

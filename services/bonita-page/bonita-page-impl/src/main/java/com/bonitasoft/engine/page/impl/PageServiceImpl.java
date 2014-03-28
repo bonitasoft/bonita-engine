@@ -361,7 +361,7 @@ public class PageServiceImpl implements PageService {
     private SPage getProvidedPage(final Properties pageProperties) {
         final long now = System.currentTimeMillis();
         return new SPageImpl(pageProperties.getProperty("name"), pageProperties.getProperty("description"), pageProperties.getProperty("displayName"), now, -1,
-                true, now);
+                true, now, -1, pageProperties.getProperty("contentName"));
     }
 
     @Override

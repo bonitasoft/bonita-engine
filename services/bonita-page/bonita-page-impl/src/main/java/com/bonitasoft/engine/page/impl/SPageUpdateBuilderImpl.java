@@ -38,6 +38,18 @@ public class SPageUpdateBuilderImpl implements SPageUpdateBuilder {
     }
 
     @Override
+    public SPageUpdateBuilder updateLastUpdatedBy(final long userId) {
+        descriptor.addField(SPageFields.PAGE_LAST_UPDATED_BY, userId);
+        return this;
+    }
+
+    @Override
+    public SPageUpdateBuilder updateContentName(final String value) {
+        descriptor.addField(SPageFields.PAGE_CONTENT_NAME, value);
+        return this;
+    }
+
+    @Override
     public EntityUpdateDescriptor done() {
         return descriptor;
     }

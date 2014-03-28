@@ -35,12 +35,16 @@ public class SPageImpl implements SPage {
 
     private long lastModificationDate;
 
+    private long lastUpdatedBy;
+
+    private String contentName;
+
     protected SPageImpl() {
 
     }
 
     public SPageImpl(final String name, final String description, final String displayName, final long installationDate, final long installedBy,
-            final boolean provided, final long lastModificationDate) {
+            final boolean provided, final long lastModificationDate, final long lastUpdatedBy, final String contentName) {
         super();
         this.name = name;
         this.description = description;
@@ -49,6 +53,8 @@ public class SPageImpl implements SPage {
         this.installedBy = installedBy;
         this.provided = provided;
         this.lastModificationDate = lastModificationDate;
+        this.lastUpdatedBy = lastUpdatedBy;
+        this.contentName = contentName;
     }
 
     /**
@@ -56,15 +62,16 @@ public class SPageImpl implements SPage {
      */
     public SPageImpl(final SPage sPage) {
         this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.isProvided(), sPage
-                .getLastModificationDate());
+                .getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
     }
 
-    public SPageImpl(final String name, final long installationDate, final long installedBy, final boolean provided) {
+    public SPageImpl(final String name, final long installationDate, final long installedBy, final boolean provided, final String contentName) {
         this.name = name;
         this.installationDate = installationDate;
         this.lastModificationDate = installationDate;
         this.installedBy = installedBy;
         this.provided = provided;
+        this.contentName = contentName;
     }
 
     @Override
@@ -155,25 +162,38 @@ public class SPageImpl implements SPage {
     }
 
     @Override
-    public String toString() {
-        return "SPageImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", displayName=" + displayName
-                + ", installationDate=" + installationDate + ", installedBy=" + installedBy + ", provided=" + provided + ", lastModificationDate="
-                + lastModificationDate + "]";
+    public String getContentName() {
+        return contentName;
+    }
+
+    public void setContentName(final String contentName) {
+        this.contentName = contentName;
+    }
+
+    @Override
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(final long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (contentName == null ? 0 : contentName.hashCode());
         result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (id ^ id >>> 32);
         result = prime * result + (int) (installationDate ^ installationDate >>> 32);
         result = prime * result + (int) (installedBy ^ installedBy >>> 32);
         result = prime * result + (int) (lastModificationDate ^ lastModificationDate >>> 32);
+        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (provided ? 1231 : 1237);
         result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         return result;
     }
 
@@ -189,11 +209,25 @@ public class SPageImpl implements SPage {
             return false;
         }
         SPageImpl other = (SPageImpl) obj;
+        if (contentName == null) {
+            if (other.contentName != null) {
+                return false;
+            }
+        } else if (!contentName.equals(other.contentName)) {
+            return false;
+        }
         if (description == null) {
             if (other.description != null) {
                 return false;
             }
         } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
             return false;
         }
         if (id != other.id) {
@@ -206,6 +240,9 @@ public class SPageImpl implements SPage {
             return false;
         }
         if (lastModificationDate != other.lastModificationDate) {
+            return false;
+        }
+        if (lastUpdatedBy != other.lastUpdatedBy) {
             return false;
         }
         if (name == null) {
@@ -221,14 +258,14 @@ public class SPageImpl implements SPage {
         if (tenantId != other.tenantId) {
             return false;
         }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "SPageImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", displayName=" + displayName
+                + ", installationDate=" + installationDate + ", installedBy=" + installedBy + ", provided=" + provided + ", lastModificationDate="
+                + lastModificationDate + ", lastUpdatedBy=" + lastUpdatedBy + ", contentName=" + contentName + "]";
     }
 
 }

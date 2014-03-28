@@ -20,7 +20,7 @@ public class PageCreatorTest {
     @Test
     public void pageCreatorWithName() throws Exception {
         // given
-        PageCreator pageCreator = new PageCreator(NAME);
+        PageCreator pageCreator = new PageCreator(NAME, "content.zip");
 
         // wwhen
         Map<PageField, Serializable> fields = pageCreator.getFields();
@@ -34,7 +34,7 @@ public class PageCreatorTest {
     @Test
     public void pageCreatorWithDescrition() throws Exception {
         // given
-        PageCreator pageCreator = new PageCreator(NAME);
+        PageCreator pageCreator = new PageCreator(NAME, "content.zip");
         pageCreator.setDescription(DESCRIPTION);
 
         // when
@@ -50,7 +50,7 @@ public class PageCreatorTest {
     @Test
     public void pageCreatorWithDisplayName() throws Exception {
         // given
-        PageCreator pageCreator = new PageCreator(NAME);
+        PageCreator pageCreator = new PageCreator(NAME, "content.zip");
         pageCreator.setDisplayName(DISPLAY_NAME);
 
         // when

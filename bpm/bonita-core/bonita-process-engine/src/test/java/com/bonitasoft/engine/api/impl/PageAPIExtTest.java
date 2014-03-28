@@ -158,7 +158,7 @@ public class PageAPIExtTest {
     @Test
     public void testCreatePage() throws Exception {
         // given
-        final PageCreator pageCreator = new PageCreator("name");
+        final PageCreator pageCreator = new PageCreator("name", "content.zip");
         final byte[] content = "content".getBytes();
 
         doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();

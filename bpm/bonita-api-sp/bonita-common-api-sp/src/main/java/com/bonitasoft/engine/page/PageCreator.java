@@ -18,16 +18,17 @@ import java.util.Map;
 public class PageCreator implements Serializable {
 
     public enum PageField {
-        NAME, DISPLAY_NAME, DESCRIPTION;
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME;
     }
 
     private static final long serialVersionUID = 8174091386958635983L;
 
     private final Map<PageField, Serializable> fields;
 
-    public PageCreator(final String name) {
+    public PageCreator(final String name, final String contentName) {
         fields = new HashMap<PageField, Serializable>(2);
         fields.put(PageField.NAME, name);
+        fields.put(PageField.CONTENT_NAME, contentName);
     }
 
     public PageCreator setDescription(final String description) {

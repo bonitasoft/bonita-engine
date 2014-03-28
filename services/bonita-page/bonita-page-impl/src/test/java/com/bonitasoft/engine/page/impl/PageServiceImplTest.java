@@ -145,7 +145,7 @@ public class PageServiceImplTest {
     public void should_create_page_throw_exception_when_name_is_empty() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage pageWithEmptyName = new SPageImpl("", 123456, 45, true);
+        final SPage pageWithEmptyName = new SPageImpl("", 123456, 45, true, "content.zip");
         pageWithEmptyName.setId(pageId);
         try {
             pageServiceImpl.addPage(pageWithEmptyName, new byte[] { 1, 2, 3 });
@@ -159,7 +159,7 @@ public class PageServiceImplTest {
     @Test
     public void getPage() throws SBonitaException {
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true);
+        final SPage expected = new SPageImpl("page1", 123456, 45, true, "content.zip");
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
         // when
@@ -172,7 +172,7 @@ public class PageServiceImplTest {
     public void getPageThrowsPageNotFoundException() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true);
+        final SPage expected = new SPageImpl("page1", 123456, 45, true, "content.zip");
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(null);
 
@@ -192,7 +192,7 @@ public class PageServiceImplTest {
     public void getPageThrowsException() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true);
+        final SPage expected = new SPageImpl("page1", 123456, 45, true, "content.zip");
         expected.setId(pageId);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenThrow(
                 new SBonitaReadException("ouch!"));
@@ -218,7 +218,8 @@ public class PageServiceImplTest {
     public void should_start_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentPage = new SPageImpl("example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis());
+        final SPageImpl currentPage = new SPageImpl("example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(), -1,
+                "content.zip");
         currentPage.setId(12);
         doReturn(currentPage).when(pageServiceImpl).getPageByName("example");
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
@@ -237,7 +238,8 @@ public class PageServiceImplTest {
     public void should_start_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentPage = new SPageImpl("example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis());
+        final SPageImpl currentPage = new SPageImpl("example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(), -1,
+                "content.zip");
         currentPage.setId(12);
         doReturn(currentPage).when(pageServiceImpl).getPageByName("example");
         final InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.zip");
@@ -255,7 +257,7 @@ public class PageServiceImplTest {
     public void deletePage() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true);
+        final SPage expected = new SPageImpl("page1", 123456, 45, true, "content.zip");
         expected.setId(pageId);
 
         doAnswer(new Answer<Object>() {
@@ -280,7 +282,7 @@ public class PageServiceImplTest {
     public void deletePageThrowsPageNotFoundException() throws SBonitaException {
 
         final long pageId = 15;
-        final SPage expected = new SPageImpl("page1", 123456, 45, true);
+        final SPage expected = new SPageImpl("page1", 123456, 45, true, "content.zip");
         expected.setId(pageId);
 
         doAnswer(new Answer<Object>() {
@@ -299,7 +301,7 @@ public class PageServiceImplTest {
     @Test(expected = SBonitaException.class)
     public void updatePageContent_should_check_zip_content() throws Exception {
         final long pageId = 15;
-        final SPage sPage = new SPageImpl("page1", 123456, 45, true);
+        final SPage sPage = new SPageImpl("page1", 123456, 45, true, "content.zip");
         final Map<String, Object> fields = new HashMap<String, Object>();
 
         // given
@@ -321,7 +323,7 @@ public class PageServiceImplTest {
         // given
         final long pageId = 15;
         final Map<String, Object> fields = new HashMap<String, Object>();
-        final SPage sPage = new SPageImpl("page1", 123456, 45, true);
+        final SPage sPage = new SPageImpl("page1", 123456, 45, true, "content.zip");
         sPage.setId(pageId);
         final byte[] content = "invalid content".getBytes();
         fields.put(SPageContentFields.PAGE_CONTENT, content);

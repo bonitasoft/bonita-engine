@@ -201,11 +201,15 @@ public class PageAPIExt implements PageAPI {
                 case DESCRIPTION:
                     pageUpdateBuilder.updateDescription((String) field.getValue());
                     break;
+                case CONTENT_NAME:
+                    pageUpdateBuilder.updateContentName((String) field.getValue());
+                    break;
                 default:
                     break;
             }
         }
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
+        pageUpdateBuilder.updateLastUpdatedBy(getUserIdFromSessionInfos());
 
         try {
             final SPage updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());

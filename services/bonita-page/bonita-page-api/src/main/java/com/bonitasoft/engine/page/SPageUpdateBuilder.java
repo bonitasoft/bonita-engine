@@ -14,4 +14,8 @@ public interface SPageUpdateBuilder {
 
     SPageUpdateBuilder updateLastModificationDate(long currentTimeMillis);
 
+    SPageUpdateBuilder updateLastUpdatedBy(long userId);
+
+    SPageUpdateBuilder updateContentName(String value);
+
 }

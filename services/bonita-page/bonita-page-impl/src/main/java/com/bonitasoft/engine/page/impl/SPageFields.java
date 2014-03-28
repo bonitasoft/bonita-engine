@@ -12,4 +12,8 @@ public interface SPageFields {
 
     String PAGE_LAST_MODIFICATION_DATE = "lastModificationDate";
 
+    String PAGE_LAST_UPDATED_BY = "lastUpdatedBy";
+
+    String PAGE_CONTENT_NAME = "contentName";
+
 }

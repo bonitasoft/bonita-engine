@@ -19,6 +19,10 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl> {
 
     private long lastModificationDate;
 
+    private long lastUpdatedBy;
+
+    private String contentName;
+
     private byte[] content;
 
     public static PageBuilder aPage() {
@@ -27,7 +31,8 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl> {
 
     @Override
     public SPageWithContentImpl _build() {
-        SPageImpl sPageImpl = new SPageImpl(name, description, displayName, installationDate, installedBy, provided, lastModificationDate);
+        SPageImpl sPageImpl = new SPageImpl(name, description, displayName, installationDate, installedBy, provided, lastModificationDate, lastUpdatedBy,
+                contentName);
         return new SPageWithContentImpl(sPageImpl, content);
     }
 
@@ -63,6 +68,16 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl> {
 
     public PageBuilder withLastModificationDate(final long lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
+        return this;
+    }
+
+    public PageBuilder withLastUpdatedBy(final long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+        return this;
+    }
+
+    public PageBuilder withContentName(final String contentName) {
+        this.contentName = contentName;
         return this;
     }
 

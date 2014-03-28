@@ -33,7 +33,7 @@ public class PageImplTest {
         installationDate = System.currentTimeMillis();
         modificationDate = installationDate + 10000;
 
-        pageImpl = new PageImpl(PAGE_ID, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, installationDate, USER_ID, modificationDate);
+        pageImpl = new PageImpl(PAGE_ID, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, installationDate, USER_ID, modificationDate, USER_ID, "content.zip");
     }
 
     @Test

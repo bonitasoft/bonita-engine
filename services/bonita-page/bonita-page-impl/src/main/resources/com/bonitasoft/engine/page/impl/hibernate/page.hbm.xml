@@ -18,6 +18,8 @@
 		<property name="installedBy" column="installedBy" />
 		<property name="provided" column="provided" />
 		<property name="lastModificationDate" column="lastModificationDate" />
+		<property name="lastUpdatedBy" column="lastUpdatedBy" />
+		<property name="contentName" column="contentName" />
 		<filter name="tenantFilter" />
 	</class>
 
@@ -33,6 +35,8 @@
 		<property name="installedBy" column="installedBy" />
 		<property name="provided" column="provided" />
 		<property name="lastModificationDate" column="lastModificationDate" />
+		<property name="lastUpdatedBy" column="lastUpdatedBy" />
+		<property name="contentName" column="contentName" />
 		<property name="content" column="content" />
 		<filter name="tenantFilter" />
 	</class>

@@ -70,4 +70,18 @@ public interface Page extends BaseElement {
      */
     Date getLastModificationDate();
 
+    /**
+     * Get the userId of the user that last updated this page.
+     * 
+     * @return the user id of the user that last updated this page.
+     */
+    long getLastUpdatedBy();
+
+    /**
+     * Gets the name of the zip file.
+     * 
+     * @return the name of the zip file of this <code>Page</code>.
+     */
+    String getContentName();
+
 }

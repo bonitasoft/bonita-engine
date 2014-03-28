@@ -20,7 +20,7 @@ public class PageUpdater implements Serializable {
     private static final long serialVersionUID = 4295108162470507415L;
 
     public enum PageUpdateField {
-        NAME, DISPLAY_NAME, DESCRIPTION;
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME;
     }
 
     private final Map<PageUpdateField, Serializable> fields;
@@ -41,6 +41,11 @@ public class PageUpdater implements Serializable {
 
     public PageUpdater setDisplayName(final String displayName) {
         fields.put(PageUpdateField.DISPLAY_NAME, displayName);
+        return this;
+    }
+
+    public PageUpdater setContentName(final String contentName) {
+        fields.put(PageUpdateField.CONTENT_NAME, contentName);
         return this;
     }
 
