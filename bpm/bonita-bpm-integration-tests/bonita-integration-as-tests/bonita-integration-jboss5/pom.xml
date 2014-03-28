@@ -134,8 +134,9 @@
 										<replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
 										
 										<!-- Change Dialect of BDR -->
-										<replace file="${bonita.home}/server/platform/tenant-template/conf/services/cfg-bonita-business-data-impl.xml" token="org.hibernate.dialect.H2Dialect"
-											value="org.hibernate.dialect.PostgreSQL82Dialect" failOnNoReplacements="true" />
+										<replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties" match="businessdata.hibernate.dialect=.*"
+                                            replace="businessdata.hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect" byline="true" />
+										
 										
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
 											<fileset dir="${user.home}/lic" includes="*.lic" />
