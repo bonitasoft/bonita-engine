@@ -116,12 +116,19 @@
             <type>link</type>
             <page>profilelisting</page>
           </profileEntry>
-	  <profileEntry name="Look &amp; Feel">
+          <profileEntry name="Look &amp; Feel">
             <parentName>Portal</parentName>
             <index>2</index>
             <description>LooknFeel</description>
             <type>link</type>
             <page>thememoredetailsadminext</page>
+          </profileEntry>
+          <profileEntry name="Custom pages">
+            <parentName>Portal</parentName>
+            <index>4</index>
+            <description>All custom pages</description>
+            <type>link</type>
+            <page>pagelisting</page>
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>	
