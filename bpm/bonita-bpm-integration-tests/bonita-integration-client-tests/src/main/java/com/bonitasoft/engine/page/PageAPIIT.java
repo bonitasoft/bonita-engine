@@ -67,21 +67,27 @@ public class PageAPIIT extends CommonAPISPTest {
     @Test
     public void should_update_return_the_modified_page() throws BonitaException {
         // given
-        final long currentTimeMillis = System.currentTimeMillis();
         final byte[] pageContent = getPageContent(INDEX_GROOVY);
-        final Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+        final String pageName = "mypage";
+        final Page page = getPageAPI().createPage(new PageCreator(pageName).setDescription("page description").setDisplayName("My Päge"),
                 pageContent);
-
         // when
         final PageUpdater pageUpdater = new PageUpdater();
         final String newDescription = "new description";
+        final String newDisplayName = "new display name";
         pageUpdater.setDescription(newDescription);
+        pageUpdater.setDisplayName(newDisplayName);
 
         final Page returnedPage = getPageAPI().updatePage(page.getId(), pageUpdater);
 
         // then
-        assertThat(returnedPage.getDescription()).isEqualTo(newDescription);
-        assertThat(returnedPage.getLastModificationDate()).isAfter(new Date(currentTimeMillis));
+        assertThat(returnedPage).as("page should be returned").isNotNull();
+        assertThat(returnedPage.getName()).as("page name not changed").isEqualTo(pageName);
+        assertThat(returnedPage.getInstallationDate()).as("installation date not changed").isEqualTo(page.getInstallationDate());
+        assertThat(returnedPage.getInstalledBy()).as("installed by not changed").isEqualTo(page.getInstalledBy());
+        assertThat(returnedPage.getDisplayName()).as("display name should be:" + newDisplayName).isEqualTo(newDisplayName);
+        assertThat(returnedPage.getDescription()).as("description should be:" + newDescription).isEqualTo(newDescription);
+        assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated").isAfter(page.getLastModificationDate());
 
     }
 

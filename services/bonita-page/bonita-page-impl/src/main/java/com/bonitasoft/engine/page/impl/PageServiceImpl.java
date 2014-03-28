@@ -211,7 +211,7 @@ public class PageServiceImpl implements PageService {
 
     private SUpdateEvent getUpdateEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.UPDATED)) {
-            return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
+            return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(type).setObject(object).done();
         } else {
             return null;
         }
@@ -301,18 +301,18 @@ public class PageServiceImpl implements PageService {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-page.properties found in the class path, nothing will be imported");
                 return;
             }
-            Properties pageProperties = new Properties();
+            final Properties pageProperties = new Properties();
             pageProperties.load(inputStream);
 
             // provided pages name?
-            SPage pageByName = getPageByName(pageProperties.getProperty("name"));
+            final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
             if (pageByName == null) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
                 addPage(getProvidedPage(pageProperties), getProvidedPageContent());
                 return;
             }
-            byte[] providedPageContent = getProvidedPageContent();
-            byte[] pageContent = getPageContent(pageByName.getId());
+            final byte[] providedPageContent = getProvidedPageContent();
+            final byte[] pageContent = getPageContent(pageByName.getId());
             if (pageContent.length != providedPageContent.length) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
                 // think of a better way to check the content are the same or not, it will almost always be the same so....
@@ -320,7 +320,7 @@ public class PageServiceImpl implements PageService {
             } else {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SBonitaReadException("Unable to import the provided page", e);
         }
     }
@@ -359,7 +359,7 @@ public class PageServiceImpl implements PageService {
      * @return
      */
     private SPage getProvidedPage(final Properties pageProperties) {
-        long now = System.currentTimeMillis();
+        final long now = System.currentTimeMillis();
         return new SPageImpl(pageProperties.getProperty("name"), pageProperties.getProperty("description"), pageProperties.getProperty("displayName"), now, -1,
                 true, now);
     }

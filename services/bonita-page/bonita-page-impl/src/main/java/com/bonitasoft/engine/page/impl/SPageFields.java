@@ -6,7 +6,7 @@ public interface SPageFields {
 
     String PAGE_NAME = "name";
 
-    String PAGE_DISPLAY_NAME = "name";
+    String PAGE_DISPLAY_NAME = "displayName";
 
     String PAGE_DESCRIPTION = "description";
 
