@@ -168,9 +168,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         if (entityManagerFactory == null) {
             throw new IllegalStateException("The BDR is not started");
         }
-        final EntityManager entityManager = entityManagerFactory.createEntityManager();
-        entityManager.joinTransaction();
-        return entityManager;
+        return entityManagerFactory.createEntityManager();
     }
 
     protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {
