@@ -61,6 +61,7 @@ import com.bonitasoft.engine.page.SPageLogBuilder;
 import com.bonitasoft.engine.page.SPageUpdateBuilder;
 import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import com.bonitasoft.engine.page.SPageWithContent;
+import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
 /**
@@ -85,11 +86,9 @@ public class PageServiceImpl implements PageService {
 
     PageServiceImpl(final Manager manager, final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
-
-        // FIXME : uncomment when licence pb is fix onIC
-        // if (!manager.isFeatureActive(Features.CUSTOM_PAGES)) {
-        // throw new IllegalStateException("The custom pages is not an active feature.");
-        // }
+        if (!manager.isFeatureActive(Features.CUSTOM_PAGES)) {
+            throw new IllegalStateException("The custom pages is not an active feature.");
+        }
         this.persistenceService = persistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -302,18 +301,18 @@ public class PageServiceImpl implements PageService {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-page.properties found in the class path, nothing will be imported");
                 return;
             }
-            final Properties pageProperties = new Properties();
+            Properties pageProperties = new Properties();
             pageProperties.load(inputStream);
 
             // provided pages name?
-            final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
+            SPage pageByName = getPageByName(pageProperties.getProperty("name"));
             if (pageByName == null) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
                 addPage(getProvidedPage(pageProperties), getProvidedPageContent());
                 return;
             }
-            final byte[] providedPageContent = getProvidedPageContent();
-            final byte[] pageContent = getPageContent(pageByName.getId());
+            byte[] providedPageContent = getProvidedPageContent();
+            byte[] pageContent = getPageContent(pageByName.getId());
             if (pageContent.length != providedPageContent.length) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
                 // think of a better way to check the content are the same or not, it will almost always be the same so....
@@ -321,7 +320,7 @@ public class PageServiceImpl implements PageService {
             } else {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
             }
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new SBonitaReadException("Unable to import the provided page", e);
         }
     }
@@ -360,7 +359,7 @@ public class PageServiceImpl implements PageService {
      * @return
      */
     private SPage getProvidedPage(final Properties pageProperties) {
-        final long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
         return new SPageImpl(pageProperties.getProperty("name"), pageProperties.getProperty("description"), pageProperties.getProperty("displayName"), now, -1,
                 true, now);
     }
