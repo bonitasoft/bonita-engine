@@ -88,11 +88,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @After
     public void tearDown() throws BonitaException {
-        getTenantManagementAPI().pause();
-        getTenantManagementAPI().uninstallBusinessDataRepository();
-        getTenantManagementAPI().resume();
+    	if(!getTenantManagementAPI().isPaused()){
+    	    getTenantManagementAPI().pause();
+    	    getTenantManagementAPI().uninstallBusinessDataRepository();
+    	    getTenantManagementAPI().resume();
+    	}
+  
         deleteUser(matti);
-
         logout();
     }
 
