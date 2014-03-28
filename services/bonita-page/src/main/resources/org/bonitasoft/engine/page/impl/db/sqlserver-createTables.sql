@@ -8,6 +8,8 @@ CREATE TABLE page (
   installedBy NUMERIC(19, 0) NOT NULL,
   provided BIT,
   lastModificationDate NUMERIC(19, 0) NOT NULL,
+  lastUpdatedBy NUMERIC(19, 0) NOT NULL,
+  contentName NVARCHAR(50) NOT NULL,
   content VARBINARY(MAX),
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)

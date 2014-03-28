@@ -8,6 +8,8 @@ CREATE TABLE page (
   installedBy INT8 NOT NULL,
   provided BOOLEAN,
   lastModificationDate INT8 NOT NULL,
+  lastUpdatedBy INT8 NOT NULL,
+  contentName VARCHAR(50) NOT NULL,
   content BYTEA,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)

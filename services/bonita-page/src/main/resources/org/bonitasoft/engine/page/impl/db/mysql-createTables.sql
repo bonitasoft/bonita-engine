@@ -8,6 +8,8 @@ CREATE TABLE page (
   installedBy BIGINT NOT NULL,
   provided BOOLEAN,
   lastModificationDate BIGINT NOT NULL,
+  lastUpdatedBy BIGINT NOT NULL,
+  contentName VARCHAR(50) NOT NULL,
   content LONGBLOB,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
