@@ -86,7 +86,7 @@ public class PageServiceImpl implements PageService {
 
     PageServiceImpl(final Manager manager, final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
-        if (!manager.isFeatureActive(Features.CUSTOM_PAGES)) {
+        if (!manager.isFeatureActive(Features.CUSTOM_PAGE)) {
             throw new IllegalStateException("The custom pages is not an active feature.");
         }
         this.persistenceService = persistenceService;

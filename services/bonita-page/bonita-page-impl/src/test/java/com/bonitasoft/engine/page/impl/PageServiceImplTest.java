@@ -105,7 +105,7 @@ public class PageServiceImplTest {
 
     @Before
     public void before() {
-        doReturn(true).when(manager).isFeatureActive(Features.CUSTOM_PAGES);
+        doReturn(true).when(manager).isFeatureActive(Features.CUSTOM_PAGE);
 
         when(technicalLoggerService.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         when(queriableLoggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
