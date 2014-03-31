@@ -13,7 +13,7 @@ xmlns:util="http://www.springframework.org/schema/util"
 				<entry key="hibernate.connection.datasource" value="${businessdata.datasource.jndi.path}" />
 				<entry key="hibernate.show_sql" value="false" />
 				<entry key="hibernate.format_sql" value="false" />
-				<entry key="hibernate.transaction.jta.platform" value="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform" />
+				<entry key="hibernate.transaction.jta.platform" value="${businessdata.hibernate.transaction.jta_platform}" />
 				<entry key="hibernate.validator.autoregister_listeners" value="false" />
 				<entry key="hibernate.validator.apply_to_ddl" value="false" />
 				<entry key="javax.persistence.validation.mode" value="NONE" />
@@ -25,7 +25,7 @@ xmlns:util="http://www.springframework.org/schema/util"
 				<entry key="hibernate.connection.datasource" value="${businessdata.notmanageddatasource.jndi.path}" />
 				<entry key="hibernate.show_sql" value="true" />
 				<entry key="hibernate.format_sql" value="true" />
-				<entry key="hibernate.transaction.jta.platform" value="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform" />
+				<entry key="hibernate.transaction.jta.platform" value="${businessdata.hibernate.transaction.jta_platform}" />
 				<entry key="hibernate.validator.autoregister_listeners" value="false" />
 				<entry key="hibernate.validator.apply_to_ddl" value="false" />
 				<entry key="javax.persistence.validation.mode" value="NONE" />
