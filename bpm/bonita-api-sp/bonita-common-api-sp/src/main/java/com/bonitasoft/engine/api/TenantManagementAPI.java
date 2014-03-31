@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.UpdateException;
 
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 
 /**
@@ -66,4 +67,11 @@ public interface TenantManagementAPI {
      *             if the deployment cannot be fulfilled completely.
      */
     void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException;
+
+    /**
+     * 
+     * @return content of the deployed client Business data model jar, null if no Business data model has been deployed
+     * @throws BusinessDataRepositoryException
+     */
+    byte[] getClientBDMJar() throws BusinessDataRepositoryException;
 }

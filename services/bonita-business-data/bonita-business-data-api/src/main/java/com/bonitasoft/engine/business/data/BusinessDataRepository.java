@@ -96,4 +96,6 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      */
     Set<String> getEntityClassNames();
 
+    byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException;
+
 }

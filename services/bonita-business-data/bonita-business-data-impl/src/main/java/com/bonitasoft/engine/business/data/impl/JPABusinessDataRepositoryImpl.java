@@ -155,13 +155,29 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return entityClassNames;
     }
 
-    protected boolean isDBMDeployed() throws SDependencyException {
+    protected boolean isDBMDeployed() throws SBusinessDataRepositoryException {
+        final byte[] dependency = getDeployedBDMDependency();
+        return dependency != null && dependency.length > 0;
+    }
+
+    
+    
+    @Override
+    public byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException {
         final FilterOption filterOption = new FilterOption(SDependency.class, "name", BDR);
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(filterOption);
         final QueryOptions queryOptions = new QueryOptions(filters, null);
-        final List<SDependency> dependencies = dependencyService.getDependencies(queryOptions);
-        return !dependencies.isEmpty();
+        List<SDependency> dependencies;
+        try {
+            dependencies = dependencyService.getDependencies(queryOptions);
+        } catch (SDependencyException e) {
+            throw new SBusinessDataRepositoryException(e);
+        }
+        if(dependencies.isEmpty()){
+            return null;
+        }
+        return dependencies.get(0).getValue();
     }
 
     private EntityManager getEntityManager() {
