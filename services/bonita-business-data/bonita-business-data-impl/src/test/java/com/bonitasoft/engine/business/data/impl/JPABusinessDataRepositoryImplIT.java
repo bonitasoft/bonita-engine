@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -18,17 +17,12 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.NamingException;
+import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
-import org.assertj.core.data.Index;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.dbunit.DataSourceDatabaseTester;
-import org.dbunit.IDatabaseTester;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,11 +32,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import bitronix.tm.TransactionManagerServices;
-import bitronix.tm.resource.jdbc.PoolingDataSource;
 
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -51,8 +45,6 @@ import com.bonitasoft.pojo.Employee;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
 public class JPABusinessDataRepositoryImplIT {
-
-    private IDatabaseTester databaseTester;
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
@@ -64,15 +56,29 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Autowired
     @Qualifier("businessDataDataSource")
-    private PoolingDataSource datasource;
+    private DataSource datasource;
+
+    @Autowired
+    @Qualifier("notManagedBizDataSource")
+    private DataSource modelDatasource;
 
     @Resource(name = "jpa-configuration")
     private Map<String, Object> configuration;
+
+    @Resource(name = "jpa-model-configuration")
+    private Map<String, Object> modelConfiguration;
+
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeClass
     public static void initializeBitronix() throws NamingException, SQLException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
         TransactionManagerServices.getConfiguration().setJournal(null);
+
+        // addEmployeeToRepository(buildEmployee(45L, "Hannu", "Hakkinen"));
+        // addEmployeeToRepository(buildEmployee(23L, "Petteri", "Salo"));
+        // addEmployeeToRepository(buildEmployee(75L, "Matti", "Hakkinen"));
+
     }
 
     @AfterClass
@@ -83,37 +89,26 @@ public class JPABusinessDataRepositoryImplIT {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
+        if (jdbcTemplate == null) {
+            jdbcTemplate = new JdbcTemplate(datasource);
+        }
 
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration, configuration));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, loggerService, configuration, modelConfiguration));
         doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
         doReturn(true).when(businessDataRepository).isDBMDeployed();
+        // doNothing().when(businessDataRepository).updateSchema();
+
     }
 
     @After
     public void tearDown() throws Exception {
-        if (databaseTester != null) {
-            final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-            try {
-                ut.begin();
-                databaseTester.setTearDownOperation(DatabaseOperation.DELETE_ALL);
-                databaseTester.onTearDown();
-            } catch (final Exception e) {
-                ut.rollback();
-            } finally {
-                ut.commit();
-            }
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
+        try {
+            jdbcTemplate.update("drop table Employee");
+        } catch (Exception e) {
+            // ignore drop of non-existing table
         }
-    }
-
-    public void setUpDatabase() throws Exception {
-        databaseTester = new DataSourceDatabaseTester(datasource);
-        final InputStream stream = JPABusinessDataRepositoryImplIT.class.getResourceAsStream("/dataset.xml");
-        final FlatXmlDataSet dataSet = new FlatXmlDataSetBuilder().build(stream);
-        stream.close();
-        databaseTester.setDataSet(dataSet);
-        databaseTester.setSetUpOperation(DatabaseOperation.CLEAN_INSERT);
-        databaseTester.onSetup();
     }
 
     @Test
@@ -123,16 +118,16 @@ public class JPABusinessDataRepositoryImplIT {
             @Override
             public void run() {
                 try {
+                    Employee expectedEmployee = buildEmployee(45L, "Hannu", "Hakkinen");
+                    addEmployeeToRepository(expectedEmployee);
+
                     final Employee employee = businessDataRepository.findById(Employee.class, 45l);
-                    assertThat(employee).isNotNull();
-                    assertThat(employee.getPersistenceId()).isEqualTo(45l);
-                    assertThat(employee.getFirstName()).isEqualTo("Hannu");
-                    assertThat(employee.getLastName()).isEqualTo("Hakkinen");
+
+                    assertThat(employee).isEqualTo(expectedEmployee);
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
             }
-
         });
     }
 
@@ -193,10 +188,13 @@ public class JPABusinessDataRepositoryImplIT {
 
             @Override
             public void run() {
+                Employee expectedEmployee = buildEmployee(46L, "Matti", "Hakkinen");
+                addEmployeeToRepository(expectedEmployee);
+
                 final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
                 try {
                     final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
-                    assertThat(matti.getFirstName()).isEqualTo("Matti");
+                    assertThat(matti).isEqualTo(expectedEmployee);
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -211,6 +209,9 @@ public class JPABusinessDataRepositoryImplIT {
 
             @Override
             public void run() {
+                addEmployeeToRepository(buildEmployee(45L, "Hannu", "Hakkinen"));
+                addEmployeeToRepository(buildEmployee(41L, "Alfred", "Hakkinen"));
+
                 final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Hakkinen");
                 try {
                     businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
@@ -275,16 +276,20 @@ public class JPABusinessDataRepositoryImplIT {
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        final Employee matti1;
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
+
+            Employee expectedEmployee = buildEmployee(47L, "Matti", "Hakkinen");
+            addEmployeeToRepository(expectedEmployee);
+
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
-            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
-            matti.setLastName("NewLastName");
-            businessDataRepository.merge(matti);
-            matti.setFirstName("NewFirstName");
-            businessDataRepository.merge(matti);
+            matti1 = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            matti1.setLastName("NewLastName");
+            businessDataRepository.merge(matti1);
+            matti1.setFirstName("NewFirstName");
+            businessDataRepository.merge(matti1);
         } finally {
             ut.commit();
         }
@@ -293,8 +298,8 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "NewFirstName");
-            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
-            assertThat(matti.getLastName()).isEqualTo("NewLastName");
+            final Employee matti2 = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            assertThat(matti2).isEqualTo(matti1);
         } finally {
             ut.commit();
             businessDataRepository.stop();
@@ -307,7 +312,9 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
+            Employee expectedEmployee = buildEmployee(45L, "Matti", "not-important");
+            addEmployeeToRepository(expectedEmployee);
+
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
             final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
             matti.setLastName("Halonen");
@@ -340,7 +347,7 @@ public class JPABusinessDataRepositoryImplIT {
             ut.begin();
             businessDataRepository.start();
             if (runnable.isSetupDatabase()) {
-                setUpDatabase();
+                // setUpDatabase();
             }
 
             runnable.run();
@@ -386,7 +393,6 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
             final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
             businessDataRepository.remove(matti);
@@ -428,15 +434,26 @@ public class JPABusinessDataRepositoryImplIT {
         });
     }
 
+    public void addEmployeeToRepository(final Employee employee) {
+        String sql = "INSERT INTO Employee (PERSISTENCEID, FIRSTNAME, LASTNAME) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, new Object[] { employee.getPersistenceId(), employee.getFirstName(), employee.getLastName() });
+    }
+
+    private Employee buildEmployee(final Long persistenceId, final String firstName, final String lastName) {
+        return new Employee(persistenceId, firstName, lastName);
+    }
+
     @Test
     public void remove_should_not_throw_an_exception_with_an_unknown_entity() throws Exception {
         Employee matti;
+        String firstName = "Matti";
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
-            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            addEmployeeToRepository(buildEmployee(17L, firstName, "Hakkinen"));
+            // setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) firstName);
             matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
             businessDataRepository.remove(matti);
         } finally {
@@ -462,10 +479,14 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
+            Employee e1 = buildEmployee(45L, "Hannu", "Balou");
+            Employee e2 = buildEmployee(41L, "Aliz", "akkinen");
+            Employee e3 = buildEmployee(51L, "Jean-Luc", "akkinen");
+            addEmployeeToRepository(e1);
+            addEmployeeToRepository(e2);
+            addEmployeeToRepository(e3);
             final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName, e.firstName", null);
-            assertThat(employees).hasSize(3).has(new EmployeeCondition("Hannu", "Hakkinen"), Index.atIndex(0))
-                    .has(new EmployeeCondition("Matti", "Hakkinen"), Index.atIndex(1)).has(new EmployeeCondition("Petteri", "Salo"), Index.atIndex(2));
+            assertThat(employees).containsExactly(e2, e3, e1);
 
         } finally {
             ut.commit();
@@ -478,7 +499,6 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Jaakko");
             final List<Employee> employees = businessDataRepository.findList(Employee.class,
                     "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters);
@@ -495,7 +515,6 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             businessDataRepository.start();
-            setUpDatabase();
             businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null);
         } finally {
             ut.commit();

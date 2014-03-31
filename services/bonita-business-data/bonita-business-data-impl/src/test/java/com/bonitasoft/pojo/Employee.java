@@ -21,6 +21,11 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity {
         super();
     }
 
+    public Employee(final long persistenceId, final String firstName, final String lastName) {
+        this(firstName, lastName);
+        this.persistenceId = persistenceId;
+    }
+
     public Employee(final String firstName, final String lastName) {
         super();
         this.firstName = firstName;

@@ -11,11 +11,12 @@
 			<util:properties>
 				<prop key="db.hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
 				<prop key="db.datasource.classname">oracle.jdbc.xa.client.OracleXADataSource</prop>
-				<prop key="db.server.name">localhost</prop>
+				<prop key="db.server.name">192.168.4.61</prop>
 				<prop key="db.server.port">1521</prop>
 				<prop key="db.instance.name">orcl</prop>
 				<prop key="db.user">bonita_engine</prop>
                 <prop key="db.password">bonita_engine</prop>
+                <prop key="db.url">jdbc:oracle:thin:@${db.server.name}:${db.server.port}:${db.instance.name}</prop>
 			</util:properties>
 		</property>
 	</bean>

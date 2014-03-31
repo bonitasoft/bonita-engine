@@ -82,7 +82,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
 
         this.modelConfiguration = modelConfiguration;
-        this.modelConfiguration.remove("hibernate.hbm2ddl.auto");
         final Object remove = this.modelConfiguration.remove("hibernate.hbm2ddl.auto");
         if (remove != null && loggerService.isLoggable(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO)) {
             this.loggerService.log(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO,
@@ -122,7 +121,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         start();
     }
 
-    private void updateSchema() throws SBusinessDataRepositoryDeploymentException {
+    protected void updateSchema() throws SBusinessDataRepositoryDeploymentException {
         final Configuration cfg = new Configuration();
         final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
         for (final EntityType<?> entity : entities) {

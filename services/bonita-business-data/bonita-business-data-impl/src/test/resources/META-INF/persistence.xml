@@ -6,7 +6,6 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>com.bonitasoft.pojo.Employee</class>
 		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
@@ -17,11 +16,8 @@
 	<persistence-unit name="notManagedBDR" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="true" />
-			<property name="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
-			<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.BitronixJtaPlatform" />
 		</properties>
 	</persistence-unit>
 </persistence>

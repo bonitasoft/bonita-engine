@@ -17,6 +17,7 @@
                 <prop key="db.database.name">bonita</prop>
                 <prop key="db.user">bonita</prop>
                 <prop key="db.password">bonita</prop>
+                <prop key="db.url">jdbc:postgresql://${db.server.name}:${db.server.port}/${db.database.name}</prop>
             </util:properties>
         </property>
     </bean>
