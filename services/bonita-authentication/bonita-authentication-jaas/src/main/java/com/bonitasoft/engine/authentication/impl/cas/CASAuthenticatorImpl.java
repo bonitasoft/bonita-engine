@@ -77,18 +77,14 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
     protected String casService;
 
+    protected CASUtils casUtils = CASUtils.getInstance();
+
     /**
      * Default Constructor.
      * 
      * @param logger
      */
     public CASAuthenticatorImpl(final TechnicalLoggerService logger) {
-        // TODO : To uncomment when the licence key for CAS is created
-
-        // if (!Manager.getInstance().isFeatureActive(Features.)) {
-        // throw new IllegalStateException("The CAS authenticator is not an active feature.");
-        // }
-
         this.logger = logger;
     }
 
@@ -97,6 +93,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      */
     @Override
     public Map<String, Serializable> authenticate(final Map<String, Serializable> credentials) {
+        casUtils.checkLicense();
         return loginToServiceViaCAS(credentials);
     }
 
@@ -359,7 +356,6 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
         final DocumentBuilder builder = factory.newDocumentBuilder();
         builder.setEntityResolver(new EntityResolver() {
 
-            @SuppressWarnings("unused")
             @Override
             public InputSource resolveEntity(final String publicId, final String systemId) {
                 return new InputSource(new StringReader(""));

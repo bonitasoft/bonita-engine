@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -16,14 +15,17 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 
+import com.bonitasoft.engine.authentication.impl.cas.CASCallbackHandlerDelegate;
+
 public class AuthenticationCallbackHandler implements CallbackHandler {
 
     private final Map<String, Serializable> credentials;
+
+    protected CASCallbackHandlerDelegate casCallbackHandlerDelegate = new CASCallbackHandlerDelegate();
 
     public AuthenticationCallbackHandler(final Map<String, Serializable> credentials) {
         if (credentials == null) {
@@ -50,8 +52,10 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
      */
     protected void handlePassword(final PasswordCallback pc) {
         if (StringUtils.equals(pc.getPrompt(), AuthenticationConstants.CAS_TICKET)) {
-            String password = String.valueOf(credentials.get(AuthenticationConstants.CAS_TICKET));
-            pc.setPassword(password.toCharArray());
+            String password = casCallbackHandlerDelegate.getCASTicket(credentials);
+            if (password != null) {
+                pc.setPassword(password.toCharArray());
+            }
         } else {
             String password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
             pc.setPassword(password.toCharArray());
@@ -62,9 +66,11 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
      * @param nc
      */
     protected void handleName(final NameCallback nc) {
-        if (StringUtils.equals(nc.getPrompt(), AuthenticationConstants.CAS_SERVICE) && credentials.get(AuthenticationConstants.CAS_SERVICE) != null) {
-            String userName = String.valueOf(credentials.get(AuthenticationConstants.CAS_SERVICE));
-            nc.setName(userName);
+        if (StringUtils.equals(nc.getPrompt(), AuthenticationConstants.CAS_SERVICE)) {
+            String userName = casCallbackHandlerDelegate.getCASService(credentials);
+            if (userName != null) {
+                nc.setName(userName);
+            }
         } else if (credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
             String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
             nc.setName(userName);

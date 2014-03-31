@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="casAuthenticatorDelegate"
-		class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl">
+		class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<property name="casServerUrlPrefix"
 			value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
@@ -12,10 +12,10 @@
 	</bean>
 
 	<bean id="nullAuthenticationDelegate"
-		class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate" />
+		class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
 
 	<bean id="genericAuthenticationService"
-		class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl">
+		class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<property name="authenticatorDelegate"
@@ -23,7 +23,7 @@
 	</bean>
 
 	<bean id="authenticationService"
-		class="org.bonitasoft.engine.authentication.impl.AuthenticationServiceImpl">
+		class="org.bonitasoft.engine.authentication.impl.AuthenticationServiceImpl" lazy-init="true">
 		<constructor-arg name="identityService" ref="identityService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>

@@ -1,17 +1,9 @@
 package com.bonitasoft.engine.authentication.impl.cas;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,6 +47,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -92,6 +85,10 @@ public class CASAuthenticatorImplTest {
     @Mock
     private Header header;
 
+    @Mock
+    private CASUtils casUtils;
+
+    @Spy
     @InjectMocks
     private CASAuthenticatorImpl casAuthenticatorImpl;
 
@@ -99,15 +96,36 @@ public class CASAuthenticatorImplTest {
     public void before() {
         casAuthenticatorImpl.setCasService(casService);
         casAuthenticatorImpl.setCasServerUrlPrefix(casURLPRefix);
-        casAuthenticatorImpl = spy(casAuthenticatorImpl);
+        casAuthenticatorImpl.casUtils = casUtils;
         credentials = new HashMap<String, Serializable>();
+    }
+
+    @Test
+    public void testAuthenticateShouldRaiseLicenseError() {
+        Exception e = new IllegalStateException(CASUtils.THE_CAS_AUTHENTICATOR_IS_NOT_AN_ACTIVE_FEATURE);
+        doThrow(e).when(casUtils).checkLicense();
+        try {
+            casAuthenticatorImpl.authenticate(credentials);
+        } catch (IllegalStateException raisedException) {
+            assertThat(raisedException).isSameAs(e);
+            verify(casAuthenticatorImpl, never()).loginToServiceViaCAS(credentials);
+            return;
+        }
+        fail();
     }
 
     @Test
     public void testAuthenticate() {
         doAnswer(new Answer<Object>() {
 
-            @SuppressWarnings("unused")
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                return null;
+            }
+        }).when(casUtils).checkLicense();
+
+        doAnswer(new Answer<Object>() {
+
             @Override
             public Object answer(InvocationOnMock invocation) {
                 return null;
