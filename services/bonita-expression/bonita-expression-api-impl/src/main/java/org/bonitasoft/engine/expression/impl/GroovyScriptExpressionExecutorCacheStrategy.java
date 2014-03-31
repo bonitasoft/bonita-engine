@@ -56,7 +56,6 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     }
 
     private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
-        final GroovyShell shell = getShell(definitionId);
         /*
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
          * This way we store one script for each thread, it is like a thread local cache.
@@ -65,6 +64,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME,
                 key);
         if (script == null) {
+            final GroovyShell shell = getShell(definitionId);
             script = shell.parse(expressionContent);
             cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, script);
         }
