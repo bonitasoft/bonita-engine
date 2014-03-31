@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
 	<profile name="User" isDefault="true">
-		<description>The user can view and perform tasks and can start a new
-			case of an app.</description>
+		<description>The user can view and perform tasks and can start a new case of an app.</description>
 		<iconPath>/profiles/profileUser.png</iconPath>
 		<profileEntries>
 			<parentProfileEntry name="Tasks">
@@ -29,9 +28,7 @@
 		</profileEntries>
 	</profile>
 	<profile name="Administrator" isDefault="true">
-		<description>The administrator can install an app, manage the
-			organization, and handle some errors (for example, by replaying a
-			task).</description>
+		<description>The administrator can install an app, manage the organization, and handle some errors (for example, by replaying a task).</description>
 		<iconPath>/profiles/profileAdmin.png</iconPath>
 		<profileEntries>
 			<parentProfileEntry name="Apps management">
@@ -117,8 +114,7 @@
 		</profileEntries>
 	</profile>
 	<profile name="Process manager" isDefault="true">
-		<description>The process manager can manage (not install/delete) his
-			apps, view and export his reports.</description>
+		<description>The process manager can manage (not install/delete) his apps, view and export his reports.</description>
 		<iconPath>/profiles/profilePM.png</iconPath>
 		<profileEntries>
 			<parentProfileEntry name="Tasks">
