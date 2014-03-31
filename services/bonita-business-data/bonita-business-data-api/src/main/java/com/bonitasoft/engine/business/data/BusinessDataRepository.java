@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +72,10 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     <T> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException, NonUniqueResultException;
 
     <T> List<T> findList(Class<T> resultClass, String qlString, Map<String, Object> parameters);
+    
+    <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
+    <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters);
     /**
      * Saves or updates an entity in the Business Data Repository.
      * 
@@ -97,5 +101,7 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     Set<String> getEntityClassNames();
 
     byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException;
+
+   
 
 }

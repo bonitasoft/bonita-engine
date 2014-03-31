@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -160,8 +161,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return dependency != null && dependency.length > 0;
     }
 
-    
-    
+
+
     @Override
     public byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException {
         final FilterOption filterOption = new FilterOption(SDependency.class, "name", BDR);
@@ -241,7 +242,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws SBusinessDataNotFoundException,
-            NonUniqueResultException {
+    NonUniqueResultException {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = buildQuery(em, resultClass, qlString, parameters);
         try {
@@ -253,6 +254,42 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         } catch (final NoResultException nre) {
             throw new SBusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
         }
+    }
+
+    @Override
+    public <T extends Serializable> T findByNamedQuery(final String queryName,final Class<T> resultClass, final Map<String, Serializable> parameters) throws NonUniqueResultException {
+        final EntityManager em = getEntityManager();
+        TypedQuery<T> query = em.createNamedQuery(queryName,resultClass);
+        if(parameters != null){
+            for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
+                query.setParameter(parameter.getKey(), parameter.getValue());
+            }
+        }
+        try {
+            final T result = query.getSingleResult();
+            detachEntity(em, resultClass, result);
+            return result;
+        } catch (final javax.persistence.NonUniqueResultException nure) {
+            throw new NonUniqueResultException(nure);
+        } catch (final NoResultException nre) {
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) {
+        final EntityManager em = getEntityManager();
+        TypedQuery<T> query = em.createNamedQuery(queryName,resultClass);
+        if(parameters != null){
+            for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
+                query.setParameter(parameter.getKey(), parameter.getValue());
+            }
+        }
+        final List<T> resultList = query.getResultList();
+        for (final T entity : resultList) {
+            detachEntity(em, resultClass, entity);
+        }
+        return resultList;
     }
 
     @Override
