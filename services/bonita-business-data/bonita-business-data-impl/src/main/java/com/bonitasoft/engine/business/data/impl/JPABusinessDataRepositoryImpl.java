@@ -74,6 +74,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private final Map<String, Object> modelConfiguration;
 
+    private EntityManager entityManager;
+
     public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final TechnicalLoggerService loggerService,
             final Map<String, Object> configuration, final Map<String, Object> modelConfiguration) {
         this.dependencyService = dependencyService;
@@ -105,6 +107,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             entityManagerFactory.close();
             entityManagerFactory = null;
         }
+        if (entityManager != null) {
+            entityManager.close();
+            entityManager = null;
+        }
+
         if (notManagedEntityManagerFactory != null) {
             notManagedEntityManagerFactory.close();
             notManagedEntityManagerFactory = null;
@@ -184,7 +191,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         if (entityManagerFactory == null) {
             throw new IllegalStateException("The BDR is not started");
         }
-        return entityManagerFactory.createEntityManager();
+
+        if (entityManager == null) {
+            entityManager = entityManagerFactory.createEntityManager();
+        }
+        return entityManager;
     }
 
     protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {
