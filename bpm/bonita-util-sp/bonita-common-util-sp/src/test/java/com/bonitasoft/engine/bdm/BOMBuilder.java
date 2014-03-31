@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
+import java.util.List;
+
 public class BOMBuilder {
 
     private Field buildField(final String name, final FieldType type) {
@@ -66,7 +68,7 @@ public class BOMBuilder {
     public BusinessObjectModel buildBOMWithQuery() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         final BusinessObject employee = buildMyBusinessObject();
-        employee.addQuery("employeeByName","Select e FROM Employee e WHERE e.name='romain'");
+        employee.addQuery("employeeByName","Select e FROM Employee e WHERE e.name='romain'",List.class.getName());
         bom.addBusinessObject(employee);
         return bom;
     }

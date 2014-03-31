@@ -51,6 +51,9 @@ public class QueryValidationRule implements ValidationRule {
 		if(query.getContent() == null || query.getContent().isEmpty()){
 			status.addError(name + " query must have a content defined");
 		}
+		if(query.getReturnType() == null || query.getReturnType().isEmpty()){
+            status.addError(name + " query must have a return type defined");
+        }
 		return status;
 	}
 

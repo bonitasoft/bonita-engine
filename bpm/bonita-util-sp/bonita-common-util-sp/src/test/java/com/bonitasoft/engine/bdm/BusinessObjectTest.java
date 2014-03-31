@@ -2,6 +2,8 @@ package com.bonitasoft.engine.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.junit.Test;
 
 public class BusinessObjectTest {
@@ -38,7 +40,7 @@ public class BusinessObjectTest {
     @Test
 	public void should_addQuery() throws Exception {
 		BusinessObject businessObject = new BusinessObject();
-		Query query = businessObject.addQuery("userByName","Select u FROM User u WHERE u.name='romain'");
+		Query query = businessObject.addQuery("userByName","Select u FROM User u WHERE u.name='romain'",List.class.getName());
 		assertThat(businessObject.getQueries()).containsExactly(query);
 	}
 

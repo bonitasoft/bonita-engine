@@ -77,7 +77,7 @@ public class BDMJarBuilder {
         return IOUtil.generateJar(resources);
     }
 
-    protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
+    protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
         final BDMCodeGenerator codeGenerator = new BDMCodeGenerator(bom);
         codeGenerator.generate(directory);
     }

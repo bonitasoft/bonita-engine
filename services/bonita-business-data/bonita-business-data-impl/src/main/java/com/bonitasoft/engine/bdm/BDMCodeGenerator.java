@@ -11,6 +11,7 @@ package com.bonitasoft.engine.bdm;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -25,13 +26,16 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 
 /**
@@ -39,6 +43,7 @@ import com.sun.codemodel.JType;
  */
 public class BDMCodeGenerator extends CodeGenerator {
 
+    private static final String DAO_SUFFIX = "DAO";
     private final BusinessObjectModel bom;
 
     public BDMCodeGenerator(final BusinessObjectModel bom) {
@@ -49,10 +54,68 @@ public class BDMCodeGenerator extends CodeGenerator {
         this.bom = bom;
     }
 
-    protected void buildASTFromBom() throws JClassAlreadyExistsException {
+    protected void buildASTFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
         for (final BusinessObject bo : bom.getBusinessObjects()) {
-            addEntity(bo);
+            JDefinedClass entity = addEntity(bo);
+            addDAO(bo,entity);
         }
+    }
+    protected void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
+        //TODO add BO DAO Interface + Impl
+        String daoInterfaceClassName = toDaoInterfaceClassname(bo);
+        JDefinedClass daoInterface = addInterface(daoInterfaceClassName);
+        addInterface(daoInterface, BusinessObjectDAO.class.getName());
+        
+        //Add method signature in interface for queries
+        for(Query q : bo.getQueries()){
+            String name = q.getName();
+            JType returnType = getModel().parseType(q.getReturnType());
+            JClass collectionType = (JClass) getModel().parseType(Collection.class.getName());
+            if(returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)){
+                returnType = ((JClass) returnType).narrow(entity);
+            }
+            JMethod method = addMethodSignature(daoInterface, name,returnType);
+            for(QueryParameter param : q.getQueryParameters()){
+                method.param(getModel().parseType(param.getClassName()), param.getName());
+            }
+        }
+        
+        //Add method signature in interface for unique constraint
+        for(UniqueConstraint uc : bo.getUniqueConstraints()){
+            String name =createQueryNameForUniqueConstraint(entity,uc);
+            JMethod method = addMethodSignature(daoInterface, name,entity);
+            for(String param : uc.getFieldNames()){
+                method.param(getModel().parseType(getFieldType(param,bo)), param);
+            }
+        }
+        
+    }
+
+    private String createQueryNameForUniqueConstraint(JDefinedClass entity, UniqueConstraint uc) {
+        StringBuilder sb = new StringBuilder("get"+entity.name()+"By");
+        for(String f : uc.getFieldNames()){
+            f = Character.toUpperCase(f.charAt(0)) + f.substring(1);
+            sb.append(f);
+            sb.append("And");
+        }
+        String name = sb.toString();
+        if(name.endsWith("And")){
+            name = name.substring(0, name.length()-3);
+        }
+        return name;
+    }
+
+    private String getFieldType(String param, BusinessObject bo) {
+        for(Field f: bo.getFields()){
+            if(f.getName().equals(param)){
+                return f.getType().getClazz().getName();
+            }
+        }
+        return null;
+    }
+
+    private String toDaoInterfaceClassname(BusinessObject bo) {
+        return bo.getQualifiedName()+DAO_SUFFIX;
     }
 
     protected JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
@@ -161,7 +224,7 @@ public class BDMCodeGenerator extends CodeGenerator {
     }
 
     @Override
-    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
+    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
         final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
         final ValidationStatus validationStatus = validator.validate(bom);
         if (!validationStatus.isOk()) {

@@ -100,8 +100,8 @@ public class BusinessObject {
 		this.uniqueConstraints = uniqueConstraints;
 	}
     
-    public Query addQuery(final String name, final String queryContent) {
-    	Query query = new Query(name,queryContent);
+    public Query addQuery(final String name, final String queryContent,final String returnType) {
+    	Query query = new Query(name,queryContent,returnType);
     	queries.add(query);
     	return query;
     }

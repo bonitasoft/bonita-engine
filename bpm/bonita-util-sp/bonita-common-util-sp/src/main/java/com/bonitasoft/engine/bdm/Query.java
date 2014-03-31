@@ -29,6 +29,9 @@ public class Query {
 
     @XmlAttribute(required = true)
     private String content;
+    
+    @XmlAttribute(required = true)
+    private String returnType;
 
     @XmlElementWrapper(name = "queryParameters")
     @XmlElement(name = "queryParameter")
@@ -38,10 +41,11 @@ public class Query {
         queryParameters = new ArrayList<QueryParameter>();
     }
     
-    public Query(String name,String content){
+    public Query(String name,String content,String returnType){
         this();
     	this.name = name;
     	this.content = content;
+    	this.returnType = returnType;
     }
     
     public String getName() {
@@ -75,6 +79,16 @@ public class Query {
         this.queryParameters = queryParameters;
     }
 
+    
+    public String getReturnType() {
+        return returnType;
+    }
+
+    
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -82,6 +96,7 @@ public class Query {
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((queryParameters == null) ? 0 : queryParameters.hashCode());
+        result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
         return result;
     }
 
@@ -108,6 +123,11 @@ public class Query {
             if (other.queryParameters != null)
                 return false;
         } else if (!queryParameters.equals(other.queryParameters))
+            return false;
+        if (returnType == null) {
+            if (other.returnType != null)
+                return false;
+        } else if (!returnType.equals(other.returnType))
             return false;
         return true;
     }

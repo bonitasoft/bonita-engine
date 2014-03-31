@@ -53,7 +53,7 @@ public class CodeGenerator {
 		hashCodeBuilder = new HashCodeBuilder();
 	}
 
-	public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
+	public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
 		final PrintStream stream = new PrintStream(new NullStream());
 		try {
 			model.build(destDir, stream);
@@ -128,6 +128,11 @@ public class CodeGenerator {
 		block._return(field);
 		return method;
 	}
+	
+	public JMethod addMethodSignature(final JDefinedClass definedClass, String methodName,JType returnType) {
+        final JMethod method = definedClass.method(JMod.PUBLIC, returnType, methodName);
+        return method;
+    }
 
 	public JMethod addGetterSignature(final JDefinedClass definedClass, final JFieldVar field) {
 		final JMethod method = definedClass.method(JMod.PUBLIC, field.type(), getGetterName(field));

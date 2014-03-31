@@ -1,5 +1,7 @@
 package com.bonitasoft.engine;
 
+import java.util.List;
+
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
@@ -40,7 +42,7 @@ public class BOMBuilder {
         employee.addField(firstName);
         employee.addField(lastName);
 
-        employee.addQuery("getEmployee", "SELECT e FROM Employee e");
+        employee.addQuery("getEmployee", "SELECT e FROM Employee e",List.class.getName());
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employee);
         return bom;
