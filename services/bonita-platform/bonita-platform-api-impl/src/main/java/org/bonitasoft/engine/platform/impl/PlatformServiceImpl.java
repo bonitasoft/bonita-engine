@@ -129,8 +129,8 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatform", e));
             }
             throw new SPlatformCreationException("Unable to insert the platform row : " + e.getMessage(), e);
+            }
         }
-    }
 
     @Override
     public long createTenant(final STenant tenant) throws STenantCreationException, STenantAlreadyExistException {
@@ -313,7 +313,7 @@ public class PlatformServiceImpl implements PlatformService {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenantTables", e));
             }
-            throw new STenantDeletionException("Unable to delete tenant tables:  " + e.getMessage(), e);
+            throw new STenantDeletionException("Unable to delete tenant tables: " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenantTables", e));
@@ -371,7 +371,7 @@ public class PlatformServiceImpl implements PlatformService {
      */
     private void cachePlatform(final SPlatform platform) {
         try {
-            platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
+        platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
         } catch (SCacheException e) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Can't cache the platform, maybe the platform cache service is not started yet");
         }

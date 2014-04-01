@@ -409,16 +409,16 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionService transactionService = platformAccessor.getTransactionService();
-            final List<PlatformLifecycleService> otherServicesToStart = plaformConfiguration.getLifecycleServices();
+            final List<PlatformLifecycleService> otherServicesToStart = nodeConfiguration.getLifecycleServices();
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-            if (plaformConfiguration.shouldStartScheduler()) {
+            if (nodeConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(schedulerService);
             }
-            if (plaformConfiguration.shouldClearSessions()) {
+            if (nodeConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
             for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
@@ -427,9 +427,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
             final List<STenant> tenantIds = getTenants(platformService, transactionService);
             for (final STenant tenant : tenantIds) {
-                // stop the connector executor thread pool
-                final SetServiceState stopService = new SetServiceState(tenant.getId(), new StopServiceStrategy());
-                platformAccessor.getTransactionService().executeInTransaction(stopService);
+                // stop the tenant services:
+                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -722,6 +721,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -730,6 +730,16 @@ public class PlatformAPIImpl implements PlatformAPI {
             // delete tenant in database
             final TransactionContent transactionContentForTenant = new DeleteTenant(tenantId, platformService);
             transactionExecutor.execute(transactionContentForTenant);
+
+            // stop tenant services and clear the spring context
+            TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+
+            // stop the tenant services:
+            final SetServiceState stopService = new SetServiceState(tenantId, new StopServiceStrategy());
+            platformAccessor.getTransactionService().executeInTransaction(stopService);
+
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
+            tenantServiceAccessor.destroy();
 
             // delete tenant folder
             final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;

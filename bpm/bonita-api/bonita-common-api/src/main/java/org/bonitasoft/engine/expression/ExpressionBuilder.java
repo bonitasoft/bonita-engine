@@ -419,6 +419,8 @@ public class ExpressionBuilder {
             case NOT_EQUALS:
                 strOperator = NOT_EQUALS_COMPARATOR;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return createComparisonExpression(name, leftOperand, strOperator, rightOperand);
     }

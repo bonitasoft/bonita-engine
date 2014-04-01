@@ -18,7 +18,7 @@ public class BuilderFactory {
 
     private final Properties properties;
 
-    private static final Object mutex = new BuilderFactoryMutex();
+    private static final Object MUTEX = new BuilderFactoryMutex();
 
     private static BuilderFactory INSTANCE = null;
 
@@ -26,14 +26,14 @@ public class BuilderFactory {
         this.properties = properties;
         factoryCache = new HashMap<String, Object>();
     }
-    
+
     private static final class BuilderFactoryMutex {
-        
+
     }
 
     public static BuilderFactory getInstance() {
         if (INSTANCE == null) {
-            synchronized (mutex) {
+            synchronized (MUTEX) {
                 // ensure we do not create many instances of this class
                 if (INSTANCE == null) {
                     URL defaultFileURL = null;
@@ -51,7 +51,7 @@ public class BuilderFactory {
                         INSTANCE = new BuilderFactory(allProperties);
 
                     } catch (final Exception e) {
-                        throw new RuntimeException("Unable to load builder factories from: fileURL:" + defaultFileURL);
+                        throw new RuntimeException("Unable to load builder factories from : fileURL=" + defaultFileURL);
                     }
                 }
             }
@@ -82,7 +82,6 @@ public class BuilderFactory {
 
     @SuppressWarnings("unchecked")
     private <T extends Object> T getInternalBuilderFactory(final Class<T> clazz) {
-        // System.err.println("Looking for class: " + clazz.getName());
         if (!factoryCache.containsKey(clazz.getName())) {
             cacheFactory(clazz.getName(), properties.getProperty(clazz.getName()));
         }

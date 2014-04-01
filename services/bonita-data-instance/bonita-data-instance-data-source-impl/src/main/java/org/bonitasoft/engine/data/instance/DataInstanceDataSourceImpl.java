@@ -81,7 +81,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             final SInsertEvent insertEvent = getInsertEvent(dataInstance);
             recorder.recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
-            throw new SCreateDataInstanceException("Imposible to create data intance.", e);
+            throw new SCreateDataInstanceException("Impossible to create data instance.", e);
         }
     }
 
