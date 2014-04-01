@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -38,9 +40,12 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -178,7 +183,14 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
         final BDMJarBuilder builder = new BDMJarBuilder(BDMCompiler.create());
-        return builder.build(bdmZip);
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        BusinessObjectModel bom;
+        try {
+            bom = converter.unzip(bdmZip);
+        } catch (Exception e) {
+            throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
+        }
+        return builder.build(bom);
     }
 
     @Override

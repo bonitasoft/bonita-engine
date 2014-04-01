@@ -12,16 +12,14 @@ public class BDMJarBuilderIT {
     @Test
     public void jar_builder_should_goes_well_without_errors() throws Exception {
         final BDMJarBuilder bdmJarBuilder = new BDMJarBuilder(BDMCompiler.create());
-        bdmJarBuilder.build(aBOM().buildZip());
+        bdmJarBuilder.build(aBOM().build());
     }
 
     @Test
     public void jar_builder_should_goes_well_without_errors_with_queries() throws Exception {
         final BDMJarBuilder bdmJarBuilder = new BDMJarBuilder(BDMCompiler.create());
         final BOMBuilder builder = new BOMBuilder();
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(builder.buildComplex());
-        bdmJarBuilder.build(zip);
+        bdmJarBuilder.build(builder.buildComplex());
     }
 
 }

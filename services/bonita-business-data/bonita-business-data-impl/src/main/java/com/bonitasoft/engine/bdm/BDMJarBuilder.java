@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -40,9 +39,8 @@ public class BDMJarBuilder {
         this.compiler = compiler;
     }
 
-    public byte[] build(final byte[] bomZip) throws SBusinessDataRepositoryDeploymentException {
+    public byte[] build(BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
         try {
-            final BusinessObjectModel bom = getBOM(bomZip);
             final File tmpBDMDirectory = createBDMTmpDir();
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
@@ -55,11 +53,6 @@ public class BDMJarBuilder {
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
-    }
-
-    protected BusinessObjectModel getBOM(final byte[] bomZip) throws IOException, JAXBException, SAXException {
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        return converter.unzip(bomZip);
     }
 
     protected File createBDMTmpDir() throws IOException {

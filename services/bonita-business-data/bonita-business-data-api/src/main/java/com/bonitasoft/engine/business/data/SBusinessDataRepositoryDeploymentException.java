@@ -23,4 +23,8 @@ public class SBusinessDataRepositoryDeploymentException extends SBusinessDataRep
         super(cause);
     }
 
+    public SBusinessDataRepositoryDeploymentException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
 }
