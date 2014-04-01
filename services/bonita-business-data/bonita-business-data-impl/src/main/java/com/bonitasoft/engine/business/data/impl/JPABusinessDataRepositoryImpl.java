@@ -36,8 +36,6 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 
@@ -62,28 +60,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private EntityManagerFactory entityManagerFactory;
 
-    private final TechnicalLoggerService loggerService;
-
     private final DependencyService dependencyService;
-
-    private final Map<String, Object> modelConfiguration;
 
     private EntityManager entityManager;
 
-    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final TechnicalLoggerService loggerService,
-            final Map<String, Object> configuration, final Map<String, Object> modelConfiguration) {
+    private SchemaUpdater schemaUpdater;
+
+    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final Map<String, Object> configuration) {
         this.dependencyService = dependencyService;
-        this.loggerService = loggerService;
+        this.schemaUpdater = schemaUpdater;
         this.configuration = new HashMap<String, Object>(configuration);
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
-
-        this.modelConfiguration = modelConfiguration;
-        final Object remove = this.modelConfiguration.remove("hibernate.hbm2ddl.auto");
-        if (remove != null && loggerService.isLoggable(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO)) {
-            this.loggerService.log(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO,
-                    "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
-        }
-
     }
 
     @Override
@@ -113,12 +100,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected void updateSchema() throws SBusinessDataRepositoryDeploymentException {
-        
-        final SchemaUpdater updater = new SchemaUpdater(modelConfiguration, loggerService);
-        updater.execute(getAnnotatedClasses());
 
+        schemaUpdater.execute(getAnnotatedClasses());
 
-        final List<Exception> exceptions = updater.getExceptions();
+        final List<Exception> exceptions = schemaUpdater.getExceptions();
         if (!exceptions.isEmpty()) {
             throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
         }

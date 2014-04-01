@@ -85,8 +85,8 @@ public class JPABusinessDataRepositoryImplIT {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(mock(DependencyService.class), mock(TechnicalLoggerService.class), configuration,
-                modelConfiguration));
+        SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(mock(DependencyService.class), schemaUpdater, configuration));
         doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
         doReturn(true).when(businessDataRepository).isDBMDeployed();

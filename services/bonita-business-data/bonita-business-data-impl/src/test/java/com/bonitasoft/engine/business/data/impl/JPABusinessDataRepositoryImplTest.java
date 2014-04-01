@@ -27,16 +27,13 @@ public class JPABusinessDataRepositoryImplTest {
 
     private DependencyService dependencyService;
 
-    private TechnicalLoggerService loggerService;
-
     private JPABusinessDataRepositoryImpl repository;
 
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        loggerService = mock(TechnicalLoggerService.class);
-        repository = new JPABusinessDataRepositoryImpl(dependencyService, loggerService, Collections.<String, Object> emptyMap(),
-                Collections.<String, Object> emptyMap());
+        SchemaUpdater schemaUpdater = new SchemaUpdater(Collections.<String, Object> emptyMap(), mock(TechnicalLoggerService.class));
+        repository = new JPABusinessDataRepositoryImpl(dependencyService, schemaUpdater, Collections.<String, Object> emptyMap());
     }
 
     @Test
