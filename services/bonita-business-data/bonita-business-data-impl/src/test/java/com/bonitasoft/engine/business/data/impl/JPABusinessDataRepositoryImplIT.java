@@ -243,11 +243,12 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findList_should_return_employee_list() throws Exception {
-        Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("Balou").withId(698L).build());
+        Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").withId(698L).build());
         Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").withId(61L).build());
         Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").withId(64L).build());
 
-        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName, e.firstName", null);
+        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
+                null);
 
         assertThat(employees).containsExactly(e2, e3, e1);
     }
