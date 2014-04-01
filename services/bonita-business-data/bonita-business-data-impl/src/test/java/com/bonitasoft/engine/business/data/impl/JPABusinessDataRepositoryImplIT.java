@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -151,7 +152,7 @@ public class JPABusinessDataRepositoryImplIT {
         Employee expectedEmployee = anEmployee().withFirstName(firstName).build();
         addEmployeeToRepository(expectedEmployee);
 
-        final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) firstName);
+        final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) firstName);
         final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
 
         assertThat(matti).isEqualTo(expectedEmployee);
@@ -163,14 +164,14 @@ public class JPABusinessDataRepositoryImplIT {
         addEmployeeToRepository(anEmployee().withLastName(lastName).withId(698L).build());
         addEmployeeToRepository(anEmployee().withLastName(lastName).withId(6448L).build());
 
-        final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) lastName);
+        final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) lastName);
         businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
     }
 
-    @Test(expected = SBusinessDataNotFoundException.class)
-    public void throwExceptionWhenFindingAnUnknownEmployee() throws Exception {
-        final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Unknown_lastName");
-        businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
+    @Test
+    public void returnNullnWhenFindingAnUnknownEmployee() throws Exception {
+        final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) "Unknown_lastName");
+       assertThat(businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters)).isNull();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -254,7 +255,7 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findListShouldReturnEmptyListIfNoResults() throws Exception {
-        final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Jaakko");
+        final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) "Jaakko");
         final List<Employee> employees = businessDataRepository.findList(Employee.class,
                 "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters);
         assertThat(employees).isEmpty();

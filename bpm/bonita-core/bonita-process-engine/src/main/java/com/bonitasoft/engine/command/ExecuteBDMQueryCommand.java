@@ -61,7 +61,6 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
               throw new SCommandExecutionException(e);
             }
         }
-
     }
 
     protected BusinessDataRepository getBusinessDataRepository(TenantServiceAccessor serviceAccessor) {

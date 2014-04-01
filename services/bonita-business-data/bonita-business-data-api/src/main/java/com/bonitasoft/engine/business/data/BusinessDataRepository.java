@@ -69,9 +69,9 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @throws NonUniqueResultException
      *             if more than one result was found.
      */
-    <T> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException, NonUniqueResultException;
+    <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery,Map<String, Serializable> parameters) throws NonUniqueResultException;
 
-    <T> List<T> findList(Class<T> resultClass, String qlString, Map<String, Object> parameters);
+    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery,Map<String, Serializable> parameters);
     
     <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
@@ -102,6 +102,5 @@ public interface BusinessDataRepository extends TenantLifecycleService {
 
     byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException;
 
-   
 
 }
