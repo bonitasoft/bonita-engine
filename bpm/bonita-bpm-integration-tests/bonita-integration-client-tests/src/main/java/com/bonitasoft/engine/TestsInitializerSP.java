@@ -68,4 +68,9 @@ public class TestsInitializerSP extends TestsInitializer {
         SPBPMTestUtil.createEnvironmentWithDefaultTenant();
     }
 
+    @Override
+    protected String getInitializerListenerClassName() {
+        return "com.bonitasoft.engine.EngineInitializerSP";
+    }
+
 }

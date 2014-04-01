@@ -106,21 +106,22 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createNewInstance("myEmployee").done(),
+        String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createNewInstance(bizDataName).done(),
                 OperatorType.CREATE_BUSINESS_DATA, null, null, employeeExpression);
 
         final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
-        String employeeToString = getEmployeeToString("myEmployee", instance.getId());
+        String employeeToString = getEmployeeToString(bizDataName, instance.getId());
         assertThat(employeeToString).isNull();
 
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
         getProcessAPI().executeFlowNode(userTask.getId());
 
-        employeeToString = getEmployeeToString("myEmployee", instance.getId());
+        employeeToString = getEmployeeToString(bizDataName, instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Doe]");
 
         disableAndDeleteProcess(definition.getId());

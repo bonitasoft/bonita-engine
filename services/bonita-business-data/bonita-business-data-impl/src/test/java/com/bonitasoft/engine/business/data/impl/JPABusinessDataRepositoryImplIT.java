@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.NamingException;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
@@ -64,6 +65,8 @@ public class JPABusinessDataRepositoryImplIT {
 
     private UserTransaction ut;
 
+    private EntityManager entityManager;
+
     @BeforeClass
     public static void initializeBitronix() throws NamingException, SQLException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
@@ -90,11 +93,13 @@ public class JPABusinessDataRepositoryImplIT {
         ut.begin();
         businessDataModelRepositoryImpl.updateSchema(Collections.singleton(Employee.class.getName()));
         businessDataRepository.start();
+        entityManager = businessDataRepository.getEntityManager();
     }
 
     @After
     public void tearDown() throws Exception {
-        ut.commit();
+        ut.rollback();
+        businessDataRepository.stop();
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
         try {
@@ -105,9 +110,7 @@ public class JPABusinessDataRepositoryImplIT {
     }
 
     private Employee addEmployeeToRepository(final Employee employee) throws SBusinessDataNotFoundException {
-        String sql = "INSERT INTO Employee (PERSISTENCEID, FIRSTNAME, LASTNAME) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, new Object[] { employee.getPersistenceId(), employee.getFirstName(), employee.getLastName() });
-        return businessDataRepository.findById(Employee.class, employee.getPersistenceId());
+        return entityManager.merge(employee);
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
@@ -179,6 +182,8 @@ public class JPABusinessDataRepositoryImplIT {
         businessDataRepository.stop();
 
         businessDataRepository.findById(Employee.class, 124L);
+
+        businessDataRepository.start();
     }
 
     @Test
@@ -192,16 +197,14 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
-        Employee expectedEmployee = anEmployee().build();
-        addEmployeeToRepository(expectedEmployee);
-        final Employee originalEmployee = businessDataRepository.findById(Employee.class, expectedEmployee.getPersistenceId());
+        final Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
 
         originalEmployee.setLastName("NewLastName");
         businessDataRepository.merge(originalEmployee);
         originalEmployee.setFirstName("NewFirstName");
         businessDataRepository.merge(originalEmployee);
 
-        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, expectedEmployee.getPersistenceId());
+        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, anEmployee().build().getPersistenceId());
         assertThat(updatedEmployee).isEqualTo(originalEmployee);
     }
 
@@ -244,11 +247,12 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findList_should_return_employee_list() throws Exception {
-        Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("Balou").withId(698L).build());
+        Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").withId(698L).build());
         Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").withId(61L).build());
         Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").withId(64L).build());
 
-        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName, e.firstName", null);
+        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
+                null);
 
         assertThat(employees).containsExactly(e2, e3, e1);
     }
