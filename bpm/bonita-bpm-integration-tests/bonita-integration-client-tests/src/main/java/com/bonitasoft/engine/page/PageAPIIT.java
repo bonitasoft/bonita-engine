@@ -31,7 +31,7 @@ import com.bonitasoft.engine.CommonAPISPTest;
 @SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPISPTest {
 
-    private static final String INDEX_GROOVY = "index.groovy";
+    private static final String INDEX_GROOVY = "Index.groovy";
 
     private static final String INDEX_HTML = "index.html";
 

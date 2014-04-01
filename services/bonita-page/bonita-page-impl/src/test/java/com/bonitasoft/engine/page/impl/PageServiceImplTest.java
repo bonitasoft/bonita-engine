@@ -24,11 +24,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +53,9 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -102,6 +102,9 @@ public class PageServiceImplTest {
     private EntityUpdateDescriptor entityUpdateDescriptor;
 
     private PageServiceImpl pageServiceImpl;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void before() {
@@ -338,9 +341,10 @@ public class PageServiceImplTest {
 
     }
 
-    @Test(expected = SBonitaReadException.class)
+    @Test
     public void zipTestNotZip() throws Exception {
-
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage("Page content is not a valid zip file");
         // given
         final byte[] content = "badContent".getBytes();
 
@@ -351,11 +355,13 @@ public class PageServiceImplTest {
         // exception
     }
 
-    @Test(expected = SBonitaReadException.class)
+    @Test
     public void zipTestBadContent() throws Exception {
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage("Page content does not contains a Index.groovy or index.html file");
 
         // given
-        final byte[] content = getPageContent("badContent.zip");
+        final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
 
         // when
         pageServiceImpl.checkContentIsValid(content);
@@ -369,7 +375,20 @@ public class PageServiceImplTest {
     public void zipTestGroovy() throws Exception {
 
         // given
-        final byte[] content = getPageContent("index.groovy.zip");
+        final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+
+    }
+
+    @Test
+    public void zipTestGroovyWithWrongName() throws Exception {
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage("Page content does not contains a Index.groovy or index.html file");
+
+        // given
+        final byte[] content = IOUtil.zip(Collections.singletonMap("index.groovy", "content of the groovy".getBytes()));
 
         // when then
         assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
@@ -380,33 +399,11 @@ public class PageServiceImplTest {
     public void zipTestHtml() throws Exception {
 
         // given
-        final byte[] content = getPageContent("index.html.zip");
+        final byte[] content = IOUtil.zip(Collections.singletonMap("index.html", "content of the html".getBytes()));
 
         // when then
         assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
 
-    }
-
-    private byte[] getPageContent(final String zipResourceName) throws IOException, URISyntaxException {
-
-        final File file = new File(getClass().getResource(zipResourceName).toURI());
-        final byte[] buffer = new byte[(int) file.length()];
-        InputStream ios = null;
-        try {
-            ios = new FileInputStream(file);
-            if (ios.read(buffer) == -1) {
-                return null;
-            }
-        } finally {
-            try {
-                if (ios != null) {
-                    ios.close();
-                }
-            } catch (final IOException e) {
-            }
-        }
-
-        return buffer;
     }
 
 }

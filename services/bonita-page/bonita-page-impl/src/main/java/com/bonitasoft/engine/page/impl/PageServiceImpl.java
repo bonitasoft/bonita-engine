@@ -65,7 +65,7 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public class PageServiceImpl implements PageService {
 
@@ -79,6 +79,8 @@ public class PageServiceImpl implements PageService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final boolean active;
+
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
         this(Manager.getInstance(), persistenceService, recorder, eventService, logger, queriableLoggerService);
@@ -86,9 +88,7 @@ public class PageServiceImpl implements PageService {
 
     PageServiceImpl(final Manager manager, final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
-        if (!manager.isFeatureActive(Features.CUSTOM_PAGE)) {
-            throw new IllegalStateException("The custom pages is not an active feature.");
-        }
+        active = manager.isFeatureActive(Features.CUSTOM_PAGE);
         this.persistenceService = persistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -98,6 +98,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException {
+        check();
         if (page.getName() == null || page.getName().isEmpty()) {
             throw new SObjectCreationException("Unable to create a page with null or empty name");
         }
@@ -124,6 +125,15 @@ public class PageServiceImpl implements PageService {
         }
     }
 
+    /**
+     * 
+     */
+    private final void check() {
+        if (!active) {
+            throw new IllegalStateException("The custom pages is not an active feature.");
+        }
+    }
+
     SPageLogBuilder getPageLog(final ActionType actionType, final String message) {
         final SPageLogBuilder logBuilder = new SPageLogBuilderImpl();
         this.initializeLogBuilder(logBuilder, message);
@@ -133,6 +143,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPage(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
+        check();
         final SPage page = persistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId));
         if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
@@ -142,6 +153,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
+        check();
         final SPage page = persistenceService.selectOne(new SelectOneDescriptor<SPage>("getPageByName", Collections.singletonMap("pageName",
                 (Object) pageName), SPage.class));
         return page;
@@ -149,12 +161,14 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public long getNumberOfPages(final QueryOptions options) throws SBonitaReadException {
+        check();
         final long number = persistenceService.getNumberOfEntities(SPage.class, options, null);
         return number;
     }
 
     @Override
     public List<SPage> searchPages(final QueryOptions options) throws SBonitaSearchException {
+        check();
         try {
             return persistenceService.searchEntity(SPage.class, options, null);
         } catch (final SBonitaReadException e) {
@@ -164,6 +178,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void deletePage(final long pageId) throws SObjectModificationException, SObjectNotFoundException {
+        check();
         try {
             final SPage page = getPage(pageId);
             deletePage(page);
@@ -229,6 +244,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
+        check();
         final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>("getPageContent",
                 SPageContent.class, pageId));
         if (pageContent == null) {
@@ -239,6 +255,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+        check();
         // EntityUpdateDescriptor updateDescriptor;
         final String message = "Update a page with id " + pageId;
 
@@ -266,6 +283,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void updatePageContent(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+        check();
         final String message = "Update a page with name " + pageId;
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
 
@@ -293,35 +311,37 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void start() throws SBonitaException {
-        try {
-            // check if the provided pages are here or not up to date and import them from class path if needed
-            final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.properties");
-            if (inputStream == null) {
-                // no provided page
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-page.properties found in the class path, nothing will be imported");
-                return;
-            }
-            final Properties pageProperties = new Properties();
-            pageProperties.load(inputStream);
+        if (active) {
+            try {
+                // check if the provided pages are here or not up to date and import them from class path if needed
+                final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.properties");
+                if (inputStream == null) {
+                    // no provided page
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-page.properties found in the class path, nothing will be imported");
+                    return;
+                }
+                final Properties pageProperties = new Properties();
+                pageProperties.load(inputStream);
 
-            // provided pages name?
-            final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
-            if (pageByName == null) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
-                addPage(getProvidedPage(pageProperties), getProvidedPageContent());
-                return;
+                // provided pages name?
+                final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
+                if (pageByName == null) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
+                    addPage(getProvidedPage(pageProperties), getProvidedPageContent());
+                    return;
+                }
+                final byte[] providedPageContent = getProvidedPageContent();
+                final byte[] pageContent = getPageContent(pageByName.getId());
+                if (pageContent.length != providedPageContent.length) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
+                    // think of a better way to check the content are the same or not, it will almost always be the same so....
+                    updateProvidedPage(pageByName.getId(), pageProperties, providedPageContent);
+                } else {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
+                }
+            } catch (final IOException e) {
+                throw new SBonitaReadException("Unable to import the provided page", e);
             }
-            final byte[] providedPageContent = getProvidedPageContent();
-            final byte[] pageContent = getPageContent(pageByName.getId());
-            if (pageContent.length != providedPageContent.length) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
-                // think of a better way to check the content are the same or not, it will almost always be the same so....
-                updateProvidedPage(pageByName.getId(), pageProperties, providedPageContent);
-            } else {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
-            }
-        } catch (final IOException e) {
-            throw new SBonitaReadException("Unable to import the provided page", e);
         }
     }
 
@@ -393,17 +413,17 @@ public class PageServiceImpl implements PageService {
         final InputStream resourceAsStream = new ByteArrayInputStream(content);
         final ZipInputStream zin = new ZipInputStream(new BufferedInputStream(resourceAsStream));
         boolean zipIsValid = false;
+        boolean zipContainsIndex = false;
         ZipEntry entry;
-
         try {
-            while ((entry = zin.getNextEntry()) != null) {
-                if (entry.getName().equalsIgnoreCase("index.groovy")) {
-                    zipIsValid = true;
+            while ((entry = zin.getNextEntry()) != null && !zipContainsIndex) {
+                zipIsValid = true;
+                if (entry.getName().equals("Index.groovy")) {
+                    zipContainsIndex = true;
                 }
                 if (entry.getName().equalsIgnoreCase("index.html")) {
-                    zipIsValid = true;
+                    zipContainsIndex = true;
                 }
-
             }
             zin.close();
         } catch (final IOException e) {
@@ -411,7 +431,10 @@ public class PageServiceImpl implements PageService {
         }
 
         if (!zipIsValid) {
-            throw new SBonitaReadException("page content is not a valid zip file");
+            throw new SBonitaReadException("Page content is not a valid zip file");
+        }
+        if (!zipContainsIndex) {
+            throw new SBonitaReadException("Page content does not contains a Index.groovy or index.html file");
         }
         return zipIsValid;
     }
