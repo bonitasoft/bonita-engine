@@ -117,11 +117,11 @@ public class JPABusinessDataRepositoryImplIT {
     public void throwAnExceptionIfTheIdentifierIsNull() throws Exception {
         businessDataRepository.findById(Employee.class, null);
     }
-    
+
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
         Employee expectedEmployee = anEmployee().build();
-        addEmployeeToRepository(expectedEmployee);
+        expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Employee employee = businessDataRepository.findById(Employee.class, expectedEmployee.getPersistenceId());
 
@@ -153,7 +153,7 @@ public class JPABusinessDataRepositoryImplIT {
     public void findListShouldAcceptParameterizedQuery() throws Exception {
         String firstName = "anyName";
         Employee expectedEmployee = anEmployee().withFirstName(firstName).build();
-        addEmployeeToRepository(expectedEmployee);
+        expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) firstName);
         final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
@@ -197,14 +197,14 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
-        final Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
+        Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
 
         originalEmployee.setLastName("NewLastName");
-        businessDataRepository.merge(originalEmployee);
+        originalEmployee = businessDataRepository.merge(originalEmployee);
         originalEmployee.setFirstName("NewFirstName");
         businessDataRepository.merge(originalEmployee);
 
-        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, anEmployee().build().getPersistenceId());
+        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, originalEmployee.getPersistenceId());
         assertThat(updatedEmployee).isEqualTo(originalEmployee);
     }
 
