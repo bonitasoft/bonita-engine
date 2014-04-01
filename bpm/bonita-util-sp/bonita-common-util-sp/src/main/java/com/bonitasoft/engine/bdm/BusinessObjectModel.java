@@ -9,7 +9,9 @@
 package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -44,6 +46,14 @@ public class BusinessObjectModel {
         businessObjects.add(businessObject);
     }
 
+	public Set<String> getBusinessObjectsClassNames() {
+	    HashSet<String> set = new HashSet<String>();
+	    for (BusinessObject o : businessObjects) {
+            set.add(o.getQualifiedName());
+        }
+	    return set;
+	}
+	
     @Override
     public int hashCode() {
         final int prime = 31;

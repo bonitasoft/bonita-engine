@@ -93,6 +93,7 @@ public class JPABusinessDataRepositoryImplIT {
 
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
+        businessDataRepository.updateSchema(Collections.singleton(Employee.class.getName()));
         businessDataRepository.start();
     }
 

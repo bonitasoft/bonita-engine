@@ -2,6 +2,8 @@ package com.bonitasoft.engine.business.data.impl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -15,10 +17,10 @@ import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -32,8 +34,7 @@ public class JPABusinessDataRepositoryImplTest {
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        SchemaUpdater schemaUpdater = new SchemaUpdater(Collections.<String, Object> emptyMap(), mock(TechnicalLoggerService.class));
-        repository = new JPABusinessDataRepositoryImpl(dependencyService, schemaUpdater, Collections.<String, Object> emptyMap());
+        repository = new JPABusinessDataRepositoryImpl(dependencyService, mock(SchemaUpdater.class), Collections.<String, Object> emptyMap());
     }
 
     @Test
@@ -43,7 +44,8 @@ public class JPABusinessDataRepositoryImplTest {
         final SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
         final byte[] zip = "zip".getBytes();
         final byte[] jar = "jar".getBytes();
-        doReturn(jar).when(bdrService).generateBDMJar(zip);
+        doReturn(new BusinessObjectModel()).when(bdrService).getBusinessObjectModel(zip);
+        doReturn(jar).when(bdrService).generateBDMJar(any(BusinessObjectModel.class));
         doReturn(sDependency).when(bdrService).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(bdrService).createDependencyMapping(1, sDependency);
 
@@ -52,6 +54,7 @@ public class JPABusinessDataRepositoryImplTest {
         verify(dependencyService).createDependency(sDependency);
         verify(bdrService).createDependencyMapping(1, sDependency);
         verify(dependencyService).createDependencyMapping(dependencyMapping);
+        verify(bdrService).updateSchema(anySetOf(String.class));
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)

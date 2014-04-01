@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +24,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -40,7 +38,6 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
@@ -82,7 +79,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public void start() throws SBonitaException {
         if (isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
-            updateSchema();
         }
     }
 
@@ -104,22 +100,14 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         start();
     }
 
-    protected void updateSchema() throws SBusinessDataRepositoryDeploymentException {
+    protected void updateSchema(Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
 
-        schemaUpdater.execute(getAnnotatedClasses());
+        schemaUpdater.execute(annotatedClassNames);
 
         final List<Exception> exceptions = schemaUpdater.getExceptions();
         if (!exceptions.isEmpty()) {
             throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
         }
-    }
-
-    private Set<Class<?>> getAnnotatedClasses() {
-        Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
-        for (final EntityType<?> entity : entityManagerFactory.getMetamodel().getEntities()) {
-            annotatedClasses.add(entity.getJavaType());
-        }
-        return annotatedClasses;
     }
 
     @Override
@@ -181,28 +169,32 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
                 .done();
     }
 
-    protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
-        final BDMJarBuilder builder = new BDMJarBuilder(BDMCompiler.create());
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        BusinessObjectModel bom;
-        try {
-            bom = converter.unzip(bdmZip);
-        } catch (Exception e) {
-            throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
-        }
-        return builder.build(bom);
-    }
-
     @Override
     public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
-        final byte[] bdmJar = generateBDMJar(bdmZip);
+        BusinessObjectModel model = getBusinessObjectModel(bdmZip);
+        final byte[] bdmJar = generateBDMJar(model);
         final SDependency sDependency = createSDependency(tenantId, bdmJar);
         try {
             dependencyService.createDependency(sDependency);
             final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
             dependencyService.createDependencyMapping(sDependencyMapping);
+            updateSchema(model.getBusinessObjectsClassNames());
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+    }
+
+    protected byte[] generateBDMJar(BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+        final BDMJarBuilder builder = new BDMJarBuilder(BDMCompiler.create());
+        return builder.build(model);
+    }
+    
+    protected BusinessObjectModel getBusinessObjectModel(byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        try {
+            return converter.unzip(bdmZip);
+        } catch (Exception e) {
+            throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
         }
     }
 
