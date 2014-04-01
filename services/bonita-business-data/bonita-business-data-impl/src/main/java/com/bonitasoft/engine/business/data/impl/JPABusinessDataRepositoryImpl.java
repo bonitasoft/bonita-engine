@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,36 +25,19 @@ import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 
-import com.bonitasoft.engine.bdm.BDMCompiler;
-import com.bonitasoft.engine.bdm.BDMJarBuilder;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 /**
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
-public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, BusinessDataModelRepository {
+public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private static final String BDR = "BDR";
 
@@ -63,22 +45,19 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Bu
 
     private EntityManagerFactory entityManagerFactory;
 
-    private final DependencyService dependencyService;
-
     private EntityManager entityManager;
 
-    private SchemaUpdater schemaUpdater;
+    private BusinessDataModelRepository businessDataModelRepository;
 
-    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final Map<String, Object> configuration) {
-        this.dependencyService = dependencyService;
-        this.schemaUpdater = schemaUpdater;
+    public JPABusinessDataRepositoryImpl(BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration) {
+        this.businessDataModelRepository = businessDataModelRepository;
         this.configuration = new HashMap<String, Object>(configuration);
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
     }
 
     @Override
     public void start() throws SBonitaException {
-        if (isDBMDeployed()) {
+        if (businessDataModelRepository.isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
         }
     }
@@ -101,16 +80,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Bu
         start();
     }
 
-    protected void updateSchema(Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
-
-        schemaUpdater.execute(annotatedClassNames);
-
-        final List<Exception> exceptions = schemaUpdater.getExceptions();
-        if (!exceptions.isEmpty()) {
-            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
-        }
-    }
-
     @Override
     public Set<String> getEntityClassNames() {
         if (entityManagerFactory == null) {
@@ -125,29 +94,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Bu
         return entityClassNames;
     }
 
-    protected boolean isDBMDeployed() throws SBusinessDataRepositoryException {
-        final byte[] dependency = getDeployedBDMDependency();
-        return dependency != null && dependency.length > 0;
-    }
-
-    @Override
-    public byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException {
-        final FilterOption filterOption = new FilterOption(SDependency.class, "name", BDR);
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(filterOption);
-        final QueryOptions queryOptions = new QueryOptions(filters, null);
-        List<SDependency> dependencies;
-        try {
-            dependencies = dependencyService.getDependencies(queryOptions);
-        } catch (SDependencyException e) {
-            throw new SBusinessDataRepositoryException(e);
-        }
-        if (dependencies.isEmpty()) {
-            return null;
-        }
-        return dependencies.get(0).getValue();
-    }
-
     private EntityManager getEntityManager() {
         if (entityManagerFactory == null) {
             throw new IllegalStateException("The BDR is not started");
@@ -159,55 +105,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Bu
             entityManager.joinTransaction();
         }
         return entityManager;
-    }
-
-    protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {
-        return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, ScopeType.TENANT).done();
-    }
-
-    protected SDependency createSDependency(final long tenantId, final byte[] transformedBdrArchive) {
-        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(BDR, tenantId, ScopeType.TENANT, BDR + ".jar", transformedBdrArchive)
-                .done();
-    }
-
-    @Override
-    public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
-        BusinessObjectModel model = getBusinessObjectModel(bdmZip);
-        final byte[] bdmJar = generateBDMJar(model);
-        final SDependency sDependency = createSDependency(tenantId, bdmJar);
-        try {
-            dependencyService.createDependency(sDependency);
-            final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
-            dependencyService.createDependencyMapping(sDependencyMapping);
-            updateSchema(model.getBusinessObjectsClassNames());
-        } catch (final SDependencyException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
-        }
-    }
-
-    protected byte[] generateBDMJar(BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
-        final BDMJarBuilder builder = new BDMJarBuilder(BDMCompiler.create());
-        return builder.build(model);
-    }
-    
-    protected BusinessObjectModel getBusinessObjectModel(byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        try {
-            return converter.unzip(bdmZip);
-        } catch (Exception e) {
-            throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
-        }
-    }
-
-    @Override
-    public void undeploy(final long tenantId) throws SBusinessDataRepositoryException {
-        try {
-            dependencyService.deleteDependency(BDR);
-        } catch (final SDependencyNotFoundException sde) {
-            // do nothing
-        } catch (final SDependencyException sde) {
-            throw new SBusinessDataRepositoryException(sde);
-        }
     }
 
     @Override

@@ -28,4 +28,6 @@ public interface BusinessDataModelRepository {
     void undeploy(long tenantId) throws SBusinessDataRepositoryException;
 
     byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException;
+    
+    boolean isDBMDeployed();
 }

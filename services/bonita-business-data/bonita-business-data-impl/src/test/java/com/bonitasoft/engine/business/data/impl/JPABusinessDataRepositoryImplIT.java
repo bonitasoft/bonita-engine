@@ -3,8 +3,6 @@ package com.bonitasoft.engine.business.data.impl;
 import static com.bonitasoft.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -23,7 +21,6 @@ import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -86,14 +83,12 @@ public class JPABusinessDataRepositoryImplIT {
         }
 
         SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(mock(DependencyService.class), schemaUpdater, configuration));
-        doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
-        doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
-        doReturn(true).when(businessDataRepository).isDBMDeployed();
-
+        BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class), schemaUpdater));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(businessDataModelRepositoryImpl, configuration));
+        doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
-        businessDataRepository.updateSchema(Collections.singleton(Employee.class.getName()));
+        businessDataModelRepositoryImpl.updateSchema(Collections.singleton(Employee.class.getName()));
         businessDataRepository.start();
     }
 
@@ -115,6 +110,11 @@ public class JPABusinessDataRepositoryImplIT {
         return businessDataRepository.findById(Employee.class, employee.getPersistenceId());
     }
 
+    @Test(expected = SBusinessDataNotFoundException.class)
+    public void throwAnExceptionIfTheIdentifierIsNull() throws Exception {
+        businessDataRepository.findById(Employee.class, null);
+    }
+    
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
         Employee expectedEmployee = anEmployee().build();
