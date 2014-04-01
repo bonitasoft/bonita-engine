@@ -26,4 +26,11 @@ public class EngineInitializerSP extends EngineInitializer {
         return new PlatformAPIExt();
     }
 
+    public static void init() throws Exception {
+        new EngineInitializerSP(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
+    }
+
+    public static void unload() throws Exception {
+        new EngineInitializerSP(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
+    }
 }
