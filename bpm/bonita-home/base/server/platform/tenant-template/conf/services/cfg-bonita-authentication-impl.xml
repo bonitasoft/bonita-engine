@@ -14,7 +14,7 @@
 	<bean id="nullAuthenticationDelegate"
 		class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
 
-	<bean id="genericAuthenticationService"
+	<bean id="jaasAuthenticationService"
 		class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
