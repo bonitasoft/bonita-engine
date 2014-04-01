@@ -192,7 +192,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         try {
             platformService.updateTenant(tenant, descriptor);
         } catch (final SBonitaException e) {
-            throw new UpdateException("Could not update the tenant maintenance mode", e);
+            throw new UpdateException("Could not update the tenant pause mode", e);
         }
     }
 

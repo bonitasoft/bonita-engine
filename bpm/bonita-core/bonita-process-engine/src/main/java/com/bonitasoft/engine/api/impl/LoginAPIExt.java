@@ -75,7 +75,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
 
                 if (!technicalUserName.equals(userName)) {
                     throw new TenantIsPausedException("Tenant with ID " + sTenant.getId()
-                            + " is in maintenance, unable to login with other user than the technical user.");
+                            + " is in pause, unable to login with other user than the technical user.");
                 }
             }
         } catch (BonitaHomeNotSetException e) {

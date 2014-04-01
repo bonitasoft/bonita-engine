@@ -49,7 +49,7 @@ public class ServerAPIExtTest {
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnMaintenanceTenant", new Class[0]), session);
+                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant", new Class[0]), session);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -70,7 +70,7 @@ public class ServerAPIExtTest {
     }
 
     @Test
-    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnNOTAnnotatedMethodsIfNotInMaintenance() throws Exception {
+    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnNOTAnnotatedMethodsIfNotInPause() throws Exception {
         // Given:
         final long tenantId = 54L;
         final APISessionImpl session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", tenantId);
@@ -85,7 +85,7 @@ public class ServerAPIExtTest {
     }
 
     @Test(expected = TenantIsPausedException.class)
-    public void checkMethodAccessibilityOnTenantAPIShouldNotBePossibleOnNOTAnnotatedMethodsIfTenantInMaintenance() throws Exception {
+    public void checkMethodAccessibilityOnTenantAPIShouldNotBePossibleOnNOTAnnotatedMethodsIfTenantInPause() throws Exception {
         // Given:
         final long tenantId = 54L;
         final APISessionImpl session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", tenantId);

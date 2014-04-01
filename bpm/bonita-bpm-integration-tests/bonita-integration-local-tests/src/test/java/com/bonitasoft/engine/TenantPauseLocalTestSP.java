@@ -29,7 +29,7 @@ import com.bonitasoft.engine.platform.TenantCreator;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantMaintenanceLocalTestSP extends CommonAPISPTest {
+public class TenantPauseLocalTestSP extends CommonAPISPTest {
 
     private static final String TECH_USER = "install";
 

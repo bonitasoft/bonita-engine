@@ -21,10 +21,12 @@ import com.bonitasoft.engine.theme.ThemeTest;
         BPMSPTests.class,
         BPMLocalSuiteTests.class,
         LocalLogTest.class,
+        JobSPTests.class,
         APIMethodSPTest.class,
         ConnectorExecutionTimeOutTest.class,
         ConnectorImplementationLocalSPTest.class,
-        ThemeTest.class
+        ThemeTest.class,
+        TenantPauseLocalTestSP.class
 })
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
