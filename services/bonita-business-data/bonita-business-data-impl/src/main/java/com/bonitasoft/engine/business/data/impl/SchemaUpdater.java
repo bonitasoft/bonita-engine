@@ -56,13 +56,13 @@ public class SchemaUpdater {
         final Configuration cfg = new Configuration();
         final Properties properties = new Properties();
         properties.putAll(configuration);
-        
+
         for (final Class<?> entity : annotatedClasses) {
             cfg.addAnnotatedClass(entity);
         }
-        
+
         cfg.setProperties(properties);
-        
+
         Dialect dialect = Dialect.getDialect(properties);
         final Properties props = new Properties();
         props.putAll(dialect.getDefaultProperties());

@@ -18,8 +18,9 @@ import org.junit.Test;
 public class JDTCompilerTest {
 
     private static final List<String> EMPTY_CLASSPATH = null;
-    
+
     private JDTCompiler jdtCompiler;
+
     private File outputdirectory;
 
     private File getTestResourceAsFile(String fileName) throws URISyntaxException {
@@ -73,7 +74,7 @@ public class JDTCompilerTest {
             assertThat(e.getMessage()).contains("cannot be resolved to a type");
         }
     }
-    
+
     @Test
     public void should_compile_class_with_external_dependencies() throws Exception {
         File compilableWithDependency = getTestResourceAsFile("DependenciesNeeded.java");

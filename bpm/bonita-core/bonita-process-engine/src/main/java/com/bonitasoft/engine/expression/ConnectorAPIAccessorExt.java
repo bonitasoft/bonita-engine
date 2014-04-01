@@ -64,7 +64,7 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
     }
 
     @SuppressWarnings("unchecked")
-	private static <T> T getAPI(final Class<T> clazz, final APISession session) {
+    private static <T> T getAPI(final Class<T> clazz, final APISession session) {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
         return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);

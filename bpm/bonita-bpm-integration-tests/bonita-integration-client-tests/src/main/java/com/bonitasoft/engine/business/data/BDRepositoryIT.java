@@ -68,8 +68,9 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.setDescription("Describe a simple employee");
         // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
-        employee.addQuery("getEmployees", "SELECT e FROM Employee e",List.class.getName());
-        employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM Employee e WHERE e.firstName=:firstName AND e.lastName=:lastName",List.class.getName());
+        employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
+        employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM Employee e WHERE e.firstName=:firstName AND e.lastName=:lastName",
+                List.class.getName());
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         return model;
@@ -89,12 +90,12 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @After
     public void tearDown() throws BonitaException {
-    	if(!getTenantManagementAPI().isPaused()){
-    	    getTenantManagementAPI().pause();
-    	    getTenantManagementAPI().uninstallBusinessDataRepository();
-    	    getTenantManagementAPI().resume();
-    	}
-  
+        if (!getTenantManagementAPI().isPaused()) {
+            getTenantManagementAPI().pause();
+            getTenantManagementAPI().uninstallBusinessDataRepository();
+            getTenantManagementAPI().resume();
+        }
+
         deleteUser(matti);
         logout();
     }

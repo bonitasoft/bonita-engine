@@ -33,8 +33,11 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 public class ExecuteBDMQueryCommand extends TenantCommand {
 
     public static final String RETURNS_LIST = "returnsList";
+
     public static final String QUERY_PARAMETERS = "queryParameters";
+
     public static final String RETURN_TYPE = "returnType";
+
     public static final String QUERY_NAME = "queryName";
 
     @Override
@@ -43,22 +46,22 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
         BusinessDataRepository businessDataRepository = getBusinessDataRepository(serviceAccessor);
         String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> queryParameters = (Map<String, Serializable>)parameters.get(QUERY_PARAMETERS); 
+        Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
         String returnType = getStringMandadoryParameter(parameters, RETURN_TYPE);
         Class<? extends Serializable> resultClass = null;
         try {
             resultClass = loadClass(returnType);
         } catch (ClassNotFoundException e) {
-           throw new SCommandParameterizationException(e);
+            throw new SCommandParameterizationException(e);
         }
         Boolean returnsList = (Boolean) parameters.get(RETURNS_LIST);
-        if(returnsList != null && returnsList){
+        if (returnsList != null && returnsList) {
             return (Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters);
-        }else{
+        } else {
             try {
                 return businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
             } catch (NonUniqueResultException e) {
-              throw new SCommandExecutionException(e);
+                throw new SCommandExecutionException(e);
             }
         }
     }

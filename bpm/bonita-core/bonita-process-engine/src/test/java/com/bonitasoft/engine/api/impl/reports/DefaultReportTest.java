@@ -50,7 +50,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-				assertThat(name).isEqualTo("myreport");
+                assertThat(name).isEqualTo("myreport");
             }
         });
     }
@@ -65,7 +65,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
-				assertThat(content).isEqualTo(IOUtil.getAllContentFrom(zip));
+                assertThat(content).isEqualTo(IOUtil.getAllContentFrom(zip));
             }
         });
     }
@@ -79,7 +79,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-				assertThat(description).isEqualTo("My report description");
+                assertThat(description).isEqualTo("My report description");
             }
         });
     }
@@ -93,7 +93,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-				assertThat(description).isNull();
+                assertThat(description).isNull();
             }
         });
     }
@@ -107,7 +107,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-				assertThat(screenShot).isNull();
+                assertThat(screenShot).isNull();
             }
         });
     }
@@ -123,7 +123,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
-				assertThat(screenShot).isEqualTo(IOUtil.getAllContentFrom(file));
+                assertThat(screenShot).isEqualTo(IOUtil.getAllContentFrom(file));
             }
         });
     }

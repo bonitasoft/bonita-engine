@@ -242,7 +242,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-
     protected PlatformService getPlatformService() {
         final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformAccessor.getPlatformService();

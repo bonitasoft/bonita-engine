@@ -34,7 +34,8 @@ public class JDTCompiler {
      * Compile files in output directory using provided classpath
      * Put null for classpath argument to take current classpath
      * 
-     * @throws CompilationException if compilation errors occurs
+     * @throws CompilationException
+     *             if compilation errors occurs
      */
     public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, Collection<String> classpathEntries) throws CompilationException {
         final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpathEntries);

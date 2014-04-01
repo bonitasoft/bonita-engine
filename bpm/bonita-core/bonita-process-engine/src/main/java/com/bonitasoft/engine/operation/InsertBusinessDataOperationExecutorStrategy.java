@@ -55,7 +55,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
             throws SOperationExecutionException {
         try {
             long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            final SRefBusinessDataInstance refBusinessDataInstance = 
+            final SRefBusinessDataInstance refBusinessDataInstance =
                     refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), processInstanceId);
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {

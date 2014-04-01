@@ -174,7 +174,7 @@ public class JPABusinessDataRepositoryImplIT {
     @Test
     public void returnNullnWhenFindingAnUnknownEmployee() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) "Unknown_lastName");
-       assertThat(businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters)).isNull();
+        assertThat(businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters)).isNull();
     }
 
     @Test(expected = IllegalStateException.class)

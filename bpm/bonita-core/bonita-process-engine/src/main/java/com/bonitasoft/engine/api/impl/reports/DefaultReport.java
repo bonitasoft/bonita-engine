@@ -35,6 +35,7 @@ public class DefaultReport {
     public void deploy(final String reportPath, final ReportDeployer deployer) throws Exception {
         ZipReader zip = new ZipReader(reportPath, name + "-content.zip");
         zip.read(new Reader() {
+
             @Override
             public void read(File zip, File unzipped) throws Exception {
                 deployer.deploy(name,

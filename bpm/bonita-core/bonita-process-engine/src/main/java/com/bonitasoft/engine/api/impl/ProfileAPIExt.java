@@ -325,7 +325,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @SuppressWarnings("unchecked")
-	private List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws ExecutionException {
+    private List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws ExecutionException {
         StringReader reader = new StringReader(xmlContent);
         try {
             parser.validate(reader);

@@ -42,7 +42,7 @@ public class BOMBuilder {
         employee.addField(firstName);
         employee.addField(lastName);
 
-        employee.addQuery("getEmployee", "SELECT e FROM Employee e",List.class.getName());
+        employee.addQuery("getEmployee", "SELECT e FROM Employee e", List.class.getName());
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employee);
         return bom;

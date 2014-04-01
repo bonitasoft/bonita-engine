@@ -69,7 +69,7 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
     }
 
     private EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
-        final SProfileEntryUpdateBuilder updateBuilder = BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance(); 
+        final SProfileEntryUpdateBuilder updateBuilder = BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance();
         final Map<ProfileEntryUpdateField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<ProfileEntryUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {

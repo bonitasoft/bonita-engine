@@ -293,7 +293,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final JFieldVar nameFieldVar = definedClass.fields().get("description");
         assertTextField(nameFieldVar);
     }
-    
+
     @Test
     public void should_AddDao_generate_Dao_interface_with_query_methods_signature() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
@@ -302,8 +302,8 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
-        
-        Query query = new Query("findByName", "From Employee e WHERE e.name = :name",List.class.getName());
+
+        Query query = new Query("findByName", "From Employee e WHERE e.name = :name", List.class.getName());
         query.addQueryParameter("name", String.class.getName());
         employeeBO.getQueries().add(query);
         BusinessObjectModel bom = new BusinessObjectModel();
@@ -311,7 +311,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new BDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
     }
-    
+
     @Test
     public void should_AddDao_generate_Dao_interface_with_unique_constraint_methods_signature() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
@@ -319,14 +319,14 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final Field nameField = new Field();
         nameField.setName("firstName");
         nameField.setType(FieldType.STRING);
-        
+
         final Field lastnameField = new Field();
         lastnameField.setName("lastName");
         lastnameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
         employeeBO.getFields().add(lastnameField);
-        
-        employeeBO.addUniqueConstraint("TOTO","firstName","lastName");
+
+        employeeBO.addUniqueConstraint("TOTO", "firstName", "lastName");
         BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new BDMCodeGenerator(bom);
@@ -359,7 +359,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     public void shouldAddNamedQueries_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        employeeBO.addQuery("getEmployees", "SELECT e FROM Employee e",List.class.getName());
+        employeeBO.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
         final JDefinedClass entity = bdmCodeGenerator.addEntity(employeeBO);
 
         final JAnnotationUse namedQueriesAnnotation = getAnnotation(entity, NamedQueries.class.getName());

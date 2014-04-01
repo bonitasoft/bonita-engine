@@ -28,9 +28,10 @@ public class DefaultReportList {
             new DefaultReport("case_list"),
             new DefaultReport("task_list"),
             new ProtectedReport("case_history", Features.TRACEABILITY, LicenseChecker.getInstance())
-    );
+            );
 
     private TechnicalLoggerService logger;
+
     private String reportFolder;
 
     public DefaultReportList(TechnicalLoggerService logger, String reportFolder) {
@@ -39,7 +40,7 @@ public class DefaultReportList {
     }
 
     public void deploy(ReportDeployer deployer) throws Exception {
-        for(DefaultReport report: reports) {
+        for (DefaultReport report : reports) {
             try {
                 report.deploy(reportFolder, deployer);
             } catch (IllegalStateException e) {
@@ -49,7 +50,7 @@ public class DefaultReportList {
     }
 
     private void log(String message, Throwable e) {
-        if(logger.isLoggable(DefaultReportList.class, TechnicalLogSeverity.DEBUG)) {
+        if (logger.isLoggable(DefaultReportList.class, TechnicalLogSeverity.DEBUG)) {
             logger.log(DefaultReportList.class, TechnicalLogSeverity.DEBUG, message, e);
         }
     }
