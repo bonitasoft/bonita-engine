@@ -64,7 +64,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private EntityManager entityManager;
 
-    private SchemaUpdater schemaUpdater;
+    private final SchemaUpdater schemaUpdater;
 
     public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final Map<String, Object> configuration) {
         this.dependencyService = dependencyService;
@@ -154,7 +154,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return dependencies.get(0).getValue();
     }
 
-    private EntityManager getEntityManager() {
+    protected EntityManager getEntityManager() {
         if (entityManagerFactory == null) {
             throw new IllegalStateException("The BDR is not started");
         }
@@ -236,7 +236,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters)
+    public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final EntityManager em = getEntityManager();
         TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
