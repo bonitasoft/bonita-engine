@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -37,11 +36,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.hibernate.cfg.Configuration;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
@@ -64,28 +60,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	private final TechnicalLoggerService loggerService;
-
 	private final DependencyService dependencyService;
-
-	private final Map<String, Object> modelConfiguration;
 
 	private EntityManager entityManager;
 
-	public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final TechnicalLoggerService loggerService,
-			final Map<String, Object> configuration, final Map<String, Object> modelConfiguration) {
+	private final SchemaUpdater schemaUpdater;
+
+	public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final Map<String, Object> configuration) {
 		this.dependencyService = dependencyService;
-		this.loggerService = loggerService;
+		this.schemaUpdater = schemaUpdater;
 		this.configuration = new HashMap<String, Object>(configuration);
 		this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
-
-		this.modelConfiguration = modelConfiguration;
-		final Object remove = this.modelConfiguration.remove("hibernate.hbm2ddl.auto");
-		if (remove != null && loggerService.isLoggable(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO)) {
-			this.loggerService.log(JPABusinessDataRepositoryImpl.class, TechnicalLogSeverity.INFO,
-					"'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
-		}
-
 	}
 
 	@Override
@@ -115,24 +100,21 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 	}
 
 	protected void updateSchema() throws SBusinessDataRepositoryDeploymentException {
-		final Configuration cfg = new Configuration();
-		final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
-		for (final EntityType<?> entity : entities) {
-			cfg.addAnnotatedClass(entity.getJavaType());
-		}
+		schemaUpdater.execute(getAnnotatedClasses());
 
-		final Properties properties = new Properties();
-		properties.putAll(modelConfiguration);
-		cfg.setProperties(properties);
-
-		final SchemaUpdater updater = new SchemaUpdater(cfg, loggerService);
-		updater.execute();
-
-		final List<Exception> exceptions = updater.getExceptions();
-		if (!exceptions.isEmpty()) {
-			throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
-		}
+        final List<Exception> exceptions = schemaUpdater.getExceptions();
+        if (!exceptions.isEmpty()) {
+            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
+        }
 	}
+	
+	 private Set<Class<?>> getAnnotatedClasses() {
+	        Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
+	        for (final EntityType<?> entity : entityManagerFactory.getMetamodel().getEntities()) {
+	            annotatedClasses.add(entity.getJavaType());
+	        }
+	        return annotatedClasses;
+	    }
 
 	@Override
 	public Set<String> getEntityClassNames() {
@@ -171,7 +153,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 		return dependencies.get(0).getValue();
 	}
 
-	private EntityManager getEntityManager() {
+	protected EntityManager getEntityManager() {
 		if (entityManagerFactory == null) {
 			throw new IllegalStateException("The BDR is not started");
 		}
@@ -236,7 +218,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 		return entity;
 	}
 
-	
+
 	protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters) throws NonUniqueResultException {
 		if(query == null){
 			throw new IllegalArgumentException("query is null");
@@ -261,7 +243,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 	@Override
 	public <T extends Serializable> T find(Class<T> resultClass,
 			String jpqlQuery, Map<String, Serializable> parameters)
-			throws NonUniqueResultException {
+					throws NonUniqueResultException {
 		TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
 		return find(resultClass, typedQuery, parameters);
 	}
@@ -272,7 +254,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 		TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
 		return findList(resultClass, typedQuery, parameters);
 	}
-	
+
 	@Override
 	public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
 			throws NonUniqueResultException {
@@ -288,11 +270,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 		return findList(resultClass, query, parameters);
 	}
 
-	
+
 	private  <T extends Serializable> TypedQuery<T> createTypedQuery(String jpqlQuery,Class<T> resultClass){
 		return getEntityManager().createQuery(jpqlQuery, resultClass);
 	}
-	
+
 
 	protected <T extends Serializable> List<T> findList(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters) {
 		if(query == null){

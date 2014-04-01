@@ -10,9 +10,13 @@ package com.bonitasoft.engine.expression;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -24,6 +28,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SContext;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -40,6 +46,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -122,6 +129,24 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
 
         assertThat(fetchedBizData).isEqualTo(expectedBizData);
+    }
+
+    @Test
+    public void failingEvaluateShouldPutProcessInstanceIdInExceptionContext() throws Exception {
+        final SimpleBizData expectedBizData = createAbizDataInRepository();
+        final long proccessInstanceId = 1564L;
+        final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, proccessInstanceId);
+        final HashMap<String, Object> context = buildBusinessDataExpressionContext(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
+        final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
+        when(flowNodeInstanceService.getProcessInstanceId(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(proccessInstanceId);
+        doThrow(new SRefBusinessDataInstanceNotFoundException(444L, "toto")).when(refBusinessDataService).getRefBusinessDataInstance(anyString(), anyLong());
+
+        try {
+            businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
+            fail("should throw Exception");
+        } catch (SBonitaException e) {
+            assertThat(((SBonitaException) e.getCause()).getContext().get(SContext.PROCESS_INSTANCE_ID)).isEqualTo(proccessInstanceId);
+        }
     }
 
     @Test

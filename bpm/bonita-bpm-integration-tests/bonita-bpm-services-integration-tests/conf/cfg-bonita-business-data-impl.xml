@@ -3,7 +3,7 @@
 
 	<bean id="businessDataRepository" class="com.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
 		<constructor-arg name="dependencyService" ref="dependencyService"/>
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="schemaUpdater" ref="schemaUpdater" />
 		<constructor-arg>
 			<map>
 				<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
@@ -16,18 +16,21 @@
 				<entry key="javax.persistence.validation.mode" value="NONE" />
 			</map>
 		</constructor-arg>
-		<constructor-arg name="modelConfiguration">
-			<map>
-				<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
-				<entry key="hibernate.connection.datasource" value="java:comp/env/NotManagedBizDataDS" />
-				<entry key="hibernate.show_sql" value="true" />
-				<entry key="hibernate.format_sql" value="true" />
-				<entry key="hibernate.transaction.jta.platform" value="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform" />
-				<entry key="hibernate.validator.autoregister_listeners" value="false" />
-				<entry key="hibernate.validator.apply_to_ddl" value="false" />
-				<entry key="javax.persistence.validation.mode" value="NONE" />
-			</map>
-		</constructor-arg>
 	</bean>
 
+    <bean id="schemaUpdater" class="com.bonitasoft.engine.business.data.impl.SchemaUpdater">
+        <constructor-arg name="loggerService" ref="technicalLoggerService" />
+        <constructor-arg name="configuration">
+            <map>
+                <entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+                <entry key="hibernate.connection.datasource" value="java:comp/env/NotManagedBizDataDS" />
+                <entry key="hibernate.show_sql" value="true" />
+                <entry key="hibernate.format_sql" value="true" />
+                <entry key="hibernate.transaction.jta.platform" value="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform" />
+                <entry key="hibernate.validator.autoregister_listeners" value="false" />
+                <entry key="hibernate.validator.apply_to_ddl" value="false" />
+                <entry key="javax.persistence.validation.mode" value="NONE" />
+            </map>
+        </constructor-arg>
+    </bean>
 </beans>

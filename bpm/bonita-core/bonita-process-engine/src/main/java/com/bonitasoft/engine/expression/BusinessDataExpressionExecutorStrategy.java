@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
@@ -57,15 +58,21 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
         if (context.containsKey(bizDataName)) {
             return context.get(bizDataName);
         }
+        long processInstanceId = -1;
         try {
-            long processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
+            processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
                     (String) context.get(SExpressionContext.containerTypeKey));
             SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
             Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             return businessDataRepository.findById(bizClass, refBusinessDataInstance.getDataId());
         } catch (SBonitaReadException e) {
             throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + bizDataName, expression.getName());
-        } catch (Exception e) {
+        } catch (SBonitaException e) {
+            if (processInstanceId != -1) {
+                e.setProcessInstanceIdOnContext(processInstanceId);
+            }
+            throw new SExpressionEvaluationException(e, expression.getName());
+        } catch (ClassNotFoundException e) {
             throw new SExpressionEvaluationException(e, expression.getName());
         }
     }
