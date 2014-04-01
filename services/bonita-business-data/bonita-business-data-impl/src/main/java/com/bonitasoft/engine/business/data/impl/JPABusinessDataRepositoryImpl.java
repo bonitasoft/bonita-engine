@@ -39,7 +39,7 @@ import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
  */
 public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
-    private static final String BDR = "BDR";
+    private static final String BDR_PERSISTENCE_UNIT = "BDR";
 
     private final Map<String, Object> configuration;
 
@@ -47,7 +47,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private EntityManager entityManager;
 
-    private BusinessDataModelRepository businessDataModelRepository;
+    private final BusinessDataModelRepository businessDataModelRepository;
 
     public JPABusinessDataRepositoryImpl(BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration) {
         this.businessDataModelRepository = businessDataModelRepository;
@@ -58,7 +58,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     @Override
     public void start() throws SBonitaException {
         if (businessDataModelRepository.isDBMDeployed()) {
-            entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
+            entityManagerFactory = Persistence.createEntityManagerFactory(BDR_PERSISTENCE_UNIT, configuration);
         }
     }
 
