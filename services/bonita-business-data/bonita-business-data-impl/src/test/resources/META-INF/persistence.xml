@@ -13,11 +13,4 @@
 		</properties>
 	</persistence-unit>
 
-	<persistence-unit name="notManagedBDR" transaction-type="JTA">
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<properties>
-			<property name="hibernate.show_sql" value="true" />
-			<property name="hibernate.format_sql" value="true" />
-		</properties>
-	</persistence-unit>
 </persistence>

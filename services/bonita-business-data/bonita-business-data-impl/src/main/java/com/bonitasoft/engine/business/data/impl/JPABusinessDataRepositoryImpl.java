@@ -60,13 +60,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private static final String BDR = "BDR";
 
-    private static final String SCHEMA_CREATION_BDR = "notManagedBDR";
-
     private final Map<String, Object> configuration;
 
     private EntityManagerFactory entityManagerFactory;
-
-    private EntityManagerFactory notManagedEntityManagerFactory;
 
     private final TechnicalLoggerService loggerService;
 
@@ -96,7 +92,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public void start() throws SBonitaException {
         if (isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
-            notManagedEntityManagerFactory = Persistence.createEntityManagerFactory(SCHEMA_CREATION_BDR, modelConfiguration);
             updateSchema();
         }
     }
@@ -106,11 +101,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         if (entityManagerFactory != null) {
             entityManagerFactory.close();
             entityManagerFactory = null;
-        }
-
-        if (notManagedEntityManagerFactory != null) {
-            notManagedEntityManagerFactory.close();
-            notManagedEntityManagerFactory = null;
         }
     }
 
@@ -132,7 +122,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         }
 
         final Properties properties = new Properties();
-        properties.putAll(notManagedEntityManagerFactory.getProperties());
+        properties.putAll(modelConfiguration);
         cfg.setProperties(properties);
 
         final SchemaUpdater updater = new SchemaUpdater(cfg, loggerService);
@@ -175,7 +165,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         } catch (SDependencyException e) {
             throw new SBusinessDataRepositoryException(e);
         }
-        if(dependencies.isEmpty()){
+        if (dependencies.isEmpty()) {
             return null;
         }
         return dependencies.get(0).getValue();
@@ -248,7 +238,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws SBusinessDataNotFoundException,
-    NonUniqueResultException {
+            NonUniqueResultException {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = buildQuery(em, resultClass, qlString, parameters);
         try {
@@ -263,10 +253,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> T findByNamedQuery(final String queryName,final Class<T> resultClass, final Map<String, Serializable> parameters) throws NonUniqueResultException {
+    public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
+            throws NonUniqueResultException {
         final EntityManager em = getEntityManager();
-        TypedQuery<T> query = em.createNamedQuery(queryName,resultClass);
-        if(parameters != null){
+        TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
+        if (parameters != null) {
             for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
                 query.setParameter(parameter.getKey(), parameter.getValue());
             }
@@ -283,10 +274,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) {
+    public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters) {
         final EntityManager em = getEntityManager();
-        TypedQuery<T> query = em.createNamedQuery(queryName,resultClass);
-        if(parameters != null){
+        TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
+        if (parameters != null) {
             for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
                 query.setParameter(parameter.getKey(), parameter.getValue());
             }

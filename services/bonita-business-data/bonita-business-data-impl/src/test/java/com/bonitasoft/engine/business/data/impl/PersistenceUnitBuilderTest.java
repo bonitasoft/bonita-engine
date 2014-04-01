@@ -51,7 +51,7 @@ public class PersistenceUnitBuilderTest {
     public void shouldDone_WhenNothingIsCalledReturnsDefaultPersistenceUnits() throws Exception {
         Document document = builder.done();
         assertThat(document).isNotNull();
-        assertThat(document.getElementsByTagName("persistence-unit").getLength()).isEqualTo(2);
+        assertThat(document.getElementsByTagName("persistence-unit").getLength()).isEqualTo(1);
         assertThat(document.getElementsByTagName("class").getLength()).isEqualTo(0);
     }
 
