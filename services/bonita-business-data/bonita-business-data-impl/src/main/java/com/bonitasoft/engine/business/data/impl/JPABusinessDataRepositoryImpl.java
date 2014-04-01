@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -41,7 +40,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.hibernate.cfg.Configuration;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
@@ -115,23 +113,23 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected void updateSchema() throws SBusinessDataRepositoryDeploymentException {
-        final Configuration cfg = new Configuration();
-        final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
-        for (final EntityType<?> entity : entities) {
-            cfg.addAnnotatedClass(entity.getJavaType());
-        }
+        
+        final SchemaUpdater updater = new SchemaUpdater(modelConfiguration, loggerService);
+        updater.execute(getAnnotatedClasses());
 
-        final Properties properties = new Properties();
-        properties.putAll(modelConfiguration);
-        cfg.setProperties(properties);
-
-        final SchemaUpdater updater = new SchemaUpdater(cfg, loggerService);
-        updater.execute();
 
         final List<Exception> exceptions = updater.getExceptions();
         if (!exceptions.isEmpty()) {
             throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
         }
+    }
+
+    private Set<Class<?>> getAnnotatedClasses() {
+        Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
+        for (final EntityType<?> entity : entityManagerFactory.getMetamodel().getEntities()) {
+            annotatedClasses.add(entity.getJavaType());
+        }
+        return annotatedClasses;
     }
 
     @Override
@@ -253,7 +251,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
+    public <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final EntityManager em = getEntityManager();
         TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
