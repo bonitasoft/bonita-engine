@@ -44,6 +44,7 @@ import com.bonitasoft.engine.bdm.BDMJarBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -54,7 +55,7 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
-public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
+public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, BusinessDataModelRepository {
 
     private static final String BDR = "BDR";
 

@@ -35,6 +35,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
 import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -210,8 +211,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     public void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
-            bdr.deploy(zip, tenantAccessor.getTenantId());
+            final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
+            bdmRepository.deploy(zip, tenantAccessor.getTenantId());
         } catch (final IllegalStateException e) {
             throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {
@@ -224,8 +225,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     public void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
-            bdr.undeploy(tenantAccessor.getTenantId());
+            final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
+            bdmRepository.undeploy(tenantAccessor.getTenantId());
         } catch (final SBusinessDataRepositoryException sbdre) {
             throw new BusinessDataRepositoryDeploymentException(sbdre);
         }
@@ -234,9 +235,9 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     @Override
     public byte[] getClientBDMJar() throws BusinessDataRepositoryException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        BusinessDataRepository businessDataRepository = tenantAccessor.getBusinessDataRepository();
+        final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
         try {
-            return businessDataRepository.getDeployedBDMDependency();
+            return bdmRepository.getDeployedBDMDependency();
         } catch (SBusinessDataRepositoryException e) {
             throw new BusinessDataRepositoryException(e);
         }
