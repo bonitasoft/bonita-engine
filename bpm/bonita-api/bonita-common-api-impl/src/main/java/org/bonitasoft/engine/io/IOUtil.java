@@ -239,7 +239,7 @@ public class IOUtil {
     }
 
     public static byte[] zip(final Map<String, byte[]> files) throws IOException {
-        return IOUtil.zip(files);
+        return org.bonitasoft.engine.commons.io.IOUtil.zip(files);
     }
 
     /**
