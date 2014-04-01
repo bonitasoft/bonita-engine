@@ -27,7 +27,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -240,18 +239,7 @@ public class IOUtil {
     }
 
     public static byte[] zip(final Map<String, byte[]> files) throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ZipOutputStream zos = new ZipOutputStream(baos);
-        try {
-            for (final Entry<String, byte[]> file : files.entrySet()) {
-                zos.putNextEntry(new ZipEntry(file.getKey()));
-                zos.write(file.getValue());
-                zos.closeEntry();
-            }
-            return baos.toByteArray();
-        } finally {
-            zos.close();
-        }
+        return IOUtil.zip(files);
     }
 
     /**
@@ -407,7 +395,7 @@ public class IOUtil {
         temp.setReadable(true);
         temp.setWritable(true);
 
-        if (!(temp.delete())) {
+        if (!temp.delete()) {
             throw new IOException("Could not delete temporary file : " + temp.getAbsolutePath());
         }
         mkdirs(temp);

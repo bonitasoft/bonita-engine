@@ -31,9 +31,12 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -335,6 +338,21 @@ public class IOUtil {
             }
         } finally {
             fos.close();
+        }
+    }
+
+    public static byte[] zip(final Map<String, byte[]> files) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
+            for (final Entry<String, byte[]> file : files.entrySet()) {
+                zos.putNextEntry(new ZipEntry(file.getKey()));
+                zos.write(file.getValue());
+                zos.closeEntry();
+            }
+            return baos.toByteArray();
+        } finally {
+            zos.close();
         }
     }
 
