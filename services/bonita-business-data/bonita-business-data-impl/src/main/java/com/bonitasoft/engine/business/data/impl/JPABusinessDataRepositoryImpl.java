@@ -107,10 +107,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             entityManagerFactory.close();
             entityManagerFactory = null;
         }
-        if (entityManager != null) {
-            entityManager.close();
-            entityManager = null;
-        }
 
         if (notManagedEntityManagerFactory != null) {
             notManagedEntityManagerFactory.close();
@@ -167,8 +163,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return dependency != null && dependency.length > 0;
     }
 
-
-
     @Override
     public byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException {
         final FilterOption filterOption = new FilterOption(SDependency.class, "name", BDR);
@@ -192,8 +186,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new IllegalStateException("The BDR is not started");
         }
 
-        if (entityManager == null) {
+        if (entityManager == null || !entityManager.isOpen()) {
             entityManager = entityManagerFactory.createEntityManager();
+        } else {
+            entityManager.joinTransaction();
         }
         return entityManager;
     }
