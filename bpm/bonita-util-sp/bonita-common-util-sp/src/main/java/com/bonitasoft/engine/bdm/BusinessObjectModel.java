@@ -38,22 +38,22 @@ public class BusinessObjectModel {
         return businessObjects;
     }
 
-    public void setBusinessObjects(List<BusinessObject> businessObjects) {
-		this.businessObjects = businessObjects;
-	}
+    public void setBusinessObjects(final List<BusinessObject> businessObjects) {
+        this.businessObjects = businessObjects;
+    }
 
-	public void addBusinessObject(final BusinessObject businessObject) {
+    public void addBusinessObject(final BusinessObject businessObject) {
         businessObjects.add(businessObject);
     }
 
-	public Set<String> getBusinessObjectsClassNames() {
-	    HashSet<String> set = new HashSet<String>();
-	    for (BusinessObject o : businessObjects) {
+    public Set<String> getBusinessObjectsClassNames() {
+        HashSet<String> set = new HashSet<String>();
+        for (BusinessObject o : businessObjects) {
             set.add(o.getQualifiedName());
         }
-	    return set;
-	}
-	
+        return set;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

@@ -30,6 +30,14 @@ public class BOMBuilder {
         return bom;
     }
 
+    public BusinessObjectModel buildModelWithAllSupportedTypes() {
+        final BusinessObject invoice = new BusinessObject();
+        invoice.setQualifiedName("com.bonitasoft.pojo.ComplexInvoice");
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(invoice);
+        return bom;
+    }
+
     public BusinessObjectModel buildComplex() {
         final Field firstName = new Field();
         firstName.setName("firstName");

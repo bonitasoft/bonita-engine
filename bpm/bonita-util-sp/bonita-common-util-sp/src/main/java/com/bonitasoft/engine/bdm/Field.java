@@ -117,4 +117,9 @@ public class Field {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Field [name=" + name + ", type=" + type + ", nullable=" + nullable + ", length=" + length + "]";
+    }
+
 }

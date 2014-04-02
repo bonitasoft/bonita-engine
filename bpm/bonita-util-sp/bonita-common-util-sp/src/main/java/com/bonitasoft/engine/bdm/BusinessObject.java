@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "description", "fields", "uniqueConstraints","queries" })
+@XmlType(propOrder = { "description", "fields", "uniqueConstraints", "queries" })
 public class BusinessObject {
 
     @XmlAttribute(required = true)
@@ -39,7 +39,7 @@ public class BusinessObject {
     @XmlElementWrapper(name = "uniqueConstraints")
     @XmlElement(name = "uniqueConstraint")
     private List<UniqueConstraint> uniqueConstraints;
-    
+
     @XmlElementWrapper(name = "queries")
     @XmlElement(name = "query")
     private List<Query> queries;
@@ -62,11 +62,11 @@ public class BusinessObject {
         return fields;
     }
 
-    public void setFields(List<Field> fields) {
-		this.fields = fields;
-	}
+    public void setFields(final List<Field> fields) {
+        this.fields = fields;
+    }
 
-	public void addField(final Field field) {
+    public void addField(final Field field) {
         fields.add(field);
     }
 
@@ -96,77 +96,77 @@ public class BusinessObject {
         return uniqueConstraints;
     }
 
-    public void setUniqueConstraints(List<UniqueConstraint> uniqueConstraints) {
-		this.uniqueConstraints = uniqueConstraints;
-	}
-    
-    public Query addQuery(final String name, final String queryContent,final String returnType) {
-    	Query query = new Query(name,queryContent,returnType);
-    	queries.add(query);
-    	return query;
+    public void setUniqueConstraints(final List<UniqueConstraint> uniqueConstraints) {
+        this.uniqueConstraints = uniqueConstraints;
     }
-    
-    
-	public List<Query> getQueries() {
-		return queries;
-	}
 
-	public void setQueries(List<Query> queries) {
-		this.queries = queries;
-	}
+    public Query addQuery(final String name, final String queryContent, final String returnType) {
+        Query query = new Query(name, queryContent, returnType);
+        queries.add(query);
+        return query;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((fields == null) ? 0 : fields.hashCode());
-		result = prime * result
-				+ ((qualifiedName == null) ? 0 : qualifiedName.hashCode());
-		result = prime * result + ((queries == null) ? 0 : queries.hashCode());
-		result = prime
-				* result
-				+ ((uniqueConstraints == null) ? 0 : uniqueConstraints
-						.hashCode());
-		return result;
-	}
+    public List<Query> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(final List<Query> queries) {
+        this.queries = queries;
+    }
 
     @Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		BusinessObject other = (BusinessObject) obj;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (fields == null) {
-			if (other.fields != null)
-				return false;
-		} else if (!fields.equals(other.fields))
-			return false;
-		if (qualifiedName == null) {
-			if (other.qualifiedName != null)
-				return false;
-		} else if (!qualifiedName.equals(other.qualifiedName))
-			return false;
-		if (queries == null) {
-			if (other.queries != null)
-				return false;
-		} else if (!queries.equals(other.queries))
-			return false;
-		if (uniqueConstraints == null) {
-			if (other.uniqueConstraints != null)
-				return false;
-		} else if (!uniqueConstraints.equals(other.uniqueConstraints))
-			return false;
-		return true;
-	}
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((fields == null) ? 0 : fields.hashCode());
+        result = prime * result + ((qualifiedName == null) ? 0 : qualifiedName.hashCode());
+        result = prime * result + ((queries == null) ? 0 : queries.hashCode());
+        result = prime * result + ((uniqueConstraints == null) ? 0 : uniqueConstraints.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BusinessObject other = (BusinessObject) obj;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (fields == null) {
+            if (other.fields != null)
+                return false;
+        } else if (!fields.equals(other.fields))
+            return false;
+        if (qualifiedName == null) {
+            if (other.qualifiedName != null)
+                return false;
+        } else if (!qualifiedName.equals(other.qualifiedName))
+            return false;
+        if (queries == null) {
+            if (other.queries != null)
+                return false;
+        } else if (!queries.equals(other.queries))
+            return false;
+        if (uniqueConstraints == null) {
+            if (other.uniqueConstraints != null)
+                return false;
+        } else if (!uniqueConstraints.equals(other.uniqueConstraints))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessObject [qualifiedName=" + qualifiedName + ", description=" + description + ", fields=" + fields + ", uniqueConstraints="
+                + uniqueConstraints + ", queries=" + queries + "]";
+    }
 
 }
