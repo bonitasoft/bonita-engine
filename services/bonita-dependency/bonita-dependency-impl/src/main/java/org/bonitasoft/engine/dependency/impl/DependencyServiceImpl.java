@@ -700,7 +700,10 @@ public class DependencyServiceImpl implements DependencyService {
         List<Long> dependencyIds = null;
 
         do {
+            // final OrderByOption orderByOption = new OrderByOption(SDependency.class, "id", OrderByType.ASC);
+            // final QueryOptions queryOptions = new QueryOptions(fromIndex, pageSize, Arrays.asList(orderByOption));
             final QueryOptions queryOptions = new QueryOptions(fromIndex, pageSize);
+
             dependencyIds = getDependencyIds(id, type, queryOptions);
             if (dependencyIds != null && dependencyIds.size() > 0) {
                 final List<SDependency> dependencies = getDependencies(dependencyIds);

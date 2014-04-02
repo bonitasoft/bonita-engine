@@ -383,9 +383,9 @@
 	</query>  
  	 
 	<query name="getArchivedFlowNodesFromProcessInstance">
-		SELECT af
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS af
-		WHERE af.rootContainerId = :rootContainerId
+		SELECT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
+		WHERE aa.rootContainerId = :rootContainerId
 	</query>
 	
 	
