@@ -149,6 +149,7 @@ CREATE TABLE waiting_event (
   	correlation5 VARCHAR2(128),
   	PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active);
 
 CREATE TABLE message_instance (
 	tenantid NUMBER(19, 0) NOT NULL,
@@ -167,6 +168,7 @@ CREATE TABLE message_instance (
   	correlation5 VARCHAR2(128),
   	PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_message_instance ON message_instance (targetProcess, correlation1, correlation2);
 
 CREATE TABLE pending_mapping (
 	tenantid NUMBER(19, 0) NOT NULL,
