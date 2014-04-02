@@ -27,6 +27,7 @@ import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -227,7 +228,7 @@ public class PlatformServiceImpl implements PlatformService {
         final SPlatform platform = readPlatform();
         List<STenant> existingTenants;
         try {
-            existingTenants = getTenants(QueryOptions.defaultQueryOptions());
+            existingTenants = getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id", OrderByType.ASC));
         } catch (final STenantException e) {
             throw new SPlatformDeletionException(e);
         }
@@ -554,25 +555,25 @@ public class PlatformServiceImpl implements PlatformService {
         final STenant tenant = getTenant(tenantId);
         if (isTenantActivated(tenant)) {
             return false;
-        } else {
-            final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), ACTIVATED);
-            try {
-                platformPersistenceService.update(desc);
-                if (trace) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "activateTenant"));
-                }
-            } catch (final SPersistenceException e) {
-                if (trace) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "activateTenant", e));
-                }
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                }
-                throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
-            }
-            return true;
         }
+
+        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
+        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), ACTIVATED);
+        try {
+            platformPersistenceService.update(desc);
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "activateTenant"));
+            }
+        } catch (final SPersistenceException e) {
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "activateTenant", e));
+            }
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+            }
+            throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
+        }
+        return true;
     }
 
     @Override

@@ -78,6 +78,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -370,7 +371,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 int i = 0;
                 final List<Long> tenantIds = new ArrayList<Long>();
                 do {
-                    tenants = platformService.getTenants(new QueryOptions(i, maxResults));
+                    tenants = platformService.getTenants(new QueryOptions(i, maxResults, STenant.class, "id", OrderByType.ASC));
                     i += maxResults;
                     for (final STenant sTenant : tenants) {
                         tenantIds.add(sTenant.getId());
@@ -700,7 +701,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            TransactionService transactionService = platformAccessor.getTransactionService();
             TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
