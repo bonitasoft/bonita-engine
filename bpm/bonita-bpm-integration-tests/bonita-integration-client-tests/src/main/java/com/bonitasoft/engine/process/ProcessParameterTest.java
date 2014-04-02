@@ -185,15 +185,14 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final User user = createUser("jules", "his_password");
         final String parameterName = "anotherParam";
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("setDataDefaultValueWithParameter", "9.23");
-        final String actorName = "anyActor";
-        processBuilder.addActor(actorName);
+        processBuilder.addActor(ACTOR_NAME);
         final String aTask = "userTask1";
         final String dataName = "aData";
         processBuilder
                 .addParameter(parameterName, String.class.getCanonicalName())
                 .addData(dataName, String.class.getName(),
                         new ExpressionBuilder().createParameterExpression("takes value of default parameter value", parameterName, String.class.getName()))
-                .addUserTask(aTask, actorName);
+                .addUserTask(aTask, ACTOR_NAME);
 
         final DesignProcessDefinition design = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -203,16 +202,13 @@ public class ProcessParameterTest extends CommonAPISPTest {
         params.put(parameterName, paramValue);
         businessArchive.setParameters(params);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        addMappingOfActorsForUser(actorName, user.getId(), definition);
-        final long processDefinitionId = definition.getId();
-        getProcessAPI().enableProcess(processDefinitionId);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(aTask, processInstance.getId());
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(paramValue, dataInstance.getValue());
 
-        disableAndDeleteProcess(processDefinitionId);
+        disableAndDeleteProcess(processDefinition);
 
         deleteUser(user.getId());
     }
@@ -650,14 +646,13 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final String connectorVersion = "1.0";
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput);
         final String paraName = "Para1";
-        final long userId = getIdentityAPI().getUserByUserName(johnName).getId();
         final Map<String, String> paraMap = new HashMap<String, String>();
         paraMap.put(paraName, "abc");
 
         final ProcessDefinitionBuilderExt designProcessDefinition = buildProcessWithOutputConnectorAndParameter(delivery, inputName, connectorId,
                 connectorVersion, input1Expression, paraName);
 
-        final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(delivery, userId, designProcessDefinition, paraMap);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(delivery, user, designProcessDefinition, paraMap);
         final long proDefId = processDefinition.getId();
         ProcessInstance processInstance = getProcessAPI().startProcess(proDefId);
         assertNotNull(waitForUserTask("step2", processInstance.getId()));
@@ -720,7 +715,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         return designProcessDefinition;
     }
 
-    private ProcessDefinition deployProcessWithTestConnectorAndParameter(final String delivery, final long userId,
+    private ProcessDefinition deployProcessWithTestConnectorAndParameter(final String actorName, final User user,
             final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         if (parameters != null) {
@@ -737,10 +732,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     @Test

@@ -491,11 +491,11 @@ public class OperationTest extends CommonAPITest {
     @Cover(classes = Operation.class, concept = BPMNConcept.CONNECTOR, keywords = { "Operation", "JavaMethodOperationExecutorStrategy", "primitive type" }, story = "execution of an JavaMethod operation with primitive parameters", jira = "ENGINE-1067")
     @Test
     public void javaMethodOperationWithPrimitiveParameters() throws Exception {
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt();
-        final ProcessDefinitionBuilderExt pBuilder = processDefinitionBuilder.createNewInstance("javaMethodOperationWithPrimitiveParameters",
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "javaMethodOperationWithPrimitiveParameters",
                 String.valueOf(System.currentTimeMillis()));
-        final AutomaticTaskDefinitionBuilder task1Def = pBuilder
-                .addActor("actor")
+        final AutomaticTaskDefinitionBuilder task1Def = processDefinitionBuilder
+                .addActor(ACTOR_NAME)
                 .addData(
                         "myDatum",
                         "java.lang.StringBuilder",
@@ -503,11 +503,9 @@ public class OperationTest extends CommonAPITest {
                                 "java.lang.StringBuilder")).addAutomaticTask("step1");
         task1Def.addOperation(new OperationBuilder().createJavaMethodOperation("myDatum", "append", "int",
                 new ExpressionBuilder().createConstantIntegerExpression(55)));
-        task1Def.addUserTask("step2", "actor").addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(pBuilder.done()).done());
-        addMappingOfActorsForUser("actor", john.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        task1Def.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, john);
+
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance activityInstance = waitForUserTask("step2", processInstance);
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDatum", activityInstance.getId());
