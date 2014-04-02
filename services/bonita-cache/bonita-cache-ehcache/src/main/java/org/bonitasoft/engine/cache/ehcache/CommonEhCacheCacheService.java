@@ -14,8 +14,8 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
 import org.bonitasoft.engine.cache.CacheConfigurations;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -56,8 +56,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
-        ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         ehCacheConfig.setEternal(cacheConfig.isEternal());
+        if (!cacheConfig.isEternal()) {
+            ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+        }
         return ehCacheConfig;
     }
 
