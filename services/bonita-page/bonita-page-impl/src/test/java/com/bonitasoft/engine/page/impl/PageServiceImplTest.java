@@ -206,7 +206,7 @@ public class PageServiceImplTest {
     @Test
     public void should_start_import_provided_page() throws SBonitaException {
         // given
-        // resource in the classpath provided-page.properties and provided-page.zip
+        // resource in the classpath bonita-groovy-example-page.zip
         doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
         // when
         pageServiceImpl.start();
@@ -221,10 +221,11 @@ public class PageServiceImplTest {
     public void should_start_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentPage = new SPageImpl("example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(), -1,
+        final SPageImpl currentPage = new SPageImpl("groovy-example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(),
+                -1,
                 "content.zip");
         currentPage.setId(12);
-        doReturn(currentPage).when(pageServiceImpl).getPageByName("example");
+        doReturn(currentPage).when(pageServiceImpl).getPageByName("groovy-example");
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
         doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
@@ -241,11 +242,12 @@ public class PageServiceImplTest {
     public void should_start_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentPage = new SPageImpl("example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(), -1,
+        final SPageImpl currentPage = new SPageImpl("groovy-example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(),
+                -1,
                 "content.zip");
         currentPage.setId(12);
-        doReturn(currentPage).when(pageServiceImpl).getPageByName("example");
-        final InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.zip");
+        doReturn(currentPage).when(pageServiceImpl).getPageByName("groovy-example");
+        final InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
         doReturn(IOUtil.getAllContentFrom(resourceAsStream)).when(pageServiceImpl).getPageContent(12);
         doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
         // when

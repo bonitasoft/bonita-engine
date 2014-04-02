@@ -44,7 +44,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
     }
 
     /*
-     * when the tenant is created the provided page "provided-page.zip" should be imported from classpath
+     * when the tenant is created the provided page "bonita-groovy-page-example.zip" should be imported from classpath
      */
     @Test
     public void should_provided_page_be_imported() throws BonitaException {
@@ -52,7 +52,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
         // engine started
 
         // when
-        Page page = getPageAPI().getPageByName("example");
+        Page page = getPageAPI().getPageByName("groovy-example");
 
         // then
         assertThat(page).isNotNull();

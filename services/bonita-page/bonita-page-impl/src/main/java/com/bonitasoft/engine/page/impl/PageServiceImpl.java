@@ -312,36 +312,45 @@ public class PageServiceImpl implements PageService {
     @Override
     public void start() throws SBonitaException {
         if (active) {
-            try {
-                // check if the provided pages are here or not up to date and import them from class path if needed
-                final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.properties");
-                if (inputStream == null) {
-                    // no provided page
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-page.properties found in the class path, nothing will be imported");
-                    return;
-                }
-                final Properties pageProperties = new Properties();
-                pageProperties.load(inputStream);
+            importProvidedPage("bonita-html-page-example.zip");
+            importProvidedPage("bonita-groovy-page-example.zip");
+        }
+    }
 
-                // provided pages name?
-                final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
-                if (pageByName == null) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
-                    addPage(getProvidedPage(pageProperties), getProvidedPageContent());
-                    return;
-                }
-                final byte[] providedPageContent = getProvidedPageContent();
-                final byte[] pageContent = getPageContent(pageByName.getId());
-                if (pageContent.length != providedPageContent.length) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
-                    // think of a better way to check the content are the same or not, it will almost always be the same so....
-                    updateProvidedPage(pageByName.getId(), pageProperties, providedPageContent);
-                } else {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
-                }
-            } catch (final IOException e) {
-                throw new SBonitaReadException("Unable to import the provided page", e);
+    private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
+            SObjectNotFoundException,
+            SObjectModificationException {
+        try {
+            // check if the provided pages are here or not up to date and import them from class path if needed
+            final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(zipName);
+            if (inputStream == null) {
+                // no provided page
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-" + zipName + " found in the class path, nothing will be imported");
+                return;
             }
+            final byte[] providedPageContent = IOUtil.getAllContentFrom(inputStream);
+
+            byte[] zipEntryContent = IOUtil.getZipEntryContent("page.properties", new ByteArrayInputStream(providedPageContent));
+            final Properties pageProperties = new Properties();
+            pageProperties.load(new ByteArrayInputStream(zipEntryContent));
+
+            // provided pages name?
+            final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
+            if (pageByName == null) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
+                addPage(getProvidedPage(pageProperties, zipName), providedPageContent);
+                return;
+            }
+            final byte[] pageContent = getPageContent(pageByName.getId());
+            if (pageContent.length != providedPageContent.length) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
+                // think of a better way to check the content are the same or not, it will almost always be the same so....
+                updateProvidedPage(pageByName.getId(), pageProperties, providedPageContent);
+            } else {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
+            }
+        } catch (final IOException e) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Provided page " + zipName + "can't be imported");
         }
     }
 
@@ -368,20 +377,11 @@ public class PageServiceImpl implements PageService {
     /**
      * @param pageProperties
      * @return
-     * @throws IOException
      */
-    private byte[] getProvidedPageContent() throws IOException {
-        return IOUtil.getAllContentFrom(Thread.currentThread().getContextClassLoader().getResourceAsStream("provided-page.zip"));
-    }
-
-    /**
-     * @param pageProperties
-     * @return
-     */
-    private SPage getProvidedPage(final Properties pageProperties) {
+    private SPage getProvidedPage(final Properties pageProperties, final String zipName) {
         final long now = System.currentTimeMillis();
         return new SPageImpl(pageProperties.getProperty("name"), pageProperties.getProperty("description"), pageProperties.getProperty("displayName"), now, -1,
-                true, now, -1, pageProperties.getProperty("contentName"));
+                true, now, -1, zipName);
     }
 
     @Override
