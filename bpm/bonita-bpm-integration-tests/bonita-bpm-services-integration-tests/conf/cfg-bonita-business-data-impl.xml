@@ -20,6 +20,9 @@
     <bean id="businessDataModelRepository" class="com.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
         <constructor-arg name="dependencyService" ref="dependencyService"/>
         <constructor-arg name="schemaUpdater" ref="schemaUpdater" />
+		<constructor-arg name="compilationPath">
+			<value>${bonita.home}/server/platform/data-management/compilation-dependencies</value>
+		</constructor-arg>
     </bean>
     
     <bean id="schemaUpdater" class="com.bonitasoft.engine.business.data.impl.SchemaUpdater">
