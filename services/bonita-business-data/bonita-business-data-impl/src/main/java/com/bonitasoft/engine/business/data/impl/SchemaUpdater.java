@@ -20,9 +20,11 @@ import java.util.Set;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
+import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.internal.StandardServiceRegistryImpl;
@@ -51,14 +53,14 @@ public class SchemaUpdater {
         }
     }
 
-    public void execute(Set<Class<?>> annotatedClasses) {
+    public void execute(Set<String> annotatedClasses) {
         exceptions.clear();
         final Configuration cfg = new Configuration();
         final Properties properties = new Properties();
         properties.putAll(configuration);
 
-        for (final Class<?> entity : annotatedClasses) {
-            cfg.addAnnotatedClass(entity);
+        for (final String entity : annotatedClasses) {
+            cfg.addAnnotatedClass(getMappedClass(entity));
         }
 
         cfg.setProperties(properties);
@@ -103,6 +105,16 @@ public class SchemaUpdater {
             } catch (final Exception e) {
                 exceptions.add(e);
             }
+        }
+    }
+
+    public Class<?> getMappedClass(String className) throws MappingException {
+        if (className == null)
+            return null;
+        try {
+            return ReflectHelper.classForName(className);
+        } catch (ClassNotFoundException cnfe) {
+            throw new MappingException("entity class not found: " + className, cnfe);
         }
     }
 

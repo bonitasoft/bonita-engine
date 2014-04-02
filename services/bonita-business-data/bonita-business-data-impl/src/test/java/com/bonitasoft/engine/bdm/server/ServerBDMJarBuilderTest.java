@@ -1,47 +1,54 @@
 package com.bonitasoft.engine.bdm.server;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.io.IOUtils;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ServerBDMJarBuilderTest {
 
-    @Test
-    public void testGetPersistenceFileContentFor() throws Exception {
-        // // given
-        // final byte[] bomZip = "bomZip".getBytes();
-        // final BDMCompiler compiler = mock(BDMCompiler.class);
-        // final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler);
-        // final AbstractBDMJarBuilder spyBuilder = spy(builder);
-        // final BusinessObjectModel model = new BusinessObjectModel();
-        // final File tmpDir = IOUtils.createTempDirectory("bdm");
-        // final byte[] jar = "jar".getBytes();
-        // doReturn(model).when((AbstractBDMJarBuilder)spyBuilder).getBOM(bomZip);
-        // doReturn(tmpDir).when(spyBuilder).createBDMTmpDir();
-        // doNothing().when(spyBuilder).generateJavaFiles(model, tmpDir);
-        // doReturn(jar).when(spyBuilder).generateJar(tmpDir);
-        //
-        // // when
-        // spyBuilder.build(bomZip);
-        //
-        // // verify
-        // verify(spyBuilder).getBOM(bomZip);
-        // verify(spyBuilder).createBDMTmpDir();
-        // verify(spyBuilder).generateJavaFiles(model, tmpDir);
-        // verify(compiler).compile(tmpDir);
-        // verify(spyBuilder).generateJar(tmpDir);
-        // verify(spyBuilder).addPersistenceFile(tmpDir, model);
+    @Mock
+    private BusinessObjectModel bom;
+
+    private File directory;
+
+    @Before
+    public void setUp() throws Exception {
+        directory = File.createTempFile(ServerBDMJarBuilderTest.class.getName(), "");
+        directory.delete();
+        directory.mkdir();
     }
 
+    @After
+    public void tearDown() throws Exception {
+        directory.delete();
+    }
+
+    @Test
+    public void should_addPersistenceUnittestGetPersistenceFileContentFor() throws Exception {
+        final BDMCompiler compiler = mock(BDMCompiler.class);
+        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler));
+        assertThat(builder.getBDMCodeGenerator(bom)).isInstanceOf(ServerBDMCodeGenerator.class);
+
+        builder.addPersistenceFile(directory, bom);
+
+        verify(bom).getBusinessObjects();
+        assertThat(directory).isDirectory();
+        File metaInf = new File(directory, "META-INF");
+        assertThat(metaInf).exists();
+        assertThat(new File(metaInf, "persistence.xml")).exists();
+    }
 }

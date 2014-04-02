@@ -3,8 +3,6 @@ package com.bonitasoft.engine.business.data.impl;
 import static com.bonitasoft.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -25,7 +23,6 @@ import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -90,13 +87,12 @@ public class JPABusinessDataRepositoryImplIT {
         }
 
         SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(mock(DependencyService.class), schemaUpdater, configuration));
-        doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
-        doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
-        doReturn(true).when(businessDataRepository).isDBMDeployed();
-
+        BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class), schemaUpdater));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(businessDataModelRepositoryImpl, configuration));
+        doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
+        businessDataModelRepositoryImpl.updateSchema(Collections.singleton(Employee.class.getName()));
         businessDataRepository.start();
         entityManager = businessDataRepository.getEntityManager();
     }
@@ -118,10 +114,15 @@ public class JPABusinessDataRepositoryImplIT {
         return entityManager.merge(employee);
     }
 
+    @Test(expected = SBusinessDataNotFoundException.class)
+    public void throwAnExceptionIfTheIdentifierIsNull() throws Exception {
+        businessDataRepository.findById(Employee.class, null);
+    }
+
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
         Employee expectedEmployee = anEmployee().build();
-        addEmployeeToRepository(expectedEmployee);
+        expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Employee employee = businessDataRepository.findById(Employee.class, expectedEmployee.getPersistenceId());
 
@@ -153,7 +154,7 @@ public class JPABusinessDataRepositoryImplIT {
     public void findListShouldAcceptParameterizedQuery() throws Exception {
         String firstName = "anyName";
         Employee expectedEmployee = anEmployee().withFirstName(firstName).build();
-        addEmployeeToRepository(expectedEmployee);
+        expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) firstName);
         final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
@@ -197,14 +198,14 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
-        final Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
+        Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
 
         originalEmployee.setLastName("NewLastName");
-        businessDataRepository.merge(originalEmployee);
+        originalEmployee = businessDataRepository.merge(originalEmployee);
         originalEmployee.setFirstName("NewFirstName");
         businessDataRepository.merge(originalEmployee);
 
-        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, anEmployee().build().getPersistenceId());
+        final Employee updatedEmployee = businessDataRepository.findById(Employee.class, originalEmployee.getPersistenceId());
         assertThat(updatedEmployee).isEqualTo(originalEmployee);
     }
 

@@ -28,20 +28,6 @@ import com.bonitasoft.engine.bdm.Entity;
 public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
-     * Deploys a Business Data Model / repository on the specified tenant.
-     * 
-     * @param bdmArchive
-     *            the Business Data Model, as a jar containing the Business Object classes to deploy.
-     * @param tenantId
-     *            the ID of the tenant to deploy the Business Data Model to.
-     * @throws SBusinessDataRepositoryDeploymentException
-     *             if a deployment exception occurs.
-     */
-    void deploy(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
-
-    void undeploy(long tenantId) throws SBusinessDataRepositoryException;
-
-    /**
      * Finds an Entity that is defined in a deployed Business Data Model.
      * 
      * @param entityClass
@@ -69,13 +55,14 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @throws NonUniqueResultException
      *             if more than one result was found.
      */
-    <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery,Map<String, Serializable> parameters) throws NonUniqueResultException;
+    <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
-    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery,Map<String, Serializable> parameters);
-    
+    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters);
+
     <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
     <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters);
+
     /**
      * Saves or updates an entity in the Business Data Repository.
      * 
@@ -99,8 +86,5 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @return the <code>Set</code> of known Entity class names, as qualified class names.
      */
     Set<String> getEntityClassNames();
-
-    byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException;
-
 
 }

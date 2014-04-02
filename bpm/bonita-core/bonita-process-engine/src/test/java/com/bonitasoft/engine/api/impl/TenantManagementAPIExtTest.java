@@ -44,6 +44,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
 import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
@@ -319,10 +320,10 @@ public class TenantManagementAPIExtTest {
     @Test
     public void uninstallBusinessDataRepository() throws Exception {
         final TenantServiceAccessor accessor = mock(TenantServiceAccessor.class);
-        final BusinessDataRepository repository = mock(BusinessDataRepository.class);
+        final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
         doReturn(accessor).when(tenantManagementAPI).getTenantAccessor();
-        when(accessor.getBusinessDataRepository()).thenReturn(repository);
+        when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
 
         tenantManagementAPI.uninstallBusinessDataRepository();
 
@@ -332,10 +333,10 @@ public class TenantManagementAPIExtTest {
     @Test(expected = BusinessDataRepositoryException.class)
     public void uninstallBusinessDataRepositoryThrowException() throws Exception {
         final TenantServiceAccessor accessor = mock(TenantServiceAccessor.class);
-        final BusinessDataRepository repository = mock(BusinessDataRepository.class);
+        final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
         doReturn(accessor).when(tenantManagementAPI).getTenantAccessor();
-        when(accessor.getBusinessDataRepository()).thenReturn(repository);
+        when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
         doThrow(new SBusinessDataRepositoryException("error")).when(repository).undeploy(anyLong());
 
         tenantManagementAPI.uninstallBusinessDataRepository();

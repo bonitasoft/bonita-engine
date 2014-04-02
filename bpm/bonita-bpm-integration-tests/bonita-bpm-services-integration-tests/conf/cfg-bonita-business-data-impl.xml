@@ -2,8 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="businessDataRepository" class="com.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
-		<constructor-arg name="dependencyService" ref="dependencyService"/>
-		<constructor-arg name="schemaUpdater" ref="schemaUpdater" />
+		<constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository"/>
 		<constructor-arg>
 			<map>
 				<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
@@ -18,6 +17,11 @@
 		</constructor-arg>
 	</bean>
 
+    <bean id="businessDataModelRepository" class="com.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
+        <constructor-arg name="dependencyService" ref="dependencyService"/>
+        <constructor-arg name="schemaUpdater" ref="schemaUpdater" />
+    </bean>
+    
     <bean id="schemaUpdater" class="com.bonitasoft.engine.business.data.impl.SchemaUpdater">
         <constructor-arg name="loggerService" ref="technicalLoggerService" />
         <constructor-arg name="configuration">

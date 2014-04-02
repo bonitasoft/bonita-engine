@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -22,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.xml.sax.SAXException;
 
+import com.bonitasoft.engine.bdm.server.ServerBDMCodeGenerator;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.io.IOUtils;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -37,9 +37,8 @@ public abstract class AbstractBDMJarBuilder {
         this.compiler = compiler;
     }
 
-    public byte[] build(final byte[] bomZip) throws SBusinessDataRepositoryDeploymentException {
+    public byte[] build(BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
         try {
-            final BusinessObjectModel bom = getBOM(bomZip);
             final File tmpBDMDirectory = createBDMTmpDir();
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
@@ -52,11 +51,6 @@ public abstract class AbstractBDMJarBuilder {
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
-    }
-
-    protected BusinessObjectModel getBOM(final byte[] bomZip) throws IOException, JAXBException, SAXException {
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        return converter.unzip(bomZip);
     }
 
     protected File createBDMTmpDir() throws IOException {
@@ -74,10 +68,15 @@ public abstract class AbstractBDMJarBuilder {
         return IOUtil.generateJar(resources);
     }
 
-    protected abstract void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException,
-            BusinessObjectModelValidationException, ClassNotFoundException;
+    protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException,
+            BusinessObjectModelValidationException, ClassNotFoundException {
+        AbstractBDMCodeGenerator codeGenerator = getBDMCodeGenerator(bom);
+        codeGenerator.generate(directory);
+    }
 
     protected abstract void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
             ParserConfigurationException, SAXException;
+
+    protected abstract AbstractBDMCodeGenerator getBDMCodeGenerator(BusinessObjectModel bom);
 
 }

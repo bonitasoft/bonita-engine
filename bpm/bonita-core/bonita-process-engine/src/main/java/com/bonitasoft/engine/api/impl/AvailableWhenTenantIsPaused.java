@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to identify tenant-level API methods that can be called if a the tenant is in a Maintenance mode. All other API method calls will be rejected.
+ * Used to identify tenant-level API methods that can be called if a the tenant is in a pause mode. All other API method calls will be rejected.
  * Used by the BonitaBPM Engine server interceptor.
  * 
  * @author Emmanuel Duchastenier

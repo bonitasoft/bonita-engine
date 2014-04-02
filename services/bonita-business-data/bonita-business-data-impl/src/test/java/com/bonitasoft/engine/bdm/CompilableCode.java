@@ -43,7 +43,15 @@ public abstract class CompilableCode {
     }
 
     private String getDotClassParentPath(final String completeClassUrl) {
-        return completeClassUrl.substring(0, completeClassUrl.indexOf(Entity.class.getName().replace('.', File.separatorChar)));
+        int indexOf = completeClassUrl.indexOf(Entity.class.getName().replace('.', File.separatorChar));
+        if (indexOf != -1) {
+            return completeClassUrl.substring(0, indexOf);
+        }
+        File f = new File(completeClassUrl);
+        if (f.exists()) {
+            return f.getParent();
+        }
+        return completeClassUrl;
     }
 
 }

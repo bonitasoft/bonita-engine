@@ -18,14 +18,13 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.BusinessObjectModelValidationException;
 import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
 import com.bonitasoft.engine.io.IOUtils;
-import com.sun.codemodel.JClassAlreadyExistsException;
 
 /**
  * @author Matthieu Chaffotte
@@ -37,10 +36,9 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
         super(compiler);
     }
 
-    protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException,
-            BusinessObjectModelValidationException, ClassNotFoundException {
-        ServerBDMCodeGenerator codeGenerator = new ServerBDMCodeGenerator(bom);
-        codeGenerator.generate(directory);
+    @Override
+    protected AbstractBDMCodeGenerator getBDMCodeGenerator(BusinessObjectModel bom) {
+        return new ServerBDMCodeGenerator(bom);
     }
 
     protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
