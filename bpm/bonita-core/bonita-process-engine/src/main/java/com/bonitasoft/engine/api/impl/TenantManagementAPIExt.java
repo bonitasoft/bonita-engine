@@ -36,7 +36,6 @@ import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
 import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
@@ -237,7 +236,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
         try {
-            return bdmRepository.getDeployedBDMDependency();
+            return bdmRepository.getClientBDMJar();
         } catch (SBusinessDataRepositoryException e) {
             throw new BusinessDataRepositoryException(e);
         }

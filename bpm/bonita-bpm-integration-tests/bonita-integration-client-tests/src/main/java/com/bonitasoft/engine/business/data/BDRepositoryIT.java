@@ -45,6 +45,7 @@ import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.FieldType;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -325,9 +326,11 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 + "data-management"
                 + File.separator + "client";
         assertThat(new File(clientBdmJarPath, "client-bdm.jar")).exists().isFile();
+
+        assertThat(getTenantManagementAPI().getClientBDMJar()).isNotEmpty();
     }
 
-    @Test
+    @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         login();
         getTenantManagementAPI().pause();
@@ -339,6 +342,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 + "data-management"
                 + File.separator + "client";
         assertThat(new File(clientBdmJarPath, "client-bdm.jar")).doesNotExist();
+
+        getTenantManagementAPI().getClientBDMJar();
     }
 
     private ProcessDefinition buildProcessThatUpdateBizDataInsideConnector(final String taskName) throws BonitaException, IOException {
