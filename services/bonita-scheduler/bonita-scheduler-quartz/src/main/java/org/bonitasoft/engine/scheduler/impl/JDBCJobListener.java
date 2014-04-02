@@ -18,12 +18,15 @@ package org.bonitasoft.engine.scheduler.impl;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -128,7 +131,8 @@ public class JDBCJobListener extends AbstractJobListener {
     private List<SJobLog> getJobLogs(final long jobDescriptorId) throws SBonitaSearchException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId));
-        final QueryOptions options = new QueryOptions(0, 1, null, filters, null);
+        final OrderByOption orderByOption = new OrderByOption(SJobLog.class, "jobDescriptorId", OrderByType.ASC);
+        final QueryOptions options = new QueryOptions(0, 1, Arrays.asList(orderByOption), filters, null);
         return jobService.searchJobLogs(options);
     }
 
