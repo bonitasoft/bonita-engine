@@ -118,8 +118,10 @@ public class SpringTenantFileSystemBeanAccessor {
     }
 
     public void destroy() {
-        context.close();
-        context = null;
+        if (context != null) {
+            context.close();
+            context = null;
+        }
     }
 
 }

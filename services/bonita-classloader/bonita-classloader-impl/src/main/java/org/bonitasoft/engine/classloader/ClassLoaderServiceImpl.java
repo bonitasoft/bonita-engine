@@ -33,6 +33,16 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
+    private static final String SEPARATOR = ":";
+
+    private static final String GLOBAL_FOLDER = "global";
+
+    public static final String GLOBAL_TYPE = "GLOBAL";
+
+    public static final long GLOBAL_ID = -1;
+
+    private static final String LOCAL_FOLDER = "local";
+
     private final ParentClassLoaderResolver parentClassLoaderResolver;
 
     private final TechnicalLoggerService logger;
@@ -43,16 +53,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
-    private static final String separator = ":";
-
-    private static final String GLOBAL_FOLDER = "global";
-
-    public static final String GLOBAL_TYPE = "GLOBAL";
-
-    public static final long GLOBAL_ID = -1;
-
-    private static final String LOCAL_FOLDER = "local";
-    
     private Object mutex = new ClassLoaderServiceMutex();
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
@@ -79,7 +79,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private String getKey(final String type, final long id) {
         final StringBuffer stb = new StringBuffer();
         stb.append(type);
-        stb.append(separator);
+        stb.append(SEPARATOR);
         stb.append(id);
         return stb.toString();
     }
@@ -174,7 +174,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         NullCheckingUtil.checkArgsNotNull(application);
         final Set<String> keySet = new HashSet<String>(this.localClassLoaders.keySet());
         for (final String key : keySet) {
-            if (key.startsWith(application + separator)) {
+            if (key.startsWith(application + SEPARATOR)) {
                 final VirtualClassLoader localClassLoader = this.localClassLoaders.get(key);
                 if (localClassLoader != null) {
                     localClassLoader.release();

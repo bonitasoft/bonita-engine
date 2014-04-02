@@ -277,6 +277,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                     case ENABLED:
                         userUpdateBuilder.updateEnabled((Boolean) field.getValue());
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
             userUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
@@ -327,6 +329,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                     case WEBSITE:
                         updateBuilder.updateWebsite((String) field.getValue());
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
             return updateBuilder.done();
@@ -561,6 +565,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sUserfactory.getUserNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetUsersInRole getUsersInRole = new GetUsersInRole(roleId, startIndex, maxResults, field, order, identityService);
@@ -616,6 +622,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sUserFact.getUserNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetUsersInGroup getUsersOfGroup = new GetUsersInGroup(groupId, startIndex, maxResults, order, field, identityService);
@@ -807,6 +815,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sRoleFactory.getDisplayNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetRoles getRolesWithOrder = new GetRoles(identityService, startIndex, maxResults, field, order);
@@ -1048,6 +1058,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sGroupFactory.getDisplayNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetGroups getGroups = new GetGroups(identityService, startIndex, maxResults, order, field);
@@ -1154,6 +1166,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             case USER_NAME_DESC:
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return order;
     }
@@ -1180,6 +1194,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             case USER_NAME_DESC:
                 field = sUserFact.getUserNameKey();
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return field;
     }

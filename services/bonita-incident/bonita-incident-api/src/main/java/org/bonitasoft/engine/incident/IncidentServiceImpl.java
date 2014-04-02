@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 /**
  * @author Baptsite Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class IncidentServiceImpl implements IncidentService {
 
@@ -38,7 +39,7 @@ public class IncidentServiceImpl implements IncidentService {
         for (final IncidentHandler handler : handlers) {
             try {
                 handler.handle(tenantId, incident);
-            } catch (final Throwable t) {
+            } catch (final Exception t) {
                 logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to report an incident using the handler " + handler + " incident was " + incident);
             }
         }

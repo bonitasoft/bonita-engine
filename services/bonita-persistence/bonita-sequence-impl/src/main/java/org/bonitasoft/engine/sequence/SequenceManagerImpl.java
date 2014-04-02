@@ -61,9 +61,9 @@ public class SequenceManagerImpl implements SequenceManager {
         this.delayFactor = delayFactor;
         this.datasource = datasource;
     }
-    
+
     private static final class SequenceManagerImplMutex {
-        
+
     }
 
     @Override
@@ -78,7 +78,8 @@ public class SequenceManagerImpl implements SequenceManager {
             synchronized (mutex) {
                 mgr = this.sequenceManagers.get(tenantId);
                 if (mgr == null) {
-                    mgr = new TenantSequenceManagerImpl(tenantId, lockService, rangeSizes, defaultRangeSize, sequencesMappings, datasource, retries, delay, delayFactor);
+                    mgr = new TenantSequenceManagerImpl(tenantId, lockService, rangeSizes, defaultRangeSize, sequencesMappings, datasource, retries, delay,
+                            delayFactor);
                     this.sequenceManagers.put(tenantId, mgr);
                 }
             }
@@ -93,6 +94,7 @@ public class SequenceManagerImpl implements SequenceManager {
 
     @Override
     public void close() {
+        // Do nothing
     }
 
     @Override
