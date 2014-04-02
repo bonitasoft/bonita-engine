@@ -86,8 +86,9 @@ public class JPABusinessDataRepositoryImplIT {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
-        SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
-        BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class), schemaUpdater));
+        final SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
+        final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
+                schemaUpdater, null));
         businessDataRepository = spy(new JPABusinessDataRepositoryImpl(businessDataModelRepositoryImpl, configuration));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
@@ -102,10 +103,10 @@ public class JPABusinessDataRepositoryImplIT {
         ut.rollback();
         businessDataRepository.stop();
 
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
+        final JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
         try {
             jdbcTemplate.update("drop table Employee");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // ignore drop of non-existing table
         }
     }
@@ -138,7 +139,7 @@ public class JPABusinessDataRepositoryImplIT {
     public void persistNewEmployeeShouldAddEmployeeInRepository() throws Exception {
         final Employee employee = businessDataRepository.merge(anEmployee().build());
 
-        Employee myEmployee = businessDataRepository.findById(Employee.class, employee.getPersistenceId());
+        final Employee myEmployee = businessDataRepository.findById(Employee.class, employee.getPersistenceId());
         assertThat(myEmployee).isEqualTo(employee);
     }
 
@@ -152,7 +153,7 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findListShouldAcceptParameterizedQuery() throws Exception {
-        String firstName = "anyName";
+        final String firstName = "anyName";
         Employee expectedEmployee = anEmployee().withFirstName(firstName).build();
         expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
@@ -164,7 +165,7 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test(expected = NonUniqueResultException.class)
     public void findShouldThrowExceptionWhenSeveralResultsMatch() throws Exception {
-        String lastName = "Kangaroo";
+        final String lastName = "Kangaroo";
         addEmployeeToRepository(anEmployee().withLastName(lastName).withId(698L).build());
         addEmployeeToRepository(anEmployee().withLastName(lastName).withId(6448L).build());
 
@@ -223,7 +224,7 @@ public class JPABusinessDataRepositoryImplIT {
             employee = addEmployeeToRepository(anEmployee().build());
 
             businessDataRepository.remove(employee);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             fail("Should not fail here");
         }
         businessDataRepository.findById(Employee.class, employee.getPersistenceId());
@@ -241,16 +242,16 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void remove_should_not_throw_an_exception_with_an_unknown_entity() throws Exception {
-        Employee newEmployee = addEmployeeToRepository(anEmployee().build());
+        final Employee newEmployee = addEmployeeToRepository(anEmployee().build());
         businessDataRepository.remove(newEmployee);
         businessDataRepository.remove(newEmployee);
     }
 
     @Test
     public void findList_should_return_employee_list() throws Exception {
-        Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").withId(698L).build());
-        Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").withId(61L).build());
-        Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").withId(64L).build());
+        final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").withId(698L).build());
+        final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").withId(61L).build());
+        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").withId(64L).build());
 
         final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
                 null);

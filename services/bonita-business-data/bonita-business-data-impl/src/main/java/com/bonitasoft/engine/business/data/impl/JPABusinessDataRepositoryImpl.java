@@ -49,7 +49,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private final BusinessDataModelRepository businessDataModelRepository;
 
-    public JPABusinessDataRepositoryImpl(BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration) {
+    public JPABusinessDataRepositoryImpl(final BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration) {
         this.businessDataModelRepository = businessDataModelRepository;
         this.configuration = new HashMap<String, Object>(configuration);
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
@@ -138,23 +138,21 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             return entity;
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
-        } catch (NoResultException e) {
+        } catch (final NoResultException e) {
             return null;
         }
     }
 
     @Override
-    public <T extends Serializable> T find(Class<T> resultClass,
-            String jpqlQuery, Map<String, Serializable> parameters)
+    public <T extends Serializable> T find(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
-        TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
+        final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         return find(resultClass, typedQuery, parameters);
     }
 
     @Override
-    public <T extends Serializable> List<T> findList(Class<T> resultClass,
-            String jpqlQuery, Map<String, Serializable> parameters) {
-        TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
+    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters) {
+        final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         return findList(resultClass, typedQuery, parameters);
     }
 
@@ -162,18 +160,18 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final EntityManager em = getEntityManager();
-        TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
+        final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
         return find(resultClass, query, parameters);
     }
 
     @Override
     public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters) {
         final EntityManager em = getEntityManager();
-        TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
+        final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
         return findList(resultClass, query, parameters);
     }
 
-    private <T extends Serializable> TypedQuery<T> createTypedQuery(String jpqlQuery, Class<T> resultClass) {
+    private <T extends Serializable> TypedQuery<T> createTypedQuery(final String jpqlQuery, final Class<T> resultClass) {
         return getEntityManager().createQuery(jpqlQuery, resultClass);
     }
 

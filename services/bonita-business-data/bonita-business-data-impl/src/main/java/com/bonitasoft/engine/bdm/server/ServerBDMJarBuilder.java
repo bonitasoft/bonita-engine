@@ -20,10 +20,10 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
-import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
+import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;
 
 /**
@@ -32,15 +32,16 @@ import com.bonitasoft.engine.io.IOUtils;
  */
 public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
 
-    public ServerBDMJarBuilder(final BDMCompiler compiler) {
-        super(compiler);
+    public ServerBDMJarBuilder(final JDTCompiler compiler, final String dependencyPath) {
+        super(compiler, dependencyPath);
     }
 
     @Override
-    protected AbstractBDMCodeGenerator getBDMCodeGenerator(BusinessObjectModel bom) {
+    protected AbstractBDMCodeGenerator getBDMCodeGenerator(final BusinessObjectModel bom) {
         return new ServerBDMCodeGenerator(bom);
     }
 
+    @Override
     protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
             ParserConfigurationException, SAXException {
         final List<BusinessObject> entities = bom.getBusinessObjects();

@@ -14,8 +14,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.compiler.JDTCompiler;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServerBDMJarBuilderTest {
@@ -39,16 +39,17 @@ public class ServerBDMJarBuilderTest {
 
     @Test
     public void should_addPersistenceUnittestGetPersistenceFileContentFor() throws Exception {
-        final BDMCompiler compiler = mock(BDMCompiler.class);
-        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler));
+        final JDTCompiler compiler = mock(JDTCompiler.class);
+        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler, null));
         assertThat(builder.getBDMCodeGenerator(bom)).isInstanceOf(ServerBDMCodeGenerator.class);
 
         builder.addPersistenceFile(directory, bom);
 
         verify(bom).getBusinessObjects();
         assertThat(directory).isDirectory();
-        File metaInf = new File(directory, "META-INF");
+        final File metaInf = new File(directory, "META-INF");
         assertThat(metaInf).exists();
         assertThat(new File(metaInf, "persistence.xml")).exists();
     }
+
 }

@@ -26,13 +26,13 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
-import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import com.bonitasoft.engine.compiler.JDTCompiler;
 
 /**
  * @author Colin PUY
@@ -41,18 +41,21 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
 
-    private DependencyService dependencyService;
+    private final DependencyService dependencyService;
 
-    private SchemaUpdater schemaUpdater;
+    private final SchemaUpdater schemaUpdater;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater) {
+    private final String compilationPath;
+
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final String compilationPath) {
         this.dependencyService = dependencyService;
         this.schemaUpdater = schemaUpdater;
+        this.compilationPath = compilationPath;
     }
 
     @Override
     public byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException {
-        List<SDependency> dependencies = searchBDMDependencies();
+        final List<SDependency> dependencies = searchBDMDependencies();
         if (dependencies.isEmpty()) {
             return null;
         }
@@ -61,9 +64,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private List<SDependency> searchBDMDependencies() throws SBusinessDataRepositoryException {
         try {
-            QueryOptions queryOptions = new QueryOptions(asList(new FilterOption(SDependency.class, "name", BDR_DEPENDENCY_NAME)), null);
+            final QueryOptions queryOptions = new QueryOptions(asList(new FilterOption(SDependency.class, "name", BDR_DEPENDENCY_NAME)), null);
             return dependencyService.getDependencies(queryOptions);
-        } catch (SDependencyException e) {
+        } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryException(e);
         }
     }
@@ -71,39 +74,40 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public boolean isDBMDeployed() {
         try {
-            byte[] dependency = getDeployedBDMDependency();
+            final byte[] dependency = getDeployedBDMDependency();
             return dependency != null && dependency.length > 0;
-        } catch (SBusinessDataRepositoryException e) {
+        } catch (final SBusinessDataRepositoryException e) {
             return false;
         }
     }
 
     @Override
     public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
-        BusinessObjectModel model = getBusinessObjectModel(bdmZip);
-        byte[] bdmJar = generateBDMJar(model);
-        SDependency sDependency = createSDependency(tenantId, bdmJar);
+        final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
+        final byte[] bdmJar = generateBDMJar(model);
+        final SDependency sDependency = createSDependency(tenantId, bdmJar);
         try {
             dependencyService.createDependency(sDependency);
-            SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
+            final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
             dependencyService.createDependencyMapping(sDependencyMapping);
             updateSchema(model.getBusinessObjectsClassNames());
-        } catch (SDependencyException e) {
+        } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
     }
 
-    protected BusinessObjectModel getBusinessObjectModel(byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
+    protected BusinessObjectModel getBusinessObjectModel(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         try {
             return converter.unzip(bdmZip);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException("Unable to get business object model", e);
         }
     }
 
-    protected byte[] generateBDMJar(BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
-        final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(BDMCompiler.create());
+    protected byte[] generateBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler, compilationPath);
         return builder.build(model);
     }
 
@@ -116,9 +120,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, ScopeType.TENANT).done();
     }
 
-    protected void updateSchema(Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
+    protected void updateSchema(final Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
         schemaUpdater.execute(annotatedClassNames);
-        List<Exception> updateExceptions = schemaUpdater.getExceptions();
+        final List<Exception> updateExceptions = schemaUpdater.getExceptions();
         if (!updateExceptions.isEmpty()) {
             throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + updateExceptions);
         }
@@ -134,4 +138,5 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throw new SBusinessDataRepositoryException(sde);
         }
     }
+
 }

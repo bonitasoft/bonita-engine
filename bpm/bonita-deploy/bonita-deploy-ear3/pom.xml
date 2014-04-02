@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			</dependency>
+		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -94,10 +94,10 @@
 					<description>Bonita Application</description>
 
 					<jboss>
-						<version>4.2</version>
+						<version>5</version>
 						<loader-repository>com.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
 					</jboss>
-					
+
 				</configuration>
 			</plugin>
 		</plugins>

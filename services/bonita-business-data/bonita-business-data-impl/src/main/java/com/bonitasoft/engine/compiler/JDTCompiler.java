@@ -8,23 +8,23 @@
  *******************************************************************************/
 package com.bonitasoft.engine.compiler;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.apache.commons.lang3.StringUtils.join;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 /**
  * Compiler based on JDTCompiler
  * 
  * @author Colin PUY
+ * @author Matthieu Chaffotte
  */
 public class JDTCompiler {
 
@@ -37,12 +37,24 @@ public class JDTCompiler {
      * @throws CompilationException
      *             if compilation errors occurs
      */
-    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, Collection<String> classpathEntries) throws CompilationException {
+    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, final Collection<File> classpathEntries)
+            throws CompilationException {
         final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpathEntries);
         launchCompiler(commandLine);
     }
 
-    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory, Collection<String> classpathEntries) {
+    public void compile(final File srcDirectory, final File compilationPath) throws CompilationException {
+        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
+        Collection<File> classpathEntries;
+        if (compilationPath.exists()) {
+            classpathEntries = FileUtils.listFiles(compilationPath, new String[] { "jar" }, false);
+        } else {
+            classpathEntries = Collections.emptyList();
+        }
+        compile(files, srcDirectory, classpathEntries);
+    }
+
+    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory, final Collection<File> classpathEntries) {
         final List<String> arguments = new ArrayList<String>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
@@ -51,11 +63,16 @@ public class JDTCompiler {
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    private List<String> classpathArguments(Collection<String> classpathEntries) {
+    private List<String> classpathArguments(final Collection<File> classpathEntries) {
         if (classpathEntries == null || classpathEntries.isEmpty()) {
-            return emptyList();
+            return Collections.emptyList();
         }
-        return asList("-cp", join(classpathEntries, File.pathSeparator));
+
+        final StringBuilder builder = new StringBuilder();
+        for (final File file : classpathEntries) {
+            builder.append(file.getAbsolutePath()).append(File.pathSeparator);
+        }
+        return Arrays.asList("-cp", builder.toString());
     }
 
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
@@ -68,9 +85,9 @@ public class JDTCompiler {
 
     private List<String> outputDirectoryArguments(final File outputdirectory) {
         if (outputdirectory == null) {
-            return emptyList();
+            return Collections.emptyList();
         }
-        return asList("-d", outputdirectory.getAbsolutePath());
+        return Arrays.asList("-d", outputdirectory.getAbsolutePath());
     }
 
     private void launchCompiler(final String[] commandLine) throws CompilationException {
@@ -95,4 +112,5 @@ public class JDTCompiler {
             throw new CompilationException(new String(errorStream.toByteArray()));
         }
     }
+
 }

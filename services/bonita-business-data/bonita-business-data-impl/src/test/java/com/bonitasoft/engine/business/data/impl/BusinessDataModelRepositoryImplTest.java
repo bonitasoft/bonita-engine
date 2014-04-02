@@ -33,13 +33,13 @@ public class BusinessDataModelRepositoryImplTest {
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaUpdater.class)));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaUpdater.class), null));
     }
 
     @Test
     public void deployABOMShouldCreatetheBOMJARAndAddANewTenantDependency() throws Exception {
-        SDependency sDependency = mock(SDependency.class);
-        SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
+        final SDependency sDependency = mock(SDependency.class);
+        final SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
         doReturn(sDependency).when(businessDataModelRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(businessDataModelRepository).createDependencyMapping(1, sDependency);
 

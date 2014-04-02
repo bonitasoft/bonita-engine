@@ -22,6 +22,7 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;
 import com.sun.codemodel.JClassAlreadyExistsException;
 
@@ -30,18 +31,21 @@ import com.sun.codemodel.JClassAlreadyExistsException;
  */
 public abstract class AbstractBDMJarBuilder {
 
-    private final BDMCompiler compiler;
+    private final JDTCompiler compiler;
 
-    public AbstractBDMJarBuilder(final BDMCompiler compiler) {
+    private final String dependencyPath;
+
+    public AbstractBDMJarBuilder(final JDTCompiler compiler, final String dependencyPath) {
         this.compiler = compiler;
+        this.dependencyPath = dependencyPath == null ? "" : dependencyPath;
     }
 
-    public byte[] build(BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
+    public byte[] build(final BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
         try {
             final File tmpBDMDirectory = createBDMTmpDir();
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
-                compiler.compile(tmpBDMDirectory);
+                compiler.compile(tmpBDMDirectory, new File(dependencyPath));
                 addPersistenceFile(tmpBDMDirectory, bom);
                 return generateJar(tmpBDMDirectory);
             } finally {
@@ -69,7 +73,7 @@ public abstract class AbstractBDMJarBuilder {
 
     protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException,
             BusinessObjectModelValidationException, ClassNotFoundException {
-        AbstractBDMCodeGenerator codeGenerator = getBDMCodeGenerator(bom);
+        final AbstractBDMCodeGenerator codeGenerator = getBDMCodeGenerator(bom);
         codeGenerator.generate(directory);
     }
 
