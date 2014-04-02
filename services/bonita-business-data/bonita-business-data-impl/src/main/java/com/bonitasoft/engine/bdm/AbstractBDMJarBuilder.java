@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
@@ -21,22 +20,20 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
 import com.bonitasoft.engine.io.IOUtils;
 import com.sun.codemodel.JClassAlreadyExistsException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class BDMJarBuilder {
+public abstract class AbstractBDMJarBuilder {
 
     private final BDMCompiler compiler;
 
-    public BDMJarBuilder(final BDMCompiler compiler) {
+    public AbstractBDMJarBuilder(final BDMCompiler compiler) {
         this.compiler = compiler;
     }
 
@@ -77,22 +74,10 @@ public class BDMJarBuilder {
         return IOUtil.generateJar(resources);
     }
 
-    protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException,
-            BusinessObjectModelValidationException, ClassNotFoundException {
-        final BDMCodeGenerator codeGenerator = new BDMCodeGenerator(bom);
-        codeGenerator.generate(directory);
-    }
+    protected abstract void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException,
+            BusinessObjectModelValidationException, ClassNotFoundException;
 
-    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
-            ParserConfigurationException, SAXException {
-        final List<BusinessObject> entities = bom.getBusinessObjects();
-        final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
-        for (final BusinessObject businessObject : entities) {
-            builder.addClass(businessObject.getQualifiedName());
-        }
-        final Document document = builder.done();
-        final File metaInf = IOUtils.createSubDirectory(directory, "META-INF");
-        IOUtils.saveDocument(document, new File(metaInf, "persistence.xml"));
-    }
+    protected abstract void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
+            ParserConfigurationException, SAXException;
 
 }

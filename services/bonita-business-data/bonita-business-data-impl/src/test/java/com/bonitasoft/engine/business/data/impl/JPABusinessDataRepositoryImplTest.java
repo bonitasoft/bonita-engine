@@ -43,7 +43,7 @@ public class JPABusinessDataRepositoryImplTest {
         final SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
         final byte[] zip = "zip".getBytes();
         final byte[] jar = "jar".getBytes();
-        doReturn(jar).when(bdrService).generateBDMJar(zip);
+        doReturn(jar).when(bdrService).generateClientBDMJar(zip);
         doReturn(sDependency).when(bdrService).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(bdrService).createDependencyMapping(1, sDependency);
 

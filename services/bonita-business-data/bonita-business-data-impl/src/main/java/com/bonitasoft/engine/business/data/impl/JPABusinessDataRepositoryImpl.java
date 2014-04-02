@@ -40,8 +40,8 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
-import com.bonitasoft.engine.bdm.BDMJarBuilder;
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -175,14 +175,14 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
                 .done();
     }
 
-    protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
-        final BDMJarBuilder builder = new BDMJarBuilder(BDMCompiler.create());
+    protected byte[] generateClientBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
+        final ClientBDMJarBuilder builder = new ClientBDMJarBuilder(BDMCompiler.create());
         return builder.build(bdmZip);
     }
 
     @Override
     public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
-        final byte[] bdmJar = generateBDMJar(bdmZip);
+        final byte[] bdmJar = generateClientBDMJar(bdmZip);
         final SDependency sDependency = createSDependency(tenantId, bdmJar);
         try {
             dependencyService.createDependency(sDependency);

@@ -25,6 +25,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
+import com.bonitasoft.engine.bdm.BusinessObject;
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.FieldType;
+import com.bonitasoft.engine.bdm.Query;
+import com.bonitasoft.engine.bdm.client.ClientBDMCodeGenerator;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
@@ -34,18 +41,18 @@ import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 
-public class BDMCodeGeneratorTest extends CompilableCode {
+public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     private static final String EMPLOYEE_QUALIFIED_NAME = "org.bonitasoft.hr.Employee";
 
-    private BDMCodeGenerator bdmCodeGenerator;
+    private AbstractBDMCodeGenerator bdmCodeGenerator;
 
     private File destDir;
 
     @Before
     public void setUp() throws Exception {
         BusinessObjectModel bom = new BusinessObjectModel();
-        bdmCodeGenerator = new BDMCodeGenerator(bom);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         destDir = new File(System.getProperty("java.io.tmpdir"), "generationDir");
         destDir.mkdirs();
     }
@@ -61,7 +68,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName("Employee");
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new BDMCodeGenerator(bom);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.buildASTFromBom();
         assertThat(bdmCodeGenerator.getModel()._getClass("Employee")).isNotNull();
     }
@@ -308,7 +315,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         employeeBO.getQueries().add(query);
         BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new BDMCodeGenerator(bom);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
     }
 
@@ -329,7 +336,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         employeeBO.addUniqueConstraint("TOTO", "firstName", "lastName");
         BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new BDMCodeGenerator(bom);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
     }
 

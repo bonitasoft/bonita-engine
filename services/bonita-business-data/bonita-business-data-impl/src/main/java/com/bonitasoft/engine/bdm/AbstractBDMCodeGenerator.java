@@ -11,7 +11,6 @@ package com.bonitasoft.engine.bdm;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -26,28 +25,25 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 
 /**
  * @author Romain Bioteau
  */
-public class BDMCodeGenerator extends CodeGenerator {
+public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
-    private static final String DAO_SUFFIX = "DAO";
+    private static final String AND = " AND ";
 
     private final BusinessObjectModel bom;
 
-    public BDMCodeGenerator(final BusinessObjectModel bom) {
+    public AbstractBDMCodeGenerator(final BusinessObjectModel bom) {
         super();
         if (bom == null) {
             throw new IllegalArgumentException("bom is null");
@@ -62,36 +58,7 @@ public class BDMCodeGenerator extends CodeGenerator {
         }
     }
 
-    protected void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
-        // TODO add BO DAO Interface + Impl
-        String daoInterfaceClassName = toDaoInterfaceClassname(bo);
-        JDefinedClass daoInterface = addInterface(daoInterfaceClassName);
-        addInterface(daoInterface, BusinessObjectDAO.class.getName());
-
-        // Add method signature in interface for queries
-        for (Query q : bo.getQueries()) {
-            String name = q.getName();
-            JType returnType = getModel().parseType(q.getReturnType());
-            JClass collectionType = (JClass) getModel().parseType(Collection.class.getName());
-            if (returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)) {
-                returnType = ((JClass) returnType).narrow(entity);
-            }
-            JMethod method = addMethodSignature(daoInterface, name, returnType);
-            for (QueryParameter param : q.getQueryParameters()) {
-                method.param(getModel().parseType(param.getClassName()), param.getName());
-            }
-        }
-
-        // Add method signature in interface for unique constraint
-        for (UniqueConstraint uc : bo.getUniqueConstraints()) {
-            String name = createQueryNameForUniqueConstraint(entity, uc);
-            JMethod method = addMethodSignature(daoInterface, name, entity);
-            for (String param : uc.getFieldNames()) {
-                method.param(getModel().parseType(getFieldType(param, bo)), param);
-            }
-        }
-
-    }
+    protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
 
     private String createQueryNameForUniqueConstraint(JDefinedClass entity, UniqueConstraint uc) {
         StringBuilder sb = new StringBuilder("get" + entity.name() + "By");
@@ -105,19 +72,6 @@ public class BDMCodeGenerator extends CodeGenerator {
             name = name.substring(0, name.length() - 3);
         }
         return name;
-    }
-
-    private String getFieldType(String param, BusinessObject bo) {
-        for (Field f : bo.getFields()) {
-            if (f.getName().equals(param)) {
-                return f.getType().getClazz().getName();
-            }
-        }
-        return null;
-    }
-
-    private String toDaoInterfaceClassname(BusinessObject bo) {
-        return bo.getQualifiedName() + DAO_SUFFIX;
     }
 
     protected JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
@@ -135,9 +89,18 @@ public class BDMCodeGenerator extends CodeGenerator {
         final JAnnotationUse tableAnnotation = addAnnotation(entityClass, Table.class);
         tableAnnotation.param("name", entityClass.name().toUpperCase());
         final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
+
+        final List<Query> queries = bo.getQueries();
+
+        JAnnotationUse namedQueriesAnnotation = null;
+        JAnnotationArrayMember valueArray = null;
+        if (!queries.isEmpty() || !uniqueConstraints.isEmpty()) {
+            namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
+            valueArray = namedQueriesAnnotation.paramArray("value");
+        }
+
         if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
-
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
                 final JAnnotationUse uniqueConstraintAnnotatation = uniqueConstraintsArray.annotate(javax.persistence.UniqueConstraint.class);
                 uniqueConstraintAnnotatation.param("name", uniqueConstraint.getName().toUpperCase());
@@ -145,18 +108,17 @@ public class BDMCodeGenerator extends CodeGenerator {
                 for (final String fieldName : uniqueConstraint.getFieldNames()) {
                     columnNamesParamArray.param(fieldName.toUpperCase());
                 }
+
+                // Generate a query for Unique Constraint
+                addNamedQuery(entityClass,
+                        valueArray,
+                        createQueryNameForUniqueConstraint(entityClass, uniqueConstraint),
+                        createQueryContentForUniqueConstraint(entityClass, uniqueConstraint));
             }
         }
 
-        final List<Query> queries = bo.getQueries();
-        if (!queries.isEmpty()) {
-            final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
-            final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
-            for (final Query query : queries) {
-                final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
-                nameQueryAnnotation.param("name", query.getName());
-                nameQueryAnnotation.param("query", query.getContent());
-            }
+        for (final Query query : queries) {
+            addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
         }
 
         addPersistenceIdFieldAndAccessors(entityClass);
@@ -171,6 +133,28 @@ public class BDMCodeGenerator extends CodeGenerator {
         addHashCodeMethod(entityClass);
 
         return entityClass;
+    }
+
+    private void addNamedQuery(JDefinedClass entityClass, JAnnotationArrayMember valueArray, final String name, final String content) {
+        final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
+        nameQueryAnnotation.param("name", name);
+        nameQueryAnnotation.param("query", content);
+    }
+
+    private String createQueryContentForUniqueConstraint(JDefinedClass entityClass, UniqueConstraint uniqueConstraint) {
+        StringBuilder sb = new StringBuilder("SELECT o FROM " + entityClass.name() + " o WHERE ");
+        for (String fieldName : uniqueConstraint.getFieldNames()) {
+            sb.append("o.");
+            sb.append(fieldName);
+            sb.append("=:");
+            sb.append(fieldName);
+            sb.append(AND);
+        }
+        String query = sb.toString();
+        if (query.endsWith(AND)) {
+            query = query.substring(0, query.length() - AND.length());
+        }
+        return query;
     }
 
     private void validateClassNotExistsInRuntime(final String qualifiedName) {
