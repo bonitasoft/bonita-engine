@@ -147,9 +147,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     private ProcessInstance ensureAProcessInstanceIsStarted(final BusinessArchive businessArchive, final User user) throws BonitaException {
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue(processInstance != null);
         return processInstance;
@@ -205,18 +203,15 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Test
     public void createProcessWithUrlDocument() throws BonitaException {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("createProcessWithUrlDocument", "1.0");
-        final String actorName = "doctor";
-        designProcessDefinition.addActor(actorName);
-        designProcessDefinition.addUserTask("step1", actorName);
+        designProcessDefinition.addActor(ACTOR_NAME);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final String docName = "myRtfDocument";
         final String url = "http://intranet.bonitasoft.com/private/docStorage/anyValue";
         final DocumentDefinitionBuilder documentDefinition = designProcessDefinition.addDocumentDefinition(docName);
         documentDefinition.addUrl(url);
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(designProcessDefinition.getProcess()).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(actorName, user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         try {
             final SearchOptionsBuilder sob = new SearchOptionsBuilder(0, 10).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
@@ -1017,15 +1012,15 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Test
     public void startProcessAndSetDocumentValueWithOperations() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("LivingDay", "1.0");
-        final String actorName = "documentalist";
+        final String ACTOR_NAME = "documentalist";
         String docRefName = "invoiceReference";
         designProcessDefinition.addData(docRefName, DocumentValue.class.getName(), null);
         String docName = "invoiceLetter";
         designProcessDefinition.addData(docName, DocumentValue.class.getName(), null);
-        designProcessDefinition.addActor(actorName);
+        designProcessDefinition.addActor(ACTOR_NAME);
         // ...
-        designProcessDefinition.addUserTask("step1", actorName);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), actorName, user);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
 
         String docUrl = "http://internal.intranet.org/resources/myDoc.pdf";
         Operation docRefOperation = new OperationBuilder().createSetDocument(docRefName,
@@ -1084,17 +1079,16 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     private ProcessDefinition deployProcessWithURLDocumentCreateOperation(final String documentName, final String url) throws BonitaException {
-        final String actorName = "doctor";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("simpleProcess", "1.0");
-        designProcessDefinition.addActor(actorName).addDescription("The doctor");
-        designProcessDefinition.addUserTask("step1", actorName);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doctor");
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step2").addOperation(
                 new OperationBuilder().createNewInstance().setRightOperand(getDocumentValueExpressionWithUrl(url)).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
                         .setLeftOperand(documentName, false).done());
-        designProcessDefinition.addUserTask("step3", actorName);
+        designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
-        return deployAndEnableWithActor(designProcessDefinition.done(), actorName, user);
+        return deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
     }
 
     @Cover(classes = Document.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-652", keywords = { "document", "sort" }, story = "get last version of document, sorted")
@@ -1204,9 +1198,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.getProcess())
                 .addDocumentResource(new BarResource("myPdf.pdf", pdfContent)).done();
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
         getProcessAPI().startProcess(processDefinition.getId());
 
         disableAndDeleteProcess(processDefinition.getId());
@@ -1257,9 +1249,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.getProcess())
                 .done();
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
         getProcessAPI().startProcess(processDefinition.getId());
 
         disableAndDeleteProcess(processDefinition.getId());

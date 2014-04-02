@@ -790,7 +790,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition4 = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition4).done());
-        addMappingOfActorsForUser(actor2, users.get(1).getId(), processDefinition4);
+        getProcessAPI().addUserToActor(actor2, processDefinition4, users.get(1).getId());
         processDefinitions.add(processDefinition4);
 
         // process without actor initiator

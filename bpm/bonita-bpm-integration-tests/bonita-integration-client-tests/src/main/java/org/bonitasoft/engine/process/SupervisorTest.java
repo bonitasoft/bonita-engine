@@ -72,16 +72,15 @@ public class SupervisorTest extends CommonAPITest {
 
     public void init() throws Exception {
         login();
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");
-        definition = deployAndEnableWithActor(processDefinition, delivery, john);
+        definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
 
         // Three tasks
         getProcessAPI().startProcess(definition.getId());
@@ -213,17 +212,16 @@ public class SupervisorTest extends CommonAPITest {
     @Test
     public void getPendingTasksSupervisedBy() throws Exception {
         login();
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");
-        definition = deployAndEnableWithActor(processDefinition, delivery, john);
+        definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
 
         getProcessAPI().startProcess(definition.getId());
         waitForPendingTasks(john.getId(), 1);
@@ -341,12 +339,12 @@ public class SupervisorTest extends CommonAPITest {
 
         // login with user and create a processDefinition
         loginWith("matti", "bpm");
-        String delivery = "totor";
+
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder1.addDescription("definition1 description");
-        processBuilder1.addActor(delivery).addUserTask("temporize", delivery);
+        processBuilder1.addActor(ACTOR_NAME).addUserTask("temporize", ACTOR_NAME);
         final DesignProcessDefinition designprocessDefinition1 = processBuilder1.done();
-        final ProcessDefinition definition1 = deployAndEnableWithActor(designprocessDefinition1, delivery, matti);
+        final ProcessDefinition definition1 = deployAndEnableWithActor(designprocessDefinition1, ACTOR_NAME, matti);
         final ProcessInstance pi0 = getProcessAPI().startProcess(definition1.getId());
 
         // add comment to processInstance
@@ -357,9 +355,9 @@ public class SupervisorTest extends CommonAPITest {
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "2.0");
         processBuilder2.addDescription("definition2 description");
-        processBuilder2.addActor(delivery).addUserTask("temporize", delivery);
+        processBuilder2.addActor(ACTOR_NAME).addUserTask("temporize", ACTOR_NAME);
         final DesignProcessDefinition designprocessDefinition2 = processBuilder2.done();
-        final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, delivery, matti);
+        final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, ACTOR_NAME, matti);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
         getProcessAPI().addProcessComment(pi1.getId(), commentContent4);

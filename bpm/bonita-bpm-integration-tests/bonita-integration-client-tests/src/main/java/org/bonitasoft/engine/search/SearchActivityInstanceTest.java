@@ -1169,7 +1169,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         processBuilder.addUserTask("userTask", ACTOR_NAME);
         processBuilder.addTransition("autoTask", "sendTask");
         processBuilder.addTransition("sendTask", "userTask");
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user.getId(), processBuilder);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user, processBuilder);
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -1185,7 +1185,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final long userId,
+    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final User user,
             final ProcessDefinitionBuilder processDefinitionBuilder) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefinitionBuilder.done());
@@ -1199,10 +1199,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     private List<BarResource> generateDefaultConnectorImplementations() throws IOException {

@@ -427,8 +427,8 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForUser(ACTOR_NAME, user1.getId(), definition);
-        addMappingOfActorsForUser(ACTOR_NAME, user2.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, user2.getId());
         getProcessAPI().enableProcess(definition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
@@ -536,7 +536,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userMembershipTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForUser(ACTOR_NAME, user1.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
         addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group1.getId(), definition);
         addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group2.getId(), definition);
         getProcessAPI().enableProcess(definition.getId());

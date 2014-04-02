@@ -57,6 +57,7 @@ import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
@@ -236,15 +237,11 @@ public class APITestUtil {
         loginWith(userName, password);
     }
 
-    public User addMappingAndActor(final String actorName, final String userName, final String password, final ProcessDefinition definition)
+    public User addMappingAndActor(final String actorName, final String userName, final String password, final ProcessDefinition processDefinition)
             throws BonitaException {
         final User user = createUser(userName, password);
-        addMappingOfActorsForUser(actorName, user.getId(), definition);
+        getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
         return user;
-    }
-
-    public void addMappingOfActorsForUser(final String actorName, final long userId, final ProcessDefinition definition) throws BonitaException {
-        getProcessAPI().addUserToActor(actorName, definition, userId);
     }
 
     public void addMappingOfActorsForRole(final String actorName, final long roleId, final ProcessDefinition definition) throws BonitaException {
@@ -484,10 +481,16 @@ public class APITestUtil {
 
     protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final List<User> users)
             throws BonitaException {
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        return deployAndEnableWithActor(businessArchive, actorName, users);
+    }
+
+    public ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final List<User> users)
+            throws AlreadyExistsException, ProcessDeployException, ActorNotFoundException, CreationException, ProcessDefinitionNotFoundException,
+            ProcessEnablementException {
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         for (final User user : users) {
-            addMappingOfActorsForUser(actorName, user.getId(), processDefinition);
+            getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
         }
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -508,7 +511,7 @@ public class APITestUtil {
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         for (int i = 0; i < users.size(); i++) {
-            addMappingOfActorsForUser(actorsName.get(i), users.get(i).getId(), processDefinition);
+            getProcessAPI().addUserToActor(actorsName.get(i), processDefinition, users.get(i).getId());
         }
         try {
             processAPI.enableProcess(processDefinition.getId());
@@ -529,7 +532,7 @@ public class APITestUtil {
         final BusinessArchive businessArchive = businessArchiveBuilder.setParameters(parameters).setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         for (int i = 0; i < users.size(); i++) {
-            addMappingOfActorsForUser(actorsName.get(i), users.get(i).getId(), processDefinition);
+            getProcessAPI().addUserToActor(actorsName.get(i), processDefinition, users.get(i).getId());
         }
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;

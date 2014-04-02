@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -1166,20 +1165,20 @@ public class ProcessManagementTest extends CommonAPITest {
         final User jack = createUser(username1, PASSWORD);
         final User john = createUser(username2, PASSWORD);
         final User lucy = createUser(username3, PASSWORD);
-        final String coders = "Coding men";
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(coders).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", coders).addUserTask("userTask2", coders)
-                .addUserTask("userTask3", coders);
+        processBuilder.addActor(ACTOR_NAME).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", ACTOR_NAME)
+                .addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, coders, jack);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
                 new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
         // add lucy to actor
-        addMappingOfActorsForUser(coders, lucy.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
         final List<ActivityInstance> activities = getProcessAPI().getActivities(startedProcess.getId(), 0, 10);
         getProcessAPI().assignUserTask(activities.get(0).getId(), jack.getId());
@@ -1211,20 +1210,20 @@ public class ProcessManagementTest extends CommonAPITest {
         final User jack = createUser(username1, PASSWORD);
         final User john = createUser(username2, PASSWORD);
         final User lucy = createUser(username3, PASSWORD);
-        final String coders = "Coding men";
         // default expectedDuration is null for HumanTaskDefinition, so the expectedEndDate is 0 by default, no need to set it in particular.
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(coders).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", coders).addUserTask("userTask2", coders)
-                .addUserTask("userTask3", coders);
+        processBuilder.addActor(ACTOR_NAME).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", ACTOR_NAME)
+                .addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, coders, jack);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
                 new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
         // add lucy to actor
-        addMappingOfActorsForUser(coders, lucy.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
         final List<ActivityInstance> activities = getProcessAPI().getActivities(startedProcess.getId(), 0, 10);
         getProcessAPI().assignUserTask(activities.get(0).getId(), jack.getId());
