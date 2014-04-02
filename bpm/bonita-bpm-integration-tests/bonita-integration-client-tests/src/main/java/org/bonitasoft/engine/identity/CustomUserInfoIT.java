@@ -13,17 +13,18 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.CustomUserInfoAPI;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -158,8 +159,7 @@ public class CustomUserInfoIT extends CommonAPITest {
     @Test
     public void deleteCustomUserInfoDefinition_should_delete_object_from_database() throws Exception {
         //given
-        CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(DEFAULT_NAME);
-        CustomUserInfoDefinition info = getIdentityAPI().createCustomUserInfoDefinition(creator);
+        CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
         assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).containsExactly(info);
 
         //when
@@ -168,6 +168,44 @@ public class CustomUserInfoIT extends CommonAPITest {
 
         //then
         assertThat(definitions).isEmpty();
+    }
+
+    @Ignore
+    @Test
+    public void deleteCustomUserInfoDefinition_should_delete_object_from_database_loading_scalability() throws Exception {
+        // given
+        List<User> users = createUsers(10);
+        CustomUserInfoDefinition info = createDefinition("Skill");
+        setValues(users, info, "code slayer");
+
+        // when
+        getIdentityAPI().deleteCustomUserInfoDefinition(info.getId());
+
+        // then
+        assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 1)).isEmpty();
+        assertThat(getIdentityAPI().searchCustomUserInfoValues(new SearchOptionsBuilder(0, 1).done()).getCount()).isEqualTo(0);
+
+        // clean
+        deleteUsers(users);
+    }
+
+    private void setValues(List<User> users, CustomUserInfoDefinition definition, String value) throws UpdateException {
+        for (User user : users) {
+            getIdentityAPI().setCustomUserInfoValue(definition.getId(), user.getId(), value);
+        }
+    }
+
+    private CustomUserInfoDefinition createDefinition(String name) throws CreationException {
+        CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(name);
+        return getIdentityAPI().createCustomUserInfoDefinition(creator);
+    }
+
+    private List<User> createUsers(int number) throws BonitaException, InterruptedException {
+        List<User> users = new ArrayList<User>(number);
+        for (int i = 0; i < number; i++) {
+            users.add(createUser("User " + i, "password"));
+        }
+        return users;
     }
 
 }
