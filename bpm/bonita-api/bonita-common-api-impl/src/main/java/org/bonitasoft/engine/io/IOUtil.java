@@ -26,7 +26,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -37,8 +36,6 @@ import java.util.zip.ZipOutputStream;
  * @author Celine Souchet
  */
 public class IOUtil {
-
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -284,26 +281,7 @@ public class IOUtil {
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
-        final Scanner scanner = new Scanner(inputStream, fEncoding);
-        return read(scanner);
-    }
-
-    private static String read(final Scanner scanner) {
-        final StringBuilder text = new StringBuilder();
-        try {
-            boolean isFirst = true;
-            while (scanner.hasNextLine()) {
-                if (isFirst) {
-                    text.append(scanner.nextLine());
-                } else {
-                    text.append(LINE_SEPARATOR + scanner.nextLine());
-                }
-                isFirst = false;
-            }
-        } finally {
-            scanner.close();
-        }
-        return text.toString();
+        return org.bonitasoft.engine.commons.io.IOUtil.read(inputStream);
     }
 
     /**
@@ -312,8 +290,7 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
-        return read(scanner);
+        return org.bonitasoft.engine.commons.io.IOUtil.read(file);
     }
 
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {

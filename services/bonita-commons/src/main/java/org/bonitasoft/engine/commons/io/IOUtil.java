@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -46,6 +47,8 @@ import org.bonitasoft.engine.commons.NullCheckingUtil;
  * @author Matthieu Chaffotte
  */
 public class IOUtil {
+
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -203,6 +206,46 @@ public class IOUtil {
             }
         }
         return resultArray;
+    }
+
+    /**
+     * Read the contents from the given FileInputStream. Return the result as a String.
+     * 
+     * @param inputStream
+     *            the stream to read from
+     * @return the content read from the inputStream, as a String
+     */
+    public static String read(final InputStream inputStream) {
+        final Scanner scanner = new Scanner(inputStream, fEncoding);
+        final StringBuilder text = new StringBuilder();
+        try {
+            boolean isFirst = true;
+            while (scanner.hasNextLine()) {
+                if (isFirst) {
+                    text.append(scanner.nextLine());
+                } else {
+                    text.append(LINE_SEPARATOR + scanner.nextLine());
+                }
+                isFirst = false;
+            }
+        } finally {
+            scanner.close();
+        }
+        return text.toString();
+    }
+
+    /**
+     * Read the contents of the given file.
+     * 
+     * @param file
+     */
+    public static String read(final File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        try {
+            return read(inputStream);
+        } finally {
+            inputStream.close();
+        }
     }
 
     /**

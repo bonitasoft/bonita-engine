@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String SERVER_URL = "server.url";
+    static final String SERVER_URL = "server.url";
 
     private static final String BASIC_AUTHENTICATION_ACTIVE = "basicAuthentication.active";
 
@@ -86,7 +87,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final String BASIC_AUTHENTICATION_PASSWORD = "basicAuthentication.password";
 
-    private static final String APPLICATION_NAME = "application.name";
+    static final String APPLICATION_NAME = "application.name";
 
     private static final Logger LOGGER = Logger.getLogger(HTTPServerAPI.class.getName());
 
@@ -103,6 +104,8 @@ public class HTTPServerAPI implements ServerAPI {
     private static DefaultHttpClient httpclient;
 
     private static final XStream xstream;
+
+    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
 
@@ -161,7 +164,7 @@ public class HTTPServerAPI implements ServerAPI {
         return httpclient.execute(httpost, responseHandler);
     }
 
-    private HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    private final HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException {
         final HttpEntity httpEntity = buildEntity(options, classNameParameters, parametersValues, xstream);
         final StringBuilder sBuilder = new StringBuilder(serverUrl);
@@ -181,7 +184,7 @@ public class HTTPServerAPI implements ServerAPI {
         return httpost;
     }
 
-    private HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters, final Object[] parametersValues,
+    final HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters, final Object[] parametersValues,
             final XStream xstream) throws UnsupportedEncodingException, IOException {
         final HttpEntity httpEntity;
         /*
@@ -189,9 +192,9 @@ public class HTTPServerAPI implements ServerAPI {
          */
         if (classNameParameters.contains(BusinessArchive.class.getName()) || classNameParameters.contains(byte[].class.getName())) {
             final List<Object> bytearrayParameters = new ArrayList<Object>();
-            final MultipartEntity entity = new MultipartEntity();
-            entity.addPart(OPTIONS, new StringBody(toXML(options, xstream)));
-            entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(toXML(classNameParameters, xstream)));
+            final MultipartEntity entity = new MultipartEntity(null, null, UTF8);
+            entity.addPart(OPTIONS, new StringBody(toXML(options, xstream), UTF8));
+            entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(toXML(classNameParameters, xstream), UTF8));
             for (int i = 0; i < parametersValues.length; i++) {
                 final Object parameterValue = parametersValues[i];
                 if (parameterValue instanceof BusinessArchive || parameterValue instanceof byte[]) {
@@ -199,7 +202,7 @@ public class HTTPServerAPI implements ServerAPI {
                     bytearrayParameters.add(parameterValue);
                 }
             }
-            entity.addPart(PARAMETERS_VALUES, new StringBody(toXML(parametersValues, xstream)));
+            entity.addPart(PARAMETERS_VALUES, new StringBody(toXML(parametersValues, xstream), UTF8));
             int i = 0;
             for (final Object object : bytearrayParameters) {
                 entity.addPart(BINARY_PARAMETER + i, new ByteArrayBody(serialize(object), BINARY_PARAMETER + i));
