@@ -716,7 +716,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
 
-            checkOrderByClause(selectDescriptor, query);
+            // TODO: add a parameter to enable NONE,WARNING or STRICT mode "order by" checking
+            // checkOrderByClause(selectDescriptor, query);
 
             @SuppressWarnings("unchecked")
             final List<T> list = query.list();
