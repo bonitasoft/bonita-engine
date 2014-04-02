@@ -12,48 +12,59 @@ import java.util.Set;
 
 /**
  * @author Romain Bioteau
- *
+ * 
  */
 public class SQLNameValidator {
 
-	private int maxLength;
-	static Set<String> sqlKeywords;
-	static{
-		sqlKeywords = new HashSet<String>();
-	}
+    private int maxLength;
 
-	public SQLNameValidator(){
-		this(255);
-	}
+    static Set<String> sqlKeywords;
+    static {
+        sqlKeywords = new HashSet<String>();
+    }
 
-	public SQLNameValidator(int maxLength){
-		this.maxLength = maxLength;
-		if(sqlKeywords.isEmpty()){
-			initializeSQLKeywords();
-		}
-	}
+    public SQLNameValidator() {
+        this(255);
+    }
 
-	private void initializeSQLKeywords() {
-		InputStream resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords");
-		Scanner scanner = new Scanner(resourceAsStream);
-		while (scanner.hasNext()) {
-			String word = (String) scanner.nextLine();
-			sqlKeywords.add(word.trim());
-		}
-		try {
-			resourceAsStream.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public SQLNameValidator(int maxLength) {
+        this.maxLength = maxLength;
+        if (sqlKeywords.isEmpty()) {
+            initializeSQLKeywords();
+        }
+    }
 
-	public boolean isValid(String name){
-		return name.matches("[a-zA-Z][\\d\\w#@]{0,"+maxLength+"}$") && !isSQLKeyword(name);
-	}
+    private void initializeSQLKeywords() {
+        InputStream resourceAsStream = null;
+        Scanner scanner = null;
+        try {
+            resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords");
+            scanner = new Scanner(resourceAsStream);
+            while (scanner.hasNext()) {
+                String word = (String) scanner.nextLine();
+                sqlKeywords.add(word.trim());
+            }
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+            if (resourceAsStream != null) {
+                try {
+                    resourceAsStream.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
-	public boolean isSQLKeyword(String name){
-		return sqlKeywords.contains(name.toUpperCase());
-	}
+    }
 
+    public boolean isValid(String name) {
+        return name.matches("[a-zA-Z][\\d\\w#@]{0," + maxLength + "}$") && !isSQLKeyword(name);
+    }
+
+    public boolean isSQLKeyword(String name) {
+        return sqlKeywords.contains(name.toUpperCase());
+    }
 
 }

@@ -21,6 +21,7 @@ import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.UniqueConstraint;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.validator.QueryNameUtil;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -81,7 +82,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Add method for unique constraint
         for (UniqueConstraint uc : bo.getUniqueConstraints()) {
             JMethod method = createMethodForUniqueConstraint(bo, entity, implClass, uc);
-            addQueryMethodBody(method, createQueryNameForUniqueConstraint(entity, uc), entity.fullName());
+            addQueryMethodBody(method, QueryNameUtil.createQueryNameForUniqueConstraint(entity.name(), uc), entity.fullName());
         }
         return daoInterface;
     }
@@ -141,7 +142,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private JMethod createMethodForUniqueConstraint(final BusinessObject bo, JDefinedClass entity, JDefinedClass targetClass, UniqueConstraint uc)
             throws ClassNotFoundException {
-        String name = createQueryNameForUniqueConstraint(entity, uc);
+        String name = QueryNameUtil.createQueryNameForUniqueConstraint(entity.name(), uc);
         JMethod queryMethod = createQueryMethod(entity, targetClass, name, entity.fullName());
         for (String param : uc.getFieldNames()) {
             queryMethod.param(getModel().parseType(getFieldType(param, bo)), param);
@@ -172,20 +173,6 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         method._throws(commandParametrizationExceptionClass);
 
         return method;
-    }
-
-    private String createQueryNameForUniqueConstraint(JDefinedClass entity, UniqueConstraint uc) {
-        StringBuilder sb = new StringBuilder("get" + entity.name() + "By");
-        for (String f : uc.getFieldNames()) {
-            f = Character.toUpperCase(f.charAt(0)) + f.substring(1);
-            sb.append(f);
-            sb.append("And");
-        }
-        String name = sb.toString();
-        if (name.endsWith("And")) {
-            name = name.substring(0, name.length() - 3);
-        }
-        return name;
     }
 
     private String getFieldType(String param, BusinessObject bo) {

@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.xml.sax.SAXException;
 
-import com.bonitasoft.engine.bdm.server.ServerBDMCodeGenerator;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.io.IOUtils;
 import com.sun.codemodel.JClassAlreadyExistsException;

@@ -26,6 +26,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
+import com.bonitasoft.engine.bdm.validator.QueryNameUtil;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
@@ -59,20 +60,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
-
-    private String createQueryNameForUniqueConstraint(JDefinedClass entity, UniqueConstraint uc) {
-        StringBuilder sb = new StringBuilder("get" + entity.name() + "By");
-        for (String f : uc.getFieldNames()) {
-            f = Character.toUpperCase(f.charAt(0)) + f.substring(1);
-            sb.append(f);
-            sb.append("And");
-        }
-        String name = sb.toString();
-        if (name.endsWith("And")) {
-            name = name.substring(0, name.length() - 3);
-        }
-        return name;
-    }
 
     protected JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
         final String qualifiedName = bo.getQualifiedName();
@@ -112,7 +99,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
                 // Generate a query for Unique Constraint
                 addNamedQuery(entityClass,
                         valueArray,
-                        createQueryNameForUniqueConstraint(entityClass, uniqueConstraint),
+                        QueryNameUtil.createQueryNameForUniqueConstraint(entityClass.name(), uniqueConstraint),
                         createQueryContentForUniqueConstraint(entityClass, uniqueConstraint));
             }
         }
