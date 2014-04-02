@@ -14,6 +14,7 @@
  */
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -33,6 +34,8 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -54,6 +57,10 @@ public class TokenServiceImpl implements TokenService {
     private final EventService eventService;
 
     private final TechnicalLoggerService logger;
+
+    private static final OrderByOption ORDER_BY_OPTION = new OrderByOption(SToken.class, "id", OrderByType.ASC);
+
+    private static final QueryOptions QUERY_OPTIONS = new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, Arrays.asList(ORDER_BY_OPTION));
 
     public TokenServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
             final EventService eventService, final TechnicalLoggerService logger) {
@@ -111,7 +118,8 @@ public class TokenServiceImpl implements TokenService {
             final DeleteRecord deleteRecord = new DeleteRecord(token);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token)
+                        .done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -125,10 +133,9 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void deleteTokens(final long processInstanceId) throws SObjectReadException, SObjectModificationException {
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
         List<SToken> tokens;
         do {
-            tokens = getTokens(processInstanceId, queryOptions);
+            tokens = getTokens(processInstanceId, QUERY_OPTIONS);
             for (final SToken token : tokens) {
                 deleteToken(token);
             }
@@ -137,10 +144,9 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void deleteAllTokens() throws SObjectReadException, SObjectModificationException {
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
         List<SToken> tokens;
         do {
-            tokens = getTokens(queryOptions);
+            tokens = getTokens(QUERY_OPTIONS);
             for (final SToken token : tokens) {
                 deleteToken(token);
             }
@@ -201,9 +207,8 @@ public class TokenServiceImpl implements TokenService {
             if (selectList.isEmpty()) {
                 throw new SObjectNotFoundException("no token found for process " + processInstanceId + " and reference " + refId
                         + " , the design may be invalid, check that all branches are correctly merged");
-            } else {
-                return selectList.get(0);
             }
+            return selectList.get(0);
         } catch (final SBonitaReadException e) {
             throw new SObjectReadException(e);
         }
