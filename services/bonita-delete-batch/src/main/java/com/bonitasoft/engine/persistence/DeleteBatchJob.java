@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.persistence;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -28,10 +27,6 @@ public class DeleteBatchJob implements StatelessJob {
 
     private PersistenceService persistenceService;
 
-    public static final String ATTR_CLASSES_TO_PURE = "classesToPurge";
-
-    private List<String> classesToPurge;
-
     @InjectedService
     public void setPersistenceService(final PersistenceService persistenceService) {
         this.persistenceService = persistenceService;
@@ -49,18 +44,14 @@ public class DeleteBatchJob implements StatelessJob {
 
     @Override
     public void execute() throws SJobExecutionException {
-        for (final String classToPurge : classesToPurge) {
-            try {
-                persistenceService.purge(classToPurge);
-            } catch (final SBonitaException e) {
-                throw new SJobExecutionException(e);
-            }
+        try {
+            persistenceService.purge();
+        } catch (final SBonitaException e) {
+            throw new SJobExecutionException(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) {
-        classesToPurge = (List<String>) attributes.get(ATTR_CLASSES_TO_PURE);
     }
 }

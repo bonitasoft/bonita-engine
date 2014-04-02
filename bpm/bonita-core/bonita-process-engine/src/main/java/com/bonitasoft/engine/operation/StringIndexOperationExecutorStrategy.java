@@ -48,7 +48,7 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return false;
     }
 
