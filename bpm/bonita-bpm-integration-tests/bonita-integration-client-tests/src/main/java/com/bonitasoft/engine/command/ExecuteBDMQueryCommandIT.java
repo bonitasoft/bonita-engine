@@ -49,7 +49,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     private static final String EXECUTE_BDM_QUERY_COMMAND = "executeBDMQuery";
 
-    private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
+    private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.BonitaEmployee";
 
     private static final String RETURNS_LIST = "returnsList";
 
@@ -77,10 +77,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         employee.setDescription("Describe a simple employee");
         // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
-        employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
-        employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM Employee e WHERE e.firstName=:firstName AND e.lastName=:lastName",
+        employee.addQuery("getEmployees", "SELECT e FROM BonitaEmployee e", List.class.getName());
+        employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName",
                 EMPLOYEE_QUALIF_CLASSNAME);
-        employee.addQuery("getEmployeeByLastName", "SELECT e FROM Employee e WHERE e.lastName=:lastName", EMPLOYEE_QUALIF_CLASSNAME);
+        employee.addQuery("getEmployeeByLastName", "SELECT e FROM BonitaEmployee e WHERE e.lastName=:lastName", EMPLOYEE_QUALIF_CLASSNAME);
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         return model;
@@ -188,7 +188,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     public void addEmployee(String firstName, String lastName) throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+                + "; BonitaEmployee e = new BonitaEmployee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;",
+                EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
