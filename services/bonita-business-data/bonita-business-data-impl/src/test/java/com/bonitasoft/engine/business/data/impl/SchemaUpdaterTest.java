@@ -49,14 +49,28 @@ public class SchemaUpdaterTest {
         try {
             jdbcTemplate.update("drop table ComplexInvoice");
         } catch (Exception e) {
-            // ignore drop of non-existing table
+            // e.printStackTrace();
+        }
+        try {
+            jdbcTemplate.update("drop table ConstrainedItem");
+        } catch (Exception e) {
         }
     }
 
     @Test
     public void executeScriptsABOMShouldWorkWithAllSupportedTypes() throws Exception {
-        BOMBuilder bomBuilder = BOMBuilder.aBOM();
-        BusinessObjectModel bom = bomBuilder.buildModelWithAllSupportedTypes();
+        BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithAllSupportedTypes();
+
+        schemaUpdater.execute(bom.getBusinessObjectsClassNames());
+        List<Exception> updateExceptions = schemaUpdater.getExceptions();
+        if (!updateExceptions.isEmpty()) {
+            fail("Upating schema fails due to: " + updateExceptions);
+        }
+    }
+
+    @Test
+    public void executeScriptsABOMShouldSupportConstraints() throws Exception {
+        BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithConstrainedFields();
 
         schemaUpdater.execute(bom.getBusinessObjectsClassNames());
         List<Exception> updateExceptions = schemaUpdater.getExceptions();

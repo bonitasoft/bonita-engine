@@ -38,6 +38,14 @@ public class BOMBuilder {
         return bom;
     }
 
+    public BusinessObjectModel buildModelWithConstrainedFields() {
+        final BusinessObject constrained = new BusinessObject();
+        constrained.setQualifiedName("com.bonitasoft.pojo.ConstrainedItem");
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(constrained);
+        return bom;
+    }
+
     public BusinessObjectModel buildComplex() {
         final Field firstName = new Field();
         firstName.setName("firstName");
