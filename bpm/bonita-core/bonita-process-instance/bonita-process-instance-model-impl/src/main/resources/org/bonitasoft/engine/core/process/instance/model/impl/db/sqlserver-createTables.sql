@@ -178,7 +178,7 @@ CREATE TABLE message_instance (
   	PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_message_instance ON message_instance (targetProcess, correlation1, correlation2)
+CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3)
 GO
 
 CREATE TABLE pending_mapping (

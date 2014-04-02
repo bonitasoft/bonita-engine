@@ -168,7 +168,7 @@ CREATE TABLE message_instance (
   	correlation5 VARCHAR2(128),
   	PRIMARY KEY (tenantid, id)
 );
-CREATE INDEX idx_message_instance ON message_instance (targetProcess, correlation1, correlation2);
+CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
 
 CREATE TABLE pending_mapping (
 	tenantid NUMBER(19, 0) NOT NULL,
