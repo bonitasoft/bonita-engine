@@ -427,7 +427,6 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.supervisor.mapping.SSupervisorAlreadyExistsException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorCreationException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
@@ -3761,6 +3760,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         SProcessSupervisor supervisor;
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        // TODO : Check in first if the supervisor already exists. See create user in identityAPI
+        // throw new AlreadyExistsException("This supervisor already exists");
+
         try {
             final SProcessSupervisorBuilder supervisorBuilder = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(
                     processDefinitionId);
@@ -3788,8 +3790,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             supervisor = supervisorBuilder.done();
             supervisor = supervisorService.createSupervisor(supervisor);
             return ModelConvertor.toProcessSupervisor(supervisor);
-        } catch (final SSupervisorAlreadyExistsException e) {
-            throw new AlreadyExistsException("This supervisor already exists");
         } catch (final SSupervisorCreationException e) {
             throw new CreationException(e);
         }

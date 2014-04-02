@@ -37,10 +37,9 @@ public interface SupervisorMappingService {
      * @param supervisor
      *            a SSupervisor object
      * @return the new created supervisor
-     * @throws SSupervisorAlreadyExistsException
      * @throws SSupervisorCreationException
      */
-    SProcessSupervisor createSupervisor(SProcessSupervisor supervisor) throws SSupervisorAlreadyExistsException, SSupervisorCreationException;
+    SProcessSupervisor createSupervisor(SProcessSupervisor supervisor) throws SSupervisorCreationException;
 
     /**
      * get supervisor without display name by its id
