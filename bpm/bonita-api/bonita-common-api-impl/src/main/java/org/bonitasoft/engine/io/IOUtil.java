@@ -18,7 +18,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +30,6 @@ import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -319,59 +317,7 @@ public class IOUtil {
     }
 
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
-        final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
-        ZipEntry zipEntry = null;
-
-        try {
-            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
-                extractZipEntry(zipInputstream, zipEntry, outputFolder);
-            }
-        } finally {
-            zipInputstream.close();
-        }
-    }
-
-    private static void extractZipEntry(final ZipInputStream zipInputstream, final ZipEntry zipEntry, final File outputFolder) throws FileNotFoundException,
-            IOException {
-        try {
-            final String entryName = zipEntry.getName();
-            // entryName = entryName.replace('/', File.separatorChar);
-            // entryName = entryName.replace('\\', File.separatorChar);
-
-            // For each entry, a file is created in the output directory "folder"
-            final File outputFile = new File(outputFolder.getAbsolutePath(), entryName);
-
-            // If the entry is a directory, it creates in the output folder, and we go to the next entry (return).
-            if (zipEntry.isDirectory()) {
-                mkdirs(outputFile);
-                return;
-            }
-            writeZipInputToFile(zipInputstream, outputFile);
-        } finally {
-            zipInputstream.closeEntry();
-        }
-    }
-
-    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
-        // The input is a file. An FileOutputStream is created to write the content of the new file.
-        mkdirs(outputFile.getParentFile());
-        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-        try {
-            try {
-                // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
-                int bytesRead;
-                final byte[] buffer = new byte[BUFFER_SIZE];
-                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
-                    fileOutputStream.write(buffer, 0, bytesRead);
-                }
-            } finally {
-                fileOutputStream.close();
-            }
-        } catch (final IOException ioe) {
-            // In case of error, the file is deleted
-            outputFile.delete();
-            throw ioe;
-        }
+        org.bonitasoft.engine.commons.io.IOUtil.unzipToFolder(inputStream, outputFolder);
     }
 
     public static void writeContentToFile(final String content, final File outputFile) throws IOException {
@@ -383,23 +329,8 @@ public class IOUtil {
         }
     }
 
-    private static boolean mkdirs(final File file) {
-        if (!file.exists()) {
-            return file.mkdirs();
-        }
-        return true;
-    }
-
     public static File createTempDirectory(final String fileName) throws IOException {
-        final File temp = File.createTempFile(fileName, String.valueOf(System.currentTimeMillis()));
-        temp.setReadable(true);
-        temp.setWritable(true);
-
-        if (!temp.delete()) {
-            throw new IOException("Could not delete temporary file : " + temp.getAbsolutePath());
-        }
-        mkdirs(temp);
-        return temp;
+        return org.bonitasoft.engine.commons.io.IOUtil.createTempDirectory(fileName);
     }
 
 }
