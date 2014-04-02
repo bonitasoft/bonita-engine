@@ -87,6 +87,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     TechnicalLoggerService logger;
 
+    List<String> classesToPurge;
+
     @SuppressWarnings("unchecked")
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
@@ -139,6 +141,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
         this.logger = logger;
+    }
+
+    /**
+     * @param classesToPurge
+     *            the classesToPurge to set
+     */
+    public void setClassesToPurge(final List<String> classesToPurge) {
+        this.classesToPurge = classesToPurge;
     }
 
     /**
@@ -253,6 +263,15 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 checkClassMapping(entityClass);
                 setId(entity);
                 session.save(entity);
+            }
+        }
+    }
+
+    @Override
+    public void purge() throws SPersistenceException {
+        if (classesToPurge != null) {
+            for (String classToPurge : classesToPurge) {
+                purge(classToPurge);
             }
         }
     }
