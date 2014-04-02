@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -24,6 +25,8 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -163,8 +166,10 @@ public class JobServiceImpl implements JobService {
         try {
             final int limit = 100;
             final List<FilterOption> filters = new ArrayList<FilterOption>(1);
+
             filters.add(new FilterOption(SJobParameter.class, "jobDescriptorId", jobDescriptorId));
-            final QueryOptions options = new QueryOptions(0, limit, null, filters, null);
+            List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
+            final QueryOptions options = new QueryOptions(0, limit, orderByOptions, filters, null);
             List<SJobParameter> jobParameters = null;
             do {
                 jobParameters = searchJobParameters(options);
