@@ -10,10 +10,14 @@ package com.bonitasoft.engine.business.data.impl;
 
 import static java.util.Arrays.asList;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -28,6 +32,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
 import com.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
@@ -41,16 +46,22 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
 
+    private static final String CLIENT_BDM_JAR_NAME = "client-bdm.jar";
+
     private final DependencyService dependencyService;
 
     private final SchemaUpdater schemaUpdater;
 
     private final String compilationPath;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final String compilationPath) {
+    private String clientStoragePath;
+
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final String compilationPath,
+            final String clientStoragePath) {
         this.dependencyService = dependencyService;
         this.schemaUpdater = schemaUpdater;
         this.compilationPath = compilationPath;
+        this.clientStoragePath = clientStoragePath;
     }
 
     @Override
@@ -60,6 +71,23 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             return null;
         }
         return dependencies.get(0).getValue();
+    }
+
+    @Override
+    public byte[] getClientBDMJar() throws SBusinessDataRepositoryException {
+        final File clientBDMJarFile = getClientBDMJarFile();
+        if (clientBDMJarFile.exists()) {
+            try {
+                return IOUtil.getAllContentFrom(clientBDMJarFile);
+            } catch (IOException e) {
+                throw new SBusinessDataRepositoryException(e);
+            }
+        }
+        throw new SBusinessDataRepositoryException(new FileNotFoundException(clientBDMJarFile.getAbsolutePath()));
+    }
+
+    private File getClientBDMJarFile() {
+        return new File(clientStoragePath, CLIENT_BDM_JAR_NAME);
     }
 
     private List<SDependency> searchBDMDependencies() throws SBusinessDataRepositoryException {
@@ -84,8 +112,14 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
-        final byte[] bdmJar = generateBDMJar(model);
-        final SDependency sDependency = createSDependency(tenantId, bdmJar);
+
+        createClientBDMJar(model);
+        createServerBDMJar(tenantId, model);
+    }
+
+    protected void createServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+        final byte[] serverBdmJar = generateServerBDMJar(model);
+        final SDependency sDependency = createSDependency(tenantId, serverBdmJar);
         try {
             dependencyService.createDependency(sDependency);
             final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
@@ -93,6 +127,19 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             updateSchema(model.getBusinessObjectsClassNames());
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+    }
+
+    private void createClientBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+        final byte[] clientBdmJar = generateClientBDMJar(model);
+        File clientBDMJarFile = getClientBDMJarFile();
+        if (clientBDMJarFile.exists()) {
+            clientBDMJarFile.delete();
+        }
+        try {
+            IOUtil.write(clientBDMJarFile, clientBdmJar);
+        } catch (IOException e1) {
+            throw new SBusinessDataRepositoryDeploymentException(e1);
         }
     }
 
@@ -105,9 +152,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    protected byte[] generateBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+    protected byte[] generateServerBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler, compilationPath);
+        return builder.build(model);
+    }
+
+    protected byte[] generateClientBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, compilationPath);
         return builder.build(model);
     }
 
@@ -137,6 +190,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         } catch (final SDependencyException sde) {
             throw new SBusinessDataRepositoryException(sde);
         }
+        getClientBDMJarFile().delete();
     }
 
 }

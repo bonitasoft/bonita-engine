@@ -25,6 +25,9 @@
 		<constructor-arg name="compilationPath">
 			<value>${bonita.home}/server/platform/data-management/compilation-dependencies</value>
 		</constructor-arg>
+		<constructor-arg name="clientStoragePath">
+			<value>${bonita.home}/server/tenants/${tenantId}/data-management/client</value>
+		</constructor-arg>
 	</bean>
 
 	<bean id="schemaUpdater" class="com.bonitasoft.engine.business.data.impl.SchemaUpdater">

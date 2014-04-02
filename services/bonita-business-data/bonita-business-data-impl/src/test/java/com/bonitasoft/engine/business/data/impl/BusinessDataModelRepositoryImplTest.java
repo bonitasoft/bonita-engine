@@ -33,7 +33,7 @@ public class BusinessDataModelRepositoryImplTest {
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaUpdater.class), null));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaUpdater.class), null, null));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(sDependency).when(businessDataModelRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(businessDataModelRepository).createDependencyMapping(1, sDependency);
 
-        businessDataModelRepository.deploy(BOMBuilder.aBOM().buildZip(), 1);
+        businessDataModelRepository.createServerBDMJar(1, BOMBuilder.aBOM().build());
 
         verify(dependencyService).createDependency(sDependency);
         verify(dependencyService).createDependencyMapping(dependencyMapping);

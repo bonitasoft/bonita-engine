@@ -203,4 +203,9 @@ public class CodeGenerator {
         return elementTypes;
     }
 
+    public void addThrows(JMethod method, String exceptionClassname) {
+        JClass ref = getModel().ref(exceptionClassname);
+        method._throws(ref);
+    }
+
 }

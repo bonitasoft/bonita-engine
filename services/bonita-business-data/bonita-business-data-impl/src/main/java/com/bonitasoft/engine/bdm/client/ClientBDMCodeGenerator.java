@@ -165,12 +165,12 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
             returnType = ((JClass) returnType).narrow(entity);
         }
         JMethod method = addMethodSignature(targetClass, name, returnType);
-        JClass commandNotFoundExceptionClass = getModel().ref("org.bonitasoft.engine.command.CommandNotFoundException");
-        JClass commandExecutionExceptionClass = getModel().ref("org.bonitasoft.engine.command.CommandExecutionException");
-        JClass commandParametrizationExceptionClass = getModel().ref("org.bonitasoft.engine.command.CommandParameterizationException");
-        method._throws(commandNotFoundExceptionClass);
-        method._throws(commandExecutionExceptionClass);
-        method._throws(commandParametrizationExceptionClass);
+        addThrows(method, "org.bonitasoft.engine.command.CommandNotFoundException");
+        addThrows(method, "org.bonitasoft.engine.command.CommandExecutionException");
+        addThrows(method, "org.bonitasoft.engine.command.CommandParameterizationException");
+        addThrows(method, "org.bonitasoft.engine.exception.BonitaHomeNotSetException");
+        addThrows(method, "org.bonitasoft.engine.exception.UnknownAPITypeException");
+        addThrows(method, "org.bonitasoft.engine.exception.ServerAPIException");
 
         return method;
     }

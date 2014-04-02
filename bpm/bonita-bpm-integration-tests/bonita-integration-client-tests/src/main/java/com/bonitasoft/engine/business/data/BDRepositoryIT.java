@@ -2,6 +2,7 @@ package com.bonitasoft.engine.business.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
@@ -314,6 +316,29 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Hakkinen]");
 
         disableAndDeleteProcess(definition);
+    }
+
+    @Test
+    public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
+        String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
+        String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
+                + "data-management"
+                + File.separator + "client";
+        assertThat(new File(clientBdmJarPath, "client-bdm.jar")).exists().isFile();
+    }
+
+    @Test
+    public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
+        login();
+        getTenantManagementAPI().pause();
+        getTenantManagementAPI().uninstallBusinessDataRepository();
+        getTenantManagementAPI().resume();
+
+        String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
+        String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
+                + "data-management"
+                + File.separator + "client";
+        assertThat(new File(clientBdmJarPath, "client-bdm.jar")).doesNotExist();
     }
 
     private ProcessDefinition buildProcessThatUpdateBizDataInsideConnector(final String taskName) throws BonitaException, IOException {
