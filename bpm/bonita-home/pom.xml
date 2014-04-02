@@ -81,6 +81,12 @@
 									<artifactId>hibernate-jpa-2.0-api</artifactId>
 									<type>jar</type>
 								</artifactItem>
+								<artifactItem>
+									<groupId>com.bonitasoft.engine</groupId>
+									<artifactId>bonita-client-sp</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/common/home/server/platform/data-management/compilation-dependencies</outputDirectory>
 						</configuration>
