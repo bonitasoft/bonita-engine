@@ -11,7 +11,6 @@ package com.bonitasoft.engine.persistence;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,16 +29,13 @@ public class DeleteBatchJobRegister implements JobRegister {
 
     private final String repeat;
 
-    private final List<String> classesToPurge;
-
     /**
      * @param classesToPurge
      * @param repeat
      *            cron expression to tell when the job must be run
      *            e.g. * *\/2 * * * ? to run it every 2 minutes
      */
-    public DeleteBatchJobRegister(final List<String> classesToPurge, final String repeat) {
-        this.classesToPurge = classesToPurge;
+    public DeleteBatchJobRegister(final String repeat) {
         this.repeat = repeat;
     }
 
@@ -65,7 +61,7 @@ public class DeleteBatchJobRegister implements JobRegister {
 
     @Override
     public Map<String, Serializable> getJobParameters() {
-        return Collections.singletonMap(DeleteBatchJob.ATTR_CLASSES_TO_PURE, (Serializable) classesToPurge);
+        return Collections.emptyMap();
     }
 
     @Override
