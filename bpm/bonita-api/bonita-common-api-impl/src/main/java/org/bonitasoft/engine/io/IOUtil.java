@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
@@ -393,20 +392,6 @@ public class IOUtil {
             out.write(content);
         } finally {
             out.close();
-        }
-    }
-
-    public static void write(final File file, final byte[] fileContent) throws IOException {
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-        final OutputStream os = new FileOutputStream(file);
-        try {
-            os.write(fileContent);
-            os.flush();
-        } finally {
-            os.close();
         }
     }
 
