@@ -114,7 +114,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             final List<Operation> outputs = connectorDefinition.getOutputs();
             final ArrayList<SOperation> operations = new ArrayList<SOperation>(outputs.size());
             for (final Operation operation : outputs) {
-                operations.add(ModelConvertor.constructSOperation(operation));
+                operations.add(ModelConvertor.convertOperation(operation));
             }
             expcontext.setInputValues(result.getResult());
             connectorService.executeOutputOperation(operations, expcontext, result);
