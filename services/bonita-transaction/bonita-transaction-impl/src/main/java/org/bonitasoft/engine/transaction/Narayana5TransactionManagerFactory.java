@@ -17,23 +17,23 @@ import java.lang.reflect.Method;
 
 import javax.transaction.TransactionManager;
 
-public class Narayana5TransactionManagerAccessor {
+public class Narayana5TransactionManagerFactory {
 
     private static TransactionManager transactionManager;
 
-    public Narayana5TransactionManagerAccessor() throws Exception {
+    public Narayana5TransactionManagerFactory() throws Exception {
         final Class<?> jtaPropertyManagerClass = Class.forName("com.arjuna.ats.jta.common.jtaPropertyManager");
         final Method getJTAEnvironmentBeanMethod = jtaPropertyManagerClass.getMethod("getJTAEnvironmentBean");
         final Object jtaEnvironmentBeanInstance = getJTAEnvironmentBeanMethod.invoke((Object) null);
         final Class<?> jtaEnvironmentBeanClass = jtaEnvironmentBeanInstance.getClass();
-        
+
         final Method getTransactionManagerMethod = jtaEnvironmentBeanClass.getMethod("getTransactionManager");
         transactionManager = (TransactionManager) getTransactionManagerMethod.invoke(jtaEnvironmentBeanInstance);
-        
-        //System.err.println("Configured transactionManager:" + transactionManager);
+
+        // System.err.println("Configured transactionManager:" + transactionManager);
     }
 
-    public static TransactionManager getTransactionManager() {
+    public TransactionManager getTransactionManager() {
         return transactionManager;
     }
 

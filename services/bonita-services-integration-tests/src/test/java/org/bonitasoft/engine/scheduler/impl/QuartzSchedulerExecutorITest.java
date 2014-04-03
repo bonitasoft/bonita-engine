@@ -19,8 +19,8 @@ import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 import org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy;
-import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
+import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
@@ -407,12 +407,12 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().complete();
 
         final int value = IncrementItselfJob.getValue();
-
-        Thread.sleep(2000);
-
+      
+        Thread.sleep(1500);
+      
         final int newValue = IncrementItselfJob.getValue();
         final int delta = newValue - value;
-        assertTrue("expected 1 or 2, 3 execution in 2 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
+        assertTrue("expected 1,2 or 3 executions in 1.5 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
     }
 
     @Test

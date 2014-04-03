@@ -131,6 +131,14 @@ public interface PersistenceService extends ReadPersistenceService {
     /**
      * Delete elements that are marked to be deleted
      * 
+     * @throws SPersistenceException
+     * @throws SRetryableException
+     */
+    void purge() throws SPersistenceException;
+
+    /**
+     * Delete elements that are marked to be deleted
+     * 
      * @param classToPurge
      *            the class to purge
      * @throws SPersistenceException
