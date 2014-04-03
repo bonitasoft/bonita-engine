@@ -18,6 +18,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +27,12 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -36,6 +40,8 @@ import java.util.zip.ZipOutputStream;
  * @author Celine Souchet
  */
 public class IOUtil {
+
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -234,7 +240,18 @@ public class IOUtil {
     }
 
     public static byte[] zip(final Map<String, byte[]> files) throws IOException {
-        return org.bonitasoft.engine.commons.io.IOUtil.zip(files);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
+            for (final Entry<String, byte[]> file : files.entrySet()) {
+                zos.putNextEntry(new ZipEntry(file.getKey()));
+                zos.write(file.getValue());
+                zos.closeEntry();
+            }
+            return baos.toByteArray();
+        } finally {
+            zos.close();
+        }
     }
 
     /**
@@ -281,7 +298,22 @@ public class IOUtil {
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
-        return org.bonitasoft.engine.commons.io.IOUtil.read(inputStream);
+        final Scanner scanner = new Scanner(inputStream, fEncoding);
+        final StringBuilder text = new StringBuilder();
+        try {
+            boolean isFirst = true;
+            while (scanner.hasNextLine()) {
+                if (isFirst) {
+                    text.append(scanner.nextLine());
+                } else {
+                    text.append(LINE_SEPARATOR + scanner.nextLine());
+                }
+                isFirst = false;
+            }
+        } finally {
+            scanner.close();
+        }
+        return text.toString();
     }
 
     /**
@@ -290,11 +322,75 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        return org.bonitasoft.engine.commons.io.IOUtil.read(file);
+        FileInputStream inputStream = new FileInputStream(file);
+        try {
+            return read(inputStream);
+        } finally {
+            inputStream.close();
+        }
     }
 
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
-        org.bonitasoft.engine.commons.io.IOUtil.unzipToFolder(inputStream, outputFolder);
+        final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
+        ZipEntry zipEntry = null;
+
+        try {
+            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+                extractZipEntry(zipInputstream, zipEntry, outputFolder);
+            }
+        } finally {
+            zipInputstream.close();
+        }
+    }
+
+    private static boolean mkdirs(final File file) {
+        if (!file.exists()) {
+            return file.mkdirs();
+        }
+        return true;
+    }
+
+    private static void extractZipEntry(final ZipInputStream zipInputstream, final ZipEntry zipEntry, final File outputFolder) throws FileNotFoundException,
+            IOException {
+        try {
+            final String entryName = zipEntry.getName();
+            // entryName = entryName.replace('/', File.separatorChar);
+            // entryName = entryName.replace('\\', File.separatorChar);
+
+            // For each entry, a file is created in the output directory "folder"
+            final File outputFile = new File(outputFolder.getAbsolutePath(), entryName);
+
+            // If the entry is a directory, it creates in the output folder, and we go to the next entry (return).
+            if (zipEntry.isDirectory()) {
+                mkdirs(outputFile);
+                return;
+            }
+            writeZipInputToFile(zipInputstream, outputFile);
+        } finally {
+            zipInputstream.closeEntry();
+        }
+    }
+
+    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
+        // The input is a file. An FileOutputStream is created to write the content of the new file.
+        mkdirs(outputFile.getParentFile());
+        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        try {
+            try {
+                // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
+                int bytesRead;
+                final byte[] buffer = new byte[BUFFER_SIZE];
+                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+            } finally {
+                fileOutputStream.close();
+            }
+        } catch (final IOException ioe) {
+            // In case of error, the file is deleted
+            outputFile.delete();
+            throw ioe;
+        }
     }
 
     public static void writeContentToFile(final String content, final File outputFile) throws IOException {
@@ -304,10 +400,6 @@ public class IOUtil {
         } finally {
             out.close();
         }
-    }
-
-    public static File createTempDirectory(final String fileName) throws IOException {
-        return org.bonitasoft.engine.commons.io.IOUtil.createTempDirectory(fileName);
     }
 
 }
