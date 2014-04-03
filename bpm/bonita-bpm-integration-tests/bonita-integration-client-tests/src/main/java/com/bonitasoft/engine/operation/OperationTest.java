@@ -150,7 +150,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step1", actorName);
         designProcessDefinition.addUserTask("step3", actorName);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createDataLeftOperand("baseData"), OperatorType.ASSIGNMENT, null, "",
+        addAutomaticTask.addOperation(new LeftOperandBuilder().createDataLeftOperand("baseData"), OperatorType.ASSIGNMENT, null, null,
                 new ExpressionBuilder().createConstantStringExpression("changedData"));
         addAutomaticTask.addOperation(OperationBuilder.setStringIndex(1).with(new ExpressionBuilder().createDataExpression("baseData", String.class.getName()))
                 .done());

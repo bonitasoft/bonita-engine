@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -13,19 +13,20 @@ import java.util.concurrent.ExecutorService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
-import org.bonitasoft.engine.work.ExecutorWorkService;
 import org.bonitasoft.engine.work.WorkSynchronizationFactory;
 
 /**
  * @author Charles Souillard
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ParallelWorkSynchronizationFactory implements WorkSynchronizationFactory {
 
+    @SuppressWarnings("unused")
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor, final ExecutorWorkService threadPoolWorkService) {
-        return new ParallelWorkSynchronization(executorService, loggerService, sessionAccessor, threadPoolWorkService);
+            final SessionAccessor sessionAccessor) {
+        return new ParallelWorkSynchronization(executorService, sessionAccessor);
     }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -12,12 +12,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -29,6 +27,7 @@ import com.hazelcast.core.HazelcastInstance;
  * Cache service that uses hazelcast
  * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public abstract class CommonClusteredCacheService implements CommonCacheService {
 
@@ -50,7 +49,7 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     @Override
-    public void store(final String cacheName, final Serializable key, final Object value) throws CacheException {
+    public void store(final String cacheName, final Serializable key, final Object value) throws SCacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "store"));
         }
@@ -71,12 +70,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public Object get(final String cacheName, final Object key) throws CacheException {
+    public Object get(final String cacheName, final Object key) throws SCacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "get"));
         }
@@ -99,12 +98,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public List<Object> getKeys(final String cacheName) throws CacheException {
+    public List<Object> getKeys(final String cacheName) throws SCacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getKeys"));
         }
@@ -127,12 +126,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public boolean remove(final String cacheName, final Object key) throws CacheException {
+    public boolean remove(final String cacheName, final Object key) throws SCacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "remove"));
         }
@@ -154,12 +153,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public boolean clear(final String cacheName) throws CacheException {
+    public boolean clear(final String cacheName) throws SCacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "clear"));
         }
@@ -181,12 +180,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public void clearAll() throws CacheException {
+    public void clearAll() throws SCacheException {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "clearAll"));
@@ -202,36 +201,36 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "clearAll", e));
             }
-            throw new CacheException(e);
+            throw new SCacheException(e);
         }
 
     }
 
     @Override
-    public int getCacheSize(final String cacheName) throws CacheException {
+    public int getCacheSize(final String cacheName) throws SCacheException {
         final Map<Serializable, Object> cache = hazelcastInstance.getMap(getKeyFromCacheName(cacheName));
         return cache.size();
     }
 
-    protected abstract String getKeyFromCacheName(final String cacheName) throws CacheException;
+    protected abstract String getKeyFromCacheName(final String cacheName) throws SCacheException;
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         // do nothing, we start/stop hazelcast, not this service
     }
 
     @Override
-    public void stop() throws SBonitaException, TimeoutException {
+    public void stop() {
         // do nothing, we start/stop hazelcast, not this service
     }
 
     @Override
-    public void pause() throws SBonitaException, TimeoutException {
+    public void pause() {
         // nothing to do
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         // nothing to do
     }
 

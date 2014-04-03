@@ -8,15 +8,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider">
-		<property name="expressionExecutors">
-			<list>
-				<ref bean="assignmentOperationExecutorStrategy" />
-				<ref bean="javaMethodOperationExecutorStrategy" />
-				<ref bean="xpathUpdateQueryOperationExecutorStrategy" />
-			</list>
-		</property>
-	</bean>
+	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor" />
 
 	<bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
 		<property name="leftOperandHandlers">

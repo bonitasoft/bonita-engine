@@ -8,9 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
+import java.security.Principal;
+import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -37,9 +41,50 @@ public class MockLoginModule implements LoginModule {
     public MockLoginModule() {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void initialize(final Subject subject, final CallbackHandler callbackHandler, final Map<String, ?> sharedState, final Map<String, ?> options) {
         this.callbackHandler = callbackHandler;
+        subject.getPrincipals().add(new Group() {
+            
+            Principal userPrincipal = new Principal() {
+                
+                @Override
+                public String getName() {
+                    return "admin";
+                }
+            };
+            
+            @Override
+            public String getName() {
+                return "CallerPrincipal";
+            }
+            
+            @Override
+            public boolean removeMember(Principal user) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            @Override
+            public Enumeration<? extends Principal> members() {
+                Vector<Principal> principals = new Vector<Principal>();
+                principals.add(userPrincipal);
+                return principals.elements();
+            }
+            
+            @Override
+            public boolean isMember(Principal member) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            @Override
+            public boolean addMember(Principal user) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
     }
 
     @Override
@@ -77,17 +122,17 @@ public class MockLoginModule implements LoginModule {
     }
 
     @Override
-    public boolean commit() throws LoginException {
+    public boolean commit() {
         return true;
     }
 
     @Override
-    public boolean abort() throws LoginException {
+    public boolean abort() {
         return true;
     }
 
     @Override
-    public boolean logout() throws LoginException {
+    public boolean logout() {
         return true;
     }
 

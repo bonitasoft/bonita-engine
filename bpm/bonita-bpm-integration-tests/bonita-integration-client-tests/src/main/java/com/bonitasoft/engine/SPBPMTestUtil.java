@@ -193,7 +193,7 @@ public class SPBPMTestUtil {
             for (int i = 0; i < stepNames.size() - 1; i++) {
                 if (transitionDefinitionBuilder != null) {
                     transitionDefinitionBuilder = transitionDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
-                } else {
+                } else if (activityDefinitionBuilder != null) {
                     transitionDefinitionBuilder = activityDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
                 }
             }

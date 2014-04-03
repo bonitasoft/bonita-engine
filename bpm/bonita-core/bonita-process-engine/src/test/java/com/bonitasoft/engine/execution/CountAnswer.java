@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -13,6 +13,7 @@ import org.mockito.stubbing.Answer;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class CountAnswer implements Answer<Void> {
 
@@ -22,8 +23,9 @@ public class CountAnswer implements Answer<Void> {
         return count;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public Void answer(final InvocationOnMock invocation) throws Throwable {
+    public Void answer(final InvocationOnMock invocation) {
         count++;
         return null;
     }

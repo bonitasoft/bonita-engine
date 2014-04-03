@@ -100,7 +100,7 @@ public class ClusteredLockService implements LockService {
     }
 
     @Override
-    public void unlock(final BonitaLock bonitaLock, final long tenantId) throws SLockException {
+    public void unlock(final BonitaLock bonitaLock, final long tenantId) {
         final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType(), tenantId);
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);

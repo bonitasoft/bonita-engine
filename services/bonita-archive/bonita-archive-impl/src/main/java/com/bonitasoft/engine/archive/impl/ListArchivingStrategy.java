@@ -10,7 +10,6 @@ package com.bonitasoft.engine.archive.impl;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.archive.ArchivingStrategy;
 import org.bonitasoft.engine.archive.impl.AbstractArchivingStrategy;
 
 import com.bonitasoft.manager.Features;
@@ -20,7 +19,7 @@ import com.bonitasoft.manager.Manager;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ListArchivingStrategy extends AbstractArchivingStrategy implements ArchivingStrategy {
+public class ListArchivingStrategy extends AbstractArchivingStrategy {
 
     public ListArchivingStrategy(final Map<String, Boolean> archives) {
         super(archives);

@@ -15,8 +15,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -57,7 +57,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     }
 
     @Override
-    public ClassLoader getGlobalClassLoader() throws ClassLoaderException {
+    public ClassLoader getGlobalClassLoader() throws SClassLoaderException {
         return classLoaderService.getGlobalClassLoader();
     }
 
@@ -73,7 +73,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
     @Override
     public ClassLoader getLocalClassLoader(final String type, final long id)
-            throws ClassLoaderException {
+            throws SClassLoaderException {
         return classLoaderService.getLocalClassLoader(type, id);
     }
 
@@ -91,7 +91,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
     @Override
     public void refreshGlobalClassLoader(final Map<String, byte[]> resources)
-            throws ClassLoaderException {
+            throws SClassLoaderException {
 
         // we use the executor service to refresh classloader on all nodes
 
@@ -104,7 +104,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
     @Override
     public void refreshLocalClassLoader(final String type, final long id,
-            final Map<String, byte[]> resources) throws ClassLoaderException {
+            final Map<String, byte[]> resources) throws SClassLoaderException {
 
         // we use the executor service to refresh classloader on all nodes
 
@@ -116,7 +116,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
     private void executeRefreshOnCluster(final String type, final long id,
             final RefreshClassLoaderTask refreshClassLoaderTask)
-            throws ClassLoaderException {
+            throws SClassLoaderException {
         long before = System.currentTimeMillis();
         Map<Member, Future<TaskStatus>> submitToAllMembers = hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(refreshClassLoaderTask);
         // wait for result;
@@ -136,15 +136,15 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
                 if (result.isError()) {
                     loggerService.log(ClusteredClassLoaderService.class,
                             TechnicalLogSeverity.DEBUG, result.getThrowable());
-                    throw new ClassLoaderException(result.getThrowable());
+                    throw new SClassLoaderException(result.getThrowable());
                 }
             }
         } catch (ExecutionException e) {
             // exception in a node
-            throw new ClassLoaderException(e);
+            throw new SClassLoaderException(e);
         } catch (InterruptedException e) {
             // TIMEOUT
-            throw new ClassLoaderException(e);
+            throw new SClassLoaderException(e);
         }
     }
 

@@ -10,12 +10,18 @@ package com.bonitasoft.engine.licence;
 
 import org.apache.commons.log.ConfigurationError;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
 public class LicenseTest {
+
+    @BeforeClass
+    public static void setBonitaHome() {
+        System.setProperty("bonita.home", "target/home");
+    }
 
     @Test
     public void validateLicence() {

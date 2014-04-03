@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,57 +8,28 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
+import java.io.Serializable;
+import java.util.Map;
 
 import org.bonitasoft.engine.authentication.AuthenticationException;
-import org.bonitasoft.engine.authentication.AuthenticationService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
-public class JAASAuthenticationServiceImpl implements AuthenticationService {
+public class JAASAuthenticationServiceImpl implements GenericAuthenticationService {
 
-    private static final String LOGIN_CONTEXT_PREFIX = "BonitaAuthentication";
-
-    private final TechnicalLoggerService logger;
-
-    private final ReadSessionAccessor sessionAccessor;
+    protected JAASGenericAuthenticationServiceImpl jaasGenericAuthenticationServiceImpl;
 
     public JAASAuthenticationServiceImpl(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor) {
-        this.logger = logger;
-        this.sessionAccessor = sessionAccessor;
+        this.jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(logger, sessionAccessor);
     }
 
     @Override
-    public boolean checkUserCredentials(final String username, final String password) throws AuthenticationException {
-        LoginContext loginContext = null;
-        try {
-            loginContext = new LoginContext(getLoginContext(), new AuthenticationCallbackHandler(username, password));
-        } catch (final Exception e) {
-            throw new AuthenticationException(e);
-        }
-        try {
-            loginContext.login();
-        } catch (final LoginException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "", e);
-            }
-            return false;
-        }
-        try {
-            loginContext.logout();
-        } catch (final LoginException e) {
-            throw new AuthenticationException(e);
-        }
-        return true;
-    }
-
-    private String getLoginContext() throws TenantIdNotSetException {
-        return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
+    public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
+        return this.jaasGenericAuthenticationServiceImpl.checkUserCredentials(credentials);
     }
 }

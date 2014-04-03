@@ -9,14 +9,11 @@
 package com.bonitasoft.engine.persistence;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
 
@@ -29,10 +26,6 @@ public class DeleteBatchJob implements StatelessJob {
     private static final long serialVersionUID = 1L;
 
     private PersistenceService persistenceService;
-
-    public static final String ATTR_CLASSES_TO_PURE = "classesToPurge";
-
-    private List<String> classesToPurge;
 
     @InjectedService
     public void setPersistenceService(final PersistenceService persistenceService) {
@@ -50,20 +43,15 @@ public class DeleteBatchJob implements StatelessJob {
     }
 
     @Override
-    public void execute() throws SJobExecutionException, FireEventException {
-        for (final String classToPurge : classesToPurge) {
-            try {
-                persistenceService.purge(classToPurge);
-            } catch (final SBonitaException e) {
-                throw new SJobExecutionException(e);
-            }
+    public void execute() throws SJobExecutionException {
+        try {
+            persistenceService.purge();
+        } catch (final SBonitaException e) {
+            throw new SJobExecutionException(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-        classesToPurge = (List<String>) attributes.get(ATTR_CLASSES_TO_PURE);
+    public void setAttributes(final Map<String, Serializable> attributes) {
     }
-
 }

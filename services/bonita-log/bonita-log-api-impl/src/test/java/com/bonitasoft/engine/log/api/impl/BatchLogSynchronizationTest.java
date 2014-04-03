@@ -12,7 +12,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.transaction.TransactionState;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -45,13 +44,8 @@ public class BatchLogSynchronizationTest {
     @Captor
     private ArgumentCaptor<List<PersistentObject>> captor;
 
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
     @Test
-    public void afterCompletion_add_logs_to_buffer_clean_synchro_if_delayable_and_transaction_was_committed() throws Exception {
+    public void afterCompletion_add_logs_to_buffer_clean_synchro_if_delayable_and_transaction_was_committed() {
         // given
         BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, true, loggerService);
         synchro.addLog(log1);
@@ -66,7 +60,7 @@ public class BatchLogSynchronizationTest {
     }
 
     @Test
-    public void afterCompletion_clear_synchro_but_doesnt_add_logs_to_buffer_if_not_delayable_and_transaction_was_committed() throws Exception {
+    public void afterCompletion_clear_synchro_but_doesnt_add_logs_to_buffer_if_not_delayable_and_transaction_was_committed() {
         // given
         BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, false, loggerService);
         synchro.addLog(log1);
@@ -81,7 +75,7 @@ public class BatchLogSynchronizationTest {
     }
 
     @Test
-    public void afterCompletion_doesnt_add_logs_to_buffer_if_delayable_and_transaction_wasnt_committed() throws Exception {
+    public void afterCompletion_doesnt_add_logs_to_buffer_if_delayable_and_transaction_wasnt_committed() {
         // given
         BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, true, loggerService);
         synchro.addLog(log1);

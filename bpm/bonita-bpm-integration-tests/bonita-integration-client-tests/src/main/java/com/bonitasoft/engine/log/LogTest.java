@@ -280,7 +280,7 @@ public class LogTest extends CommonAPISPTest {
                 null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         waitForUserTask("step1");
 

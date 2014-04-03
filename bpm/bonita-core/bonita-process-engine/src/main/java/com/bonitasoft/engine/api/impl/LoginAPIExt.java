@@ -9,9 +9,12 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.LoginException;
@@ -34,22 +37,57 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final String userName, final String password) throws LoginException {
+    public APISession login(final String userName, final String password) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started: " + LicenseChecker.getInstance().getErrorMessage());
+            throw new LoginException("The node is not started : " + LicenseChecker.getInstance().getErrorMessage());
         }
-        return super.login(userName, password);
+        try {
+            return loginInternal(userName, password, null);
+        } catch (final LoginException e) {
+            throw e;
+        } catch (final TenantIsPausedException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new LoginException(e);
+        }
     }
 
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final long tenantId, final String userName, final String password) throws LoginException {
+    public APISession login(final long tenantId, final String userName, final String password) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started");
+            throw new LoginException("The node is not started !!");
         }
-        checkUsernameAndPassword(userName, password);
-        return login(userName, password, tenantId);
+        try {
+            return loginInternal(userName, password, tenantId);
+        } catch (final LoginException e) {
+            throw e;
+        } catch (final TenantIsPausedException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new LoginException(e);
+        }
+    }
+
+    @Override
+    public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException {
+        if (!LicenseChecker.getInstance().checkLicence()) {
+            throw new LoginException("The node is not started !!");
+        }
+        checkCredentials(credentials);
+        if (credentials != null) {
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        }
+        try {
+            return loginInternal(tenantId, credentials);
+        } catch (final LoginException e) {
+            throw e;
+        } catch (final TenantIsPausedException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new LoginException(e);
+        }
     }
 
     @Override
@@ -58,16 +96,21 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     }
 
     @Override
-    protected void checkThatWeCanLogin(final String userName, final Long tenantId, final PlatformService platformService, final STenant sTenant,
-            final long resolvedTenantId)
-            throws LoginException, BonitaHomeNotSetException, IOException {
-        super.checkThatWeCanLogin(userName, tenantId, platformService, sTenant, resolvedTenantId);
-        if (sTenant.isPaused()) {
-            String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(resolvedTenantId).getProperty("userName");
-            if (!technicalUserName.equals(userName)) {
-                throw new TenantIsPausedException("Tenant with ID " + tenantId
-                        + " is in maintenance, unable to login with other user than the technical user.");
+    protected void checkThatWeCanLogin(final String userName, final PlatformService platformService, final STenant sTenant) throws LoginException {
+        super.checkThatWeCanLogin(userName, platformService, sTenant);
+        try {
+            if (sTenant.isPaused()) {
+                final String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(sTenant.getId()).getProperty("userName");
+
+                if (!technicalUserName.equals(userName)) {
+                    throw new TenantIsPausedException("Tenant with ID " + sTenant.getId()
+                            + " is in maintenance, unable to login with other user than the technical user.");
+                }
             }
+        } catch (BonitaHomeNotSetException e) {
+            throw new LoginException(e);
+        } catch (IOException e) {
+            throw new LoginException(e);
         }
     }
 
