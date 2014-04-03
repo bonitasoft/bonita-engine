@@ -30,7 +30,7 @@
 			</value>
 		</constructor-arg>
 		<constructor-arg name="clientStoragePath">
-			<value>${bonita.home}/server/tenants/${tenantId}/data-management/client
+			<value>${bonita.home}/server/platform/data-management/client
 			</value>
 		</constructor-arg>
 	</bean>
