@@ -160,7 +160,7 @@ public class SupervisorTest extends CommonAPITest {
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>(1);
         fieldValues.put("field_fieldId1", "Excel");
         final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
-        final Operation operation = buildOperation("Application", OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Operation operation = buildOperation("Application", false, OperatorType.ASSIGNMENT, "=", rightOperand);
         final List<Operation> operationsMap = new ArrayList<Operation>(1);
         operationsMap.add(operation);
         final Map<String, Serializable> executeParameters = new HashMap<String, Serializable>(2);

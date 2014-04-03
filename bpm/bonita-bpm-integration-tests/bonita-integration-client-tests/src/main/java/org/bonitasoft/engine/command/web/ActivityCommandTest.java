@@ -84,7 +84,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", updatedValue);
         final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
-        executeActionsAndTerminate("dataName", activityInstanceId, fieldValues, rightOperand);
+        executeActionsAndTerminate("dataName", true, activityInstanceId, fieldValues, rightOperand);
 
         // Get value of updated data in connector
         waitForUserTask("step2", processInstance);
@@ -108,7 +108,7 @@ public class ActivityCommandTest extends CommonAPITest {
         // the operation execute a groovy script that depend in a class in the jar
         final Expression rightOperand = new ExpressionBuilder().createGroovyScriptExpression("myScript",
                 "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName());
-        executeActionsAndTerminate("application", activityInstanceId, fieldValues, rightOperand);
+        executeActionsAndTerminate("application", false, activityInstanceId, fieldValues, rightOperand);
 
         // Clean
         disableAndDeleteProcess(processDefinition);
@@ -126,7 +126,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Excel");
         final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
-        executeActionsAndTerminate("application", activityInstanceId, fieldValues, rightOperand);
+        executeActionsAndTerminate("application", false, activityInstanceId, fieldValues, rightOperand);
 
         // check we have the other task ready and the operation was executed
         waitForUserTask("step2", processInstance);
@@ -192,9 +192,10 @@ public class ActivityCommandTest extends CommonAPITest {
         return processDefinitionBuilder;
     }
 
-    private void executeActionsAndTerminate(final String dataName, final long taskId, final Map<String, Serializable> fieldValues, final Expression rightOperand)
+    private void executeActionsAndTerminate(final String dataName, final boolean isTransient, final long taskId, final Map<String, Serializable> fieldValues,
+            final Expression rightOperand)
             throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
-        final Operation operation = buildOperation(dataName, OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Operation operation = buildOperation(dataName, isTransient, OperatorType.ASSIGNMENT, "=", rightOperand);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();

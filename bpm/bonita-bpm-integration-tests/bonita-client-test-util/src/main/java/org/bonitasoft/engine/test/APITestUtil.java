@@ -1473,12 +1473,14 @@ public class APITestUtil {
         getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
     }
 
-    public Operation buildOperation(final String dataName, final OperatorType operatorType, final String operator, final Expression rightOperand) {
+    public Operation buildOperation(final String dataName, final boolean isTransient, final OperatorType operatorType, final String operator,
+            final Expression rightOperand) {
         final OperationBuilder operationBuilder = new OperationBuilder().createNewInstance();
         operationBuilder.setOperator(operator);
         operationBuilder.setRightOperand(rightOperand);
         operationBuilder.setType(operatorType);
-        operationBuilder.setLeftOperand(new LeftOperandBuilder().createDataLeftOperand(dataName));
+        operationBuilder.setLeftOperand(new LeftOperandBuilder().createNewInstance(dataName)
+                .setType(isTransient ? LeftOperand.TRANSIENT_DATA : LeftOperand.DATA).done());
         return operationBuilder.done();
     }
 

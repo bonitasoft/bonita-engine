@@ -147,6 +147,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -155,6 +156,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -1670,6 +1672,31 @@ public class ModelConvertor {
         } catch (final SInvalidExpressionException e) {
             throw new IllegalArgumentException("Error constructing SExpression");
         }
+    }
+
+    public static SOperation convertOperation(final Operation operation) {
+        if (operation == null) {
+            return null;
+        }
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
+                .setType(SOperatorType.valueOf(operation.getType().name()))
+                .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                        .setName(operation.getLeftOperand().getName())
+                        .setType(operation.getLeftOperand().getType())
+                        .done())
+                .done();
+    }
+
+    public static List<SOperation> convertOperations(final List<Operation> operations) {
+        if (operations == null) {
+            return Collections.emptyList();
+        }
+        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
+        for (final Operation operation : operations) {
+            sOperations.add(convertOperation(operation));
+        }
+        return sOperations;
     }
 
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(

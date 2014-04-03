@@ -712,11 +712,11 @@ public class ProcessManagementTest extends CommonAPITest {
 
         DataInstance dataInstance = getProcessAPI().getActivityDataInstance(dataName1, activityInstanceId);
         final String newConstantValue1 = "afterUpdate";
-        final Operation stringOperation = buildStringOperation(dataInstance.getName(), newConstantValue1);
+        final Operation stringOperation = buildStringOperation(dataInstance.getName(), newConstantValue1, false);
 
         final String newConstantValue2 = "GOLDORAK";
         dataInstance = getProcessAPI().getActivityDataInstance(dataName2, activityInstanceId);
-        final Operation stringOperation2 = buildStringOperation(dataInstance.getName(), newConstantValue2);
+        final Operation stringOperation2 = buildStringOperation(dataInstance.getName(), newConstantValue2, false);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
         operations.add(stringOperation2);
@@ -767,7 +767,7 @@ public class ProcessManagementTest extends CommonAPITest {
         assertThat(values).contains("aacti", "bprocess", "cprocess", "dprocess", "eprocess", "facti");
         final List<Operation> operations = new ArrayList<Operation>();
         for (DataInstance dataInstance2 : dataInstances) {
-            final Operation stringOperation = buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up");
+            final Operation stringOperation = buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up", false);
             operations.add(stringOperation);
         }
         getProcessAPI().updateActivityInstanceVariables(operations, step1.getId(), null);
@@ -1520,7 +1520,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Operation stringOperation = buildStringOperation("aData", "15");
+        final Operation stringOperation = buildStringOperation("aData", "15", false);
         final Map<String, Serializable> context = new HashMap<String, Serializable>();
         context.put("page", "1");
 
@@ -1545,7 +1545,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Operation stringOperation = buildStringOperation("aData", "15");
+        final Operation stringOperation = buildStringOperation("aData", "15", false);
         final Map<String, Serializable> context = new HashMap<String, Serializable>();
         context.put("page", "1");
 
@@ -1570,7 +1570,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Operation stringOperation = buildStringOperation("aData", "15");
+        final Operation stringOperation = buildStringOperation("aData", "15", false);
         final ArrayList<Operation> operations = new ArrayList<Operation>(1);
         operations.add(stringOperation);
         final Map<String, Serializable> context = new HashMap<String, Serializable>();
