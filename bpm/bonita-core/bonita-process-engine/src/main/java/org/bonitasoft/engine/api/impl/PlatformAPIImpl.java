@@ -477,15 +477,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    try {
-                        final STenant tenant = getDefaultTenant();
-                        deactiveTenant(tenant.getId());
-                    } catch (final STenantNotFoundException e) {
-
-                    }
                     clean.execute();
                     deleteAll.execute();
-
                     return null;
                 }
             });
@@ -721,7 +714,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -732,7 +725,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(transactionContentForTenant);
 
             // stop tenant services and clear the spring context
-            TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
             // stop the tenant services:
             final SetServiceState stopService = new SetServiceState(tenantId, new StopServiceStrategy());

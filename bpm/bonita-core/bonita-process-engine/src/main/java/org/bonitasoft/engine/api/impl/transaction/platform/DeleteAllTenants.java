@@ -37,7 +37,8 @@ public class DeleteAllTenants implements TransactionContent {
         List<STenant> tenants;
         do {
             tenants = platformService.getTenants(QueryOptions.defaultQueryOptions());
-            for (STenant sTenant : tenants) {
+            for (final STenant sTenant : tenants) {
+                platformService.deactiveTenant(sTenant.getId());
                 platformService.deleteTenant(sTenant.getId());
             }
         } while (tenants.size() > 0);
