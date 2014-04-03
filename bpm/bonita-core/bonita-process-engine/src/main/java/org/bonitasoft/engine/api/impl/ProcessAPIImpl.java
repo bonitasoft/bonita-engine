@@ -212,7 +212,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -487,7 +486,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchHumanTaskInstances searchHumanTasksTransaction = new SearchHumanTaskInstances(activityInstanceService, flowNodeStateManager,
                 searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), searchOptions);
-            searchHumanTasksTransaction.execute();
+        searchHumanTasksTransaction.execute();
         return searchHumanTasksTransaction.getResult();
     }
 
@@ -2863,16 +2862,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
         if (userTaskInstances.size() != 0) {
-        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
                 final String stateName = userTaskInstance.getState();
-            try {
+                try {
                     final SProcessInstance sProcessInstance = getSProcessInstance(userTaskInstance.getRootContainerId());
                     if (stateName.equals(ActivityStates.READY_STATE) && sProcessInstance.getProcessDefinitionId() == processDefinitionId) {
                         return userTaskInstance.getId();
                     }
-            } catch (final SBonitaException e) {
-                throw new RetrieveException(e);
-            }
+                } catch (final SBonitaException e) {
+                    throw new RetrieveException(e);
+                }
             }
         }
         return -1;
@@ -3291,7 +3290,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         } catch (final NotSerializableException e) {
@@ -3692,7 +3691,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         try {
-            supervisorService.deleteSupervisor(supervisorId);
+            supervisorService.deleteProcessSupervisor(supervisorId);
         } catch (final SSupervisorNotFoundException e) {
             throw new DeletionException("supervisor not found with id " + supervisorId);
         } catch (final SSupervisorDeletionException e) {
@@ -3705,25 +3704,12 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
 
-        // Prepare search options
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
-        searchOptionsBuilder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
-        searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId == null ? -1 : processDefinitionId);
-        searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.USER_ID, userId == null ? -1 : userId);
-        searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.ROLE_ID, roleId == null ? -1 : roleId);
-        searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.GROUP_ID, groupId == null ? -1 : groupId);
-        final SearchProcessSupervisorDescriptor searchDescriptor = new SearchProcessSupervisorDescriptor();
-        final SearchSupervisors searchSupervisorsTransaction = new SearchSupervisors(supervisorService, searchDescriptor, searchOptionsBuilder.done());
-
         try {
-            // Search the supervisor corresponding to criteria
-            searchSupervisorsTransaction.execute();
-            final SearchResult<ProcessSupervisor> result = searchSupervisorsTransaction.getResult();
+            final List<SProcessSupervisor> sProcessSupervisors = searchSProcessSupervisors(processDefinitionId, userId, groupId, roleId);
 
-            if (result.getCount() > 0) {
+            if (!sProcessSupervisors.isEmpty()) {
                 // Then, delete it
-                final List<ProcessSupervisor> processSupervisors = result.getResult();
-                supervisorService.deleteSupervisor(processSupervisors.get(0).getSupervisorId());
+                supervisorService.deleteProcessSupervisor(sProcessSupervisors.get(0));
             } else {
                 throw new SSupervisorNotFoundException("No supervisor was found with userId = " + userId + ", roleId = " + roleId + ", groupId = " + groupId
                         + ", processDefinitionId = " + processDefinitionId);
@@ -3757,14 +3743,13 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private ProcessSupervisor createSupervisor(final long processDefinitionId, final Long userId, final Long groupId, final Long roleId,
             final MemberType memberType) throws CreationException, AlreadyExistsException {
-        SProcessSupervisor supervisor;
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        // TODO : Check in first if the supervisor already exists. See create user in identityAPI
-        // throw new AlreadyExistsException("This supervisor already exists");
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
 
         try {
-            final SProcessSupervisorBuilder supervisorBuilder = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(
+            checkIfProcessSupervisorAlreadyExists(processDefinitionId, userId, groupId, roleId);
+            final SProcessSupervisorBuilder supervisorBuilder = sProcessSupervisorBuilderFactory.createNewInstance(
                     processDefinitionId);
             switch (memberType) {
                 case USER:
@@ -3787,12 +3772,40 @@ public class ProcessAPIImpl implements ProcessAPI {
                     throw new IllegalStateException();
             }
 
-            supervisor = supervisorBuilder.done();
-            supervisor = supervisorService.createSupervisor(supervisor);
+            final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(supervisorBuilder.done());
             return ModelConvertor.toProcessSupervisor(supervisor);
-        } catch (final SSupervisorCreationException e) {
+        } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
+    }
+
+    protected void checkIfProcessSupervisorAlreadyExists(final long processDefinitionId, final Long userId, final Long groupId, final Long roleId)
+            throws SBonitaSearchException, AlreadyExistsException {
+        final List<SProcessSupervisor> processSupervisors = searchSProcessSupervisors(processDefinitionId, userId, groupId, roleId);
+        if (!processSupervisors.isEmpty()) {
+            throw new AlreadyExistsException("This supervisor already exists");
+        }
+    }
+
+    protected List<SProcessSupervisor> searchSProcessSupervisors(final Long processDefinitionId, final Long userId, final Long groupId, final Long roleId)
+            throws SBonitaSearchException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
+
+        final List<OrderByOption> oderByOptions = Collections.singletonList(new OrderByOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
+                .getUserIdKey(), OrderByType.DESC));
+        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
+                .getProcessDefIdKey(), processDefinitionId == null ? -1 : processDefinitionId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
+                .getUserIdKey(), userId == null ? -1 : userId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
+                .getGroupIdKey(), groupId == null ? -1 : groupId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory
+                .getRoleIdKey(), roleId == null ? -1 : roleId));
+
+        return supervisorService.searchProcessSupervisors(new QueryOptions(0, 1, oderByOptions, filterOptions, null));
     }
 
     @Override
@@ -4175,7 +4188,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
                 return result;
             }
-                return Collections.emptyList();
+            return Collections.emptyList();
         } catch (final SBonitaException sbe) {
             throw new DocumentException(sbe);
         }
@@ -5221,8 +5234,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, startIndex, maxResults,
                     HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
             if (humanTaskInstances == null) {
-            return Collections.emptyList();
-        }
+                return Collections.emptyList();
+            }
             return humanTaskInstances;
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -5249,7 +5262,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         builder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName);
         builder.sort(field, order);
         final SearchResult<HumanTaskInstance> searchHumanTasks = searchHumanTasksTransaction(builder.done());
-            return searchHumanTasks.getResult();
+        return searchHumanTasks.getResult();
     }
 
     @Override

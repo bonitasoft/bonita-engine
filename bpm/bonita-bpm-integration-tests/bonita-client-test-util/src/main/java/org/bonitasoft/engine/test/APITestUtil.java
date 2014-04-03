@@ -239,7 +239,7 @@ public class APITestUtil {
 
     public User addMappingAndActor(final String actorName, final String userName, final String password, final ProcessDefinition processDefinition)
             throws BonitaException {
-        final User user = createUser(userName, password);
+        final User user = getIdentityAPI().createUser(userName, password);
         getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
         return user;
     }
@@ -279,7 +279,7 @@ public class APITestUtil {
         }
         return null;
     }
-
+    
     protected User createUser(final String userName, final String password) throws BonitaException {
         return getIdentityAPI().createUser(userName, password);
     }
@@ -303,7 +303,7 @@ public class APITestUtil {
     }
 
     protected User createUserAndLogin(final String userName, final String password) throws BonitaException {
-        final User user = createUser(userName, password);
+        final User user = getIdentityAPI().createUser(userName, password);
         logout();
         loginWith(userName, password);
         return user;

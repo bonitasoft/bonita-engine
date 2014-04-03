@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.command.web;
 
 import org.bonitasoft.engine.external.profile.command.ProfileImportCommandTest;
+import org.bonitasoft.engine.supervisor.ProcessSupervisedTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -10,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-        SupervisorCommandTest.class,
+        ProcessSupervisedTest.class,
         ActorCommandTest.class,
         ProfileImportCommandTest.class,
         ActorPermissionCommandTest.class,

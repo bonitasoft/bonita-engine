@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.process;
+package org.bonitasoft.engine.supervisor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.bpm.actor.ActorCriterion;
-import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
@@ -58,7 +55,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Test;
 
-public class SupervisorTest extends CommonAPITest {
+public class ProcessSupervisedTest extends CommonAPITest {
 
     private static final String SEARCH_S_COMMENT_SUPERVISED_BY = "searchSCommentSupervisedBy";
 
@@ -72,26 +69,21 @@ public class SupervisorTest extends CommonAPITest {
 
     public void init() throws Exception {
         login();
+        john = createUser("john", "bpm");
+        matti = createUser("matti", "bpm");
+
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
-        final DesignProcessDefinition processDefinition = processBuilder.done();
-        final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchive.setProcessDefinition(processDefinition);
-        john = createUser("john", "bpm");
-        matti = createUser("matti", "bpm");
-        definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        definition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         // Three tasks
-        getProcessAPI().startProcess(definition.getId());
-        getProcessAPI().startProcess(definition.getId());
-        getProcessAPI().startProcess(definition.getId());
-        waitForPendingTasks(john.getId(), 3);
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        // Two assign tasks
-        getProcessAPI().assignUserTask(taskInstances.get(0).getId(), john.getId());
-        getProcessAPI().assignUserTask(taskInstances.get(1).getId(), john.getId());
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(definition.getId());
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(definition.getId());
+        final ProcessInstance processInstance3 = getProcessAPI().startProcess(definition.getId());
+        waitForUserTaskAndAssigneIt("userTask1", processInstance1, john);
+        waitForUserTaskAndAssigneIt("userTask1", processInstance2, john);
+        waitForUserTask("userTask1", processInstance3);
 
         final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(definition.getId(), matti.getId());
         assertEquals(definition.getId(), createdSupervisor.getProcessDefinitionId());
@@ -211,26 +203,9 @@ public class SupervisorTest extends CommonAPITest {
 
     @Test
     public void getPendingTasksSupervisedBy() throws Exception {
-        login();
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
-        final DesignProcessDefinition processDefinition = processBuilder.done();
-        john = createUser("john", "bpm");
-        matti = createUser("matti", "bpm");
-        definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
-        assertEquals(1, actors.size());
-        final ActorInstance actor = actors.get(0);
-        assertEquals(ACTOR_NAME, actor.getName());
-
-        getProcessAPI().startProcess(definition.getId());
-        waitForPendingTasks(john.getId(), 1);
-
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(definition.getId(), matti.getId());
-        assertEquals(definition.getId(), createdSupervisor.getProcessDefinitionId());
+        init();
 
         final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC).done();
-
         final SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions);
         assertEquals(1, searchResult.getCount());
         final List<HumanTaskInstance> tasks = searchResult.getResult();
