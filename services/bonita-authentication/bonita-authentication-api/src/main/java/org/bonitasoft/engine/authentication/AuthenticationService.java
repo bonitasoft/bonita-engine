@@ -16,9 +16,12 @@ package org.bonitasoft.engine.authentication;
 
 
 /**
+ * deprecated since 6.3, use {@link GenericAuthenticationService} instead
+ * 
  * @author Elias Ricken de Medeiros
  * @since 6.0
  */
+@Deprecated
 public interface AuthenticationService {
 
     /**

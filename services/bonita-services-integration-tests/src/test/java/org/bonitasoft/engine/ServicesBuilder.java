@@ -1,7 +1,7 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.authentication.AuthenticationService;
+import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -150,8 +150,8 @@ public class ServicesBuilder implements ServicesResolver {
         return getAccessor().getInstanceOf(CacheService.class);
     }
 
-    public AuthenticationService buildAuthenticationService() {
-        return getAccessor().getInstanceOf(AuthenticationService.class);
+    public GenericAuthenticationService buildAuthenticationService() {
+        return getAccessor().getInstanceOf(GenericAuthenticationService.class);
     }
 
     public PlatformAuthenticationService buildPlatformAuthenticationService() {

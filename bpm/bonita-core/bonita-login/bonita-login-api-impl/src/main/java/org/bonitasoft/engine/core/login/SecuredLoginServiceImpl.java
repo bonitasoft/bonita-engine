@@ -53,7 +53,8 @@ public class SecuredLoginServiceImpl implements LoginService {
 
     private final IdentityService identityService;
 
-    public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService sessionService,
+    @Deprecated
+    public SecuredLoginServiceImpl(@SuppressWarnings("deprecation") final AuthenticationService authenticationService, final SessionService sessionService,
             final SessionAccessor sessionAccessor, final IdentityService identityService) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
@@ -70,6 +71,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     @Override
+    @Deprecated
     public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, String.valueOf(tenantId));

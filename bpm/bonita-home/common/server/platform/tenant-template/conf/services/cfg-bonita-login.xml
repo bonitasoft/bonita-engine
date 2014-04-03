@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
-		<constructor-arg name="authenticationService" ref="authenticationService" />
-		<constructor-arg name="sessionService" ref="sessionService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="identityService" ref="identityService" />
+		<constructor-arg ref="authenticationService" />
+		<constructor-arg ref="sessionService" />
+		<constructor-arg ref="sessionAccessor" />
+		<constructor-arg ref="identityService" />
 	</bean>
 
 </beans>

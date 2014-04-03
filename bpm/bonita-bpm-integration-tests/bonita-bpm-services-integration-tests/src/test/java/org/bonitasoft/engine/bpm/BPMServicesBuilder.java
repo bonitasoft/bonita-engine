@@ -27,7 +27,7 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.authentication.AuthenticationService;
+import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
@@ -223,8 +223,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(CacheService.class);
     }
 
-    public AuthenticationService getAuthenticationService() {
-        return getInstanceOf(AuthenticationService.class);
+    public GenericAuthenticationService getAuthenticationService() {
+        return getInstanceOf(GenericAuthenticationService.class);
     }
 
     public PlatformAuthenticationService getPlatformAuthenticationService() {

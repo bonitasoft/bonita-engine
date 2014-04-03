@@ -48,6 +48,7 @@ public interface LoginService {
      * @throws SLoginException
      *             if login fails
      */
+    @Deprecated
     SSession login(final long tenantId, final String userName, final String password) throws SLoginException;
 
     boolean isValid(final long sessionId);
