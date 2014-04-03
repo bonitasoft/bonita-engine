@@ -13,21 +13,23 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import java.util.ArrayList;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.CustomUserInfoAPI;
-import org.bonitasoft.engine.exception.*;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -157,55 +159,49 @@ public class CustomUserInfoIT extends CommonAPITest {
 
     @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info definition", "Deletion" })
     @Test
-    public void deleteCustomUserInfoDefinition_should_delete_object_from_database() throws Exception {
+    public void deleteCustomUserInfoDefinition_should_delete_definition_and_values_from_database() throws Exception {
         //given
         CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
+        getIdentityAPI().setCustomUserInfoValue(info.getId(), user.getId(), "Java");
         assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).containsExactly(info);
+        SearchOptions searchOptions = new SearchOptionsBuilder(0, 1).done();
+        assertThat(getIdentityAPI().searchCustomUserInfoValues(searchOptions).getCount()).isEqualTo(1);
 
         //when
         getIdentityAPI().deleteCustomUserInfoDefinition(info.getId());
         List<CustomUserInfoDefinition> definitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
+        SearchResult<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
 
         //then
         assertThat(definitions).isEmpty();
+        assertThat(values.getCount()).isEqualTo(0);
     }
 
-    @Ignore
+    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info value", "User deletion" })
     @Test
-    public void deleteCustomUserInfoDefinition_should_delete_object_from_database_loading_scalability() throws Exception {
-        // given
-        List<User> users = createUsers(10);
-        CustomUserInfoDefinition info = createDefinition("Skill");
-        setValues(users, info, "code slayer");
-
-        // when
-        getIdentityAPI().deleteCustomUserInfoDefinition(info.getId());
-
-        // then
-        assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 1)).isEmpty();
-        assertThat(getIdentityAPI().searchCustomUserInfoValues(new SearchOptionsBuilder(0, 1).done()).getCount()).isEqualTo(0);
-
-        // clean
-        deleteUsers(users);
+    public void deleteUser_should_delete_related_custom_user_info_value_from_database() throws Exception {
+        //given
+        CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
+        User user = createUser("user.with.custom.user.info", "bpm");
+        getIdentityAPI().setCustomUserInfoValue(info.getId(), user.getId(), "Java");
+        assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).containsExactly(info);
+        SearchOptions searchOptions = new SearchOptionsBuilder(0, 1).done();
+        assertThat(getIdentityAPI().searchCustomUserInfoValues(searchOptions).getCount()).isEqualTo(1);
+        
+        //when
+        getIdentityAPI().deleteUser(user.getId());
+        List<CustomUserInfoDefinition> definitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
+        SearchResult<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
+        
+        //then
+        assertThat(definitions.size()).isEqualTo(1);
+        assertThat(values.getCount()).isEqualTo(0);
     }
 
-    private void setValues(List<User> users, CustomUserInfoDefinition definition, String value) throws UpdateException {
-        for (User user : users) {
-            getIdentityAPI().setCustomUserInfoValue(definition.getId(), user.getId(), value);
-        }
-    }
 
     private CustomUserInfoDefinition createDefinition(String name) throws CreationException {
         CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(name);
         return getIdentityAPI().createCustomUserInfoDefinition(creator);
-    }
-
-    private List<User> createUsers(int number) throws BonitaException, InterruptedException {
-        List<User> users = new ArrayList<User>(number);
-        for (int i = 0; i < number; i++) {
-            users.add(createUser("User " + i, "password"));
-        }
-        return users;
     }
 
 }
