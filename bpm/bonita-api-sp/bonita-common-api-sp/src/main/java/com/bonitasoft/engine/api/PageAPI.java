@@ -106,8 +106,10 @@ public interface PageAPI {
      * @return the newly created page.
      * @throws UpdateException
      *             if an error occurs during the update.
+     * @throws AlreadyExistsException
+     *             if a page with this name already exists.
      */
-    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException;
+    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException;
 
     /**
      * Updates a custom page content.

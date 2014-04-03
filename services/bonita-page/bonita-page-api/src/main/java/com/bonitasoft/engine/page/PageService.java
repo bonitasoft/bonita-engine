@@ -42,7 +42,8 @@ public interface PageService extends ServiceWithLifecycle {
 
     List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
 
-    SPage updatePage(long pageId, EntityUpdateDescriptor updateDescriptor) throws SBonitaException;
+    SPage updatePage(long pageId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+            SObjectAlreadyExistsException;
 
     void updatePageContent(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SBonitaException;
 

@@ -174,15 +174,18 @@ public class PageAPIExtTest {
 
     @Test
     public void testUpdatePage() throws Exception {
+        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
         doReturn(sPage).when(pageAPIExt).constructPage(any(PageUpdater.class), anyLong());
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
         doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
+        doReturn(map).when(pageUpdater).getFields();
 
         // given
-        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         map.put(PageUpdateField.DISPLAY_NAME, "displayname");
-        doReturn(map).when(pageUpdater).getFields();
+        map.put(PageUpdateField.NAME, "name");
+        map.put(PageUpdateField.DESCRIPTION, "description");
+        map.put(PageUpdateField.CONTENT_NAME, "content.zip");
 
         // when
         pageAPIExt.updatePage(1, pageUpdater);

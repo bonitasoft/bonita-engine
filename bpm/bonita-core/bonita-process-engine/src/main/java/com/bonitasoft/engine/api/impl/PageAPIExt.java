@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -182,7 +184,7 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException {
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
         }
@@ -211,11 +213,14 @@ public class PageAPIExt implements PageAPI {
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateBuilder.updateLastUpdatedBy(getUserIdFromSessionInfos());
 
+        SPage updatedPage;
         try {
-            final SPage updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());
+            updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());
             return convertToPage(updatedPage);
-        } catch (final SBonitaException sBonitaException) {
-            throw new UpdateException(sBonitaException);
+        } catch (final SObjectModificationException e) {
+            throw new UpdateException(e);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException(e);
         }
 
     }

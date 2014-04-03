@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.ZipEntry;
@@ -69,6 +70,18 @@ import com.bonitasoft.manager.Manager;
  */
 public class PageServiceImpl implements PageService {
 
+    private static final String QUERY_GET_PAGE_CONTENT = "getPageContent";
+
+    private static final String QUERY_GET_PAGE_BY_NAME = "getPageByName";
+
+    private static final String QUERY_GET_PAGE_BY_ID = "getPageById";
+
+    private static final String METHOD_DELETE_PAGE = "deletePage";
+
+    private static final String METHOD_NAME_ADD_PAGE = "addPage";
+
+    private static final String METHOD_UPDATE_PAGE = "updatePage";
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -105,22 +118,29 @@ public class PageServiceImpl implements PageService {
         final String message = "Adding a new page with name " + page.getName();
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, message);
         try {
-
-            checkContentIsValid(content);
-
             final SPageWithContent pageContent = new SPageWithContentImpl(page, content);
             final InsertRecord insertContentRecord = new InsertRecord(pageContent);
             final SInsertEvent insertContentEvent = getInsertEvent(insertContentRecord, PAGE);
+
+            final SPage pageByName = getPageByName(page.getName());
+            if (null != pageByName)
+            {
+                initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
+                throwAlreadyExistsException(pageByName.getName());
+            }
+
+            checkContentIsValid(content);
+
             recorder.recordInsert(insertContentRecord, insertContentEvent);
             page.setId(pageContent.getId());
 
-            initiateLogBuilder(pageContent.getId(), SQueriableLog.STATUS_OK, logBuilder, "addPage");
+            initiateLogBuilder(pageContent.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_NAME_ADD_PAGE);
             return page;
         } catch (final SRecorderException re) {
-            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addPage");
+            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
             throw new SObjectCreationException(re);
         } catch (final SBonitaReadException bre) {
-            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addPage");
+            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
             throw new SObjectCreationException(bre);
         }
     }
@@ -144,7 +164,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public SPage getPage(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         check();
-        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId));
+        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
         if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
@@ -154,7 +174,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
         check();
-        final SPage page = persistenceService.selectOne(new SelectOneDescriptor<SPage>("getPageByName", Collections.singletonMap("pageName",
+        final SPage page = persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
                 (Object) pageName), SPage.class));
         return page;
     }
@@ -193,9 +213,9 @@ public class PageServiceImpl implements PageService {
             final DeleteRecord deleteRecord = new DeleteRecord(page);
             final SDeleteEvent deleteEvent = getDeleteEvent(page, PAGE);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_OK, logBuilder, "deletePage");
+            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
         } catch (final SRecorderException re) {
-            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deletePage");
+            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
         }
     }
@@ -245,7 +265,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         check();
-        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>("getPageContent",
+        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
                 SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
@@ -254,31 +274,49 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+    public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException,
+            SObjectAlreadyExistsException {
         check();
-        // EntityUpdateDescriptor updateDescriptor;
-        final String message = "Update a page with id " + pageId;
-
-        final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Update a page with id ");
+        stringBuilder.append(pageId);
+        final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, stringBuilder.toString());
+        final String logMethodName = METHOD_UPDATE_PAGE;
         try {
+            if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME))
+            {
+                final SPage pageByName = getPageByName(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString());
+                if (null != pageByName && pageByName.getId() != pageId)
+                {
+                    initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+                    throwAlreadyExistsException(pageByName.getName());
+                }
+            }
 
-            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId));
+            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
                     entityUpdateDescriptor);
 
             final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
             recorder.recordUpdate(updateRecord, updatePageEvent);
 
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, "updatePage");
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
             return sPage;
         } catch (final SRecorderException re) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(re);
         } catch (final SBonitaReadException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
         }
 
+    }
+
+    private void throwAlreadyExistsException(final String pageName) throws SObjectAlreadyExistsException {
+        final StringBuilder stringBuilderException = new StringBuilder();
+        stringBuilderException.append("page with name ");
+        stringBuilderException.append(pageName);
+        throw new SObjectAlreadyExistsException(stringBuilderException.toString());
     }
 
     @Override
@@ -289,7 +327,7 @@ public class PageServiceImpl implements PageService {
 
         try {
             checkPageContentIsValid(entityUpdateDescriptor);
-            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>("getPageContent",
+            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
                     SPageContent.class, pageId));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageContent,
                     entityUpdateDescriptor);
@@ -297,13 +335,13 @@ public class PageServiceImpl implements PageService {
 
             recorder.recordUpdate(updateRecord, updatePageEvent);
 
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, "updatePage");
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 
         } catch (final SRecorderException re) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(re);
         } catch (final SBonitaReadException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(e);
         }
 
@@ -330,7 +368,7 @@ public class PageServiceImpl implements PageService {
             }
             final byte[] providedPageContent = IOUtil.getAllContentFrom(inputStream);
 
-            byte[] zipEntryContent = IOUtil.getZipEntryContent("page.properties", new ByteArrayInputStream(providedPageContent));
+            final byte[] zipEntryContent = IOUtil.getZipEntryContent("page.properties", new ByteArrayInputStream(providedPageContent));
             final Properties pageProperties = new Properties();
             pageProperties.load(new ByteArrayInputStream(zipEntryContent));
 
@@ -368,7 +406,12 @@ public class PageServiceImpl implements PageService {
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateContentBuilder.updateContent(providedPageContent);
 
-        updatePage(id, pageUpdateBuilder.done());
+        try {
+            updatePage(id, pageUpdateBuilder.done());
+        } catch (final SObjectAlreadyExistsException e) {
+            // throw only when updating with existing name
+            throw new SObjectModificationException(e);
+        }
         updatePageContent(id, pageUpdateContentBuilder.done());
 
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
@@ -401,11 +444,14 @@ public class PageServiceImpl implements PageService {
 
     protected void checkPageContentIsValid(final EntityUpdateDescriptor entityUpdateDescriptor)
             throws SBonitaReadException {
-        if (null == entityUpdateDescriptor || !entityUpdateDescriptor.getFields().containsKey(SPageContentFields.PAGE_CONTENT)) {
+        if (null == entityUpdateDescriptor) {
             throw new SBonitaReadException("page content error");
         }
-
-        checkContentIsValid((byte[]) entityUpdateDescriptor.getFields().get(SPageContentFields.PAGE_CONTENT));
+        final Map<String, Object> fields = entityUpdateDescriptor.getFields();
+        if (!fields.containsKey(SPageContentFields.PAGE_CONTENT)) {
+            throw new SBonitaReadException("page content error");
+        }
+        checkContentIsValid((byte[]) fields.get(SPageContentFields.PAGE_CONTENT));
 
     }
 
