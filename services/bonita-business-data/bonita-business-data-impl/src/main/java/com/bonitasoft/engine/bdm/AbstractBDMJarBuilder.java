@@ -18,6 +18,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.xml.sax.SAXException;
 
@@ -40,14 +42,22 @@ public abstract class AbstractBDMJarBuilder {
         this.dependencyPath = dependencyPath == null ? "" : dependencyPath;
     }
 
-    public byte[] build(final BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
+    /**
+     * 
+     * @param bom
+     * @param fileFilter
+     *            filter the entries to be added or not in generated jar
+     * @return the content of the generated jar
+     * @throws SBusinessDataRepositoryDeploymentException
+     */
+    public byte[] build(final BusinessObjectModel bom, IOFileFilter fileFilter) throws SBusinessDataRepositoryDeploymentException {
         try {
             final File tmpBDMDirectory = createBDMTmpDir();
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
                 compiler.compile(tmpBDMDirectory, new File(dependencyPath));
                 addPersistenceFile(tmpBDMDirectory, bom);
-                return generateJar(tmpBDMDirectory);
+                return generateJar(tmpBDMDirectory, fileFilter);
             } finally {
                 FileUtils.deleteDirectory(tmpBDMDirectory);
             }
@@ -60,8 +70,8 @@ public abstract class AbstractBDMJarBuilder {
         return IOUtils.createTempDirectory("bdm");
     }
 
-    protected byte[] generateJar(final File directory) throws IOException {
-        final Collection<File> files = FileUtils.listFiles(directory, new String[] { "class", "xml" }, true);
+    protected byte[] generateJar(final File directory, IOFileFilter fileFilter) throws IOException {
+        final Collection<File> files = FileUtils.listFiles(directory, fileFilter, TrueFileFilter.TRUE);
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         for (final File file : files) {
             final String relativeName = directory.toURI().relativize(file.toURI()).getPath();

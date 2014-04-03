@@ -49,6 +49,8 @@ import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
+    private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
+
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
 
     private User matti;
@@ -325,9 +327,9 @@ public class BDRepositoryIT extends CommonAPISPTest {
         String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
                 + "data-management"
                 + File.separator + "client";
-        assertThat(new File(clientBdmJarPath, "client-bdm.jar")).exists().isFile();
+        assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
 
-        assertThat(getTenantManagementAPI().getClientBDMJar()).isNotEmpty();
+        assertThat(getTenantManagementAPI().getClientBDMZip()).isNotEmpty();
     }
 
     @Test(expected = BusinessDataRepositoryException.class)
@@ -341,9 +343,9 @@ public class BDRepositoryIT extends CommonAPISPTest {
         String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
                 + "data-management"
                 + File.separator + "client";
-        assertThat(new File(clientBdmJarPath, "client-bdm.jar")).doesNotExist();
+        assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
 
-        getTenantManagementAPI().getClientBDMJar();
+        getTenantManagementAPI().getClientBDMZip();
     }
 
     private ProcessDefinition buildProcessThatUpdateBizDataInsideConnector(final String taskName) throws BonitaException, IOException {

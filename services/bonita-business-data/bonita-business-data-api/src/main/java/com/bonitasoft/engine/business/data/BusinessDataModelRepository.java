@@ -27,16 +27,14 @@ public interface BusinessDataModelRepository {
      */
     void undeploy(long tenantId) throws SBusinessDataRepositoryException;
 
-    byte[] getDeployedBDMDependency() throws SBusinessDataRepositoryException;
-
     boolean isDBMDeployed();
 
     /**
-     * Retrieve the client side BDM generated jar.
-     * This jar contains BDM Pojos and DAOs
+     * Retrieve the client side BDM generated zip.
+     * This zip contains jars with BDM Pojos and DAOs
      * 
-     * @return the jar content
+     * @return the zip content
      * @throws SBusinessDataRepositoryException
      */
-    byte[] getClientBDMJar() throws SBusinessDataRepositoryException;
+    byte[] getClientBDMZip() throws SBusinessDataRepositoryException;
 }

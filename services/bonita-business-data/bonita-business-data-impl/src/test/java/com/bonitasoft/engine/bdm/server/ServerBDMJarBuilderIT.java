@@ -2,6 +2,7 @@ package com.bonitasoft.engine.bdm.server;
 
 import static com.bonitasoft.engine.BOMBuilder.aBOM;
 
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BOMBuilder;
@@ -15,7 +16,7 @@ public class ServerBDMJarBuilderIT {
     public void jar_builder_should_goes_well_without_errors() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
-        bdmJarBuilder.build(aBOM().build());
+        bdmJarBuilder.build(aBOM().build(), TrueFileFilter.TRUE);
     }
 
     @Test
@@ -23,7 +24,7 @@ public class ServerBDMJarBuilderIT {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();
-        bdmJarBuilder.build(builder.buildComplex());
+        bdmJarBuilder.build(builder.buildComplex(), TrueFileFilter.TRUE);
     }
 
 }

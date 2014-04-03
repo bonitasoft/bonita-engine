@@ -70,8 +70,8 @@ public interface TenantManagementAPI {
 
     /**
      * 
-     * @return content of the deployed client Business data model jar, null if no Business data model has been deployed
+     * @return zip content of the deployed client Business data model, null if no Business data model has been deployed
      * @throws BusinessDataRepositoryException
      */
-    byte[] getClientBDMJar() throws BusinessDataRepositoryException;
+    byte[] getClientBDMZip() throws BusinessDataRepositoryException;
 }

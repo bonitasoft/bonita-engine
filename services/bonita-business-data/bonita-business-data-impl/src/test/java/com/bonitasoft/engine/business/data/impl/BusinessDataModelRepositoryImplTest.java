@@ -43,7 +43,7 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(sDependency).when(businessDataModelRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(businessDataModelRepository).createDependencyMapping(1, sDependency);
 
-        businessDataModelRepository.createServerBDMJar(1, BOMBuilder.aBOM().build());
+        businessDataModelRepository.createAndDeployServerBDMJar(1, BOMBuilder.aBOM().build());
 
         verify(dependencyService).createDependency(sDependency);
         verify(dependencyService).createDependencyMapping(dependencyMapping);

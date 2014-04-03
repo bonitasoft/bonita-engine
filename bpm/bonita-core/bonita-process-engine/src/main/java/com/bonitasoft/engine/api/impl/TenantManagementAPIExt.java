@@ -232,11 +232,11 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     @Override
-    public byte[] getClientBDMJar() throws BusinessDataRepositoryException {
+    public byte[] getClientBDMZip() throws BusinessDataRepositoryException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
         try {
-            return bdmRepository.getClientBDMJar();
+            return bdmRepository.getClientBDMZip();
         } catch (SBusinessDataRepositoryException e) {
             throw new BusinessDataRepositoryException(e);
         }
