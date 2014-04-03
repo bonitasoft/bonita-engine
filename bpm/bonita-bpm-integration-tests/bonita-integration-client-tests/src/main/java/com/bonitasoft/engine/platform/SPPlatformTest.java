@@ -681,8 +681,8 @@ public class SPPlatformTest {
         platformAPI.stopNode();
         platformAPI.cleanAndDeletePlaftorm();
 
-        platformAPI.createAndInitializePlatform();
-        platformAPI.startNode();
+        platformAPI.createPlatform();
+        apiTestSpUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
         createTenants();
     }
 
