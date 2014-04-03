@@ -63,8 +63,8 @@ public class SetServiceState implements Callable<Void>, Serializable {
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             for (final TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, serviceStrategy.getStateName() + " service of tenant: "
-                            + tenantService.getClass().getName() + "on tenant " + tenantId);
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, serviceStrategy.getStateName() + "ing tenant-level service "
+                            + tenantService.getClass().getName() + " on tenant with ID " + tenantId);
                 }
                 try {
                     serviceStrategy.changeState(tenantService);
