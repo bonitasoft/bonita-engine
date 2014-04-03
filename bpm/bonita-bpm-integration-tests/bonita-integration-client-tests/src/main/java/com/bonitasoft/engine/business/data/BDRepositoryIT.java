@@ -7,15 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -33,7 +31,6 @@ import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -87,8 +84,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
         Query addQuery = employee.addQuery("getEmployeeByFirstNameAndLastName",
-                "SELECT e FROM Employee e WHERE e.firstName=:firstName AND e.lastName=:lastName",
-                List.class.getName());
+                "SELECT e FROM Employee e WHERE e.firstName=:firstName AND e.lastName=:lastName", List.class.getName());
         addQuery.addQueryParameter("firstName", String.class.getName());
         addQuery.addQueryParameter("lastName", String.class.getName());
         final BusinessObjectModel model = new BusinessObjectModel();
@@ -111,8 +107,9 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @After
-    public void tearDown() throws BonitaException {
-        clientFolder.delete();
+    public void tearDown() throws Exception {
+        FileUtils.deleteDirectory(clientFolder);
+
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
             getTenantManagementAPI().uninstallBusinessDataRepository();
@@ -343,8 +340,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
         String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
         String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
-                + "data-management"
-                + File.separator + "client";
+                + "data-management" + File.separator + "client";
         assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
 
         assertThat(getTenantManagementAPI().getClientBDMZip()).isNotEmpty();
@@ -359,52 +355,26 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
         String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
-                + "data-management"
-                + File.separator + "client";
+                + "data-management" + File.separator + "client";
         assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
 
         getTenantManagementAPI().getClientBDMZip();
     }
 
     @Test
-    public void should_use_factory_to_implement_dao_on_client_side() throws Exception {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    public void should_use_factory_to_instantiate_dao_on_client_side() throws Exception {
         addEmployee("Marcel", "Pagnol");
         APISession apiSession = getSession();
         byte[] clientBDMZip = getTenantManagementAPI().getClientBDMZip();
-        Map<String, byte[]> ressources = com.bonitasoft.engine.io.IOUtils.unzip(clientBDMZip);
 
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        List<URL> urls = new ArrayList<URL>();
-        for (Entry<String, byte[]> e : ressources.entrySet()) {
-            File file = new File(clientFolder, e.getKey());
-            if (file.getName().endsWith(".jar")) {
-                if (file.getName().contains("model")) {
-                    try {
-                        classLoader.loadClass(EMPLOYEE_QUALIF_CLASSNAME);
-                    } catch (ClassNotFoundException e1) {
-                        IOUtil.write(file, e.getValue());
-                        urls.add(file.toURI().toURL());
-                    }
-                }
-                if (file.getName().contains("dao")) {
-                    try {
-                        classLoader.loadClass(EMPLOYEE_QUALIF_CLASSNAME + "DAO");
-                    } catch (ClassNotFoundException e1) {
-                        IOUtil.write(file, e.getValue());
-                        urls.add(file.toURI().toURL());
-                    }
-                }
-            }
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        }
-        ClassLoader classLoaderWithBDM = classLoader;
-        if (!urls.isEmpty()) {
-            classLoaderWithBDM = new URLClassLoader(urls.toArray(new URL[urls.size()]), classLoader);
-        }
+        ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader, EMPLOYEE_QUALIF_CLASSNAME,
+                clientFolder);
 
         try {
             Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
+
             @SuppressWarnings("unchecked")
             Class<? extends BusinessObjectDAO> daoInterface = (Class<? extends BusinessObjectDAO>) Class.forName(EMPLOYEE_QUALIF_CLASSNAME + "DAO", true,
                     classLoaderWithBDM);
@@ -412,24 +382,22 @@ public class BDRepositoryIT extends CommonAPISPTest {
             BusinessObjectDAO daoImpl = businessObjectDAOFactory.createDAO(apiSession, daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME + "DAOImpl");
 
-            Method method = daoImpl.getClass().getMethod("getEmployeeByFirstNameAndLastName", String.class, String.class);
-            assertThat(method).isNotNull();
-            assertThat(method.getReturnType().getName()).isEqualTo(List.class.getName());
-            List<?> result = (List<?>) method.invoke(daoImpl, "Marcel", "Pagnol");
+            Method daoMethod = daoImpl.getClass().getMethod("getEmployeeByFirstNameAndLastName", String.class, String.class);
+            assertThat(daoMethod).isNotNull();
+            assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
+            List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Marcel", "Pagnol");
             assertThat(result).isNotEmpty();
 
-            result = (List<?>) method.invoke(daoImpl, "Roger", "Hanin");
+            result = (List<?>) daoMethod.invoke(daoImpl, "Roger", "Hanin");
             assertThat(result).isEmpty();
-
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 
-    private void addEmployee(String firstName, String lastName) throws Exception {
+    private void addEmployee(final String firstName, final String lastName) throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;",
-                EMPLOYEE_QUALIF_CLASSNAME);
+                + "; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);

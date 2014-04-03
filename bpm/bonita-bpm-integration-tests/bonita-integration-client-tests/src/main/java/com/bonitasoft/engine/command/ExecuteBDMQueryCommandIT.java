@@ -10,11 +10,14 @@ package com.bonitasoft.engine.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -28,7 +31,9 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -40,9 +45,9 @@ import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.FieldType;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.business.data.ClassloaderRefresher;
 
 /**
- * 
  * @author Romain Bioteau
  */
 public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
@@ -58,6 +63,14 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     private static final String RETURN_TYPE = "returnType";
 
     private static final String QUERY_NAME = "queryName";
+
+    protected User businessUser;
+
+    private static boolean alreadyAdded = false;
+
+    private ClassLoader contextClassLoader;
+
+    private static File clientFolder;
 
     private BusinessObjectModel buildBOM() {
         final Field firstName = new Field();
@@ -86,9 +99,16 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         return model;
     }
 
-    protected User businessUser;
+    @BeforeClass
+    public static void initTestClass() {
+        clientFolder = new File(System.getProperty("java.io.tmpdir"), "client");
+        clientFolder.mkdirs();
+    }
 
-    private static boolean alreadyAdded = false;
+    @AfterClass
+    public static void cleanTestClass() throws IOException {
+        FileUtils.deleteDirectory(clientFolder);
+    }
 
     @Before
     public void beforeTest() throws Exception {
@@ -104,6 +124,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         getTenantManagementAPI().resume();
         logout();
         loginWith(USERNAME, PASSWORD);
+
+        loadClientJars();
+
         if (!alreadyAdded) {
             addEmployee("Romain", "Bioteau");
             addEmployee("Jules", "Bioteau");
@@ -112,8 +135,19 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         }
     }
 
+    protected void loadClientJars() throws Exception {
+        contextClassLoader = Thread.currentThread().getContextClassLoader();
+        byte[] clientBDMZip = getTenantManagementAPI().getClientBDMZip();
+        ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader, EMPLOYEE_QUALIF_CLASSNAME,
+                clientFolder);
+        Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
+    }
+
     @After
     public void afterTest() throws BonitaException {
+        // reset previous classloader:
+        Thread.currentThread().setContextClassLoader(contextClassLoader);
+
         logout();
         login();
         if (!getTenantManagementAPI().isPaused()) {
@@ -186,7 +220,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
     }
 
-    public void addEmployee(String firstName, String lastName) throws Exception {
+    public void addEmployee(final String firstName, final String lastName) throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; BonitaEmployee e = new BonitaEmployee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;",
                 EMPLOYEE_QUALIF_CLASSNAME);
