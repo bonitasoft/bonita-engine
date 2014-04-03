@@ -69,7 +69,9 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.command.CommandDescriptor;
+import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -177,16 +179,15 @@ public class APITestUtil {
     public static final int DEFAULT_REPEAT_EACH = 500;
 
     public static final int DEFAULT_TIMEOUT;
-    
+
     static {
         String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
-        if(strTimeout != null) {
+        if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
             DEFAULT_TIMEOUT = 7 * 60 * 1000;
         }
     }
-
 
     @After
     public void clearSynchroRepository() {
@@ -1439,8 +1440,10 @@ public class APITestUtil {
         return builder;
     }
 
-    public Operation buildStringOperation(final String dataInstanceName, final String newConstantValue) throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
+    public Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
+            throws InvalidExpressionException {
+        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
+                .setType(isTransient ? LeftOperand.TRANSIENT_DATA : LeftOperand.DATA).done();
         final Expression expression = new ExpressionBuilder().createConstantStringExpression(newConstantValue);
         final Operation operation;
         operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
@@ -1461,9 +1464,10 @@ public class APITestUtil {
         getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
 
-    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName)
+    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
+            final boolean isTransient)
             throws InvalidExpressionException, UpdateException {
-        final Operation stringOperation = buildStringOperation(dataName, updatedValue);
+        final Operation stringOperation = buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
         getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
@@ -1733,5 +1737,16 @@ public class APITestUtil {
         final byte[] descByteArray = IOUtil.getAllContentFrom(clazz.getResourceAsStream(connectorImplResource));
         businessArchiveBuilder.addConnectorImplementation(new BarResource(fileBaseName + ".impl", descByteArray));
         businessArchiveBuilder.addClasspathResource(buildBarResource(clazz, fileBaseName + ".jar"));
+    }
+
+    /**
+     * tell the engine to run BPMEventHandlingjob now
+     * 
+     * @throws CommandParameterizationException
+     * @throws CommandExecutionException
+     * @throws CommandNotFoundException
+     */
+    protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
+        commandAPI.execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
     }
 }
