@@ -16,16 +16,18 @@ package org.bonitasoft.engine.api.impl.transaction.data;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
 /**
@@ -54,7 +56,7 @@ public class CreateSDataInstances implements TransactionContent {
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public void execute() throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         if (!sDataInstances.isEmpty()) {
             for (final SDataInstance sDataInstance : sDataInstances) {
                 dataInstanceService.createDataInstance(sDataInstance);

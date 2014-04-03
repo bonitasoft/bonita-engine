@@ -21,6 +21,7 @@ import org.bonitasoft.engine.operation.OperatorType;
 /**
  * @author Zhang Bole
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public class OperationImpl implements Operation {
 
@@ -52,7 +53,11 @@ public class OperationImpl implements Operation {
 
     public void setOperatorInputType(final String operatorInputType) {
         if (null != operatorInputType) {
-            operator = operator + ":" + operatorInputType;
+            if (operator == null) {
+                throw new IllegalArgumentException("Please set 'operator' before setting 'operator input type'");
+            } else {
+                operator = operator + ":" + operatorInputType;
+            }
         }
     }
 

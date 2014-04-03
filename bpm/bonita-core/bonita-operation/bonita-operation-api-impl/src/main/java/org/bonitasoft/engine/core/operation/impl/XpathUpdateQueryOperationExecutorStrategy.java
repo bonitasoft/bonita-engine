@@ -60,23 +60,21 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
     private String getStringValue(final Object variableValue) {
         if (variableValue instanceof String) {
             return (String) variableValue;
-        } else {
-            return String.valueOf(variableValue);
         }
+        return String.valueOf(variableValue);
     }
 
     private boolean isSetAttribute(final String xpathExpression, final Object variableValue) {
         if (variableValue instanceof Attr) {
             return true;
-        } else {
-            final String[] segments = xpathExpression.split("/");
-            return segments[segments.length - 1].startsWith("@");
         }
+        final String[] segments = xpathExpression.split("/");
+        return segments[segments.length - 1].startsWith("@");
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object getValue(final SOperation operation, final Object value, final SExpressionContext expressionContext) throws SOperationExecutionException {
         try {
             final String dataInstanceName = operation.getLeftOperand().getName();
             // should be a String because the data is an xml expression

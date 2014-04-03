@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchivingStrategy;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -42,7 +43,7 @@ public abstract class AbstractArchivingStrategy implements ArchivingStrategy {
     public boolean isArchivable(final Class<? extends PersistentObject> srcClass) {
         final Boolean isArchivable = archives.get(srcClass.getName());
         if (isArchivable == null) {
-            throw new RuntimeException("The class '" + srcClass.getName() + "' is not known as archivable");
+            throw new SBonitaRuntimeException("The class '" + srcClass.getName() + "' is not known as archivable");
         }
         return isArchivable;
     }

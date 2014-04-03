@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -287,8 +286,8 @@ public class ProcessManagementTest extends CommonAPITest {
         // one archive for each change in the activity state. For automatic tasks we have initializingAndexecuting, completed
         checkNbOfArchivedActivityInstances(processInstance1, 2 * 2);
         checkNbOfArchivedActivityInstances(processInstance2, 3 * 2);
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance1));
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance2));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance1));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
         disableAndDeleteProcess(processDefinition1);
         disableAndDeleteProcess(processDefinition2);
     }
@@ -349,7 +348,7 @@ public class ProcessManagementTest extends CommonAPITest {
                 assertEquals("task3", archivedActivityInstances.get(desc3 * nbOfStates + i).getName());
             }
         }
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance2));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
         disableAndDeleteProcess(processDefinition2);
     }
 

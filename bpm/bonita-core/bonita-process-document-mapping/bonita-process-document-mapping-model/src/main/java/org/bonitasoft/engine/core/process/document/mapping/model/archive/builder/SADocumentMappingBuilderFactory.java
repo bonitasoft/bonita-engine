@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.core.process.document.mapping.model.archive.builder;
 
 import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
-import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 
 /**
  * @author Nicolas Chabanoles

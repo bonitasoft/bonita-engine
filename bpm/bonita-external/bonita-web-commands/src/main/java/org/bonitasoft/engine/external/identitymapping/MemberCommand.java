@@ -85,6 +85,8 @@ public abstract class MemberCommand extends CommandWithParameters {
             case MEMBERSHIP:
                 suffix = "ForRoleAndGroup";
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return suffix;
     }

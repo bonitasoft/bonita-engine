@@ -39,7 +39,7 @@ public class PlatformTenantManagerTest {
     private PlatformTenantManager platformTenantManager;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         platformTenantManager = new PlatformTenantManager();
     }
 

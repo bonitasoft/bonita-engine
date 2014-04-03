@@ -18,12 +18,10 @@ import java.util.List;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserMembershipCriterion;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * MembershipAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on <code>UserMembership</code>s:

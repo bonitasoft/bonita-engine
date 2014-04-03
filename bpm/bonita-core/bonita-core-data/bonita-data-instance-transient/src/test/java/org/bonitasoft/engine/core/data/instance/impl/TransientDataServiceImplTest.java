@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -47,7 +47,7 @@ public class TransientDataServiceImplTest {
         verify(cacheService, times(1)).store("transient_data", "name:42:containerType", data);
     }
 
-    private SShortTextDataInstanceImpl createData(final long id, final int containerId, final String name, final String containerType) throws CacheException {
+    private SShortTextDataInstanceImpl createData(final long id, final int containerId, final String name, final String containerType) throws SCacheException {
         SShortTextDataInstanceImpl data = new SShortTextDataInstanceImpl();
         data.setId(id);
         data.setName(name);

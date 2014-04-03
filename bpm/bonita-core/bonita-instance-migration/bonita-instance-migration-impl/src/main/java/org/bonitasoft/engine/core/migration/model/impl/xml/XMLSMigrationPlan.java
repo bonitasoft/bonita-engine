@@ -107,8 +107,6 @@ public class XMLSMigrationPlan {
 
     public static final String DESCRIPTION = "description";
 
-    private static final String ID = "id";
-
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
     public XMLNode getXMLMigrationPlan(final SMigrationPlan migrationPlan) {

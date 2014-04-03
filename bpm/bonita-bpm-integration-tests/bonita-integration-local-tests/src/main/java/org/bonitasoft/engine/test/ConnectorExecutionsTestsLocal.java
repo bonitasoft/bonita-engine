@@ -465,20 +465,17 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
-        waitForStep("step1", processInstance);
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(johnUserId, 0, 10, null);
-        final long activityInstanceId = pendingTasks.get(0).getId();
-        getProcessAPI().assignUserTask(activityInstanceId, johnUserId);
+        final ActivityInstance step1 = waitForUserTaskAndAssigneIt("step1", processInstance, johnUser);
 
         // Check Ready state of human task
-        assertEquals("ready", pendingTasks.get(0).getState());
+        assertEquals("ready", step1.getState());
 
         // Check that the "input1" variable has no value for "valueOfInput1", in Ready state of human task
         WaitUntil waitUntil = waitForVariableStorage(50, 800, inputName, valueOfInput1);
         assertFalse(waitUntil.waitUntil());
 
         // Run Started state of the human task
-        getProcessAPI().executeFlowNode(activityInstanceId);
+        getProcessAPI().executeFlowNode(step1.getId());
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
         waitUntil = waitForVariableStorage(50, DEFAULT_TIMEOUT, inputName, valueOfInput1);
@@ -658,7 +655,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final String logs = myOut.toString();
         System.out.println(logs);
         assertTrue("should have written in logs an exception", logs.contains("SConnectorException"));
-        assertTrue("should have written in logs an exception", logs.contains("java.lang.ClassNotFoundException: org.unknown.MyUnknownClass"));
+        assertTrue("should have written in logs an exception", logs.contains("org.unknown.MyUnknownClass"));
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")

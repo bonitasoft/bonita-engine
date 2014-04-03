@@ -54,6 +54,8 @@ public class SearchEntityMembersCommand extends EntityMemberCommand {
 
         try {
             return searchEntityMembers(searchDescriptor, kind, searchOptions, querySuffix);
+        } catch (SCommandExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException("Error executing command 'SearchEntityMembersCommand'", e);
         }
@@ -77,7 +79,8 @@ public class SearchEntityMembersCommand extends EntityMemberCommand {
             case MEMBERSHIP:
                 searchDescriptor = new SearchEntityMemberRoleAndGroupDescriptor();
                 break;
-
+            default:
+                throw new IllegalStateException();
         }
         return searchDescriptor;
     }

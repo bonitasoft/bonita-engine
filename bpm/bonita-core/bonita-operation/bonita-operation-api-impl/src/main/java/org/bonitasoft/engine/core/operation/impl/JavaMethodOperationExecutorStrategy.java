@@ -84,12 +84,12 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
     }
 
     @Override
-    public Object getValue(final SOperation operation, final Object valueToSetObjectWith, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object getValue(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
         final String dataToSet = operation.getLeftOperand().getName();
         final Object objectToInvokeJavaMethodOn = expressionContext.getInputValues().get(dataToSet);
         if (objectToInvokeJavaMethodOn == null) {
-            throw new SOperationExecutionException("data " + dataToSet + " does not exist in the context " + containerId + " " + containerType);
+            throw new SOperationExecutionException("data " + dataToSet + " does not exist");
         }
         Class<?> expressionResultType;
         try {

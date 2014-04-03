@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -141,8 +139,7 @@ public class HTTPServerAPIIT {
     private static final class BonitaHandler extends AbstractHandler {
 
         @Override
-        public void handle(final String s, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) throws IOException,
-                ServletException {
+        public void handle(final String s, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) {
             assertEquals("john", request.getUserPrincipal().getName());
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);

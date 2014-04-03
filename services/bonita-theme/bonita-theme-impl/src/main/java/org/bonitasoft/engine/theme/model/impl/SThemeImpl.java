@@ -50,7 +50,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
 
     public SThemeImpl(final STheme theme) {
         this(theme.getContent(), theme.isDefault(), theme.getType(), theme.getLastUpdateDate());
-        setCssContent(theme.getCssContent());
+        this.cssContent = theme.getCssContent();
     }
 
     @Override
@@ -123,16 +123,21 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
             return false;
         }
         if (type == null) {
-            if (other.type != null)
+            if (other.type != null) {
                 return false;
-        } else if (!type.equals(other.type))
+            }
+        } else if (!type.equals(other.type)) {
             return false;
-        if (lastUpdateDate != other.lastUpdateDate)
+        }
+        if (lastUpdateDate != other.lastUpdateDate) {
             return false;
-        if (!Arrays.equals(content, other.content))
+        }
+        if (!Arrays.equals(content, other.content)) {
             return false;
-        if (!Arrays.equals(cssContent, other.cssContent))
+        }
+        if (!Arrays.equals(cssContent, other.cssContent)) {
             return false;
+        }
         return true;
     }
 

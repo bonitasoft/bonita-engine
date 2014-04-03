@@ -21,7 +21,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Charles Souillard
@@ -41,7 +41,7 @@ public class SetFlowNodeInFailedThread extends AbstractSetInFailedThread {
     private String flowNodeInstanceName;
 
     public SetFlowNodeInFailedThread(final long flowNodeInstanceId, final long processDefinitionId, final FlowNodeExecutor flowNodeExecutor)
-            throws TenantIdNotSetException, BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException, IllegalAccessException,
+            throws STenantIdNotSetException, BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException {
         super();
         this.flowNodeInstanceId = flowNodeInstanceId;

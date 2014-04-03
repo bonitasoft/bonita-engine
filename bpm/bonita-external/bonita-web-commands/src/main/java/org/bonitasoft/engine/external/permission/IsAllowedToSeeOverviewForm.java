@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
@@ -20,9 +20,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsOfUserCanStartProcessDefinitions;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -31,9 +29,9 @@ import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
@@ -43,6 +41,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * Specific Command to ckeck if the user given can see a overview form of a ProcesInstance with the processInstanceId given.
  * 
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class IsAllowedToSeeOverviewForm extends TenantCommand {
 
@@ -72,46 +71,43 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         }
 
         long processDefinitionId = 0;
-        final ProcessInstanceService processInstanceService = this.tenantAccessor.getProcessInstanceService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = searchEntitiesDescriptor.getSearchProcessInstanceDescriptor();
 
-        final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
-                processInstanceId);
         try {
-            getProcessInstance.execute();
+            final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+            if (sProcessInstance != null) {
+                processDefinitionId = sProcessInstance.getProcessDefinitionId();
+            }
         } catch (final SBonitaException e) {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
                     searchEntitiesDescriptor, processInstanceId, 0, 5);
             try {
                 getArchivedProcessInstanceList.execute();
+            } catch (SCommandExecutionException e1) {
+                throw e1;
             } catch (final SBonitaException e1) {
-                throw new SCommandExecutionException("No processInstance and archived ProcessInstance with id: " + processInstanceId
-                        + " during executing command isAllowedToSeeOverviewForm.", e);
+                e.setProcessInstanceIdOnContext(processInstanceId);
+                throw new SCommandExecutionException("No process instance and archived process instance during executing command isAllowedToSeeOverviewForm.",
+                        e);
             }
             final List<ArchivedProcessInstance> archivedPInstances = getArchivedProcessInstanceList.getResult();
             if (archivedPInstances.size() > 0) {
                 processDefinitionId = archivedPInstances.get(0).getProcessDefinitionId();
             }
         }
-        final ProcessInstance processInstance = getProcessInstance.getResult();
-        if (processInstance != null) {
-            processDefinitionId = processInstance.getProcessDefinitionId();
-        }
 
         if (processDefinitionId != 0) {
             final ActorMappingService actorMappingService = this.tenantAccessor.getActorMappingService();
-            final GetActorsOfUserCanStartProcessDefinitions checker = new GetActorsOfUserCanStartProcessDefinitions(actorMappingService, processDefinitionId,
-                    userId);
             try {
-                checker.execute();
+                final List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId);
+                if (ckRes != null && ckRes.size() == 1) {
+                    isHas = true;
+                }
             } catch (final SBonitaException e) {
-                throw new SCommandExecutionException("No actorInitiator of user who can start the processDefinition with id:" + processDefinitionId, e);
-            }
-            final List<SActor> ckRes = checker.getResult();
-            if (ckRes != null && ckRes.size() == 1) {
-                isHas = true;
+                e.setProcessDefinitionIdOnContext(processDefinitionId);
+                throw new SCommandExecutionException("No actorInitiator of user who can start the processDefinition.", e);
             }
         }
 
@@ -124,6 +120,8 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             try {
                 searchOpenProcessInstances.execute();
                 processInstanceRes = searchOpenProcessInstances.getResult();
+            } catch (SCommandExecutionException e) {
+                throw e;
             } catch (final SBonitaException sbe) {
                 throw new SCommandExecutionException("No processInstance that involves user :" + userId
                         + " found durng executing method IsAllowedToSeeOverviewForm.", sbe);
@@ -135,6 +133,8 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                         processInstanceService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
                 try {
                     archivedSearcher.execute();
+                } catch (SCommandExecutionException e) {
+                    throw e;
                 } catch (final SBonitaException e) {
                     throw new SCommandExecutionException("No archived processInstance that involves user :" + userId
                             + " found during execution of method IsAllowedToSeeOverviewForm.", e);

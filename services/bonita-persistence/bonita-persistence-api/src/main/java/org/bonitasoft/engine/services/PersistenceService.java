@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SRetryableException;
 
 /**
  * @author Charles Souillard
@@ -132,6 +131,14 @@ public interface PersistenceService extends ReadPersistenceService {
     /**
      * Delete elements that are marked to be deleted
      * 
+     * @throws SPersistenceException
+     * @throws SRetryableException
+     */
+    void purge() throws SPersistenceException;
+
+    /**
+     * Delete elements that are marked to be deleted
+     * 
      * @param classToPurge
      *            the class to purge
      * @throws SPersistenceException
@@ -175,7 +182,6 @@ public interface PersistenceService extends ReadPersistenceService {
      */
     void flushStatements() throws SPersistenceException;
 
-    
     /**
      * Delete a record from the table by id and its class type.
      * 

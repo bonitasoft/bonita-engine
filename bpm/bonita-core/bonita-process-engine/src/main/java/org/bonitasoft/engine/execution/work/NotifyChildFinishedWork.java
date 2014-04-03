@@ -42,18 +42,13 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private final String parentType;
 
-    private final int stateId;
-
     private final long parentId;
 
-    NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
-            final String parentType,
-            final int stateId) {
+    NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType) {
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.parentId = parentId;
         this.parentType = parentType;
-        this.stateId = stateId;
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
@@ -67,7 +62,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
             final ContainerRegistry containerRegistry = getTenantAccessor(context).getContainerRegistry();
-            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
+            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, parentId, parentType);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -78,12 +73,13 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
-        UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
+        final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
         userTransactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 

@@ -153,7 +153,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         assertEquals(1, searchResult.getCount());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
         forceMatchingOfEvents();
         waitForUserTask("userTask1", receiveMessageProcessInstance);
 
@@ -185,7 +185,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "waitForMessage", null, null, null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                 "delivery", user, "m3", null, null, null);
@@ -217,8 +217,8 @@ public class ReceiveTasksTest extends CommonAPITest {
                     "waitForMessage", null, null, null, null);
             final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
             final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(sendMessageProcess2.getId());
-            assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-            assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
+            assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+            assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance2));
 
             receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                     "delivery", user, "m4", null, null, null);
@@ -261,7 +261,7 @@ public class ReceiveTasksTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
         forceMatchingOfEvents();
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 20000, true, 1, user);

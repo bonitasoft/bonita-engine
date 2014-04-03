@@ -78,6 +78,7 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
             return buildExpressionResultSameOrderAsInputList(expressions, results);
         }
         if (dependencyValues != null && dependencyValues.containsKey(CONTAINER_ID_KEY) && dependencyValues.containsKey(CONTAINER_TYPE_KEY)) {
+            String currentData = null;
             try {
                 containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
                 containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
@@ -91,6 +92,7 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
                 // }
                 // }
                 for (final String name : dataNames) {
+                    currentData = name;
                     SDataInstance dataInstance;
                     try {
                         dataInstance = transientDataService.getDataInstance(name, containerId, containerType);
@@ -101,9 +103,9 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
                 }
                 return buildExpressionResultSameOrderAsInputList(expressions, results);
             } catch (final SBonitaReadException e) {
-                throw new SExpressionEvaluationException(e);
+                throw new SExpressionEvaluationException("Can't read transient data", e, currentData);
             } catch (final SDataInstanceException e) {
-                throw new SExpressionEvaluationException(e);
+                throw new SExpressionEvaluationException("Can't read transient data", e, currentData);
             }
         } else {
             throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");

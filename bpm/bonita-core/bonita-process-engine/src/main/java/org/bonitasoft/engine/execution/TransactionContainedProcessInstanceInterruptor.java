@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -36,6 +35,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class TransactionContainedProcessInstanceInterruptor extends AbstractProcessInstanceInterruptor {
 
@@ -61,18 +61,12 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     }
 
     @Override
-    protected void resumeStableChildExecution(final long childId, final long processInstanceId, final long userId) throws SBonitaException {
+    protected void resumeChildExecution(final long childId, final long processInstanceId, final long userId) throws SBonitaException {
         final SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(childId);
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        String containerType = SFlowElementsContainerType.PROCESS.name();
-        final long parentActivity = flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
-        if (parentActivity > 0) {
-            containerType = SFlowElementsContainerType.FLOWNODE.name();
-        }
-
-        containerRegistry.executeFlowNode(flowNodeInstance.getId(), null, null, containerType,
-                flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()));
+        containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()), flowNodeInstance.getId(), null,
+                null);
     }
 
     @Override

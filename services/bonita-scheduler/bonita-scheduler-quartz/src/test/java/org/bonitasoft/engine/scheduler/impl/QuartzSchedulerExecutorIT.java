@@ -1,11 +1,12 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
-import org.assertj.core.api.Fail;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -107,6 +108,32 @@ public class QuartzSchedulerExecutorIT {
     private Trigger buildTrigger(final String triggerName, final String groupName) {
         return TriggerBuilder.newTrigger().withIdentity(triggerName, groupName).startNow()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).repeatForever()).build();
+    }
+
+    @Test
+    public void isShutdown_should_return_true_when_the_scheduler_is_shutdown() throws Exception {
+        quartzSchedulerExecutor.shutdown();
+
+        assertThat(quartzSchedulerExecutor.isShutdown()).isTrue();
+    }
+
+    @Test
+    public void shutdown_should_not_throw_any_exception_when_callled_several_times() throws Exception {
+        quartzSchedulerExecutor.shutdown();
+        quartzSchedulerExecutor.shutdown();
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void start_should_throw_an_exception_when_it_is_already_started() throws Exception {
+        quartzSchedulerExecutor.start();
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void start_should_throw_an_exception_if_the_scheduler_has_already_been_shutdown() throws Exception {
+        quartzSchedulerExecutor.shutdown();
+        assertThat(quartzSchedulerExecutor.isShutdown()).isTrue();
+
+        quartzSchedulerExecutor.start();
     }
 
 }

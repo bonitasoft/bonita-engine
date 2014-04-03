@@ -31,6 +31,10 @@ import org.bonitasoft.engine.theme.model.SThemeType;
  */
 public class SelectDescriptorBuilder {
 
+    private SelectDescriptorBuilder() {
+        // For Sonar
+    }
+
     public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final String elementName, final long id) {
         return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
     }

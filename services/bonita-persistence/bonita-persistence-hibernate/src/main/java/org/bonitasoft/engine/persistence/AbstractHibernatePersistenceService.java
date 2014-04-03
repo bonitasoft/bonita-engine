@@ -87,6 +87,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     TechnicalLoggerService logger;
 
+    List<String> classesToPurge;
+
     @SuppressWarnings("unchecked")
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
@@ -121,7 +123,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
         }
 
-        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+        final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         statistics = sessionFactory.getStatistics();
 
@@ -139,6 +141,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
         this.logger = logger;
+    }
+
+    /**
+     * @param classesToPurge
+     *            the classesToPurge to set
+     */
+    public void setClassesToPurge(final List<String> classesToPurge) {
+        this.classesToPurge = classesToPurge;
     }
 
     /**
@@ -179,6 +189,43 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected void flushStatements(final boolean useTenant) throws SPersistenceException {
         final Session session = getSession(useTenant);
         session.flush();
+    }
+
+    private <T> void checkOrderByClause(final SelectListDescriptor<T> selectDescriptor, final Query query) {
+        final boolean needOrderBy = needOrderBy(selectDescriptor, query);
+        if (needOrderBy) {
+            logWarningMessage(selectDescriptor, query);
+        }
+    }
+
+    private <T> boolean needOrderBy(final SelectListDescriptor<T> selectDescriptor, final Query query) {
+        boolean needOrderBy = true;
+        if (selectDescriptor.getQueryName().startsWith("getNumberOf")) {
+            needOrderBy = false;
+        }
+
+        if (query.toString().toLowerCase().contains("order by")) {
+            needOrderBy = false;
+        }
+
+        if (selectDescriptor.getPageSize() == QueryOptions.UNLIMITED_NUMBER_OF_RESULTS) {
+            needOrderBy = false;
+        }
+
+        return needOrderBy;
+    }
+
+    protected <T> void logWarningMessage(final SelectListDescriptor<T> selectDescriptor, final Query query) {
+        final StringBuilder message = new StringBuilder();
+        message.append("selectList call without \"order by\" clause ");
+        message.append("\n");
+        message.append(query.toString());
+        message.append("\n");
+        message.append(String.format("query name:%s\nentity:%s\nstart index:%d\npage size:%d", selectDescriptor.getQueryName(), selectDescriptor
+                .getEntityType().getCanonicalName(), selectDescriptor.getStartIndex(), selectDescriptor.getPageSize()));
+        logger.log(this.getClass(), TechnicalLogSeverity.WARNING, message.toString());
+
+        // throw new IllegalArgumentException("Query " + selectDescriptor.getQueryName());
     }
 
     @Override
@@ -253,6 +300,15 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 checkClassMapping(entityClass);
                 setId(entity);
                 session.save(entity);
+            }
+        }
+    }
+
+    @Override
+    public void purge() throws SPersistenceException {
+        if (classesToPurge != null) {
+            for (final String classToPurge : classesToPurge) {
+                purge(classToPurge);
             }
         }
     }
@@ -604,6 +660,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
 
+            // TODO: add a parameter to enable NONE,WARNING or STRICT mode "order by" checking
+            // checkOrderByClause(selectDescriptor, query);
+
             @SuppressWarnings("unchecked")
             final List<T> list = query.list();
             if (list != null) {
@@ -770,5 +829,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
         }
+    }
+
+    public void destroy() {
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Closing Hibernate session factory of " + getClass().getName());
+        sessionFactory.close();
     }
 }

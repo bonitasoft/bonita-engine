@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl.resolver;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -25,6 +24,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class ProcessDependencyResolver {
 
@@ -33,14 +33,13 @@ public abstract class ProcessDependencyResolver {
      * e.g. load connectors
      * Must throw an exception is something is not resolved in the process
      * 
-     * @param processApi
      * @param tenantAccessor
      * @param businessArchive
      * @param sDefinition
      * @throws BonitaException
      */
-    public abstract boolean resolve(ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
-            final SProcessDefinition sDefinition) throws BonitaException;
+    public abstract boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
+            throws BonitaException;
 
     /**
      * @param processAPIImpl
@@ -55,6 +54,7 @@ public abstract class ProcessDependencyResolver {
      * @param processDefinitionId
      * @return
      */
+    @SuppressWarnings("unused")
     public List<Problem> checkResolution(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) {
         return null;
     }

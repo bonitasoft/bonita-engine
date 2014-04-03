@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +29,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -75,6 +75,7 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
         numericTypes.add(byte.class.getName());
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
@@ -91,21 +92,21 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
 
     private Object evaluateBooleanOperator(final Map<Integer, Object> resolvedExpressions, final List<SExpression> dependencies, final String content)
             throws SExpressionEvaluationException {
-        Serializable result;
-        checkDependenciesSize(dependencies, content, 1);
+        final String expressionName = dependencies.get(0).getName();
+        throwSExpressionEvaluationExceptionIfBadDependenciesSize(dependencies, 1, content, expressionName);
         if (!Boolean.class.getName().equals(dependencies.get(0).getReturnType())) {
-            throw new SExpressionEvaluationException("The dependency of expression '" + content + "' must have the return type " + Boolean.class.getName());
+            throw new SExpressionEvaluationException("The dependency of expression '" + content + "' must have the return type " + Boolean.class.getName(),
+                    expressionName);
         }
-        final Boolean dependencyValue = (Boolean) resolvedExpressions.get(dependencies.get(0).getDiscriminant());
-        result = !dependencyValue;
-        return result;
+        return !(Boolean) resolvedExpressions.get(dependencies.get(0).getDiscriminant());
     }
 
     private Object evaluateBinaryComparator(final Map<Integer, Object> resolvedExpressions, final List<SExpression> dependencies, final String content)
             throws SExpressionEvaluationException {
-        checkDependenciesSize(dependencies, content, 2);
+        final String expressionName = dependencies.get(0).getName();
+        throwSExpressionEvaluationExceptionIfBadDependenciesSize(dependencies, 2, content, expressionName);
         if (!returnTypeCompatible(dependencies) && !EQUALS_COMPARATOR.equals(content)) {
-            throw new SExpressionEvaluationException("The two dependencies of expression '" + content + "' must have the same return type.");
+            throw new SExpressionEvaluationException("The two dependencies of expression '" + content + "' must have the same return type.", expressionName);
         }
         final Object resolvedLeftExpr = transtypeIfApplicable(dependencies.get(0).getReturnType(),
                 resolvedExpressions.get(dependencies.get(0).getDiscriminant()));
@@ -130,7 +131,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
                     result = compare <= 0;
                 }
             } else {
-                throw new SExpressionEvaluationException("The two dependencies of expression '" + content + "' must implements java.lang.Comparable.");
+                throw new SExpressionEvaluationException("The two dependencies of expression '" + content + "' must implements java.lang.Comparable.",
+                        expressionName);
             }
         }
         return result;
@@ -179,10 +181,10 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
         return result;
     }
 
-    private void checkDependenciesSize(final List<SExpression> dependencies, final String content, final int nbDependencies)
-            throws SExpressionEvaluationException {
+    private void throwSExpressionEvaluationExceptionIfBadDependenciesSize(final List<SExpression> dependencies, final int nbDependencies, final String content,
+            final String expressionName) throws SExpressionEvaluationException {
         if (dependencies.size() != nbDependencies) {
-            throw new SExpressionEvaluationException("The expression '" + content + "' must have exactly " + nbDependencies + " dependencies.");
+            throw new SExpressionEvaluationException("The expression '" + content + "' must have exactly " + nbDependencies + " dependencies.", expressionName);
         }
     }
 
@@ -190,7 +192,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         super.validate(expression);
         if (!validOperators.contains(expression.getContent())) {
-            throw new SInvalidExpressionException("The content of expression must be among: " + validOperators + " for expression: " + expression.toString());
+            throw new SInvalidExpressionException("The content of expression must be among: " + validOperators + " for expression: " + expression.toString(),
+                    expression.getName());
         }
     }
 

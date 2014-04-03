@@ -27,36 +27,34 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeNameFilterTest {
-    
+
     @Mock
     private SFlowNodeDefinition flowNode1;
 
     @Mock
     private SFlowNodeDefinition flowNode2;
-    
-    private List<String> names = Arrays.asList("step1", "step3");
-    
+
+    private final List<String> names = Arrays.asList("step1", "step3");
+
     @Before
     public void setUp() {
         doReturn("step1").when(flowNode1).getName();
         doReturn("step2").when(flowNode2).getName();
     }
-    
+
     @Test
-    public void select_return_true_if_name_is_contained_in_the_list() throws Exception {
+    public void select_return_true_if_name_is_contained_in_the_list() {
         assertTrue(new FlowNodeNameFilter(names).mustSelect(flowNode1));
     }
 
     @Test
-    public void select_return_false_if_name_is_contained_in_the_list() throws Exception {
+    public void select_return_false_if_name_is_contained_in_the_list() {
         assertFalse(new FlowNodeNameFilter(names).mustSelect(flowNode2));
     }
 

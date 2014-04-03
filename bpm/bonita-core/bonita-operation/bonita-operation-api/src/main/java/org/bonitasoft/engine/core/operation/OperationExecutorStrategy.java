@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
  */
 public interface OperationExecutorStrategy {
 
-    Object getValue(SOperation operation, Object value, long containerId, String containerType, SExpressionContext expressionContext)
+    Object getValue(SOperation operation, Object value, SExpressionContext expressionContext)
             throws SOperationExecutionException;
 
     String getOperationType();

@@ -44,8 +44,7 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
     }
 
     @Override
-    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object getValue(final SOperation operation, final Object value, final SExpressionContext expressionContext) throws SOperationExecutionException {
         // do not check if value is external, see ENGINE-1739
         if (operation.getLeftOperand().getType().equals(SLeftOperand.DATA)) {
             checkReturnType(value, operation, expressionContext);

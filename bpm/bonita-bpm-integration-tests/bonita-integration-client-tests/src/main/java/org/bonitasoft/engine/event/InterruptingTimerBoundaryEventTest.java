@@ -2,7 +2,6 @@ package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -10,6 +9,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
@@ -24,7 +24,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.Test;
 
 public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
@@ -42,10 +41,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         assertNotNull(waitForStep1);
 
         // wait timer trigger
-        final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
-        assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
-
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
+        waitForProcessToFinishAndBeArchived(processInstance);
         waitForArchivedActivity(waitForStep1.getId(), TestStates.getAbortedState());
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
@@ -56,14 +53,14 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     @Test
     public void testTimerBoundaryEventWithScriptThatFail() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
-        processDefinitionBuilder.addActor("actor");
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("start");
-        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", "actor");
+        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         userTaskDefinitionBuilder.addBoundaryEvent("timer", true).addTimerEventTriggerDefinition(TimerType.DURATION,
                 new ExpressionBuilder().createGroovyScriptExpression("script", "throw new java.lang.RuntimeException()", Long.class.getName()));
         processDefinitionBuilder.addAutomaticTask("timerStep");
         processDefinitionBuilder.addTransition("timer", "timerStep");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), "actor", donaBenta);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
@@ -101,9 +98,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         assertNotNull(waitForStepCA);
         // wait timer trigger
         // check that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep(exceptionFlowTaskName, processInstance, TestStates.getReadyState());
-        assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
+        waitForProcessToFinishAndBeArchived(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
@@ -136,9 +132,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance.getId());
         // wait timer trigger
         // check that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
-        assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
+        waitForProcessToFinishAndBeArchived(processInstance);
 
         waitForArchivedActivity(multiInstance.getId(), TestStates.getAbortedState());
 
@@ -168,13 +163,12 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         // start the process and wait for process to be triggered
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForStep waitForStep1 = waitForStep("step1", processInstance);
+        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
         // wait timer trigger
-        final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
-        assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
+        waitForProcessToFinishAndBeArchived(processInstance);
 
-        final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
+        final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(step1.getId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
@@ -207,8 +201,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        final ActivityInstance exceptionStep = waitForUserTask(exceptionFlowStepName, processInstance.getId());
-        assignAndExecuteStep(exceptionStep, getUser().getId());
+        waitForUserTaskAndExecuteIt(exceptionFlowStepName, processInstance, getUser());
         waitForProcessToFinish(processInstance);
 
         // verify that the normal flow was aborted
@@ -235,15 +228,15 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait and execute the step1 with a timer boundary event
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
+        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
         getProcessAPI().assignUserTask(step1.getId(), getUser().getId());
 
-        // Wait timer trigger
-        final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
+        // wait timer trigger
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
+        waitForProcessToFinishAndBeArchived(processInstance);
+
         // Check that step1 is aborted
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
-        assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -251,10 +244,9 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     private ProcessDefinition deployProcessWithTimerEventOnHumanTask(final long timerValue, final boolean withData) throws BonitaException,
             InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
-        final String actorName = "delivery";
-        processDefinitionBuilder.addActor(actorName);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("start");
-        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", actorName);
+        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
 
         final Expression timerExpr;
         if (withData) {
@@ -264,15 +256,15 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
             timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
         }
         userTaskDefinitionBuilder.addBoundaryEvent("Boundary timer").addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
-        userTaskDefinitionBuilder.addUserTask("exceptionStep", actorName);
-        userTaskDefinitionBuilder.addUserTask("step2", actorName);
+        userTaskDefinitionBuilder.addUserTask("exceptionStep", ACTOR_NAME);
+        userTaskDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", "step1");
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition("Boundary timer", "exceptionStep");
         processDefinitionBuilder.addTransition("exceptionStep", "end");
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, getUser());
+        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
     }
 
 }

@@ -274,13 +274,14 @@ public class IdentityAPIImpl implements IdentityAPI {
                     case ENABLED:
                         userUpdateBuilder.updateEnabled((Boolean) field.getValue());
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
             userUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
             return userUpdateBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private EntityUpdateDescriptor getUserContactInfoUpdateDescriptor(final ContactDataUpdater updater) {
@@ -325,12 +326,13 @@ public class IdentityAPIImpl implements IdentityAPI {
                     case WEBSITE:
                         updateBuilder.updateWebsite((String) field.getValue());
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
             return updateBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -463,7 +465,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final IdentityService identityService = tenantAccessor.getIdentityService();
-            return getUsersWithOrder(startIndex, maxResults, criterion, tenantAccessor, identityService);
+            return getUsersWithOrder(startIndex, maxResults, criterion, identityService);
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -560,6 +562,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sUserfactory.getUserNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final String fieldExecutor = field;
@@ -617,6 +621,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sUserFact.getUserNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetUsersInGroup getUsersOfGroup = new GetUsersInGroup(groupId, startIndex, maxResults, order, field, identityService);
@@ -808,6 +814,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sRoleFactory.getDisplayNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final String fieldExecutor = field;
@@ -1052,6 +1060,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 field = sGroupFactory.getDisplayNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetGroups getGroups = new GetGroups(identityService, startIndex, maxResults, order, field);
@@ -1128,14 +1138,13 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     private List<User> getUsersWithOrder(final int startIndex, final int maxResults, final UserCriterion pagingCriterion,
-            final TenantServiceAccessor tenantAccessor, final IdentityService identityService) throws SIdentityException {
-        final String field = getUserFieldKey(pagingCriterion, tenantAccessor);
+            final IdentityService identityService) throws SIdentityException {
+        final String field = getUserFieldKey(pagingCriterion);
         final OrderByType order = getUserOrderByType(pagingCriterion);
         if (field == null) {
             return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults));
-        } else {
-            return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults, field, order));
         }
+        return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults, field, order));
     }
 
     private OrderByType getUserOrderByType(final UserCriterion pagingCriterion) {
@@ -1159,11 +1168,13 @@ public class IdentityAPIImpl implements IdentityAPI {
             case USER_NAME_DESC:
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return order;
     }
 
-    private String getUserFieldKey(final UserCriterion pagingCriterion, final TenantServiceAccessor tenantAccessor) {
+    private String getUserFieldKey(final UserCriterion pagingCriterion) {
         final SUserBuilderFactory sUserFact = BuilderFactory.get(SUserBuilderFactory.class);
         String field = null;
         switch (pagingCriterion) {
@@ -1185,6 +1196,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             case USER_NAME_DESC:
                 field = sUserFact.getUserNameKey();
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return field;
     }

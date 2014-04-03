@@ -23,7 +23,7 @@ import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -102,7 +102,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         try {
             // executeWork is called and not registerWork because the registerWork is relying on transaction
             workService.executeWork(rootWork);
-        } catch (WorkRegisterException e) {
+        } catch (SWorkRegisterException e) {
             throw new SLockException(e);
         }
 

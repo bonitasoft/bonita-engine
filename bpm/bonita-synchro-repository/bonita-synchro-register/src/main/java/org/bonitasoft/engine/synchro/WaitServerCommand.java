@@ -31,15 +31,14 @@ public class WaitServerCommand extends TenantCommand {
         if (parameters.get("clear") != null) {
             serviceAccessor.getSynchroService().clearAllEvents();
             return null;
-        } else {
-            @SuppressWarnings("unchecked")
-            final Map<String, Serializable> event = (Map<String, Serializable>) parameters.get("event");
-            final int timeout = (Integer) parameters.get("timeout");
-            try {
-                return serviceAccessor.getSynchroService().waitForEvent(event, timeout);
-            } catch (final Exception e) {
-                throw new SCommandExecutionException(e);
-            }
+        }
+        @SuppressWarnings("unchecked")
+        final Map<String, Serializable> event = (Map<String, Serializable>) parameters.get("event");
+        final int timeout = (Integer) parameters.get("timeout");
+        try {
+            return serviceAccessor.getSynchroService().waitForEvent(event, timeout);
+        } catch (final Exception e) {
+            throw new SCommandExecutionException(e);
         }
     }
 

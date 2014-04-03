@@ -19,7 +19,6 @@ import java.util.Map;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.Role;
@@ -29,7 +28,6 @@ import org.bonitasoft.engine.identity.RoleNotFoundException;
 import org.bonitasoft.engine.identity.RoleUpdater;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * RoleAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Roles: creation, deletion,

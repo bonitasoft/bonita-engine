@@ -26,7 +26,6 @@ import org.bonitasoft.engine.api.impl.transaction.activity.CreateActivityInstanc
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
-import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpression;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -108,10 +107,15 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -286,7 +290,7 @@ public class BPMInstancesCreator {
                         (SBoundaryEventDefinition) sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, relatedActivityInstanceId);
                 break;
             default:
-                throw new SActivityReadException("Activity type not found: " + sFlowNodeDefinition.getType());
+                throw new SActivityReadException("Activity type not found : " + sFlowNodeDefinition.getType());
         }
         builder.setLoopCounter(loopCounter);
         builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
@@ -530,7 +534,8 @@ public class BPMInstancesCreator {
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
             final SProcessDefinition processDefinition, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Map<String, Object> context) throws SBonitaException {
+            final Map<String, Object> context) throws SDataInstanceNotWellFormedException, SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException, SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         final List<SDataDefinition> sDataDefinitions = processContainer.getDataDefinitions();
         final List<SDataInstance> sDataInstances = new ArrayList<SDataInstance>(sDataDefinitions.size());
         for (final SDataDefinition sDataDefinition : sDataDefinitions) {
@@ -561,9 +566,7 @@ public class BPMInstancesCreator {
                         processInstance.getProcessDefinitionId());
             }
             if (expression != null) {
-                final EvaluateExpression evaluateExpression = new EvaluateExpression(expressionResolverService, currentExpressionContext, expression);
-                evaluateExpression.execute();
-                defaultValue = evaluateExpression.getResult();
+                defaultValue = (Serializable) expressionResolverService.evaluate(expression, currentExpressionContext);
             } else if (sDataDefinition.isTransientData()) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
@@ -576,10 +579,8 @@ public class BPMInstancesCreator {
                         .setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name()).setValue(defaultValue).done();
                 sDataInstances.add(dataInstance);
             } catch (final ClassCastException e) {
-                throw new SBonitaException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: " + e.getMessage()) {
-
-                    private static final long serialVersionUID = -3864933477546504156L;
-                };
+                throw new SDataInstanceNotWellFormedException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: "
+                        + e.getMessage());
             }
         }
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
@@ -669,11 +670,12 @@ public class BPMInstancesCreator {
                     try {
                         dataValue = (Serializable) ((List<?>) dataInstance.getValue()).get(index);
                     } catch (final ClassCastException e) {
-                        throw new SDataInstanceException("loopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
-                                + " is not a list or the value is not serializable");
+                        throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
+                                + " is not a list or the value is not serializable.");
                     }
                 } else {
-                    throw new SDataInstanceException("loopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " " + containerType);
+                    throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " "
+                            + containerType);
                 }
             } else {
                 final SExpression defaultValueExpression = dataDefinition.getDefaultValueExpression();
@@ -690,7 +692,7 @@ public class BPMInstancesCreator {
             try {
                 dataInstance = buildDataInstance(dataDefinition, containerId, containerType, dataValue);
             } catch (final SDataInstanceNotWellFormedException e) {
-                throw new SDataInstanceException(e);
+                throw new SDataInstanceReadException(e);
             }
             if (dataInstance.isTransientData()) {
                 transientDataService.createDataInstance(dataInstance);

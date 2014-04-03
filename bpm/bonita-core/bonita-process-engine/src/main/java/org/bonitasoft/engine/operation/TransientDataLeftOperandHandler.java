@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -142,9 +142,9 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             throwBonitaReadException(name, e);
         } catch (SFlowNodeReadException e) {
             throwBonitaReadException(name, e);
-        } catch (SProcessDefinitionNotFoundException e) {
-            throwBonitaReadException(name, e);
         } catch (SProcessDefinitionReadException e) {
+            throwBonitaReadException(name, e);
+        } catch (SProcessDefinitionNotFoundException e) {
             throwBonitaReadException(name, e);
         }
     }

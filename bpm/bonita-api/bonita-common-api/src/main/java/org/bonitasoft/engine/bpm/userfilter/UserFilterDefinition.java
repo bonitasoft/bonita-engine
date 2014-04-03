@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.userfilter;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.NamedElement;
-import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

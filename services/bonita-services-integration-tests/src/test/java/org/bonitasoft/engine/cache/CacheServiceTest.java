@@ -78,18 +78,22 @@ public class CacheServiceTest {
         cacheConfigurations.setConfigurations(configurationsList);
         return new EhCacheCacheService(new TechnicalLoggerService() {
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
             }
 
+            @SuppressWarnings("unused")
             @Override
             public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
                 return false;
@@ -131,15 +135,15 @@ public class CacheServiceTest {
         assertEquals("Object should still be in cache", value, object);
     }
 
-    @Test(expected = CacheException.class)
+    @Test(expected = SCacheException.class)
     public void cacheNotDefined() throws Exception {
         final String key = "defaultTimeout";
         final String anotherCacheName = "Should_use_default_config";
         cacheService.store(anotherCacheName, key, new String());
     }
 
-    @Test(expected = CacheException.class)
-    public void defaultConfigNotSerializablePutObject() throws CacheException {
+    @Test(expected = SCacheException.class)
+    public void defaultConfigNotSerializablePutObject() throws SCacheException {
         final String cacheName = "Should_use_default_config";
         final String key = "someObjectCacheKey";
         // We cannot store non-Serializable objects if copyOnRead or copyOnWrite is set to true:
@@ -147,7 +151,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testPutSimpleObjectInCache() throws CacheException {
+    public void testPutSimpleObjectInCache() throws SCacheException {
         final int cacheSize = cacheService.getCacheSize(TEST1);
         final String myObject = "testObject";
         cacheService.store(TEST1, "test", myObject);
@@ -155,7 +159,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testGetSimpleObjectInCache() throws CacheException {
+    public void testGetSimpleObjectInCache() throws SCacheException {
         final String myObject = "testObject";
         cacheService.store(TEST1, "test", myObject);
         final String inObject = (String) cacheService.get(TEST1, "test");
@@ -163,7 +167,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testPutComplexObjectInCache() throws CacheException {
+    public void testPutComplexObjectInCache() throws SCacheException {
         final int cacheSize = cacheService.getCacheSize(TEST1);
         final ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
         final HashMap<String, String> map = new HashMap<String, String>();
@@ -175,7 +179,7 @@ public class CacheServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testGetComplexObjectInCache() throws CacheException {
+    public void testGetComplexObjectInCache() throws SCacheException {
         final ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
         final HashMap<String, String> map = new HashMap<String, String>();
         map.put("bpm", "bonita");
@@ -187,7 +191,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testClearTestCache() throws CacheException {
+    public void testClearTestCache() throws SCacheException {
         cacheService.store(TEST1, "test1", "test1 value");
         assertTrue("cache was not empty", cacheService.getCacheSize(TEST1) > 0);
         cacheService.clear(TEST1);
@@ -196,7 +200,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testClearAllCache() throws CacheException {
+    public void testClearAllCache() throws SCacheException {
         cacheService.store(TEST1, "test1", "test1");
         assertTrue("cache was not empty", cacheService.getCacheSize(TEST1) > 0);
         cacheService.clearAll();
@@ -204,21 +208,21 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testPutNullInCacheShouldWork() throws CacheException {
+    public void testPutNullInCacheShouldWork() throws SCacheException {
         cacheService.store(TEST1, "test2", null);
         assertEquals("Null should be added to the cache", 1, cacheService.getCacheSize(TEST1));
         assertTrue("Null value can't be put", cacheService.get(TEST1, "test2") == null);
     }
 
     @Test
-    public void testPutInDifferentCache() throws CacheException {
+    public void testPutInDifferentCache() throws SCacheException {
         final int cacheSize = cacheService.getCacheSize(TEST1);
         cacheService.store(TEST2, "testdifferentCache", "value");
         assertEquals("element added in the wrong cache", cacheSize, cacheService.getCacheSize(TEST1));
     }
 
     @Test
-    public void testPutSameItemTwice() throws CacheException {
+    public void testPutSameItemTwice() throws SCacheException {
         cacheService.store(TEST1, "sameItem", "value");
         assertEquals("first element not added", 1, cacheService.getCacheSize(TEST1));
         cacheService.store(TEST1, "sameItem", "value");
@@ -226,7 +230,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testUpdateElementInCache() throws CacheException {
+    public void testUpdateElementInCache() throws SCacheException {
         cacheService.store(TEST1, "sameItem2", "value1");
         assertEquals("first element not added", 1, cacheService.getCacheSize(TEST1));
         cacheService.store(TEST1, "sameItem2", "value2");
@@ -235,7 +239,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testPutLotOfItems() throws CacheException {
+    public void testPutLotOfItems() throws SCacheException {
         cacheService.store(TEST2, "testLotOfItems0", "value0");
         final int j = 20000;
         for (int i = 1; i <= j; i++) {
@@ -245,7 +249,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testPutLotOfItemsWithOverflow() throws CacheException {
+    public void testPutLotOfItemsWithOverflow() throws SCacheException {
         final int cacheSize = cacheService.getCacheSize(TEST1);
         final int j = 20000;
         for (int i = 0; i < j; i++) {
@@ -256,7 +260,7 @@ public class CacheServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testChangeCachedElementWithCopy() throws CacheException {
+    public void testChangeCachedElementWithCopy() throws SCacheException {
         final ArrayList<String> list = new ArrayList<String>();
         cacheService.store(TEST1, "mylist", list);
         list.add("kikoo");
@@ -266,7 +270,7 @@ public class CacheServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testChangeCachedElementWithoutCopy() throws CacheException {
+    public void testChangeCachedElementWithoutCopy() throws SCacheException {
         final ArrayList<String> list = new ArrayList<String>();
         cacheService.store(TEST2, "mylist", list);
         list.add("kikoo");
@@ -275,7 +279,7 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void getKeysOfACache() throws CacheException {
+    public void getKeysOfACache() throws SCacheException {
         final List<?> keys = cacheService.getKeys(TEST1);
         assertFalse(keys.contains("aKeyThatMustBeHere"));
         final int cacheKeySize = keys.size();

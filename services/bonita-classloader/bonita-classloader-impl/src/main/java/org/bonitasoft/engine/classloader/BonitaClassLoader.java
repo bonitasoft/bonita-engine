@@ -112,7 +112,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private byte[] loadProcessResource(final String resourceName) {
         if (this.nonJarResources == null) {
-            return null;
+            return new byte[0];
         }
         return this.nonJarResources.get(resourceName);
     }
@@ -124,9 +124,9 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         if (c == null) {
             try {
                 c = findClass(name);
-            } catch (ClassNotFoundException e) {
+            } catch (final ClassNotFoundException e) {
                 // ignore
-            } catch (LinkageError le) {
+            } catch (final LinkageError le) {
                 // might be because of a duplicate loading (concurrency loading), retry to find it one time See BS-2483
                 c = findLoadedClass(name);
                 if (c == null) {

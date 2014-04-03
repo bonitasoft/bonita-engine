@@ -25,7 +25,6 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -57,13 +56,6 @@ public class JobServiceImplForFailedJobTest {
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getFailedJobs(int, int)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SFailedJobReadException
-     * @throws SSchedulerException
-     */
     @Test
     public final void getFailedJobs() throws SBonitaReadException, SFailedJobReadException {
         final SFailedJob sFailedJob = mock(SFailedJob.class);

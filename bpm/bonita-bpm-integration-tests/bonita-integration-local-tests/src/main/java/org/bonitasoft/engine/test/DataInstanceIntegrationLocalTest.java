@@ -106,7 +106,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         final long tStep1Id = waitForUserTask("tStep1", callingProcessInstance).getId();
         assertNotNull(getProcessAPI().getActivityDataInstance("data", tStep1Id).getValue());
         assignAndExecuteStep(tStep1Id, cebolinha.getId());
-        assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+        assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
 
         // Clean up
         disableAndDeleteProcess(callingProcessDefinition);
@@ -159,7 +159,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         final HumanTaskInstance step1 = waitForUserTask("Step1", callingProcessInstance);
         assertNotNull(getProcessAPI().getProcessDataInstance(dataName, step1.getParentProcessInstanceId()).getValue());
         assignAndExecuteStep(step1, cebolinha.getId());
-        assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+        assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
 
         // Clean up
         disableAndDeleteProcess(callingProcessDefinition);

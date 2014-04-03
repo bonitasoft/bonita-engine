@@ -138,9 +138,8 @@ public class BindingHandler extends DefaultHandler {
         try {
             if (bindingsFactory != null) {
                 return bindingsFactory.createNewInstance(binderClass);
-            } else {
-                return binderClass.newInstance();
             }
+            return binderClass.newInstance();
         } catch (final Exception e) {
             throw new SAXException(e);
         }
