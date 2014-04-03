@@ -8,34 +8,34 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.io.IOUtil;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.SecureRandom;
+
+import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.commons.io.IOUtil;
 
 /**
  * Created by Vincent Elcrin
  * Date: 03/12/13
  * Time: 08:48
- *
+ * 
  * TODO change implementation to use @{java.util.zip.ZipFile}
  */
 public class ZipReader {
 
     private static SecureRandom random = new SecureRandom();
 
-    private String parent;
+    private final String parent;
 
-    private String name;
+    private final String name;
 
-    public ZipReader(String parent, String name) {
+    public ZipReader(final String parent, final String name) {
         this.parent = parent;
         this.name = name;
     }
 
-    public void read(Reader reader) throws Exception {
+    public void read(final Reader reader) throws Exception {
         File zip = new File(parent, name);
         File unzipped = new File(parent, generateRandomFileName(name));
         FileInputStream input = null;
@@ -49,12 +49,12 @@ public class ZipReader {
         }
     }
 
-    private String generateRandomFileName(String name) {
-        return removeExtension(name, ".zip") +  "-" + random.nextLong();
+    private String generateRandomFileName(final String name) {
+        return removeExtension(name, ".zip") + "-" + random.nextLong();
     }
 
-    private String removeExtension(String name, String extension) {
-        if(name.contains(extension)) {
+    private String removeExtension(final String name, final String extension) {
+        if (name.contains(extension)) {
             return name.replaceAll(extension, "");
         }
         return name;
