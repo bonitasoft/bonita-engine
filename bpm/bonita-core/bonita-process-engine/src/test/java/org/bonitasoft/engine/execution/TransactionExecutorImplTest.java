@@ -10,11 +10,6 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
-import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Test;
@@ -61,37 +56,38 @@ public class TransactionExecutorImplTest {
     class MockTransactionService implements TransactionService {
 
         @Override
-        public void begin() throws STransactionCreationException {
+        public void begin() {
             // TODO Auto-generated method stub
 
         }
 
         @Override
-        public void complete() throws STransactionCommitException, STransactionRollbackException {
+        public void complete() {
             // TODO Auto-generated method stub
 
         }
 
         @Override
-        public TransactionState getState() throws STransactionException {
+        public TransactionState getState() {
             // TODO Auto-generated method stub
             return null;
         }
 
+        @Deprecated
         @Override
-        public boolean isTransactionActive() throws STransactionException {
+        public boolean isTransactionActive() {
             // TODO Auto-generated method stub
             return false;
         }
 
         @Override
-        public void setRollbackOnly() throws STransactionException {
+        public void setRollbackOnly() {
             // TODO Auto-generated method stub
 
         }
 
         @Override
-        public boolean isRollbackOnly() throws STransactionException {
+        public boolean isRollbackOnly() {
             // TODO Auto-generated method stub
             return false;
         }
@@ -109,19 +105,19 @@ public class TransactionExecutorImplTest {
             }
         }
 
+        @SuppressWarnings("unused")
         @Override
-        public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+        public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
             // TODO Auto-generated method stub
 
         }
-        
-        @Override
-        public void registerBeforeCommitCallable(Callable<Void> callable)
-                throws STransactionNotFoundException {
-            // TODO Auto-generated method stub
-            
-        }
 
+        @SuppressWarnings("unused")
+        @Override
+        public void registerBeforeCommitCallable(Callable<Void> callable) {
+            // TODO Auto-generated method stub
+
+        }
 
         @Override
         public long getNumberOfActiveTransactions() {

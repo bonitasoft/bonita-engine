@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.comment.api.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,9 @@ public class SCommentServiceImpl implements SCommentService {
     @Override
     public List<SComment> getComments(final long processInstanceId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class);
+        OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(Arrays.asList(orderByOption));
+        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class, queryOptions);
         return persistenceService.selectList(selectDescriptor);
     }
 

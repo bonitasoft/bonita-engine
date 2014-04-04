@@ -55,6 +55,7 @@ public abstract class EndingActivityWithBoundaryStateImpl implements FlowNodeSta
 
     public abstract SStateCategory getBoundaryCategoryState();
 
+    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;

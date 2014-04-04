@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -17,7 +16,6 @@ import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -58,7 +56,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
         ehCacheConfig.setEternal(cacheConfig.isEternal());
         if (!cacheConfig.isEternal()) {
-            ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+        ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         }
         return ehCacheConfig;
     }
@@ -294,17 +292,17 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         }
     }
 
-    public void destroy() throws SBonitaException, TimeoutException {
+    public void destroy() {
         stop();
     }
 
     @Override
-    public synchronized void start() throws SBonitaException {
+    public synchronized void start() {
         cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
     }
 
     @Override
-    public synchronized void stop() throws SBonitaException {
+    public synchronized void stop() {
         if (cacheManager != null) {
             cacheManager.shutdown();
             cacheManager = null;
@@ -312,12 +310,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         // nothing to do
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         // nothing to do
     }
 

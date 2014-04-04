@@ -83,9 +83,9 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     public void work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-        DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final SWaitingMessageEvent waitingMessage = eventInstanceService.getWaitingMessage(waitingMessageId);
-        SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
+        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         if (waitingMessage != null) {
             tenantAccessor.getEventsHandler().triggerCatchEvent(waitingMessage, messageInstanceId);
             eventInstanceService.deleteMessageInstance(messageInstance);
@@ -93,9 +93,10 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
         resetMessageInstance(messageInstanceId, tenantAccessor.getEventInstanceService());
     }

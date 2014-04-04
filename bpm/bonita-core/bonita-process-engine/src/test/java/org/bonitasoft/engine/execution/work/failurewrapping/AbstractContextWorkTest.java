@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -36,82 +37,87 @@ import org.mockito.Spy;
 
 /**
  * @author Aurelien Pupier
- *
+ * 
  */
 public abstract class AbstractContextWorkTest {
 
-	@Mock
-	protected TxInHandleFailureWrappingWork wrappedWork;
-	@Mock
-	protected TenantServiceAccessor tenantAccessor;
-	@Mock
-	private SessionService sessionService;
-	@Mock
-	private IncidentService incidentService;
-	@Mock
-	private TechnicalLoggerService loggerService;
-	@Mock
-	private SessionAccessor sessionAccessor;
-	@Spy
-	private TransactionServiceForTest transactionService;
-	protected TxInHandleFailureWrappingWork txBonitawork;
+    @Mock
+    protected TxInHandleFailureWrappingWork wrappedWork;
 
+    @Mock
+    protected TenantServiceAccessor tenantAccessor;
 
-	@Before
-	public void before() throws Exception {
-	    when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
-	    when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-	    when(tenantAccessor.getSessionService()).thenReturn(sessionService);
-	    when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-	    doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
-	
-	    
-	    doReturn("The description").when(txBonitawork).getDescription();
-	    
-	
-	    doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-	}
+    @Mock
+    private SessionService sessionService;
 
-	@Test
-	public void testWork() throws Exception {
-	    final Map<String, Object> singletonMap = new HashMap<String, Object>();
-	    txBonitawork.work(singletonMap);
-	    verify(wrappedWork, times(1)).work(singletonMap);
-	}
+    @Mock
+    private IncidentService incidentService;
 
-	@Test
-	public void getDescription() {
-	    when(wrappedWork.getDescription()).thenReturn("The description of wrapped work");
-	    assertEquals("The description", txBonitawork.getDescription());
-	}
+    @Mock
+    private TechnicalLoggerService loggerService;
 
-	@Test
-	public void getRecoveryProcedure() {
-	    when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
-	    assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
-	}
+    @Mock
+    private SessionAccessor sessionAccessor;
 
-	@Test
-	public void getTenantId() {
-	    when(wrappedWork.getTenantId()).thenReturn(12l);
-	    assertEquals(12, txBonitawork.getTenantId());
-	}
+    @Spy
+    private TransactionServiceForTest transactionService;
 
-	@Test
-	public void setTenantId() {
-	    txBonitawork.setTenantId(12l);
-	    verify(wrappedWork).setTenantId(12l);
-	}
+    protected TxInHandleFailureWrappingWork txBonitawork;
 
-	@Test
-	public void getWrappedWork() {
-	    assertEquals(wrappedWork, txBonitawork.getWrappedWork());
-	}
+    @SuppressWarnings("unused")
+    @Before
+    public void before() throws SBonitaException {
+        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
+        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
+        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
+        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
+        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
 
-	@Test
-	public void testToString() {
-	    when(wrappedWork.toString()).thenReturn("the to string");
-	    assertEquals("the to string", txBonitawork.toString());
-	}
+        doReturn("The description").when(txBonitawork).getDescription();
+
+        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+    }
+
+    @Test
+    public void testWork() throws Exception {
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        txBonitawork.work(singletonMap);
+        verify(wrappedWork, times(1)).work(singletonMap);
+    }
+
+    @Test
+    public void getDescription() {
+        when(wrappedWork.getDescription()).thenReturn("The description of wrapped work");
+        assertEquals("The description", txBonitawork.getDescription());
+    }
+
+    @Test
+    public void getRecoveryProcedure() {
+        when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
+        assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
+    }
+
+    @Test
+    public void getTenantId() {
+        when(wrappedWork.getTenantId()).thenReturn(12l);
+        assertEquals(12, txBonitawork.getTenantId());
+    }
+
+    @Test
+    public void setTenantId() {
+        txBonitawork.setTenantId(12l);
+        verify(wrappedWork).setTenantId(12l);
+    }
+
+    @Test
+    public void getWrappedWork() {
+        assertEquals(wrappedWork, txBonitawork.getWrappedWork());
+    }
+
+    @Test
+    public void testToString() {
+        when(wrappedWork.toString()).thenReturn("the to string");
+        assertEquals("the to string", txBonitawork.toString());
+    }
 
 }

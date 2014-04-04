@@ -50,7 +50,6 @@
 			</modules>
 		</profile>
 
-
 		<profile>
 			<id>as-tests</id>
 			<modules>
@@ -63,9 +62,9 @@
 		<profile>
 			<id>all</id>
 			<modules>
+			    <module>bonita-bpm-services-integration-tests</module>
 				<module>bonita-integration-client-tests</module>
 				<module>bonita-integration-local-tests</module>
-				<module>bonita-bpm-services-integration-tests</module>
 			</modules>
 		</profile>
 

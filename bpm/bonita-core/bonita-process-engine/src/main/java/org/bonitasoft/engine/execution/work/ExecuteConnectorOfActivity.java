@@ -125,13 +125,13 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Exception exception)
             throws SBonitaException {
-        setConnectorOnlyToFailed(context, throwable);
-        handleErrorEventOnFail(context, sConnectorDefinition, throwable);
+        setConnectorOnlyToFailed(context, exception);
+        handleErrorEventOnFail(context, sConnectorDefinition, exception);
     }
 
-    private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
+    private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Exception exception)
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
@@ -153,7 +153,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, sFlowNodeInstance);
         if (!hasActionToExecute) {
-            setConnectorAndContainerToFailed(context, throwable);
+            setConnectorAndContainerToFailed(context, exception);
         }
     }
 

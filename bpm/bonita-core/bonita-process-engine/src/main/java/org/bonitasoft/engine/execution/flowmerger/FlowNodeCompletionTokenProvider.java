@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.flowmerger;
 
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -27,16 +26,16 @@ import org.bonitasoft.engine.execution.TokenProvider;
  */
 public class FlowNodeCompletionTokenProvider implements TokenProvider {
 
-    private SFlowNodeWrapper flowNodeWrapper;
+    private final SFlowNodeWrapper flowNodeWrapper;
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
-    private SFlowNodeInstance child;
+    private final SFlowNodeInstance child;
 
-    private SProcessInstance processInstance;
+    private final SProcessInstance processInstance;
 
-    private FlowNodeTransitionsWrapper transitionsDescriptor;
-    
+    private final FlowNodeTransitionsWrapper transitionsDescriptor;
+
     private TokenInfo tokenInfo = null;
 
     public FlowNodeCompletionTokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance, final SFlowNodeWrapper flowNodeWrapper,
@@ -49,58 +48,56 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
     }
 
     @Override
-    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
-        if(tokenInfo != null) {
+    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+        if (tokenInfo != null) {
             return tokenInfo;
         }
         tokenInfo = calculateTokenInfo();
         return tokenInfo;
     }
-    
-    private TokenInfo calculateTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
-     // not in the definition: no merge no split no implicit end
+
+    private TokenInfo calculateTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+        // not in the definition: no merge no split no implicit end
         if (flowNodeWrapper.isNull() || transitionsDescriptor.isLastFlowNode()) {
             return new TokenInfo();
         }
 
         if (flowNodeWrapper.isBoundaryEvent() && flowNodeWrapper.isInterrupting()) {
-                return tansmitAllTokenInfo();
+            return tansmitAllTokenInfo();
         }
 
         if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge() || isNonInterruptingBoundaryEvent()) {
             // always transmit token
             return transmitOnlyTokenRefId();
         }
-        
+
         if (transitionsDescriptor.isSimpleToMany()) {
             // 1 input , >1 output
             // create children input token
             return new TokenInfo(child.getId(), child.getTokenRefId());
         }
-        
+
         if (transitionsDescriptor.isManyToMany()) {
-            if(flowNodeWrapper.isParalleleOrInclusive()) {
+            if (flowNodeWrapper.isParalleleOrInclusive()) {
                 return new TokenInfo(child.getId(), getParentTokenRefId());
             }
-            return  new TokenInfo(child.getId(), child.getTokenRefId());
+            return new TokenInfo(child.getId(), child.getTokenRefId());
         }
-        
+
         if (transitionsDescriptor.isManyToOne()) {
             if (flowNodeWrapper.isParalleleOrInclusive()) {
                 Long parentTokenRefId = getParentTokenRefId();
                 return new TokenInfo(parentTokenRefId);
-            } else {
-                return new TokenInfo(child.getTokenRefId());
             }
+            return new TokenInfo(child.getTokenRefId());
         }
-        
+
         return new TokenInfo();
     }
 
     private boolean isNonInterruptingBoundaryEvent() {
         return flowNodeWrapper.isBoundaryEvent() && !flowNodeWrapper.isInterrupting();
     }
-    
 
     private Long getParentTokenRefId() throws SObjectReadException, SObjectNotFoundException {
         SToken token = tokenService.getToken(processInstance.getId(), child.getTokenRefId());

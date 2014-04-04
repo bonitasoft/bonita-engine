@@ -37,7 +37,7 @@ public class ProcessInstanceQueriesTest {
     private ProcessInstanceRepository repository;
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_user_filters() throws Exception {
+    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_user_filters() {
         SUser expectedUser = repository.add(aUser().withId(1L).build());
         repository.add(aUser().withId(2L).build()); // not expected user
         SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
@@ -48,7 +48,7 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_userid_in_actormember() throws Exception {
+    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_userid_in_actormember() {
         SActor actor = repository.add(anActor().build());
         SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
         SUser expectedUser = repository.add(aUser().withId(1L).build());
@@ -61,7 +61,7 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_groupid_in_actormember() throws Exception {
+    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_groupid_in_actormember() {
         SActor actor = repository.add(anActor().build());
         SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withGroupId(aGroupId).build());
@@ -76,7 +76,7 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_roleid_in_actormember() throws Exception {
+    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_roleid_in_actormember() {
         SActor actor = repository.add(anActor().build());
         SPendingActivityMapping addedPendingMapping = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
         repository.add(anActorMember().forActor(actor).withRoleId(aRoleId).build());
@@ -91,7 +91,7 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_membership_in_actormember() throws Exception {
+    public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_his_membership_in_actormember() {
         SUser expectedUser = repository.add(aUser().withId(1L).build());
         SUser expectedUser2 = repository.add(aUser().withId(4L).build());
         SUser notExpectedUser = repository.add(aUser().withId(2L).build());
@@ -110,7 +110,7 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks_return_userIds_ordered_by_userName() throws Exception {
+    public void getPossibleUserIdsOfPendingTasks_return_userIds_ordered_by_userName() {
         SUser john = repository.add(aUser().withUserName("john").withId(1L).build());
         SUser paul = repository.add(aUser().withUserName("paul").withId(2L).build());
         SUser walter = repository.add(aUser().withUserName("walter").withId(3L).build());

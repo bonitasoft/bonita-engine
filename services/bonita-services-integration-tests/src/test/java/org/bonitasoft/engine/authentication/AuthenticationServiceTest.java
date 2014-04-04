@@ -1,6 +1,10 @@
 package org.bonitasoft.engine.authentication;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -15,7 +19,7 @@ import org.junit.Test;
  */
 public class AuthenticationServiceTest extends CommonServiceTest {
 
-    private static AuthenticationService authService;
+    private static GenericAuthenticationService authService;
 
     private static IdentityService identityService;
 
@@ -31,7 +35,10 @@ public class AuthenticationServiceTest extends CommonServiceTest {
         final SUser user = createUser(username, password);
 
         getTransactionService().begin();
-        authService.checkUserCredentials(username, password);
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
+        authService.checkUserCredentials(credentials);
         getTransactionService().complete();
 
         deleteUser(user);
@@ -59,9 +66,12 @@ public class AuthenticationServiceTest extends CommonServiceTest {
         final SUser user = createUser(username, password);
 
         getTransactionService().begin();
-        final boolean valid = authService.checkUserCredentials(username, "wrong");
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, "wrong");
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
+        final String userNameResult = authService.checkUserCredentials(credentials);
         getTransactionService().complete();
-        assertFalse(valid);
+        assertNull(userNameResult);
 
         deleteUser(user);
     }
@@ -71,9 +81,12 @@ public class AuthenticationServiceTest extends CommonServiceTest {
         final String username = "anonyme";
         final String password = "bpm";
         getTransactionService().begin();
-        final boolean valid = authService.checkUserCredentials(username, password);
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
+        final String userNameResult = authService.checkUserCredentials(credentials);
         getTransactionService().complete();
-        assertFalse(valid);
+        assertNull(userNameResult);
     }
 
 }

@@ -35,6 +35,7 @@ public class SStandardLoopCharacteristicsBinding extends ElementBinding {
         testBefore = Boolean.valueOf(attributes.get(XMLSProcessDefinition.TEST_BEFORE));
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
@@ -53,9 +54,8 @@ public class SStandardLoopCharacteristicsBinding extends ElementBinding {
     public Object getObject() {
         if (loopMax == null) {
             return new SStandardLoopCharacteristicsImpl(loopCondition, testBefore);
-        } else {
-            return new SStandardLoopCharacteristicsImpl(loopCondition, testBefore, loopMax);
         }
+        return new SStandardLoopCharacteristicsImpl(loopCondition, testBefore, loopMax);
     }
 
     @Override

@@ -64,7 +64,8 @@ public class ExecutorWorkService implements WorkService {
     @Override
     public void registerWork(final BonitaWork work) throws SWorkRegisterException {
         if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription() + " but the work service is stopped");
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                    + ", but the work service is stopped.");
             return;
         }
         final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
@@ -76,7 +77,8 @@ public class ExecutorWorkService implements WorkService {
     @Override
     public void executeWork(final BonitaWork work) throws SWorkRegisterException {
         if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription() + " but the work service is stopped");
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                    + ", but the work service is stopped.");
             return;
         }
 
@@ -96,7 +98,7 @@ public class ExecutorWorkService implements WorkService {
         }
         AbstractWorkSynchronization synchro = synchronizations.get();
         if (synchro == null || synchro.isExecuted()) {
-            synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor, this);
+            synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor);
             try {
                 transactionService.registerBonitaSynchronization(synchro);
             } catch (final STransactionNotFoundException e) {

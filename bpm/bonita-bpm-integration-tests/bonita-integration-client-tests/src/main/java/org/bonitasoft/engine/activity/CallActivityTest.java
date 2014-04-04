@@ -301,7 +301,7 @@ public class CallActivityTest extends CommonAPITest {
             assignAndExecuteStep(read, cascao.getId());
 
             waitForProcessToFinish(mainProcessInstance);
-            assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(mainProcessInstance));
+            assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(mainProcessInstance));
         } finally {
             disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
         }
@@ -368,7 +368,7 @@ public class CallActivityTest extends CommonAPITest {
             assertEquals("data", copyMsg.getValue());
             assignAndExecuteStep(read, cascao.getId());
             waitForProcessToFinish(mainProcessInstance);
-            assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(mainProcessInstance));
+            assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(mainProcessInstance));
         } finally {
             disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
         }
@@ -483,13 +483,13 @@ public class CallActivityTest extends CommonAPITest {
 
         activityInstance = waitForUserTask("step1", callingProcessInstance);
         checkOutputOperations(addOutputOperations, callingProcessInstance);
-        assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
+        assertTrue("target process was not archived", waitForProcessToFinishAndBeArchived(targetPI));
         assertEquals(callingProcessInstance.getId(), activityInstance.getParentProcessInstanceId());
 
         assignAndExecuteStep(activityInstance, cascao.getId());
 
         waitForProcessToFinish(callingProcessInstance);
-        assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+        assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
 
         disableAndDeleteProcess(callingProcessDef);
         disableAndDeleteProcess(targetProcessDef1);
@@ -561,11 +561,11 @@ public class CallActivityTest extends CommonAPITest {
                 waitForStepAndExecuteIt(procInstLevels[0], "tStep1", cebolinha, procInstLevels[i]);
             } else {
                 waitForStepAndExecuteIt(procInstLevels[0], "step1", cascao, procInstLevels[i], procInstLevels[i + 1]);
-                assertTrue("process of level " + i + " was not archived", waitProcessToFinishAndBeArchived(procInstLevels[i + 1]));
+                assertTrue("process of level " + i + " was not archived", waitForProcessToFinishAndBeArchived(procInstLevels[i + 1]));
             }
         }
 
-        assertTrue("root process was not archived", waitProcessToFinishAndBeArchived(procInstLevels[0]));
+        assertTrue("root process was not archived", waitForProcessToFinishAndBeArchived(procInstLevels[0]));
 
         for (int i = 0; i < nbLevel; i++) {
             disableAndDeleteProcess(processDefLevels[i]);
@@ -586,7 +586,7 @@ public class CallActivityTest extends CommonAPITest {
         final HumanTaskInstance humanTaskInstance = waitForUserTask(userTaskName, rootProcessInstance);
         if (childProcessInstances != null) {
             for (final ProcessInstance childProcessInstance : childProcessInstances) {
-                assertTrue("target process was not archived: " + childProcessInstance.getName(), waitProcessToFinishAndBeArchived(childProcessInstance));
+                assertTrue("target process was not archived: " + childProcessInstance.getName(), waitForProcessToFinishAndBeArchived(childProcessInstance));
             }
         }
 
@@ -629,11 +629,11 @@ public class CallActivityTest extends CommonAPITest {
                 assertTrue(targetPILoopExecs[i - 1].getId() != targetPILoopExecs[i].getId());
             }
             waitForStepAndExecuteIt(callingProcessInstance, "tStep1", cebolinha, targetPILoopExecs[i]); // i-th loop execution
-            assertTrue(waitProcessToFinishAndBeArchived(targetPILoopExecs[i]));
+            assertTrue(waitForProcessToFinishAndBeArchived(targetPILoopExecs[i]));
         }
 
         waitForStepAndExecuteIt(callingProcessInstance, "step1", cascao, callingProcessInstance, targetPILoopExecs[0]);
-        assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+        assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
 
         disableAndDeleteProcess(callingProcessDef);
         disableAndDeleteProcess(targetProcessDef);
@@ -674,11 +674,11 @@ public class CallActivityTest extends CommonAPITest {
 
         waitForStepAndExecuteIt(callingProcessInstance, "tStep1", cebolinha, targetPI); // first loop execution
         waitForProcessToFinish(targetPI);
-        assertTrue(waitProcessToFinishAndBeArchived(targetPI));
+        assertTrue(waitForProcessToFinishAndBeArchived(targetPI));
 
         final WaitForFinalArchivedActivity waitForFinalArchivedActivity = waitForFinalArchivedActivity("callActivity", callingProcessInstance);
         assertEquals(FlowNodeType.CALL_ACTIVITY, waitForFinalArchivedActivity.getResult().getType());
-        assertTrue(waitProcessToFinishAndBeArchived(targetPI));
+        assertTrue(waitForProcessToFinishAndBeArchived(targetPI));
         final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(targetPI.getId(), 0, 20);
 
         final ArchivedProcessInstance firstProcessInstanceArchive = archivedProcessInstanceList.get(0);
@@ -811,10 +811,10 @@ public class CallActivityTest extends CommonAPITest {
             // execute step in the target process
             assignAndExecuteStep(tStep1, cebolinha.getId());
             final HumanTaskInstance step1 = waitForUserTask("step1", callingProcessInstance);
-            assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
+            assertTrue("target process was not archived", waitForProcessToFinishAndBeArchived(targetPI));
             assertEquals(callingProcessInstance.getId(), step1.getParentProcessInstanceId());
             assignAndExecuteStep(step1, cascao.getId());
-            assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+            assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
         } finally {
             disableAndDeleteProcess(callingProcessDef);
             disableAndDeleteProcess(targetProcessDef);
@@ -865,10 +865,10 @@ public class CallActivityTest extends CommonAPITest {
             // execute step in the target process
             assignAndExecuteStep(tStep1, cebolinha.getId());
             final HumanTaskInstance step1 = waitForUserTask("step1", callingProcessInstance);
-            assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
+            assertTrue("target process was not archived", waitForProcessToFinishAndBeArchived(targetPI));
             assertEquals(callingProcessInstance.getId(), step1.getParentProcessInstanceId());
             assignAndExecuteStep(step1, cascao.getId());
-            assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+            assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
         } finally {
             disableAndDeleteProcess(callingProcessDef);
             disableAndDeleteProcess(targetProcessDef);

@@ -61,10 +61,6 @@ import org.junit.Test;
 
 public class BPMLocalTest extends CommonAPILocalTest {
 
-    protected static final String JOHN_USERNAME = "john";
-
-    protected static final String JOHN_PASSWORD = "bpm";
-
     public static Semaphore semaphore1 = new Semaphore(1);
 
     public static Semaphore semaphore2 = new Semaphore(1);
@@ -74,7 +70,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @After
     public void afterTest() throws Exception {
         VariableStorage.clearAll();
-        deleteUser(JOHN_USERNAME);
+        deleteUser(USERNAME);
         logout();
         cleanSession();
 
@@ -83,9 +79,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @Before
     public void beforeTest() throws Exception {
         login();
-        john = createUser(JOHN_USERNAME, JOHN_PASSWORD);
+        john = createUser(USERNAME, PASSWORD);
         logout();
-        loginWith(JOHN_USERNAME, JOHN_PASSWORD);
+        loginWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
     }
 
@@ -492,7 +488,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final Platform platform = platformAPI.getPlatform();
         logoutPlatform(platformSession);
-        loginWith(JOHN_USERNAME, JOHN_PASSWORD);
+        loginWith(USERNAME, PASSWORD);
         final String platformVersionToTest = getBonitaVersion();
 
         assertNotNull("can't find the platform", platform);

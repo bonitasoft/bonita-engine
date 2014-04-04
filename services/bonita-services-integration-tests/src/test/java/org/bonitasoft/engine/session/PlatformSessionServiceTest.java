@@ -55,6 +55,7 @@ public class PlatformSessionServiceTest {
             LOGGER.info("Starting test: " + this.getClass().getName() + "." + d.getMethodName());
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void failed(final Throwable e, final Description d) {
             LOGGER.info("Failed test: " + this.getClass().getName() + "." + d.getMethodName());
@@ -127,18 +128,18 @@ public class PlatformSessionServiceTest {
     @Test
     public void testrenewSession() throws Exception {
         final String username = "matti";
-        //txService.begin();
+        // txService.begin();
         final SPlatformSession session = sessionService.createSession(username);
-        //txService.complete();
+        // txService.complete();
         Thread.sleep(100);
 
-        //txService.begin();
+        // txService.begin();
         sessionService.renewSession(session.getId());
-        //txService.complete();
+        // txService.complete();
 
-        //txService.begin();
+        // txService.begin();
         final SPlatformSession session2 = sessionService.getSession(session.getId());
-        //txService.complete();
+        // txService.complete();
         assertTrue(session2.getExpirationDate().after(session.getExpirationDate()));
         assertTrue(session2.getLastRenewDate().after(session.getLastRenewDate()));
         assertEquals(session2.getLastRenewDate().getTime() + session2.getDuration(), session2.getExpirationDate().getTime());

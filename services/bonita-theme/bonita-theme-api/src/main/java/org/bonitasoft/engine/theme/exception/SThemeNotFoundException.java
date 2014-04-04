@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.theme.exception;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.theme.model.SThemeType;
 
 /**
  * @author Celine Souchet
@@ -32,6 +33,18 @@ public class SThemeNotFoundException extends SBonitaException {
 
     public SThemeNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
+    }
+
+    public SThemeNotFoundException(final long themeId) {
+        super("No theme exists with id = <" + themeId + ">");
+    }
+
+    public SThemeNotFoundException(final SThemeType type) {
+        super("No theme exists with type = " + type);
+    }
+
+    public SThemeNotFoundException(final SThemeType type, final boolean isDefault) {
+        super("No theme exists with type = " + type + ", and isDefault = " + isDefault);
     }
 
 }
