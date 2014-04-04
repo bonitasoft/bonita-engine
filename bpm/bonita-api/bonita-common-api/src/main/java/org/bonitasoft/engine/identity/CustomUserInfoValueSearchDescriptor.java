@@ -18,7 +18,7 @@ package org.bonitasoft.engine.identity;
  */
 public final class CustomUserInfoValueSearchDescriptor {
 
-    public static final String USER_ID = "userName";
+    public static final String USER_ID = "userId";
 
     public static final String DEFINITION_ID = "firstName";
 
