@@ -298,6 +298,9 @@ public class IOUtil {
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Input stream is null");
+        }
         final Scanner scanner = new Scanner(inputStream, fEncoding);
         return read(scanner);
     }
@@ -407,7 +410,7 @@ public class IOUtil {
         temp.setReadable(true);
         temp.setWritable(true);
 
-        if (!(temp.delete())) {
+        if (!temp.delete()) {
             throw new IOException("Could not delete temporary file : " + temp.getAbsolutePath());
         }
         mkdirs(temp);

@@ -12,7 +12,10 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.io.IOUtil;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Celine Souchet
@@ -26,6 +29,9 @@ public class ProcessDefinitionBARContributionTest {
     private static final String DESCRIPTION = "Description";
 
     private static final String ACTOR_NAME = "Actor Name";
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public final void serializeDeserializeProcessDefinition() throws Exception {
@@ -76,6 +82,39 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
         return processBuilder.done();
+    }
+
+    @Test
+    public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
+        exception.expect(InvalidBusinessArchiveFormatException.class);
+        exception.expectMessage("Wrong version");
+        String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
+        File createTempFile = File.createTempFile("old", "process.xml");
+        IOUtil.writeContentToFile(allContentFrom, createTempFile);
+        try {
+            new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
+        } finally {
+            createTempFile.delete();
+        }
+    }
+
+    @Test
+    public void should_checkVersion_with_old_content_thrown_exception() throws Exception {
+        exception.expect(InvalidBusinessArchiveFormatException.class);
+        exception
+                .expectMessage("6.0 namespace is not compatible with your current version");
+
+        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
+
+    }
+
+    @Test
+    public void should_checkVersion_with_bad_content_thrown_exception() throws Exception {
+        exception.expect(InvalidBusinessArchiveFormatException.class);
+        exception.expectMessage("There is no bonitasoft process namespace declaration");
+
+        new ProcessDefinitionBARContribution().checkVersion("invalid");
+
     }
 
 }

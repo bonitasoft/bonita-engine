@@ -77,7 +77,7 @@ public class XMLSProcessDefinition {
 
     public static final String CORRELATION_KEY = "key";
 
-    public static final String NAMESPACE = "http://www.bonitasoft.org/ns/process/server/6.0";
+    public static final String NAMESPACE = "http://www.bonitasoft.org/ns/process/server/6.3";
 
     public static final String PROCESS_NODE = "processDefinition";
 
