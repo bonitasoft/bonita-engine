@@ -5,12 +5,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,11 +49,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.command.helper.designer.Transition.fails;
-import static org.bonitasoft.engine.command.helper.designer.Transition.meet;
 
 /**
  * Created by Vincent Elcrin
@@ -61,8 +57,6 @@ import static org.bonitasoft.engine.command.helper.designer.Transition.meet;
  * Time: 09:45
  */
 public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
-
-    static final String JOHN = "john";
 
     User john;
 
@@ -75,15 +69,15 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        john = createUser(JOHN, "bpm");
+        john = createUser(USERNAME, "bpm");
         logout();
-        loginWith(JOHN, "bpm");
+        loginWith(USERNAME, "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
         processDeployer.clean();
-        deleteUser(JOHN);
+        deleteUser(USERNAME);
         VariableStorage.clearAll();
         logout();
     }
@@ -229,8 +223,8 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
     }
 
     private TestUtils.Process startProcess(long startedBy,
-                                           long processDefinitionId,
-                                           String activityName) throws Exception {
+            long processDefinitionId,
+            String activityName) throws Exception {
         return startProcess(startedBy, processDefinitionId, activityName, null, null);
     }
 
@@ -245,10 +239,10 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
         parameters.put("started_by", startedBy);
         parameters.put("process_definition_id", processDefinitionId);
         parameters.put("activity_name", activityName);
-        if(operations != null) {
+        if (operations != null) {
             parameters.put("operations", new ArrayList<Operation>(operations));
         }
-        if(context != null) {
+        if (context != null) {
             parameters.put("context", new HashMap<String, Serializable>(context));
         }
 

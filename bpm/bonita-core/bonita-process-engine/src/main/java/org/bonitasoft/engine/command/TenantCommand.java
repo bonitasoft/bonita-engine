@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**

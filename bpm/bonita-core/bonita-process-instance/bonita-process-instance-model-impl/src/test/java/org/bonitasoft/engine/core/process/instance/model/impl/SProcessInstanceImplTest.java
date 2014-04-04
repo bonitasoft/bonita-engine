@@ -7,7 +7,7 @@ import org.junit.Test;
 public class SProcessInstanceImplTest {
 
     @Test
-    public void defaultInterruptingEventIdShouldBeMinusOne() throws Exception {
+    public void defaultInterruptingEventIdShouldBeMinusOne() {
         assertThat(new SProcessInstanceImpl().getInterruptingEventId()).isEqualTo(-1L);
     }
 }

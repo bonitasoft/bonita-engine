@@ -80,7 +80,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) {
+    public void handleFailure(final Exception e, final Map<String, Object> context) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final Throwable cause = e.getCause();
@@ -111,7 +111,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         }
     }
 
-    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Throwable e, final Map<String, Object> context) {
+    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Exception e, final Map<String, Object> context) {
         try {
             getWrappedWork().handleFailure(e, context);
         } catch (final Throwable e1) {

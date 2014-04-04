@@ -30,10 +30,10 @@ public class PlatformTenantManager {
 
     private static final String START = "start";
 
-    protected PlatformTenantManager() throws Exception {
+    protected PlatformTenantManager() {
     }
 
-    public synchronized static PlatformTenantManager getInstance() throws Exception {
+    public synchronized static PlatformTenantManager getInstance() {
         if (instance == null) {
             instance = new PlatformTenantManager();
         }

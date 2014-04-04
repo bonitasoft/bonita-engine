@@ -16,7 +16,6 @@ package org.bonitasoft.engine.execution.work;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 public class TransactionServiceForTest implements UserTransactionService {
@@ -24,6 +23,7 @@ public class TransactionServiceForTest implements UserTransactionService {
     public TransactionServiceForTest() {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
     }
@@ -33,8 +33,9 @@ public class TransactionServiceForTest implements UserTransactionService {
         return callable.call();
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
+    public void registerBeforeCommitCallable(Callable<Void> callable) {
     }
 
 }

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.api.event;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;

@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.internal.ServerAPI;
-import org.bonitasoft.engine.api.internal.ServerWrappedException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -28,9 +26,10 @@ public class TestImplemOfServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+            final List<String> classNameParameters, final Object[] parametersValues) {
         return null;
     }
 

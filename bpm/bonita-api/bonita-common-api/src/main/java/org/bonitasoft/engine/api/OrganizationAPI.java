@@ -17,7 +17,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * Manages the Organization, that is the users, groups, roles, memberships, through import / export methods.

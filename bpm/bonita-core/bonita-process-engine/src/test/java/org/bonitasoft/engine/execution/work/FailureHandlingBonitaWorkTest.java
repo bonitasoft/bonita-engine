@@ -126,7 +126,7 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
-    public void putInMap() throws Exception {
+    public void putInMap() {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));

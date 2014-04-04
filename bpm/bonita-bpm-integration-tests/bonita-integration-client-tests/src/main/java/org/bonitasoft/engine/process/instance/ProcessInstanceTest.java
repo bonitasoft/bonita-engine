@@ -295,9 +295,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         checkProcessInstanceIsArchived(processInstance3);
         assertEquals(numberOfProcessInstancesBefore + 3, getProcessAPI().getNumberOfArchivedProcessInstances());
 
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance1));
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance2));
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance3));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance1));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance3));
         disableAndDeleteProcess(processDefinition);
     }
 

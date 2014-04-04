@@ -15,8 +15,6 @@ package org.bonitasoft.engine.bpm.actor;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-
 /**
  * ActorDefinition forms part of the ProcessDefinition. It is used to design an actor in the context of a process.
  * 

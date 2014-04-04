@@ -70,7 +70,7 @@ public class CategoryServiceImplTest {
     private CategoryServiceImpl categoryServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

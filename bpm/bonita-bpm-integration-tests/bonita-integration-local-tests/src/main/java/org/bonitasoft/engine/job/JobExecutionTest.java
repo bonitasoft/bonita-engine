@@ -20,18 +20,20 @@ import org.junit.Test;
 @SuppressWarnings("deprecation")
 public class JobExecutionTest extends CommonAPITest {
 
-    protected User matti;
+    private static final int ENOUTH_TIME_TO_GET_THE_JOB_DONE = 1000;
 
-    @Before
-    public void before() throws Exception {
-        login();
-        matti = createUser("matti", "keltainen");
-    }
+    protected User matti;
 
     @After
     public void after() throws Exception {
         deleteUser(matti);
         logout();
+    }
+
+    @Before
+    public void before() throws Exception {
+        login();
+        matti = createUser("matti", "keltainen");
     }
 
     @Test
@@ -41,7 +43,7 @@ public class JobExecutionTest extends CommonAPITest {
     }
 
     @Test
-    public void retrySeveralTimesAJob() throws Exception {
+    public void retryAJob() throws Exception {
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         try {
@@ -60,7 +62,7 @@ public class JobExecutionTest extends CommonAPITest {
             assertEquals(1, failedJob2.getRetryNumber());
             assertEquals("Throw an exception when 'throwException'=true", failedJob.getDescription());
             getProcessAPI().replayFailedJob(failedJobs.get(0).getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
-            Thread.sleep(1000);
+            Thread.sleep(ENOUTH_TIME_TO_GET_THE_JOB_DONE);
             failedJobs = getProcessAPI().getFailedJobs(0, 100);
             assertEquals(0, failedJobs.size());
         } finally {
@@ -80,5 +82,6 @@ public class JobExecutionTest extends CommonAPITest {
         assertEquals(numberOfFailedJobs, failedJobs.size());
         return failedJobs;
     }
+
 
 }

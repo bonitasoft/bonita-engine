@@ -73,12 +73,13 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
-        UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
+        final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
         userTransactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 

@@ -59,7 +59,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         this.inputParametersContext = inputParametersContext;
     }
 
-    protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Throwable throwable)
+    protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Exception Exception)
             throws SBonitaException;
 
     protected abstract SThrowEventInstance createThrowErrorEventInstance(Map<String, Object> context, final SEndEventDefinition eventDefinition)
@@ -78,17 +78,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
     }
 
-    protected void setConnectorAndContainerToFailed(final Map<String, Object> context, final Throwable throwable) throws SBonitaException {
-        setConnectorOnlyToFailed(context, throwable);
+    protected void setConnectorAndContainerToFailed(final Map<String, Object> context, final Exception Exception) throws SBonitaException {
+        setConnectorOnlyToFailed(context, Exception);
         setContainerInFail(context);
     }
 
-    protected void setConnectorOnlyToFailed(final Map<String, Object> context, final Throwable throwable) throws SBonitaException {
+    protected void setConnectorOnlyToFailed(final Map<String, Object> context, final Exception Exception) throws SBonitaException {
         final ConnectorInstanceService connectorInstanceService = getTenantAccessor(context).getConnectorInstanceService();
         final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService
                 .getConnectorInstanceWithFailureInfo(connectorInstanceId);
         connectorInstanceService.setState(connectorInstanceWithFailure, ConnectorService.FAILED);
-        connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, throwable);
+        connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, Exception);
     }
 
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition,
@@ -128,7 +128,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
         final ProcessDefinitionService processDefinitionService = getTenantAccessor(context).getProcessDefinitionService();
         if (handleError(context, userTransactionService, processDefinitionService, e)) {
@@ -137,7 +137,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     private boolean handleError(final Map<String, Object> context, final UserTransactionService userTransactionService,
-            final ProcessDefinitionService processDefinitionService, final Throwable e) throws Exception {
+            final ProcessDefinitionService processDefinitionService, final Exception e) throws Exception {
         final HandleConnectorOnFailEventTxContent handleError = new HandleConnectorOnFailEventTxContent(e, processDefinitionService, context);
         return userTransactionService.executeInTransaction(handleError);
     }
@@ -189,13 +189,13 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
      */
     private final class HandleConnectorOnFailEventTxContent implements Callable<Boolean> {
 
-        private final Throwable e;
+        private final Exception e;
 
         private final ProcessDefinitionService processDefinitionService;
 
         private final Map<String, Object> context;
 
-        private HandleConnectorOnFailEventTxContent(final Throwable e, final ProcessDefinitionService processDefinitionService,
+        private HandleConnectorOnFailEventTxContent(final Exception e, final ProcessDefinitionService processDefinitionService,
                 final Map<String, Object> context) {
             this.e = e;
             this.processDefinitionService = processDefinitionService;

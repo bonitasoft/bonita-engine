@@ -79,7 +79,6 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -117,9 +116,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     private final ArchiveService archiveService;
 
     public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final ArchiveService archiveService,
-            final EventService eventService, final QueriableLoggerService queriableLoggerService,
-            final TechnicalLoggerService logger) {
-        super(recorder, persistenceRead, eventService, queriableLoggerService, logger);
+            final EventService eventService, final TechnicalLoggerService logger) {
+        super(recorder, persistenceRead, eventService, logger);
         this.archiveService = archiveService;
         sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         sMultiInstanceActivityInstanceBuilder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);

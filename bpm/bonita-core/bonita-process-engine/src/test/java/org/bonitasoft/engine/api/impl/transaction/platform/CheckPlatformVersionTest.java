@@ -141,7 +141,7 @@ public class CheckPlatformVersionTest {
         checkPlatformVersion.call();
     }
 
-    private void given_DB_Jar_Home_Versions(final String dbVersion, final String jarVersion, final String homeVersion) throws Exception {
+    private void given_DB_Jar_Home_Versions(final String dbVersion, final String jarVersion, final String homeVersion) {
         when(platform.getVersion()).thenReturn(dbVersion);
         when(platformProperties.getPlatformVersion()).thenReturn(jarVersion);
         when(bonitaHomeServer.getVersion()).thenReturn(homeVersion);

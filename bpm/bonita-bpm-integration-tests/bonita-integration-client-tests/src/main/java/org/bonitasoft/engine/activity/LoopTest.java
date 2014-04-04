@@ -74,7 +74,7 @@ public class LoopTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(instance));
+        assertTrue(waitForProcessToFinishAndBeArchived(instance));
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(2, archivedActivityInstances.size());

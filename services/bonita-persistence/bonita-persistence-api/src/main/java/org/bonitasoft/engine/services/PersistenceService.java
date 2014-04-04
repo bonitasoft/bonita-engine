@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SRetryableException;
 
 /**
  * @author Charles Souillard

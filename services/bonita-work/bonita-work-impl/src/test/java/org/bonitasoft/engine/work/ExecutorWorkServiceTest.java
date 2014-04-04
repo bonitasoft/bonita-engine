@@ -64,8 +64,7 @@ public class ExecutorWorkServiceTest {
         queue = mock(Queue.class);
 
         doReturn(abstractWorkSynchronization).when(workSynchronizationFactory).getWorkSynchronization(any(ExecutorService.class),
-                any(TechnicalLoggerService.class), any(SessionAccessor.class),
-                any(ExecutorWorkService.class));
+                any(TechnicalLoggerService.class), any(SessionAccessor.class));
         doReturn(1L).when(sessionAccessor).getTenantId();
         Pair<ExecutorService, Queue<Runnable>> pair = new Pair<ExecutorService, Queue<Runnable>>(executorService, queue);
         doReturn(pair).when(bonitaExecutorServiceFactory).createExecutorService();
@@ -74,7 +73,6 @@ public class ExecutorWorkServiceTest {
 
         workService = spy(new ExecutorWorkService(transactionService, workSynchronizationFactory, loggerService, sessionAccessor,
                 bonitaExecutorServiceFactory));
-
     }
 
     @Test
@@ -237,7 +235,7 @@ public class ExecutorWorkServiceTest {
 
             @SuppressWarnings("unused")
             @Override
-            public void handleFailure(final Throwable e, final Map<String, Object> context) {
+            public void handleFailure(final Exception e, final Map<String, Object> context) {
 
             }
 

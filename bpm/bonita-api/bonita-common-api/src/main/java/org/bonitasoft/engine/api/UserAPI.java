@@ -20,7 +20,6 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.ContactData;
@@ -32,7 +31,6 @@ import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Users: creation, deletion, certain

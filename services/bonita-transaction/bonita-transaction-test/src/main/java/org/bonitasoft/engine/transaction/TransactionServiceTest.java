@@ -11,6 +11,7 @@ import org.junit.Test;
 public abstract class TransactionServiceTest {
 
     protected abstract TransactionService getTxService() throws Exception;
+
     TransactionService txService;
 
     @Before
@@ -19,7 +20,7 @@ public abstract class TransactionServiceTest {
     }
 
     @After
-    public void afterTest() throws Exception {
+    public void afterTest() {
         try {
             txService.complete();
         } catch (Exception e) {
@@ -98,11 +99,12 @@ public abstract class TransactionServiceTest {
         assertEquals(0, txService.getNumberOfActiveTransactions());
     }
 
-
     private static class TransactionWorker implements Runnable {
 
         private final CountDownLatch lock;
+
         private final TransactionService transactionService;
+
         private final CountDownLatch startSignal;
 
         public TransactionWorker(final CountDownLatch lock, final TransactionService transactionService, final CountDownLatch startSignal) {

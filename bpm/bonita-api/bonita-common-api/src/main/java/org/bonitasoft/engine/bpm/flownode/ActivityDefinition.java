@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.flownode;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.data.DataDefinition;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
