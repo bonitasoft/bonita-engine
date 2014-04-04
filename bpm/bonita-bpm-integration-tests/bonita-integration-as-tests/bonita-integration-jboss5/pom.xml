@@ -32,6 +32,7 @@
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 
 		<cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+		<invoker.port>4422</invoker.port>
 		<!-- -Xdebug -->
 		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
 	</properties>
@@ -242,6 +243,7 @@
 									<cargo.servlet.port>${jboss.web.port}</cargo.servlet.port>
 									<cargo.rmi.port>${provider.port}</cargo.rmi.port>
 									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
+									<cargo.jboss.jrmp.invoker.port>${invoker.port}</cargo.jboss.jrmp.invoker.port>
 								</properties>
 							</configuration>
 							<wait>false</wait>
