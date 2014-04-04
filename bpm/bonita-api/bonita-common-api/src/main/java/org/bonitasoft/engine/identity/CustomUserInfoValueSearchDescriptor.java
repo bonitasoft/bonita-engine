@@ -20,8 +20,8 @@ public final class CustomUserInfoValueSearchDescriptor {
 
     public static final String USER_ID = "userId";
 
-    public static final String DEFINITION_ID = "firstName";
+    public static final String DEFINITION_ID = "definitionId";
 
-    public static final String VALUE = "lastName";
+    public static final String VALUE = "value";
 
 }
