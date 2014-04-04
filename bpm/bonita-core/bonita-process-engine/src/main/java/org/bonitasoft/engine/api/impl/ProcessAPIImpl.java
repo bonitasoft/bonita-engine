@@ -338,7 +338,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -426,7 +425,6 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.supervisor.mapping.SSupervisorCreationException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
@@ -3721,58 +3719,49 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws CreationException, AlreadyExistsException {
-        return createSupervisor(processDefinitionId, userId, null, null, MemberType.USER);
+        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
+        supervisorBuilder.setUserId(userId);
+        return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
     public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws CreationException, AlreadyExistsException {
-        return createSupervisor(processDefinitionId, null, null, roleId, MemberType.ROLE);
+        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
+        supervisorBuilder.setRoleId(roleId);
+        return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
     public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException,
             AlreadyExistsException {
-        return createSupervisor(processDefinitionId, null, groupId, null, MemberType.GROUP);
+        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
+        supervisorBuilder.setGroupId(groupId);
+        return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
     public ProcessSupervisor createProcessSupervisorForMembership(final long processDefinitionId, final long groupId, final long roleId)
             throws CreationException, AlreadyExistsException {
-        return createSupervisor(processDefinitionId, null, groupId, roleId, MemberType.MEMBERSHIP);
+        final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
+        supervisorBuilder.setGroupId(groupId);
+        supervisorBuilder.setRoleId(roleId);
+        return createSupervisor(supervisorBuilder.done());
     }
 
-    private ProcessSupervisor createSupervisor(final long processDefinitionId, final Long userId, final Long groupId, final Long roleId,
-            final MemberType memberType) throws CreationException, AlreadyExistsException {
+    private SProcessSupervisorBuilder buildSProcessSupervisor(final long processDefinitionId) {
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
+        return sProcessSupervisorBuilderFactory.createNewInstance(processDefinitionId);
+    }
+
+    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException, AlreadyExistsException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
-        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
 
         try {
-            checkIfProcessSupervisorAlreadyExists(processDefinitionId, userId, groupId, roleId);
-            final SProcessSupervisorBuilder supervisorBuilder = sProcessSupervisorBuilderFactory.createNewInstance(
-                    processDefinitionId);
-            switch (memberType) {
-                case USER:
-                    supervisorBuilder.setUserId(userId);
-                    break;
+            checkIfProcessSupervisorAlreadyExists(sProcessSupervisor.getProcessDefId(), sProcessSupervisor.getUserId(), sProcessSupervisor.getGroupId(),
+                    sProcessSupervisor.getRoleId());
 
-                case GROUP:
-                    supervisorBuilder.setGroupId(groupId);
-                    break;
-
-                case ROLE:
-                    supervisorBuilder.setRoleId(roleId);
-                    break;
-
-                case MEMBERSHIP:
-                    supervisorBuilder.setGroupId(groupId);
-                    supervisorBuilder.setRoleId(roleId);
-                    break;
-                default:
-                    throw new IllegalStateException();
-            }
-
-            final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(supervisorBuilder.done());
+            final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(sProcessSupervisor);
             return ModelConvertor.toProcessSupervisor(supervisor);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
@@ -3783,7 +3772,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SBonitaSearchException, AlreadyExistsException {
         final List<SProcessSupervisor> processSupervisors = searchSProcessSupervisors(processDefinitionId, userId, groupId, roleId);
         if (!processSupervisors.isEmpty()) {
-            throw new AlreadyExistsException("This supervisor already exists");
+            throw new AlreadyExistsException("This supervisor already exists for process definition id = <" + processDefinitionId + ">, user id = <" + userId
+                    + ">, group id = <" + groupId + ">, role id = <" + roleId + ">");
         }
     }
 
