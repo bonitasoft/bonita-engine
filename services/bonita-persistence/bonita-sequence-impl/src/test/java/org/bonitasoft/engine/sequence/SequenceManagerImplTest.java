@@ -43,7 +43,7 @@ public class SequenceManagerImplTest {
         int i = 0;
 
         @Override
-        public Boolean answer(final InvocationOnMock invocation) throws Throwable {
+        public Boolean answer(final InvocationOnMock invocation) {
             i++;
             return i % 2 != 0;
         }

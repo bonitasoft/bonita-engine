@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.session.APISession;
@@ -41,6 +44,18 @@ public interface LoginAPI {
      */
     @NoSessionRequired
     APISession login(String userName, String password) throws LoginException;
+
+    /**
+     * Connects the user in order to use API methods of the default tenant.
+     * 
+     * @param credentials
+     *            the properties to use to login
+     * @return the session to use with other tenant API methods
+     * @throws LoginException
+     *             occurs when an exception is thrown during login
+     */
+    @NoSessionRequired
+    APISession login(Map<String, Serializable> credentials) throws LoginException;
 
     /**
      * Disconnects the logged user on a tenant according to the given session.

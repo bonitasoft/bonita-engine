@@ -51,7 +51,7 @@ public abstract class WrappingBonitaWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         wrappedWork.handleFailure(e, context);
     }
 

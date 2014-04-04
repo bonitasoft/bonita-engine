@@ -28,7 +28,6 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * Manipulate tenant commands, it can be registered, unregistered and executed with parameters.<br/>

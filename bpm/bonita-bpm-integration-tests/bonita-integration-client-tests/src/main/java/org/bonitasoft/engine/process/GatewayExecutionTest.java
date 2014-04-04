@@ -140,7 +140,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
             getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         }
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -172,7 +172,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertEquals("step4", humanTaskInstance.getName());
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -270,7 +270,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertEquals("step4", humanTaskInstance2.getName());
         assignAndExecuteStep(humanTaskInstance2, user.getId());
 
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -613,7 +613,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final HumanTaskInstance step4 = pendingTasks2.get(0);
         assertEquals("step4", step4.getName());
         assignAndExecuteStep(step4, user.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -747,7 +747,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
             getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         }
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -784,7 +784,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
             getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         }
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -822,7 +822,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
             getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         }
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -1006,7 +1006,7 @@ public class GatewayExecutionTest extends CommonAPITest {
             for (final HumanTaskInstance humanTaskInstance : pendingTasks) {
                 getProcessAPI().executeFlowNode(humanTaskInstance.getId());
             }
-            assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+            assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         }
         disableAndDeleteProcess(processDefinition);
     }

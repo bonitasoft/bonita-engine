@@ -37,12 +37,12 @@ public class ModelConvertorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void getProcessInstanceState_conversionOnUnknownStateShouldThrowException() throws Exception {
+    public void getProcessInstanceState_conversionOnUnknownStateShouldThrowException() {
         ModelConvertor.getProcessInstanceState("un_known_state");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void getProcessInstanceState_conversionOnNullStateShouldThrowException() throws Exception {
+    public void getProcessInstanceState_conversionOnNullStateShouldThrowException() {
         ModelConvertor.getProcessInstanceState(null);
     }
 

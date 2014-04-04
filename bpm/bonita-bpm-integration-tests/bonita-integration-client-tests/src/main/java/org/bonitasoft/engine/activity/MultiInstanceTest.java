@@ -106,7 +106,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(instance));
+        assertTrue(waitForProcessToFinishAndBeArchived(instance));
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(4, archivedActivityInstances.size());
@@ -625,7 +625,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(numberOfExecutedActivities, processInstance, true);
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -652,7 +652,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final HumanTaskInstance pendingTask = pendingTasks.get(0);
 
         assignAndExecuteStep(pendingTask, john.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -676,7 +676,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskInParallel(numberOfTask, numberOfTaskToComplete, processInstance);
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -703,7 +703,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final HumanTaskInstance pendingTask = pendingTasks.get(0);
 
         assignAndExecuteStep(pendingTask, john.getId());
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -752,7 +752,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final HumanTaskInstance pendingTask3 = pendingTasks3.get(0);
         assignAndExecuteStep(pendingTask3, jenny.getId());
 
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -801,7 +801,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final HumanTaskInstance pendingTask3 = pendingTasks3.get(0);
         assignAndExecuteStep(pendingTask3, jenny.getId());
 
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -834,7 +834,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition mainProcess = deployAndEnableWithActor(builderProc.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
 
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(mainProcess);
         disableAndDeleteProcess(subProcess);
     }

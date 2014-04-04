@@ -56,11 +56,9 @@ public class TimerEventTest extends CommonAPITest {
     public void timerIntermediateCatchEventDuration() throws Exception {
         final String step1Name = "step1";
         final String step2Name = "step2";
-        final String actorName = "delivery";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1000); // the timer intermediate catch event will wait one
                                                                                                        // second
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name, step2Name,
-                actorName);
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name, step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
@@ -85,13 +83,11 @@ public class TimerEventTest extends CommonAPITest {
     public void timerIntermediateCatchEventDate() throws Exception {
         final String step1Name = "step1";
         final String step2Name = "step2";
-        final String actorName = "delivery";
         final long expectedDate = System.currentTimeMillis() + 5000;
         final Expression timerExpression = new ExpressionBuilder().createGroovyScriptExpression("testTimerIntermediateCatchEventDate", "return new Date("
                 + expectedDate + "l)", Date.class.getName()); // the timer intermediate catch
         // event will wait one second
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE, timerExpression, step1Name, step2Name,
-                actorName);
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE, timerExpression, step1Name, step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
@@ -124,13 +120,7 @@ public class TimerEventTest extends CommonAPITest {
         assertTrue(processInstances.isEmpty());
 
         // wait for process instance creation
-        Thread.sleep(1500);
-
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertEquals(1, processInstances.size());
-
-        final ProcessInstance processInstance = processInstances.get(0);
-        waitForUserTask(stepName, processInstance);
+        waitForUserTask(stepName);
 
         disableAndDeleteProcess(definition);
     }
@@ -219,13 +209,13 @@ public class TimerEventTest extends CommonAPITest {
     }
 
     private ProcessDefinition deployProcessWithTimerIntermediateCatchEventAndUserTask(final TimerType timerType, final Expression timerValue,
-            final String step1Name, final String step2Name, final String actorName) throws BonitaException {
+            final String step1Name, final String step2Name) throws BonitaException {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
-                .addActor(actorName).addDescription("Delivery all day and night long").addStartEvent("startEvent").addUserTask(step1Name, actorName)
-                .addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, actorName)
+                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent").addUserTask(step1Name, ACTOR_NAME)
+                .addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, ACTOR_NAME)
                 .addEndEvent("endEvent").addTransition("startEvent", step1Name).addTransition(step1Name, "intermediateCatchEvent")
                 .addTransition("intermediateCatchEvent", step2Name).addTransition(step2Name, "endEvent").getProcess();
-        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;

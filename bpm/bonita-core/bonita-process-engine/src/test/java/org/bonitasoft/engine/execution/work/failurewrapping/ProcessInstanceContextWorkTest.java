@@ -51,7 +51,7 @@ public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
 
     @Override
     @Before
-    public void before() throws Exception {
+    public void before() throws SBonitaException {
         doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
         doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
 

@@ -46,7 +46,7 @@ public class RemoteEngineTests extends CommonAPITest {
      * check that we return the stack server exception but not the server exception itself that is not known to the client
      */
     @Test
-    public void check_remote_exception_is_given_to_client() throws Exception {
+    public void check_remote_exception_is_given_to_client() {
         try {
             getProcessAPI().getFlowNodeInstance(123456789l);
             fail("should fail");

@@ -35,6 +35,7 @@ public class ParameterDefinitionBinding extends NamedElementBinding {
         return XMLProcessDefinition.PARAMETER_NODE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLProcessDefinition.DESCRIPTION.equals(name)) {
@@ -42,6 +43,7 @@ public class ParameterDefinitionBinding extends NamedElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
 

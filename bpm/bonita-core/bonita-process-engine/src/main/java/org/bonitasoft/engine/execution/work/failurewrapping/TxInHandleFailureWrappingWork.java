@@ -43,7 +43,7 @@ public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         // Enrich the exception before log it.
         if (e instanceof SBonitaException) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);

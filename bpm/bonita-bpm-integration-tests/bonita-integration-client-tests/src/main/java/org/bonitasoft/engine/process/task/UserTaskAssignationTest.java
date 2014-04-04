@@ -570,7 +570,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
-    public void getPossibleUsersOfUnknownTask() throws Exception {
+    public void getPossibleUsersOfUnknownTask() {
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(-156l, 0, 10);
         assertEquals(0, possibleUsers.size());
     }
@@ -689,7 +689,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
-    public void getPossibleUsersOfUnknownProcessDefinition() throws Exception {
+    public void getPossibleUsersOfUnknownProcessDefinition() {
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(-156l, "step1", 0, 10);
         assertEquals(0, possibleUsers.size());
     }

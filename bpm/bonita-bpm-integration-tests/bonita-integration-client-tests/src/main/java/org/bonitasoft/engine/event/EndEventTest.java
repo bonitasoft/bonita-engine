@@ -54,7 +54,7 @@ public class EndEventTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
-        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         // final List<String> expectedEvents = getList("endEvent", "startEvent");
         // List<EventInstance> eventInstances = processAPI.getEventInstances(processInstance.getId(), 0, 5, EventSorting.NAME_ASC);
         // assertEquals(expectedEvents.size(), eventInstances.size());

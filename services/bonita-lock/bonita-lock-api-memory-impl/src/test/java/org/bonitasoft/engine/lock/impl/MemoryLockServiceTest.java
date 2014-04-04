@@ -99,8 +99,6 @@ public class MemoryLockServiceTest {
                 memoryLockService.unlock(lock, tenantId);
                 lock = null;
                 System.out.println(name2 + " unlocked");
-            } catch (SLockException e) {
-                // NOTHING
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -6,6 +6,7 @@
 		SELECT dataInstance
 		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
 		WHERE dataInstance.id IN (:ids)
+		ORDER BY dataInstance.id
 	</query>
 
 	<query name="getDataInstancesByNameAndContainer">
@@ -30,6 +31,7 @@
 		WHERE data_mapping.dataName IN (:dataNames)
 		AND data_mapping.containerId = :containerId
 		AND data_mapping.containerType = :containerType
+		ORDER BY data_mapping.tenantId, data_mapping.id
 	</query>
 
 	<query name="getDataInstanceVisibilityMappings">

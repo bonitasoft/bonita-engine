@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-
 /**
  * @author Matthieu Chaffotte
  */

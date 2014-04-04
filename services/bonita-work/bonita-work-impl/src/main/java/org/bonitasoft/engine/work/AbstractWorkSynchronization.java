@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
 
@@ -32,12 +32,8 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
 
     private long tenantId;
 
-    private final ExecutorWorkService threadPoolWorkService;
-
-    public AbstractWorkSynchronization(final ExecutorWorkService threadPoolWorkService, final ExecutorService executorService,
-            final SessionAccessor sessionAccessor) {
+    public AbstractWorkSynchronization(final ExecutorService executorService, final SessionAccessor sessionAccessor) {
         super();
-        this.threadPoolWorkService = threadPoolWorkService;
         this.executorService = executorService;
         works = new HashSet<BonitaWork>();
         try {

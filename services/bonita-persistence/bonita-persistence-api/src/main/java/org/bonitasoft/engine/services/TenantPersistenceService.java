@@ -15,8 +15,6 @@ package org.bonitasoft.engine.services;
 
 import java.io.IOException;
 
-import org.bonitasoft.engine.persistence.SRetryableException;
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet

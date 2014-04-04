@@ -52,7 +52,7 @@ public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest {
 
     @Override
     @Before
-    public void before() throws Exception {
+    public void before() throws SBonitaException {
         doReturn(NAME).when(sProcessDefinitionDeployInfo).getName();
         doReturn(VERSION).when(sProcessDefinitionDeployInfo).getVersion();
 
