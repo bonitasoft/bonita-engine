@@ -72,6 +72,8 @@ CREATE TABLE arch_flownode_instance (
   interrupting NUMBER(1),
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance (kind, logicalGroup2, executedBy);
+CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
 
 CREATE TABLE arch_transition_instance (
   tenantid NUMBER(19, 0) NOT NULL,

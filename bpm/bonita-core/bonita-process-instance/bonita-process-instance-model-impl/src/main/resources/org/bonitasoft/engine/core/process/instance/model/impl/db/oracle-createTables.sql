@@ -178,6 +178,7 @@ CREATE TABLE pending_mapping (
   	userId NUMBER(19, 0),
   	PRIMARY KEY (tenantid, id)
 );
+CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
 
 CREATE TABLE hidden_activity (
 	tenantid NUMBER(19, 0) NOT NULL,

@@ -178,6 +178,7 @@ CREATE TABLE pending_mapping (
   	userId BIGINT,
   	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
 
 CREATE TABLE hidden_activity (
 	tenantid BIGINT NOT NULL,
