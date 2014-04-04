@@ -9,11 +9,13 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -35,28 +37,55 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final String userName, final String password) throws LoginException {
+    public APISession login(final String userName, final String password) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started: " + LicenseChecker.getInstance().getErrorMessage());
+            throw new LoginException("The node is not started : " + LicenseChecker.getInstance().getErrorMessage());
         }
-        return super.login(userName, password);
+        try {
+            return loginInternal(userName, password, null);
+        } catch (final LoginException e) {
+            throw e;
+        } catch (final TenantIsPausedException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new LoginException(e);
+        }
     }
 
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final long tenantId, final String userName, final String password) throws LoginException {
+    public APISession login(final long tenantId, final String userName, final String password) throws LoginException, TenantIsPausedException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started");
+            throw new LoginException("The node is not started !!");
         }
-        checkUsernameAndPassword(userName, password);
         try {
-            return login(userName, password, tenantId);
+            return loginInternal(userName, password, tenantId);
         } catch (final LoginException e) {
             throw e;
-        } catch (final BonitaRuntimeException e) {
+        } catch (final TenantIsPausedException e) {
             throw e;
         } catch (final Exception e) {
+            throw new LoginException(e);
+        }
+    }
+
+    @Override
+    public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException {
+        if (!LicenseChecker.getInstance().checkLicence()) {
+            throw new LoginException("The node is not started !!");
+        }
+        checkCredentials(credentials);
+        if (credentials != null) {
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        }
+        try {
+            return loginInternal(tenantId, credentials);
+        } catch (final LoginException e) {
+            throw e;
+        } catch (final TenantIsPausedException e) {
+            throw e;
+        } catch (Exception e) {
             throw new LoginException(e);
         }
     }
