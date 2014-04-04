@@ -35,6 +35,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
 import org.bonitasoft.engine.identity.RoleCreator.RoleField;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -135,7 +136,8 @@ public class OrganizationTest extends CommonAPITest {
 
     private SearchOptions getCustomUserInfoValueSearchOptions(User user) {
         SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
-        optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.USER_ID, user.getId()); 
+        optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.USER_ID, user.getId());
+        optionsBuilder.sort(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, Order.ASC);
         SearchOptions searchOptions = optionsBuilder.done();
         return searchOptions;
     }
