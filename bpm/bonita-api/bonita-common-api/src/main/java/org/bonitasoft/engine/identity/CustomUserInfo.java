@@ -1,10 +1,14 @@
 package org.bonitasoft.engine.identity;
 
+import org.bonitasoft.engine.bpm.BonitaObject;
+
 /**
  * Aggregate information of {@link CustomUserInfoDefinition} and {@link CustomUserInfoValue} 
  * @author Vincent Elcrin
  */
-public class CustomUserInfo {
+public class CustomUserInfo implements BonitaObject {
+
+    private static final long serialVersionUID = 4376121609647215025L;
 
     private final CustomUserInfoDefinition definition;
 
