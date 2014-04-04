@@ -12,6 +12,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +36,20 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -94,19 +103,24 @@ public class PageServiceImpl implements PageService {
 
     private final boolean active;
 
+    private final ProfileService profileService;
+
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
-        this(Manager.getInstance(), persistenceService, recorder, eventService, logger, queriableLoggerService);
+            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final ProfileService profileService) {
+        this(Manager.getInstance(), persistenceService, recorder, eventService, logger, queriableLoggerService, profileService);
     }
 
     PageServiceImpl(final Manager manager, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final ProfileService profileService) {
         active = manager.isFeatureActive(Features.CUSTOM_PAGE);
         this.persistenceService = persistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
+        this.profileService = profileService;
     }
 
     @Override
@@ -207,16 +221,40 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void deletePage(final SPage page) throws SObjectModificationException {
-        final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + page.getName());
+    private void deletePage(final SPage sPage) throws SObjectModificationException {
+        final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + sPage.getName());
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(page);
-            final SDeleteEvent deleteEvent = getDeleteEvent(page, PAGE);
+            deleteProfileEntry(sPage);
+
+            final DeleteRecord deleteRecord = new DeleteRecord(sPage);
+            final SDeleteEvent deleteEvent = getDeleteEvent(sPage, PAGE);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
+            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
         } catch (final SRecorderException re) {
-            initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
+        } catch (final SBonitaSearchException e) {
+            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            throw new SObjectModificationException(e);
+        } catch (final SProfileEntryNotFoundException e) {
+            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            throw new SObjectModificationException(e);
+        } catch (final SProfileEntryDeletionException e) {
+            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    private void deleteProfileEntry(final SPage sPage) throws SBonitaSearchException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
+
+        final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
+        for (final SProfileEntry sProfileEntry : searchProfileEntries) {
+            profileService.deleteProfileEntry(sProfileEntry.getId());
         }
     }
 

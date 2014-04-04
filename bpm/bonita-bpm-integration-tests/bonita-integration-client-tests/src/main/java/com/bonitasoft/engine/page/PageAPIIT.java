@@ -11,6 +11,7 @@ package com.bonitasoft.engine.page;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,9 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileEntry;
+import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -27,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
 
 @SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPISPTest {
@@ -217,6 +222,47 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // then
         getPageAPI().getPage(page.getId());
+    }
+
+    @Test
+    public void should_deletePage_delete_profile_entry() throws BonitaException {
+        // given
+        final Page page = getPageAPI().createPage(
+                new PageCreator("mypagetodelete", CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
+                getPageContent(INDEX_GROOVY));
+
+        // a profile with 3 entry
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator("a", profileId).setType("folder"));
+        final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("", profileId).setType("link").setPage(page.getName())
+                .setParentId(folderProfileEntry.getId());
+        final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator1);
+        profileEntries.add(createProfileEntry);
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistingadmin")
+                .setParentId(folderProfileEntry.getId()).setCustom(true);
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistinguser")
+                .setParentId(folderProfileEntry.getId()).setCustom(false);
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
+
+        // when
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PAGE, page.getName());
+        final List<ProfileEntry> resultProfileEntriesBefore = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+
+        assertThat(resultProfileEntriesBefore).as("should contain 1 item with pageToSearch").hasSize(1).containsOnly(createProfileEntry);
+        getPageAPI().deletePage(page.getId());
+
+        // then
+        final List<ProfileEntry> resultProfileEntriesAfter = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertThat(resultProfileEntriesAfter).as("should delete profile entry").isEmpty();
+
+        // cleanup
+        getProfileAPI().deleteProfile(profileId);
+
     }
 
     @Test

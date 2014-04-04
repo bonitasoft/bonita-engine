@@ -45,6 +45,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
@@ -116,6 +117,9 @@ public class PageServiceImplTest {
     @Mock
     private EntityUpdateDescriptor entityUpdateDescriptor;
 
+    @Mock
+    ProfileService profileService;
+
     private PageServiceImpl pageServiceImpl;
 
     @Rule
@@ -128,7 +132,8 @@ public class PageServiceImplTest {
         when(technicalLoggerService.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         when(queriableLoggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
-        pageServiceImpl = spy(new PageServiceImpl(manager, readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService));
+        pageServiceImpl = spy(new PageServiceImpl(manager, readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService,
+                profileService));
         doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
         doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class), anyString());
 
