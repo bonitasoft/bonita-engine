@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -273,6 +274,53 @@ public class ProfileEntryTest extends AbstractProfileTest {
         assertEquals(22L, resultProfileEntries.get(11).getIndex());
 
         // Delete profile1
+        getProfileAPI().deleteProfile(profileId);
+    }
+
+    @Test
+    public void searchProfileByPage() throws BonitaException {
+
+        // given
+
+        // Create Profile1
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+
+        // Create Folder Profile Entry
+        final ProfileEntryCreator folderCreator = new ProfileEntryCreator("a", profileId).setType("folder");
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(folderCreator);
+
+        final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
+
+        final String pageToSearch = "tasklistinguser";
+        // Create Profile entry 1
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("", profileId).setType("link").setPage(pageToSearch)
+                .setParentId(folderProfileEntry.getId());
+        final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator1);
+        profileEntries.add(createProfileEntry);
+
+        // Create Profile entry 2
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistingadmin")
+                .setParentId(folderProfileEntry.getId()).setCustom(true);
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
+
+        // Create Profile entry 3
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistinguser")
+                .setParentId(folderProfileEntry.getId()).setCustom(false);
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
+
+        // when
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PAGE, pageToSearch);
+
+        final List<ProfileEntry> resultProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+
+        // then
+        assertThat(resultProfileEntries).as("should contain 1 item with pageToSearch").hasSize(1).containsOnly(createProfileEntry);
+
+        // cleanup
         getProfileAPI().deleteProfile(profileId);
     }
 
