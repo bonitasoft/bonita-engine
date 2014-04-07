@@ -105,12 +105,19 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
@@ -1017,6 +1024,69 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(e);
         }
         return ModelConvertor.toConnectorInstanceWithFailureInfo(serverObject);
+    }
+
+    @Override
+    public long getNumberOfProcessSupervisorsForUser(final long processDefinitionId) {
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
+        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getProcessDefIdKey(),
+                processDefinitionId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getUserIdKey(), 0, FilterOperationType.GREATER));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getGroupIdKey(), -1));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getRoleIdKey(), -1));
+
+        return getNumberOfProcessSupervisors(filterOptions);
+    }
+
+    @Override
+    public long getNumberOfProcessSupervisorsForGroup(final long processDefinitionId) {
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
+        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getProcessDefIdKey(),
+                processDefinitionId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getUserIdKey(), -1));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getGroupIdKey(), 0, FilterOperationType.GREATER));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getRoleIdKey(), -1));
+
+        return getNumberOfProcessSupervisors(filterOptions);
+    }
+
+    @Override
+    public long getNumberOfProcessSupervisorsForRole(final long processDefinitionId) {
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
+        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getProcessDefIdKey(),
+                processDefinitionId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getUserIdKey(), -1));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getGroupIdKey(), -1));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getRoleIdKey(), 0, FilterOperationType.GREATER));
+
+        return getNumberOfProcessSupervisors(filterOptions);
+    }
+
+    @Override
+    public long getNumberOfProcessSupervisorsForMembership(final long processDefinitionId) {
+        final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
+        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getProcessDefIdKey(),
+                processDefinitionId));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getUserIdKey(), -1));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getGroupIdKey(), 0, FilterOperationType.GREATER));
+        filterOptions.add(new FilterOption(SProcessSupervisor.class, sProcessSupervisorBuilderFactory.getRoleIdKey(), 0, FilterOperationType.GREATER));
+
+        return getNumberOfProcessSupervisors(filterOptions);
+    }
+
+    private long getNumberOfProcessSupervisors(final List<FilterOption> filterOptions) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SupervisorMappingService supervisorService = tenantAccessor.getSupervisorService();
+        final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, filterOptions, null);
+        try {
+            return supervisorService.getNumberOfProcessSupervisors(countOptions);
+        } catch (SBonitaSearchException e) {
+            throw new RetrieveException(e);
+        }
     }
 
 }
