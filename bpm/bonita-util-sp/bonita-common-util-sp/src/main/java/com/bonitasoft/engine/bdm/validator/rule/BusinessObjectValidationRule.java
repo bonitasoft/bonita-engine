@@ -10,11 +10,11 @@ import java.util.Set;
 
 import javax.lang.model.SourceVersion;
 
+import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.UniqueConstraint;
-import com.bonitasoft.engine.bdm.validator.QueryNameUtil;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -66,7 +66,7 @@ public class BusinessObjectValidationRule implements ValidationRule {
                 constraintNames.add(uc.getName());
             }
 
-            queryNames.add(QueryNameUtil.createQueryNameForUniqueConstraint(bo.getQualifiedName(), uc));
+            queryNames.add(BDMQueryUtil.createQueryNameForUniqueConstraint(bo.getQualifiedName(), uc));
             for (final String fName : uc.getFieldNames()) {
                 final Field field = getField(bo, fName);
                 if (field == null) {

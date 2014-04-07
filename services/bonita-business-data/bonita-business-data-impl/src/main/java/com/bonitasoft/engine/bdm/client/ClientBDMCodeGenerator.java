@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
+import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.Field;
@@ -21,7 +22,6 @@ import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.UniqueConstraint;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
-import com.bonitasoft.engine.bdm.validator.QueryNameUtil;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -82,7 +82,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Add method for unique constraint
         for (UniqueConstraint uc : bo.getUniqueConstraints()) {
             JMethod method = createMethodForUniqueConstraint(bo, entity, implClass, uc);
-            addQueryMethodBody(method, QueryNameUtil.createQueryNameForUniqueConstraint(entity.name(), uc), entity.fullName());
+            addQueryMethodBody(method, BDMQueryUtil.createQueryNameForUniqueConstraint(entity.name(), uc), entity.fullName());
         }
         return daoInterface;
     }
@@ -142,7 +142,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private JMethod createMethodForUniqueConstraint(final BusinessObject bo, JDefinedClass entity, JDefinedClass targetClass, UniqueConstraint uc)
             throws ClassNotFoundException {
-        String name = QueryNameUtil.createQueryNameForUniqueConstraint(entity.name(), uc);
+        String name = BDMQueryUtil.createQueryNameForUniqueConstraint(entity.name(), uc);
         JMethod queryMethod = createQueryMethod(entity, targetClass, name, entity.fullName());
         for (String param : uc.getFieldNames()) {
             queryMethod.param(getModel().parseType(getFieldType(param, bo)), param);

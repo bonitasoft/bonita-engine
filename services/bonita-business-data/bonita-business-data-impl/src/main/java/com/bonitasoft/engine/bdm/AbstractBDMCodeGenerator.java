@@ -26,7 +26,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
-import com.bonitasoft.engine.bdm.validator.QueryNameUtil;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
@@ -39,8 +38,6 @@ import com.sun.codemodel.JType;
  * @author Romain Bioteau
  */
 public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
-
-    private static final String AND = " AND ";
 
     private final BusinessObjectModel bom;
 
@@ -99,8 +96,8 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
                 // Generate a query for Unique Constraint
                 addNamedQuery(entityClass,
                         valueArray,
-                        QueryNameUtil.createQueryNameForUniqueConstraint(entityClass.name(), uniqueConstraint),
-                        createQueryContentForUniqueConstraint(entityClass, uniqueConstraint));
+                        BDMQueryUtil.createQueryNameForUniqueConstraint(entityClass.name(), uniqueConstraint),
+                        BDMQueryUtil.createQueryContentForUniqueConstraint(entityClass.name(), uniqueConstraint));
             }
         }
 
@@ -126,22 +123,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
         nameQueryAnnotation.param("name", name);
         nameQueryAnnotation.param("query", content);
-    }
-
-    private String createQueryContentForUniqueConstraint(JDefinedClass entityClass, UniqueConstraint uniqueConstraint) {
-        StringBuilder sb = new StringBuilder("SELECT o FROM " + entityClass.name() + " o WHERE ");
-        for (String fieldName : uniqueConstraint.getFieldNames()) {
-            sb.append("o.");
-            sb.append(fieldName);
-            sb.append("=:");
-            sb.append(fieldName);
-            sb.append(AND);
-        }
-        String query = sb.toString();
-        if (query.endsWith(AND)) {
-            query = query.substring(0, query.length() - AND.length());
-        }
-        return query;
     }
 
     private void validateClassNotExistsInRuntime(final String qualifiedName) {
