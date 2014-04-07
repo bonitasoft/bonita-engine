@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.identity.CustomUserInfoValueSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
@@ -62,6 +60,5 @@ public class SearchCustomUserInfoValueDescriptor extends SearchEntityDescriptor 
     protected Map<Class<? extends PersistentObject>, Set<String>> getAllFields() {
         return allFields;
     }
-
 
 }
