@@ -240,6 +240,7 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
@@ -276,6 +277,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -488,7 +490,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchHumanTaskInstances searchHumanTasksTransaction = new SearchHumanTaskInstances(activityInstanceService, flowNodeStateManager,
                 searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), searchOptions);
-            searchHumanTasksTransaction.execute();
+        searchHumanTasksTransaction.execute();
         return searchHumanTasksTransaction.getResult();
     }
 
@@ -2245,51 +2247,33 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void updateActorsOfUserTask(final long userTaskId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+
         try {
-            final SFlowNodeInstance flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskId);
-            if (!(flowNodeInstance instanceof SHumanTaskInstance)) {
-                throw new UpdateException("The identifier does not refer to a human task");
-            }
-            final SHumanTaskInstance humanTaskInstance = (SHumanTaskInstance) flowNodeInstance;
+            final SHumanTaskInstance humanTaskInstance = getSHumanTaskInstance(userTaskId);
             final long processDefinitionId = humanTaskInstance.getLogicalGroup(0);
             final SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processDefinitionId);
             final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
                     humanTaskInstance.getFlowNodeDefinitionId());
+            final long humanTaskInstanceId = humanTaskInstance.getId();
             if (humanTaskDefinition != null) {
                 final SUserFilterDefinition sUserFilterDefinition = humanTaskDefinition.getSUserFilterDefinition();
                 if (sUserFilterDefinition != null) {
-                    final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-                    // release
-                    if (humanTaskInstance.getAssigneeId() > 0) {
-                        activityInstanceService.assignHumanTask(userTaskId, 0);
-                    }
-                    final String actorName = humanTaskDefinition.getActorName();
-                    final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-                    final UserFilterService userFilterService = tenantAccessor.getUserFilterService();
-                    final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
-                    final SExpressionContext expressionContext = new SExpressionContext(humanTaskInstance.getId(),
-                            DataInstanceContainer.ACTIVITY_INSTANCE.name(), humanTaskInstance.getLogicalGroup(0));
-                    final FilterResult result = userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(),
-                            processClassloader, expressionContext, actorName);
+                    cleanPendingMappingsAndUnassignHumanTask(userTaskId, humanTaskInstance);
+
+                    final FilterResult result = executeFilter(processDefinitionId, humanTaskInstanceId, humanTaskDefinition.getActorName(),
+                            sUserFilterDefinition);
                     final List<Long> userIds = result.getResult();
                     if (userIds == null || userIds.isEmpty() || userIds.contains(0l) || userIds.contains(-1l)) {
                         throw new UpdateException("no user id returned by the user filter " + sUserFilterDefinition + " on activity "
                                 + humanTaskDefinition.getName());
                     }
-                    for (final Long userId : userIds) {
-                        final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
-                                .createNewInstanceForUser(humanTaskInstance.getId(), userId).done();
-                        activityInstanceService.addPendingActivityMappings(mapping);
-                    }
-                    if (userIds.size() == 1 && result.shouldAutoAssignTaskIfSingleResult()) {
-                        activityInstanceService.assignHumanTask(humanTaskInstance.getId(), userIds.get(0));
-                    }
+                    createPendingMappingsAndAssignHumanTask(humanTaskInstanceId, result);
                 }
             }
             final TechnicalLoggerService technicalLoggerService = tenantAccessor.getTechnicalLoggerService();
             if (technicalLoggerService.isLoggable(ProcessAPIImpl.class, TechnicalLogSeverity.INFO)) {
                 final StringBuilder builder = new StringBuilder("User '");
-                builder.append(SessionInfos.getUserNameFromSession()).append("' has re-executed assignation on activity ").append(humanTaskInstance.getId());
+                builder.append(SessionInfos.getUserNameFromSession()).append("' has re-executed assignation on activity ").append(humanTaskInstanceId);
                 builder.append(" of process instance ").append(humanTaskInstance.getLogicalGroup(1)).append(" of process named '")
                         .append(processDefinition.getName()).append("' in version ").append(processDefinition.getVersion());
                 technicalLoggerService.log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO, builder.toString());
@@ -2297,6 +2281,70 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }
+    }
+
+    private void createPendingMappingsAndAssignHumanTask(final long humanTaskInstanceId, final FilterResult result) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final List<Long> userIds = result.getResult();
+        for (final Long userId : userIds) {
+            createPendingMappingForUser(humanTaskInstanceId, userId);
+        }
+        if (userIds.size() == 1 && result.shouldAutoAssignTaskIfSingleResult()) {
+            tenantAccessor.getActivityInstanceService().assignHumanTask(humanTaskInstanceId, userIds.get(0));
+        }
+    }
+
+    private FilterResult executeFilter(final long processDefinitionId, final long humanTaskInstanceId, final String actorName,
+            final SUserFilterDefinition sUserFilterDefinition) throws SUserFilterExecutionException, SClassLoaderException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final UserFilterService userFilterService = tenantAccessor.getUserFilterService();
+        final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+        final SExpressionContext expressionContext = new SExpressionContext(humanTaskInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                processDefinitionId);
+        final FilterResult result = userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(),
+                processClassloader, expressionContext, actorName);
+        return result;
+    }
+
+    private void cleanPendingMappingsAndUnassignHumanTask(final long userTaskId, final SHumanTaskInstance humanTaskInstance) throws SFlowNodeNotFoundException,
+            SFlowNodeReadException, SActivityModificationException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        // release
+        if (humanTaskInstance.getAssigneeId() > 0) {
+            activityInstanceService.assignHumanTask(userTaskId, 0);
+        }
+        activityInstanceService.deletePendingMappings(humanTaskInstance.getId());
+    }
+
+    private SHumanTaskInstance getSHumanTaskInstance(final long userTaskId) throws SFlowNodeNotFoundException, SFlowNodeReadException, UpdateException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SFlowNodeInstance flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskId);
+        if (!(flowNodeInstance instanceof SHumanTaskInstance)) {
+            throw new UpdateException("The identifier does not refer to a human task");
+        }
+        return (SHumanTaskInstance) flowNodeInstance;
+    }
+
+    private void createPendingMappingForUser(final long humanTaskInstanceId, final Long userId) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final SPendingActivityMappingBuilderFactory sPendingActivityMappingBuilderFactory = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class);
+        final SPendingActivityMapping mapping = sPendingActivityMappingBuilderFactory.createNewInstanceForUser(humanTaskInstanceId, userId)
+                .done();
+        activityInstanceService.addPendingActivityMappings(mapping);
+    }
+
+    private List<SPendingActivityMapping> getSPendingMappings(final long humanTaskInstanceId, final ActivityInstanceService activityInstanceService,
+            final Long userId) throws SActivityReadException {
+        final List<OrderByOption> options = Collections.singletonList(new OrderByOption(SPendingActivityMapping.class,
+                SPendingActivityMappingBuilderFactory.USER_ID, OrderByType.ASC));
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilderFactory.USER_ID, userId));
+        filters.add(new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilderFactory.ACTIVITY_ID, humanTaskInstanceId));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, options, filters, null);
+        return activityInstanceService.getPendingMappings(humanTaskInstanceId, queryOptions);
     }
 
     @Override
@@ -2864,16 +2912,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
         if (userTaskInstances.size() != 0) {
-        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
                 final String stateName = userTaskInstance.getState();
-            try {
+                try {
                     final SProcessInstance sProcessInstance = getSProcessInstance(userTaskInstance.getRootContainerId());
                     if (stateName.equals(ActivityStates.READY_STATE) && sProcessInstance.getProcessDefinitionId() == processDefinitionId) {
                         return userTaskInstance.getId();
                     }
-            } catch (final SBonitaException e) {
-                throw new RetrieveException(e);
-            }
+                } catch (final SBonitaException e) {
+                    throw new RetrieveException(e);
+                }
             }
         }
         return -1;
@@ -3292,7 +3340,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationInputValues, expcontext, classLoader, tenantAccessor);
             }
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         } catch (final NotSerializableException e) {
@@ -4175,7 +4223,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
                 return result;
             }
-                return Collections.emptyList();
+            return Collections.emptyList();
         } catch (final SBonitaException sbe) {
             throw new DocumentException(sbe);
         }
@@ -5221,8 +5269,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, startIndex, maxResults,
                     HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
             if (humanTaskInstances == null) {
-            return Collections.emptyList();
-        }
+                return Collections.emptyList();
+            }
             return humanTaskInstances;
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -5249,7 +5297,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         builder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName);
         builder.sort(field, order);
         final SearchResult<HumanTaskInstance> searchHumanTasks = searchHumanTasksTransaction(builder.done());
-            return searchHumanTasks.getResult();
+        return searchHumanTasks.getResult();
     }
 
     @Override

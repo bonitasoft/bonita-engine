@@ -21,12 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -129,8 +130,8 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatform", e));
             }
             throw new SPlatformCreationException("Unable to insert the platform row : " + e.getMessage(), e);
-            }
         }
+    }
 
     @Override
     public long createTenant(final STenant tenant) throws STenantCreationException, STenantAlreadyExistException {
@@ -140,7 +141,7 @@ public class PlatformServiceImpl implements PlatformService {
         // check if the tenant already exists. If yes, throws
         // TenantAlreadyExistException
         STenant existingTenant = null;
-      final   String tenantName = tenant.getName();
+        final String tenantName = tenant.getName();
         try {
             existingTenant = getTenantByName(tenantName);
         } catch (final STenantNotFoundException e) {
@@ -227,7 +228,7 @@ public class PlatformServiceImpl implements PlatformService {
         final SPlatform platform = readPlatform();
         List<STenant> existingTenants;
         try {
-            existingTenants = getTenants(QueryOptions.defaultQueryOptions());
+            existingTenants = getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id", OrderByType.ASC));
         } catch (final STenantException e) {
             throw new SPlatformDeletionException(e);
         }
@@ -371,10 +372,10 @@ public class PlatformServiceImpl implements PlatformService {
      */
     private void cachePlatform(final SPlatform platform) {
         try {
-        platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
+            platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
         } catch (SCacheException e) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Can't cache the platform, maybe the platform cache service is not started yet");
-    }
+        }
     }
 
     private SPlatform readPlatform() throws SPlatformNotFoundException {
@@ -565,25 +566,25 @@ public class PlatformServiceImpl implements PlatformService {
         final STenant tenant = getTenant(tenantId);
         if (isTenantActivated(tenant)) {
             return false;
-        } else {
-            final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
-            try {
-                platformPersistenceService.update(desc);
-                if (trace) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "activateTenant"));
-                }
-            } catch (final SPersistenceException e) {
-                if (trace) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "activateTenant", e));
-                }
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                }
-                throw new STenantActivationException("Problem while activating tenant : " + tenant, e);
-            }
-            return true;
         }
+
+        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
+        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
+        try {
+            platformPersistenceService.update(desc);
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "activateTenant"));
+            }
+        } catch (final SPersistenceException e) {
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "activateTenant", e));
+            }
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+            }
+            throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
+        }
+        return true;
     }
 
     @Override

@@ -157,6 +157,8 @@ CREATE TABLE waiting_event (
   	PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active)
+GO
 
 CREATE TABLE message_instance (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -176,6 +178,8 @@ CREATE TABLE message_instance (
   	PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3)
+GO
 
 CREATE TABLE pending_mapping (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -185,6 +189,8 @@ CREATE TABLE pending_mapping (
   	userId NUMERIC(19, 0),
   	PRIMARY KEY (tenantid, id)
 )
+GO
+CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId)
 GO
 
 CREATE TABLE hidden_activity (

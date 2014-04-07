@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -36,11 +37,10 @@ public class DeleteAllTenants implements TransactionContent {
     public void execute() throws SBonitaException {
         List<STenant> tenants;
         do {
-            tenants = platformService.getTenants(QueryOptions.defaultQueryOptions());
+            tenants = platformService.getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id", OrderByType.ASC));
             for (STenant sTenant : tenants) {
                 platformService.deleteTenant(sTenant.getId());
             }
         } while (tenants.size() > 0);
     }
-
 }
