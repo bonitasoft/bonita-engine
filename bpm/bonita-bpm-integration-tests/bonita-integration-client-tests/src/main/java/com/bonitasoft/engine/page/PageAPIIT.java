@@ -32,9 +32,16 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.profile.ProfileEntryCreator;
+import com.bonitasoft.engine.profile.ProfileEntryType;
 
 @SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPISPTest {
+
+    private static final String ENTRY_TYPE_LINK = ProfileEntryType.LINK.toString().toLowerCase();
+
+    private static final String ENTRY_TYPE_FOLDER = ProfileEntryType.FOLDER.toString().toLowerCase();
+
+    private static final String ENTRY_NAME = "entryName";
 
     private static final String CONTENT_NAME = "content.zip";
 
@@ -228,24 +235,24 @@ public class PageAPIIT extends CommonAPISPTest {
     public void should_deletePage_delete_profile_entry() throws BonitaException {
         // given
         final Page page = getPageAPI().createPage(
-                new PageCreator("mypagetodelete", CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
+                new PageCreator("myPageToDelete", CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
                 getPageContent(INDEX_GROOVY));
 
         // a profile with 3 entry
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
-        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator("a", profileId).setType("folder"));
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME, profileId).setType(ENTRY_TYPE_FOLDER));
         final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
-        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("", profileId).setType("link").setPage(page.getName())
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK).setPage(page.getName())
                 .setParentId(folderProfileEntry.getId());
         final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator1);
         profileEntries.add(createProfileEntry);
-        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistingadmin")
-                .setParentId(folderProfileEntry.getId()).setCustom(true);
-        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
-        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistinguser")
-                .setParentId(folderProfileEntry.getId()).setCustom(false);
-        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
+        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
+                .setPage("tasklistingadmin")
+                .setParentId(folderProfileEntry.getId()).setCustom(true)));
+        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "3", profileId).setType(ENTRY_TYPE_LINK)
+                .setPage("caselistinguser")
+                .setParentId(folderProfileEntry.getId()).setCustom(false)));
 
         // when
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
@@ -253,7 +260,7 @@ public class PageAPIIT extends CommonAPISPTest {
         builder.filter(ProfileEntrySearchDescriptor.PAGE, page.getName());
         final List<ProfileEntry> resultProfileEntriesBefore = getProfileAPI().searchProfileEntries(builder.done()).getResult();
 
-        assertThat(resultProfileEntriesBefore).as("should contain 1 item with pageToSearch").hasSize(1).containsOnly(createProfileEntry);
+        assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(createProfileEntry);
         getPageAPI().deletePage(page.getId());
 
         // then
