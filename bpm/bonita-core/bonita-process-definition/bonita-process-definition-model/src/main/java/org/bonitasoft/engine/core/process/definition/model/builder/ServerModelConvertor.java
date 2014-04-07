@@ -76,10 +76,6 @@ public class ServerModelConvertor {
         return sOperations;
     }
 
-    /**
-     * @param dataDefinition
-     * @return
-     */
     public static SDataDefinition convertDataDefinition(final DataDefinition dataDefinition) {
         if (dataDefinition instanceof XMLDataDefinition) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
@@ -107,7 +103,7 @@ public class ServerModelConvertor {
     }
 
     public static SBusinessDataDefinition convertBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
-        SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
+        final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
         builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());
         return builder.done();
@@ -115,7 +111,7 @@ public class ServerModelConvertor {
 
     protected static SBusinessDataDefinitionBuilder getSBusinessDataDefinitionBuilder(final BusinessDataDefinition businessDataDefinition) {
         final SBusinessDataDefinitionBuilderFactory fact = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
-        SBusinessDataDefinitionBuilder builder = fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
+        final SBusinessDataDefinitionBuilder builder = fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
         return builder;
     }
 }

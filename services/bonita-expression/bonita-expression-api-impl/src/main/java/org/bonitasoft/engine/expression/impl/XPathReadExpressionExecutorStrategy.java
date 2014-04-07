@@ -61,9 +61,8 @@ import org.xml.sax.SAXException;
  */
 public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         if (expression.getDependencies().size() != 1 || expression.getDependencies().get(0) == null) {
             throw new SExpressionDependencyMissingException("XPathReadExpressionExecutorStrategy must have exactly one dependency");
@@ -108,10 +107,6 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
         }
     }
 
-    /**
-     * @param evaluate
-     * @return
-     */
     private Object transType(final Object result, final String returnType) {
         try {
             if (Boolean.class.getName().equals(returnType)) {
@@ -171,11 +166,11 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions));
         }
         return list;
     }
