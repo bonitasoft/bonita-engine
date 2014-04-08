@@ -1,5 +1,6 @@
 package com.bonitasoft.engine.business.data;
 
+
 /**
  * @author Colin PUY
  */
@@ -15,7 +16,7 @@ public interface BusinessDataModelRepository {
      * @throws SBusinessDataRepositoryDeploymentException
      *             if a deployment exception occurs.
      */
-    void deploy(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
+    void install(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
     /**
      * Undeploy Business Data Model from specified tenant
@@ -25,7 +26,7 @@ public interface BusinessDataModelRepository {
      * @throws SBusinessDataRepositoryException
      *             if error occurs during undeployement
      */
-    void undeploy(long tenantId) throws SBusinessDataRepositoryException;
+    void uninstall(long tenantId) throws SBusinessDataRepositoryException;
 
     boolean isDBMDeployed();
 
@@ -37,4 +38,6 @@ public interface BusinessDataModelRepository {
      * @throws SBusinessDataRepositoryException
      */
     byte[] getClientBDMZip() throws SBusinessDataRepositoryException;
+
+    void dropAndUninstall(long tenantId) throws SBusinessDataRepositoryException;
 }

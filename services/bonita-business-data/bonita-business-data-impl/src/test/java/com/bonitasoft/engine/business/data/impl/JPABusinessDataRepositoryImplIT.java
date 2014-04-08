@@ -86,14 +86,14 @@ public class JPABusinessDataRepositoryImplIT {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
-        final SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
+        final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaUpdater, null, null));
+                schemaManager, null, null));
         businessDataRepository = spy(new JPABusinessDataRepositoryImpl(businessDataModelRepositoryImpl, configuration));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
-        businessDataModelRepositoryImpl.updateSchema(Collections.singleton(Employee.class.getName()));
+        businessDataModelRepositoryImpl.update(Collections.singleton(Employee.class.getName()));
         businessDataRepository.start();
         entityManager = businessDataRepository.getEntityManager();
     }

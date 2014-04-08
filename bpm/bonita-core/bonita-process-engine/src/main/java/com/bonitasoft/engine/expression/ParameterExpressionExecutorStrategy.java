@@ -41,16 +41,15 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
         this.parameterService = parameterService;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         long processDefinitionId;
         final String expressionContent = expression.getContent();
         try {
-            if (dependencyValues != null && !dependencyValues.isEmpty()) {
-                if (dependencyValues.containsKey(PROCESS_DEFINITION_ID)) {
-                    processDefinitionId = (Long) dependencyValues.get(PROCESS_DEFINITION_ID);
+            if (context != null && !context.isEmpty()) {
+                if (context.containsKey(PROCESS_DEFINITION_ID)) {
+                    processDefinitionId = (Long) context.get(PROCESS_DEFINITION_ID);
                     final SParameter para = parameterService.get(processDefinitionId, expressionContent);
                     try {
                         final String returnType = expression.getReturnType();
@@ -93,11 +92,11 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions));
         }
         return list;
     }

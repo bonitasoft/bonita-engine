@@ -327,7 +327,7 @@ public class TenantManagementAPIExtTest {
 
         tenantManagementAPI.uninstallBusinessDataRepository();
 
-        verify(repository).undeploy(anyLong());
+        verify(repository).uninstall(anyLong());
     }
 
     @Test(expected = BusinessDataRepositoryException.class)
@@ -337,7 +337,7 @@ public class TenantManagementAPIExtTest {
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
         doReturn(accessor).when(tenantManagementAPI).getTenantAccessor();
         when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
-        doThrow(new SBusinessDataRepositoryException("error")).when(repository).undeploy(anyLong());
+        doThrow(new SBusinessDataRepositoryException("error")).when(repository).uninstall(anyLong());
 
         tenantManagementAPI.uninstallBusinessDataRepository();
     }
@@ -356,7 +356,7 @@ public class TenantManagementAPIExtTest {
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         doNothing().when(tenantManagementAPI).updateTenant(eq(platformService), any(EntityUpdateDescriptor.class), any(STenant.class));
         doNothing().when(tenantManagementAPI).pauseServicesForTenant(eq(platformServiceAccessor), any(BroadcastService.class), eq(tenantId));
-        doReturn(platformService).when(tenantManagementAPI).getPlatformService();
+        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
 
         tenantManagementAPI.pause();
 

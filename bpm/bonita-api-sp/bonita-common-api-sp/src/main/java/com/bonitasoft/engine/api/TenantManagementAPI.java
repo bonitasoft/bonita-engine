@@ -69,7 +69,14 @@ public interface TenantManagementAPI {
     void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException;
 
     /**
+     * Deletes all business data and uninstalls the business data model.
      * 
+     * @throws BusinessDataRepositoryDeploymentException
+     *             if the deployment cannot be fulfilled completely.
+     */
+    void cleanAndUninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException;
+
+    /**
      * @return zip content of the deployed client Business data model, null if no Business data model has been deployed
      * @throws BusinessDataRepositoryException
      */

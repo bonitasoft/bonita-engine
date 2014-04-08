@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -43,20 +44,20 @@ public abstract class AbstractBDMJarBuilder {
     }
 
     /**
-     * 
      * @param bom
      * @param fileFilter
      *            filter the entries to be added or not in generated jar
      * @return the content of the generated jar
      * @throws SBusinessDataRepositoryDeploymentException
      */
-    public byte[] build(final BusinessObjectModel bom, IOFileFilter fileFilter) throws SBusinessDataRepositoryDeploymentException {
+    public byte[] build(final BusinessObjectModel bom, final IOFileFilter fileFilter) throws SBusinessDataRepositoryDeploymentException {
         try {
             final File tmpBDMDirectory = createBDMTmpDir();
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
                 compiler.compile(tmpBDMDirectory, new File(dependencyPath));
                 addPersistenceFile(tmpBDMDirectory, bom);
+                addBOMFile(tmpBDMDirectory, bom);
                 return generateJar(tmpBDMDirectory, fileFilter);
             } finally {
                 FileUtils.deleteDirectory(tmpBDMDirectory);
@@ -70,7 +71,7 @@ public abstract class AbstractBDMJarBuilder {
         return IOUtils.createTempDirectory("bdm");
     }
 
-    protected byte[] generateJar(final File directory, IOFileFilter fileFilter) throws IOException {
+    protected byte[] generateJar(final File directory, final IOFileFilter fileFilter) throws IOException {
         final Collection<File> files = FileUtils.listFiles(directory, fileFilter, TrueFileFilter.TRUE);
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         for (final File file : files) {
@@ -89,6 +90,8 @@ public abstract class AbstractBDMJarBuilder {
 
     protected abstract void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
             ParserConfigurationException, SAXException;
+
+    protected abstract void addBOMFile(final File directory, BusinessObjectModel bom) throws IOException, JAXBException, SAXException;
 
     protected abstract AbstractBDMCodeGenerator getBDMCodeGenerator(BusinessObjectModel bom);
 
