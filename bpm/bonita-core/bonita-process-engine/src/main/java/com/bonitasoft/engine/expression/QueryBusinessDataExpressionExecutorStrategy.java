@@ -45,8 +45,14 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
             parameters.put(dependency.getName(), (Serializable) resolvedExpressions.get(dependency.getDiscriminant()));
         }
         try {
-            if (Long.class.getName().equals(returnType)) {
-                return businessDataRepository.findByNamedQuery(queryName, Long.class, parameters);
+            if (isNumber(returnType)) {
+                Class<? extends Serializable> numberClass;
+                try {
+                    numberClass = (Class<? extends Serializable>) Class.forName(returnType);
+                } catch (ClassNotFoundException e) {
+                    throw new SExpressionEvaluationException(e, expression.getName());
+                }
+                return businessDataRepository.findByNamedQuery(queryName, numberClass, parameters);
             } else if (List.class.getName().equals(returnType)) {
                 return businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters);
             } else {
@@ -55,6 +61,13 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
         } catch (final NonUniqueResultException nure) {
             throw new SExpressionEvaluationException(nure, expression.getName());
         }
+    }
+
+    private boolean isNumber(final String returnType) {
+        return Long.class.getName().equals(returnType) ||
+                Integer.class.getName().equals(returnType) ||
+                Double.class.getName().equals(returnType) ||
+                Float.class.getName().equals(returnType);
     }
 
     @Override

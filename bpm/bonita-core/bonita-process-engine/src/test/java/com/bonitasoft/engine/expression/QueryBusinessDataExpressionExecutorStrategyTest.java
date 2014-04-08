@@ -57,6 +57,39 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
     }
 
     @Test
+    public void evaluate_should_return_a_double_result_after_querying() throws Exception {
+        final SExpressionImpl expression = new SExpressionImpl("employees", "avgEmployees", null, Double.class.getName(), null, null);
+        final Double result = Double.valueOf(2.5);
+        when(businessDataRepository.findByNamedQuery("avgEmployees", Double.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
+
+        final Double avg = (Double) strategy.evaluate(expression, buildContext(), null);
+
+        assertThat(avg).isEqualTo(result);
+    }
+
+    @Test
+    public void evaluate_should_return_a_integer_result_after_querying() throws Exception {
+        final SExpressionImpl expression = new SExpressionImpl("employees", "maxEmployees", null, Integer.class.getName(), null, null);
+        final Integer result = Integer.valueOf(25);
+        when(businessDataRepository.findByNamedQuery("maxEmployees", Integer.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
+
+        final Integer max = (Integer) strategy.evaluate(expression, buildContext(), null);
+
+        assertThat(max).isEqualTo(result);
+    }
+
+    @Test
+    public void evaluate_should_return_a_float_result_after_querying() throws Exception {
+        final SExpressionImpl expression = new SExpressionImpl("employees", "minEmployees", null, Float.class.getName(), null, null);
+        final Float result = Float.valueOf(1.5F);
+        when(businessDataRepository.findByNamedQuery("minEmployees", Float.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
+
+        final Float min = (Float) strategy.evaluate(expression, buildContext(), null);
+
+        assertThat(min).isEqualTo(result);
+    }
+
+    @Test
     public void evaluate_should_return_the_list_of_results_after_querying() throws Exception {
         final SExpressionImpl expression = new SExpressionImpl("employees", "getEmployees", null, List.class.getName(), null, null);
 
