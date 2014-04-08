@@ -36,36 +36,35 @@ public class CategoryMappingBinding extends ElementBinding {
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
-        this.name = attributes.get(XMLCategoryMapping.NAME);
+        name = attributes.get(XMLCategoryMapping.NAME);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLCategoryMapping.DESCRIPTION.equals(name)) {
-            this.description = value;
+            description = value;
         }
         if (XMLCategoryMapping.CREATOR.equals(name)) {
-            this.creator = value;
+            creator = value;
         }
         if (XMLCategoryMapping.CREATION_DATE.equals(name)) {
-            this.creationDate = value;
+            creationDate = value;
         }
         if (XMLCategoryMapping.LAST_UPDATE_DATE.equals(name)) {
-            this.lastUpdateDate = value;
+            lastUpdateDate = value;
         }
     }
 
     @Override
     public void setChildObject(final String name, final Object value) {
         if (XMLCategoryMapping.PROCESS_DEFINITIONS.equals(name)) {
-            this.processDefinitionsMapping = (XMLProcessDefinitionsMapping) value;
+            processDefinitionsMapping = (XMLProcessDefinitionsMapping) value;
         }
     }
 
     @Override
     public XMLCategoryMapping getObject() {
-        return new XMLCategoryMapping(this.name, this.description, this.creator, this.creationDate, this.lastUpdateDate, this.processDefinitionsMapping);
+        return new XMLCategoryMapping(name, description, creator, creationDate, lastUpdateDate, processDefinitionsMapping);
     }
 
     @Override

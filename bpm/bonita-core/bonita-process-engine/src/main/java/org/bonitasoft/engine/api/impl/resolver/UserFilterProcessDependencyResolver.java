@@ -31,7 +31,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class UserFilterProcessDependencyResolver implements ProcessDependencyResolver {
 
-    @SuppressWarnings("unused")
     @Override
     public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
             throws UserFilterException {
@@ -44,7 +43,6 @@ public class UserFilterProcessDependencyResolver implements ProcessDependencyRes
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public List<Problem> checkResolution(final TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition) {
         // TODO check what is resolved

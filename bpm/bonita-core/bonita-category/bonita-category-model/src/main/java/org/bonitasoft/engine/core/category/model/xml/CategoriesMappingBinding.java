@@ -27,15 +27,13 @@ public class CategoriesMappingBinding extends ElementBinding {
     private final List<XMLCategoryMapping> categoryMappingList;
 
     public CategoriesMappingBinding() {
-        this.categoryMappingList = new ArrayList<XMLCategoryMapping>();
+        categoryMappingList = new ArrayList<XMLCategoryMapping>();
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
@@ -43,13 +41,13 @@ public class CategoriesMappingBinding extends ElementBinding {
     @Override
     public void setChildObject(final String name, final Object value) {
         if (XMLCategoryMapping.CATEGORY.equals(name)) {
-            this.categoryMappingList.add((XMLCategoryMapping) value);
+            categoryMappingList.add((XMLCategoryMapping) value);
         }
     }
 
     @Override
     public Object getObject() {
-        return new XMLCategoriesMapping(this.categoryMappingList);
+        return new XMLCategoriesMapping(categoryMappingList);
     }
 
     @Override

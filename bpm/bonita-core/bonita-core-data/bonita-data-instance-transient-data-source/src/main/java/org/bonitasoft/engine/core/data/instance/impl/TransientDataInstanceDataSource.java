@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
@@ -44,7 +44,6 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
 
     private CacheService cacheService;
 
-    @SuppressWarnings("unused")
     @Override
     public void setParameters(final Map<String, String> dataSourceParameters) {
         // TODO Auto-generated method stub

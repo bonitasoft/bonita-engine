@@ -54,8 +54,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         return getClass().getSimpleName() + ": messageInstanceId: " + messageInstanceId + ", waitingMessageId: " + waitingMessageId;
     }
 
-    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService
-            ) throws SWaitingEventModificationException, SWaitingEventNotFoundException, SWaitingEventReadException {
+    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService) throws SWaitingEventModificationException,
+            SWaitingEventNotFoundException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor
@@ -63,8 +63,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
-    private void resetMessageInstance(final long messageInstanceId, final EventInstanceService eventInstanceService
-            ) throws SMessageModificationException, SMessageInstanceNotFoundException, SMessageInstanceReadException {
+    private void resetMessageInstance(final long messageInstanceId, final EventInstanceService eventInstanceService) throws SMessageModificationException,
+            SMessageInstanceNotFoundException, SMessageInstanceReadException {
         final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), false);
@@ -74,9 +74,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     @Override
     public String getRecoveryProcedure() {
         return "Change the 'progress' field of the waiting message having id " + waitingMessageId + " to "
-                + SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY
-                + " and "
-                + "the 'handled' field of the message instance  having id " + messageInstanceId + " to false";
+                + SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY + " and " + "the 'handled' field of the message instance  having id "
+                + messageInstanceId + " to false";
     }
 
     @Override
@@ -93,7 +92,6 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);

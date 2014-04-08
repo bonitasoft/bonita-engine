@@ -70,7 +70,6 @@ public class SExpressionBinding extends SNamedElementBinding {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.EXPRESSION_CONTENT.equals(name)) {

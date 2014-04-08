@@ -53,7 +53,6 @@ public class STransitionDefinitionBinding extends SNamedElementBinding {
         return XMLSProcessDefinition.TRANSITION_NODE;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
