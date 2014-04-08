@@ -18,22 +18,22 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 public class NormalStateTransitionsManager {
-    
+
     protected Map<Integer, FlowNodeState> stateTransitions;
-    private SFlowNodeInstance flowNodeInstance;
+
+    private final SFlowNodeInstance flowNodeInstance;
 
     public NormalStateTransitionsManager(Map<Integer, FlowNodeState> stateTransitions, SFlowNodeInstance flowNodeInstance) {
         this.stateTransitions = stateTransitions;
         this.flowNodeInstance = flowNodeInstance;
     }
-    
-    public FlowNodeState getNextState(FlowNodeState currentState) throws SIllegalStateTransition {
+
+    public FlowNodeState getNextState(final FlowNodeState currentState) throws SIllegalStateTransition {
         FlowNodeState nextState = getNextStateFromMap(currentState);
         if (nextState == null) {
             throw new SIllegalStateTransition(getMessage(currentState), currentState.isTerminal());

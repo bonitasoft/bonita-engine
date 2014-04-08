@@ -39,6 +39,7 @@ public class ListAdder extends BonitaWork {
         return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void work(final Map<String, Object> context) {
         try {
@@ -49,7 +50,8 @@ public class ListAdder extends BonitaWork {
         list.add(toAdd);
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) {
+    public void handleFailure(final Exception e, final Map<String, Object> context) {
     }
 }

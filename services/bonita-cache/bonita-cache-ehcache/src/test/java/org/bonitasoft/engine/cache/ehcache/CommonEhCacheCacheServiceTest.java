@@ -8,7 +8,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 
 import org.bonitasoft.engine.cache.CacheConfigurations;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;
@@ -42,7 +41,7 @@ public class CommonEhCacheCacheServiceTest {
         cacheService = new EhCacheCacheService(logger, sessionAccessor, cacheConfigurations) {
 
             @Override
-            public synchronized void start() throws SBonitaException {
+            public synchronized void start() {
                 cacheManager = CommonEhCacheCacheServiceTest.this.cacheManager;
             }
         };

@@ -29,40 +29,39 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class SyncQueriableLoggerServiceImplTest {
-    
+
     private static final String FIRST_ACTION = "first_action";
 
     private static final String SECOND_ACTION = "sencond_action";
 
     @Mock
     private PersistenceService persistenceService;
-    
+
     @Mock
     private QueriableLoggerStrategy loggerStrategy;
-    
+
     @Mock
     private QueriableLogSessionProvider sessionProvider;
-    
+
     @Mock
     private TechnicalLoggerService logger;
-    
+
     @Mock
     private SQueriableLogImpl log1;
 
     @Mock
     private SQueriableLogImpl log2;
-    
+
     @Mock
     private PlatformService platformService;
-    
+
     @InjectMocks
     private SyncQueriableLoggerServiceImpl logService;
-    
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         SPlatformProperties platformProperties = mock(SPlatformProperties.class);
         doReturn(FIRST_ACTION).when(log1).getActionType();
         doReturn(SQueriableLogSeverity.INTERNAL).when(log1).getSeverity();
@@ -71,146 +70,144 @@ public class SyncQueriableLoggerServiceImplTest {
         doReturn(SECOND_ACTION).when(log2).getActionType();
         doReturn(SQueriableLogSeverity.INTERNAL).when(log2).getSeverity();
         doReturn("new action msg").when(log2).getRawMessage();
-        
+
         doReturn(platformProperties).when(platformService).getSPlatformProperties();
         doReturn("6.3").when(platformProperties).getPlatformVersion();
-        
+
     }
-    
+
     @Test
-    public void isLoggable_should_return_true_if_strategy_is_loggable() throws Exception {
-        //given
+    public void isLoggable_should_return_true_if_strategy_is_loggable() {
+        // given
         doReturn(true).when(loggerStrategy).isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
-        
-        //when
+
+        // when
         boolean loggable = logService.isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
-        
-        //then
+
+        // then
         assertThat(loggable).isTrue();
-    }    
-    
+    }
+
     @Test
-    public void isLoggable_should_return_false_if_strategy_is_not_loggable() throws Exception {
-        //given
+    public void isLoggable_should_return_false_if_strategy_is_not_loggable() {
+        // given
         doReturn(false).when(loggerStrategy).isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
-        
-        //when
+
+        // when
         boolean loggable = logService.isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
-        
-        //then
+
+        // then
         assertThat(loggable).isFalse();
-    }    
-    
+    }
+
     @Test
     public void calling_log_must_insert_log_if_isLogable() throws Exception {
-        //given
+        // given
         doReturn(true).when(loggerStrategy).isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
         doReturn("walter.bates").when(sessionProvider).getUserId();
         doReturn("node1").when(sessionProvider).getClusterNode();
-        
-        //when
+
+        // when
         logService.log("CallerClass", "callerMethod", log1);
-        
-        //then
+
+        // then
         verify(persistenceService, times(1)).insert(log1);
         verify(log1, times(1)).setClusterNode("node1");
         verify(log1, times(1)).setCallerClassName("CallerClass");
         verify(log1, times(1)).setCallerMethodName("callerMethod");
         verify(log1, times(1)).setProductVersion("6.3");
         verify(log1, times(1)).setUserId("walter.bates");
-        
+
     }
-    
 
     @Test
     public void calling_log_must_not_insert_log_if_is_not_logable() throws Exception {
-        //given
+        // given
         doReturn(false).when(loggerStrategy).isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
-        
-        //when
+
+        // when
         logService.log("CallerClass", "callerMethod", log1);
-        
-        //then
+
+        // then
         verify(persistenceService, never()).insert(log1);
     }
-    
+
     @Test
     public void calling_log_must_insert_all_logable_logs() throws Exception {
-        //given
+        // given
         doReturn(true).when(loggerStrategy).isLoggable(FIRST_ACTION, SQueriableLogSeverity.INTERNAL);
         doReturn(true).when(loggerStrategy).isLoggable(SECOND_ACTION, SQueriableLogSeverity.INTERNAL);
-        
-        //when
+
+        // when
         logService.log("CallerClass", "callerMethod", log1, log2);
-        
-        //then
+
+        // then
         verify(persistenceService, times(1)).insert(log1);
         verify(persistenceService, times(1)).insert(log2);
     }
-    
+
     @Test
     public void getNumberOfLogs_should_return_number_of_logs_from_persistence_service() throws Exception {
-        //given
+        // given
         doReturn(15L).when(persistenceService).selectOne(argThat(new SelectOneMatcher("getNumberOfLogs")));
-        
-        //when
+
+        // when
         int numberOfLogs = logService.getNumberOfLogs();
-        
-        //then
+
+        // then
         assertThat(numberOfLogs).isEqualTo(15);
     }
-    
+
     @Test
     public void getLogs_should_return_logs_from_persitence_service() throws Exception {
-        //given
+        // given
         SelectListMatcher matcher = new SelectListMatcher("getLogs", 5, 10, "id", OrderByType.ASC);
         List<SQueriableLogImpl> persistenceLogs = Arrays.asList(log1, log2);
         doReturn(persistenceLogs).when(persistenceService).selectList(argThat(matcher));
-        
-        //when
+
+        // when
         List<SQueriableLog> logs = logService.getLogs(5, 10, "id", OrderByType.ASC);
-        
-        //then
+
+        // then
         assertThat(logs).isEqualTo(persistenceLogs);
     }
-    
+
     @Test
     public void getNumberOfEntities_should_return_number_of_entities_from_persistence_service() throws Exception {
-        //given
+        // given
         QueryOptions queryOptions = new QueryOptions(0, 10);
         doReturn(20L).when(persistenceService).getNumberOfEntities(SQueriableLog.class, queryOptions, null);
-        
-        //when
+
+        // when
         long numberOfLogs = logService.getNumberOfLogs(queryOptions);
-        
-        //then
+
+        // then
         assertThat(numberOfLogs).isEqualTo(20L);
     }
-    
-    
+
     @Test
     public void searchLogs_should_return_logs_from_persistence_service() throws Exception {
-        //given
+        // given
         QueryOptions queryOptions = new QueryOptions(0, 10);
         List<SQueriableLogImpl> persistenceLogs = Arrays.asList(log1, log2);
         doReturn(persistenceLogs).when(persistenceService).searchEntity(SQueriableLog.class, queryOptions, null);
-        
-        //when
+
+        // when
         List<SQueriableLog> logs = logService.searchLogs(queryOptions);
-        
-        //then
+
+        // then
         assertThat(logs).isEqualTo(persistenceLogs);
     }
-    
+
     @Test
     public void getLog_should_return_log_from_persistence_service() throws Exception {
-        //given
+        // given
         doReturn(log1).when(persistenceService).selectById(argThat(new SelectByIdMatcher("getQueriableLogById", 100L)));
-        
-        //when
+
+        // when
         SQueriableLog log = logService.getLog(100L);
 
-        //then
+        // then
         assertThat(log).isEqualTo(log1);
     }
 

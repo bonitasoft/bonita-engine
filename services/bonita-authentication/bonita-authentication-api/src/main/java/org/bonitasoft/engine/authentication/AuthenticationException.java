@@ -23,6 +23,10 @@ public class AuthenticationException extends SBonitaException {
 
     private static final long serialVersionUID = 7204454677855421061L;
 
+    public AuthenticationException(String message) {
+        super(message);
+    }
+
     public AuthenticationException() {
         super("The user name or password is not valid.");
     }

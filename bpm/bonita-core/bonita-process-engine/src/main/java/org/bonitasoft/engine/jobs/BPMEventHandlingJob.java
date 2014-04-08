@@ -22,12 +22,8 @@ import java.util.Map;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
@@ -45,7 +41,7 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
-public class BPMEventHandlingJob extends InternalJob implements Serializable {
+public class BPMEventHandlingJob extends InternalJob {
 
     /**
      * List of BPMN Event types that can be triggered multiple times for a single instance
@@ -130,21 +126,20 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
         return pairs;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
         workService = getTenantServiceAccessor().getWorkService();
     }
 
-    private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException,
-            SMessageInstanceNotFoundException, SMessageInstanceReadException {
+    private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), true);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
-    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMsg) throws SWaitingEventModificationException,
-            SWaitingEventNotFoundException, SWaitingEventReadException {
+    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMsg) throws SWaitingEventModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);

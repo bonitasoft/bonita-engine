@@ -324,7 +324,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.get(0);
         assignAndExecuteStep(activityInstance, user.getId());
-        assertTrue("process was not completed", waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue("process was not completed", waitForProcessToFinishAndBeArchived(processInstance));
 
         // retrieve data after process has finished
         try {
@@ -537,7 +537,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.iterator().next();
         assignAndExecuteStep(activityInstance, user.getId());
-        assertTrue("process was not completed", waitProcessToFinishAndBeArchived(processInstance));
+        assertTrue("process was not completed", waitForProcessToFinishAndBeArchived(processInstance));
 
         // retrieve data after process has finished
         try {

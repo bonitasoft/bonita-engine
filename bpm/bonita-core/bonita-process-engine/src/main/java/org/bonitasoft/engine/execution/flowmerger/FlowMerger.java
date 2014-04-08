@@ -18,20 +18,19 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.execution.TokenProvider;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 public class FlowMerger {
-    
-    private SFlowNodeWrapper flowNodewrapper;
 
-    private FlowNodeTransitionsWrapper transitionsWrapper;
+    private final SFlowNodeWrapper flowNodewrapper;
 
-    private TokenProvider tokenProvider;
+    private final FlowNodeTransitionsWrapper transitionsWrapper;
 
-    public FlowMerger(final SFlowNodeWrapper flowNodeWrapper, final FlowNodeTransitionsWrapper transitionsDescriptor, TokenProvider tokenProvider) throws SObjectReadException, SObjectNotFoundException {
+    private final TokenProvider tokenProvider;
+
+    public FlowMerger(final SFlowNodeWrapper flowNodeWrapper, final FlowNodeTransitionsWrapper transitionsDescriptor, TokenProvider tokenProvider) {
         super();
         this.flowNodewrapper = flowNodeWrapper;
         this.transitionsWrapper = transitionsDescriptor;
@@ -43,20 +42,20 @@ public class FlowMerger {
      */
     public boolean mustConsumeInputTokenOnTakingTransition() {
         return !flowNodewrapper.isBoundaryEvent()
-            && flowNodewrapper.isParalleleOrInclusive()
-            && !transitionsWrapper.isLastFlowNode()
-            && transitionsWrapper.hasMultipleIncomingTransitions();
+                && flowNodewrapper.isParalleleOrInclusive()
+                && !transitionsWrapper.isLastFlowNode()
+                && transitionsWrapper.hasMultipleIncomingTransitions();
     }
-    
-    public boolean mustCreateTokenOnFinish() throws SObjectReadException, SObjectNotFoundException {
-        if(flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive() || transitionsWrapper.isLastFlowNode()) {
+
+    public boolean mustCreateTokenOnFinish() {
+        if (flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive() || transitionsWrapper.isLastFlowNode()) {
             return false;
         }
         return transitionsWrapper.hasMultipleOutgoingTransitions();
     }
-    
+
     public boolean isImplicitEnd() {
-        if(flowNodewrapper.isNull()) {
+        if (flowNodewrapper.isNull()) {
             return false;
         }
         return transitionsWrapper.isLastFlowNode();

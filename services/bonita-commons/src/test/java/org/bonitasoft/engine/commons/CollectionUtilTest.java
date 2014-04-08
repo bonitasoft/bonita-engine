@@ -11,7 +11,7 @@ import org.junit.Test;
 public class CollectionUtilTest {
 
     @Test(expected = UnsupportedOperationException.class)
-    public void should_emptyOrUnmodifiable_return_unmodiafiable_list() throws Exception {
+    public void should_emptyOrUnmodifiable_return_unmodiafiable_list() {
         ArrayList<String> list = new ArrayList<String>();
         list.add("plop");
         List<String> result = CollectionUtil.emptyOrUnmodifiable(list);
@@ -22,7 +22,7 @@ public class CollectionUtilTest {
     }
 
     @Test
-    public void should_emptyOrUnmodifiable_return_empty_list() throws Exception {
+    public void should_emptyOrUnmodifiable_return_empty_list() {
         List<String> result = CollectionUtil.emptyOrUnmodifiable(null);
 
         assertTrue(result.isEmpty());

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,14 +21,14 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Charles Souillard
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class SequenceWorkSynchronizationFactory implements WorkSynchronizationFactory {
 
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor,
-            final ExecutorWorkService runnableListener) {
-        return new SequenceWorkSynchronization(runnableListener, executorService, loggerService, sessionAccessor);
+            final SessionAccessor sessionAccessor) {
+        return new SequenceWorkSynchronization(executorService, loggerService, sessionAccessor);
     }
 
 }

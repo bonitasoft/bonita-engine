@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -393,7 +392,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void pause() throws SBonitaException, TimeoutException {
+    public void pause() throws SBonitaException {
         pauseJobs(getTenantId());
     }
 

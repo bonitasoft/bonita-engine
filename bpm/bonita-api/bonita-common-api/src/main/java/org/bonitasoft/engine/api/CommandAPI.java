@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **
+ ** 
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -33,7 +33,6 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
@@ -168,7 +167,7 @@ public interface CommandAPI {
      * @since 6.0
      */
     Serializable execute(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-    CommandExecutionException;
+            CommandExecutionException;
 
     /**
      * Execute a command according to its name and a map of parameters. During the execution of this method, the command's implementation
@@ -189,8 +188,9 @@ public interface CommandAPI {
      *             occurs when an exception is thrown during command execution
      * @since 6.2
      */
-    Serializable executeWithUserTransactions(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-    CommandExecutionException;
+    Serializable executeWithUserTransactions(String name, Map<String, Serializable> parameters) throws CommandNotFoundException,
+            CommandParameterizationException,
+            CommandExecutionException;
 
     /**
      * Execute a command according to its id and a map of parameters.
@@ -211,7 +211,7 @@ public interface CommandAPI {
      * @since 6.0
      */
     Serializable execute(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-    CommandExecutionException;
+            CommandExecutionException;
 
     /**
      * Execute a command according to its id and a map of parameters. During the execution of this method, the command's implementation
@@ -232,9 +232,9 @@ public interface CommandAPI {
      *             occurs when an exception is thrown during command execution
      * @since 6.2
      */
-    Serializable executeWithUserTransactions(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-    CommandExecutionException;
-
+    Serializable executeWithUserTransactions(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException,
+            CommandParameterizationException,
+            CommandExecutionException;
 
     /**
      * Delete a command through its name.

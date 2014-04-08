@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -71,21 +71,20 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Frederic Bouquet
+ * @author Celine Souchet
  */
 public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl implements EventInstanceService {
 
     private final EventService eventService;
 
     public SEventInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final QueriableLoggerService queriableLoggerService,
             final TechnicalLoggerService logger) {
-        super(recorder, persistenceRead, eventService, queriableLoggerService, logger);
+        super(recorder, persistenceRead, eventService, logger);
         this.eventService = eventService;
     }
 

@@ -9,17 +9,10 @@ import org.bonitasoft.engine.archive.model.Employee;
 import org.bonitasoft.engine.archive.model.EmployeeProjectMapping;
 import org.bonitasoft.engine.archive.model.Laptop;
 import org.bonitasoft.engine.archive.model.Project;
-import org.bonitasoft.engine.archive.model.TestLogBuilder;
-import org.bonitasoft.engine.archive.model.TestLogBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.session.model.SSession;
@@ -73,41 +66,23 @@ public class ArchiveServiceTest extends CommonServiceTest {
         getSessionService().deleteSession(sessionId);
     }
 
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private TestLogBuilder getLogBuilder(final ActionType actionType, final String message) {
-        final TestLogBuilder logModelBuilder = new TestLogBuilderFactory().createNewInstance();
-        initializeLogBuilder(logModelBuilder, message);
-        updateLog(actionType, logModelBuilder);
-        return logModelBuilder;
-    }
-
     @Test
     public void testRecordInsert() throws Exception {
         getTransactionService().begin();
 
-        final SQueriableLog queriableLog = getLogBuilder(ActionType.CREATED,
-                "Testing entities insertion with one-to-one, one-to-many and many-to-many relationships").done();
-
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate(queriableLog);
+        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
         assertNotNull(laptop);
 
-        final Employee employee = insertEmployeeWithYesterdayDate(queriableLog, laptop);
+        final Employee employee = insertEmployeeWithYesterdayDate(laptop);
         assertNotNull(employee);
 
-        final Address address = insertAddressRecordIntoArchiveWithYesterdayDate(queriableLog, employee);
+        final Address address = insertAddressRecordIntoArchiveWithYesterdayDate(employee);
         assertNotNull(address);
 
-        final Project project = insertProjectRecordIntoArchiveWithYesterdayDate(queriableLog);
+        final Project project = insertProjectRecordIntoArchiveWithYesterdayDate();
         assertNotNull(project);
 
-        final EmployeeProjectMapping epMapping = insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(queriableLog, employee, project);
+        final EmployeeProjectMapping epMapping = insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(employee, project);
         assertNotNull(epMapping);
 
         getTransactionService().complete();
@@ -117,14 +92,11 @@ public class ArchiveServiceTest extends CommonServiceTest {
     public void archiveInSlidingArchiveNotDone() throws Exception {
         getTransactionService().begin();
 
-        final SQueriableLog queriableLog = getLogBuilder(ActionType.CREATED,
-                "Testing entities insertion with one-to-one, one-to-many and many-to-many relationships").done();
-
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate(queriableLog);
+        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final Employee employee = insertEmployeeWithFirstJanuary2009Date(queriableLog, laptop);
+        final Employee employee = insertEmployeeWithFirstJanuary2009Date(laptop);
         getTransactionService().complete();
 
         getTransactionService().begin();
@@ -141,62 +113,56 @@ public class ArchiveServiceTest extends CommonServiceTest {
     @Test
     public void insertWithNoDefinitiveArchiveForThatDate() throws Exception {
         getTransactionService().begin();
-        final SQueriableLog queriableLog = getLogBuilder(ActionType.CREATED,
-                "Testing entities insertion with one-to-one, one-to-many and many-to-many relationships").done();
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate(queriableLog);
+        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
         try {
-            insertEmployeeWithBefore2009Date(queriableLog, laptop);
+            insertEmployeeWithBefore2009Date(laptop);
         } finally {
             getTransactionService().complete();
         }
     }
 
-    private Laptop insertLaptopRecordIntoArchiveWithYesterdayDate(final SQueriableLog queriableLog) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Laptop insertLaptopRecordIntoArchiveWithYesterdayDate() throws SRecorderException, SDefinitiveArchiveNotFound {
         final Laptop laptop = new Laptop("Dell", "1800");
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(laptop));
         return laptop;
     }
 
-    private Employee insertEmployeeWithYesterdayDate(final SQueriableLog queriableLog, final Laptop laptop) throws SRecorderException,
-            SDefinitiveArchiveNotFound {
+    private Employee insertEmployeeWithYesterdayDate(final Laptop laptop) throws SRecorderException, SDefinitiveArchiveNotFound {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(employee));
         return employee;
     }
 
-    private Employee insertEmployeeWithFirstJanuary2009Date(final SQueriableLog queriableLog, final Laptop laptop) throws SRecorderException,
-            SDefinitiveArchiveNotFound {
+    private Employee insertEmployeeWithFirstJanuary2009Date(final Laptop laptop) throws SRecorderException, SDefinitiveArchiveNotFound {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
         archiveService.recordInsert(START_OF_2009, new ArchiveInsertRecord(employee));
         return employee;
     }
 
-    private Employee insertEmployeeWithBefore2009Date(final SQueriableLog queriableLog, final Laptop laptop) throws SRecorderException,
-            SDefinitiveArchiveNotFound {
+    private Employee insertEmployeeWithBefore2009Date(final Laptop laptop) throws SRecorderException, SDefinitiveArchiveNotFound {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
         archiveService.recordInsert(BEFORE_2009, new ArchiveInsertRecord(employee));
         return employee;
     }
 
-    private Address insertAddressRecordIntoArchiveWithYesterdayDate(final SQueriableLog queriableLog, final Employee employee) throws SRecorderException,
-            SDefinitiveArchiveNotFound {
+    private Address insertAddressRecordIntoArchiveWithYesterdayDate(final Employee employee) throws SRecorderException, SDefinitiveArchiveNotFound {
         final Address address = new Address("China");
         address.setEmployeeId(employee.getId());
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(address));
         return address;
     }
 
-    private Project insertProjectRecordIntoArchiveWithYesterdayDate(final SQueriableLog queriableLog) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Project insertProjectRecordIntoArchiveWithYesterdayDate() throws SRecorderException, SDefinitiveArchiveNotFound {
         final Project project = new Project("BOS6");
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(project));
         return project;
     }
 
-    private EmployeeProjectMapping insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(final SQueriableLog queriableLog, final Employee employee,
-            final Project project) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private EmployeeProjectMapping insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(final Employee employee, final Project project)
+            throws SRecorderException, SDefinitiveArchiveNotFound {
         final EmployeeProjectMapping epMapping = new EmployeeProjectMapping(employee, project);
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(epMapping));
         return epMapping;
@@ -211,17 +177,15 @@ public class ArchiveServiceTest extends CommonServiceTest {
     public void testRecordDelete() throws Exception {
         getTransactionService().begin();
 
-        final SQueriableLog queriableLog = getLogBuilder(ActionType.DELETED, "Testing entities deletion").done();
+        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
 
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate(queriableLog);
+        final Employee employee = insertEmployeeWithYesterdayDate(laptop);
 
-        final Employee employee = insertEmployeeWithYesterdayDate(queriableLog, laptop);
+        final Address address = insertAddressRecordIntoArchiveWithYesterdayDate(employee);
 
-        final Address address = insertAddressRecordIntoArchiveWithYesterdayDate(queriableLog, employee);
+        final Project project = insertProjectRecordIntoArchiveWithYesterdayDate();
 
-        final Project project = insertProjectRecordIntoArchiveWithYesterdayDate(queriableLog);
-
-        final EmployeeProjectMapping employeeProjectMapping = insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(queriableLog, employee, project);
+        final EmployeeProjectMapping employeeProjectMapping = insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(employee, project);
 
         getTransactionService().complete();
 

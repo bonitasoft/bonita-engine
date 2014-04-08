@@ -278,9 +278,17 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             return callable.call();
         } catch (final Exception e) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Setting rollbackOnly on current transaction because callable '" + callable
+                        + "' has thrown an exception: " + e.getMessage(), e);
+            }
             setRollbackOnly();
             throw e;
         } catch (final Throwable t) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Setting rollbackOnly on current transaction because callable '" + callable
+                        + "' has thrown an exception: " + t.getMessage(), t);
+            }
             setRollbackOnly();
             throw new SBonitaRuntimeException(t);
         } finally {

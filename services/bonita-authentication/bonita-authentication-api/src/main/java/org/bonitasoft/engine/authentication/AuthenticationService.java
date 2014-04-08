@@ -14,10 +14,14 @@
 package org.bonitasoft.engine.authentication;
 
 
+
 /**
+ * deprecated since 6.3, use {@link GenericAuthenticationService} instead
+ * 
  * @author Elias Ricken de Medeiros
  * @since 6.0
  */
+@Deprecated
 public interface AuthenticationService {
 
     /**
@@ -32,5 +36,4 @@ public interface AuthenticationService {
      *             Error thrown if either the password is invalid or the user is not found.
      */
     boolean checkUserCredentials(final String username, final String password) throws AuthenticationException;
-
 }

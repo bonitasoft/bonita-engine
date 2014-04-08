@@ -911,6 +911,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(transactionContent);
             return transactionContent.getResult();
         } catch (final SBonitaException e) {
+            final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
+            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                technicalLoggerService.log(getClass(), TechnicalLogSeverity.ERROR, e);
+            }
             return false;
         }
     }

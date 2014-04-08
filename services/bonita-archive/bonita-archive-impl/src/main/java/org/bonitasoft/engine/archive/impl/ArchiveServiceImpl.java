@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -37,6 +37,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 /**
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
+ * @author Celine Souchet
  */
 public class ArchiveServiceImpl implements ArchiveService {
 
@@ -70,9 +71,7 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Override
     public void recordInserts(final long time, final ArchiveInsertRecord... records) throws SRecorderException {
         final String methodName = "recordInserts";
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
-        }
+        logBeforeMethod(TechnicalLogSeverity.TRACE, methodName);
         if (records != null) {
             final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();
             for (final ArchiveInsertRecord record : records) {
@@ -94,9 +93,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             }
         }
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
-        }
+        logAfterMethod(TechnicalLogSeverity.TRACE, methodName);
     }
 
     private void setArchiveDate(final ArchivedPersistentObject entity, final long time) throws SRecorderException {
@@ -111,19 +108,32 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     @Override
     public void recordDelete(final DeleteRecord record) throws SRecorderException {
+        String methodName = "recordDelete";
         try {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordDelete"));
-            }
+            logBeforeMethod(TechnicalLogSeverity.TRACE, methodName);
             definitiveArchivePersistenceService.delete(record.getEntity());
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "recordDelete"));
-            }
+            logAfterMethod(TechnicalLogSeverity.TRACE, methodName);
         } catch (final SPersistenceException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "recordDelete", e));
-            }
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, methodName, e);
             throw new SRecorderException(e);
+        }
+    }
+
+    private void logOnExceptionMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName, final Exception e) {
+        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
+            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
+        }
+    }
+
+    private void logAfterMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
+        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
+            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+        }
+    }
+
+    private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
+        if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
+            logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
     }
 
