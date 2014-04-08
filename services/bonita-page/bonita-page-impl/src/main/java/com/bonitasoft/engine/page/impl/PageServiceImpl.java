@@ -335,6 +335,7 @@ public class PageServiceImpl implements PageService {
             }
 
             final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+            final String oldPageName = sPage.getName();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
                     entityUpdateDescriptor);
 
@@ -342,7 +343,9 @@ public class PageServiceImpl implements PageService {
             recorder.recordUpdate(updateRecord, updatePageEvent);
             if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME))
             {
-                updateProfileEntry(sPage);
+                // page name has changed
+                final String newPageName = entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString();
+                updateProfileEntry(oldPageName, newPageName);
             }
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
@@ -363,19 +366,20 @@ public class PageServiceImpl implements PageService {
 
     }
 
-    private void updateProfileEntry(final SPage sPage) throws SBonitaSearchException, SProfileEntryUpdateException {
-        final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+    private void updateProfileEntry(final String oldPageName, final String newPageName) throws SBonitaSearchException, SProfileEntryUpdateException {
+        if (newPageName.equals(oldPageName))
+        {
+            return;
+        }
         final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM, new Boolean(true)));
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
-
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, oldPageName));
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, Collections
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC)), filters, null);
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         for (final SProfileEntry sProfileEntry : searchProfileEntries) {
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.NAME, sProfileEntry.getName());
-            entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.PAGE, sPage.getName());
+            entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.PAGE, newPageName);
             profileService.updateProfileEntry(sProfileEntry, entityUpdateDescriptor);
         }
 

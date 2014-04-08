@@ -299,7 +299,7 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // page
         final Page page = getPageAPI().createPage(
-                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
+                new PageCreator("name_" + System.currentTimeMillis(), CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
                 getPageContent(INDEX_GROOVY));
 
         // profile entries
@@ -333,7 +333,7 @@ public class PageAPIIT extends CommonAPISPTest {
         assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(customPageProfileEntry);
 
         final PageUpdater pageUpdater = new PageUpdater();
-        pageUpdater.setName(PAGE_NAME2);
+        pageUpdater.setName("newName_" + System.currentTimeMillis());
         pageUpdater.setDescription(page.getDescription());
         pageUpdater.setContentName(page.getContentName());
         final Page updatePage = getPageAPI().updatePage(page.getId(), pageUpdater);
@@ -342,7 +342,6 @@ public class PageAPIIT extends CommonAPISPTest {
         final SearchOptionsBuilder builderAfterUpdate = new SearchOptionsBuilder(0, 20);
         builderAfterUpdate.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builderAfterUpdate.filter(ProfileEntrySearchDescriptor.PAGE, updatePage.getName());
-        builderAfterUpdate.filter(ProfileEntrySearchDescriptor.CUSTOM, new Boolean(true));
         final List<ProfileEntry> resultProfileEntriesAfterDelete = getProfileAPI().searchProfileEntries(builderAfterUpdate.done()).getResult();
         assertThat(resultProfileEntriesAfterDelete).as("should contain 1 profileEntry").hasSize(1);
         assertThat(resultProfileEntriesAfterDelete.get(0).getPage()).as("should contain new custom page name").isEqualTo(updatePage.getName());
