@@ -165,8 +165,8 @@ public class TenantManagementAPIExtTest {
 
         tenantManagementAPI.pause();
 
-        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
+        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        final String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
         entityUpdateDescriptor.addField(inMaintenanceKey, STenant.PAUSED);
 
         verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
@@ -213,7 +213,7 @@ public class TenantManagementAPIExtTest {
     @Test
     public void loginShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
         // given:
-        Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
+        final Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
 
         // then:
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(long, String, String)",
@@ -223,11 +223,21 @@ public class TenantManagementAPIExtTest {
     @Test
     public void loginWithTenantIdShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
         // given:
-        Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
+        final Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
 
         // then:
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(String, String)",
                 method.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+    }
+
+    @Test
+    public void pageApi_shouldBeAvailable_in_maintenance_mode() throws Exception {
+        // given:
+        final Class<PageAPIExt> classPageApiExt = PageAPIExt.class;
+
+        // then:
+        assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(String, String)",
+                classPageApiExt.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
     }
 
     @Test(expected = UpdateException.class)

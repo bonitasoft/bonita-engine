@@ -42,6 +42,7 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
+@AvailableWhenTenantIsPaused
 public class PageAPIExt implements PageAPI {
 
     @Override
