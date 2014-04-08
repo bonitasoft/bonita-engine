@@ -68,8 +68,8 @@ public class SupervisorTest extends CommonAPITest {
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        deleteProcess(processDefinitions);
         deleteSupervisors(supervisors);
+        deleteProcess(processDefinitions);
         deleteUsers(users);
         deleteRoles(roles);
         deleteGroups(groups);
