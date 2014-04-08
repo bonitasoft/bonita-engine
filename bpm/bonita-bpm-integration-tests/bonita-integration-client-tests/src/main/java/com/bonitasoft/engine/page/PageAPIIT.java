@@ -331,7 +331,6 @@ public class PageAPIIT extends CommonAPISPTest {
         final List<ProfileEntry> resultProfileEntriesBefore = getProfileAPI().searchProfileEntries(builder.done()).getResult();
 
         assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(customPageProfileEntry);
-        getPageAPI().deletePage(page.getId());
 
         final PageUpdater pageUpdater = new PageUpdater();
         pageUpdater.setName(PAGE_NAME2);
