@@ -11,7 +11,6 @@ package com.bonitasoft.engine.page;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +35,10 @@ import com.bonitasoft.engine.profile.ProfileEntryType;
 
 @SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPISPTest {
+
+    private static final String DESCRIPTION_PAGE = "page";
+
+    private static final String DESCRIPTION_CUSTOM_PAGE = "custom page";
 
     private static final String ENTRY_TYPE_LINK = ProfileEntryType.LINK.toString().toLowerCase();
 
@@ -86,7 +89,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
-    public void should_update_return_the_modified_page() throws BonitaException {
+    public void updatePage_should_return_the_modified_page() throws BonitaException {
         // given
         final User john = createUser("john", "bpm");
         final User jack = createUser("jack", "bpm");
@@ -132,7 +135,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void should_update_with_existing_name_fail() throws BonitaException {
+    public void updatePage_with_existing_name_should_fail() throws BonitaException {
         final byte[] pageContent = getPageContent(INDEX_GROOVY);
         final PageUpdater pageUpdater = new PageUpdater();
 
@@ -216,7 +219,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test(expected = PageNotFoundException.class)
-    public void should_deletePage_delete_the_page() throws BonitaException {
+    public void deletePage_should_delete_the_page() throws BonitaException {
 
         // given
         final byte[] bytes = getPageContent(INDEX_GROOVY);
@@ -232,40 +235,119 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
-    public void should_deletePage_delete_profile_entry() throws BonitaException {
+    public void deletePage_should_delete_profile_entry() throws BonitaException {
         // given
+
+        // page
         final Page page = getPageAPI().createPage(
                 new PageCreator("myPageToDelete", CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
                 getPageContent(INDEX_GROOVY));
 
-        // a profile with 3 entry
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        // profile entries
+        final Profile createdProfile = getProfileAPI().createProfile("Profile_deletePage_should_delete_profile_entry", "Description profile1", null);
         final long profileId = createdProfile.getId();
         final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME, profileId).setType(ENTRY_TYPE_FOLDER));
-        final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
-        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK).setPage(page.getName())
-                .setParentId(folderProfileEntry.getId());
-        final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator1);
-        profileEntries.add(createProfileEntry);
-        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
+
+        final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
+                        .setPage(page.getName())
+                        .setCustom(new Boolean(true))
+                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                        .setParentId(folderProfileEntry.getId()));
+
+        getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")
-                .setParentId(folderProfileEntry.getId()).setCustom(true)));
-        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "3", profileId).setType(ENTRY_TYPE_LINK)
+                .setParentId(folderProfileEntry.getId()).setCustom(true));
+        getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "3", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("caselistinguser")
-                .setParentId(folderProfileEntry.getId()).setCustom(false)));
+                .setDescription(DESCRIPTION_PAGE)
+                .setParentId(folderProfileEntry.getId()).setCustom(false));
 
         // when
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
         builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builder.filter(ProfileEntrySearchDescriptor.PAGE, page.getName());
+        builder.filter(ProfileEntrySearchDescriptor.CUSTOM, new Boolean(true));
         final List<ProfileEntry> resultProfileEntriesBefore = getProfileAPI().searchProfileEntries(builder.done()).getResult();
 
-        assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(createProfileEntry);
+        assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(customPageProfileEntry);
         getPageAPI().deletePage(page.getId());
 
         // then
+
+        // no more custom page
         final List<ProfileEntry> resultProfileEntriesAfter = getProfileAPI().searchProfileEntries(builder.done()).getResult();
         assertThat(resultProfileEntriesAfter).as("should delete profile entry").isEmpty();
+
+        // still have normal page
+        final SearchOptionsBuilder builderAfterDelete = new SearchOptionsBuilder(0, 20);
+        builderAfterDelete.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builderAfterDelete.filter(ProfileEntrySearchDescriptor.PAGE, page.getName());
+
+        final List<ProfileEntry> resultProfileEntriesAfterDelete = getProfileAPI().searchProfileEntries(builderAfterDelete.done()).getResult();
+        assertThat(resultProfileEntriesAfterDelete).as("should be empty").isEmpty();
+
+        // cleanup
+        getProfileAPI().deleteProfile(profileId);
+
+    }
+
+    @Test
+    public void updatePage_should_update_profile_entry() throws BonitaException {
+
+        // given
+
+        // page
+        final Page page = getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
+                getPageContent(INDEX_GROOVY));
+
+        // profile entries
+        final Profile createdProfile = getProfileAPI().createProfile("Profile_updatePage_should_update_profile_entry", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME, profileId).setType(ENTRY_TYPE_FOLDER));
+
+        final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
+                        .setPage(page.getName())
+                        .setCustom(true)
+                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                        .setParentId(folderProfileEntry.getId()));
+
+        getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
+                .setPage("tasklistingadmin")
+                .setParentId(folderProfileEntry.getId()).setCustom(true));
+        getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "3", profileId).setType(ENTRY_TYPE_LINK)
+                .setPage("caselistinguser")
+                .setDescription(DESCRIPTION_PAGE)
+                .setParentId(folderProfileEntry.getId()).setCustom(false));
+        // );
+
+        // when
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PAGE, page.getName());
+        builder.filter(ProfileEntrySearchDescriptor.CUSTOM, new Boolean(true));
+        final List<ProfileEntry> resultProfileEntriesBefore = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+
+        assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(customPageProfileEntry);
+        getPageAPI().deletePage(page.getId());
+
+        final PageUpdater pageUpdater = new PageUpdater();
+        pageUpdater.setName(PAGE_NAME2);
+        pageUpdater.setDescription(page.getDescription());
+        pageUpdater.setContentName(page.getContentName());
+        final Page updatePage = getPageAPI().updatePage(page.getId(), pageUpdater);
+        // then
+
+        final SearchOptionsBuilder builderAfterUpdate = new SearchOptionsBuilder(0, 20);
+        builderAfterUpdate.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builderAfterUpdate.filter(ProfileEntrySearchDescriptor.PAGE, updatePage.getName());
+        builderAfterUpdate.filter(ProfileEntrySearchDescriptor.CUSTOM, new Boolean(true));
+        final List<ProfileEntry> resultProfileEntriesAfterDelete = getProfileAPI().searchProfileEntries(builderAfterUpdate.done()).getResult();
+        assertThat(resultProfileEntriesAfterDelete).as("should contain 1 profileEntry").hasSize(1);
+        assertThat(resultProfileEntriesAfterDelete.get(0).getPage()).as("should contain new custom page name").isEqualTo(updatePage.getName());
+        assertThat(resultProfileEntriesAfterDelete.get(0).isCustom()).as("should contain 1 custom page ").isTrue();
 
         // cleanup
         getProfileAPI().deleteProfile(profileId);

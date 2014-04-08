@@ -66,7 +66,7 @@ public class ProfileEntryCreator implements Serializable {
         return this;
     }
 
-    public ProfileEntryCreator setCustom(final boolean custom) {
+    public ProfileEntryCreator setCustom(final Boolean custom) {
         fields.put(ProfileEntryField.CUSTOM, custom);
         return this;
     }

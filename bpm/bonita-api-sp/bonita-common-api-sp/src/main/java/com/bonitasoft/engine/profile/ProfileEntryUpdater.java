@@ -20,7 +20,7 @@ public class ProfileEntryUpdater implements Serializable {
     private static final long serialVersionUID = 728214104237982027L;
 
     public enum ProfileEntryUpdateField {
-        NAME, DESCRIPTION, PARENT_ID, PROFILE_ID, INDEX, TYPE, PAGE;
+        NAME, DESCRIPTION, PARENT_ID, PROFILE_ID, INDEX, TYPE, PAGE, CUSTOM;
     }
 
     private final Map<ProfileEntryUpdateField, Serializable> fields;
@@ -55,6 +55,10 @@ public class ProfileEntryUpdater implements Serializable {
 
     public void page(final String page) {
         fields.put(ProfileEntryUpdateField.PAGE, page);
+    }
+
+    public void custom(final Boolean custom) {
+        fields.put(ProfileEntryUpdateField.CUSTOM, custom);
     }
 
     public Map<ProfileEntryUpdateField, Serializable> getFields() {

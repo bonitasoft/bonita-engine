@@ -285,6 +285,8 @@ public class ProfileEntryTest extends AbstractProfileTest {
     public void searchProfileEntryByPage() throws BonitaException {
 
         // given
+        final String pageToSearch = "tasklistinguser";
+        final String profileEntryName = "entry1";
 
         // Create Profile1
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
@@ -293,34 +295,37 @@ public class ProfileEntryTest extends AbstractProfileTest {
         // Create Folder Profile Entry
         final ProfileEntryCreator folderCreator = new ProfileEntryCreator("folderName", profileId).setType("folder");
         final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(folderCreator);
-
         final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
 
-        final String pageToSearch = "tasklistinguser";
-        // Create Profile entry 1
-        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("entry1", profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
-                .setDescription(ENTRY_DESCRIPTION)
-                .setParentId(folderProfileEntry.getId());
-        final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator1);
+        // custom page
+        final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(profileEntryName, profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
+                        .setDescription(ENTRY_DESCRIPTION)
+                        .setCustom(true)
+                        .setParentId(folderProfileEntry.getId()));
         profileEntries.add(createProfileEntry);
 
-        // Create Profile entry 2
-        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("entry2", profileId).setType(ENTRY_TYPE_LINK).setPage("tasklistingadmin")
-                .setDescription(ENTRY_DESCRIPTION)
-                .setParentId(folderProfileEntry.getId()).setCustom(true);
-        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
+        // page with same name but not a custom page
+        profileEntries.add(getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(profileEntryName, profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
+                        .setDescription(ENTRY_DESCRIPTION)
+                        .setCustom(false)
+                        .setParentId(folderProfileEntry.getId())));
 
-        // Create Profile entry 3
-        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("entry3", profileId).setType(ENTRY_TYPE_LINK).setPage("caselistinguser")
+        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator("entry2", profileId).setType(ENTRY_TYPE_LINK).setPage("tasklistingadmin")
                 .setDescription(ENTRY_DESCRIPTION)
-                .setParentId(folderProfileEntry.getId()).setCustom(false);
-        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
+                .setParentId(folderProfileEntry.getId()).setCustom(true)));
+
+        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator("entry3", profileId).setType(ENTRY_TYPE_LINK).setPage("caselistinguser")
+                .setDescription(ENTRY_DESCRIPTION)
+                .setParentId(folderProfileEntry.getId()).setCustom(false)));
 
         // when
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
         builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builder.filter(ProfileEntrySearchDescriptor.PAGE, pageToSearch);
+        builder.filter(ProfileEntrySearchDescriptor.CUSTOM, new Boolean(true));
 
         final List<ProfileEntry> resultProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
 

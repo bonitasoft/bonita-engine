@@ -49,6 +49,7 @@ import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -250,6 +251,8 @@ public class PageServiceImpl implements PageService {
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM, new Boolean(true)));
+
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
 
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
@@ -337,6 +340,10 @@ public class PageServiceImpl implements PageService {
 
             final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
             recorder.recordUpdate(updateRecord, updatePageEvent);
+            if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME))
+            {
+                updateProfileEntry(sPage);
+            }
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
             return sPage;
@@ -346,6 +353,30 @@ public class PageServiceImpl implements PageService {
         } catch (final SBonitaReadException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
+        } catch (final SBonitaSearchException e) {
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+            throw new SObjectModificationException(e);
+        } catch (final SProfileEntryUpdateException e) {
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+            throw new SObjectModificationException(e);
+        }
+
+    }
+
+    private void updateProfileEntry(final SPage sPage) throws SBonitaSearchException, SProfileEntryUpdateException {
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM, new Boolean(true)));
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
+
+        final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
+        for (final SProfileEntry sProfileEntry : searchProfileEntries) {
+            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.NAME, sProfileEntry.getName());
+            entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.PAGE, sPage.getName());
+            profileService.updateProfileEntry(sProfileEntry, entityUpdateDescriptor);
         }
 
     }
