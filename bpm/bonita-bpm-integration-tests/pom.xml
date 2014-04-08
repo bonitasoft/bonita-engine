@@ -12,8 +12,6 @@
 
 	<modules>
 		<module>bonita-query-tests</module>
-		<module>bonita-integration-client-tests</module>
-		<module>bonita-integration-local-tests</module>
 	</modules>
 	
 	<build>
@@ -31,24 +29,21 @@
 
 	<profiles>
 		<profile>
-			<id>tests</id>
-			<modules>
-				<module>bonita-bpm-services-integration-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>slow</id>
-			<modules>
-				<module>bonita-integration-as-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
 			<id>package-all</id>
 			<modules>
 				<module>bonita-bpm-services-integration-tests</module>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 				<module>bonita-integration-as-tests</module>
+			</modules>
+		</profile>
+		
+		<profile>
+			<id>tests</id>
+			<modules>
+				<module>bonita-bpm-services-integration-tests</module>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 			</modules>
 		</profile>
 		
@@ -56,6 +51,8 @@
 			<id>all</id>
 			<modules>
 				<module>bonita-bpm-services-integration-tests</module>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 			</modules>
 		</profile>
 	</profiles>
