@@ -124,7 +124,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
             }
 
             assignAndExecuteStep(waitForExceptionStep.getResult(), donaBenta.getId());
-            assertTrue(waitProcessToFinishAndBeArchived(processInstance));
+            assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
