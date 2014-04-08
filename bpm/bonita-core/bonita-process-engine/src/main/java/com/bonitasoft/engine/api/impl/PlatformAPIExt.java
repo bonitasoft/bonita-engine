@@ -24,6 +24,8 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
+import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
@@ -311,9 +313,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
 
-        DefaultReportList reports = new DefaultReportList(
-                tenantAccessor.getTechnicalLoggerService(),
-                BonitaHomeServer.getInstance().getTenantReportFolder(tenantId));
+        final DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance()
+                .getTenantReportFolder(tenantId));
 
         reports.deploy(new ReportDeployer() {
 
@@ -364,9 +365,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionContent transactionContent = new DeleteTenant(tenantId, platformService);
             transactionExecutor.execute(transactionContent);
 
-            // stop tenant services and clear the spring context
+            // stop tenant services and clear the spring context:
             TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
+            platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenantId, new StopServiceStrategy()));
+
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
             tenantServiceAccessor.destroy();
 
@@ -408,7 +410,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+
             final WorkService workService = tenantServiceAccessor.getWorkService();
 
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
@@ -623,7 +626,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final PlatformService platformService = getPlatformService();
         // check existence for tenant
         try {
-            STenant tenant = platformService.getTenant(tenantId);
+            final STenant tenant = platformService.getTenant(tenantId);
             // update user name and password in file system
             final Map<TenantField, Serializable> updatedFields = udpater.getFields();
             final String username = (String) updatedFields.get(TenantField.USERNAME);
@@ -725,7 +728,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     protected PlatformService getPlatformService() {
-        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
+        final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformAccessor.getPlatformService();
         return platformService;
     }

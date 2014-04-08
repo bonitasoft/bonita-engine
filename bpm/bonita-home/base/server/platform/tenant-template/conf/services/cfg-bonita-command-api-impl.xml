@@ -43,6 +43,7 @@
 				<ref bean="removeBreakpointCommand" />
 				<ref bean="getBreakpointsCommand" />
                 <ref bean="advancedStartProcessCommand" />
+                <ref bean="executeBDMQuery" />
 			</list>
 		</property>
 	</bean>
@@ -69,6 +70,18 @@
 		</constructor-arg>
 		<constructor-arg name="implementation">
 			<value>org.bonitasoft.engine.external.web.profile.command.ImportProfilesCommand</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="executeBDMQuery" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+		<constructor-arg name="name">
+			<value>executeBDMQuery</value>
+		</constructor-arg>
+		<constructor-arg name="description">
+			<value>Execute a named query in the BDM. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
+		</constructor-arg>
+		<constructor-arg name="implementation">
+			<value>com.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
 		</constructor-arg>
 	</bean>
 

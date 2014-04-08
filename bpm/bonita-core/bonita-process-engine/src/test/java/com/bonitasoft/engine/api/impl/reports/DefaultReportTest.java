@@ -8,9 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,7 +50,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-                assertEquals("myreport", name);
+                assertThat(name).isEqualTo("myreport");
             }
         });
     }
@@ -67,7 +65,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
-                assertTrue(areEquals(IOUtil.getAllContentFrom(zip), content));
+                assertThat(content).isEqualTo(IOUtil.getAllContentFrom(zip));
             }
         });
     }
@@ -81,7 +79,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-                assertEquals("My report description", description);
+                assertThat(description).isEqualTo("My report description");
             }
         });
     }
@@ -95,7 +93,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-                assertNull(description);
+                assertThat(description).isNull();
             }
         });
     }
@@ -109,7 +107,7 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
-                assertNull(screenShot);
+                assertThat(screenShot).isNull();
             }
         });
     }
@@ -125,17 +123,9 @@ public class DefaultReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
-                assertTrue(areEquals(IOUtil.getAllContentFrom(file), screenShot));
+                assertThat(screenShot).isEqualTo(IOUtil.getAllContentFrom(file));
             }
         });
     }
 
-    private boolean areEquals(byte[] expected, byte[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            if (expected[i] != actual[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

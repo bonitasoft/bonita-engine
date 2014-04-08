@@ -176,16 +176,21 @@
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.user#" value="${db.user}" />
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.password#" value="${db.password}" />
 
+
 										<!-- Replace server.xml by specific file for H2 -->
 										<if>
 											<equals arg1="${db.vendor}" arg2="h2" />
 											<then>
-												<copy todir="${tomcat.conf.dir}">
-													<fileset file="tomcat/${db.vendor}/server.xml" />
+												<copy todir="${tomcat.conf.dir}" overwrite="true">
+													<fileset dir="tomcat/${db.vendor}">
+														<include name="server.xml" />
+													</fileset>
 												</copy>
+												<replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#" value="${db.server.port}" />
 											</then>
+
 										</if>
-										
+
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
@@ -205,12 +210,17 @@
 										<copy todir="${bonita.home}" verbose="true">
 											<fileset dir="${distrib.dir}/resources/home/" />
 										</copy>
-										
+
+										<!-- Change Dialect of BDR -->
+										<property file="tomcat/${db.vendor}/bdm.properties" />
+										<replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties" match="businessdata.hibernate.dialect=.*"
+                                            replace="businessdata.hibernate.dialect=${bdm.dialect}" byline="true" />
+
 
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
 											<fileset dir="${user.home}/lic" includes="*.lic" />
 										</copy>
-										
+
 										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
 									</target>
 								</configuration>
@@ -233,7 +243,7 @@
 										<waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />
 										</waitfor>
-		
+
 										<mkdir dir="${report.xml}" />
 										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="1024m">
 											<!-- <jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500"/> -->
@@ -247,7 +257,7 @@
 											<fileset dir="${report.xml}" includes="TEST-*.xml" />
 											<report todir="${report.results}" />
 										</junitreport>
-		
+
 										<copy todir="${surefire.reports}">
 											<fileset dir="${report.xml}" />
 										</copy>

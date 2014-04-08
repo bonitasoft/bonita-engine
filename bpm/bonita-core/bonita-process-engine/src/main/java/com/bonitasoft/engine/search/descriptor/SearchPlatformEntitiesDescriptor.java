@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search.descriptor;
 
-
 /**
  * @author Zhao Na
  */

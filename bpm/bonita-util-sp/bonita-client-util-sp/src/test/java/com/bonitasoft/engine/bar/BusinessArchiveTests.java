@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -142,6 +143,11 @@ public class BusinessArchiveTests {
         processDefinitionBuilder.addDescription("a very good description");
         processDefinitionBuilder.addDisplayDescription("A very good and clean description that will be displayed in user xp");
         processDefinitionBuilder.addDisplayName("Truck Handling Process");
+        processDefinitionBuilder.addBusinessData(
+                "myLeaveRequest",
+                "org.bonitasoft.hr.LeaveRequest",
+                new ExpressionBuilder().createGroovyScriptExpression("leaveRequestGroovy", "return new org.bonitasoft.hr.LeaveRequest(\"toto\", 17L);",
+                        "org.bonitasoft.hr.LeaveRequest")).addDescription("This is the leave request I will handle in the current process");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1").addTimerEventTriggerDefinition(TimerType.CYCLE,
                 new ExpressionBuilder().createConstantStringExpression("*/3 * * * * ?"));
@@ -270,6 +276,15 @@ public class BusinessArchiveTests {
             }
         }
         assertTrue("the condition on the transition was not kept", trWithConditionOk);
+
+        // Business Data:
+        List<BusinessDataDefinition> designedBusinessData = process.getProcessContainer().getBusinessDataDefinitions();
+        List<BusinessDataDefinition> retrievedbusinessData = result.getProcessContainer().getBusinessDataDefinitions();
+        assertEquals(designedBusinessData.size(), retrievedbusinessData.size());
+        for (int i = 0; i < designedBusinessData.size(); i++) {
+            assertEquals(designedBusinessData.get(i), retrievedbusinessData.get(i));
+        }
+
         assertEquals(process.getProcessContainer().getConnectors().size(), result.getProcessContainer().getConnectors().size());
         boolean connectorWithInputOutputOk = false;
         for (final ConnectorDefinition connector : result.getProcessContainer().getConnectors()) {
@@ -339,8 +354,8 @@ public class BusinessArchiveTests {
         processDefinitionBuilder.addBooleanData("var1", null);
         processDefinitionBuilder.addStartEvent("start1").addMessageEventTrigger("m1").addOperation(opb.done());
         processDefinitionBuilder.addAutomaticTask("auto1");
-        final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processDefinitionBuilder
-                .addIntermediateCatchEvent("waitForMessage").addMessageEventTrigger("m2");
+        final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processDefinitionBuilder.addIntermediateCatchEvent(
+                "waitForMessage").addMessageEventTrigger("m2");
         catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
         catchMessageEventTriggerDefinitionBuilder.addOperation(opb.done());
         // create expression for target process/flowNode
