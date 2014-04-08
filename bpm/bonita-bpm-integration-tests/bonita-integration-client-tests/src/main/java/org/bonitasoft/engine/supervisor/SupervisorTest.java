@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -41,73 +41,42 @@ import org.junit.Test;
 
 public class SupervisorTest extends CommonAPITest {
 
-    private User user1;
+    private List<User> users;
 
-    private User user2;
+    private List<Group> groups;
 
-    private User user3;
+    private List<Role> roles;
 
-    private User user4;
+    private List<ProcessDefinition> processDefinitions;
 
-    private User user5;
-
-    private Group group1;
-
-    private Group group2;
-
-    private Role role1;
-
-    private Role role2;
-
-    private ProcessDefinition processDefinition1;
-
-    private ProcessDefinition processDefinition2;
-
-    private ProcessSupervisor supervisor1;
-
-    private ProcessSupervisor supervisor2;
-
-    private ProcessSupervisor supervisor3;
-
-    private ProcessSupervisor supervisor4;
-
-    private ProcessSupervisor supervisor5;
+    private List<ProcessSupervisor> supervisors;
 
     @Before
     public void before() throws Exception {
         login();
-        user1 = getIdentityAPI().createUser(USERNAME, PASSWORD);
-        group1 = getIdentityAPI().createGroup("Engine", null);
-        role1 = getIdentityAPI().createRole("Developer");
+
+        createUsers();
+        createGroups();
+        createRoles();
+        createProcessDefinitions();
+        supervisors = new ArrayList<ProcessSupervisor>();
+        createUserSupervisors();
+        createGroupSupervisors();
+        createRoleSupervisors();
+        createMembershipSupervisors();
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        deleteUser(user1);
-        deleteRoles(role1);
-        deleteGroups(group1);
+        deleteProcess(processDefinitions);
+        deleteSupervisors(supervisors);
+        deleteUsers(users);
+        deleteRoles(roles);
+        deleteGroups(groups);
         logout();
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Process" }, story = "Test if a user is supervisor of a process.", jira = "")
-    @Test
-    public void isUserProcessSupervisor() throws Exception {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
-        // before create supervisor
-        assertFalse(getProcessAPI().isUserProcessSupervisor(processDefinition.getId(), user1.getId()));
-
-        // create supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
-        // after created supervisor
-
-        assertTrue(getProcessAPI().isUserProcessSupervisor(processDefinition.getId(), user1.getId()));
-
-        // clean-up
-        deleteProcess(processDefinition);
-        deleteSupervisor(createdSupervisor.getSupervisorId());
-    }
-
-    private void deleteSupervisors(final ProcessSupervisor... processSupervisors) throws BonitaException {
+    private void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
                 deleteSupervisor(processSupervisor.getSupervisorId());
@@ -115,137 +84,201 @@ public class SupervisorTest extends CommonAPITest {
         }
     }
 
+    private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, InvalidBusinessArchiveFormatException,
+            AlreadyExistsException {
+        processDefinitions = new ArrayList<ProcessDefinition>();
+        processDefinitions.add(createProcessDefinition("myProcess1"));
+        processDefinitions.add(createProcessDefinition("myProcess2"));
+    }
+
     private ProcessDefinition createProcessDefinition(final String processName) throws InvalidProcessDefinitionException, ProcessDeployException,
             InvalidBusinessArchiveFormatException, AlreadyExistsException {
         // test process definition with no supervisor
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0").done();
-
         return getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+    }
+
+    private void createUsers() throws BonitaException {
+        users = new ArrayList<User>();
+        users.add(getIdentityAPI().createUser(USERNAME, PASSWORD));
+        users.add(createUser("user2", "bpm", "FirstName2", "LastName2"));
+        users.add(createUser("user3", "bpm", "FirstName3", "LastName3"));
+        users.add(createUser("user4", "bpm", "FirstName4", "LastName4"));
+        users.add(createUser("user5", "bpm", "FirstName5", "LastName5"));
+    }
+
+    private void createGroups() throws BonitaException {
+        groups = new ArrayList<Group>();
+        groups.add(getIdentityAPI().createGroup("Engine", null));
+        groups.add(createGroup("group2", "level2"));
+    }
+
+    private void createRoles() throws BonitaException {
+        roles = new ArrayList<Role>();
+        roles.add(getIdentityAPI().createRole("Developer"));
+        roles.add(createRole("role2"));
+    }
+
+    private void createUserSupervisors() throws BonitaException {
+        final ProcessDefinition processDefinition1 = processDefinitions.get(0);
+        final ProcessDefinition processDefinition2 = processDefinitions.get(1);
+
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(0).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(1).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), users.get(2).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), users.get(3).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), users.get(4).getId()));
+    }
+
+    private void createGroupSupervisors() throws BonitaException {
+        supervisors.add(getProcessAPI().createProcessSupervisorForGroup(processDefinitions.get(0).getId(), groups.get(0).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForGroup(processDefinitions.get(1).getId(), groups.get(1).getId()));
+    }
+
+    private void createRoleSupervisors() throws BonitaException {
+        supervisors.add(getProcessAPI().createProcessSupervisorForRole(processDefinitions.get(0).getId(), roles.get(0).getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForRole(processDefinitions.get(1).getId(), roles.get(1).getId()));
+    }
+
+    private void createMembershipSupervisors() throws BonitaException {
+        final ProcessDefinition processDefinition1 = processDefinitions.get(0);
+        final Role role1 = roles.get(0);
+        final Role role2 = roles.get(1);
+        final Group group1 = groups.get(0);
+        final Group group2 = groups.get(1);
+        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group1.getId(), role1.getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group2.getId(), role2.getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinitions.get(1).getId(), group2.getId(), role1.getId()));
+    }
+
+    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Process" }, story = "Test if a user is supervisor of a process.", jira = "")
+    @Test
+    public void isUserProcessSupervisor() throws Exception {
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final long userId = createUser("user546", "bpm", "FirstName564", "LastName2").getId();
+        ProcessSupervisor createdSupervisor = null;
+
+        try {
+            // before create supervisor
+            assertFalse(getProcessAPI().isUserProcessSupervisor(processDefinitionId, userId));
+            // create supervisor
+            createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, userId);
+            // after created supervisor
+            assertTrue(getProcessAPI().isUserProcessSupervisor(processDefinitionId, userId));
+        } finally {
+            // clean-up
+            if (createdSupervisor != null) {
+                deleteSupervisor(createdSupervisor.getSupervisorId());
+            }
+            deleteUser(userId);
+        }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Get", "Delete" }, story = "Get and delete supervisor.", jira = "")
     @Test
-    public void addGetAndDeleteSupervisor() throws BonitaException {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
-        // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
-        assertEquals(processDefinition.getId(), createdSupervisor.getProcessDefinitionId());
+    public void getAndDeleteSupervisor() throws BonitaException {
+        final long userId = users.get(0).getId();
 
         // Count to assert
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(1, result.getCount());
+        assertEquals(12, result.getCount());
 
         final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
-        assertEquals(createdSupervisor.getSupervisorId(), getSupervisorResult.getSupervisorId());
-        assertEquals(user1.getId(), getSupervisorResult.getUserId());
-        assertEquals(createdSupervisor.getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
-
-        // Delete supervisor using id
-        deleteSupervisor(getSupervisorResult.getSupervisorId());
-
-        result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(0, result.getCount());
-
-        // clean-up
-        deleteProcess(processDefinition);
+        assertEquals(supervisors.get(0).getSupervisorId(), getSupervisorResult.getSupervisorId());
+        assertEquals(userId, getSupervisorResult.getUserId());
+        assertEquals(supervisors.get(0).getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameUserSupervisor() throws BonitaException {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final long userId = users.get(0).getId();
+
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, userId);
 
         try {
-            getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
+            getProcessAPI().createProcessSupervisorForUser(processDefinitionId, userId);
         } finally {
             // clean-up
             deleteSupervisor(createdSupervisor.getSupervisorId());
-            deleteProcess(processDefinition);
         }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameGroupSupervisor() throws BonitaException {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final long groupId = groups.get(0).getId();
+
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinition.getId(), group1.getId());
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, groupId);
 
         try {
-            getProcessAPI().createProcessSupervisorForGroup(processDefinition.getId(), group1.getId());
+            getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, groupId);
         } finally {
             // clean-up
             deleteSupervisor(createdSupervisor.getSupervisorId());
-            deleteProcess(processDefinition);
         }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameRoleSupervisor() throws BonitaException {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final long roleId = roles.get(0).getId();
+
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForRole(processDefinition.getId(), role1.getId());
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForRole(processDefinitionId, roleId);
 
         try {
-            getProcessAPI().createProcessSupervisorForRole(processDefinition.getId(), role1.getId());
+            getProcessAPI().createProcessSupervisorForRole(processDefinitionId, roleId);
         } finally {
             // clean-up
             deleteSupervisor(createdSupervisor.getSupervisorId());
-            deleteProcess(processDefinition);
         }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Membership", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameMembershipSupervisor() throws BonitaException {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final Group group1 = groups.get(0);
+        final Role role1 = roles.get(0);
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForMembership(processDefinition.getId(), group1.getId(),
+        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForMembership(processDefinitionId, group1.getId(),
                 role1.getId());
 
         try {
-            getProcessAPI().createProcessSupervisorForMembership(processDefinition.getId(), group1.getId(), role1.getId());
+            getProcessAPI().createProcessSupervisorForMembership(processDefinitionId, group1.getId(), role1.getId());
         } finally {
             // clean-up
             deleteSupervisor(createdSupervisor.getSupervisorId());
-            deleteProcess(processDefinition);
         }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Delete" }, story = "Delete supervisors corresponding to criteria", jira = "ENGINE-766")
     @Test
     public void deleteSupervisors() throws BonitaException {
-        // Create groups, roles, users
-        createUsers();
-        createGroups();
-        createRoles();
-        createProcessDefinitions();
-
-        supervisor1 = getProcessAPI().createProcessSupervisorForGroup(processDefinition1.getId(), group1.getId());
-        supervisor2 = getProcessAPI().createProcessSupervisorForGroup(processDefinition2.getId(), group2.getId());
-        supervisor3 = getProcessAPI().createProcessSupervisorForRole(processDefinition2.getId(), role2.getId());
-        supervisor4 = getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group1.getId(), role1.getId());
-        supervisor5 = getProcessAPI().createProcessSupervisorForMembership(processDefinition2.getId(), group2.getId(), role1.getId());
-
-        getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group2.getId(), role2.getId());
-        getProcessAPI().createProcessSupervisorForRole(processDefinition1.getId(), role1.getId());
-        getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user1.getId());
+        final ProcessDefinition processDefinition1 = processDefinitions.get(0);
+        final Role role1 = roles.get(0);
+        final Role role2 = roles.get(1);
+        final Group group2 = groups.get(1);
+        final long userId = users.get(0).getId();
 
         // Delete supervisor using ids
         // Unexisted Supervisor
         try {
-            getProcessAPI().deleteSupervisor(processDefinition1.getId(), user1.getId(), role2.getId(), group2.getId());
+            getProcessAPI().deleteSupervisor(processDefinition1.getId(), userId, role2.getId(), group2.getId());
             fail("no exception was thrown when deleting an unknown supervisor");
         } catch (final DeletionException e) {
 
         }
         final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 10, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
         SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(8, result.getCount());
+        assertEquals(12, result.getCount());
 
         try {
             getProcessAPI().deleteSupervisor(null, null, role1.getId(), null);
@@ -254,502 +287,326 @@ public class SupervisorTest extends CommonAPITest {
 
         }
         result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(8, result.getCount());
+        assertEquals(12, result.getCount());
 
         // Existed Supervisor
         getProcessAPI().deleteSupervisor(processDefinition1.getId(), null, role2.getId(), group2.getId());
+        supervisors.remove(10);
         result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(7, result.getCount());
+        assertEquals(11, result.getCount());
 
-        getProcessAPI().deleteSupervisor(processDefinition1.getId(), user1.getId(), null, null);
+        getProcessAPI().deleteSupervisor(processDefinition1.getId(), userId, null, null);
+        supervisors.remove(0);
         result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(6, result.getCount());
+        assertEquals(10, result.getCount());
 
         getProcessAPI().deleteSupervisor(processDefinition1.getId(), null, role1.getId(), null);
+        supervisors.remove(6);
         result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result.getCount());
-
-        // clean-up
-        deleteSupervisors(supervisor1, supervisor2, supervisor3, supervisor4, supervisor5);
-        deleteRoles(role2);
-        deleteGroups(group2);
-        deleteUsers(user2, user3, user4, user5);
-        deleteProcess(processDefinition1, processDefinition2);
+        assertEquals(9, result.getCount());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group" }, story = "Add group to supervisor.", jira = "")
     @Test
     public void addGroupToSupervisor() throws Exception {
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final Group group = getIdentityAPI().createGroup("Engine789489", null);
 
-        // Add Superviso
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinition.getId(), group1.getId());
-        assertEquals(processDefinition.getId(), createdSupervisor.getProcessDefinitionId());
-
-        // Search supervisor
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
-        final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(1, result.getCount());
-
-        final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
-        assertEquals(createdSupervisor.getSupervisorId(), getSupervisorResult.getSupervisorId());
-        assertEquals(group1.getId(), getSupervisorResult.getGroupId());
-        assertEquals(createdSupervisor.getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
-
-        // clean-up
-        deleteSupervisor(createdSupervisor.getSupervisorId());
-        deleteProcess(processDefinition);
+        // Add Supervisor
+        ProcessSupervisor createdSupervisor = null;
+        try {
+            createdSupervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, group.getId());
+            assertEquals(processDefinitionId, createdSupervisor.getProcessDefinitionId());
+            // Search supervisor
+            final SearchOptionsBuilder builder = buildSearchOptions(null, 12, 1, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+            final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
+            assertEquals(13, result.getCount());
+            final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
+            assertEquals(createdSupervisor.getSupervisorId(), getSupervisorResult.getSupervisorId());
+            assertEquals(group.getId(), getSupervisorResult.getGroupId());
+            assertEquals(createdSupervisor.getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
+        } finally {
+            // clean-up
+            if (createdSupervisor != null) {
+                deleteSupervisor(createdSupervisor.getSupervisorId());
+            }
+            deleteGroups(group);
+        }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Membership" }, story = "Add membership to supervisor.", jira = "")
     @Test
     public void addMembershipToSupervisor() throws Exception {
-        final UserMembership membership = getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
-        final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        final Role role = getIdentityAPI().createRole("Developer5646");
+        final Group group1 = groups.get(0);
+
         // Add Supervisor
-        final ProcessSupervisor createdSupervisor = getProcessAPI()
-                .createProcessSupervisorForMembership(processDefinition.getId(), group1.getId(), role1.getId());
-        assertEquals(processDefinition.getId(), createdSupervisor.getProcessDefinitionId());
-
-        // Search supervisor
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
-        final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(1, result.getCount());
-
-        final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
-        assertEquals(createdSupervisor.getSupervisorId(), getSupervisorResult.getSupervisorId());
-        assertEquals(group1.getId(), getSupervisorResult.getGroupId());
-        assertEquals(role1.getId(), getSupervisorResult.getRoleId());
-        assertEquals(createdSupervisor.getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
-
-        // Check is user supervisor
-        assertTrue(getProcessAPI().isUserProcessSupervisor(processDefinition.getId(), user1.getId()));
-        // clean-up
-        deleteSupervisor(createdSupervisor.getSupervisorId());
-        // delete membership first
-        getIdentityAPI().deleteUserMembership(membership.getId());
-        deleteProcess(processDefinition);
-    }
-
-    private void afterSearchProcessSupervisorsForUser() throws BonitaException {
-        deleteSupervisors(supervisor1, supervisor2, supervisor3, supervisor4, supervisor5);
-        deleteUsers(user2, user3, user4, user5);
-        deleteProcess(processDefinition1, processDefinition2);
-    }
-
-    private void afterSearchProcessSupervisorsForGroup() throws BonitaException {
-        deleteSupervisors(supervisor1, supervisor2);
-        deleteGroups(group2);
-        deleteProcess(processDefinition1, processDefinition2);
-    }
-
-    private void afterSearchProcessSupervisorsForRole() throws BonitaException {
-        deleteSupervisors(supervisor1, supervisor2);
-        deleteRoles(role2);
-        deleteProcess(processDefinition1, processDefinition2);
-    }
-
-    private void afterSearchProcessSupervisorsForRoleAndGroup() throws BonitaException {
-        deleteSupervisors(supervisor1, supervisor2, supervisor3);
-        deleteRoles(role2);
-        deleteGroups(group2);
-        deleteProcess(processDefinition1, processDefinition2);
-    }
-
-    private void afterSearchProcessSupervisorsForUserAndMembership() throws BonitaException {
-        deleteSupervisors(supervisor1, supervisor2, supervisor3, supervisor4, supervisor5);
-        deleteUsers(user2, user3, user4, user5);
-        deleteGroups(group2);
-        deleteRoles(role2);
-        deleteProcess(processDefinition1, processDefinition2);
-    }
-
-    private void beforeSearchProcessSupervisorsForUser() throws BonitaException {
-        // create users
-        createUsers();
-        // add user as supervisor for process definition
-        createProcessDefinitions();
-        createUserSupervisors();
-    }
-
-    private void beforeSearchProcessSupervisorsForGroup() throws BonitaException {
-        createGroups();
-        createProcessDefinitions();
-        createGroupSupervisors();
-    }
-
-    private void beforeSearchProcessSupervisorsForRole() throws BonitaException {
-        createRoles();
-        createProcessDefinitions();
-        createRoleSupervisors();
-    }
-
-    private void beforeSearchProcessSupervisorsForRoleAndGroup() throws BonitaException {
-        createGroups();
-        createRoles();
-        createProcessDefinitions();
-        createMembershipSupervisors();
-    }
-
-    private void beforeSearchProcessSupervisorsForUserAndMembership() throws BonitaException {
-        createUsers();
-        createGroups();
-        createRoles();
-        createProcessDefinitions();
-        createUserAndMembershipSupervisors();
-    }
-
-    private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, InvalidBusinessArchiveFormatException,
-            AlreadyExistsException {
-        processDefinition1 = createProcessDefinition("myProcess1");
-        processDefinition2 = createProcessDefinition("myProcess2");
-    }
-
-    private void createUsers() throws BonitaException {
-        user2 = createUser("user2", "bpm", "FirstName2", "LastName2");
-        user3 = createUser("user3", "bpm", "FirstName3", "LastName3");
-        user4 = createUser("user4", "bpm", "FirstName4", "LastName4");
-        user5 = createUser("user5", "bpm", "FirstName5", "LastName5");
-    }
-
-    private void createGroups() throws BonitaException {
-        group2 = createGroup("group2", "level2");
-    }
-
-    private void createRoles() throws BonitaException {
-        role2 = createRole("role2");
-    }
-
-    private void createUserSupervisors() throws BonitaException {
-        supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user1.getId());
-        supervisor2 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user2.getId());
-        supervisor3 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user3.getId());
-        supervisor4 = getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), user4.getId());
-        supervisor5 = getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), user5.getId());
-    }
-
-    private void createGroupSupervisors() throws BonitaException {
-        supervisor1 = getProcessAPI().createProcessSupervisorForGroup(processDefinition1.getId(), group1.getId());
-        supervisor2 = getProcessAPI().createProcessSupervisorForGroup(processDefinition2.getId(), group2.getId());
-        supervisor3 = null;
-        supervisor4 = null;
-        supervisor5 = null;
-    }
-
-    private void createRoleSupervisors() throws BonitaException {
-        supervisor1 = getProcessAPI().createProcessSupervisorForRole(processDefinition1.getId(), role1.getId());
-        supervisor2 = getProcessAPI().createProcessSupervisorForRole(processDefinition2.getId(), role2.getId());
-        supervisor3 = null;
-        supervisor4 = null;
-        supervisor5 = null;
-    }
-
-    private void createMembershipSupervisors() throws BonitaException {
-        supervisor1 = getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group1.getId(), role1.getId());
-        supervisor2 = getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group2.getId(), role2.getId());
-        supervisor3 = getProcessAPI().createProcessSupervisorForMembership(processDefinition2.getId(), group2.getId(), role1.getId());
-        supervisor4 = null;
-        supervisor5 = null;
-    }
-
-    private void createUserAndMembershipSupervisors() throws BonitaException {
-        supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user1.getId());
-        supervisor2 = getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group2.getId(), role2.getId());
-        supervisor3 = getProcessAPI().createProcessSupervisorForMembership(processDefinition2.getId(), group2.getId(), role1.getId());
-        supervisor4 = getProcessAPI().createProcessSupervisorForMembership(processDefinition1.getId(), group1.getId(), role1.getId());
-        supervisor5 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), user2.getId());
+        ProcessSupervisor createdSupervisor = null;
+        try {
+            createdSupervisor = getProcessAPI()
+                    .createProcessSupervisorForMembership(processDefinitionId, group1.getId(), role.getId());
+            assertEquals(processDefinitionId, createdSupervisor.getProcessDefinitionId());
+            // Search supervisor
+            final SearchOptionsBuilder builder = buildSearchOptions(null, 12, 12, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+            final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
+            assertEquals(13, result.getCount());
+            final ProcessSupervisor getSupervisorResult = result.getResult().get(0);
+            assertEquals(createdSupervisor.getSupervisorId(), getSupervisorResult.getSupervisorId());
+            assertEquals(group1.getId(), getSupervisorResult.getGroupId());
+            assertEquals(role.getId(), getSupervisorResult.getRoleId());
+            assertEquals(createdSupervisor.getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
+            // Check is user supervisor
+            assertTrue(getProcessAPI().isUserProcessSupervisor(processDefinitionId, users.get(0).getId()));
+        } finally {
+            // clean-up
+            if (createdSupervisor != null) {
+                deleteSupervisor(createdSupervisor.getSupervisorId());
+            }
+            deleteRoles(role);
+        }
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Search", "Process" }, story = "Search process supervisors for user.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUser() throws Exception {
-        beforeSearchProcessSupervisorsForUser();
+        final ProcessSupervisor supervisor4 = supervisors.get(3);
+        final ProcessSupervisor supervisor5 = supervisors.get(4);
 
         // test ASC
-        SearchOptionsBuilder builder = buildSearchOptions(null, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result1.getCount());
-        List<ProcessSupervisor> supervisors = result1.getResult();
-        assertNotNull(supervisors);
-        assertEquals(3, supervisors.size());
-        assertEquals(supervisor1.getUserId(), supervisors.get(0).getUserId());
-        assertEquals(supervisor2.getUserId(), supervisors.get(1).getUserId());
-        assertEquals(supervisor3.getUserId(), supervisors.get(2).getUserId());
+        assertEquals(12, result1.getCount());
+        List<ProcessSupervisor> supervisorsResult = result1.getResult();
+        assertNotNull(supervisorsResult);
+        assertEquals(3, supervisorsResult.size());
+        assertEquals(supervisors.get(0).getUserId(), supervisorsResult.get(0).getUserId());
+        assertEquals(supervisors.get(1).getUserId(), supervisorsResult.get(1).getUserId());
+        assertEquals(supervisors.get(2).getUserId(), supervisorsResult.get(2).getUserId());
 
-        builder = buildSearchOptions(null, 3, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        builder = buildSearchOptions(null, 10, 2, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         final SearchResult<ProcessSupervisor> result2 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result2.getCount());
-        supervisors = result2.getResult();
-        assertNotNull(supervisors);
-        assertEquals(2, supervisors.size());
-        assertEquals(supervisor4.getUserId(), supervisors.get(0).getUserId());
-        assertEquals(supervisor5.getUserId(), supervisors.get(1).getUserId());
+        assertEquals(12, result2.getCount());
+        supervisorsResult = result2.getResult();
+        assertNotNull(supervisorsResult);
+        assertEquals(2, supervisorsResult.size());
+        assertEquals(supervisor4.getUserId(), supervisorsResult.get(0).getUserId());
+        assertEquals(supervisor5.getUserId(), supervisorsResult.get(1).getUserId());
 
         // test DESC
         builder = buildSearchOptions(null, 0, 2, ProcessSupervisorSearchDescriptor.USER_ID, Order.DESC);
         final SearchResult<ProcessSupervisor> result4 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result4.getCount());
-        supervisors = result4.getResult();
-        assertNotNull(supervisors);
-        assertEquals(2, supervisors.size());
-        assertEquals(supervisor5.getUserId(), supervisors.get(0).getUserId());
-        assertEquals(supervisor4.getUserId(), supervisors.get(1).getUserId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUser();
+        assertEquals(12, result4.getCount());
+        supervisorsResult = result4.getResult();
+        assertNotNull(supervisorsResult);
+        assertEquals(2, supervisorsResult.size());
+        assertEquals(supervisor5.getUserId(), supervisorsResult.get(0).getUserId());
+        assertEquals(supervisor4.getUserId(), supervisorsResult.get(1).getUserId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Search", "Process", "Filter" }, story = "Search process supervisors for user with filter on process def id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForUser();
+        // filter on process
+        Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID,
+                (Serializable) processDefinitions.get(1).getId());
+        SearchOptionsBuilder builder = buildSearchOptions(filters, 3, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
+        assertEquals(5, result1.getCount());
+        List<ProcessSupervisor> supervisorsResult = result1.getResult();
+        assertEquals(supervisors.get(3).getUserId(), supervisorsResult.get(0).getUserId());
+        assertEquals(supervisors.get(4).getUserId(), supervisorsResult.get(1).getUserId());
 
-        try {
-            // filter on process
-            Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID,
-                    (Serializable) processDefinition2.getId());
-            SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
-            final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-            assertEquals(2, result1.getCount());
-            List<ProcessSupervisor> supervisors = result1.getResult();
-            assertEquals(supervisor4.getUserId(), supervisors.get(0).getUserId());
-            assertEquals(supervisor5.getUserId(), supervisors.get(1).getUserId());
-            // filter on firstname
-            filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) user1.getId());
-            builder = buildSearchOptions(filters, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
-            final SearchResult<ProcessSupervisor> result2 = getProcessAPI().searchProcessSupervisors(builder.done());
-            assertEquals(1, result2.getCount());
-            supervisors = result2.getResult();
-            assertEquals(supervisor1.getUserId(), supervisors.get(0).getUserId());
-        } finally {
-            // clean-up
-            afterSearchProcessSupervisorsForUser();
-        }
+        // filter on firstname
+        filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
+        builder = buildSearchOptions(filters, 0, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchResult<ProcessSupervisor> result2 = getProcessAPI().searchProcessSupervisors(builder.done());
+        assertEquals(1, result2.getCount());
+        supervisorsResult = result2.getResult();
+        assertEquals(supervisors.get(0).getUserId(), supervisorsResult.get(0).getUserId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group", "Search", "Process" }, story = "Search process supervisors for group.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForGroup() throws Exception {
-        beforeSearchProcessSupervisorsForGroup();
-
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 2, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(2, result1.getCount());
+        assertEquals(12, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
-        assertEquals(group1.getId(), supervisors.get(0).getGroupId());
-        assertEquals(group2.getId(), supervisors.get(1).getGroupId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForGroup();
+        assertEquals(groups.get(0).getId(), supervisors.get(0).getGroupId());
+        assertEquals(groups.get(1).getId(), supervisors.get(1).getGroupId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group", "Search", "Process", "Filter" }, story = "Search process supervisors for group with filter on group id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForGroupWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForGroup();
+        final Group group1 = groups.get(0);
 
         final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.GROUP_ID, (Serializable) group1.getId());
         final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(1, result1.getCount());
+        assertEquals(2, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
         assertEquals(group1.getId(), supervisors.get(0).getGroupId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForGroup();
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Search", "Process" }, story = "Search process supervisors for role.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRole() throws Exception {
-        beforeSearchProcessSupervisorsForRole();
-
-        try {
-            final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
-            final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-            assertEquals(2, result1.getCount());
-            final List<ProcessSupervisor> supervisors = result1.getResult();
-            assertEquals(role1.getId(), supervisors.get(0).getRoleId());
-            assertEquals(role2.getId(), supervisors.get(1).getRoleId());
-        } finally {
-            // clean-up
-            afterSearchProcessSupervisorsForRole();
-        }
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 9, 11, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
+        assertEquals(12, result1.getCount());
+        final List<ProcessSupervisor> supervisors = result1.getResult();
+        assertEquals(roles.get(0).getId(), supervisors.get(0).getRoleId());
+        assertEquals(roles.get(1).getId(), supervisors.get(1).getRoleId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Search", "Process", "Filter" }, story = "Search process supervisors for role with filter on role id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRoleWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForRole();
+        final Role role1 = roles.get(0);
 
-        try {
-            final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) role1.getId());
-            final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
-            final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-            assertEquals(1, result1.getCount());
-            final List<ProcessSupervisor> supervisors = result1.getResult();
-            assertEquals(role1.getId(), supervisors.get(0).getRoleId());
-        } finally {
-            // clean-up
-            afterSearchProcessSupervisorsForRole();
-        }
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) role1.getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
+        assertEquals(3, result1.getCount());
+        final List<ProcessSupervisor> supervisors = result1.getResult();
+        assertEquals(role1.getId(), supervisors.get(0).getRoleId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Group", "Search", "Process" }, story = "Search process supervisors for role and group.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRoleAndGroup() throws Exception {
-        beforeSearchProcessSupervisorsForRoleAndGroup();
+        final Role role1 = roles.get(0);
+        final Role role2 = roles.get(1);
+        final Group group1 = groups.get(0);
+        final Group group2 = groups.get(1);
 
-        try {
-            final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
-            builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
-            final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-            assertEquals(3, result1.getCount());
-            final List<ProcessSupervisor> supervisors = result1.getResult();
-            assertEquals(role1.getId(), supervisors.get(0).getRoleId());
-            assertEquals(group1.getId(), supervisors.get(0).getGroupId());
-            assertEquals(role1.getId(), supervisors.get(1).getRoleId());
-            assertEquals(group2.getId(), supervisors.get(1).getGroupId());
-            assertEquals(role2.getId(), supervisors.get(2).getRoleId());
-            assertEquals(group2.getId(), supervisors.get(2).getGroupId());
-        } finally {
-            // clean-up
-            afterSearchProcessSupervisorsForRoleAndGroup();
-        }
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 4, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
+        final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
+        assertEquals(12, result1.getCount());
+        final List<ProcessSupervisor> supervisorsResult = result1.getResult();
+        assertEquals(role1.getId(), supervisorsResult.get(0).getRoleId());
+        assertEquals(group1.getId(), supervisorsResult.get(0).getGroupId());
+        assertEquals(role1.getId(), supervisorsResult.get(1).getRoleId());
+        assertEquals(group2.getId(), supervisorsResult.get(1).getGroupId());
+        assertEquals(role2.getId(), supervisorsResult.get(3).getRoleId());
+        assertEquals(group2.getId(), supervisorsResult.get(3).getGroupId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Group", "Search", "Process", "Filter" }, story = "Search process supervisors for role and group with filter on role id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRoleAndGroupWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForRoleAndGroup();
-
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) role1.getId());
-        final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) roles.get(0).getId());
+        final SearchOptionsBuilder builder = buildSearchOptions(filters, 1, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(2, result1.getCount());
-        final List<ProcessSupervisor> supervisors = result1.getResult();
-        assertEquals(supervisor1.getSupervisorId(), supervisors.get(0).getSupervisorId());
-        assertEquals(supervisor3.getSupervisorId(), supervisors.get(1).getSupervisorId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForRoleAndGroup();
+        assertEquals(3, result1.getCount());
+        final List<ProcessSupervisor> supervisorsResult = result1.getResult();
+        assertEquals(supervisors.get(9).getSupervisorId(), supervisorsResult.get(0).getSupervisorId());
+        assertEquals(supervisors.get(11).getSupervisorId(), supervisorsResult.get(1).getSupervisorId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "User", "Search", "Process" }, story = "Search process supervisors for role and user.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndRole() throws Exception {
-        beforeSearchProcessSupervisorsForUserAndMembership();
+        final Role role1 = roles.get(0);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 6, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result1.getCount());
+        assertEquals(12, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
         assertEquals(role1.getId(), supervisors.get(0).getRoleId());
         assertEquals(role1.getId(), supervisors.get(1).getRoleId());
-        assertEquals(role2.getId(), supervisors.get(2).getRoleId());
-        assertEquals(user1.getId(), supervisors.get(3).getUserId());
-        assertEquals(user2.getId(), supervisors.get(4).getUserId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUserAndMembership();
+        assertEquals(roles.get(1).getId(), supervisors.get(2).getRoleId());
+        assertEquals(users.get(0).getId(), supervisors.get(4).getUserId());
+        assertEquals(users.get(1).getId(), supervisors.get(5).getUserId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "User", "Search", "Process", "Filter" }, story = "Search process supervisors for role and user with filter on role id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndRoleWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForUserAndMembership();
+        final Role role1 = roles.get(0);
 
         final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) role1.getId());
         final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(2, result1.getCount());
+        assertEquals(3, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
         assertEquals(role1.getId(), supervisors.get(0).getRoleId());
         assertEquals(role1.getId(), supervisors.get(1).getRoleId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUserAndMembership();
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Search", "Process" }, story = "Search process supervisors for user and group.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroup() throws Exception {
-        beforeSearchProcessSupervisorsForUserAndMembership();
+        final Group group2 = groups.get(1);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 8, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result1.getCount());
+        assertEquals(12, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
-        assertEquals(group1.getId(), supervisors.get(0).getGroupId());
+        assertEquals(groups.get(0).getId(), supervisors.get(0).getGroupId());
         assertEquals(group2.getId(), supervisors.get(1).getGroupId());
         assertEquals(group2.getId(), supervisors.get(2).getGroupId());
-        assertEquals(user1.getId(), supervisors.get(3).getUserId());
-        assertEquals(user2.getId(), supervisors.get(4).getUserId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUserAndMembership();
+        assertEquals(group2.getId(), supervisors.get(3).getGroupId());
+        assertEquals(users.get(0).getId(), supervisors.get(4).getUserId());
+        assertEquals(users.get(1).getId(), supervisors.get(5).getUserId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Search", "Process", "Filter" }, story = "Search process supervisors for user and group with filter on user id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroupWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForUserAndMembership();
-
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) user1.getId());
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
         final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(1, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
-        assertEquals(supervisor1.getSupervisorId(), supervisors.get(0).getSupervisorId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUserAndMembership();
+        assertEquals(supervisors.get(0).getSupervisorId(), supervisors.get(0).getSupervisorId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Search", "Process" }, story = "Search process supervisors for user, group and role.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroupAndRole() throws Exception {
-        beforeSearchProcessSupervisorsForUserAndMembership();
+        final Role role1 = roles.get(0);
+        final Role role2 = roles.get(1);
+        final Group group1 = groups.get(0);
+        final Group group2 = groups.get(1);
 
-        final SearchOptionsBuilder builder = buildSearchOptions(null, 0, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
+        final SearchOptionsBuilder builder = buildSearchOptions(null, 3, 6, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
 
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
-        assertEquals(5, result1.getCount());
+        assertEquals(12, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
         assertEquals(group1.getId(), supervisors.get(0).getGroupId());
         assertEquals(role1.getId(), supervisors.get(0).getRoleId());
-        assertEquals(group2.getId(), supervisors.get(1).getGroupId());
-        assertEquals(role1.getId(), supervisors.get(1).getRoleId());
         assertEquals(group2.getId(), supervisors.get(2).getGroupId());
-        assertEquals(role2.getId(), supervisors.get(2).getRoleId());
-        assertEquals(user1.getId(), supervisors.get(3).getUserId());
-        assertEquals(user2.getId(), supervisors.get(4).getUserId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUserAndMembership();
+        assertEquals(role1.getId(), supervisors.get(2).getRoleId());
+        assertEquals(group2.getId(), supervisors.get(3).getGroupId());
+        assertEquals(role2.getId(), supervisors.get(3).getRoleId());
+        assertEquals(users.get(0).getId(), supervisors.get(4).getUserId());
+        assertEquals(users.get(1).getId(), supervisors.get(5).getUserId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Search", "Process",
             "Filter" }, story = "Search process supervisors for user and group with filter on user id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroupAndRoleWithFilter() throws Exception {
-        beforeSearchProcessSupervisorsForUserAndMembership();
-
-        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) user1.getId());
+        final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
         final SearchOptionsBuilder builder = buildSearchOptions(filters, 0, 5, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
         builder.sort(ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
@@ -757,10 +614,7 @@ public class SupervisorTest extends CommonAPITest {
         final SearchResult<ProcessSupervisor> result1 = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(1, result1.getCount());
         final List<ProcessSupervisor> supervisors = result1.getResult();
-        assertEquals(supervisor1.getSupervisorId(), supervisors.get(0).getSupervisorId());
-
-        // clean-up
-        afterSearchProcessSupervisorsForUserAndMembership();
+        assertEquals(supervisors.get(0).getSupervisorId(), supervisors.get(0).getSupervisorId());
     }
 
     private SearchOptionsBuilder buildSearchOptions(final Map<String, Serializable> filters, final int pageIndex, final int numberOfResults,
