@@ -56,6 +56,8 @@ import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
+    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "getEmployeeByLastName";
+
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
 
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
@@ -84,7 +86,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
 
-        final Query addQuery = employee.addQuery("getEmployeeByLastName", "SELECT e FROM Employee e WHERE e.lastName=:lastName", List.class.getName());
+        final Query addQuery = employee.addQuery(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, "SELECT e FROM Employee e WHERE e.lastName=:lastName",
+                List.class.getName());
         addQuery.addQueryParameter("lastName", String.class.getName());
 
         final BusinessObjectModel model = new BusinessObjectModel();
@@ -195,21 +198,30 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @Test
-    public void deployABDRAndCreateADefaultBusinessData() throws Exception {
+    public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
+        String secondBizData = "people";
+        processDefinitionBuilder.addBusinessData(secondBizData, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(
+                new OperationBuilder().attachBusinessDataSetAttributeOperation(secondBizData, new ExpressionBuilder().createQueryBusinessDataExpression(
+                        "oneEmployee", GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, EMPLOYEE_QUALIF_CLASSNAME,
+                        new ExpressionBuilder().createConstantStringExpression("lastName", "Doe"))));
 
         final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
-        waitForUserTask("step1", instance.getId());
-        final String employeeToString = getEmployeeToString("myEmployee", instance.getId());
+        HumanTaskInstance userTask = waitForUserTask("step1", processInstance.getId());
+        final String employeeToString = getEmployeeToString("myEmployee", processInstance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
+
+        assignAndExecuteStep(userTask, matti);
+        String people = getEmployeeToString(secondBizData, processInstance.getId());
+        assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -240,7 +252,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @Test(expected = ProcessEnablementException.class)
-    public void deployProcessWithBusinessDataShouldBeRetrievable() throws Exception {
+    public void deployProcessWithWrongBusinessDataTypeShouldNotBeDeployable() throws Exception {
         final User user = createUser("login1", "password");
         ProcessDefinition processDefinition = null;
         try {
@@ -382,7 +394,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
             final BusinessObjectDAO daoImpl = businessObjectDAOFactory.createDAO(apiSession, daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME + "DAOImpl");
 
-            final Method daoMethod = daoImpl.getClass().getMethod("getEmployeeByLastName", String.class);
+            final Method daoMethod = daoImpl.getClass().getMethod(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, String.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
             List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol");
