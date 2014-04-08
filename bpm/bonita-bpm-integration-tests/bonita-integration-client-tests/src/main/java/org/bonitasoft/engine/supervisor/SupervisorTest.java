@@ -76,14 +76,6 @@ public class SupervisorTest extends CommonAPITest {
         logout();
     }
 
-    private void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
-        if (processSupervisors != null) {
-            for (final ProcessSupervisor processSupervisor : processSupervisors) {
-                deleteSupervisor(processSupervisor.getSupervisorId());
-            }
-        }
-    }
-
     private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, InvalidBusinessArchiveFormatException,
             AlreadyExistsException {
         processDefinitions = new ArrayList<ProcessDefinition>();

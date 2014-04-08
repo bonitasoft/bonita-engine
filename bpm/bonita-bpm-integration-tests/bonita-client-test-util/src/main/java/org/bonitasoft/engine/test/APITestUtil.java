@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +91,6 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
 import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCriterion;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
@@ -375,37 +373,6 @@ public class APITestUtil {
             actorList.add(actorName);
         }
         return actorList;
-    }
-
-    private ProcessSupervisor createSupervisorByRole(final long processDefID, final long roleId) throws BonitaException {
-        return getProcessAPI().createProcessSupervisorForRole(processDefID, roleId);
-    }
-
-    private ProcessSupervisor createSupervisorByGroup(final long processDefID, final long groupId) throws BonitaException {
-        return getProcessAPI().createProcessSupervisorForGroup(processDefID, groupId);
-    }
-
-    public Map<String, Object> createSupervisorByRoleAndGroup(final long processDefinitionId, final long userId) throws BonitaException {
-        // add supervisor by role
-        final String developer = "developer";
-        final RoleCreator roleCreator = new RoleCreator(developer);
-        final Role role = getIdentityAPI().createRole(roleCreator);
-        final ProcessSupervisor supervisorByRole = createSupervisorByRole(processDefinitionId, role.getId());
-
-        // add supervisor group
-        final Group group = getIdentityAPI().createGroup("R&D", null);
-        final ProcessSupervisor supervisorByGroup = createSupervisorByGroup(processDefinitionId, group.getId());
-
-        // add supervisor membership
-        final UserMembership membership = getIdentityAPI().addUserMembership(userId, group.getId(), role.getId());
-
-        final HashMap<String, Object> parameters1 = new HashMap<String, Object>();
-        parameters1.put(ROLE_ID_KEY, role);
-        parameters1.put(GROUP_ID_KEY, group);
-        parameters1.put("supervisorByRole", supervisorByRole);
-        parameters1.put("supervisorByGroup", supervisorByGroup);
-        parameters1.put("membership", membership);
-        return parameters1;
     }
 
     /**
@@ -1754,5 +1721,13 @@ public class APITestUtil {
         final byte[] descByteArray = IOUtil.getAllContentFrom(clazz.getResourceAsStream(connectorImplResource));
         businessArchiveBuilder.addConnectorImplementation(new BarResource(fileBaseName + ".impl", descByteArray));
         businessArchiveBuilder.addClasspathResource(buildBarResource(clazz, fileBaseName + ".jar"));
+    }
+
+    public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
+        if (processSupervisors != null) {
+            for (final ProcessSupervisor processSupervisor : processSupervisors) {
+                deleteSupervisor(processSupervisor.getSupervisorId());
+            }
+        }
     }
 }
