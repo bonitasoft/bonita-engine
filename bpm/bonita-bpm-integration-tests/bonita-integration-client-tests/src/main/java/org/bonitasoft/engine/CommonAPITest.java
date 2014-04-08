@@ -93,6 +93,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkNoUsers());
         messages.addAll(checkNoGroups());
         messages.addAll(checkNoRoles());
+        messages.addAll(checkNoSupervisors());
         messages.addAll(checkNoProcessDefinitions());
         messages.addAll(checkNoProcessIntances());
         messages.addAll(checkNoArchivedProcessIntances());

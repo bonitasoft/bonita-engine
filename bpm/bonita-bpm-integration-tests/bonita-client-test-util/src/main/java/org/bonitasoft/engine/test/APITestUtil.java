@@ -69,6 +69,7 @@ import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
@@ -279,7 +280,7 @@ public class APITestUtil {
         }
         return null;
     }
-    
+
     protected User createUser(final String userName, final String password) throws BonitaException {
         return getIdentityAPI().createUser(userName, password);
     }
@@ -1567,6 +1568,23 @@ public class APITestUtil {
                     getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
                 }
                 getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());
+            }
+            messages.add(processBuilder.toString());
+        }
+        return messages;
+    }
+
+    public List<String> checkNoSupervisors() throws SearchException, DeletionException {
+        final List<String> messages = new ArrayList<String>();
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 200);
+        builder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
+        final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done()).getResult();
+
+        if (supervisors.size() > 0) {
+            final StringBuilder processBuilder = new StringBuilder("Process Supervisors are still active: ");
+            for (final ProcessSupervisor supervisor : supervisors) {
+                processBuilder.append(supervisor.getSupervisorId()).append(", ");
+                getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
             }
             messages.add(processBuilder.toString());
         }
