@@ -21,6 +21,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
+import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -289,6 +290,32 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // cleanup
         getProfileAPI().deleteProfile(profileId);
+
+    }
+
+    @Test(expected = ProfileEntryNotFoundException.class)
+    public void deletePage_should_delete_parent_profile_entry() throws BonitaException {
+        // given
+        final Page page = getPageAPI().createPage(
+                new PageCreator("myPageToDelete_" + System.currentTimeMillis(), CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
+                getPageContent(INDEX_GROOVY));
+
+        final Profile createdProfile = getProfileAPI().createProfile("deletePage_should_delete_parent_profile_entry", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME, profileId).setType(ENTRY_TYPE_FOLDER));
+
+        final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
+                        .setPage(page.getName())
+                        .setCustom(new Boolean(true))
+                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                        .setParentId(folderProfileEntry.getId()));
+
+        // when
+        getPageAPI().deletePage(page.getId());
+
+        // then
+        getProfileAPI().getProfileEntry(folderProfileEntry.getId()); // ProfileEntryNotFoundException
 
     }
 

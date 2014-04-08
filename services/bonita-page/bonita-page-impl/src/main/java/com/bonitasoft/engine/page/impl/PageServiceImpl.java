@@ -258,7 +258,26 @@ public class PageServiceImpl implements PageService {
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         for (final SProfileEntry sProfileEntry : searchProfileEntries) {
             profileService.deleteProfileEntry(sProfileEntry.getId());
+            deleteParentIfNoMoreChildren(sProfileEntry);
         }
+    }
+
+    private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry) throws SBonitaSearchException, SProfileEntryNotFoundException,
+            SProfileEntryDeletionException {
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID, sProfileEntry.getProfileId()));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID, sProfileEntry.getParentId()));
+
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, null);
+
+        final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
+        if (null == searchProfileEntries || searchProfileEntries.isEmpty()) {
+            // no more children
+            profileService.deleteProfileEntry(sProfileEntry.getParentId());
+        }
+
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
