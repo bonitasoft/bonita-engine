@@ -26,11 +26,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.data.definition</groupId>
 			<artifactId>bonita-data-definition-model</artifactId>
 			<version>${project.version}</version>
