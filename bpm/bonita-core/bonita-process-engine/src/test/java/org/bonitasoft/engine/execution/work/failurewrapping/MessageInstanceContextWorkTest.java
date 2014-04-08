@@ -51,7 +51,7 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
 
     @Override
     @Before
-    public void before() throws Exception {
+    public void before() throws SBonitaException {
         txBonitawork = spy(new MessageInstanceContextWork(wrappedWork, messageInstance, waitingMessageEvent));
         doReturn(MESSAGE_INSTANCE_NAME).when(messageInstance).getMessageName();
         doReturn(MESSAGE_INSTANCE_TARGET_PROCESS_NAME).when(messageInstance).getTargetProcess();

@@ -25,9 +25,9 @@ import org.bonitasoft.engine.platform.authentication.SInvalidUserException;
  */
 public class PlatformAuthenticationServiceImpl implements PlatformAuthenticationService {
 
-    private final String USERNAME = "platformAdmin";
+    private static final String USERNAME = "platformAdmin";
 
-    private final String PASSWORD = "platform";
+    private static final String PASSWORD = "platform";
 
     private final TechnicalLoggerService logger;
 
@@ -38,18 +38,28 @@ public class PlatformAuthenticationServiceImpl implements PlatformAuthentication
 
     @Override
     public void checkUserCredentials(final String username, final String password) throws SInvalidUserException, SInvalidPasswordException {
-        if(logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)){logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));}
+        final String methodName = "checkUserCredentials";
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+        }
         // FIXME read user and password from a configuration file
         if (!USERNAME.equals(username)) {
-            if(logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)){logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "checkUserCredentials", "Invalid user: " + username));}
-            throw new SInvalidUserException("Invalid user: " + username);
+            logOnExceptionMethod(username, methodName);
+            throw new SInvalidUserException("Invalid user : " + username);
         }
         if (!PASSWORD.equals(password)) {
-            if(logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)){logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "checkUserCredentials", "Invalid user: " + username));}
+            logOnExceptionMethod(username, methodName);
             throw new SInvalidPasswordException("Invalid password");
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+        }
+    }
+
+    private void logOnExceptionMethod(final String username, final String methodName) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, "Invalid user : " + username));
         }
     }
 

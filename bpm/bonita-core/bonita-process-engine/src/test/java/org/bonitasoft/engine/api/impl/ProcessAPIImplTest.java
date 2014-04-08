@@ -198,7 +198,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void getJobParametersShouldConvertMapIntoList() throws Exception {
+    public void getJobParametersShouldConvertMapIntoList() {
         // given:
         Map<String, Serializable> parameters = new HashMap<String, Serializable>(2);
         String key1 = "mon param 1";

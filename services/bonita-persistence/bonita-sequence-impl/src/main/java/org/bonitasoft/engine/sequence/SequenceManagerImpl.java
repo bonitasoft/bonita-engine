@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.lock.LockService;
 
@@ -72,7 +71,7 @@ public class SequenceManagerImpl implements SequenceManager {
     }
 
     @Override
-    public long getNextId(final String entityName, final long tenantId) throws SObjectNotFoundException, SObjectModificationException {
+    public long getNextId(final String entityName, final long tenantId) throws SObjectNotFoundException {
         TenantSequenceManagerImpl mgr = this.sequenceManagers.get(tenantId);
         if (mgr == null) {
             synchronized (mutex) {

@@ -3642,7 +3642,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(sbe);
         }
         return searchedTasksTransaction.getResult();
-
     }
 
     @Override

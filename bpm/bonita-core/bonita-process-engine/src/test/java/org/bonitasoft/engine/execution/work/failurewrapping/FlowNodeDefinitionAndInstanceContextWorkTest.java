@@ -48,7 +48,7 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest extends AbstractContex
 
     @Override
     @Before
-    public void before() throws Exception {
+    public void before() throws SBonitaException {
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
 
         txBonitawork = spy(new FlowNodeDefinitionAndInstanceContextWork(wrappedWork, FLOW_NODE_INSTANCE_ID));

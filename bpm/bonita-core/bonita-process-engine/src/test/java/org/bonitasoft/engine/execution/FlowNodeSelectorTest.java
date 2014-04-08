@@ -34,15 +34,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeSelectorTest {
-    
+
     /**
      * 
      */
@@ -53,43 +51,44 @@ public class FlowNodeSelectorTest {
 
     @Mock
     private SFlowElementContainerDefinition subProcessContainer;
-    
+
     @Mock
     private SProcessDefinition definition;
-    
+
     @Mock
     private SSubProcessDefinition subProcessDefinition;
-    
+
     @Before
     public void setUp() {
         doReturn(rootContainer).when(definition).getProcessContainer();
         doReturn(subProcessDefinition).when(rootContainer).getFlowNode(SUB_PROCESS_DEFINITION_ID);
         doReturn(subProcessContainer).when(subProcessDefinition).getSubProcessContainer();
-        
-        Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>(Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"), creatFlowNode("step3")));
+
+        Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>(Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"),
+                creatFlowNode("step3")));
         doReturn(flowNodes).when(rootContainer).getFlowNodes();
     }
-    
+
     @Test
-    public void getContainer_return_root_container_if_subprocess_id_is_not_set() throws Exception {
+    public void getContainer_return_root_container_if_subprocess_id_is_not_set() {
         FlowNodeSelector selector = new FlowNodeSelector(definition, null);
         assertEquals(rootContainer, selector.getContainer());
     }
 
     @Test
-    public void getContainer_return_subprocess_container_if_subprocess_id_is_set() throws Exception {
+    public void getContainer_return_subprocess_container_if_subprocess_id_is_set() {
         FlowNodeSelector selector = new FlowNodeSelector(definition, null, SUB_PROCESS_DEFINITION_ID);
         assertEquals(subProcessContainer, selector.getContainer());
     }
-    
+
     private SFlowNodeDefinition creatFlowNode(String name) {
         SFlowNodeDefinition flowNodeDefinition = mock(SFlowNodeDefinition.class);
         doReturn(name).when(flowNodeDefinition).getName();
         return flowNodeDefinition;
     }
-    
+
     @Test
-    public void getStartNodes_return_all_selected_elements() throws Exception {
+    public void getStartNodes_return_all_selected_elements() {
         FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition, new FlowNodeNameFilter(Arrays.asList("step1", "step3")));
         assertEquals("[step1, step3]", stringfy(flowNodeSelector.getFilteredElements()));
     }
@@ -102,18 +101,17 @@ public class FlowNodeSelectorTest {
         Collections.sort(elementNames);
         return elementNames.toString();
     }
-    
+
     @Test
-    public void get_process_definition_returns_process_definition_given_in_constructor() throws Exception {
+    public void get_process_definition_returns_process_definition_given_in_constructor() {
         FlowNodeSelector selector = new FlowNodeSelector(definition, null);
         assertEquals(definition, selector.getProcessDefinition());
     }
-    
+
     @Test
-    public void get_subProcess_definition_returns_the_id_given_in_constructor() throws Exception {
+    public void get_subProcess_definition_returns_the_id_given_in_constructor() {
         FlowNodeSelector selector = new FlowNodeSelector(null, null, SUB_PROCESS_DEFINITION_ID);
         assertEquals(SUB_PROCESS_DEFINITION_ID, selector.getSubProcessDefinitionId());
     }
-    
-            
+
 }

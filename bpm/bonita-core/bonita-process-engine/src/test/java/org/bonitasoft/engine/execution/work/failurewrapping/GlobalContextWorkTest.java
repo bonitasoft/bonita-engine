@@ -42,7 +42,7 @@ public class GlobalContextWorkTest extends AbstractContextWorkTest {
 
     @Override
     @Before
-    public void before() throws Exception {
+    public void before() throws SBonitaException {
         txBonitawork = spy(new GlobalContextWork(wrappedWork));
         super.before();
         ((GlobalContextWork) doReturn(THREAD_ID).when(txBonitawork)).retrieveThreadId();

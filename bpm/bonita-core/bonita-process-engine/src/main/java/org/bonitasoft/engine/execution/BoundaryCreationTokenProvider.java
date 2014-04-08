@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
@@ -27,11 +26,11 @@ import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
  */
 public class BoundaryCreationTokenProvider implements TokenProvider {
 
-    private SBoundaryEventDefinition boundaryEventDefinition;
+    private final SBoundaryEventDefinition boundaryEventDefinition;
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
-    private SActivityInstance relatedActivityInstance;
+    private final SActivityInstance relatedActivityInstance;
 
     public BoundaryCreationTokenProvider(SActivityInstance relatedActivityInstance, SBoundaryEventDefinition boundaryEventDefinition, TokenService tokenService) {
         this.boundaryEventDefinition = boundaryEventDefinition;
@@ -40,7 +39,7 @@ public class BoundaryCreationTokenProvider implements TokenProvider {
     }
 
     @Override
-    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
+    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException {
         if (boundaryEventDefinition.isInterrupting()) {
             SToken token = tokenService.getToken(relatedActivityInstance.getParentProcessInstanceId(), relatedActivityInstance.getTokenRefId());
             return new TokenInfo(token.getRefId(), token.getParentRefId());

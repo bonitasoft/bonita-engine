@@ -12,7 +12,7 @@ import org.junit.Test;
 public class DefaultBonitaExecutorServiceFactoryTest {
 
     @Test
-    public void ThreadNameInExecutorServiceShouldContainsTenantId() throws Exception {
+    public void ThreadNameInExecutorServiceShouldContainsTenantId() {
         long tenantId = 999;
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, tenantId, 1,
                 20, 15, 10);

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,17 +21,17 @@ import org.bonitasoft.engine.theme.model.SThemeType;
  */
 public interface SThemeBuilderFactory {
 
-    static String ID = "id";
+    public static final String ID = "id";
 
-    static String CONTENT = "content";
+    public static final String CONTENT = "content";
 
-    static String CSS_CONTENT = "cssContent";
+    public static final String CSS_CONTENT = "cssContent";
 
-    static String LAST_UPDATE_DATE = "lastUpdateDate";
+    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
-    static String TYPE = "type";
+    public static final String TYPE = "type";
 
-    static String IS_DEFAULT = "isDefault";
+    public static final String IS_DEFAULT = "isDefault";
 
     SThemeBuilder createNewInstance(STheme theme);
 

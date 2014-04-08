@@ -23,17 +23,6 @@ public class PlatformServiceTest extends CommonServiceTest {
         TestUtil.closeTransactionIfOpen(getTransactionService());
     }
 
-    private void createDefaultPlatform() throws Exception {
-        getTransactionService().begin();
-        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class)
-                .createNewInstance("defaultVersion", "previousVersion", "initialVersion", "defaultUser", System.currentTimeMillis()).done();
-        getPlatformService().createPlatformTables();
-        getTransactionService().complete();
-        getTransactionService().begin();
-        getPlatformService().createPlatform(platform);
-        getTransactionService().complete();
-    }
-
     @Test
     public void testPlatformBuilder() {
         final String version = "myVersion";
@@ -159,10 +148,6 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created)
                 .done();
-        final EntityUpdateDescriptor dummyDescriptor = new EntityUpdateDescriptor();
-
-        final SPlatform readPlatform = getPlatformService().getPlatform();
-
         final String newCreatedBy = "newCreatedBy";
         final String newInitialVersion = "initialVersion";
         final String newPreviousVersion = "previousVersion";

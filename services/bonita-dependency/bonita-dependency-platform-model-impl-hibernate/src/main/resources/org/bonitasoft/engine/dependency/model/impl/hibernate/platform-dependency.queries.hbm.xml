@@ -44,6 +44,7 @@
 		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping AS pdependencymapping
 		WHERE pdependencymapping.artifactId = :artifactId
 		AND pdependencymapping.artifactType = :artifactType
+		ORDER BY pdependencymapping.id
 	</query>
 
 </hibernate-mapping>

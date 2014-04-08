@@ -17,14 +17,13 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.Test;
 
 /**
@@ -46,15 +45,15 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final WaitForStep exceptionFlowStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
+        final HumanTaskInstance exceptionFlowStep = waitForUserTask("exceptionStep", processInstance);
 
         // execute the task containing the boundary and verify that the normal flow continues
         assignAndExecuteStep(waitForStep1, getUser().getId());
-        final WaitForStep normalFlowStep = waitForStep("step2", processInstance, TestStates.getReadyState());
+        final HumanTaskInstance normalFlowStep = waitForUserTask("step2", processInstance);
 
         // execute exception flow step and normal flow step and verify that the process has finished
-        assignAndExecuteStep(exceptionFlowStep.getResult(), getUser().getId());
-        assignAndExecuteStep(normalFlowStep.getResult(), getUser().getId());
+        assignAndExecuteStep(exceptionFlowStep, getUser().getId());
+        assignAndExecuteStep(normalFlowStep, getUser().getId());
         waitForProcessToFinish(processInstance);
 
         // clean up
@@ -174,14 +173,14 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
+        final HumanTaskInstance exceptionFlowStep = waitForUserTask("exceptionStep", processInstance);
 
         // execute multi-instance and verify that normal flow continues
         executeRemainingParallelMultiInstances(multiTaskName, processInstance, loopCardinality);
         final ActivityInstance normalTask = waitForUserTask(normalTaskName, processInstance);
 
         // execute exception flow and normal flow and verify the process completes
-        assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
+        assignAndExecuteStep(exceptionFlowStep, getUser().getId());
         assignAndExecuteStep(normalTask, getUser().getId());
         waitForProcessToFinish(processInstance);
 

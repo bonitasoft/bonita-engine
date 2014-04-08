@@ -54,12 +54,12 @@ public abstract class BonitaWork implements Runnable, Serializable {
     public void run() {
         try {
             work(new HashMap<String, Object>());
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             throw new IllegalStateException("Exception should be handled by works.", e);
         }
     }
 
-    public abstract void handleFailure(Throwable e, Map<String, Object> context) throws Exception;
+    public abstract void handleFailure(Exception e, Map<String, Object> context) throws Exception;
 
     public long getTenantId() {
         if (tenantId <= 0) {

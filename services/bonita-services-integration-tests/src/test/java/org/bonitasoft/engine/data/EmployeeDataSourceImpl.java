@@ -11,8 +11,6 @@ import org.bonitasoft.engine.data.model.LightEmployee;
 
 public class EmployeeDataSourceImpl implements EmployeeDataSource {
 
-    private Map<String, String> parameters;
-
     // key = employeeId
     private final Map<Long, LightEmployee> employees = new HashMap<Long, LightEmployee>();
 
@@ -22,9 +20,9 @@ public class EmployeeDataSourceImpl implements EmployeeDataSource {
     // key = employeeId, value = list of AddressId
     private final Map<Long, List<Long>> employeeAddressJoinMap = new HashMap<Long, List<Long>>();
 
+    @SuppressWarnings("unused")
     @Override
     public void setParameters(final Map<String, String> dataSourceParameters) {
-        this.parameters = dataSourceParameters;
     }
 
     @Override
@@ -93,14 +91,16 @@ public class EmployeeDataSourceImpl implements EmployeeDataSource {
         this.employeeAddressJoinMap.put(id, addressIds);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean configurationMatches(final DataSourceConfiguration datasourceConfiguration) {
         // TODO Auto-generated method stub
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void configure(final DataSourceConfiguration dataSourceConfiguration) throws SDataSourceInitializationException {
+    public void configure(final DataSourceConfiguration dataSourceConfiguration) {
         // TODO Auto-generated method stub
     }
 

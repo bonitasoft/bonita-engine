@@ -18,8 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -78,8 +76,7 @@ public final class DisableProcess implements TransactionContent {
 
     }
 
-    private void deleteJobs(final SProcessDefinition processDefinition) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException,
-            SSchedulerException {
+    private void deleteJobs(final SProcessDefinition processDefinition) throws SSchedulerException {
         final List<SStartEventDefinition> startEvents = processDefinition.getProcessContainer().getStartEvents();
         for (final SStartEventDefinition startEvent : startEvents) {
             if (!startEvent.getTimerEventTriggerDefinitions().isEmpty()) {

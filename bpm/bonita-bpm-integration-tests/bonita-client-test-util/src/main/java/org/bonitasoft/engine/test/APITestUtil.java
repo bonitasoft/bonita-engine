@@ -833,12 +833,12 @@ public class APITestUtil {
     @Deprecated
     private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
         final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
-        assertTrue("process was not finished", waitUntil);
+        assertTrue("Process was not finished", waitUntil);
         return waitUntil;
     }
 
     @Deprecated
-    protected boolean waitProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
+    protected boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
         return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
