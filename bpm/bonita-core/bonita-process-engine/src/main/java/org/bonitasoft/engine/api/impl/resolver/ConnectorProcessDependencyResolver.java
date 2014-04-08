@@ -34,7 +34,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ConnectorProcessDependencyResolver extends ProcessDependencyResolver {
+public class ConnectorProcessDependencyResolver implements ProcessDependencyResolver {
 
     @SuppressWarnings("unused")
     @Override

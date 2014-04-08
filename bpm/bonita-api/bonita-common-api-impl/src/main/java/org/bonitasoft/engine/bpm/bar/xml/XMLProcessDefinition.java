@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -180,6 +181,12 @@ public class XMLProcessDefinition {
     public static final String STRING_INDEXES = "stringIndexes";
 
     public static final String STRING_INDEX = "stringIndex";
+
+    public static final String BUSINESS_DATA_DEFINITION_NODE = "businessDataDefinition";
+
+    public static final String BUSINESS_DATA_DEFINITIONS_NODE = "businessDataDefinitions";
+
+    public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
     public static final String INDEX = "index";
 
@@ -433,6 +440,15 @@ public class XMLProcessDefinition {
             final XMLNode connectorNode = new XMLNode(CONNECTOR_NODE);
             fillConnectorNode(connectorNode, connector);
             connectorsNode.addChild(connectorNode);
+        }
+        List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
+        if (!businessDataDefinitions.isEmpty()) {
+            final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
+            flowElements.addChild(businessDataDefinitionsNode);
+            for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                final XMLNode businessDataDefinitionNode = getBusinessDataDefinitionNode(businessDataDefinition);
+                businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+            }
         }
         final XMLNode dataDefinitionsNode = new XMLNode(DATA_DEFINITIONS_NODE);
         flowElements.addChild(dataDefinitionsNode);
@@ -839,6 +855,23 @@ public class XMLProcessDefinition {
         userFilterNode.addAttribute(CONNECTOR_VERSION, userFilter.getVersion());
         final Map<String, Expression> inputs = userFilter.getInputs();
         createAndFillInputsNode(userFilterNode, inputs);
+    }
+
+    private XMLNode getBusinessDataDefinitionNode(final BusinessDataDefinition businessDataDefinition) {
+        XMLNode businessDataDefinitionNode = null;
+        businessDataDefinitionNode = new XMLNode(BUSINESS_DATA_DEFINITION_NODE);
+        businessDataDefinitionNode.addAttribute(NAME, businessDataDefinition.getName());
+        businessDataDefinitionNode.addAttribute(DATA_DEFINITION_CLASS, businessDataDefinition.getClassName());
+        if (businessDataDefinition.getDescription() != null) {
+            businessDataDefinitionNode.addChild(DESCRIPTION, businessDataDefinition.getDescription());
+        }
+        Expression defaultValueExpression;
+        if ((defaultValueExpression = businessDataDefinition.getDefaultValueExpression()) != null) {
+            final XMLNode defaultValueNode = new XMLNode(DEFAULT_VALUE_NODE);
+            fillExpressionNode(defaultValueNode, defaultValueExpression, false);
+            businessDataDefinitionNode.addChild(defaultValueNode);
+        }
+        return businessDataDefinitionNode;
     }
 
     private XMLNode getDataDefinitionNode(final DataDefinition dataDefinition) {

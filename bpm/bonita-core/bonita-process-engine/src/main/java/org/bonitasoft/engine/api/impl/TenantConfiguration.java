@@ -18,14 +18,14 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**
- * 
  * Bean that returns configuration
  * 
  * @author Baptiste Mesta
- * 
+ * @author Matthieu Chaffotte
  */
 public class TenantConfiguration {
 
@@ -34,6 +34,8 @@ public class TenantConfiguration {
     private String cleanInvalidSessionsJobCron = "0 0 */2 * * ?";
 
     private List<JobRegister> jobsToRegister;
+
+    private List<TenantLifecycleService> lifecycleServices;
 
     /**
      * Specify how often we look for matching matching event couple
@@ -72,6 +74,14 @@ public class TenantConfiguration {
 
     public void setCleanInvalidSessionsJobCron(final String cleanInvalidSessionsJobCron) {
         this.cleanInvalidSessionsJobCron = cleanInvalidSessionsJobCron;
+    }
+
+    public List<TenantLifecycleService> getLifecycleServices() {
+        return lifecycleServices;
+    }
+
+    public void setLifecycleServices(final List<TenantLifecycleService> lifecycleServices) {
+        this.lifecycleServices = lifecycleServices;
     }
 
 }

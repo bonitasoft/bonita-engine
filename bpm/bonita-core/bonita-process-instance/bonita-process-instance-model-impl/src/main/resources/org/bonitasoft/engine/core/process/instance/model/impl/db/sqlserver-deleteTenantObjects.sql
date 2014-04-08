@@ -18,3 +18,6 @@ DELETE FROM token WHERE tenantid = ${tenantid}
 GO
 DELETE FROM breakpoint WHERE tenantid = ${tenantid}
 GO
+DELETE FROM ref_biz_data_inst WHERE tenantid = ${tenantid}
+GO
+

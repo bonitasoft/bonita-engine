@@ -140,7 +140,7 @@ public class PlatformServiceImpl implements PlatformService {
         // check if the tenant already exists. If yes, throws
         // TenantAlreadyExistException
         STenant existingTenant = null;
-      final   String tenantName = tenant.getName();
+        final String tenantName = tenant.getName();
         try {
             existingTenant = getTenantByName(tenantName);
         } catch (final STenantNotFoundException e) {
@@ -374,7 +374,7 @@ public class PlatformServiceImpl implements PlatformService {
         platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
         } catch (SCacheException e) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Can't cache the platform, maybe the platform cache service is not started yet");
-    }
+        }
     }
 
     private SPlatform readPlatform() throws SPlatformNotFoundException {
@@ -534,8 +534,7 @@ public class PlatformServiceImpl implements PlatformService {
         String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
         if (tenantName != null) {
             try {
-                if (getTenantByName(tenantName).getId() != tenant.getId())
-                {
+                if (getTenantByName(tenantName).getId() != tenant.getId()) {
                     throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
                 }
             } catch (final STenantNotFoundException e) {

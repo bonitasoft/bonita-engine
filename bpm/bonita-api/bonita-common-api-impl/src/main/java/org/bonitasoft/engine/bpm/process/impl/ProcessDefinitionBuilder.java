@@ -144,6 +144,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateFlowNodeName(names, flowElementContainer.getIntermediateCatchEvents());
         validateFlowNodeName(names, flowElementContainer.getIntermediateThrowEvents());
         validateFlowNodeName(names, flowElementContainer.getStartEvents());
+        // validateFlowNodeName(names, flowElementContainer.getBusinessDataDefinitions());
     }
 
     private void validateFlowNodeName(final List<String> names, final Collection<? extends FlowNodeDefinition> flowNodes) {
@@ -262,11 +263,12 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 final MultiInstanceLoopCharacteristics loopCharacteristics = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
                 if (loopCharacteristics.getLoopDataInputRef() != null && !loopCharacteristics.getLoopDataInputRef().isEmpty()
                         && (loopCharacteristics.getLoopDataInputRef() == null || loopCharacteristics.getLoopDataInputRef().isEmpty())) {
-                    designErrors.add("The multi instance havs got a data input reference but has not got a loop data input: on activity" + activity.getName());
+                    designErrors.add("The multi instance has got a data input reference but does not have a loop data input on activity" + activity.getName());
                 }
                 if (loopCharacteristics.getDataOutputItemRef() != null && !loopCharacteristics.getDataOutputItemRef().isEmpty()
                         && (loopCharacteristics.getLoopDataOutputRef() == null || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
-                    designErrors.add("The multi instance has got a data output reference but has not got a loop data output: on activity" + activity.getName());
+                    designErrors
+                            .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
                 }
                 // TODO add validation on data existence
             }

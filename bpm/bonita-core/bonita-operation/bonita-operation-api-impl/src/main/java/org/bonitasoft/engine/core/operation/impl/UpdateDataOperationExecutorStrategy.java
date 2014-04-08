@@ -26,11 +26,11 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Matthieu Chaffotte
  */
-public abstract class UpdateOperationExecutorStrategy implements OperationExecutorStrategy {
+public abstract class UpdateDataOperationExecutorStrategy implements OperationExecutorStrategy {
 
     private final DataInstanceService dataInstanceService;
 
-    public UpdateOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
+    public UpdateDataOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
         this.dataInstanceService = dataInstanceService;
     }
 

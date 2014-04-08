@@ -241,7 +241,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
                 .addOutput(
                         new LeftOperandBuilder().createDataLeftOperand(globalDataName),
-                        OperatorType.ASSIGNMENT, "=", "",
+                        OperatorType.ASSIGNMENT,
+                        "=",
+                        "",
                         new ExpressionBuilder().createGroovyScriptExpression("Script", globalDataName + " + 1", Long.class.getName(),
                                 new ExpressionBuilder().createDataExpression(globalDataName, Long.class.getName())));
 
@@ -1123,42 +1125,6 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // connector restarted
         waitForDataValue(processInstance, "data", "value2");
 
-        disableAndDeleteProcess(processDefinition.getId());
-    }
-
-    @Test
-    @Cover(classes = {}, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode", "connector" }, story = "elements must be restarted when connectors were not completed when the node was shut down")
-    public void restartProcessWithConnector() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTransition", "1.0");
-        builder.addActor(ACTOR_NAME);
-        builder.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("default"));
-        builder.addConnector("myConnector1", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
-                .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addConnector("wait1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(1000));
-        builder.addConnector("wait2", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(500));
-        builder.addConnector("myConnector2", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
-                .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addUserTask("step1", ACTOR_NAME);
-        // start check value1,stop, check still value1, start, check value 2, check step2 is active
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForDataValue(processInstance, "data", "value1");
-        logout();
-        final PlatformSession loginPlatform = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.stopNode();
-        Thread.sleep(300);
-        platformAPI.startNode();
-        logoutPlatform(loginPlatform);
-        login();
-        // connector restarted
-        waitForDataValue(processInstance, "data", "value2");
         disableAndDeleteProcess(processDefinition.getId());
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,8 +16,8 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 
 /**
@@ -37,7 +37,7 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     private List<TenantRestartHandler> tenantRestartHandlers;
 
-    private List<ServiceWithLifecycle> servicesToStart;
+    private List<PlatformLifecycleService> lifecycleServices;
 
     @Override
     public boolean shouldStartScheduler() {
@@ -90,11 +90,12 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     }
 
     @Override
-    public List<ServiceWithLifecycle> getServicesToStart() {
-        return servicesToStart;
+    public List<PlatformLifecycleService> getLifecycleServices() {
+        return lifecycleServices;
     }
 
-    public void setServicesToStart(final List<ServiceWithLifecycle> servicesToStart) {
-        this.servicesToStart = servicesToStart;
+    public void setLifecycleServices(final List<PlatformLifecycleService> lifecycleServices) {
+        this.lifecycleServices = lifecycleServices;
     }
+
 }
