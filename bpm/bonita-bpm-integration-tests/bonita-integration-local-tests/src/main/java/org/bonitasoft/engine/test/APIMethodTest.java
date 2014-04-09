@@ -14,7 +14,6 @@ import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class APIMethodTest {
@@ -40,7 +39,6 @@ public class APIMethodTest {
     }
 
     @Test
-    @Ignore
     public void checkAllMethodsOfProcessAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(ProcessAPIImpl.class);
     }

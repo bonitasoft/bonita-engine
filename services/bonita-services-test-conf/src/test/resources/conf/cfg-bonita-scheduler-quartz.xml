@@ -17,6 +17,7 @@
 				<prop key="org.quartz.dataSource.notManagedDS.jndiURL">${database.sequence.manager.datasource.name}</prop>
 				<prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
 				<prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
+				<prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
 				<prop key="org.quartz.jobStore.misfireThreshold">2000</prop>
 			</props>
 		</constructor-arg>

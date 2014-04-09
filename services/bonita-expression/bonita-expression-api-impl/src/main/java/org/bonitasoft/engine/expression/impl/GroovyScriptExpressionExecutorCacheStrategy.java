@@ -31,6 +31,8 @@ import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrateg
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Zhao na
@@ -50,21 +52,31 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
     private final ClassLoaderService classLoaderService;
 
-    public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService, final ClassLoaderService classLoaderService) {
+    private final TechnicalLoggerService logger;
+
+    public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService, final ClassLoaderService classLoaderService,
+            final TechnicalLoggerService logger) {
         this.cacheService = cacheService;
         this.classLoaderService = classLoaderService;
+        this.logger = logger;
     }
 
     private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
+        final GroovyShell shell = getShell(definitionId);
         /*
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
          * This way we store one script for each thread, it is like a thread local cache.
          */
         final String key = Thread.currentThread().getId() + SCRIPT_KEY + definitionId + expressionContent.hashCode();
-        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME,
-                key);
+        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+
+        if (script != null && script.getClass().getClassLoader() != shell.getClassLoader()) {
+            script = null;
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG))
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Invalidating script from cache because of outdated ClassLoader ...");
+        }
+
         if (script == null) {
-            final GroovyShell shell = getShell(definitionId);
             script = shell.parse(expressionContent);
             cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, script);
         }
@@ -72,17 +84,21 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     }
 
     private GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
-        final String key = SHELL_KEY + definitionId;
-        GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+        String key = null;
+        GroovyShell shell = null;
+        if (definitionId != null) {
+            key = SHELL_KEY + definitionId;
+            shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+        }
         if (shell == null) {
             ClassLoader classLoader;
             if (definitionId != null) {
                 classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
+                cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
             } else {
                 classLoader = Thread.currentThread().getContextClassLoader();
             }
             shell = new GroovyShell(classLoader);
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
         }
         return shell;
     }

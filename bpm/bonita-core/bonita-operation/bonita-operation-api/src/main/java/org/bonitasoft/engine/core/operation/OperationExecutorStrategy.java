@@ -26,11 +26,34 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
  */
 public interface OperationExecutorStrategy {
 
+    /**
+     * @param operation
+     * @param value
+     * @param containerId
+     * @param containerType
+     * @param expressionContext
+     * @return
+     * @throws SOperationExecutionException
+     */
     Object getValue(SOperation operation, Object value, long containerId, String containerType, SExpressionContext expressionContext)
             throws SOperationExecutionException;
 
+    /**
+     * Update the object according to
+     * 
+     * @param sLeftOperand
+     * @param newValue
+     * @param containerId
+     * @param containerType
+     * @throws SOperationExecutionException
+     */
     void update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
 
+    /**
+     * Returns the type of the operation which identifies the strategy among all.
+     * 
+     * @return the operation type
+     */
     String getOperationType();
 
     boolean shouldPerformUpdateAtEnd();

@@ -72,6 +72,7 @@ MessageInstance -> 10017
 PendingActivityMapping -> 10018
 Breakpoint -> 10019
 HiddenTask -> 10095
+RefBusinessDataInstance -> 10096
 
 Datainstance
 IntegerDataInstance -> 10020

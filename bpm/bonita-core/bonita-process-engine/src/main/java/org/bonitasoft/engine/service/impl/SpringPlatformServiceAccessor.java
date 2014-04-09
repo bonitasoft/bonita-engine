@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.util.List;
-
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -68,8 +65,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private NodeConfiguration platformConfguration;
 
     private PlatformCacheService platformCacheService;
-
-    private List<ServiceWithLifecycle> servicesToStart;
 
     @Override
     public TransactionService getTransactionService() {

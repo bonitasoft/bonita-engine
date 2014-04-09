@@ -15,7 +15,7 @@ package org.bonitasoft.engine.scheduler;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -25,7 +25,7 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
  * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface SchedulerService extends ServiceWithLifecycle {
+public interface SchedulerService extends PlatformLifecycleService {
 
     String JOB_DESCRIPTOR = "JOB_DESCRIPTOR";
 
@@ -148,7 +148,6 @@ public interface SchedulerService extends ServiceWithLifecycle {
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
     /**
-     * 
      * Pause all jobs running on the tenant
      * 
      * @param tenantId

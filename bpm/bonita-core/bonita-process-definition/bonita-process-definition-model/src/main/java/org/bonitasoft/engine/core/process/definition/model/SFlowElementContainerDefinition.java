@@ -60,10 +60,11 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     List<SDataDefinition> getDataDefinitions();
 
+    List<SBusinessDataDefinition> getBusinessDataDefinitions();
+
     List<SDocumentDefinition> getDocumentDefinitions();
 
     /**
-     * 
      * @param connectorDefinitionId
      * @return
      * @since 6.1

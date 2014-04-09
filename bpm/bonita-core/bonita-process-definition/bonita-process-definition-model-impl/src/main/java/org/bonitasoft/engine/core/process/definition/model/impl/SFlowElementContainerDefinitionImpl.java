@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -44,6 +45,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -109,6 +111,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     private final List<SDataDefinition> sDataDefinitions;
 
+    private final List<SBusinessDataDefinition> sBusinessDataDefinitions;
+
     private final List<SDocumentDefinition> sDocumentDefinitions;
 
     private SNamedElement elementContainer;
@@ -134,6 +138,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         sIntermediateThrowEvents = new ArrayList<SIntermediateThrowEventDefinition>();
         sEndEvents = new ArrayList<SEndEventDefinition>();
         sDataDefinitions = new ArrayList<SDataDefinition>();
+        sBusinessDataDefinitions = new ArrayList<SBusinessDataDefinition>();
         sDocumentDefinitions = new ArrayList<SDocumentDefinition>();
         sBoundaryEvents = new ArrayList<SBoundaryEventDefinition>();
     }
@@ -183,6 +188,13 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         sIntermediateCatchEvents = initializeIntermediateCatchEvents(container.getIntermediateCatchEvents(), transitionsMap);
         sIntermediateThrowEvents = initializeIntermediateThrowEvents(container.getIntermediateThrowEvents(), transitionsMap);
         sEndEvents = initializeEndEvents(container.getEndEvents(), transitionsMap);
+
+        final List<BusinessDataDefinition> businessDataDefinitions = container.getBusinessDataDefinitions();
+        final ArrayList<SBusinessDataDefinition> mBusinessDataDefinitions = new ArrayList<SBusinessDataDefinition>(businessDataDefinitions.size());
+        for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+            mBusinessDataDefinitions.add(ServerModelConvertor.convertBusinessDataDefinition(businessDataDefinition));
+        }
+        sBusinessDataDefinitions = Collections.unmodifiableList(mBusinessDataDefinitions);
 
         final List<DataDefinition> processDataDefinitions = container.getDataDefinitions();
         final ArrayList<SDataDefinition> mDataDefinitions = new ArrayList<SDataDefinition>(processDataDefinitions.size());
@@ -235,8 +247,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         }
     }
 
-    private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents,
-            final Map<String, STransitionDefinition> transitionsMap) {
+    private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents, final Map<String, STransitionDefinition> transitionsMap) {
         final List<SEndEventDefinition> sEndEvents = new ArrayList<SEndEventDefinition>(endEvents.size());
         for (final EndEventDefinition endEventDefinition : endEvents) {
             final SEndEventDefinitionImpl sEndEvent = new SEndEventDefinitionImpl(endEventDefinition, transitionsMap);
@@ -261,7 +272,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         return sStartEvents;
     }
 
-    private List<SIntermediateCatchEventDefinition> initializeIntermediateCatchEvents(final List<IntermediateCatchEventDefinition> intermediateCatchEvents, final Map<String, STransitionDefinition> transitionsMap) {
+    private List<SIntermediateCatchEventDefinition> initializeIntermediateCatchEvents(final List<IntermediateCatchEventDefinition> intermediateCatchEvents,
+            final Map<String, STransitionDefinition> transitionsMap) {
         final List<SIntermediateCatchEventDefinition> sIntermediateCatchEvents = new ArrayList<SIntermediateCatchEventDefinition>(
                 intermediateCatchEvents.size());
         for (final IntermediateCatchEventDefinition intermediateCatchEventDefinition : intermediateCatchEvents) {
@@ -352,6 +364,10 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         allElements.add(intermediateThrowEvent);
         allElementsMap.put(intermediateThrowEvent.getId(), intermediateThrowEvent);
         allElementsMapString.put(intermediateThrowEvent.getName(), intermediateThrowEvent);
+    }
+
+    public void addBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
+        sBusinessDataDefinitions.add(businessDataDefinition);
     }
 
     public void addDataDefinition(final SDataDefinition dataDefinition) {
@@ -497,6 +513,11 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     @Override
     public List<SEndEventDefinition> getEndEvents() {
         return sEndEvents;
+    }
+
+    @Override
+    public List<SBusinessDataDefinition> getBusinessDataDefinitions() {
+        return sBusinessDataDefinitions;
     }
 
     @Override
