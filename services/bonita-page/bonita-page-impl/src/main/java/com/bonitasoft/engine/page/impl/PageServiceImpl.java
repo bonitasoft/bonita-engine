@@ -258,7 +258,9 @@ public class PageServiceImpl implements PageService {
         final List<SProfileEntry> searchProfileEntries = profileService.searchProfileEntries(queryOptions);
         for (final SProfileEntry sProfileEntry : searchProfileEntries) {
             profileService.deleteProfileEntry(sProfileEntry.getId());
-            deleteParentIfNoMoreChildren(sProfileEntry);
+            if (sProfileEntry.getParentId() > 0) {
+                deleteParentIfNoMoreChildren(sProfileEntry);
+            }
         }
     }
 

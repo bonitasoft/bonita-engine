@@ -304,7 +304,7 @@ public class PageAPIIT extends CommonAPISPTest {
         final long profileId = createdProfile.getId();
         final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME, profileId).setType(ENTRY_TYPE_FOLDER));
 
-        final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
+        getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
                         .setPage(page.getName())
                         .setCustom(new Boolean(true))
@@ -316,6 +316,37 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // then
         getProfileAPI().getProfileEntry(folderProfileEntry.getId()); // ProfileEntryNotFoundException
+
+    }
+
+    @Test
+    public void deletePage_with_no_parent_profile_entry() throws BonitaException {
+        // given
+        final Page page = getPageAPI().createPage(
+                new PageCreator("myPageToDelete_" + System.currentTimeMillis(), CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName("My Päge"),
+                getPageContent(INDEX_GROOVY));
+
+        final Profile createdProfile = getProfileAPI().createProfile("deletePage_should_delete_parent_profile_entry", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+
+        getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME, profileId).setType(ENTRY_TYPE_LINK)
+                .setPage(page.getName())
+                .setCustom(new Boolean(true))
+                .setDescription(DESCRIPTION_CUSTOM_PAGE));
+
+        // when
+        getPageAPI().deletePage(page.getId());
+
+        // then
+        final SearchOptionsBuilder builderAfterDelete = new SearchOptionsBuilder(0, 20);
+        builderAfterDelete.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builderAfterDelete.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
+
+        final List<ProfileEntry> resultProfileEntriesAfterDelete = getProfileAPI().searchProfileEntries(builderAfterDelete.done()).getResult();
+        assertThat(resultProfileEntriesAfterDelete).as("profile should have no empty").isEmpty();
+
+        // cleanup
+        getProfileAPI().deleteProfile(profileId);
 
     }
 
