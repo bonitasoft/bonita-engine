@@ -398,7 +398,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityReadException
      *             if a Read exception occurs
      */
-    long getNumberOfArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search UserTask instances assigned for a specific supervisor
@@ -424,7 +424,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityReadException
      *             if a Read exception occurs
      */
-    List<SAHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SAHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Gets the archive instance of the activity according to its identifier at a given state.

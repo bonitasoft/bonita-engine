@@ -89,7 +89,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl implements ActivityInstanceService {
+public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl implements ActivityInstanceService {
 
     private static final String SUPERVISED_BY = "SupervisedBy";
 
@@ -499,7 +499,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
             return getPersistenceRead().getNumberOfEntities(SAHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
@@ -547,7 +547,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SAHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
             return getPersistenceRead().searchEntity(SAHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
