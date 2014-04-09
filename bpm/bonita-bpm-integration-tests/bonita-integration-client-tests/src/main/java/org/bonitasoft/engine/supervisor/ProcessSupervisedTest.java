@@ -15,16 +15,23 @@ package org.bonitasoft.engine.supervisor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.category.Category;
-import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
+import org.bonitasoft.engine.bpm.category.CategoryCriterion;
+import org.bonitasoft.engine.bpm.document.ArchivedDocument;
+import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
@@ -33,11 +40,13 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -55,6 +64,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +87,9 @@ public class ProcessSupervisedTest extends CommonAPITest {
 
     private ProcessDefinition definition;
 
-    private List<ProcessDefinition> definitions;
+    private List<ProcessDefinition> processDefinitions;
+
+    private List<ProcessInstance> processInstances;
 
     private ProcessSupervisor supervisorForUser;
 
@@ -98,17 +110,10 @@ public class ProcessSupervisedTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
         definition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
-        definitions = new ArrayList<ProcessDefinition>();
-        definitions.add(definition);
+        processDefinitions = new ArrayList<ProcessDefinition>();
+        processDefinitions.add(definition);
 
-        // Three tasks
-        final ProcessInstance processInstance1 = getProcessAPI().startProcess(definition.getId());
-        final ProcessInstance processInstance2 = getProcessAPI().startProcess(definition.getId());
-        final ProcessInstance processInstance3 = getProcessAPI().startProcess(definition.getId());
-        waitForUserTaskAndAssigneIt("userTask1", processInstance1, john);
-        waitForUserTaskAndAssigneIt("userTask1", processInstance2, john);
-        waitForUserTask("userTask1", processInstance3);
-
+        // Create supervisors
         supervisorForUser = getProcessAPI().createProcessSupervisorForUser(definition.getId(), matti.getId());
         assertEquals(definition.getId(), supervisorForUser.getProcessDefinitionId());
 
@@ -127,12 +132,21 @@ public class ProcessSupervisedTest extends CommonAPITest {
         supervisors.add(supervisorForGroup);
         supervisors.add(supervisorForRole);
         supervisors.add(supervisorForUser);
+
+        // Three tasks
+        processInstances = new ArrayList<ProcessInstance>();
+        processInstances.add(getProcessAPI().startProcess(definition.getId()));
+        processInstances.add(getProcessAPI().startProcess(definition.getId()));
+        processInstances.add(getProcessAPI().startProcess(definition.getId()));
+        waitForUserTaskAndAssigneIt("userTask1", processInstances.get(0), john);
+        waitForUserTaskAndAssigneIt("userTask1", processInstances.get(1), john);
+        waitForUserTask("userTask1", processInstances.get(2));
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
         deleteSupervisors(supervisors);
-        disableAndDeleteProcess(definitions);
+        disableAndDeleteProcess(processDefinitions);
         getIdentityAPI().deleteUserMembership(membership.getId());
         getIdentityAPI().deleteUser(john.getId());
         getIdentityAPI().deleteUser(matti.getId());
@@ -209,7 +223,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
             processBuilder.addActor(actorName).addDescription("actor description" + i);
             final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", actorName).getProcess();
             final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, john);
-            definitions.add(processDefinition1);
+            processDefinitions.add(processDefinition1);
             proDefIds.add(processDefinition1.getId());
         }
 
@@ -233,16 +247,14 @@ public class ProcessSupervisedTest extends CommonAPITest {
         // two processDefinitions for sales
         getProcessAPI().addProcessDefinitionsToCategory(category2.getId(), new ArrayList<Long>(proDefIds.subList(3, proDefIds.size())));
 
-        final int pageNum = 10;
-
         // test get all process Definitions without filter
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, pageNum);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.DESC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(john.getId(), builder.done());
         assertEquals(5, searchRes.getCount());
 
         // test search in order
-        final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, pageNum);
+        final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
         builder1.filter(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, category1.getId());
         builder1.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.DESC);
 
@@ -255,7 +267,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals(proDefIds.get(1).longValue(), processDeploymentInfos1.get(1).getProcessId());
 
         // test term
-        final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, pageNum);
+        final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
         builder2.filter(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, category2.getId());
         builder2.searchTerm("My_Process4"); // use name as term
 
@@ -274,18 +286,12 @@ public class ProcessSupervisedTest extends CommonAPITest {
     @SuppressWarnings("unchecked")
     public void searchCommentsSupervisedBy() throws Exception {
         // prepare commentContent
-        final String commentContent1 = "commentContent1";
-        final String commentContent2 = "commentContent2";
-        final String commentContent3 = "commentContent3";
-        final String commentContent4 = "commentContent4";
-        final String commentContent5 = "commentContent5";
-
-        final ProcessInstance pi0 = getProcessAPI().startProcess(definitions.get(0).getId());
+        final ProcessInstance processInstance3 = processInstances.get(2);
 
         // add comment to processInstance
-        getProcessAPI().addProcessComment(pi0.getId(), commentContent1);
-        getProcessAPI().addProcessComment(pi0.getId(), commentContent2);
-        getProcessAPI().addProcessComment(pi0.getId(), commentContent3);
+        getProcessAPI().addProcessComment(processInstance3.getId(), "commentContent1");
+        getProcessAPI().addProcessComment(processInstance3.getId(), "commentContent2");
+        getProcessAPI().addProcessComment(processInstance3.getId(), "commentContent3");
 
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "2.0");
@@ -293,30 +299,159 @@ public class ProcessSupervisedTest extends CommonAPITest {
         processBuilder2.addActor(ACTOR_NAME).addUserTask("temporize", ACTOR_NAME);
         final DesignProcessDefinition designprocessDefinition2 = processBuilder2.done();
         final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, ACTOR_NAME, matti);
-        definitions.add(definition2);
+        processDefinitions.add(definition2);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
-        getProcessAPI().addProcessComment(pi1.getId(), commentContent4);
-        getProcessAPI().addProcessComment(pi1.getId(), commentContent5);
+        getProcessAPI().addProcessComment(pi1.getId(), "commentContent4");
+        getProcessAPI().addProcessComment(pi1.getId(), "commentContent5");
 
         // create supervisor for definition2
-        final ProcessSupervisor createdSupervisor2 = getProcessAPI().createProcessSupervisorForUser(definition2.getId(), john.getId());
-        assertEquals(definition2.getId(), createdSupervisor2.getProcessDefinitionId());
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForUser(definition2.getId(), john.getId());
+        supervisors.add(supervisor);
+        assertEquals(definition2.getId(), supervisor.getProcessDefinitionId());
 
         final Map<String, Serializable> parameters1 = new HashMap<String, Serializable>();
-        final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
         parameters1.put(SUPERVISOR_ID_CMD_KEY, matti.getId());
-        parameters1.put("SEARCH_OPTIONS_KEY", builder1.done());
+        parameters1.put("SEARCH_OPTIONS_KEY", new SearchOptionsBuilder(0, 10).done());
         final SearchResult<Serializable> searchResult1 = (SearchResult<Serializable>) getCommandAPI().execute(SEARCH_S_COMMENT_SUPERVISED_BY, parameters1);
         assertEquals(3, searchResult1.getCount());
 
         final Map<String, Serializable> parameters2 = new HashMap<String, Serializable>();
-        final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
-        builder2.sort(SearchCommentsDescriptor.ID, Order.ASC);
         parameters2.put(SUPERVISOR_ID_CMD_KEY, john.getId());
-        parameters2.put("SEARCH_OPTIONS_KEY", builder2.done());
+        parameters2.put("SEARCH_OPTIONS_KEY", new SearchOptionsBuilder(0, 10).done());
         final SearchResult<Serializable> searchResult2 = (SearchResult<Serializable>) getCommandAPI().execute(SEARCH_S_COMMENT_SUPERVISED_BY, parameters2);
         assertEquals(2, searchResult2.getCount());
     }
 
+    @Test
+    public void searchDocumentsSupervisedBy() throws Exception {
+        final ProcessInstance processInstance = processInstances.get(2);
+        buildAndAttachDocument(processInstance);
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
+        final SearchResult<Document> documentSearch = getProcessAPI().searchDocumentsSupervisedBy(john.getId(), searchOptionsBuilder.done());
+        assertEquals(1, documentSearch.getCount());
+        assertEquals(processInstance.getId(), documentSearch.getResult().get(0).getProcessInstanceId());
+        assertEquals(john.getId(), documentSearch.getResult().get(0).getAuthor());
+    }
+
+    @Test
+    public void searchPendingTasksSupervisedBy() throws Exception {
+        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstances.get(2).getId(), 0, 10);
+        final long activityInstanceId = activities.get(0).getId();
+
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        final SearchResult<HumanTaskInstance> result = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions.done());
+        assertNotNull(result);
+        assertEquals(1, result.getCount());
+        final List<HumanTaskInstance> humanTaskInstanceList = result.getResult();
+        assertNotNull(humanTaskInstanceList);
+        assertEquals(1, humanTaskInstanceList.size());
+        assertEquals(activityInstanceId, humanTaskInstanceList.get(0).getId());
+    }
+
+    @Test
+    public void searchArchivedDocumentsSupervisedBy() throws BonitaException {
+        final ProcessInstance processInstance2 = processInstances.get(1);
+        final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance2);
+        final Document doc = buildDocument(beforeUpdate.getName());
+        // attach new document to generate archive of the previous one:
+        getProcessAPI().attachNewDocumentVersion(processInstance2.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
+                "contentOfTheDoc".getBytes());
+        final Document afterUpdate = getAttachmentWithoutItsContent(processInstance2);
+        getProcessAPI().getDocumentAtProcessInstantiation(processInstance2.getId(), afterUpdate.getName());
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance2.getId());
+        searchOptionsBuilder.sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC);
+        final SearchResult<ArchivedDocument> documentSearch = getProcessAPI().searchArchivedDocumentsSupervisedBy(matti.getId(), searchOptionsBuilder.done());
+        assertEquals(1, documentSearch.getCount());
+        assertEquals(processInstance2.getId(), documentSearch.getResult().get(0).getProcessInstanceId());
+        assertEquals(matti.getId(), documentSearch.getResult().get(0).getDocumentAuthor());
+    }
+
+    @Test
+    public void searchUncategorizedProcessDefinitionsSupervisedBy() throws Exception {
+        // create process1
+        final String processName1 = "processDefinition1";
+        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName1, "1.1",
+                Arrays.asList("step1_1", "step1_2"), Arrays.asList(true, true));
+        processDefinitions.add(deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, matti));
+
+        // create process2
+        final String processName2 = "processDefinition2";
+        final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName2, "1.2",
+                Arrays.asList("step2_1", "step2_2"), Arrays.asList(true, true));
+        processDefinitions.add(deployAndEnableWithActor(designProcessDefinition2, ACTOR_NAME, matti));
+
+        // create supervisor
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(1).getId(), john.getId()));
+        supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(2).getId(), matti.getId()));
+
+        // add categories to processDefinition1
+        final ArrayList<Long> categoryIds = new ArrayList<Long>();
+        final Category c1 = getProcessAPI().createCategory("category1", "categoryDescription1");
+        final Category c2 = getProcessAPI().createCategory("category2", "categoryDescription2");
+        final Category c3 = getProcessAPI().createCategory("category3", "categoryDescription3");
+        categoryIds.add(c1.getId());
+        categoryIds.add(c2.getId());
+        categoryIds.add(c3.getId());
+        getProcessAPI().addCategoriesToProcess(processDefinitions.get(0).getId(), categoryIds);
+        final List<Category> categories = getProcessAPI()
+                .getCategoriesOfProcessDefinition(processDefinitions.get(0).getId(), 0, 10, CategoryCriterion.NAME_ASC);
+        assertTrue(!categories.isEmpty());
+
+        // Get all process definitions:
+        final SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 5);
+        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
+        SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        assertEquals(3, searchRes0.getCount());
+
+        // Get all process definitions with no category associated, supervised by user:
+        searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfosSupervisedBy(matti.getId(), optsBuilder.done());
+        assertEquals(1, searchRes0.getCount());
+        assertEquals(processDefinitions.get(2).getId(), searchRes0.getResult().get(0).getProcessId());
+        assertEquals("processDefinition2", searchRes0.getResult().get(0).getName());
+
+        searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfosSupervisedBy(john.getId(), optsBuilder.done());
+        assertEquals(1, searchRes0.getCount());
+        assertEquals(processDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
+        assertEquals("processDefinition2", searchRes0.getResult().get(0).getName());
+    }
+
+    @Test
+    public void searchOpenProcessInstancesSupervisedBy() throws Exception {
+        final ProcessInstance instance = processInstances.get(2);
+
+        // prepare search options
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(matti.getId(), searchOptions.done());
+        assertNotNull(result);
+        assertEquals(3, result.getCount());
+        final List<ProcessInstance> processInstanceList = result.getResult();
+        assertNotNull(processInstanceList);
+        assertEquals(3, processInstanceList.size());
+        assertEquals(instance.getId(), processInstanceList.get(2).getId());
+    }
+
+    @Test
+    public void searchArchivedProcessInstancesSupervisedBy() throws Exception {
+        final ProcessInstance processInstance = processInstances.get(2);
+
+        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
+        for (final ActivityInstance activityInstance : activityInstances) {
+            final long activityInstanceId = activityInstance.getId();
+            skipTask(activityInstanceId);
+        }
+
+        waitForProcessToFinishAndBeArchived(processInstance);
+
+        // test supervisor
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        final SearchResult<ArchivedProcessInstance> sapi = getProcessAPI().searchArchivedProcessInstancesSupervisedBy(matti.getId(), builder.done());
+        assertEquals(1, sapi.getCount());
+        final List<ArchivedProcessInstance> archivedProcessInstanceList = sapi.getResult();
+        assertEquals(processInstance.getId(), archivedProcessInstanceList.get(0).getSourceObjectId());
+    }
 }

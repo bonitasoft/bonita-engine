@@ -34,6 +34,8 @@ import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.DocumentCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
@@ -65,6 +67,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.DocumentBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
@@ -1730,4 +1733,47 @@ public class APITestUtil {
             }
         }
     }
+
+    public void buildAndAttachDocument(final ProcessInstance processInstance) throws BonitaException {
+        final String documentName = String.valueOf(System.currentTimeMillis());
+        final Document doc = buildDocument(documentName);
+        buildAndAttachDocument(processInstance, documentName, doc.getContentFileName());
+    }
+
+    public void buildAndAttachDocument(final ProcessInstance processInstance, final String documentName, final String fileName) throws BonitaException {
+        final Document doc = buildDocument(documentName);
+        getProcessAPI().attachDocument(processInstance.getId(), documentName, fileName, doc.getContentMimeType(), documentName.getBytes());
+    }
+
+    public String getAttachmentDocumentName(final ProcessInstance processInstance) throws BonitaException {
+        final Document attachment = getAttachmentWithoutItsContent(processInstance);
+        return attachment.getName();
+    }
+
+    public Document getAttachmentWithoutItsContent(final ProcessInstance processInstance) throws BonitaException {
+        final List<Document> attachments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 1, DocumentCriterion.DEFAULT);
+        assertTrue("No attachments found!", attachments != null && attachments.size() == 1);
+        return attachments.get(0);
+    }
+
+    public ProcessInstance deployAndEnableWithActorAndStartIt(final BusinessArchive businessArchive, final User user) throws BonitaException {
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        assertTrue(processInstance != null);
+        return processInstance;
+    }
+
+    public Document buildDocument(final String documentName) {
+        final String now = String.valueOf(System.currentTimeMillis());
+        final String fileName = now + ".txt";
+        final DocumentBuilder builder = new DocumentBuilder().createNewInstance(documentName, false);
+        builder.setFileName(fileName);
+        builder.setContentMimeType("plain/text");
+        return builder.done();
+    }
+
+    public byte[] generateContent(final Document doc) {
+        return doc.getName().getBytes();
+    }
+
 }

@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        ProcessSupervisedTest.class,
+        // ProcessSupervisedTest.class,
         SupervisorTest.class
 })
 public class SupervisorTests {
