@@ -406,7 +406,7 @@ import org.bonitasoft.engine.search.process.SearchProcessInstances;
 import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfos;
 import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosUserCanStart;
-import org.bonitasoft.engine.search.supervisor.SearchArchivedHumanTasksSupervisedBy;
+import org.bonitasoft.engine.search.supervisor.SearchArchivedTasksSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchAssignedTasksSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchProcessDeploymentInfosSupervised;
 import org.bonitasoft.engine.search.supervisor.SearchSupervisors;
@@ -3689,7 +3689,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
-        final SearchArchivedHumanTasksSupervisedBy searchedTasksTransaction = new SearchArchivedHumanTasksSupervisedBy(supervisorId, activityInstanceService,
+        final SearchArchivedTasksSupervisedBy searchedTasksTransaction = new SearchArchivedTasksSupervisedBy(supervisorId, activityInstanceService,
                 flowNodeStateManager, searchEntitiesDescriptor.getSearchArchivedHumanTaskInstanceDescriptor(), searchOptions);
 
         try {
