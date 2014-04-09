@@ -10,18 +10,17 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.bonitasoft.engine.BOMBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -43,53 +42,26 @@ public class SchemaManagerTest {
         schemaManager = new SchemaManager(modelConfiguration, loggerService);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
-        try {
-            jdbcTemplate.update("drop table ComplexInvoice");
-        } catch (final Exception e) {
-            // e.printStackTrace();
-        }
-        try {
-            jdbcTemplate.update("drop table ConstrainedItem");
-        } catch (final Exception e) {
-        }
-    }
-
     @Test
-    public void executeScriptsABOMShouldWorkWithAllSupportedTypes() throws Exception {
+    public void executeUpdateAndDropScriptsShouldWorkWithAllSupportedTypes() throws Exception {
         final BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithAllSupportedTypes();
-        final List<Exception> updateExceptions = schemaManager.update(bom.getBusinessObjectsClassNames());
-        if (!updateExceptions.isEmpty()) {
-            fail("Upating schema fails due to: " + updateExceptions);
-        }
+        updateAndDropSchema(bom);
     }
 
     @Test
-    public void executeScriptsABOMShouldSupportConstraints() throws Exception {
+    public void executeUpdateAndDropScriptsShouldSupportConstraints() throws Exception {
         final BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithConstrainedFields();
+        updateAndDropSchema(bom);
+    }
+
+    protected void updateAndDropSchema(final BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
         final List<Exception> updateExceptions = schemaManager.update(bom.getBusinessObjectsClassNames());
         if (!updateExceptions.isEmpty()) {
             fail("Upating schema fails due to: " + updateExceptions);
         }
-    }
-
-    @Test
-    public void executeDropScriptsABOMShouldWorkWithAllSupportedTypes() throws Exception {
-        final BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithAllSupportedTypes();
         final List<Exception> dropExceptions = schemaManager.drop(bom.getBusinessObjectsClassNames());
         if (!dropExceptions.isEmpty()) {
             fail("Upating schema fails due to: " + dropExceptions);
-        }
-    }
-
-    @Test
-    public void executedropScriptsABOMShouldSupportConstraints() throws Exception {
-        final BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithConstrainedFields();
-        final List<Exception> exceptions = schemaManager.drop(bom.getBusinessObjectsClassNames());
-        if (!exceptions.isEmpty()) {
-            fail("Upating schema fails due to: " + exceptions);
         }
     }
 
