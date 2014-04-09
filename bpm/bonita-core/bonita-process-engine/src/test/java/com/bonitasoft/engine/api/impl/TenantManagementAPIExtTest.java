@@ -325,7 +325,7 @@ public class TenantManagementAPIExtTest {
         doReturn(accessor).when(tenantManagementAPI).getTenantAccessor();
         when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
 
-        tenantManagementAPI.uninstallBusinessDataRepository();
+        tenantManagementAPI.uninstallBusinessDataModel();
 
         verify(repository).uninstall(anyLong());
     }
@@ -339,7 +339,7 @@ public class TenantManagementAPIExtTest {
         when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
         doThrow(new SBusinessDataRepositoryException("error")).when(repository).uninstall(anyLong());
 
-        tenantManagementAPI.uninstallBusinessDataRepository();
+        tenantManagementAPI.uninstallBusinessDataModel();
     }
 
     @Test

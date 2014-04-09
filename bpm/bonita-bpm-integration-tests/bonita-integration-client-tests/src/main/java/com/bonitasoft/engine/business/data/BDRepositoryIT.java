@@ -105,7 +105,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
         getTenantManagementAPI().pause();
-        getTenantManagementAPI().installBusinessDataRepository(zip);
+        getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
     }
 
@@ -115,7 +115,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
-            getTenantManagementAPI().cleanAndUninstallBusinessDataRepository();
+            getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
 
@@ -125,6 +125,9 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Test
     public void deployABDRAndCreateABusinessData() throws Exception {
+
+        assertThat(getTenantManagementAPI().getBusinessDataModelVersion()).isNotEmpty();
+
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
@@ -362,7 +365,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         login();
         getTenantManagementAPI().pause();
-        getTenantManagementAPI().uninstallBusinessDataRepository();
+        getTenantManagementAPI().uninstallBusinessDataModel();
         getTenantManagementAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);

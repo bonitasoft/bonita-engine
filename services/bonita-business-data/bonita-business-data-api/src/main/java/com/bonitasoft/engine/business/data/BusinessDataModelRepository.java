@@ -40,4 +40,13 @@ public interface BusinessDataModelRepository {
     byte[] getClientBDMZip() throws SBusinessDataRepositoryException;
 
     void dropAndUninstall(long tenantId) throws SBusinessDataRepositoryException;
+
+    /**
+     * Returns the currently deployed BDM version, or null if no BDM is deployed.
+     * 
+     * @return the currently deployed BDM version, or null if no BDM is deployed.
+     * @throws SBusinessDataRepositoryException
+     *             if the BDM cannot be retrieved.
+     */
+    String getInstalledBDMVersion() throws SBusinessDataRepositoryException;
 }

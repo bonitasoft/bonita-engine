@@ -120,7 +120,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
         getTenantManagementAPI().pause();
-        getTenantManagementAPI().installBusinessDataRepository(zip);
+        getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
         logout();
         loginWith(USERNAME, PASSWORD);
@@ -152,7 +152,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         login();
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
-            getTenantManagementAPI().uninstallBusinessDataRepository();
+            getTenantManagementAPI().uninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
         deleteUser(businessUser.getId());

@@ -97,6 +97,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         return new File(clientStoragePath, CLIENT_BDM_ZIP_NAME);
     }
 
+    @Override
+    public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
+        List<SDependency> searchBDMDependencies = searchBDMDependencies();
+        if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
+            return String.valueOf(searchBDMDependencies.get(0).getId());
+        }
+        return null;
+    }
+
     private List<SDependency> searchBDMDependencies() throws SBusinessDataRepositoryException {
         try {
             final QueryOptions queryOptions = new QueryOptions(asList(new FilterOption(SDependency.class, "name", BDR_DEPENDENCY_NAME)), null);

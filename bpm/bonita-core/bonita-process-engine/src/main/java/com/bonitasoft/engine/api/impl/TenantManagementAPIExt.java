@@ -206,12 +206,23 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     @Override
+    @AvailableWhenTenantIsPaused
+    public String getBusinessDataModelVersion() throws BusinessDataRepositoryException {
+        try {
+            final BusinessDataModelRepository modelRepository = getTenantAccessor().getBusinessDataModelRepository();
+            return modelRepository.getInstalledBDMVersion();
+        } catch (final SBusinessDataRepositoryException e) {
+            throw new BusinessDataRepositoryException(e);
+        }
+    }
+
+    @Override
     @AvailableWhenTenantIsPaused(only = true)
-    public void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
+    public String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            bdmRepository.install(zip, tenantAccessor.getTenantId());
+            return bdmRepository.install(zip, tenantAccessor.getTenantId());
         } catch (final IllegalStateException e) {
             throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {
@@ -221,7 +232,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableWhenTenantIsPaused(only = true)
-    public void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException {
+    public void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
@@ -233,7 +244,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableWhenTenantIsPaused(only = true)
-    public void cleanAndUninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException {
+    public void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
