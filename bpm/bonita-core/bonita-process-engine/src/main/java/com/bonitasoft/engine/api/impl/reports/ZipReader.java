@@ -19,7 +19,7 @@ import java.security.SecureRandom;
  * Created by Vincent Elcrin
  * Date: 03/12/13
  * Time: 08:48
- *
+ * 
  * TODO change implementation to use @{java.util.zip.ZipFile}
  */
 public class ZipReader {
@@ -50,11 +50,11 @@ public class ZipReader {
     }
 
     private String generateRandomFileName(String name) {
-        return removeExtension(name, ".zip") +  "-" + random.nextLong();
+        return removeExtension(name, ".zip") + "-" + random.nextLong();
     }
 
     private String removeExtension(String name, String extension) {
-        if(name.contains(extension)) {
+        if (name.contains(extension)) {
             return name.replaceAll(extension, "");
         }
         return name;

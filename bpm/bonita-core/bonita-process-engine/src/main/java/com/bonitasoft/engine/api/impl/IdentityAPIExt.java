@@ -47,7 +47,8 @@ public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.WEB_ORGANIZATION_EXCHANGE);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService());
+        int maxResults = 100;
+        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults);
         try {
             exportOrganization.execute();
             return exportOrganization.getResult();

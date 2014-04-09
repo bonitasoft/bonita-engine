@@ -37,29 +37,15 @@
 			<artifactId>bonita-common-api-impl-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-common-util-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-<!-- 			<plugin> -->
-<!-- 				<artifactId>maven-javadoc-plugin</artifactId> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>javadoc-jar</id> -->
-<!-- 						<phase>package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>jar</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<includeDependencySources>true</includeDependencySources> -->
-<!-- 							<dependencySourceIncludes> -->
-<!-- 								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude> -->
-<!-- 								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude> -->
-<!-- 							</dependencySourceIncludes> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -77,6 +63,7 @@
 									<include>org.bonitasoft.engine.api:bonita-common-api-ejb2</include>
 									<include>com.bonitasoft.engine.api:bonita-common-api-sp</include>
 									<include>com.bonitasoft.engine.api:bonita-common-api-impl-sp</include>
+									<include>com.bonitasoft.engine.util:bonita-common-util-sp</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${project.build.directory}</outputDirectory>

@@ -153,35 +153,27 @@ public class APITestSPUtil extends APITestUtil {
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(userName, password, tenantId));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
+        setAPIs();
     }
 
     @Override
     protected void loginWith(final String userName, final String password) throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant(userName, password));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        setAPIs();
     }
 
     @Override
     protected void login() throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant());
+        setAPIs();
+    }
+
+    protected void login(final long tenantId) throws BonitaException {
+        setSession(SPBPMTestUtil.loginTenant(tenantId));
+        setAPIs();
+    }
+
+    private void setAPIs() throws BonitaException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
@@ -192,19 +184,6 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
-    }
-
-    protected void login(final long tenantId) throws BonitaException {
-        setSession(SPBPMTestUtil.loginTenant(tenantId));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
     }
 
     @Override
@@ -219,6 +198,8 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(null);
         setReportingAPI(null);
         setCommandAPI(null);
+        setTenantManagementAPI(null);
+        logAPI = null;
     }
 
     protected boolean containsLogWithActionType(final List<Log> logs, final String actionType, final int minimalFrequency) {
@@ -258,7 +239,7 @@ public class APITestSPUtil extends APITestUtil {
             // retry 50 ms after because the might still be some jobs/works that run
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 throw new MonitoringException("interrupted while sleeping");
             }
             numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();

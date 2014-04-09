@@ -47,7 +47,7 @@
 		<copy todir="${basedir}/target/home">
 			<fileset dir="${bos_home}/hibernate" excludes="**/.svn" />
 		</copy>
-		<copy todir="${basedir}/target/home">
+		<copy todir="${basedir}/target/home" overwrite="true">
 			<fileset dir="${basedir}/base" excludes="**/.svn" />
 		</copy>
 		<echo>Override specific Hibernate SP configuration</echo>
@@ -71,6 +71,7 @@
 				<linecontains>
 					<contains value="version>"/>
 				</linecontains>
+				<headfilter lines="1"/>
 				<replaceregex pattern=".*&lt;version&gt;(.*)&lt;/version&gt;.*" replace="\1" />
 			</filterchain>
 		</loadfile>

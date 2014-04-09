@@ -18,6 +18,7 @@ import com.bonitasoft.engine.service.impl.LicenseChecker;
 public class ProtectedReport extends DefaultReport {
 
     private String feature;
+
     private LicenseChecker checker;
 
     protected ProtectedReport(String name, String feature, LicenseChecker checker) {

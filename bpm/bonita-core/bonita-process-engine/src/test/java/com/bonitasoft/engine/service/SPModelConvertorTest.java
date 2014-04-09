@@ -1,10 +1,7 @@
 package com.bonitasoft.engine.service;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.junit.Test;
 
@@ -35,15 +32,6 @@ public class SPModelConvertorTest {
         assertThat(tenant.getIconName()).isEqualTo(iconName);
         assertThat(tenant.getIconPath()).isEqualTo(iconPath);
         assertThat(tenant.getState()).isEqualTo(status);
-    }
-
-    @Test
-    public void defaultTenantMaintenanceModeIsFalse() throws Exception {
-        final STenant sTenant = BuilderFactory.get(STenantBuilderFactory.class)
-                .createNewInstance("model_conversion", "Scoobidoo", 4874411255L, "activated", false).done();
-        Tenant tenant = SPModelConvertor.toTenant(sTenant);
-
-        assertThat(tenant.isInMaintenance()).isEqualTo(false);
     }
 
 }
