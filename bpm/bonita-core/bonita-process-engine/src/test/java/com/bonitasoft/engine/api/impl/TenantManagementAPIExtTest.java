@@ -298,22 +298,21 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void installBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
-        final Method method = TenantManagementAPIExt.class.getMethod("installBusinessDataRepository", byte[].class);
+        final Method method = TenantManagementAPIExt.class.getMethod("installBusinessDataModel", byte[].class);
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.only();
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataRepository(byte[])'")
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataModel(byte[])'")
                 .isTrue();
     }
 
     @Test
     public void uninstallBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
-        final Method method = TenantManagementAPIExt.class.getMethod("uninstallBusinessDataRepository");
+        final Method method = TenantManagementAPIExt.class.getMethod("uninstallBusinessDataModel");
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.only();
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataRepository()'")
-                .isTrue();
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataModel()'").isTrue();
 
     }
 
@@ -331,7 +330,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test(expected = BusinessDataRepositoryException.class)
-    public void uninstallBusinessDataRepositoryThrowException() throws Exception {
+    public void uninstallBusinessDataModelThrowException() throws Exception {
         final TenantServiceAccessor accessor = mock(TenantServiceAccessor.class);
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
