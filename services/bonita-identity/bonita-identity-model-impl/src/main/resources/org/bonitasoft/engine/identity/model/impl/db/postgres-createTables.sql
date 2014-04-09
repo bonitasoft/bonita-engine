@@ -79,25 +79,28 @@ ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenanti
 CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal);
 
 
-CREATE TABLE p_metadata_def (
+CREATE TABLE custom_usr_inf_def (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(75) NOT NULL,
   description TEXT,
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name);
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name);
 
-CREATE TABLE p_metadata_val (
+CREATE TABLE custom_usr_inf_val (
+  id INT8 NOT NULL,
   tenantid INT8 NOT NULL,
-  metadataName VARCHAR(50) NOT NULL,
-  userName VARCHAR(50) NOT NULL,
-  value VARCHAR(50),
-  PRIMARY KEY (tenantid, metadataName, userName)
+  definitionId INT8 NOT NULL,
+  userId INT8 NOT NULL,
+  value VARCHAR(255),
+  UNIQUE (tenantid, definitionId, userId),
+  PRIMARY KEY (tenantid, id)
 );
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE user_membership (
   tenantid INT8 NOT NULL,

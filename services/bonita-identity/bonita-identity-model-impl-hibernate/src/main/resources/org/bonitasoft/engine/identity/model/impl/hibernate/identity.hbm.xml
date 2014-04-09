@@ -88,24 +88,23 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SProfileMetadataDefinitionImpl" table="p_metadata_def">
+	<class name="SCustomUserInfoDefinitionImpl" table="custom_usr_inf_def">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
 		<property name="name" type="java.lang.String" column="name" />
-		<property name="displayName" type="java.lang.String" column="displayName" />
 		<property name="description" type="java.lang.String" column="description" />
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SProfileMetadataValueImpl" table="p_metadata_val">
+	<class name="SCustomUserInfoValueImpl" table="custom_usr_inf_val">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
-		<property name="metadataName" type="java.lang.String" column="metadataName" />
-		<property name="userName" type="java.lang.String" column="userName" />
+		<property name="definitionId" type="long" column="definitionId" />
+		<property name="userId" type="long" column="userId" />
 		<property name="value" type="java.lang.String" column="value" />
 		<filter name="tenantFilter" />
 	</class>

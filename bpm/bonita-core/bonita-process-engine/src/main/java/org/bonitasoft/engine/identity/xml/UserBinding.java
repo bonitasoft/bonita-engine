@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.xml;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.identity.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.ExportedUserBuilder;
 import org.bonitasoft.engine.identity.ExportedUserBuilderFactory;
 import org.bonitasoft.engine.xml.ElementBinding;
@@ -69,11 +70,15 @@ public class UserBinding extends ElementBinding {
             if (personalData != null) {
                 userBuilder.setPersonalData(personalData.getContactData());
             }
-        }
-        if (OrganizationMappingConstants.PROFESSIONAL_DATA.equals(name)) {
+        } else if (OrganizationMappingConstants.PROFESSIONAL_DATA.equals(name)) {
             final XMLContactDataMapping professionalData = (XMLContactDataMapping) value;
             if (professionalData != null) {
                 userBuilder.setProfessionalData(professionalData.getContactData());
+            }
+        } else if (OrganizationMappingConstants.CUSTOM_USER_INFO_VALUE.equals(name)) {
+            final ExportedCustomUserInfoValue customUserInfoValue = (ExportedCustomUserInfoValue) value;
+            if (customUserInfoValue != null) {
+                userBuilder.addCustomUserInfoValue(customUserInfoValue);
             }
         }
     }

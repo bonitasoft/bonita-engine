@@ -25,6 +25,6 @@ public interface SProfileMetadataValueLogBuilderFactory extends HasCRUDEActionFa
 
     String getIdentityUserNameKey();
 
-    String getProfileMetadataDefinitionNameKey();
+    String getCustomUserInfoDefinitionNameKey();
 
 }

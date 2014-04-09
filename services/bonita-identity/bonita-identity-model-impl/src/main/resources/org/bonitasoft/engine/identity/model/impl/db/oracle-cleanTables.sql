@@ -1,8 +1,8 @@
 DELETE FROM user_membership;
 
-DELETE FROM p_metadata_val;
+DELETE FROM custom_usr_inf_val;
 
-DELETE FROM p_metadata_def;
+DELETE FROM custom_usr_inf_def;
 
 DELETE FROM user_contactinfo;
 
