@@ -41,10 +41,12 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
+import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.operation.Operation;
@@ -53,6 +55,8 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ProcessSupervisedTest extends CommonAPITest {
@@ -65,10 +69,28 @@ public class ProcessSupervisedTest extends CommonAPITest {
 
     private User matti;
 
+    private UserMembership membership;
+
+    private Role role;
+
+    private Group group;
+
     private ProcessDefinition definition;
 
-    public void init() throws Exception {
+    private List<ProcessDefinition> definitions;
+
+    private ProcessSupervisor supervisorForUser;
+
+    private ProcessSupervisor supervisorForRole;
+
+    private ProcessSupervisor supervisorForGroup;
+
+    private List<ProcessSupervisor> supervisors;
+
+    @Before
+    public void before() throws Exception {
         login();
+
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");
 
@@ -76,6 +98,8 @@ public class ProcessSupervisedTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
         definition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        definitions = new ArrayList<ProcessDefinition>();
+        definitions.add(definition);
 
         // Three tasks
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(definition.getId());
@@ -85,21 +109,40 @@ public class ProcessSupervisedTest extends CommonAPITest {
         waitForUserTaskAndAssigneIt("userTask1", processInstance2, john);
         waitForUserTask("userTask1", processInstance3);
 
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(definition.getId(), matti.getId());
-        assertEquals(definition.getId(), createdSupervisor.getProcessDefinitionId());
+        supervisorForUser = getProcessAPI().createProcessSupervisorForUser(definition.getId(), matti.getId());
+        assertEquals(definition.getId(), supervisorForUser.getProcessDefinitionId());
+
+        // add supervisor by role
+        role = getIdentityAPI().createRole(new RoleCreator("developer"));
+        supervisorForRole = getProcessAPI().createProcessSupervisorForRole(definition.getId(), role.getId());
+
+        // add supervisor group
+        group = getIdentityAPI().createGroup("R&D", null);
+        supervisorForGroup = getProcessAPI().createProcessSupervisorForGroup(definition.getId(), group.getId());
+
+        // add supervisor membership
+        membership = getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
+
+        supervisors = new ArrayList<ProcessSupervisor>();
+        supervisors.add(supervisorForGroup);
+        supervisors.add(supervisorForRole);
+        supervisors.add(supervisorForUser);
     }
 
-    public void destroy() throws BonitaException {
-        disableAndDeleteProcess(definition);
+    @After
+    public void after() throws BonitaException, BonitaHomeNotSetException {
+        deleteSupervisors(supervisors);
+        disableAndDeleteProcess(definitions);
+        getIdentityAPI().deleteUserMembership(membership.getId());
         getIdentityAPI().deleteUser(john.getId());
         getIdentityAPI().deleteUser(matti.getId());
+        getIdentityAPI().deleteGroup(group.getId());
+        getIdentityAPI().deleteRole(role.getId());
         logout();
     }
 
     @Test
     public void superviseMyAssignedTasks() throws Exception {
-        init();
-
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
         builder.filter("state", "ready");
@@ -111,38 +154,10 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
         assertEquals("userTask1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
-
-        // add supervisor by role and group
-        final User supervisor = createUser("supervisor", "bpm");
-        final Map<String, Object> map = createSupervisorByRoleAndGroup(definition.getId(), supervisor.getId());
-        final ProcessSupervisor supervisorByRole = (ProcessSupervisor) map.get("supervisorByRole");
-        final ProcessSupervisor supervisorByGroup = (ProcessSupervisor) map.get("supervisorByGroup");
-        final Role role = (Role) map.get("roleId");
-        final Group group = (Group) map.get("groupId");
-        final UserMembership membership = (UserMembership) map.get("membership");
-        assertEquals(supervisorByRole.getRoleId(), role.getId());
-        assertEquals(supervisorByGroup.getGroupId(), group.getId());
-        assertEquals(membership.getUserId(), supervisor.getId());
-        assertEquals(membership.getRoleId(), role.getId());
-        assertEquals(membership.getGroupId(), group.getId());
-
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(definition.getId(), supervisor.getId());
-        assertEquals(definition.getId(), createdSupervisor.getProcessDefinitionId());
-
-        final SearchResult<HumanTaskInstance> searchResult1 = getProcessAPI().searchAssignedTasksSupervisedBy(supervisor.getId(), builder.done());
-        assertEquals(2, searchResult1.getResult().size());
-        final UserTaskInstance taskInstance1 = (UserTaskInstance) searchResult1.getResult().get(0);
-        assertEquals("userTask1", taskInstance1.getName());
-        assertEquals(john.getId(), taskInstance1.getAssigneeId());
-
-        deleteRoleGroupSupervisor(map, supervisor.getId());
-        deleteUser(supervisor);
-        destroy();
     }
 
     @Test
     public void superviseMyArchivedTask() throws Exception {
-        init();
         final List<HumanTaskInstance> instanceList = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         HumanTaskInstance humanTaskInstance = instanceList.get(0);
         // one archive tasks
@@ -170,41 +185,10 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals("userTask1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
         assertEquals(ActivityStates.COMPLETED_STATE, taskInstance.getState());
-
-        // add supervisor by role and group
-        final User supervisor = createUser("supervisor", "bpm");
-        final Map<String, Object> map = createSupervisorByRoleAndGroup(definition.getId(), supervisor.getId());
-        final ProcessSupervisor supervisorByRole = (ProcessSupervisor) map.get("supervisorByRole");
-        final ProcessSupervisor supervisorByGroup = (ProcessSupervisor) map.get("supervisorByGroup");
-        final Role role = (Role) map.get("roleId");
-        final Group group = (Group) map.get("groupId");
-        final UserMembership membership = (UserMembership) map.get("membership");
-        assertEquals(supervisorByRole.getRoleId(), role.getId());
-        assertEquals(supervisorByGroup.getGroupId(), group.getId());
-        assertEquals(membership.getUserId(), supervisor.getId());
-        assertEquals(membership.getRoleId(), role.getId());
-        assertEquals(membership.getGroupId(), group.getId());
-
-        final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(definition.getId(), supervisor.getId());
-        assertEquals(definition.getId(), createdSupervisor.getProcessDefinitionId());
-
-        final SearchResult<ArchivedHumanTaskInstance> searchResult1 = getProcessAPI().searchArchivedHumanTasksSupervisedBy(supervisor.getId(), builder.done());
-        assertEquals(1, searchResult1.getCount());
-        assertEquals(1, searchResult1.getResult().size());
-        final ArchivedUserTaskInstance taskInstance1 = (ArchivedUserTaskInstance) searchResult.getResult().get(0);
-        assertEquals("userTask1", taskInstance1.getName());
-        assertEquals(john.getId(), taskInstance.getAssigneeId());
-        assertEquals(ActivityStates.COMPLETED_STATE, taskInstance.getState());
-
-        deleteRoleGroupSupervisor(map, supervisor.getId());
-        deleteUser(supervisor);
-        destroy();
     }
 
     @Test
     public void getPendingTasksSupervisedBy() throws Exception {
-        init();
-
         final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC).done();
         final SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions);
         assertEquals(1, searchResult.getCount());
@@ -212,17 +196,10 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final HumanTaskInstance taskInstance = tasks.get(0);
         assertEquals("userTask1", taskInstance.getName());
         assertEquals(0, taskInstance.getAssigneeId());
-        destroy();
     }
 
     @Test
     public void searchProcessDefinitionsSupervisedBy() throws Exception {
-        login();
-
-        final String username = "matti";
-        final String password = "suomenlinna";
-        final User user = createUser(username, password);
-
         // create processDefintions
         final List<Long> proDefIds = new ArrayList<Long>();
         final int num = 5;
@@ -231,13 +208,14 @@ public class ProcessSupervisedTest extends CommonAPITest {
             final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process" + i, "1." + i);
             processBuilder.addActor(actorName).addDescription("actor description" + i);
             final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", actorName).getProcess();
-            final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+            final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, john);
+            definitions.add(processDefinition1);
             proDefIds.add(processDefinition1.getId());
         }
 
         // add same supervisors
         for (int i = num - 1; i > 0; i--) {
-            getProcessAPI().createProcessSupervisorForUser(proDefIds.get(i), user.getId());
+            supervisors.add(getProcessAPI().createProcessSupervisorForUser(proDefIds.get(i), john.getId()));
         }
 
         // create category hr
@@ -260,15 +238,15 @@ public class ProcessSupervisedTest extends CommonAPITest {
         // test get all process Definitions without filter
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, pageNum);
         builder.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.DESC);
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(user.getId(), builder.done());
-        assertEquals(4, searchRes.getCount());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(john.getId(), builder.done());
+        assertEquals(5, searchRes.getCount());
 
         // test search in order
         final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, pageNum);
         builder1.filter(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, category1.getId());
         builder1.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.DESC);
 
-        final SearchResult<ProcessDeploymentInfo> searchRes1 = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(user.getId(), builder1.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes1 = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(john.getId(), builder1.done());
         assertEquals(2, searchRes1.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos1 = searchRes1.getResult();
         assertNotNull(processDeploymentInfos1);
@@ -281,26 +259,20 @@ public class ProcessSupervisedTest extends CommonAPITest {
         builder2.filter(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, category2.getId());
         builder2.searchTerm("My_Process4"); // use name as term
 
-        final SearchResult<ProcessDeploymentInfo> searchRes2 = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(user.getId(), builder2.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes2 = getProcessAPI().searchProcessDeploymentInfosSupervisedBy(john.getId(), builder2.done());
         assertEquals(1, searchRes2.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos2 = searchRes2.getResult();
         assertNotNull(processDeploymentInfos2);
         assertEquals(1, processDeploymentInfos2.size());
         assertEquals(proDefIds.get(4).longValue(), processDeploymentInfos2.get(0).getProcessId());
 
-        for (final Long pid : proDefIds) {
-            disableAndDeleteProcess(pid);
-        }
         getProcessAPI().deleteCategory(category1.getId());
         getProcessAPI().deleteCategory(category2.getId());
-        getIdentityAPI().deleteUser(user.getId());
-        logout();
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void searchCommentsSupervisedBy() throws Exception {
-        login();
         // prepare commentContent
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
@@ -308,19 +280,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final String commentContent4 = "commentContent4";
         final String commentContent5 = "commentContent5";
 
-        // create two user
-        matti = createUser("matti", "bpm");
-        john = createUser("john", "bpm");
-
-        // login with user and create a processDefinition
-        loginWith("matti", "bpm");
-
-        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder1.addDescription("definition1 description");
-        processBuilder1.addActor(ACTOR_NAME).addUserTask("temporize", ACTOR_NAME);
-        final DesignProcessDefinition designprocessDefinition1 = processBuilder1.done();
-        final ProcessDefinition definition1 = deployAndEnableWithActor(designprocessDefinition1, ACTOR_NAME, matti);
-        final ProcessInstance pi0 = getProcessAPI().startProcess(definition1.getId());
+        final ProcessInstance pi0 = getProcessAPI().startProcess(definitions.get(0).getId());
 
         // add comment to processInstance
         getProcessAPI().addProcessComment(pi0.getId(), commentContent1);
@@ -333,14 +293,11 @@ public class ProcessSupervisedTest extends CommonAPITest {
         processBuilder2.addActor(ACTOR_NAME).addUserTask("temporize", ACTOR_NAME);
         final DesignProcessDefinition designprocessDefinition2 = processBuilder2.done();
         final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, ACTOR_NAME, matti);
+        definitions.add(definition2);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
         getProcessAPI().addProcessComment(pi1.getId(), commentContent4);
         getProcessAPI().addProcessComment(pi1.getId(), commentContent5);
-
-        // create supervisor for definition1
-        final ProcessSupervisor createdSupervisor1 = getProcessAPI().createProcessSupervisorForUser(definition1.getId(), matti.getId());
-        assertEquals(definition1.getId(), createdSupervisor1.getProcessDefinitionId());
 
         // create supervisor for definition2
         final ProcessSupervisor createdSupervisor2 = getProcessAPI().createProcessSupervisorForUser(definition2.getId(), john.getId());
@@ -360,12 +317,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         parameters2.put("SEARCH_OPTIONS_KEY", builder2.done());
         final SearchResult<Serializable> searchResult2 = (SearchResult<Serializable>) getCommandAPI().execute(SEARCH_S_COMMENT_SUPERVISED_BY, parameters2);
         assertEquals(2, searchResult2.getCount());
-
-        disableAndDeleteProcess(definition1);
-        disableAndDeleteProcess(definition2);
-        getIdentityAPI().deleteUser(john.getId());
-        getIdentityAPI().deleteUser(matti.getId());
-        logout();
     }
 
 }
