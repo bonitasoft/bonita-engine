@@ -1,6 +1,5 @@
 package com.bonitasoft.engine.business.data;
 
-
 /**
  * @author Colin PUY
  */
@@ -13,10 +12,11 @@ public interface BusinessDataModelRepository {
      *            the Business Data Model, as a jar containing the Business Object classes to deploy.
      * @param tenantId
      *            the ID of the tenant to deploy the Business Data Model to.
+     * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
      *             if a deployment exception occurs.
      */
-    void install(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
+    String install(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
     /**
      * Undeploy Business Data Model from specified tenant

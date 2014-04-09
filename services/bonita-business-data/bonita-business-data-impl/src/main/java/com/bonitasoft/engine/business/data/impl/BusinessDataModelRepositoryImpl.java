@@ -117,14 +117,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public void install(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
+    public String install(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createClientBDMZip(model);
-        createAndDeployServerBDMJar(tenantId, model, bdmZip);
+        long bdmVersion = createAndDeployServerBDMJar(tenantId, model, bdmZip);
+        return String.valueOf(bdmVersion);
     }
 
-    protected void createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model, final byte[] bdmZip)
+    protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model, final byte[] bdmZip)
             throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         final SDependency sDependency = createSDependency(tenantId, serverBdmJar);
@@ -133,6 +134,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
             dependencyService.createDependencyMapping(sDependencyMapping);
             update(model.getBusinessObjectsClassNames());
+            return sDependency.getId();
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
