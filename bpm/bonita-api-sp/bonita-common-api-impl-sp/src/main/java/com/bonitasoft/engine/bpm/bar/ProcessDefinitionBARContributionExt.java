@@ -14,13 +14,14 @@ import java.io.IOException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class ProcessDefinitionBARContributionExt extends org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution {
+public class ProcessDefinitionBARContributionExt extends ProcessDefinitionBARContribution {
 
     @Override
     protected String getProcessInfos(final String infos) {
@@ -44,4 +45,5 @@ public class ProcessDefinitionBARContributionExt extends org.bonitasoft.engine.b
             }
         }
     }
+
 }

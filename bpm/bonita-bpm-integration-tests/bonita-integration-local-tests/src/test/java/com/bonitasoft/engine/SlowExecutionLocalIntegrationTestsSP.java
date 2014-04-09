@@ -20,7 +20,6 @@ import org.bonitasoft.engine.event.TimerEventSubProcessTest;
 import org.bonitasoft.engine.event.TimerEventTest;
 import org.bonitasoft.engine.platform.PlatformLoginTest;
 import org.bonitasoft.engine.platform.PlatformTest;
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -33,13 +32,7 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         TestShadesSP.class,
-        // Same suites as in LocalIntegrationTestsSP below:
-        BPMSPTests.class,
-        BPMLocalSuiteTests.class,
-        LocalLogTest.class,
-        APIMethodSPTest.class,
-        ConnectorExecutionTimeOutTest.class,
-        ConnectorImplementationLocalSPTest.class,
+        LocalIntegrationTestsSP.class,
 
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventTest.class,
@@ -58,9 +51,10 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
         SPPlatformTest.class,
         SPTimerBoundaryEventTest.class,
         SPIdentityTests.class,
-        SPProcessManagementTest.class
+        TenantPauseTestSP.class,
+        SPProcessManagementTest.class, 
 })
 @Initializer(TestsInitializerSP.class)
-public class SlowExecutionLocalIntegrationTestsSP extends LocalIntegrationTestsSP {
+public class SlowExecutionLocalIntegrationTestsSP {
 
 }

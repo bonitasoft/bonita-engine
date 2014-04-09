@@ -8,9 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.process.impl;
 
+import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.BusinessDataDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
-
 
 /**
  * @author Baptiste Mesta
@@ -29,6 +30,10 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
 
     public void setStringIndex(final int index, final String label, final Expression initialValue) {
         process.setStringIndex(index, label, initialValue);
+    }
+
+    public BusinessDataDefinitionBuilder addBusinessData(final String name, final String className, final Expression defaultValue) {
+        return new BusinessDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
     }
 
 }

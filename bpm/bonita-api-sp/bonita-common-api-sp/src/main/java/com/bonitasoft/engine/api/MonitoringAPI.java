@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.session.InvalidSessionException;
+
 import com.bonitasoft.engine.monitoring.MonitoringException;
 
 /**
@@ -38,7 +40,9 @@ public interface MonitoringAPI {
      *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @deprecated since 6.3.0, use {@link ProcessAPI#getNumberOfProcessInstances()}
      */
+    @Deprecated
     long getNumberOfExecutingProcesses() throws MonitoringException;
 
     /**
