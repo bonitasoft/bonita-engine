@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -94,6 +95,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -113,6 +115,7 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
+import org.bonitasoft.engine.search.supervisor.SearchArchivedFlowNodeInstanceSupervisedBy;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
@@ -1087,6 +1090,24 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (SBonitaSearchException e) {
             throw new RetrieveException(e);
         }
+    }
+
+    @Override
+    public SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedBy(final long supervisorId, final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchArchivedFlowNodeInstanceSupervisedBy searchedTasksTransaction = new SearchArchivedFlowNodeInstanceSupervisedBy(supervisorId,
+                activityInstanceService, flowNodeStateManager, searchEntitiesDescriptor.getSearchArchivedFlowNodeInstanceDescriptor(), searchOptions);
+
+        try {
+            searchedTasksTransaction.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        return searchedTasksTransaction.getResult();
     }
 
 }
