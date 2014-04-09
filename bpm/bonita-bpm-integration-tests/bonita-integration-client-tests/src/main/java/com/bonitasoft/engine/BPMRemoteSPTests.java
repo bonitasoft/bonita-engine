@@ -24,7 +24,7 @@ import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
-import com.bonitasoft.engine.supervisor.SupervisorTest;
+import com.bonitasoft.engine.supervisor.SupervisedTests;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
@@ -35,7 +35,7 @@ import com.bonitasoft.engine.supervisor.SupervisorTest;
         ExternalCommandsTestSP.class,
         MultiInstanceTest.class,
         ProcessTests.class,
-        SupervisorTest.class,
+        SupervisedTests.class,
         ProfileTests.class,
         RemoteConnectorExecutionTestSP.class,
         MonitoringAPITest.class,
