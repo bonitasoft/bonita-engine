@@ -3,7 +3,6 @@ package com.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
@@ -25,12 +24,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.FieldType;
-import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.client.ClientBDMCodeGenerator;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
@@ -51,7 +44,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Before
     public void setUp() throws Exception {
-        BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObjectModel bom = new BusinessObjectModel();
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         destDir = new File(System.getProperty("java.io.tmpdir"), "generationDir");
         destDir.mkdirs();
@@ -81,11 +74,9 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final JDefinedClass definedClass = bdmCodeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
         assertThat(definedClass).isNotNull();
         assertThat(definedClass._package().name()).isEqualTo("org.bonitasoft.hr");
-        assertThat(definedClass._implements()).hasSize(2);
+        assertThat(definedClass._implements()).hasSize(1);
         final Iterator<JClass> it = definedClass._implements();
-        JClass jClass = it.next();
-        assertThat(jClass.fullName()).isEqualTo(Serializable.class.getName());
-        jClass = it.next();
+        final JClass jClass = it.next();
         assertThat(jClass.fullName()).isEqualTo(com.bonitasoft.engine.bdm.Entity.class.getName());
         assertThat(definedClass.annotations()).hasSize(2);
         final Iterator<JAnnotationUse> iterator = definedClass.annotations().iterator();
@@ -117,7 +108,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setType(FieldType.STRING);
         nameField.setLength(Integer.valueOf(45));
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        bdmCodeGenerator.addBasicField(definedClass, nameField);
+        bdmCodeGenerator.addField(definedClass, nameField);
 
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
         assertThat(nameFieldVar).isNotNull();
@@ -151,7 +142,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setType(FieldType.DATE);
         nameField.setNullable(Boolean.FALSE);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        bdmCodeGenerator.addBasicField(definedClass, nameField);
+        bdmCodeGenerator.addField(definedClass, nameField);
 
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
         assertThat(nameFieldVar).isNotNull();
@@ -181,7 +172,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        final JFieldVar basicField = bdmCodeGenerator.addBasicField(definedClass, nameField);
+        final JFieldVar basicField = bdmCodeGenerator.addField(definedClass, nameField);
 
         bdmCodeGenerator.addAccessors(definedClass, basicField);
 
@@ -201,7 +192,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         foundField.setName("found");
         foundField.setType(FieldType.BOOLEAN);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        final JFieldVar basicField = bdmCodeGenerator.addBasicField(definedClass, foundField);
+        final JFieldVar basicField = bdmCodeGenerator.addField(definedClass, foundField);
 
         bdmCodeGenerator.addAccessors(definedClass, basicField);
 
@@ -295,7 +286,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setName("description");
         nameField.setType(FieldType.TEXT);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        bdmCodeGenerator.addBasicField(definedClass, nameField);
+        bdmCodeGenerator.addField(definedClass, nameField);
 
         final JFieldVar nameFieldVar = definedClass.fields().get("description");
         assertTextField(nameFieldVar);
@@ -310,10 +301,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
 
-        Query query = new Query("findByName", "From Employee e WHERE e.name = :name", List.class.getName());
+        final Query query = new Query("findByName", "From Employee e WHERE e.name = :name", List.class.getName());
         query.addQueryParameter("name", String.class.getName());
         employeeBO.getQueries().add(query);
-        BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
@@ -334,7 +325,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.getFields().add(lastnameField);
 
         employeeBO.addUniqueConstraint("TOTO", "firstName", "lastName");
-        BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);

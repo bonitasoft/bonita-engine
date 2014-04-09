@@ -58,6 +58,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "getEmployeeByLastName";
 
+    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "getEmployeeByPhoneNumber";
+
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
 
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
@@ -77,18 +79,28 @@ public class BDRepositoryIT extends CommonAPISPTest {
         lastName.setType(FieldType.STRING);
         lastName.setNullable(Boolean.FALSE);
 
+        final Field phoneNumbers = new Field();
+        phoneNumbers.setName("phoneNumbers");
+        phoneNumbers.setType(FieldType.STRING);
+        phoneNumbers.setLength(Integer.valueOf(10));
+        phoneNumbers.setCollection(Boolean.TRUE);
+
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
         employee.addField(firstName);
         employee.addField(lastName);
+        employee.addField(phoneNumbers);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
 
-        final Query addQuery = employee.addQuery(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, "SELECT e FROM Employee e WHERE e.lastName=:lastName",
+        final Query getEmployeesByLastName = employee.addQuery(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, "SELECT e FROM Employee e WHERE e.lastName=:lastName",
                 List.class.getName());
-        addQuery.addQueryParameter("lastName", String.class.getName());
+        getEmployeesByLastName.addQueryParameter("lastName", String.class.getName());
+        final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
+                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
+        getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
@@ -207,7 +219,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
-        String secondBizData = "people";
+        final String secondBizData = "people";
         processDefinitionBuilder.addBusinessData(secondBizData, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(
@@ -218,12 +230,12 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
-        HumanTaskInstance userTask = waitForUserTask("step1", processInstance.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance.getId());
         final String employeeToString = getEmployeeToString("myEmployee", processInstance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 
         assignAndExecuteStep(userTask, matti);
-        String people = getEmployeeToString(secondBizData, processInstance.getId());
+        final String people = getEmployeeToString(secondBizData, processInstance.getId());
         assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 
         disableAndDeleteProcess(definition.getId());
@@ -435,7 +447,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME);
 
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; e.addToPhoneNumbers('78945612'); return e;",
+                EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("BizDataAndConnector", "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);

@@ -25,7 +25,6 @@ import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;
@@ -60,7 +59,6 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
 
     @Override
     protected void addBOMFile(final File directory, final BusinessObjectModel bom) throws IOException, JAXBException, SAXException {
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
         final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
         IOUtil.write(new File(directory, "bom.xml"), bomXML);

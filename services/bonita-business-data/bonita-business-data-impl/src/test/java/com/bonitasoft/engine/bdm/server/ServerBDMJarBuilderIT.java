@@ -27,4 +27,12 @@ public class ServerBDMJarBuilderIT {
         bdmJarBuilder.build(builder.buildComplex(), TrueFileFilter.TRUE);
     }
 
+    @Test
+    public void jar_builder_should_goes_well_without_errors_with_queries2() throws Exception {
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
+        final BOMBuilder builder = new BOMBuilder();
+        bdmJarBuilder.build(builder.buildPerson(), TrueFileFilter.TRUE);
+    }
+
 }

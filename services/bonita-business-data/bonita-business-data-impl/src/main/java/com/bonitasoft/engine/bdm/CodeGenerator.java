@@ -14,10 +14,15 @@ import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.SourceVersion;
+import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
 
 import org.bonitasoft.engine.commons.StringUtil;
 
@@ -30,10 +35,12 @@ import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.util.NullStream;
 
 /**
@@ -108,16 +115,32 @@ public class CodeGenerator {
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    protected JClass narrowClass(final Class<? extends Collection> collectionClass, final JClass narrowClass) {
+        final JClass collectionJClass = getModel().ref(collectionClass);
+        return collectionJClass.narrow(narrowClass);
+    }
+
+    protected JFieldVar addListField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
+        final JClass fieldClass = getModel().ref(field.getType().getClazz());
+        final JClass fieldListClass = narrowClass(List.class, fieldClass);
+        final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
+
+        final JFieldVar listFieldVar = entityClass.field(JMod.PRIVATE, fieldListClass, field.getName());
+
+        final JExpression newInstance = JExpr._new(arrayListFieldClazz).arg(JExpr.lit(10));
+        listFieldVar.init(newInstance);
+
+        final JAnnotationUse collectionAnnotation = addAnnotation(listFieldVar, ElementCollection.class);
+        collectionAnnotation.param("fetch", FetchType.EAGER);
+
+        return listFieldVar;
+    }
+
     public JMethod addSetter(final JDefinedClass definedClass, final JFieldVar field) {
         final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
         method.param(field.type(), field.name());
         method.body().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
-        return method;
-    }
-
-    public JMethod addSetterSignature(final JDefinedClass definedClass, final JFieldVar field) {
-        final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
-        method.param(field.type(), field.name());
         return method;
     }
 
@@ -128,13 +151,27 @@ public class CodeGenerator {
         return method;
     }
 
-    public JMethod addMethodSignature(final JDefinedClass definedClass, String methodName, JType returnType) {
-        final JMethod method = definedClass.method(JMod.PUBLIC, returnType, methodName);
-        return method;
+    public JMethod addMethodSignature(final JDefinedClass definedClass, final String methodName, final JType returnType) {
+        return definedClass.method(JMod.PUBLIC, returnType, methodName);
     }
 
-    public JMethod addGetterSignature(final JDefinedClass definedClass, final JFieldVar field) {
-        final JMethod method = definedClass.method(JMod.PUBLIC, field.type(), getGetterName(field));
+    public JMethod addAddMethod(final JDefinedClass definedClass, final Field field) {
+        return addListMethod(definedClass, field, "add", "addTo");
+    }
+
+    public JMethod addRemoveMethod(final JDefinedClass definedClass, final Field field) {
+        return addListMethod(definedClass, field, "remove", "removeFrom");
+    }
+
+    private JMethod addListMethod(final JDefinedClass definedClass, final Field field, final String listMethodName, final String parameterName) {
+        final JClass fieldClass = getModel().ref(field.getType().getClazz());
+
+        final StringBuilder builder = new StringBuilder(parameterName);
+        builder.append(StringUtil.firstCharToUpperCase(field.getName()));
+
+        final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
+        final JVar adderParam = method.param(fieldClass, parameterName);
+        method.body().invoke(JExpr.ref(field.getName()), listMethodName).arg(adderParam);
         return method;
     }
 
@@ -203,8 +240,8 @@ public class CodeGenerator {
         return elementTypes;
     }
 
-    public void addThrows(JMethod method, String exceptionClassname) {
-        JClass ref = getModel().ref(exceptionClassname);
+    public void addThrows(final JMethod method, final String exceptionClassname) {
+        final JClass ref = getModel().ref(exceptionClassname);
         method._throws(ref);
     }
 
