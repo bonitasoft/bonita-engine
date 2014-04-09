@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
   <users>
     <user userName="matti">
       <password encrypted="true">bpm</password>

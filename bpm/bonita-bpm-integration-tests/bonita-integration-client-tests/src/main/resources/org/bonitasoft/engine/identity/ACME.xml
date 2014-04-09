@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+  <customUserInfoDefinitions>
+    <customUserInfoDefinition>
+      <name>Office location</name>
+    </customUserInfoDefinition>
+    <customUserInfoDefinition>
+      <name>Skills</name>
+      <description>The user skills</description>
+    </customUserInfoDefinition>
+  </customUserInfoDefinitions>
   <users>
     <user userName="william.jobs">
       <password encrypted="false">bpm</password>
@@ -23,6 +32,17 @@
         <metaData name="Twitter"/>
         <metaData name="Facebook"/>
       </metaDatas>
+       <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
+      
     </user>
     <user userName="april.sanchez">
       <password encrypted="false">bpm</password>
@@ -42,11 +62,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="helen.kelly">
       <password encrypted="false">bpm</password>
@@ -66,11 +82,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="walter.bates">
       <password encrypted="false">bpm</password>
@@ -90,11 +102,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="zachary.williamson">
       <password encrypted="false">bpm</password>
@@ -114,11 +122,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="patrick.gardenier">
       <password encrypted="false">bpm</password>
@@ -138,11 +142,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="virginie.jomphe">
       <password encrypted="false">bpm</password>
@@ -162,11 +162,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="thorsten.hartmann">
       <password encrypted="false">bpm</password>
@@ -186,11 +182,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="jan.fisher">
       <password encrypted="false">bpm</password>
@@ -210,11 +202,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="isabel.bleasdale">
       <password encrypted="false">bpm</password>
@@ -234,11 +222,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="favio.riviera">
       <password encrypted="false">bpm</password>
@@ -258,11 +242,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="michael.morrison">
       <password encrypted="false">bpm</password>
@@ -282,11 +262,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="marc.marseau">
       <password encrypted="false">bpm</password>
@@ -306,11 +282,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="joseph.hovell">
       <password encrypted="false">bpm</password>
@@ -330,11 +302,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="mauro.zetticci">
       <password encrypted="false">bpm</password>
@@ -354,11 +322,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="thomas.wallis">
       <password encrypted="false">bpm</password>
@@ -378,11 +342,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="daniela.angelo">
       <password encrypted="false">bpm</password>
@@ -402,11 +362,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="anthony.nichols">
       <password encrypted="false">bpm</password>
@@ -426,11 +382,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="misa.kumagai">
       <password encrypted="false">bpm</password>
@@ -450,11 +402,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="norio.yamazaki">
       <password encrypted="false">bpm</password>
@@ -474,11 +422,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
     <user userName="giovanna.almeida">
       <password encrypted="false">bpm</password>
@@ -498,11 +442,7 @@
         <state>PA</state>
         <country>United States</country>
       </professionalData>
-      <metaDatas>
-        <metaData name="Skype ID"/>
-        <metaData name="Twitter"/>
-        <metaData name="Facebook"/>
-      </metaDatas>
+      
     </user>
   </users>
   <roles>

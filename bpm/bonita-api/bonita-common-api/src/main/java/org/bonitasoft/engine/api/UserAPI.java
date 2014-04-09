@@ -33,7 +33,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Users: creation, deletion, certain
+ * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Users: creation, deletion, certain
  * specific getXXX() methods, generic search methods, etc...
  * It also to retrieve user ContactData.
  * 

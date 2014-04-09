@@ -76,11 +76,11 @@
 		WHERE group_.name = :name
 	</query>
 
-	<query name="getMetadataByName">
-		SELECT metadata
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS metadata
-		WHERE metadata.name = :name
-	</query>
+	<query name="getCustomUserInfoDefinitionByName">
+        SELECT custom_usr_inf_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
+        WHERE custom_usr_inf_def.name = :name
+    </query>
 
 <!--	Users -->
 
@@ -272,17 +272,18 @@
 		WHERE user_membership.id = :id
 	</query>
 
-<!--	 profile metadata -->
-	<query name="getProfileMetadataById">
-		SELECT p_metadata_def
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-		WHERE p_metadata_def.id = :id
-	</query>
+<!--	 custom user info -->
+	<query name="getCustomUserInfoDefinitionById">
+        SELECT custom_usr_inf_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
+        WHERE custom_usr_inf_def.id = :id
+    </query>
 
-	<query name="getProfileMetadatas">
-		SELECT p_metadata_def
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-	</query>
+	<query name="getCustomUserInfoDefinitions">
+        SELECT custom_usr_inf_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
+        ORDER BY name
+    </query>
 
 <!--	get number of -->
 	<query name="getNumberOfSUser">
@@ -336,10 +337,15 @@
 		WHERE group_.parentPath = :parentPath
 	</query>
 
-	<query name="getNumberOfProfileMetadata">
-		SELECT COUNT(p_metadata_def)
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-	</query>
+	<query name="getNumberOfCustomUserInfoDefinition">
+        SELECT COUNT(custom_usr_inf_def)
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
+    </query>
+
+    <query name="getNumberOfSCustomUserInfoValue">
+        SELECT COUNT(custom_usr_inf_val)
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS custom_usr_inf_val
+    </query>
 	
 	<query name="searchSUser">
 		SELECT user
@@ -365,14 +371,14 @@
 		FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
 	</query>
 
-	<query name="searchProfileMetadataDefinition">
-		SELECT p_metadata_def
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-	</query>
+	<query name="searchSCustomUserInfoDefinition">
+        SELECT custom_usr_inf_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
+    </query>
 
-	<query name="searchProfileMetadataValue">
-		SELECT p_metadata_val
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl AS p_metadata_val
+	<query name="searchSCustomUserInfoValue">
+		SELECT custom_usr_inf_val
+		FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS custom_usr_inf_val
 	</query>
 
 	<query name="searchSRole">

@@ -21,8 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -35,12 +39,10 @@ import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
-import org.bonitasoft.engine.identity.SUserCreationException;
 import org.bonitasoft.engine.identity.SUserMembershipCreationException;
-import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.SUserUpdateException;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -71,8 +73,14 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     private final ImportOrganizationStrategy strategy;
 
-    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy)
+    private TenantServiceAccessor serviceAccessor;
+
+    private SCustomUserInfoValueAPI userInfoValueAPI;
+
+    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy, SCustomUserInfoValueAPI userInfoValueAPI)
             throws OrganizationImportException {
+        this.serviceAccessor = serviceAccessor;
+        this.userInfoValueAPI = userInfoValueAPI;
         identityService = serviceAccessor.getIdentityService();
         this.organizationContent = organizationContent;
         parser = serviceAccessor.getParserFactgory().createParser(OrganizationNodeBuilder.BINDINGS);
@@ -86,7 +94,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
                 strategy = new ImportOrganizationIgnoreDuplicatesStrategy();
                 break;
             case MERGE_DUPLICATES:
-                strategy = new ImportOrganizationMergeDuplicatesStrategy(identityService);
+                strategy = new ImportOrganizationMergeDuplicatesStrategy(identityService, userInfoValueAPI);
                 break;
             default:
                 throw new OrganizationImportException("No import strategy found for " + policy);
@@ -99,18 +107,21 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     }
 
     @Override
-    public void execute() throws ImportDuplicateInOrganizationException {
+    public void execute() throws SBonitaException {
         try {
             parser.setSchema(this.getClass().getResourceAsStream("/bos-organization.xsd"));
             parser.validate(new StringReader(organizationContent));
-            final Organization organization = (Organization) parser.getObjectFromXML(new StringReader(organizationContent));
+            final OrganizationCreator organization = (OrganizationCreator) parser.getObjectFromXML(new StringReader(organizationContent));
             final List<ExportedUser> users = organization.getUsers();
-            final List<RoleCreator> roles = organization.getRoles();
-            final List<GroupCreator> groups = organization.getGroups();
+            final List<RoleCreator> roles = organization.getRoleCreators();
+            final List<GroupCreator> groups = organization.getGroupCreators();
             final List<UserMembership> memberships = organization.getMemberships();
+            
+            //custom user info definitions
+            Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization.getCustomUserInfoDefinitionCreators());
 
             // Users
-            final Map<String, SUser> userNameToSUsers = importUsers(users);
+            final Map<String, SUser> userNameToSUsers = importUsers(users, customUserInfoDefinitions);
             updateManagerId(users, userNameToSUsers);
 
             // Roles
@@ -121,11 +132,16 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
             // UserMemberships
             importMemberships(memberships, userNameToSUsers, roleNameToIdMap, groupPathToIdMap);
-        } catch (final ImportDuplicateInOrganizationException e) {
+        } catch (final SBonitaException e) {
             throw e;
         } catch (final Exception e) {
-            throw new ImportDuplicateInOrganizationException(e);
+            throw new SImportOrganizationException(e);
         }
+    }
+
+    private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators) throws SIdentityException, ImportDuplicateInOrganizationException {
+        CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
+        return importer.importCustomUserInfoDefinitions(customUserInfoDefinitionCreators);
     }
 
     private void importMemberships(final List<UserMembership> memberships, final Map<String, SUser> userNameToSUsers, final Map<String, Long> roleNameToIdMap,
@@ -262,19 +278,10 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, SUser> importUsers(final List<ExportedUser> users) throws ImportDuplicateInOrganizationException, SIdentityException {
-        final Map<String, SUser> userNameToSUsers = new HashMap<String, SUser>((int) Math.min(Integer.MAX_VALUE, identityService.getNumberOfUsers()));
-        for (final ExportedUser user : users) {
-            SUser sUser;
-            try {
-                sUser = identityService.getUserByUserName(user.getUserName());
-                strategy.foundExistingUser(sUser, user);
-            } catch (final SUserNotFoundException e) {
-                sUser = addUser(user);
-            }
-            userNameToSUsers.put(sUser.getUserName(), sUser);
-        }
-        return userNameToSUsers;
+    private Map<String, SUser> importUsers(final List<ExportedUser> users, Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions) throws SBonitaException {
+        CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI, customUserInfoDefinitions);
+        UserImporter userImporter = new UserImporter(serviceAccessor, strategy, SessionInfos.getUserIdFromSession(), userInfoValueImporter);
+        return userImporter.importUsers(users);
     }
 
     private void addMembership(final UserMembership newMembership, final Long userId, final Long groupId, final Long roleId, final Long assignedBy)
@@ -304,20 +311,6 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         final SRole sRole = ModelConvertor.constructSRole(creator);
         identityService.createRole(sRole);
         return sRole;
-    }
-
-    private SUser addUser(final ExportedUser user) throws SUserCreationException {
-        SUser sUser;
-        if (user.isPasswordEncrypted()) {
-            sUser = identityService.createUserWithoutEncryptingPassword(ModelConvertor.constructSUser(user));
-        } else {
-            sUser = identityService.createUser(ModelConvertor.constructSUser(user));
-        }
-        final SContactInfo persoSContactInfo = ModelConvertor.constructSUserContactInfo(user, true, sUser.getId());
-        identityService.createUserContactInfo(persoSContactInfo);
-        final SContactInfo professSContactInfo = ModelConvertor.constructSUserContactInfo(user, false, sUser.getId());
-        identityService.createUserContactInfo(professSContactInfo);
-        return sUser;
     }
 
 }
