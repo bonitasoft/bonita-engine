@@ -38,7 +38,6 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.SActorMemberCreationException;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
@@ -717,7 +716,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
 
@@ -922,7 +920,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                     logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                 }
             }
-
         };
 
         try {
@@ -938,7 +935,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
-
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,
@@ -1252,19 +1248,37 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ActorMember addUserToActor(final long actorId, final long userId) throws CreationException, AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        ActorMember clientActorMember;
-        long processDefinitionId;
+
         try {
+            // Check if the mapping already to throw a specific exception
+            checkIfActorMappingForUserAlreadyExists(actorId, userId);
+
             final SActorMember actorMember = actorMappingService.addUserToActor(actorId, userId);
-            processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
-            clientActorMember = ModelConvertor.toActorMember(actorMember);
+            final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
+            final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
+            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            return clientActorMember;
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
-        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        return clientActorMember;
+    }
+
+    private void checkIfActorMappingForUserAlreadyExists(final long actorId, final long userId)
+            throws AlreadyExistsException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+
+        try {
+            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfUser(userId);
+            for (final SActorMember sActorMember : actorMembersOfUser) {
+                if (sActorMember.getActorId() == actorId && sActorMember.getRoleId() == -1 && sActorMember.getRoleId() == -1) {
+                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the user id = <" + userId + ">");
+                }
+            }
+        } catch (final SBonitaReadException e) {
+            // Do nothing
+        }
     }
 
     @Override
@@ -1282,73 +1296,84 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ActorMember addGroupToActor(final long actorId, final long groupId) throws CreationException, AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        ActorMember clientActorMember;
-        long processDefinitionId;
         try {
-            checkAlreadyExistingGroupMapping(actorId, groupId, actorMappingService);
+            // Check if the mapping already to throw a specific exception
+            checkIfActorMappingForGroupAlreadyExists(actorId, groupId);
+
             final SActorMember actorMember = actorMappingService.addGroupToActor(actorId, groupId);
-            processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
-            clientActorMember = ModelConvertor.toActorMember(actorMember);
-        } catch (final SActorNotFoundException e) {
-            throw new CreationException(e);
-        } catch (final SActorMemberCreationException e) {
-            throw new CreationException(e);
-        } catch (final SBonitaReadException e) {
+            final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
+            final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
+            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            return clientActorMember;
+        } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
-        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        return clientActorMember;
+    }
+
+    private void checkIfActorMappingForGroupAlreadyExists(final long actorId, final long groupId)
+            throws AlreadyExistsException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+
+        try {
+            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfGroup(groupId);
+            for (final SActorMember sActorMember : actorMembersOfUser) {
+                if (sActorMember.getActorId() == actorId && sActorMember.getRoleId() == -1 && sActorMember.getUserId() == -1) {
+                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the group id = <" + groupId + ">");
+                }
+            }
+        } catch (final SBonitaReadException e) {
+            // Do nothing
+        }
     }
 
     @Override
     public ActorMember addGroupToActor(final String actorName, final long groupId, final ProcessDefinition processDefinition) throws CreationException,
             AlreadyExistsException, ActorNotFoundException {
         final List<ActorInstance> actors = getActors(processDefinition.getId(), 0, Integer.MAX_VALUE, ActorCriterion.NAME_ASC);
-        for (final ActorInstance ai : actors) {
-            if (actorName.equals(ai.getName())) {
-                return addGroupToActor(ai.getId(), groupId);
+        for (final ActorInstance actorInstance : actors) {
+            if (actorName.equals(actorInstance.getName())) {
+                return addGroupToActor(actorInstance.getId(), groupId);
             }
         }
         throw new ActorNotFoundException("Actor " + actorName + " not found in process definition " + processDefinition.getName());
     }
 
-    private void checkAlreadyExistingGroupMapping(final long actorId, final long groupId, final ActorMappingService actorMappingService)
-            throws AlreadyExistsException, CreationException {
-        try {
-            List<SActorMember> actorMembersOfGroup;
-            int startIndex = 0;
-            do {
-                actorMembersOfGroup = actorMappingService.getActorMembers(actorId, startIndex, 50);
-                for (final SActorMember sActorMember : actorMembersOfGroup) {
-                    if (sActorMember.getGroupId() == groupId && sActorMember.getRoleId() == -1 && sActorMember.getUserId() == -1) {
-                        throw new AlreadyExistsException("This group / actor mapping already exists");
-                    }
-                }
-                startIndex += 50;
-            } while (actorMembersOfGroup.size() > 0);
-        } catch (final SBonitaReadException e2) {
-            throw new CreationException("Read problem when checking for duplicate actor member", e2);
-        }
-    }
-
     @Override
     public ActorMember addRoleToActor(final long actorId, final long roleId) throws CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        ActorMember clientActorMember;
-        long processDefinitionId;
+
         try {
+            // Check if the mapping already to throw a specific exception
+            checkIfActorMappingForRoleAlreadyExists(actorId, roleId);
+
             final SActorMember actorMember = actorMappingService.addRoleToActor(actorId, roleId);
-            processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
-            clientActorMember = ModelConvertor.toActorMember(actorMember);
+            final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
+            final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
+            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            return clientActorMember;
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
-        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        return clientActorMember;
+    }
+
+    private void checkIfActorMappingForRoleAlreadyExists(final long actorId, final long roleId)
+            throws AlreadyExistsException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+
+        try {
+            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfRole(roleId);
+            for (final SActorMember sActorMember : actorMembersOfUser) {
+                if (sActorMember.getActorId() == actorId && sActorMember.getGroupId() == -1 && sActorMember.getUserId() == -1) {
+                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the role id = <" + roleId + ">");
+                }
+            }
+        } catch (final SBonitaReadException e) {
+            // Do nothing
+        }
     }
 
     @Override
@@ -1378,19 +1403,36 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ActorMember addRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        ActorMember clientActorMember;
-        long processDefinitionId;
+
         try {
+            checkIfActorMappingForMembershipAlreadyExists(actorId, roleId, groupId);
+
             final SActorMember actorMember = actorMappingService.addRoleAndGroupToActor(actorId, roleId, groupId);
-            processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
-            clientActorMember = ModelConvertor.toActorMember(actorMember);
+            final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
+            final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
+            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            return clientActorMember;
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
-        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        return clientActorMember;
+    }
+
+    private void checkIfActorMappingForMembershipAlreadyExists(final long actorId, final long roleId, final long groupId) throws AlreadyExistsException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+
+        try {
+            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfRole(roleId);
+            for (final SActorMember sActorMember : actorMembersOfUser) {
+                if (sActorMember.getActorId() == actorId && sActorMember.getGroupId() == groupId && sActorMember.getUserId() == -1) {
+                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the role id = <" + roleId
+                            + ">, the group id = <" + groupId + ">");
+                }
+            }
+        } catch (final SBonitaReadException e) {
+            // Do nothing
+        }
     }
 
     @Override
@@ -3767,12 +3809,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void checkIfProcessSupervisorAlreadyExists(final long processDefinitionId, final Long userId, final Long groupId, final Long roleId)
-            throws SBonitaSearchException, AlreadyExistsException {
-        final List<SProcessSupervisor> processSupervisors = searchSProcessSupervisors(processDefinitionId, userId, groupId, roleId);
-        if (!processSupervisors.isEmpty()) {
-            throw new AlreadyExistsException("This supervisor already exists for process definition id = <" + processDefinitionId + ">, user id = <" + userId
-                    + ">, group id = <" + groupId + ">, role id = <" + roleId + ">");
+    private void checkIfProcessSupervisorAlreadyExists(final long processDefinitionId, final Long userId, final Long groupId, final Long roleId)
+            throws AlreadyExistsException {
+        try {
+            final List<SProcessSupervisor> processSupervisors = searchSProcessSupervisors(processDefinitionId, userId, groupId, roleId);
+            if (!processSupervisors.isEmpty()) {
+                throw new AlreadyExistsException("This supervisor already exists for process definition id = <" + processDefinitionId + ">, user id = <"
+                        + userId + ">, group id = <" + groupId + ">, role id = <" + roleId + ">");
+            }
+        } catch (final SBonitaSearchException e1) {
+            // Nothing to do
         }
     }
 

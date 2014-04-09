@@ -1431,8 +1431,16 @@ public class APITestUtil {
         return operation;
     }
 
-    public void skipTask(final long activityId) throws Exception {
+    public void skipTask(final long activityId) throws UpdateException {
         getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
+    }
+
+    public void skipTasks(final ProcessInstance processInstance) throws UpdateException {
+        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
+        for (final ActivityInstance activityInstance : activityInstances) {
+            final long activityInstanceId = activityInstance.getId();
+            skipTask(activityInstanceId);
+        }
     }
 
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName)

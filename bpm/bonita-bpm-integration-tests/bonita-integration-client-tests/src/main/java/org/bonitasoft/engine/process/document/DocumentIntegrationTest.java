@@ -109,7 +109,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void attachADocumentToProcessInstanceTest() throws BonitaException {
-        final ProcessInstance pi = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
             final String documentName = "newDocument";
@@ -125,7 +125,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void attachADocumentAndItsContentToProcessInstanceTest() throws BonitaException {
-        final ProcessInstance pi = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
             final String documentName = "newDocument";
@@ -193,7 +193,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void attachAnExternalDocumentReferenceToProcessInstanceTest() throws BonitaException {
-        final ProcessInstance pi = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
             final Document doc = buildReferenceToExternalDocument();
@@ -217,7 +217,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void attachAnExternalDocumentReferenceToProcessInstanceAsNewVersionTest() throws BonitaException {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         Document attachment;
         try {
@@ -234,7 +234,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void attachADocumentAndItsContentToProcessInstanceAsNewVersionTest() throws BonitaException {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
 
         try {
@@ -253,7 +253,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void getDocumentContentTest() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         try {
             final Document attachment = getAttachmentWithoutItsContent(processInstance);
@@ -268,7 +268,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void getLastDocumentTest() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
 
         Document attachment;
@@ -393,7 +393,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void getDocumentAtProcessInstantiation() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         try {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
@@ -411,7 +411,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void getDocumentAtActivityInstanceCompletion() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         try {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
@@ -438,7 +438,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void getNumberOfDocument() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
 
         try {
@@ -457,7 +457,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void getNumberOfDocumentAfterAddingDocumentValue() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
 
         try {
@@ -478,7 +478,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     public void searchDocuments() throws Exception {
         // add a new document, search it.
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
         searchOptionsBuilder.sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC);
@@ -498,7 +498,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     private void searchDocumentsWithApostrophe(final String documentName, final String fileName) throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance, documentName, fileName);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -514,7 +514,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void documentsAreDeletedWhenProcessIsDeleted() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance, "test", "test.txt");
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
 
@@ -528,7 +528,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Test
     public void searchArchivedDocuments() throws Exception {
         // first time search, no document in archive table.
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         SearchOptionsBuilder searchOptionsBuilder;
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -568,7 +568,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedDocuments", "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchArchivedDocumentsWithApostropheInTheDocumentName() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance, "a'", "a");
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         SearchResult<ArchivedDocument> documentSearch = getProcessAPI().searchArchivedDocuments(searchOptionsBuilder.done());
@@ -597,7 +597,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedDocuments", "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchArchivedDocumentsWithApostropheInTheFileName() throws Exception {
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance, "b", "b'");
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         SearchResult<ArchivedDocument> documentSearch = getProcessAPI().searchArchivedDocuments(searchOptionsBuilder.done());
@@ -626,7 +626,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Test
     public void getArchivedVersionOfDocuments() throws BonitaException {
         // add new document
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         // search archive document. result is 0.
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -660,7 +660,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Test
     public void getArchivedDocument() throws BonitaException {
         // add new document
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         // search archive document. result is 0.
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -686,7 +686,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     public void countAttachmentWithSomeAttachments() throws BonitaException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         final long initialNbOfDocument = getProcessAPI().countAttachments(searchOptionsBuilder.done());
-        final ProcessInstance processInstance = ensureAProcessInstanceIsStarted(user);
+        final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         final long numberOfAttachments = getProcessAPI().countAttachments(searchOptionsBuilder.done());
         assertEquals(1 + initialNbOfDocument, numberOfAttachments);
@@ -1237,7 +1237,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         disableAndDeleteProcess(docDefinition);
     }
 
-    public ProcessInstance ensureAProcessInstanceIsStarted(final User user) throws BonitaException {
+    public ProcessInstance deployAndEnableWithActorAndStartIt(final User user) throws BonitaException {
         return deployAndEnableWithActorAndStartIt(getNormalBar(), user);
     }
 

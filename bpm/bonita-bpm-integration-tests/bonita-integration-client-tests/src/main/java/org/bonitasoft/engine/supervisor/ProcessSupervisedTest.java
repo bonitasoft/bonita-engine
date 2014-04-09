@@ -59,7 +59,6 @@ import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -154,7 +153,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
     }
 
     @Test
-    public void superviseMyAssignedTasks() throws Exception {
+    public void searchAssignedTasksSupervisedBy() throws Exception {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
         builder.filter("state", "ready");
@@ -197,17 +196,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals("userTask1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
         assertEquals(ActivityStates.COMPLETED_STATE, taskInstance.getState());
-    }
-
-    @Test
-    public void getPendingTasksSupervisedBy() throws Exception {
-        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC).done();
-        final SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions);
-        assertEquals(1, searchResult.getCount());
-        final List<HumanTaskInstance> tasks = searchResult.getResult();
-        final HumanTaskInstance taskInstance = tasks.get(0);
-        assertEquals("userTask1", taskInstance.getName());
-        assertEquals(0, taskInstance.getAssigneeId());
     }
 
     @Test
@@ -318,7 +306,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         parameters2.put(SUPERVISOR_ID_CMD_KEY, john.getId());
         parameters2.put("SEARCH_OPTIONS_KEY", new SearchOptionsBuilder(0, 10).done());
         final SearchResult<Serializable> searchResult2 = (SearchResult<Serializable>) getCommandAPI().execute(SEARCH_S_COMMENT_SUPERVISED_BY, parameters2);
-        assertEquals(2, searchResult2.getCount());
+        assertEquals(5, searchResult2.getCount());
     }
 
     @Test
@@ -331,7 +319,21 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final SearchResult<Document> documentSearch = getProcessAPI().searchDocumentsSupervisedBy(john.getId(), searchOptionsBuilder.done());
         assertEquals(1, documentSearch.getCount());
         assertEquals(processInstance.getId(), documentSearch.getResult().get(0).getProcessInstanceId());
-        assertEquals(john.getId(), documentSearch.getResult().get(0).getAuthor());
+    }
+
+    @Test
+    public void searchArchivedDocumentsSupervisedBy() throws BonitaException {
+        final ProcessInstance processInstance = processInstances.get(2);
+        buildAndAttachDocument(processInstance);
+
+        skipTasks(processInstance);
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
+        searchOptionsBuilder.sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC);
+        final SearchResult<ArchivedDocument> documentSearch = getProcessAPI().searchArchivedDocumentsSupervisedBy(matti.getId(), searchOptionsBuilder.done());
+        assertEquals(3, documentSearch.getCount());
+        assertEquals(processInstance.getId(), documentSearch.getResult().get(0).getProcessInstanceId());
     }
 
     @Test
@@ -347,26 +349,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertNotNull(humanTaskInstanceList);
         assertEquals(1, humanTaskInstanceList.size());
         assertEquals(activityInstanceId, humanTaskInstanceList.get(0).getId());
-    }
-
-    @Test
-    public void searchArchivedDocumentsSupervisedBy() throws BonitaException {
-        final ProcessInstance processInstance2 = processInstances.get(1);
-        final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance2);
-        final Document doc = buildDocument(beforeUpdate.getName());
-        // attach new document to generate archive of the previous one:
-        getProcessAPI().attachNewDocumentVersion(processInstance2.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                "contentOfTheDoc".getBytes());
-        final Document afterUpdate = getAttachmentWithoutItsContent(processInstance2);
-        getProcessAPI().getDocumentAtProcessInstantiation(processInstance2.getId(), afterUpdate.getName());
-
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance2.getId());
-        searchOptionsBuilder.sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC);
-        final SearchResult<ArchivedDocument> documentSearch = getProcessAPI().searchArchivedDocumentsSupervisedBy(matti.getId(), searchOptionsBuilder.done());
-        assertEquals(1, documentSearch.getCount());
-        assertEquals(processInstance2.getId(), documentSearch.getResult().get(0).getProcessInstanceId());
-        assertEquals(matti.getId(), documentSearch.getResult().get(0).getDocumentAuthor());
     }
 
     @Test
@@ -415,7 +397,9 @@ public class ProcessSupervisedTest extends CommonAPITest {
         searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfosSupervisedBy(john.getId(), optsBuilder.done());
         assertEquals(1, searchRes0.getCount());
         assertEquals(processDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
-        assertEquals("processDefinition2", searchRes0.getResult().get(0).getName());
+        assertEquals("processDefinition1", searchRes0.getResult().get(0).getName());
+
+        deleteCategories(categories);
     }
 
     @Test
