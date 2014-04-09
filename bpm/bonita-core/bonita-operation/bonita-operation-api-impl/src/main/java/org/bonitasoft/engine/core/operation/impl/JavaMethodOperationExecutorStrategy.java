@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -27,61 +24,12 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class JavaMethodOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
+public class JavaMethodOperationExecutorStrategy extends UpdateDataOperationExecutorStrategy {
 
     public static final String TYPE_JAVA_METHOD = "JAVA_METHOD";
 
-    protected static Map<String, Class<?>> primitiveTypes;
-
-    private static Map<String, Class<?>> autoboxableTypes;
-    static {
-        primitiveTypes = new HashMap<String, Class<?>>(8);
-        primitiveTypes.put("char", char.class);
-        primitiveTypes.put("byte", byte.class);
-        primitiveTypes.put("long", long.class);
-        primitiveTypes.put("int", int.class);
-        primitiveTypes.put("float", float.class);
-        primitiveTypes.put("double", double.class);
-        primitiveTypes.put("short", short.class);
-        primitiveTypes.put("boolean", boolean.class);
-
-        autoboxableTypes = new HashMap<String, Class<?>>(8);
-        autoboxableTypes.put(Character.class.getName(), char.class);
-        autoboxableTypes.put(Byte.class.getName(), byte.class);
-        autoboxableTypes.put(Long.class.getName(), long.class);
-        autoboxableTypes.put(Integer.class.getName(), int.class);
-        autoboxableTypes.put(Float.class.getName(), float.class);
-        autoboxableTypes.put(Double.class.getName(), double.class);
-        autoboxableTypes.put(Short.class.getName(), short.class);
-        autoboxableTypes.put(Boolean.class.getName(), boolean.class);
-    }
-
     public JavaMethodOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
         super(dataInstanceService);
-    }
-
-    private Method getMethod(final SOperation operation, final Class<?> dataType) throws NoSuchMethodException, ClassNotFoundException {
-        final String[] split = operation.getOperator().split(":", 2);
-        final String operator = split[0];
-        if (split.length > 1) {
-            final String className = split[1];
-            try {
-                return dataType.getDeclaredMethod(operator, getClass(className));
-            } catch (final NoSuchMethodException e) {
-                if (autoboxableTypes.containsKey(className)) {
-                    return dataType.getDeclaredMethod(operator, autoboxableTypes.get(className));
-                }
-                throw e;
-            }
-        }
-        return dataType.getDeclaredMethod(operator);
-    }
-
-    protected Class<?> getClass(final String type) throws ClassNotFoundException {
-        if (primitiveTypes.containsKey(type)) {
-            return primitiveTypes.get(type);
-        }
-        return Class.forName(type);
     }
 
     @Override
@@ -92,14 +40,15 @@ public class JavaMethodOperationExecutorStrategy extends UpdateOperationExecutor
         if (objectToInvokeJavaMethodOn == null) {
             throw new SOperationExecutionException("data " + dataToSet + " does not exist in the context " + containerId + " " + containerType);
         }
-        Class<?> expressionResultType;
+        final String[] split = operation.getOperator().split(":", 2);
+        final String operator = split[0];
+        String className = null;
+        if (split.length > 1) {
+            className = split[1];
+        }
         try {
-            expressionResultType = Thread.currentThread().getContextClassLoader().loadClass(operation.getRightOperand().getReturnType());
-            final Class<?> dataType = Thread.currentThread().getContextClassLoader().loadClass(objectToInvokeJavaMethodOn.getClass().getName());
-            final Method method = getMethod(operation, dataType);
-            final Object o = dataType.cast(objectToInvokeJavaMethodOn);
-            method.invoke(o, expressionResultType.cast(valueToSetObjectWith));
-            return o;
+            return new JavaMethodInvoker().invokeJavaMethod(operation.getRightOperand().getReturnType(), valueToSetObjectWith, objectToInvokeJavaMethodOn,
+                    operator, className);
         } catch (final Exception e) {
             throw new SOperationExecutionException("Unable to evaluate operation " + operation, e);
         }

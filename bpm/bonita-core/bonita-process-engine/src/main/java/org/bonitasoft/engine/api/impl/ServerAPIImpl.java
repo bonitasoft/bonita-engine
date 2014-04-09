@@ -358,7 +358,7 @@ public class ServerAPIImpl implements ServerAPI {
             final Object apiImpl = accessResolver.getAPIImplementation(PlatformAPI.class.getName());
             final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_NODE_STARTED_METHOD_NAME, new Class[0]);
             return (Boolean) invokeAPI(new Object[0], apiImpl, method);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             return false;
         }
     }
@@ -469,7 +469,7 @@ public class ServerAPIImpl implements ServerAPI {
                     }
 
                 });
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // do not throw exceptions: it's just in case the platform was not in cache
             }
         }

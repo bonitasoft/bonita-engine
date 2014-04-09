@@ -90,9 +90,8 @@ public class DependencyServiceImpl implements DependencyService {
 
     private final Map<String, Long> lastUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
 
-    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
-            final ClassLoaderService classLoaderService) {
+    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -263,19 +262,31 @@ public class DependencyServiceImpl implements DependencyService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteDependency"));
         }
+        final SDependency dependency = getDependencyByName(name);
+        try {
+            delete(dependency);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
+            }
+        } catch (final SDependencyException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
+            }
+            throw new SDependencyDeletionException("Can't delete dependency with name: " + name, e);
+        }
+    }
+
+    private SDependency getDependencyByName(final String name) throws SDependencyNotFoundException {
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
         final SelectOneDescriptor<SDependency> desc = new SelectOneDescriptor<SDependency>("getDependencyByName", parameters, SDependency.class);
         try {
             final SDependency sDependency = persistenceService.selectOne(desc);
-            deleteDependency(sDependency);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
+            if (sDependency == null) {
+                throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
             }
-        } catch (final SBonitaReadException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
-            }
-            throw new SDependencyNotFoundException("Can't get dependency with name: " + name, e);
+            return sDependency;
+        } catch (final SBonitaReadException sbre) {
+            throw new SDependencyNotFoundException(sbre);
         }
     }
 
@@ -330,8 +341,7 @@ public class DependencyServiceImpl implements DependencyService {
         NullCheckingUtil.checkArgsNotNull(queryOptions);
         try {
             final List<SDependency> listSDependency = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
-                    SDependency.class,
-                    queryOptions));
+                    SDependency.class, queryOptions));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
             }
@@ -728,15 +738,15 @@ public class DependencyServiceImpl implements DependencyService {
 
     @Override
     public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
-        Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
-        List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
+        final Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
+        final List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
         if (!dependencyIds.isEmpty()) {
-            List<SDependency> currentDependencies = getDependencies(dependencyIds);
-            for (SDependency currentDependency : currentDependencies) {
+            final List<SDependency> currentDependencies = getDependencies(dependencyIds);
+            for (final SDependency currentDependency : currentDependencies) {
                 if (!newDependenciesByName.containsKey(currentDependency.getName())) {
                     delete(currentDependency);
                 } else {
-                    SDependency newDependency = newDependenciesByName.get(currentDependency.getName());
+                    final SDependency newDependency = newDependenciesByName.get(currentDependency.getName());
                     update(currentDependency, newDependency);
                 }
                 // remove from list
@@ -744,7 +754,7 @@ public class DependencyServiceImpl implements DependencyService {
             }
         }
         // all artifact that are still here must be created
-        for (SDependency sDependency : newDependenciesByName.values()) {
+        for (final SDependency sDependency : newDependenciesByName.values()) {
             createForArtifact(id, type, sDependency);
         }
     }
@@ -766,18 +776,14 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     private void delete(final SDependency dependency) throws SDependencyException, SDependencyDeletionException {
-        SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), QueryOptions.defaultQueryOptions()).get(0);
+        final SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), QueryOptions.defaultQueryOptions()).get(0);
         deleteDependencyMapping(sDependencyMapping);
         deleteDependency(dependency);
     }
 
-    /**
-     * @param dependencies
-     * @return
-     */
     private Map<String, SDependency> getMapOfNames(final ArrayList<SDependency> dependencies) {
-        HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
-        for (SDependency sDependency : dependencies) {
+        final HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
+        for (final SDependency sDependency : dependencies) {
             hashMap.put(sDependency.getName(), sDependency);
         }
         return hashMap;

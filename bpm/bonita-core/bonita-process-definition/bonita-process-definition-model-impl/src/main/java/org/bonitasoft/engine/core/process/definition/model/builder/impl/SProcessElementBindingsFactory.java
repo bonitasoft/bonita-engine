@@ -20,6 +20,7 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SActorDefini
 import org.bonitasoft.engine.core.process.definition.model.bindings.SActorInitiatorDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SAutomaticTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SBoundaryEventDefinitionBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SBusinessDataDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCallActivityDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCallableElementBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCallableElementVersionBinding;
@@ -113,6 +114,7 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SConnectorDefinitionInputBinding());
         bindings.add(new SUserFilterDefinitionBinding());
         bindings.add(new SDataDefinitionBinding());
+        bindings.add(new SBusinessDataDefinitionBinding());
         bindings.add(new STextDataDefinitionBinding());
         bindings.add(new SXMLDataDefinitionBinding());
         bindings.add(new SDocumentDefinitionBinding());
@@ -201,6 +203,9 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         }
         if (SDisplayNameExpressionBinding.class.equals(binderClass)) {
             return new SDisplayDescriptionExpressionBinding();
+        }
+        if (SBusinessDataDefinitionBinding.class.equals(binderClass)) {
+            return new SBusinessDataDefinitionBinding();
         }
         if (SDataDefinitionBinding.class.equals(binderClass)) {
             return new SDataDefinitionBinding();

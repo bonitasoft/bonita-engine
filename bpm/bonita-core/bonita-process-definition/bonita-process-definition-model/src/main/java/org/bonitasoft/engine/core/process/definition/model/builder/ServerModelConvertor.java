@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.definition.model.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -24,6 +25,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
@@ -62,7 +64,8 @@ public class ServerModelConvertor {
         return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
-                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName()).done()).done();
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName()).done())
+                .done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -81,14 +84,15 @@ public class ServerModelConvertor {
         if (dataDefinition instanceof XMLDataDefinition) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
             final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
-            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement())
+                    .setNamespace(xmlDataDef.getNamespace());
             builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
             builder.setDescription(dataDefinition.getDescription());
             builder.setTransient(dataDefinition.isTransientData());
             return builder.done();
         } else {
             final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-            SDataDefinitionBuilder builder = null; 
+            SDataDefinitionBuilder builder = null;
             if (dataDefinition instanceof TextDataDefinition) {
                 final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
                 builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
@@ -100,5 +104,18 @@ public class ServerModelConvertor {
             builder.setTransient(dataDefinition.isTransientData());
             return builder.done();
         }
+    }
+
+    public static SBusinessDataDefinition convertBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
+        builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
+        builder.setDescription(businessDataDefinition.getDescription());
+        return builder.done();
+    }
+
+    protected static SBusinessDataDefinitionBuilder getSBusinessDataDefinitionBuilder(final BusinessDataDefinition businessDataDefinition) {
+        final SBusinessDataDefinitionBuilderFactory fact = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
+        SBusinessDataDefinitionBuilder builder = fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
+        return builder;
     }
 }

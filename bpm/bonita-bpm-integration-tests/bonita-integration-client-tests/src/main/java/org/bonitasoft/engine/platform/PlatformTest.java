@@ -149,7 +149,6 @@ public class PlatformTest {
             fail("session should not work");
         } catch (InvalidSessionException e) {
             // ok
-            e.printStackTrace();
         }
     }
 }

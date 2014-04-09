@@ -29,7 +29,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class UserFilterProcessDependencyResolver extends ProcessDependencyResolver {
+public class UserFilterProcessDependencyResolver implements ProcessDependencyResolver {
 
     @SuppressWarnings("unused")
     @Override

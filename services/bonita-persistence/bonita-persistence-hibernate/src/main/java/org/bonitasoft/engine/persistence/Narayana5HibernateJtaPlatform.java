@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
-import org.hibernate.engine.transaction.jta.platform.internal.AbstractJtaPlatform;
+import org.hibernate.service.jta.platform.internal.AbstractJtaPlatform;
 
 /**
  * @author Charles Souillard
@@ -26,36 +26,38 @@ import org.hibernate.engine.transaction.jta.platform.internal.AbstractJtaPlatfor
 public class Narayana5HibernateJtaPlatform extends AbstractJtaPlatform {
 
     private static final long serialVersionUID = 4893085097625997082L;
-    
+
     private final TransactionManager transactionManager;
+
     private final Method getUserTransactionMethod;
+
     private final Object jtaEnvironmentBeanInstance;
-    
+
     public Narayana5HibernateJtaPlatform() throws Exception {
         final Class<?> jtaPropertyManagerClass = Class.forName("com.arjuna.ats.jta.common.jtaPropertyManager");
         final Method getJTAEnvironmentBeanMethod = jtaPropertyManagerClass.getMethod("getJTAEnvironmentBean");
-        this.jtaEnvironmentBeanInstance = getJTAEnvironmentBeanMethod.invoke((Object) null);
-        final Class<?> jtaEnvironmentBeanClass = this.jtaEnvironmentBeanInstance.getClass();
-        
+        jtaEnvironmentBeanInstance = getJTAEnvironmentBeanMethod.invoke((Object) null);
+        final Class<?> jtaEnvironmentBeanClass = jtaEnvironmentBeanInstance.getClass();
+
         final Method getTransactionManagerMethod = jtaEnvironmentBeanClass.getMethod("getTransactionManager");
-        this.transactionManager = (TransactionManager) getTransactionManagerMethod.invoke(this.jtaEnvironmentBeanInstance);
-        
-        this.getUserTransactionMethod = jtaEnvironmentBeanClass.getMethod("getUserTransaction");
+        transactionManager = (TransactionManager) getTransactionManagerMethod.invoke(jtaEnvironmentBeanInstance);
+
+        getUserTransactionMethod = jtaEnvironmentBeanClass.getMethod("getUserTransaction");
     }
-    
+
     @Override
     protected TransactionManager locateTransactionManager() {
-        return this.transactionManager;
-        
+        return transactionManager;
+
     }
 
     @Override
     protected UserTransaction locateUserTransaction() {
         try {
-            return (UserTransaction) this.getUserTransactionMethod.invoke(this.jtaEnvironmentBeanInstance);
+            return (UserTransaction) getUserTransactionMethod.invoke(jtaEnvironmentBeanInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
+
 }

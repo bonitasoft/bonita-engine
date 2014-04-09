@@ -371,9 +371,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    /**
-     * @param statelessJob
-     */
     protected void injectServices(final StatelessJob statelessJob) throws Exception {
         final Method[] methods = statelessJob.getClass().getMethods();
         for (final Method method : methods) {
@@ -401,12 +398,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         resumeJobs(getTenantId());
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.bonitasoft.engine.scheduler.SchedulerService#rescheduleErroneousTriggers
-     * ()
-     */
     @Override
     public void rescheduleErroneousTriggers() throws SSchedulerException {
         schedulerExecutor.rescheduleErroneousTriggers();

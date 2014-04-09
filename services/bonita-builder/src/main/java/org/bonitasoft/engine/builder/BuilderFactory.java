@@ -24,11 +24,11 @@ public class BuilderFactory {
 
     private BuilderFactory(final Properties properties) {
         this.properties = properties;
-        this.factoryCache = new HashMap<String, Object>();
+        factoryCache = new HashMap<String, Object>();
     }
-    
+
     private static final class BuilderFactoryMutex {
-        
+
     }
 
     public static BuilderFactory getInstance() {
@@ -67,12 +67,12 @@ public class BuilderFactory {
             final Class<?> clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
             final Object factory = clazz.newInstance();
             factoryCache.put(interfaceName, factory);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T extends Object> T get(Class<T> clazz) {
+    public static <T extends Object> T get(final Class<T> clazz) {
         final T factoryImplementation = getInstance().getInternalBuilderFactory(clazz);
         if (factoryImplementation == null) {
             throw new RuntimeException("No factory found for interface: " + clazz);
@@ -82,10 +82,10 @@ public class BuilderFactory {
 
     @SuppressWarnings("unchecked")
     private <T extends Object> T getInternalBuilderFactory(final Class<T> clazz) {
-        if (!this.factoryCache.containsKey(clazz.getName())) {
+        if (!factoryCache.containsKey(clazz.getName())) {
             cacheFactory(clazz.getName(), properties.getProperty(clazz.getName()));
         }
-        return (T) this.factoryCache.get(clazz.getName());
+        return (T) factoryCache.get(clazz.getName());
     }
 
     public static Properties getProperties(final URL url) throws IOException {

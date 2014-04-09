@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,9 +15,23 @@ package org.bonitasoft.engine.operation;
 
 /**
  * @author Zhang Bole
+ * @author Matthieu Chaffotte
  */
 public enum OperatorType {
 
-    ASSIGNMENT, JAVA_METHOD, XPATH_UPDATE_QUERY, DOCUMENT_CREATE_UPDATE, STRING_INDEX
+    // assign new value to process / task variable:
+    ASSIGNMENT,
 
+    JAVA_METHOD,
+
+    XPATH_UPDATE_QUERY,
+
+    DOCUMENT_CREATE_UPDATE,
+
+    STRING_INDEX,
+
+    CREATE_BUSINESS_DATA,
+
+    // update a Business Data attribute by calling setter method on it:
+    BUSINESS_DATA_JAVA_SETTER;
 }

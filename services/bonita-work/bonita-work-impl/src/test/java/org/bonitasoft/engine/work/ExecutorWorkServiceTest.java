@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.work;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -66,7 +65,7 @@ public class ExecutorWorkServiceTest {
         doReturn(abstractWorkSynchronization).when(workSynchronizationFactory).getWorkSynchronization(any(ExecutorService.class),
                 any(TechnicalLoggerService.class), any(SessionAccessor.class));
         doReturn(1L).when(sessionAccessor).getTenantId();
-        Pair<ExecutorService, Queue<Runnable>> pair = new Pair<ExecutorService, Queue<Runnable>>(executorService, queue);
+        final Pair<ExecutorService, Queue<Runnable>> pair = new Pair<ExecutorService, Queue<Runnable>>(executorService, queue);
         doReturn(pair).when(bonitaExecutorServiceFactory).createExecutorService();
         doReturn(false).when(executorService).isShutdown();
         doReturn(true).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -76,7 +75,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void pauseShouldStopWorkservice() throws TimeoutException, SBonitaException {
+    public void pauseShouldStopWorkservice() throws SBonitaException {
         // given
         workService.start();
 
@@ -89,7 +88,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_pause_shutdown_ThreadPool_and_clear_queue() throws InterruptedException, TimeoutException, SBonitaException {
+    public void should_pause_shutdown_ThreadPool_and_clear_queue() throws InterruptedException, SBonitaException {
         InOrder inOrder = inOrder(executorService, workService, queue);
         // given
         workService.start();
@@ -119,7 +118,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void pauseShouldNotAllowToRegisterWork() throws TimeoutException, SBonitaException {
+    public void pauseShouldNotAllowToRegisterWork() throws SBonitaException {
         // given
         workService.start();
         workService.pause();
@@ -134,7 +133,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void pauseShouldNotAllowToExecuteWork() throws TimeoutException, SBonitaException {
+    public void pauseShouldNotAllowToExecuteWork() throws SBonitaException {
         // given
         workService.start();
 
@@ -148,7 +147,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void resumeShouldDeactivateWorkservice() throws TimeoutException, SBonitaException {
+    public void resumeShouldDeactivateWorkservice() throws SBonitaException {
         // given
         workService.start();
         workService.pause();
@@ -162,7 +161,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void resumeShouldAllowToRegisterWork() throws TimeoutException, SBonitaException {
+    public void resumeShouldAllowToRegisterWork() throws SBonitaException {
         // given
         workService.start();
         workService.pause();
@@ -176,7 +175,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void resumeShouldAllowToExecuteWork() throws TimeoutException, SBonitaException {
+    public void resumeShouldAllowToExecuteWork() throws SBonitaException {
         // given
         workService.start();
         workService.pause();
@@ -199,7 +198,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void checkStopStatus() {
+    public void checkStopStatus() throws SWorkException {
         // given
         workService.start();
 
@@ -224,7 +223,7 @@ public class ExecutorWorkServiceTest {
     }
 
     private BonitaWork createBonitaWork() {
-        BonitaWork work = new BonitaWork() {
+        final BonitaWork work = new BonitaWork() {
 
             private static final long serialVersionUID = 1L;
 
@@ -248,7 +247,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_start_do_nothing_when_already_started() {
+    public void should_start_do_nothing_when_already_started() throws SWorkException {
         // given
         workService.start();
 
@@ -260,7 +259,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_stop_do_nothing_when_already_stopped() {
+    public void should_stop_do_nothing_when_already_stopped() throws SWorkException {
         // given
         workService.start();
         workService.stop();
@@ -273,7 +272,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_isStopped_return_true_when_only_executor_is_shutdown() {
+    public void should_isStopped_return_true_when_only_executor_is_shutdown() throws SWorkException {
         // given
         doReturn(true).when(executorService).isShutdown();
 
@@ -281,8 +280,8 @@ public class ExecutorWorkServiceTest {
         assertThat(workService.isStopped()).as("Should be stopped if only executor service is shutdown").isTrue();
     }
 
-    @Test(expected = TimeoutException.class)
-    public void should_pause_throw_exception_on_timeout() throws TimeoutException, InterruptedException, SBonitaException {
+    @Test(expected = SWorkException.class)
+    public void should_pause_throw_exception_on_timeout() throws SWorkException, InterruptedException {
         // given
         workService.start();
         doReturn(false).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -294,7 +293,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_stop_do_not_throw_exception_on_timeout() throws InterruptedException {
+    public void should_stop_do_not_throw_exception_on_timeout() throws SWorkException, InterruptedException {
         // given
         workService.start();
         doReturn(false).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -307,7 +306,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test(expected = SWorkException.class)
-    public void should_pause_throw_exception_on_interrupted() throws TimeoutException, InterruptedException, SBonitaException {
+    public void should_pause_throw_exception_on_interrupted() throws InterruptedException, SBonitaException {
         // given
         workService.start();
         doThrow(InterruptedException.class).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -319,7 +318,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_stop_do_not_throw_exception_on_interrupted() throws InterruptedException {
+    public void should_stop_do_not_throw_exception_on_interrupted() throws SWorkException, InterruptedException {
         // given
         workService.start();
         doThrow(InterruptedException.class).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));

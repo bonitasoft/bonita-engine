@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SAutomaticTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
@@ -121,6 +122,8 @@ public class XMLSProcessDefinition {
 
     public static final String DATA_DEFINITION_NODE = "dataDefinition";
 
+    public static final String BUSINESS_DATA_DEFINITION_NODE = "businessDataDefinition";
+
     public static final String USER_TASK_NODE = "userTask";
 
     public static final String MANUAL_TASK_NODE = "manualTask";
@@ -214,6 +217,8 @@ public class XMLSProcessDefinition {
     public static final String USER_FILTER_ID = "userFilterId";
 
     public static final String DATA_DEFINITION_CLASS = "className";
+
+    public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
     public static final String DATA_DEFINITION_TRANSIENT = "transient";
 
@@ -325,6 +330,8 @@ public class XMLSProcessDefinition {
 
     public static final String TRIGGERED_BY_EVENT = "triggeredByEvent";
 
+    private static final String BUSINESS_DATA_DEFINITIONS_NODE = "businessDataDefinitions";
+
     private final Map<Object, String> objectToId = new HashMap<Object, String>();
 
     static final class BEntry<K, V> implements Map.Entry<K, V> {
@@ -430,6 +437,14 @@ public class XMLSProcessDefinition {
             fillConnectorNode(connectorNode, connector);
             connectorsNode.addChild(connectorNode);
         }
+
+        final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
+        flowElements.addChild(businessDataDefinitionsNode);
+        for (final SBusinessDataDefinition businessDataDefinition : container.getBusinessDataDefinitions()) {
+            final XMLNode businessDataDefinitionNode = createBusinessDataDefinitionNode(businessDataDefinition);
+            businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+        }
+
         final XMLNode dataDefinitionsNode = new XMLNode(DATA_DEFINITIONS_NODE);
         flowElements.addChild(dataDefinitionsNode);
         for (final SDataDefinition dataDefinition : container.getDataDefinitions()) {
@@ -445,6 +460,22 @@ public class XMLSProcessDefinition {
         }
 
         createAndFillFlowNodes(container, flowElements);
+    }
+
+    protected XMLNode createBusinessDataDefinitionNode(final SBusinessDataDefinition businessDataDefinition) {
+        final XMLNode businessDataDefinitionNode = new XMLNode(BUSINESS_DATA_DEFINITION_NODE);
+        businessDataDefinitionNode.addAttribute(NAME, businessDataDefinition.getName());
+        businessDataDefinitionNode.addAttribute(BUSINESS_DATA_DEFINITION_CLASS, businessDataDefinition.getClassName());
+        if (businessDataDefinition.getDescription() != null) {
+            businessDataDefinitionNode.addChild(DESCRIPTION, businessDataDefinition.getDescription());
+        }
+        SExpression defaultValueExpression;
+        if ((defaultValueExpression = businessDataDefinition.getDefaultValueExpression()) != null) {
+            final XMLNode defaultValueNode = new XMLNode(DEFAULT_VALUE_NODE);
+            fillExpressionNode(defaultValueNode, defaultValueExpression);
+            businessDataDefinitionNode.addChild(defaultValueNode);
+        }
+        return businessDataDefinitionNode;
     }
 
     private void createAndFillFlowNodes(final SFlowElementContainerDefinition container, final XMLNode flowElements) {

@@ -17,3 +17,5 @@ DELETE FROM token;
 DELETE FROM process_instance;
 
 DELETE FROM breakpoint;
+
+DELETE FROM ref_biz_data_inst;

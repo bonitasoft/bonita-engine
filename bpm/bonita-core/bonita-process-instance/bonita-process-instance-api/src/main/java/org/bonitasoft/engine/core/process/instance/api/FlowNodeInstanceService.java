@@ -66,7 +66,6 @@ public interface FlowNodeInstanceService {
     static final String EXPECTED_END_DATE_MODIFIED = "EXPECTED_END_DATE_MODIFIED";
 
     /**
-     * 
      * @param flowNodeInstanceId
      * @return
      * @throws SFlowNodeNotFoundException
@@ -76,7 +75,6 @@ public interface FlowNodeInstanceService {
     SFlowNodeInstance getFlowNodeInstance(long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException;
 
     /**
-     * 
      * @param rootContainerId
      * @param fromIndex
      * @param maxResults
@@ -87,7 +85,6 @@ public interface FlowNodeInstanceService {
     List<SFlowNodeInstance> getFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
 
     /**
-     * 
      * @param flowNodeInstance
      * @param state
      * @throws SFlowNodeModificationException
@@ -96,7 +93,6 @@ public interface FlowNodeInstanceService {
     void setState(SFlowNodeInstance flowNodeInstance, FlowNodeState state) throws SFlowNodeModificationException;
 
     /**
-     * 
      * @param rootContainerId
      * @return
      * @throws SFlowNodeReadException
@@ -105,7 +101,6 @@ public interface FlowNodeInstanceService {
     List<SFlowNodeInstance> getActiveFlowNodes(long rootContainerId) throws SFlowNodeReadException;
 
     /**
-     * 
      * @param flowNodeInstance
      * @param priority
      * @throws SFlowNodeModificationException
@@ -114,7 +109,6 @@ public interface FlowNodeInstanceService {
     void setTaskPriority(SFlowNodeInstance flowNodeInstance, STaskPriority priority) throws SFlowNodeModificationException;
 
     /**
-     * 
      * @param flowNodeInstance
      * @param displayDescription
      * @throws SFlowNodeModificationException
@@ -123,7 +117,6 @@ public interface FlowNodeInstanceService {
     void updateDisplayDescription(SFlowNodeInstance flowNodeInstance, String displayDescription) throws SFlowNodeModificationException;
 
     /**
-     * 
      * @param flowNodeInstance
      * @param displayName
      * @throws SFlowNodeModificationException
@@ -132,7 +125,6 @@ public interface FlowNodeInstanceService {
     void updateDisplayName(SFlowNodeInstance flowNodeInstance, String displayName) throws SFlowNodeModificationException;
 
     /**
-     * 
      * @param flowElementInstance
      * @param stateCategory
      * @throws SFlowNodeModificationException
@@ -141,7 +133,6 @@ public interface FlowNodeInstanceService {
     void setStateCategory(SFlowElementInstance flowElementInstance, SStateCategory stateCategory) throws SFlowNodeModificationException;
 
     /**
-     * 
      * @param entityClass
      * @param countOptions
      * @return
@@ -151,7 +142,6 @@ public interface FlowNodeInstanceService {
     long getNumberOfFlowNodeInstances(Class<? extends PersistentObject> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
 
     /**
-     * 
      * @param entityClass
      * @param searchOptions
      * @return
@@ -226,7 +216,6 @@ public interface FlowNodeInstanceService {
     List<SAFlowNodeInstance> getArchivedFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
 
     /**
-     * 
      * @param archivedFlowNodeInstanceId
      * @param persistenceService
      * @return
@@ -251,7 +240,6 @@ public interface FlowNodeInstanceService {
     List<SFlowNodeInstance> getFlowNodeInstancesToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
     /**
-     * 
      * @param saFlowNodeInstance
      * @throws SFlowNodeReadException
      * @throws SFlowNodeDeletionException
@@ -260,12 +248,28 @@ public interface FlowNodeInstanceService {
     void deleteArchivedFlowNodeInstance(SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
 
     /**
-     * 
      * @param sFlowNodeInstance
      * @throws SFlowNodeReadException
      * @throws SFlowNodeDeletionException
      * @since 6.1
      */
     void deleteFlowNodeInstance(SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
+
+    /**
+     * Get the process instance ID. It can be itself if containerType is a PROCESS_INSTANCE, or the containing process instance id if containerType is a
+     * ACTIVITY_INSTANCE.
+     * 
+     * @param containerId
+     *            the ID of the container of the flownode or process to get the process instance ID for.
+     * @param containerType
+     *            the type of container, can be one of {@link DataInstanceContainer#PROCESS_INSTANCE} or {@link DataInstanceContainer#ACTIVITY_INSTANCE}
+     * @return the process instance id found
+     * @throws SFlowNodeNotFoundException
+     *             if containerType is an ACTIVITY_INSTANCE and the flownode/activity instance is not found with id containerId.
+     * @throws SFlowNodeReadException
+     *             if a read exception occurs.
+     * @since 6.3
+     */
+    long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException;
 
 }

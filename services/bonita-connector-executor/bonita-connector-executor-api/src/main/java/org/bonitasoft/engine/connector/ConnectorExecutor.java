@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,15 @@ package org.bonitasoft.engine.connector;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 
 /**
  * @author Feng Hui
+ * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface ConnectorExecutor extends ServiceWithLifecycle {
+public interface ConnectorExecutor extends TenantLifecycleService {
 
     /**
      * Execute a connector.

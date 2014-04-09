@@ -1065,7 +1065,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void setExceptionContext(final SProcessInstance sProcessInstance, final SBonitaException e) {
         e.setProcessInstanceIdOnContext(sProcessInstance.getId());
         e.setRootProcessInstanceIdOnContext(sProcessInstance.getRootProcessInstanceId());
-    }
+        }
 
     private void setExceptionContext(final SFlowNodeInstance sFlowNodeInstance, final SBonitaException e) {
         e.setFlowNodeDefinitionIdOnContext(sFlowNodeInstance.getFlowNodeDefinitionId());

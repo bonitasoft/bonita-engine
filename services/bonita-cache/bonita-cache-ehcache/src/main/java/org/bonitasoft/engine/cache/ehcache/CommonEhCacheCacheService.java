@@ -54,8 +54,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
-        ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         ehCacheConfig.setEternal(cacheConfig.isEternal());
+        if (!cacheConfig.isEternal()) {
+        ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+        }
         return ehCacheConfig;
     }
 
@@ -296,14 +298,14 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public synchronized void start() {
-        this.cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
+        cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
     }
 
     @Override
     public synchronized void stop() {
         if (cacheManager != null) {
-            this.cacheManager.shutdown();
-            this.cacheManager = null;
+            cacheManager.shutdown();
+            cacheManager = null;
         }
     }
 
