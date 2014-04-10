@@ -3795,14 +3795,20 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException, AlreadyExistsException {
-        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
-        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
+        final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
+        final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
         try {
             checkIfProcessSupervisorAlreadyExists(sProcessSupervisor.getProcessDefId(), sProcessSupervisor.getUserId(), sProcessSupervisor.getGroupId(),
                     sProcessSupervisor.getRoleId());
 
             final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(sProcessSupervisor);
+            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "The process manager for the process definition with id <"
+                        + sProcessSupervisor.getProcessDefId() + "> bas been created with user id = <" + sProcessSupervisor.getUserId() + ">, group id = <"
+                        + sProcessSupervisor.getGroupId() + ">, and role id = <" + sProcessSupervisor.getRoleId() + ">");
+            }
             return ModelConvertor.toProcessSupervisor(supervisor);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
