@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -91,11 +92,17 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_should_return_the_list_of_results_after_querying() throws Exception {
-        final SExpressionImpl expression = new SExpressionImpl("employees", "getEmployees", null, List.class.getName(), null, null);
+        final SExpression dependencyStartIndex = new SExpressionImpl("startIndex", "startIndex", null, Integer.class.getName(), null, null);
+        final SExpression dependencyMaxResults = new SExpressionImpl("maxResults", "startIndex", null, Integer.class.getName(), null, null);
+        final SExpressionImpl expression = new SExpressionImpl("employees", "getEmployees", null, List.class.getName(), null, Arrays.asList(
+                dependencyStartIndex, dependencyMaxResults));
 
-        strategy.evaluate(expression, buildContext(), null);
+        final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(2);
+        resolvedExpressions.put(dependencyStartIndex.getDiscriminant(), 0);
+        resolvedExpressions.put(dependencyMaxResults.getDiscriminant(), 10);
+        strategy.evaluate(expression, buildContext(), resolvedExpressions);
 
-        verify(businessDataRepository).findListByNamedQuery("getEmployees", Entity.class, Collections.<String, Serializable> emptyMap());
+        verify(businessDataRepository).findListByNamedQuery("getEmployees", Entity.class, Collections.<String, Serializable> emptyMap(), 0, 10);
     }
 
     @Test

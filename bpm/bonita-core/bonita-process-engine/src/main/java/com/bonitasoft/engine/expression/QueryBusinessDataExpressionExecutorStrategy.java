@@ -54,7 +54,9 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
                 }
                 return businessDataRepository.findByNamedQuery(queryName, numberClass, parameters);
             } else if (List.class.getName().equals(returnType)) {
-                return businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters);
+                return businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters,
+                        getStartIndexParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters),
+                        getMaxResultParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters));
             } else {
                 return businessDataRepository.findByNamedQuery(queryName, Entity.class, parameters);
             }
@@ -63,11 +65,33 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
+    private int getStartIndexParameter(final List<SExpression> dependencies, final Map<Integer, Object> resolvedExpressions, final String expressionName,
+            final Map<String, Serializable> parameters) throws SExpressionEvaluationException {
+        for (SExpression dependency : dependencies) {
+            if ("startIndex".equals(dependency.getName())) {
+                parameters.remove(dependency.getName());
+                return (Integer) resolvedExpressions.get(dependency.getDiscriminant());
+            }
+        }
+        throw new SExpressionEvaluationException(
+                "Pagination parameter 'startIndex' is mandatory when calling 'find*()' methods returning a List of Business Data", expressionName);
+    }
+
+    private int getMaxResultParameter(final List<SExpression> dependencies, final Map<Integer, Object> resolvedExpressions, final String expressionName,
+            final Map<String, Serializable> parameters) throws SExpressionEvaluationException {
+        for (SExpression dependency : dependencies) {
+            if ("maxResults".equals(dependency.getName())) {
+                parameters.remove(dependency.getName());
+                return (Integer) resolvedExpressions.get(dependency.getDiscriminant());
+            }
+        }
+        throw new SExpressionEvaluationException(
+                "Pagination parameter 'maxResults' is mandatory when calling 'find*()' methods returning a List of Business Data", expressionName);
+    }
+
     private boolean isNumber(final String returnType) {
-        return Long.class.getName().equals(returnType) ||
-                Integer.class.getName().equals(returnType) ||
-                Double.class.getName().equals(returnType) ||
-                Float.class.getName().equals(returnType);
+        return Long.class.getName().equals(returnType) || Integer.class.getName().equals(returnType) || Double.class.getName().equals(returnType)
+                || Float.class.getName().equals(returnType);
     }
 
     @Override

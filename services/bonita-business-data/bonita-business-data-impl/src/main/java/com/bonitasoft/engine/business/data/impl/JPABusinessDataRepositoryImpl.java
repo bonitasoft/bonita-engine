@@ -162,9 +162,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters) {
+    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters,
+            final int startIndex, final int maxResults) {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
-        return findList(resultClass, typedQuery, parameters);
+        return findList(resultClass, typedQuery, parameters, startIndex, maxResults);
     }
 
     @Override
@@ -176,17 +177,19 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters) {
+    public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass,
+            final Map<String, Serializable> parameters, final int startIndex, final int maxResults) {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
-        return findList(resultClass, query, parameters);
+        return findList(resultClass, query, parameters, startIndex, maxResults);
     }
 
     private <T extends Serializable> TypedQuery<T> createTypedQuery(final String jpqlQuery, final Class<T> resultClass) {
         return getEntityManager().createQuery(jpqlQuery, resultClass);
     }
 
-    protected <T extends Serializable> List<T> findList(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters) {
+    protected <T extends Serializable> List<T> findList(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters,
+            final int startIndex, final int maxResults) {
         if (query == null) {
             throw new IllegalArgumentException("query is null");
         }
@@ -195,6 +198,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
                 query.setParameter(parameter.getKey(), parameter.getValue());
             }
         }
+        query.setFirstResult(startIndex);
+        query.setMaxResults(maxResults);
         final EntityManager em = getEntityManager();
         final List<T> resultList = query.getResultList();
         final List<T> copyList = new ArrayList<T>();

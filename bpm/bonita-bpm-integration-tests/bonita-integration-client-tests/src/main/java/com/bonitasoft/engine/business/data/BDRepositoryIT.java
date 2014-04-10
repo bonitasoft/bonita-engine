@@ -412,13 +412,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
             final BusinessObjectDAO daoImpl = businessObjectDAOFactory.createDAO(apiSession, daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME + "DAOImpl");
 
-            final Method daoMethod = daoImpl.getClass().getMethod(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, String.class);
+            final Method daoMethod = daoImpl.getClass().getMethod(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, String.class, int.class, int.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
-            List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol");
+            List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol", 0, 10);
             assertThat(result).isNotEmpty();
 
-            result = (List<?>) daoMethod.invoke(daoImpl, "Hanin");
+            result = (List<?>) daoMethod.invoke(daoImpl, "Hanin", 0, 10);
             assertThat(result).isEmpty();
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);

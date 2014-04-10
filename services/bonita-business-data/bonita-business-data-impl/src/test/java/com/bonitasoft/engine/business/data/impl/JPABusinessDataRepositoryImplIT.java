@@ -263,7 +263,7 @@ public class JPABusinessDataRepositoryImplIT {
         final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
 
         final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
-                null);
+                null, 0, 10);
 
         assertThat(employees).containsExactly(e2, e3, e1);
     }
@@ -272,13 +272,13 @@ public class JPABusinessDataRepositoryImplIT {
     public void findListShouldReturnEmptyListIfNoResults() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) "Jaakko");
         final List<Employee> employees = businessDataRepository.findList(Employee.class,
-                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters);
+                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters, 0, 10);
         assertThat(employees).isEmpty();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findListShouldThrowAnExceptionIfAtLeastOneQueryParameterIsNotSet() throws Exception {
-        businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null);
+        businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null, 0, 10);
     }
 
     @Test

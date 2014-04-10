@@ -3,6 +3,7 @@ package com.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
@@ -20,6 +21,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +54,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @After
     public void tearDown() throws Exception {
-        destDir.delete();
+        FileUtils.deleteDirectory(destDir);
     }
 
     @Test
@@ -301,13 +303,70 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
 
-        final Query query = new Query("findByName", "From Employee e WHERE e.name = :name", List.class.getName());
+        final Query query = new Query("findByName", "From Employee e WHERE e.name = :name", EMPLOYEE_QUALIFIED_NAME);
         query.addQueryParameter("name", String.class.getName());
         employeeBO.getQueries().add(query);
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
+        String daoContent = readGeneratedDAOFile();
+        // String signature = getQueryMethodSignature(query, query.getReturnType(), EMPLOYEE_QUALIFIED_NAME, false);
+        assertThat(daoContent).contains("public Employee findByName(String name)");
+    }
+
+    @Test
+    public void queryGenerationReturningListShouldAddPaginationParameters() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final Field nameField = new Field();
+        nameField.setName("name");
+        nameField.setType(FieldType.STRING);
+        employeeBO.getFields().add(nameField);
+        final Field ageField = new Field();
+        ageField.setName("age");
+        ageField.setType(FieldType.INTEGER);
+        employeeBO.getFields().add(ageField);
+
+        final Query query = new Query("getEmployeesByNameAndAge", "From Employee e WHERE e.name = :myName AND e.age = :miEdad", List.class.getName());
+        query.addQueryParameter("myName", String.class.getName());
+        query.addQueryParameter("miEdad", Integer.class.getName());
+        employeeBO.getQueries().add(query);
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(employeeBO);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
+        bdmCodeGenerator.generate(destDir);
+        String daoContent = readGeneratedDAOFile();
+        // String signature = getQueryMethodSignature(query, query.getReturnType(), EMPLOYEE_QUALIFIED_NAME, true);
+        // "public List<Employee> getEmployeesByNameAndAge(String myName, Integer miEdad, final int startIndex, final int maxResults)":
+        assertThat(daoContent).contains("public List<Employee> getEmployeesByNameAndAge(String myName, Integer miEdad, int startIndex, int maxResults)");
+    }
+
+    protected String getQueryMethodSignature(final Query query, final String queryReturnType, final String businessObjectName, final boolean returnsList) {
+        String signature = "public " + getSimpleClassName(queryReturnType) + "<" + getSimpleClassName(businessObjectName) + "> " + query.getName() + "(";
+        boolean first = true;
+        for (QueryParameter param : query.getQueryParameters()) {
+            signature = appendCommaIfNotFirstParam(signature, first);
+            signature += getSimpleClassName(param.getClassName()) + " " + param.getName();
+            first = false;
+        }
+        if (returnsList) {
+            signature = appendCommaIfNotFirstParam(signature, first);
+            signature += "int startIndex, int maxResults";
+        }
+        signature += ")";
+        return signature;
+    }
+
+    protected String appendCommaIfNotFirstParam(String signature, final boolean first) {
+        if (!first) {
+            signature += ", ";
+        }
+        return signature;
+    }
+
+    private String getSimpleClassName(final String qualifedClassName) {
+        return qualifedClassName.substring(qualifedClassName.lastIndexOf('.') + 1);
     }
 
     @Test
@@ -329,6 +388,11 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
+    }
+
+    private String readGeneratedDAOFile() throws IOException {
+        File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replaceAll("\\.", File.separator) + "DAO.java");
+        return FileUtils.readFileToString(daoInterface);
     }
 
     public void assertTextField(final JFieldVar fieldVar) {
