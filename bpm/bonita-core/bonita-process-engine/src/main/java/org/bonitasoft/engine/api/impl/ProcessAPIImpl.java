@@ -3729,10 +3729,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteSupervisor(final long supervisorId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
         try {
             supervisorService.deleteProcessSupervisor(supervisorId);
+            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "The process manager has been deleted with id = <" + supervisorId + ">.");
+            }
         } catch (final SSupervisorNotFoundException e) {
-            throw new DeletionException("supervisor not found with id " + supervisorId);
+            throw new DeletionException("The process manager was not found with id = <" + supervisorId + ">");
         } catch (final SSupervisorDeletionException e) {
             throw new DeletionException(e);
         }
@@ -3742,6 +3746,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteSupervisor(final Long processDefinitionId, final Long userId, final Long roleId, final Long groupId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
 
         try {
             final List<SProcessSupervisor> sProcessSupervisors = searchSProcessSupervisors(processDefinitionId, userId, groupId, roleId);
@@ -3749,6 +3754,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (!sProcessSupervisors.isEmpty()) {
                 // Then, delete it
                 supervisorService.deleteProcessSupervisor(sProcessSupervisors.get(0));
+                if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                    technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "The process manager has been deleted with process definition id = <"
+                            + processDefinitionId + ">, user id = <" + userId + ">, group id = <" + groupId + ">, and role id = <" + roleId + ">.");
+                }
             } else {
                 throw new SSupervisorNotFoundException("No supervisor was found with userId = " + userId + ", roleId = " + roleId + ", groupId = " + groupId
                         + ", processDefinitionId = " + processDefinitionId);
@@ -3805,8 +3814,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
             final SProcessSupervisor supervisor = supervisorService.createProcessSupervisor(sProcessSupervisor);
             if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "The process manager for the process definition with id <"
-                        + sProcessSupervisor.getProcessDefId() + "> bas been created with user id = <" + sProcessSupervisor.getUserId() + ">, group id = <"
+                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "The process manager has been created with process definition id = <"
+                        + sProcessSupervisor.getProcessDefId() + ">, user id = <" + sProcessSupervisor.getUserId() + ">, group id = <"
                         + sProcessSupervisor.getGroupId() + ">, and role id = <" + sProcessSupervisor.getRoleId() + ">");
             }
             return ModelConvertor.toProcessSupervisor(supervisor);
