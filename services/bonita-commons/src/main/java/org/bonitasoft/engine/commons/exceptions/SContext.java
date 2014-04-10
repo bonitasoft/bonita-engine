@@ -93,6 +93,14 @@ public enum SContext {
      */
     USER_ID,
     /**
+     * Corresponding to the identifier of the group
+     */
+    GROUP_ID,
+    /**
+     * Corresponding to the identifier of the role
+     */
+    ROLE_ID,
+    /**
      * Corresponding to the identifier of the thread
      */
     THREAD_ID,

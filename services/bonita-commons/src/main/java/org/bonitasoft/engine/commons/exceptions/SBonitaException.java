@@ -276,6 +276,24 @@ public abstract class SBonitaException extends Exception {
     }
 
     /**
+     * @param groupId
+     *            The identifier of the group
+     * @since 6.3
+     */
+    public void setGroupIdOnContext(long groupId) {
+        context.put(SContext.GROUP_ID, groupId);
+    }
+
+    /**
+     * @param roleId
+     *            The identifier of the role
+     * @since 6.3
+     */
+    public void setRoleIdOnContext(long roleId) {
+        context.put(SContext.ROLE_ID, roleId);
+    }
+
+    /**
      * @param threadId
      *            The thread id to set
      * @since 6.3

@@ -3759,8 +3759,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                             + processDefinitionId + ">, user id = <" + userId + ">, group id = <" + groupId + ">, and role id = <" + roleId + ">.");
                 }
             } else {
-                throw new SSupervisorNotFoundException("No supervisor was found with userId = " + userId + ", roleId = " + roleId + ", groupId = " + groupId
-                        + ", processDefinitionId = " + processDefinitionId);
+                throw new SSupervisorNotFoundException(userId, roleId, groupId, processDefinitionId);
             }
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
