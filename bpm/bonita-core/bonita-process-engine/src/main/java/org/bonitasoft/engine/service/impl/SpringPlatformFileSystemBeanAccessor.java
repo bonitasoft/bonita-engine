@@ -16,6 +16,9 @@ package org.bonitasoft.engine.service.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -43,8 +46,13 @@ public class SpringPlatformFileSystemBeanAccessor {
                     return pathname.isFile() && pathname.getName().endsWith(".xml");
                 }
             };
-
-            final File[] listFiles = serviceFolder.listFiles(filter);
+            /*
+             * sort this to have always the same order
+             */
+            File[] listFiles = serviceFolder.listFiles(filter);
+            List<File> listFilesCollection = Arrays.asList(listFiles);
+            Collections.sort(listFilesCollection);
+            listFiles = listFilesCollection.toArray(new File[listFilesCollection.size()]);
             if (listFiles.length == 0) {
                 throw new RuntimeException("No file found");
             }
