@@ -267,6 +267,15 @@ public abstract class SBonitaException extends Exception {
     }
 
     /**
+     * @param id
+     *            The identifier of the document
+     * @since 6.3
+     */
+    public void setDocumentIdOnContext(final long id) {
+        context.put(SContext.DOCUMENT_ID, id);
+    }
+
+    /**
      * @param userId
      *            The identifier of the user
      * @since 6.3
