@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
@@ -26,7 +27,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -76,7 +76,6 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    @Ignore
     public void searchArchivedFlowNodeInstancesSupervisedBy() throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
@@ -95,7 +94,6 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class, FlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    @Ignore
     public void searchFlowNodeInstancesSupervisedByShouldFind1PendingFlowNodeAndThenFinishesItAndFindNoFlowNode() throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -142,5 +140,23 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
         assertEquals(failingTaskName, result.get(0).getName());
 
         getProcessAPI().deleteSupervisor(failedProcessSupervisor.getSupervisorId());
+    }
+
+    @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
+    @Test
+    public void searchArchivedACtivityInstancesSupervisedByShouldFind2Activities() throws Exception {
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
+        waitForProcessToFinish(processInstance);
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
+        final SearchResult<ArchivedActivityInstance> searchArchivedActivityInstancesSupervisedBy = getProcessAPI().searchArchivedActivityInstancesSupervisedBy(
+                user.getId(), builder.done());
+        assertEquals(2, searchArchivedActivityInstancesSupervisedBy.getCount());
+
+        final List<ArchivedActivityInstance> result = searchArchivedActivityInstancesSupervisedBy.getResult();
+        assertEquals("sendTask", result.get(0).getName());
+        assertEquals("userTask1", result.get(1).getName());
     }
 }

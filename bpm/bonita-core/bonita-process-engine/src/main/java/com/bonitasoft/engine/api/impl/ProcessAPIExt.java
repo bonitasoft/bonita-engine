@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
@@ -116,6 +117,7 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
+import org.bonitasoft.engine.search.supervisor.SearchArchivedActivityInstanceSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchArchivedFlowNodeInstanceSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchFlowNodeInstanceSupervisedBy;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -1092,6 +1094,24 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (SBonitaSearchException e) {
             throw new RetrieveException(e);
         }
+    }
+
+    @Override
+    public SearchResult<ArchivedActivityInstance> searchArchivedActivityInstancesSupervisedBy(final long supervisorId, final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchArchivedActivityInstanceSupervisedBy searchedTasksTransaction = new SearchArchivedActivityInstanceSupervisedBy(supervisorId,
+                activityInstanceService, flowNodeStateManager, searchEntitiesDescriptor.getSearchArchivedFlowNodeInstanceDescriptor(), searchOptions);
+
+        try {
+            searchedTasksTransaction.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        return searchedTasksTransaction.getResult();
     }
 
     @Override
