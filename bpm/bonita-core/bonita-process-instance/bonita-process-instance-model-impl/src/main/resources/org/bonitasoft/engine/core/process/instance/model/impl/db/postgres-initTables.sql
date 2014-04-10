@@ -8,3 +8,4 @@ INSERT INTO sequence VALUES(${tenantid}, 10018, 1);
 INSERT INTO sequence VALUES(${tenantid}, 10019, 1);
 INSERT INTO sequence VALUES(${tenantid}, 10095, 1);
 INSERT INTO sequence VALUES(${tenantid}, 10110, 1);
+INSERT INTO sequence VALUES(${tenantid}, 10096, 1);

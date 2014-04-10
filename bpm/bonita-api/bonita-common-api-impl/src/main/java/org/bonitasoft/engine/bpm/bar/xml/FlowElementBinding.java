@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -54,6 +55,8 @@ public class FlowElementBinding extends ElementBinding {
 
     private final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
 
+    private final List<BusinessDataDefinition> businessDataDefinitions = new ArrayList<BusinessDataDefinition>();
+
     private final List<DocumentDefinition> documentDefinitions = new ArrayList<DocumentDefinition>();
 
     private final List<ConnectorDefinition> connectors = new ArrayList<ConnectorDefinition>();
@@ -69,6 +72,8 @@ public class FlowElementBinding extends ElementBinding {
             connectors.add((ConnectorDefinition) value);
         } else if (XMLProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((DataDefinition) value);
+        } else if (XMLProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
+            businessDataDefinitions.add((BusinessDataDefinition) value);
         } else if (XMLProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((DataDefinition) value);
         } else if (XMLProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
@@ -109,6 +114,9 @@ public class FlowElementBinding extends ElementBinding {
         for (final DataDefinition dataDefinition : dataDefinitions) {
             container.addDataDefinition(dataDefinition);
         }
+        for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+            container.addBusinessDataDefinition(businessDataDefinition);
+        }
         for (final DocumentDefinition documentDefinition : documentDefinitions) {
             container.addDocumentDefinition(documentDefinition);
         }
@@ -139,8 +147,7 @@ public class FlowElementBinding extends ElementBinding {
             final FlowNodeDefinitionImpl sourceNode = (FlowNodeDefinitionImpl) container.getFlowNode(source);
             if (sourceNode != null) {
                 final TransitionDefinition defaultTransition = sourceNode.getDefaultTransition();
-                if (defaultTransition != null
-                        && ((TransitionDefinitionImpl) defaultTransition).getId() == ((TransitionDefinitionImpl) transition).getId()) {
+                if (defaultTransition != null && ((TransitionDefinitionImpl) defaultTransition).getId() == ((TransitionDefinitionImpl) transition).getId()) {
                     sourceNode.setDefaultTransition(transition);
                 } else {
                     final List<TransitionDefinition> outgoingTransitionsForSourceNode = sourceNode.getOutgoingTransitions();

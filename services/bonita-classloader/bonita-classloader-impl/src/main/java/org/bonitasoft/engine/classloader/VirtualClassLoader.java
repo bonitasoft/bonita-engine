@@ -31,7 +31,7 @@ public class VirtualClassLoader extends ClassLoader {
      * The bigger weakness of this class is that it does not override ALL public, package and protected methods of the java.lang.ClassLoader class
      * The risk (already experimented with Groovy integration for example) is that this VirtualClassLoader will be the parent of any other kind of classloader
      * (GroovyClassLoader for example)
-     * and thus, all protected/package methods can be called this this "clhid" classloader. If VirtualClassLoader does not override the given method to delegate
+     * and thus, all protected/package methods can be called with this "child" classloader. If VirtualClassLoader does not override the given method to delegate
      * this to the BonitaClassLoader instance
      * then the delegation model does not work anymore and some classes/resources can't be found. A good implementation should override all methods...
      */
@@ -53,57 +53,57 @@ public class VirtualClassLoader extends ClassLoader {
 
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
-        if (this.classloader != null) {
-            return this.classloader.loadClass(name, false);
+        if (classloader != null) {
+            return classloader.loadClass(name, false);
         }
         return getParent().loadClass(name);
     }
 
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        if (this.classloader != null) {
-            return this.classloader.loadClass(name, resolve);
+        if (classloader != null) {
+            return classloader.loadClass(name, resolve);
         }
         return getParent().loadClass(name);
     }
 
     @Override
     public InputStream getResourceAsStream(final String name) {
-        if (this.classloader != null) {
-            return this.classloader.getResourceAsStream(name);
+        if (classloader != null) {
+            return classloader.getResourceAsStream(name);
         }
         return getParent().getResourceAsStream(name);
     }
 
     public BonitaClassLoader getClassLoader() {
-        return this.classloader;
+        return classloader;
     }
 
     @Override
     public URL getResource(final String name) {
-        if (this.classloader != null) {
-            return this.classloader.getResource(name);
+        if (classloader != null) {
+            return classloader.getResource(name);
         }
         return getParent().getResource(name);
     }
-
+    
     @Override
     public Enumeration<URL> getResources(final String name) throws IOException {
-        if (this.classloader != null) {
-            return this.classloader.getResources(name);
+        if (classloader != null) {
+            return classloader.getResources(name);
         }
         return getParent().getResources(name);
     }
-
+    
     public void release() {
-        if (this.classloader != null) {
-            this.classloader.release();
+        if (classloader != null) {
+            classloader.release();
         }
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + this.artifactType + ", id=" + this.artifactId;
+        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + this.classloader;
     }
 
 }

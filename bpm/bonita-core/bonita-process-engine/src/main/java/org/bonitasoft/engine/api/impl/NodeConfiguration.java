@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,16 +15,16 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 
 /**
  * This class allow to provide a configuration for the current node
- * 
  * We should be able to have one different per node
  * 
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public interface NodeConfiguration {
 
@@ -49,6 +49,11 @@ public interface NodeConfiguration {
     List<RestartHandler> getRestartHandlers();
 
     /**
+     * @return the platform services with a lifecycle
+     */
+    List<PlatformLifecycleService> getLifecycleServices();
+
+    /**
      * @return
      */
     boolean shouldStartEventHandlingJob();
@@ -59,15 +64,9 @@ public interface NodeConfiguration {
     List<TenantRestartHandler> getTenantRestartHandlers();
 
     /**
-     * 
      * @return
      *         true if the sessions should be cleaned when the node is stopped
      */
     boolean shouldClearSessions();
-
-    /**
-     * @return
-     */
-    List<ServiceWithLifecycle> getServicesToStart();
 
 }

@@ -119,4 +119,12 @@ public class OrganizationMappingConstants {
 
     static final String EMAIL = "email";
 
+    static final String CUSTOM_USER_INFO_DEFINITION = "customUserInfoDefinition";
+
+    static final String CUSTOM_USER_INFO_DEFINITIONS = "customUserInfoDefinitions";
+    
+    static final String CUSTOM_USER_INFO_VALUE = "customUserInfoValue";
+    
+    static final String CUSTOM_USER_INFO_VALUES = "customUserInfoValues";
+
 }

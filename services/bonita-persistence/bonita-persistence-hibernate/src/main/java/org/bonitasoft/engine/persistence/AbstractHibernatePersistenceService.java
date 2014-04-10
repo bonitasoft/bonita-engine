@@ -49,11 +49,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StaleStateException;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.service.ServiceRegistry;
 import org.hibernate.stat.Statistics;
 
 /**
@@ -121,8 +119,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
         }
 
-        final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        sessionFactory = configuration.buildSessionFactory();
         statistics = sessionFactory.getStatistics();
 
         final Iterator<PersistentClass> classMappingsIterator = configuration.getClassMappings();
@@ -551,7 +548,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 clause.append(completeField).append(" != ").append(fieldValue);
                 break;
             case IN:
-                // TODO:write IN
+                clause.append(getInClause(completeField, filterOption));
                 break;
             case BETWEEN:
                 final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
@@ -580,6 +577,23 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 break;
         }
         return completeField;
+    }
+    
+    private String getInClause(StringBuilder completeField, FilterOption filterOption) {
+        StringBuilder stb = new StringBuilder(completeField);
+        stb.append(" in (");
+        stb.append(getInValues(filterOption));
+        stb.append(")");
+        return stb.toString();
+    }
+
+    private String getInValues(FilterOption filterOption) {
+        StringBuilder stb = new StringBuilder();
+        for (Object element : filterOption.getIn()) {
+            stb.append(element + ",");
+        }
+        String inValues = stb.toString();
+        return inValues.substring(0, inValues.length() -1);
     }
 
     private <T> void appendOrderByClause(final StringBuilder builder, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {

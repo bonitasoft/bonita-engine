@@ -36,4 +36,8 @@ public class SIdentityException extends SBonitaException {
         super(message, cause);
     }
 
+    public SIdentityException(final String message) {
+        super(message);
+    }
+
 }

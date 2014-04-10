@@ -99,12 +99,12 @@ public class ExpressionBuilder {
      * @since 6.0
      */
     public Expression createConstantStringExpression(final String value) throws InvalidExpressionException {
-        createNewInstance(value).setContent(value).setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName());
+        createNewInstance(value).setContent(value).setExpressionType(ExpressionType.TYPE_CONSTANT).setReturnType(String.class.getName());
         return done();
     }
 
     public Expression createConstantBooleanExpression(final boolean value) throws InvalidExpressionException {
-        createNewInstance(Boolean.toString(value)).setContent(value ? "true" : "false").setExpressionType(ExpressionType.TYPE_CONSTANT.name())
+        createNewInstance(Boolean.toString(value)).setContent(value ? "true" : "false").setExpressionType(ExpressionType.TYPE_CONSTANT)
                 .setReturnType(Boolean.class.getName());
         return done();
     }
@@ -119,49 +119,53 @@ public class ExpressionBuilder {
      * @since 6.0
      */
     public Expression createConstantDateExpression(final String value) throws InvalidExpressionException {
-        createNewInstance(value).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
-                .setReturnType(Date.class.getName());
+        createNewInstance(value).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT).setReturnType(Date.class.getName());
         return done();
     }
 
     public Expression createConstantLongExpression(final long value) throws InvalidExpressionException {
-        createNewInstance(Long.toString(value)).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
+        createNewInstance(Long.toString(value)).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT)
                 .setReturnType(Long.class.getName());
         return done();
     }
 
     public Expression createConstantIntegerExpression(final int value) throws InvalidExpressionException {
-        createNewInstance(Integer.toString(value)).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
+        createNewInstance(Integer.toString(value)).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT)
                 .setReturnType(Integer.class.getName());
         return done();
     }
 
     public Expression createDataExpression(final String dataName, final String dataType) throws InvalidExpressionException {
-        return createNewInstance(dataName).setContent(dataName).setExpressionType(ExpressionType.TYPE_VARIABLE.name()).setReturnType(dataType).done();
+        return createNewInstance(dataName).setContent(dataName).setExpressionType(ExpressionType.TYPE_VARIABLE).setReturnType(dataType).done();
+    }
+
+    public Expression createBusinessDataExpression(final String businessDataName, final String returnType) throws InvalidExpressionException {
+        return createNewInstance(businessDataName).setContent(businessDataName).setExpressionType(ExpressionType.TYPE_BUSINESS_DATA).setReturnType(returnType)
+                .done();
     }
 
     public Expression createDocumentReferenceExpression(final String documentName) throws InvalidExpressionException {
-        return createNewInstance(documentName).setContent(documentName).setExpressionType(ExpressionType.TYPE_DOCUMENT.name())
-                .setReturnType(Document.class.getName()).done();
+        return createNewInstance(documentName).setContent(documentName).setExpressionType(ExpressionType.TYPE_DOCUMENT).setReturnType(Document.class.getName())
+                .done();
     }
 
     public Expression createPatternExpression(final String dataContent) throws InvalidExpressionException {
-        return createNewInstance(dataContent).setContent(dataContent).setExpressionType(ExpressionType.TYPE_PATTERN.name())
-                .setReturnType(String.class.getName()).done();
+        return createNewInstance(dataContent).setContent(dataContent).setExpressionType(ExpressionType.TYPE_PATTERN).setReturnType(String.class.getName())
+                .done();
     }
 
     public Expression createInputExpression(final String value, final String returnType) throws InvalidExpressionException {
-        return createNewInstance(value).setContent(value).setExpressionType(ExpressionType.TYPE_INPUT.name()).setReturnType(returnType).done();
+        return createNewInstance(value).setContent(value).setExpressionType(ExpressionType.TYPE_INPUT).setReturnType(returnType).done();
     }
 
     public Expression createAPIAccessorExpression() throws InvalidExpressionException {
         return createNewInstance(ExpressionConstants.API_ACCESSOR.getEngineConstantName()).setContent(ExpressionConstants.API_ACCESSOR.getEngineConstantName())
-                .setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(ExpressionConstants.API_ACCESSOR.getReturnType()).done();
+                .setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT).setReturnType(ExpressionConstants.API_ACCESSOR.getReturnType()).done();
     }
 
     public Expression createEngineConstant(final ExpressionConstants value) throws InvalidExpressionException {
         return createNewInstance(value.getEngineConstantName()).setContent(value.getEngineConstantName())
-                .setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(value.getReturnType()).done();
+                .setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT).setReturnType(value.getReturnType()).done();
     }
 
     /**
@@ -231,17 +235,43 @@ public class ExpressionBuilder {
         return this;
     }
 
+    /**
+     * @deprecated use {@link #setExpressionType(ExpressionType)} instead
+     */
+    @Deprecated
     public ExpressionBuilder setExpressionType(final String expressionType) {
         expression.setExpressionType(expressionType);
         return this;
     }
 
+    /**
+     * Sets the type of this expression.
+     * 
+     * @param expressionType
+     *            the expression type to use.
+     * @return this ExpressionBuilder itself, for chain calls.
+     * @see ExpressionType
+     */
     public ExpressionBuilder setExpressionType(final ExpressionType expressionType) {
         expression.setExpressionType(expressionType.name());
         return this;
     }
 
-    public ExpressionBuilder setReturnType(final String returnType) {
+    private static List<String> INVALID_PRIMITIVE_TYPES = Arrays.asList("char", "byte", "long", "int", "float", "double", "short", "boolean");
+
+    /**
+     * Sets the return type of the underlining expression.
+     * 
+     * @param returnType
+     *            the return type to set on the expression.
+     * @return this ExpressionBuilder itself.
+     * @throws IllegalArgumentException
+     *             if the return type is a primitive type
+     */
+    public ExpressionBuilder setReturnType(final String returnType) throws IllegalArgumentException {
+        if (INVALID_PRIMITIVE_TYPES.contains(returnType)) {
+            throw new IllegalArgumentException("Primitive type " + returnType + " is forbidden in Expression return type");
+        }
         expression.setReturnType(returnType);
         return this;
     }
@@ -263,26 +293,24 @@ public class ExpressionBuilder {
 
     public Expression createExpression(final String name, final String expressionContent, final String returnType, final ExpressionType expressionType)
             throws InvalidExpressionException {
-        createNewInstance(name).setContent(expressionContent).setExpressionType(expressionType.name()).setReturnType(returnType);
+        createNewInstance(name).setContent(expressionContent).setExpressionType(expressionType).setReturnType(returnType);
         return done();
     }
 
     public Expression createConstantDoubleExpression(final double d) throws InvalidExpressionException {
-        createNewInstance(Double.toString(d)).setContent(String.valueOf(d)).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
+        createNewInstance(Double.toString(d)).setContent(String.valueOf(d)).setExpressionType(ExpressionType.TYPE_CONSTANT)
                 .setReturnType(Double.class.getName());
         return done();
     }
 
     public Expression createConstantFloatExpression(final float f) throws InvalidExpressionException {
-        createNewInstance(Float.toString(f)).setContent(String.valueOf(f)).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
-                .setReturnType(Float.class.getName());
+        createNewInstance(Float.toString(f)).setContent(String.valueOf(f)).setExpressionType(ExpressionType.TYPE_CONSTANT).setReturnType(Float.class.getName());
         return done();
     }
 
     public Expression createListExpression(final String name, final List<Expression> expressions) throws InvalidExpressionException {
         // name of the list is put in content because content is used to name the List variable in dependencies:
-        createNewInstance(name).setContent(name).setExpressionType(ExpressionType.TYPE_LIST.name()).setReturnType(List.class.getName())
-                .setDependencies(expressions);
+        createNewInstance(name).setContent(name).setExpressionType(ExpressionType.TYPE_LIST).setReturnType(List.class.getName()).setDependencies(expressions);
         return done();
     }
 
@@ -291,16 +319,36 @@ public class ExpressionBuilder {
         int i = 0;
         for (final List<Expression> list : expressions) {
             final String name2 = name + "_" + i++;
-            final Expression exp = createNewInstance(name2).setContent(name2).setExpressionType(ExpressionType.TYPE_LIST.name())
-                    .setReturnType(List.class.getName()).setDependencies(list).done();
+            final Expression exp = createNewInstance(name2).setContent(name2).setExpressionType(ExpressionType.TYPE_LIST).setReturnType(List.class.getName())
+                    .setDependencies(list).done();
             deps.add(exp);
 
         }
-        return createNewInstance(name).setContent(name).setExpressionType(ExpressionType.TYPE_LIST.name()).setReturnType(List.class.getName())
-                .setDependencies(deps).done();
+        return createNewInstance(name).setContent(name).setExpressionType(ExpressionType.TYPE_LIST).setReturnType(List.class.getName()).setDependencies(deps)
+                .done();
     }
 
+    /**
+     * @deprecated use {@link #createExpression(String, String, ExpressionType, String, String, List)} instead
+     */
+    @Deprecated
     public Expression createExpression(final String name, final String content, final String type, final String returnType, final String interpreter,
+            final List<Expression> dependencies) throws InvalidExpressionException {
+        createNewInstance(name).setContent(content).setExpressionType(type).setReturnType(returnType);
+        if (interpreter == null) {
+            setInterpreter("NONE");
+        } else {
+            setInterpreter(interpreter);
+        }
+        if (dependencies == null) {
+            setDependencies(new ArrayList<Expression>());
+        } else {
+            setDependencies(dependencies);
+        }
+        return done();
+    }
+
+    public Expression createExpression(final String name, final String content, final ExpressionType type, final String returnType, final String interpreter,
             final List<Expression> dependencies) throws InvalidExpressionException {
         createNewInstance(name).setContent(content).setExpressionType(type).setReturnType(returnType);
         if (interpreter == null) {
@@ -317,35 +365,35 @@ public class ExpressionBuilder {
     }
 
     public Expression createGroovyScriptExpression(final String name, final String script, final String returnType) throws InvalidExpressionException {
-        createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT.name())
-                .setInterpreter(ExpressionInterpreter.GROOVY.name()).setReturnType(returnType);
+        createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionInterpreter.GROOVY.name())
+                .setReturnType(returnType);
         return done();
     }
 
     public Expression createGroovyScriptExpression(final String name, final String script, final String returnType, final List<Expression> dependencies)
             throws InvalidExpressionException {
-        createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT.name())
-                .setInterpreter(ExpressionInterpreter.GROOVY.name()).setReturnType(returnType).setDependencies(dependencies);
+        createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionInterpreter.GROOVY.name())
+                .setReturnType(returnType).setDependencies(dependencies);
         return done();
     }
 
     public Expression createGroovyScriptExpression(final String name, final String script, final String returnType, final Expression... dependencies)
             throws InvalidExpressionException {
-        createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT.name())
-                .setInterpreter(ExpressionInterpreter.GROOVY.name()).setReturnType(returnType).setDependencies(Arrays.asList(dependencies));
+        createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionInterpreter.GROOVY.name())
+                .setReturnType(returnType).setDependencies(Arrays.asList(dependencies));
         return done();
     }
 
     public Expression createPatternExpression(final String name, final String messagePattern, final Expression... dependencies)
             throws InvalidExpressionException {
-        createNewInstance(name).setName(messagePattern).setContent(messagePattern).setExpressionType(ExpressionType.TYPE_PATTERN.name()).setInterpreter("NONE")
+        createNewInstance(name).setName(messagePattern).setContent(messagePattern).setExpressionType(ExpressionType.TYPE_PATTERN).setInterpreter("NONE")
                 .setReturnType(String.class.getName()).setDependencies(Arrays.asList(dependencies));
         return done();
     }
 
     public Expression createParameterExpression(final String expressionName, final String parameterName, final String returnType)
             throws InvalidExpressionException {
-        createNewInstance(expressionName).setExpressionType(ExpressionType.TYPE_PARAMETER.name()).setReturnType(returnType).setContent(parameterName);
+        createNewInstance(expressionName).setExpressionType(ExpressionType.TYPE_PARAMETER).setReturnType(returnType).setContent(parameterName);
         return done();
     }
 
@@ -379,7 +427,7 @@ public class ExpressionBuilder {
 
     public Expression createComparisonExpression(final String name, final Expression leftOperand, final String operator, final Expression rightOperand)
             throws InvalidExpressionException {
-        createNewInstance(name).setExpressionType(ExpressionType.TYPE_CONDITION.name()).setReturnType(Boolean.class.getName()).setContent(operator);
+        createNewInstance(name).setExpressionType(ExpressionType.TYPE_CONDITION).setReturnType(Boolean.class.getName()).setContent(operator);
         final List<Expression> dependencies = new ArrayList<Expression>(2);
         dependencies.add(leftOperand);
         dependencies.add(rightOperand);
@@ -388,7 +436,7 @@ public class ExpressionBuilder {
     }
 
     public Expression createLogicalComplementExpression(final String name, final Expression expression) throws InvalidExpressionException {
-        createNewInstance(name).setExpressionType(ExpressionType.TYPE_CONDITION.name()).setReturnType(Boolean.class.getName()).setContent(NOT_COMPARATOR);
+        createNewInstance(name).setExpressionType(ExpressionType.TYPE_CONDITION).setReturnType(Boolean.class.getName()).setContent(NOT_COMPARATOR);
         setDependencies(Collections.singletonList(expression));
         return done();
     }
@@ -467,7 +515,7 @@ public class ExpressionBuilder {
      */
     public Expression createJavaMethodCallExpression(final String name, final String methodName, final String returnType, final Expression entityExpression)
             throws InvalidExpressionException {
-        createNewInstance(name).setExpressionType(ExpressionType.TYPE_JAVA_METHOD_CALL.name()).setReturnType(returnType).setContent(methodName);
+        createNewInstance(name).setExpressionType(ExpressionType.TYPE_JAVA_METHOD_CALL).setReturnType(returnType).setContent(methodName);
         setDependencies(Collections.singletonList(entityExpression));
         return done();
     }

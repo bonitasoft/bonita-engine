@@ -26,6 +26,7 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.BaseElementImpl;
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -63,6 +64,8 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     private final List<DataDefinition> dataDefinitions;
 
+    private final List<BusinessDataDefinition> businessDataDefinitions;
+
     private final List<DocumentDefinition> documentDefinitions;
 
     private final List<ConnectorDefinition> connectors;
@@ -78,6 +81,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         endEvents = new ArrayList<EndEventDefinition>(4);
         intermediateThrowEvents = new ArrayList<IntermediateThrowEventDefinition>(4);
         dataDefinitions = new ArrayList<DataDefinition>();
+        businessDataDefinitions = new ArrayList<BusinessDataDefinition>();
         documentDefinitions = new ArrayList<DocumentDefinition>();
         connectors = new ArrayList<ConnectorDefinition>();
         flowNodes = new HashMap<String, FlowNodeDefinition>();
@@ -195,6 +199,11 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     }
 
     @Override
+    public List<BusinessDataDefinition> getBusinessDataDefinitions() {
+        return Collections.unmodifiableList(businessDataDefinitions);
+    }
+
+    @Override
     public List<DataDefinition> getDataDefinitions() {
         return Collections.unmodifiableList(dataDefinitions);
     }
@@ -243,6 +252,10 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         flowNodes.put(endEvent.getName(), endEvent);
     }
 
+    public void addBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        businessDataDefinitions.add(businessDataDefinition);
+    }
+
     public void addDataDefinition(final DataDefinition dataDefinition) {
         dataDefinitions.add(dataDefinition);
     }
@@ -262,6 +275,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         result = prime * result + (activities == null ? 0 : activities.hashCode());
         result = prime * result + (connectors == null ? 0 : connectors.hashCode());
         result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
+        result = prime * result + (businessDataDefinitions == null ? 0 : businessDataDefinitions.hashCode());
         result = prime * result + (documentDefinitions == null ? 0 : documentDefinitions.hashCode());
         result = prime * result + (endEvents == null ? 0 : endEvents.hashCode());
         result = prime * result + (gateways == null ? 0 : gateways.hashCode());
@@ -304,6 +318,13 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
                 return false;
             }
         } else if (!dataDefinitions.equals(other.dataDefinitions)) {
+            return false;
+        }
+        if (businessDataDefinitions == null) {
+            if (other.businessDataDefinitions != null) {
+                return false;
+            }
+        } else if (!businessDataDefinitions.equals(other.businessDataDefinitions)) {
             return false;
         }
         if (documentDefinitions == null) {

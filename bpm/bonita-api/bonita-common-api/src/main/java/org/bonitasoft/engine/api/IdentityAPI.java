@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+
 /**
  * The Interface IdentityAPI.
  * 
@@ -22,6 +23,7 @@ package org.bonitasoft.engine.api;
  * @author Bole Zhang
  * @author Yanyan Liu
  */
-public interface IdentityAPI extends UserAPI, RoleAPI, GroupAPI, MembershipAPI, OrganizationAPI {
+public interface IdentityAPI extends UserAPI, RoleAPI, GroupAPI, MembershipAPI, OrganizationAPI, CustomUserInfoAPI {
+
 
 }

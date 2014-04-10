@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,14 +30,27 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.w3c.dom.Document;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -52,6 +66,30 @@ public class IOUtil {
             file.mkdirs();
         }
         return file;
+    }
+
+    public static List<String> getClassNameList(final byte[] jarContent) throws IOException {
+        final List<String> classes = new ArrayList<String>(10);
+        JarInputStream stream = null;
+        try {
+            stream = new JarInputStream(new ByteArrayInputStream(jarContent));
+            JarEntry nextJarEntry = null;
+            while ((nextJarEntry = stream.getNextJarEntry()) != null) {
+                String name = nextJarEntry.getName();
+                if (name.endsWith(".class")) {
+                    classes.add(toQualifiedClassName(name));
+                }
+            }
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+        return classes;
+    }
+
+    private static String toQualifiedClassName(final String name) {
+        return name.replace('/', '.').replaceAll(".class", "");
     }
 
     public static File createTempFile(final String prefix, final String suffix, final File directory) throws IOException {
@@ -150,6 +188,36 @@ public class IOUtil {
         } finally {
             if (jarOutStream != null) {
                 jarOutStream.close();
+            }
+            if (baos != null) {
+                baos.close();
+            }
+        }
+
+        return baos.toByteArray();
+    }
+
+    public static byte[] generateZip(final Map<String, byte[]> resources) throws IOException {
+        if (resources == null || resources.size() == 0) {
+            final String message = "No resources available";
+            throw new IOException(message);
+        }
+
+        ByteArrayOutputStream baos = null;
+        ZipOutputStream zipOutStream = null;
+
+        try {
+            baos = new ByteArrayOutputStream();
+            zipOutStream = new ZipOutputStream(new BufferedOutputStream(baos));
+            for (final Map.Entry<String, byte[]> resource : resources.entrySet()) {
+                zipOutStream.putNextEntry(new ZipEntry(resource.getKey()));
+                zipOutStream.write(resource.getValue());
+            }
+            zipOutStream.flush();
+            baos.flush();
+        } finally {
+            if (zipOutStream != null) {
+                zipOutStream.close();
             }
             if (baos != null) {
                 baos.close();
@@ -281,6 +349,27 @@ public class IOUtil {
         return retries > 0;
     }
 
+    //
+    // public static String getFileContent(final byte[] textFileContent) {
+    // final StringBuilder sb = new StringBuilder();
+    // try {
+    // final BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(textFileContent));
+    // try {
+    // byte[] buff = new byte[256];
+    // int read = 0;
+    // while ((read = is.read(buff)) != 0) {
+    // sb.append(buff);
+    // }
+    // } finally {
+    // is.close();
+    // }
+    // } catch (final IOException ex) {
+    // ex.printStackTrace();
+    // }
+    //
+    // return sb.toString();
+    // }
+
     public static String getFileContent(final File file) {
         final StringBuilder sb = new StringBuilder();
         try {
@@ -335,6 +424,69 @@ public class IOUtil {
             }
         } finally {
             fos.close();
+        }
+    }
+
+    public static byte[] toByteArray(Document document) throws IOException, TransformerException {
+        if (document == null) {
+            throw new IllegalArgumentException("Document should not be null.");
+        }
+        Transformer tf = TransformerFactory.newInstance().newTransformer();
+        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        ByteArrayOutputStream out = null;
+        try {
+            out = new ByteArrayOutputStream();
+            tf.transform(new DOMSource(document), new StreamResult(out));
+            return out.toByteArray();
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
+
+    public static byte[] addJarEntry(byte[] jarToUpdate, String entryName, byte[] entryContent) throws IOException {
+        ByteArrayOutputStream out = null;
+        ByteArrayInputStream bais = null;
+        JarOutputStream jos = null;
+        JarInputStream jis = null;
+        byte[] buffer = new byte[4096];
+        try {
+            bais = new ByteArrayInputStream(jarToUpdate);
+            jis = new JarInputStream(bais);
+            out = new ByteArrayOutputStream();
+            jos = new JarOutputStream(out);
+            JarEntry inEntry;
+            while ((inEntry = (JarEntry) jis.getNextEntry()) != null) {
+                if (!inEntry.getName().equals(entryName)) {
+                    jos.putNextEntry(new JarEntry(inEntry));
+                } else {
+                    throw new IllegalArgumentException("Jar entry " + entryName + " already exists in jar to update");
+                }
+                int len;
+                while ((len = jis.read(buffer)) > 0) {
+                    jos.write(buffer, 0, len);
+                }
+                jos.flush();
+            }
+            JarEntry entry = new JarEntry(entryName);
+            jos.putNextEntry(entry);
+            jos.write(entryContent);
+            jos.closeEntry();
+            jos.finish();
+            out.flush();
+            return out.toByteArray();
+        } finally {
+            if (jos != null) {
+                jos.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+            if (jis != null) {
+                jis.close();
+            }
         }
     }
 

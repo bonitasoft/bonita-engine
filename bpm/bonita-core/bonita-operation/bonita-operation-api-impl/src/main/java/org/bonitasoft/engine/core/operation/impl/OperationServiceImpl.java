@@ -93,7 +93,7 @@ public class OperationServiceImpl implements OperationService {
             }
             
             logOperation(TechnicalLogSeverity.DEBUG, containerId, containerType, operation, operationValue);
-        }
+            }
         
         for (Entry<SLeftOperand, OperationExecutorStrategy> operationToUpdate : operationsToUpdateAtEnd.entrySet()) {
             OperationExecutorStrategy strategy = operationToUpdate.getValue();

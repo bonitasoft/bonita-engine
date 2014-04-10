@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,7 +26,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public abstract class ProcessDependencyResolver {
+public interface ProcessDependencyResolver {
 
     /**
      * resolve a dedicated part of the process
@@ -38,25 +38,13 @@ public abstract class ProcessDependencyResolver {
      * @param sDefinition
      * @throws BonitaException
      */
-    public abstract boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
-            throws BonitaException;
+    boolean resolve(TenantServiceAccessor tenantAccessor, BusinessArchive businessArchive, SProcessDefinition sDefinition) throws BonitaException;
 
     /**
-     * @param processAPIImpl
      * @param tenantAccessor
      * @param processDefinition
      * @return
      */
-    public abstract List<Problem> checkResolution(final TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition);
-
-    /**
-     * @param tenantAccessor
-     * @param processDefinitionId
-     * @return
-     */
-    @SuppressWarnings("unused")
-    public List<Problem> checkResolution(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) {
-        return null;
-    }
+    List<Problem> checkResolution(TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition);
 
 }

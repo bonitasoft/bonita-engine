@@ -4,10 +4,7 @@ target
 .classpath
 FILEPATH.*.db
 dependency-reduced-pom.xml
-services/bonita-integration-tests/src/test/java/org/bonitasoft/engine/TemporaryAllTests.java
-bpm/bonita-bpm-integration-tests/bonita-bpm-services-integration-tests/src/test/java/org/bonitasoft/engine/bpm/test/TemporaryTestsWithJNDI.java
-TemporaryLocalIntegrationTests.java
-bpm/bonita-bpm-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/DeployBarTest.java
+Temporary*.java
 *.iml
 *.orig
 engine-it.exec

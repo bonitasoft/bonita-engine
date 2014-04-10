@@ -71,26 +71,16 @@
 			<version>1</version>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- Spring doesn't fit well with hibernate4.3 so ... -->
-		<!-- TODO remove exclusion and hibernate dependency when downgrading to 
-			4.2.8 -->
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-server</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-core</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>4.2.8.Final</version>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

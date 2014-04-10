@@ -49,5 +49,7 @@ public enum ExpressionType {
 
     TYPE_XPATH_READ,
 
-    TYPE_JAVA_METHOD_CALL
+    TYPE_JAVA_METHOD_CALL,
+
+    TYPE_BUSINESS_DATA
 }

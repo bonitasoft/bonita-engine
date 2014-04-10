@@ -36,7 +36,6 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     Set<ParameterDefinition> getParameters();
 
     /**
-     * 
      * @return A set of ActorDefinition
      * @see #getActorsList()
      * @since 6.0
@@ -46,7 +45,6 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     Set<ActorDefinition> getActors();
 
     /**
-     * 
      * @return A list of ActorDefinition
      * @since 6.1
      */

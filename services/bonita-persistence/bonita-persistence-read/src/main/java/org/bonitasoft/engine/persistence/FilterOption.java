@@ -43,9 +43,7 @@ public class FilterOption implements Serializable {
 
     public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName, final Object value,
             final FilterOperationType operatorType) {
-        super();
-        this.persistentClass = persistentClass;
-        this.fieldName = fieldName;
+        this(persistentClass, fieldName);
         this.value = value;
         operationType = operatorType;
     }
@@ -53,6 +51,11 @@ public class FilterOption implements Serializable {
     public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName, final Object value) {
         // EQUALS operation by default:
         this(persistentClass, fieldName, value, FilterOperationType.EQUALS);
+    }
+
+    public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName) {
+        this.persistentClass = persistentClass;
+        this.fieldName = fieldName;
     }
 
     public FilterOption(final Class<? extends PersistentObject> persistentClass, final String fieldName, final Object from, final Object to) {
