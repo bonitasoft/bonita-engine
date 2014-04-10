@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -31,6 +31,7 @@ import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.impl.CommandAPIExt;
 import com.bonitasoft.engine.api.impl.IdentityAPIExt;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
@@ -51,7 +52,7 @@ import com.bonitasoft.engine.api.impl.ThemeAPIExt;
  */
 public class APIAccessResolverImpl implements APIAccessResolver {
 
-    private static final Map<String, Object> apis = new HashMap<String, Object>(12);
+    private static final Map<String, Object> apis = new HashMap<String, Object>(25);
 
     private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName(),
             com.bonitasoft.engine.api.LoginAPI.class.getName(), NodeAPI.class.getName());
@@ -75,6 +76,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.ReportingAPI.class.getName(), new ReportingAPIExt());
         apis.put(ProfileAPI.class.getName(), new ProfileAPIExt());
         apis.put(com.bonitasoft.engine.api.ProfileAPI.class.getName(), new ProfileAPIExt());
+        apis.put(TenantManagementAPI.class.getName(), new TenantManagementAPIExt());
         apis.put(ThemeAPI.class.getName(), new ThemeAPIExt());
         apis.put(com.bonitasoft.engine.api.ThemeAPI.class.getName(), new ThemeAPIExt());
         apis.put(com.bonitasoft.engine.api.TenantManagementAPI.class.getName(), new TenantManagementAPIExt());

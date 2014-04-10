@@ -147,7 +147,7 @@ public class TenantTest {
 
     @Test(expected = TenantIsPausedException.class)
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
-    public void cannotAccessTenantAPIsOnMaintenanceTenant() throws Exception {
+    public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
         final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
@@ -163,8 +163,8 @@ public class TenantTest {
     }
 
     @Test
-    @Cover(classes = { ServerAPI.class }, jira = "BS-7101", keywords = { "tenant maintenance" }, concept = BPMNConcept.NONE)
-    public void should_be_able_to_login_only_with_technical_user_in_maintenance() throws Exception {
+    @Cover(classes = { ServerAPI.class }, jira = "BS-7101", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
+    public void should_be_able_to_login_only_with_technical_user_on_paused_tenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         apiTestSPUtil.loginWith(userName, password, tenantId);
@@ -196,8 +196,8 @@ public class TenantTest {
     }
 
     @Test
-    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant maintenance" }, concept = BPMNConcept.NONE)
-    public void maintenanceAnnotatedAPIMethodShouldBePossibleOnMaintenanceTenant() throws Exception {
+    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
+    public void pauseAnnotatedAPIMethodShouldBePossibleOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
         apiTestSPUtil.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);

@@ -521,17 +521,17 @@ public class PageServiceImpl implements PageService {
                 true, now, -1, zipName);
     }
 
-    @Override
+    // @Override
     public void stop() throws SBonitaException, TimeoutException {
         // nothing to do
     }
 
-    @Override
+    // @Override
     public void pause() throws SBonitaException, TimeoutException {
         // nothing to do
     }
 
-    @Override
+    // @Override
     public void resume() throws SBonitaException {
         // nothing to do
     }

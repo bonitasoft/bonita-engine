@@ -60,6 +60,12 @@
         		<entry key="IDENTITY_USER_MEMBERSHIP_CREATED:INTERNAL" value="true" />
         		<entry key="IDENTITY_USER_MEMBERSHIP_DELETED:INTERNAL" value="true" />
         		<entry key="IDENTITY_USER_MEMBERSHIP_UPDATED:INTERNAL" value="true" />
+        		<entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_CREATED:INTERNAL" value="true" />
+        		<entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_DELETED:INTERNAL" value="true" />
+        		<entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_UPDATED:INTERNAL" value="true" />
+        		<entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_CREATED:INTERNAL" value="true" />
+        		<entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_DELETED:INTERNAL" value="true" />
+        		<entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_UPDATED:INTERNAL" value="true" />
         		<entry key="JOB_CREATED:INTERNAL" value="false" />
         		<entry key="JOB_DELETED:INTERNAL" value="false" />
         		<entry key="JOB_PARAMETER_CREATED:INTERNAL" value="true" />
@@ -84,6 +90,9 @@
         		<entry key="PROFILE_ENTRY_CREATED:INTERNAL" value="true" />
         		<entry key="PROFILE_ENTRY_DELETED:INTERNAL" value="true" />
         		<entry key="PROFILE_ENTRY_UPDATED:INTERNAL" value="true" />
+        		<entry key="REF_BUSINESS_DATA_INSTANCE_CREATED:INTERNAL" value="true" />
+        		<entry key="REF_BUSINESS_DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
+        		<entry key="REF_BUSINESS_DATA_INSTANCE_DELETED:INTERNAL" value="true" />
         		<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
         		<entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
         		<entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />

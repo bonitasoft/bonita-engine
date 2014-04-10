@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
-import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
@@ -73,8 +72,6 @@ public class APITestSPUtil extends APITestUtil {
 
     private ReportingAPI reportingAPI;
 
-    private PageAPI pageAPI;
-
     private ThemeAPI themeAPI;
 
     private TenantManagementAPI tenantManagementAPI;
@@ -100,10 +97,6 @@ public class APITestSPUtil extends APITestUtil {
 
     protected void setReportingAPI(final ReportingAPI reportingAPI) {
         this.reportingAPI = reportingAPI;
-    }
-
-    protected void setPagegAPI(final PageAPI pageAPI) {
-        this.pageAPI = pageAPI;
     }
 
     protected void setPlatformMonitoringAPI(final PlatformMonitoringAPI platformMonitoringAPI) {
@@ -146,10 +139,6 @@ public class APITestSPUtil extends APITestUtil {
         return reportingAPI;
     }
 
-    public PageAPI getPageAPI() {
-        return pageAPI;
-    }
-
     public LogAPI getLogAPI() {
         return logAPI;
     }
@@ -164,62 +153,38 @@ public class APITestSPUtil extends APITestUtil {
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(userName, password, tenantId));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
+        setAPIs();
     }
 
     @Override
     protected void loginWith(final String userName, final String password) throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant(userName, password));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        setAPIs();
     }
 
     @Override
     protected void login() throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant());
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        setAPIs();
     }
 
     protected void login(final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(tenantId));
+        setAPIs();
+    }
+
+    private void setAPIs() throws BonitaException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
+	setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
+        logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
     @Override
@@ -234,6 +199,8 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(null);
         setReportingAPI(null);
         setCommandAPI(null);
+        setTenantManagementAPI(null);
+        logAPI = null;
     }
 
     protected boolean containsLogWithActionType(final List<Log> logs, final String actionType, final int minimalFrequency) {
@@ -273,7 +240,7 @@ public class APITestSPUtil extends APITestUtil {
             // retry 50 ms after because the might still be some jobs/works that run
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 throw new MonitoringException("interrupted while sleeping");
             }
             numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();

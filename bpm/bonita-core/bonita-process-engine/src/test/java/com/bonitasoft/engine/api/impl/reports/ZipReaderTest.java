@@ -8,9 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.Arrays;
@@ -33,8 +31,8 @@ public class ZipReaderTest {
             @SuppressWarnings("unused")
             @Override
             public void read(File zip, File unzipped) throws Exception {
-                assertTrue(unzipped.exists());
-                assertEquals("[myreport.properties]", Arrays.asList(unzipped.list()).toString());
+                assertThat(unzipped).exists();
+                assertThat(Arrays.asList(unzipped.list()).toString()).isEqualTo("[myreport.properties]");
             }
         });
     }
@@ -53,6 +51,6 @@ public class ZipReaderTest {
             }
         });
 
-        assertFalse(files[0].exists());
+        assertThat(files[0]).doesNotExist();
     }
 }

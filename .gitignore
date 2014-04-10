@@ -4,10 +4,7 @@ target
 .classpath
 FILEPATH.*.db
 dependency-reduced-pom.xml
-TemporaryLocalIntegrationTestsSP.java
-TemporaryAllBPMSPTestsWithJNDI.java
-TemporarySlowExecutionLocalIntegrationTestsSP.java
-bpm/bonita-integration-tests/bonita-integration-local-tests/src/test/java/com/bonitasoft/engine/DeployBarTest.java
+Temporary*.java
 *.iml
 *.orig
 engine-sp-it.exec

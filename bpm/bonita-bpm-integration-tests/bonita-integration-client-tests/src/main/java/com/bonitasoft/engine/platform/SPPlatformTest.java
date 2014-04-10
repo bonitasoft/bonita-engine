@@ -675,4 +675,15 @@ public class SPPlatformTest {
         }
     }
 
+    @Test
+    public void cleanAndDeletePlaftorm_should_deactive_tenants_before_deletion() throws Exception {
+        platformAPI.activateTenant(tenantId1);
+        platformAPI.stopNode();
+        platformAPI.cleanAndDeletePlaftorm();
+
+        platformAPI.createPlatform();
+        apiTestSpUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
+        createTenants();
+    }
+
 }

@@ -34,11 +34,4 @@ public interface Tenant extends BonitaObject {
 
     boolean isDefaultTenant();
 
-    /**
-     * Is this tenant in Maintenance mode, that is, can we normally use this tenant ?
-     * 
-     * @return true if in maintenance, false otherwise.
-     */
-    boolean isInMaintenance();
-
 }

@@ -12,4 +12,11 @@
 		FROM com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl AS breakpoint
 	</query>
 	
+	<query name="getSRefBusinessDataInstance">
+		SELECT ref
+		FROM com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl AS ref
+		WHERE ref.name = :name
+		AND ref.processInstanceId = :processInstanceId
+	</query>
+	
 </hibernate-mapping>

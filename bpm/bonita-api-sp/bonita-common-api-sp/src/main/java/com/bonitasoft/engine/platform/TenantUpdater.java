@@ -21,7 +21,7 @@ public class TenantUpdater implements Serializable {
     private static final long serialVersionUID = -3608167879596202047L;
 
     public enum TenantField {
-        NAME, DESCRIPTION, ICON_NAME, ICON_PATH, STATUS, USERNAME, PASSWOWRD, IN_MAINTENANCE;
+        NAME, DESCRIPTION, ICON_NAME, ICON_PATH, STATUS, USERNAME, PASSWOWRD;
     }
 
     private final Map<TenantField, Serializable> fields;
@@ -56,10 +56,6 @@ public class TenantUpdater implements Serializable {
 
     public void setPassword(final String password) {
         fields.put(TenantField.PASSWOWRD, password);
-    }
-
-    public void setInMaintenance(final boolean inMaintenance) {
-        fields.put(TenantField.IN_MAINTENANCE, inMaintenance);
     }
 
     public Map<TenantField, Serializable> getFields() {

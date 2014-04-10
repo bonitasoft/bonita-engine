@@ -47,14 +47,14 @@
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
     </bean>
-	
+
 	<bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
-	
+
 	<bean id="breakpointService" class="com.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
@@ -63,5 +63,12 @@
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
-	
+
+	<bean id="refBusinessDataService" class="com.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">
+		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="persistenceRead" ref="persistenceService" />
+		<constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
 </beans>

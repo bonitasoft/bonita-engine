@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -50,7 +50,7 @@ public class ProtectedReportTest {
             @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws Exception {
-                assertEquals("myreport", name);
+                assertThat(name).isEqualTo("myreport");
             }
         });
     }
