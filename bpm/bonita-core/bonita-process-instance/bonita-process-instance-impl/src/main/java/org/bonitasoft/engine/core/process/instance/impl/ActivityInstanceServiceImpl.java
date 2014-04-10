@@ -1097,4 +1097,26 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         }
     }
 
+    @Override
+    public long getNumberOfArchivedActivityInstancesSupervisedBy(final long supervisorId, final Class<? extends SAActivityInstance> entityClass,
+            final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            return getPersistenceRead().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @Override
+    public List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(final long supervisorId, final Class<? extends SAActivityInstance> entityClass,
+            final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            return (List<SAActivityInstance>) getPersistenceRead().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
 }

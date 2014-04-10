@@ -111,6 +111,10 @@ public enum SContext {
     /**
      * Corresponding to the identifier of the tenant
      */
-    TENANT_ID;
+    TENANT_ID,
+    /**
+     * Corresponding to the identifier of the document
+     */
+    DOCUMENT_ID;
 
 }

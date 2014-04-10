@@ -62,6 +62,63 @@
 		)
 	 )
     </query>
+	
+	<query name="searchSAActivityInstanceSupervisedBy">
+		SELECT DISTINCT aa
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa,
+	     	 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+		WHERE terminal = TRUE
+		AND aa.archiveDate = (
+			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
+			WHERE aa2.sourceObjectId = aa.sourceObjectId
+		)
+		AND aa.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			WHERE supervisor.userId = :supervisorId
+			OR (
+				supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					WHERE um.userId = :supervisorId 
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		 )
+  	</query>
+  	
+	<query name="getNumberOfSAActivityInstanceSupervisedBy">
+  		SELECT COUNT(DISTINCT aa)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa,
+	     	 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+		WHERE terminal = TRUE
+		AND aa.archiveDate = (
+			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
+			WHERE aa2.sourceObjectId = aa.sourceObjectId
+		)AND aa.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			WHERE supervisor.userId = :supervisorId
+			OR (
+				supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					WHERE um.userId = :supervisorId 
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		 )
+	</query> 
   
 	<query name="getArchivedFlowNodeInstanceById">
 		SELECT aa
@@ -412,7 +469,7 @@
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
 		)
-	</query> 
+	</query>   
 	
 	<query name="searchSAActivityInstance">
 		SELECT aa
