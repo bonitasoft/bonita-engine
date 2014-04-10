@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
@@ -22,11 +24,14 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.platform.PlatformLoginException;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -40,6 +45,7 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
@@ -49,7 +55,9 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantMaintenanceTestSP extends CommonAPISPTest {
+public class TenantTestSpITest extends CommonAPISPTest {
+
+    private static final int EXPECTED_PAGE_SEARCH_RESULT_COUNT = 1;
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";
 
@@ -68,7 +76,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
     private static PlatformSession platFormSession;
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(TenantMaintenanceTestSP.class);
+            .getLogger(TenantTestSpITest.class);
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {
@@ -178,12 +186,12 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
 
         logAsPlatformAdmin();
 
-        StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(uniqueName);
         stringBuilder.append("_");
         stringBuilder.append(new Date().getTime());
-        String tenantUniqueName = stringBuilder.toString();
-        TenantParameter tenantParameter = new TenantParameter(tenantUniqueName);
+        final String tenantUniqueName = stringBuilder.toString();
+        final TenantParameter tenantParameter = new TenantParameter(tenantUniqueName);
 
         long tenantId = platformAPI.createTenant(new TenantCreator(
                 tenantParameter.getTenantName(), tenantParameter
@@ -228,15 +236,15 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         platFormSession = platformLoginAPI.login("platformAdmin", "platform");
         platformAPI = PlatformAPIAccessor.getPlatformAPI(platFormSession);
 
-        TenantParameter tenant1 = createTenant("TenantMaintenanceTestSP2");
-        TenantParameter tenant2 = createTenant("TenantMaintenanceTestSP3");
+        final TenantParameter tenant1 = createTenant("TenantMaintenanceTestSP2");
+        final TenantParameter tenant2 = createTenant("TenantMaintenanceTestSP3");
 
         createProcessOnTenant(tenant1);
         createProcessOnTenant(tenant2);
 
         // given a timer triggered process
         waitArchivedProcessCount(1, tenant2);
-        long numberOfArchivedJobsBefore = getNumberOfArchivedJobs(tenant2);
+        final long numberOfArchivedJobsBefore = getNumberOfArchivedJobs(tenant2);
 
         // when a tenant is paused mode
         pauseTenant(tenant1);
@@ -244,7 +252,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         waitForMaintenanceTime();
 
         waitArchivedProcessCount(2, tenant2);
-        long numberOfArchivedJobsAfter = getNumberOfArchivedJobs(tenant2);
+        final long numberOfArchivedJobsAfter = getNumberOfArchivedJobs(tenant2);
 
         // then the other tenant is still working
         Assert.assertTrue("second tenant should work",
@@ -269,11 +277,11 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         platformAPI = PlatformAPIAccessor.getPlatformAPI(platFormSession);
 
         // given we have 1 platform with 1 tenant
-        TenantParameter tenantParameter = createTenant("tenant1");
+        final TenantParameter tenantParameter = createTenant("tenant1");
 
         createProcessOnTenant(tenantParameter);
         waitArchivedProcessCount(1, tenantParameter);
-        long numberOfArchivedJobsBeforeTenantPause = getNumberOfArchivedJobs(tenantParameter);
+        final long numberOfArchivedJobsBeforeTenantPause = getNumberOfArchivedJobs(tenantParameter);
 
         // when the tenant is paused and then resume
         pauseTenant(tenantParameter);
@@ -284,7 +292,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
 
         // then process is resume
         waitArchivedProcessCount(2, tenantParameter);
-        long numberOfArchivedJobsAfterTenantPauseAfterResume = getNumberOfArchivedJobs(tenantParameter);
+        final long numberOfArchivedJobsAfterTenantPauseAfterResume = getNumberOfArchivedJobs(tenantParameter);
         Assert.assertTrue(numberOfArchivedJobsAfterTenantPauseAfterResume >= numberOfArchivedJobsBeforeTenantPause);
 
         // cleanup
@@ -293,6 +301,43 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         logNumberOfProcess(tenantParameter);
         deactivateAndDeleteTenant(tenantParameter);
 
+    }
+
+    @Test
+    public void createNewTenant_should_deploy_provided_customPage_example() throws Exception {
+        // given
+        final TenantParameter createTenant = createTenant("new tenant");
+
+        // when then
+        checkThatPageServiceExamplesAreDeployedOnTenant(createTenant.getTenantId());
+
+        // clean up
+        deactivateAndDeleteTenant(createTenant);
+
+    }
+
+    @Test
+    public void createDefaultTenant_should_deploy_provided_customPage_example() throws Exception {
+        // given
+        final long tenantId = platformAPI.getDefaultTenant().getId();
+
+        // when then
+        checkThatPageServiceExamplesAreDeployedOnTenant(tenantId);
+    }
+
+    private void checkThatPageServiceExamplesAreDeployedOnTenant(final long tenantId) throws BonitaException, SearchException {
+        // given
+        login(tenantId);
+
+        // when
+        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, EXPECTED_PAGE_SEARCH_RESULT_COUNT).done());
+
+        // then
+        assertThat(searchPages.getResult()).as("should have:" + EXPECTED_PAGE_SEARCH_RESULT_COUNT + " provided pages on tenantId:" + tenantId).hasSize(
+                EXPECTED_PAGE_SEARCH_RESULT_COUNT);
+
+        // clean up
+        logout();
     }
 
     private void waitForMaintenanceTime() throws InterruptedException {
@@ -325,9 +370,9 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             throws Exception {
         logAsTechnicalUserOnTenant(tenantParameter);
 
-        long numberOfProcessInstances = getProcessAPI()
+        final long numberOfProcessInstances = getProcessAPI()
                 .getNumberOfProcessInstances();
-        long numberOfArchivedProcessInstances = getProcessAPI()
+        final long numberOfArchivedProcessInstances = getProcessAPI()
                 .getNumberOfArchivedProcessInstances();
 
         LOGGER.info(String.format(
@@ -346,10 +391,10 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             throws Exception {
         logAsNormalUserOnTenant(tenantParameter);
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        String processName = new StringBuilder().append(PROCESS_TENANT)
+        final String processName = new StringBuilder().append(PROCESS_TENANT)
                 .append(tenantParameter.getTenantId()).toString();
 
-        ProcessAPI processAPI = getProcessAPI();
+        final ProcessAPI processAPI = getProcessAPI();
 
         final ProcessDefinition processDefinition = processAPI
                 .deploy(new BusinessArchiveBuilder()
@@ -368,7 +413,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
                                         .addEndEvent(END_EVENT).getProcess())
                         .done());
 
-        ActorInstance actorInstance = processAPI.getActors(
+        final ActorInstance actorInstance = processAPI.getActors(
                 processDefinition.getId(), 0, 10, ActorCriterion.NAME_ASC).get(
                 0);
 

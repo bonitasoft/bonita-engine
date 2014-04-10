@@ -295,6 +295,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
 
+                        // Create customPage examples
+                        createCustomPageExamples(tenantServiceAccessor);
+
                         // Create default themes
                         getDelegate().createDefaultThemes(tenantServiceAccessor);
 
@@ -304,6 +307,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
                 }
+
             };
             return transactionService.executeInTransaction(initializeTenant);
         } catch (final Exception e) {
@@ -311,9 +315,18 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
+    private void createCustomPageExamples(final TenantServiceAccessor tenantServiceAccessor) throws CreationException {
+        try {
+            tenantServiceAccessor.getPageService().start();
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
+        }
+
+    }
+
     public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
 
-        DefaultReportList reports = new DefaultReportList(
+        final DefaultReportList reports = new DefaultReportList(
                 tenantAccessor.getTechnicalLoggerService(),
                 BonitaHomeServer.getInstance().getTenantReportFolder(tenantId));
 
@@ -356,7 +369,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -367,7 +380,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(transactionContent);
 
             // stop tenant services and clear the spring context
-            TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             stopServicesOfTenant(logger, tenantId, tenantServiceAccessor);
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
             tenantServiceAccessor.destroy();
@@ -410,7 +423,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
             final WorkService workService = tenantServiceAccessor.getWorkService();
 
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
@@ -625,7 +638,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final PlatformService platformService = getPlatformService();
         // check existence for tenant
         try {
-            STenant tenant = platformService.getTenant(tenantId);
+            final STenant tenant = platformService.getTenant(tenantId);
             // update user name and password in file system
             final Map<TenantField, Serializable> updatedFields = udpater.getFields();
             final String username = (String) updatedFields.get(TenantField.USERNAME);
@@ -727,7 +740,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     protected PlatformService getPlatformService() {
-        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
+        final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformAccessor.getPlatformService();
         return platformService;
     }
@@ -754,7 +767,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 PageService pageService;
                 try {
                     pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
-                } catch (MissingServiceException e) {
+                } catch (final MissingServiceException e) {
                     // if not in the configuration just ignore it
                     return;
                 }

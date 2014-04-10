@@ -30,6 +30,8 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
 @SuiteClasses({
         // SPIdentityTests.class, // slow execution test suite only
         // SPProcessManagementTest.class, // slow execution test suite only
+        PageAPIIT.class,
+        TenantTestSpITest.class,
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
@@ -41,9 +43,7 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         SearchEntitiesTests.class,
         ReportingAPIIT.class,
         PlatformMonitoringAPITest.class,
-        TenantTest.class,
-        TenantMaintenanceTestSP.class,
-        PageAPIIT.class
+        TenantTest.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {
