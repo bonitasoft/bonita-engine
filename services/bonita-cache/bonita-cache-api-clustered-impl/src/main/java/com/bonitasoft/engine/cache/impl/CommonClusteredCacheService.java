@@ -16,6 +16,7 @@ import java.util.Map;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -39,8 +40,7 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
         this(Manager.getInstance(), logger, hazelcastInstance);
     }
 
-    public CommonClusteredCacheService(final Manager manager, final TechnicalLoggerService logger,
-            final HazelcastInstance hazelcastInstance) {
+    public CommonClusteredCacheService(final Manager manager, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance) {
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -220,12 +220,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     @Override
-    public void stop() {
+    public void stop() throws SBonitaException {
         // do nothing, we start/stop hazelcast, not this service
     }
 
     @Override
-    public void pause() {
+    public void pause() throws SBonitaException {
         // nothing to do
     }
 

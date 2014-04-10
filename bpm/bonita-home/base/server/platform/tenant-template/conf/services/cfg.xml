@@ -13,8 +13,7 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
-	</bean>
+	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor" />
 
 	<bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
@@ -84,7 +83,7 @@
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
-	
+
 	<bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
@@ -118,20 +117,22 @@
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 	</bean>
-	
+
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="processExecutor" ref="processExecutor" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
-	
+
 	<bean id="documentReferenceExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 	</bean>
-	
+
 	<bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
 		<constructor-arg name="dependencyResolvers">
 			<list>
@@ -139,6 +140,7 @@
 				<bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver" />
 				<bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver" />
 				<bean class="com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver" />
+				<bean class="com.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyResolver" />
 			</list>
 		</constructor-arg>
 	</bean>

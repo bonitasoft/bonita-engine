@@ -52,6 +52,7 @@
 				<entry key="10001" value="100" /><!-- actorMapping -->
 				<entry key="10019" value="100" /><!-- Breakpoint -->
 				<entry key="10095" value="100" /><!-- HiddenTask -->
+				<entry key="10096" value="100" /><!-- Ref Business Data Instance -->
 				<entry key="10030" value="100" /><!-- category -->
 				<entry key="10040" value="100" /><!-- SDocumentMapping -->
 				<entry key="10050" value="100" /><!-- supervisor -->
@@ -88,8 +89,8 @@
 				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="21" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="22" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="23" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="24" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="25" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="24" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="25" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="26" />
 				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="30" />
 				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="31" />
@@ -133,6 +134,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="10017" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="10018" />
 				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
+				<entry key="com.bonitasoft.engine.core.process.instance.model.SBusinessDataInstanceImpl" value="10096" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="10020" />

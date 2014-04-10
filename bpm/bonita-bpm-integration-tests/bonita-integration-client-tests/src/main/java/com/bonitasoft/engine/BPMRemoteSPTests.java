@@ -14,6 +14,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.MultiInstanceTest;
+import com.bonitasoft.engine.business.data.BDRepositoryIT;
+import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.log.LogTest;
@@ -43,7 +45,8 @@ import com.bonitasoft.engine.supervisor.SupervisedTests;
         ReportingAPIIT.class,
         PlatformMonitoringAPITest.class,
         TenantTest.class,
-        TenantMaintenanceTestSP.class
+        BDRepositoryIT.class,
+        ExecuteBDMQueryCommandIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {

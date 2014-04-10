@@ -44,6 +44,7 @@
       <artifactId>bonita-server-api-http</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Archive -->
     <dependency>
       <groupId>com.bonitasoft.engine.archive</groupId>
@@ -67,6 +68,13 @@
       <artifactId>bonita-authentication-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+		<!-- Business Data -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-business-data-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
     <!-- Cache -->
     <dependency>
@@ -692,7 +700,6 @@
       <version>${project.version}</version>
     </dependency>
 
-
     <!-- Transient Data -->
     <dependency>
       <groupId>org.bonitasoft.engine.core.data</groupId>
@@ -737,8 +744,6 @@
       <artifactId>bonita-data-cached-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-
 
     <!-- XML -->
     <dependency>
@@ -789,6 +794,7 @@
       <artifactId>bonita-common-sp</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- add hazel cast here because hibernate cache use it by configuration -->
     <dependency>
       <groupId>com.hazelcast</groupId>
@@ -836,6 +842,9 @@
                   <include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
                   <include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
                   <include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
+									<!-- Business Data -->
+									<inlude>com.bonitasoft.engine.data:bonita-business-data-api</inlude>
+									<inlude>com.bonitasoft.engine.data:bonita-business-data-impl</inlude>
                   <!-- Cache -->
                   <include>org.bonitasoft.engine.cache:bonita-cache-api</include>
                   <include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>

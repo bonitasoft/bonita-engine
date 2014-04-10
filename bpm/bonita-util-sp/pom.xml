@@ -12,9 +12,10 @@
 	<artifactId>bonita-util-sp</artifactId>
 	<packaging>pom</packaging>
 
-	<name>Bonita Util</name>
+	<name>Bonita Util SP</name>
 
 	<modules>
 		<module>bonita-client-util-sp</module>
+		<module>bonita-common-util-sp</module>
 	</modules>
 </project>

@@ -26,7 +26,7 @@ public abstract class AbstractTenantSearchEntity extends AbstractSearchEntity<Te
     public AbstractTenantSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
     }
-    
+
     @Override
     public List<Tenant> convertToClientObjects(final List<STenant> serverObjects) {
         return SPModelConvertor.toTenants(serverObjects);
