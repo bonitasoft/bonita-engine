@@ -104,6 +104,11 @@ public class ExportedUserBuilder {
         user.setEnabled(enabled);
         return this;
     }
+    
+    public ExportedUserBuilder addCustomUserInfoValue(ExportedCustomUserInfoValue userInfo) {
+        user.addCustomUserInfoValues(userInfo);
+        return this;
+    }
 
     public ExportedUser done() {
         return user;

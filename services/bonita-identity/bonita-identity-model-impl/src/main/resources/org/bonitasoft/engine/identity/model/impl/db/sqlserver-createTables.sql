@@ -31,7 +31,7 @@ CREATE TABLE role (
 )
 GO
 
-CREATE INDEX idx_role_name ON role (tenantid, name, id)
+CREATE INDEX idx_role_name ON role (tenantid, name)
 GO
 
 CREATE TABLE user_ (
@@ -57,7 +57,7 @@ CREATE TABLE user_ (
 )
 GO
 
-CREATE INDEX idx_user_name ON user_ (tenantid, userName, id)
+CREATE INDEX idx_user_name ON user_ (tenantid, userName)
 GO
 
 CREATE TABLE user_contactinfo (
@@ -87,27 +87,32 @@ CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, persona
 GO
 
 
-CREATE TABLE p_metadata_def (
+CREATE TABLE custom_usr_inf_def (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
-  displayName NVARCHAR(75),
+  name NVARCHAR(75) NOT NULL,
   description NVARCHAR(MAX),
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 )
 GO
 
-CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name, id)
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name)
 GO
 
-CREATE TABLE p_metadata_val (
+CREATE TABLE custom_usr_inf_val (
+  id NUMERIC(19, 0) NOT NULL,
   tenantid NUMERIC(19, 0) NOT NULL,
-  metadataName NVARCHAR(50) NOT NULL,
-  userName NVARCHAR(50) NOT NULL,
-  value NVARCHAR(50),
-  PRIMARY KEY (tenantid, metadataName, userName)
+  definitionId NUMERIC(19, 0) NOT NULL,
+  userId NUMERIC(19, 0) NOT NULL,
+  value NVARCHAR(255),
+  UNIQUE (tenantid, definitionId, userId),
+  PRIMARY KEY (tenantid, id)
 )
+GO
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE
+GO
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE
 GO
 
 CREATE TABLE user_membership (
