@@ -128,7 +128,7 @@
 		</profileEntries>
 	</profile>
 	<profile name="Process manager" isDefault="true">
-		<description>The process manager can manage (not install/delete) his apps.</description>
+		<description>The Process manager can supervise designated apps, and manage cases and tasks of those apps.</description>
 		<iconPath>/profiles/profilePM.png</iconPath>
 		<profileEntries>
 			<parentProfileEntry name="Tasks">
