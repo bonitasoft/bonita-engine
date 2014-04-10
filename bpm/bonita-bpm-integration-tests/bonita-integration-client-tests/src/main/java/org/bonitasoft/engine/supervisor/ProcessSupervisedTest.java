@@ -322,11 +322,12 @@ public class ProcessSupervisedTest extends CommonAPITest {
     }
 
     @Test
-    public void searchArchivedDocumentsSupervisedBy() throws BonitaException {
+    public void searchArchivedDocumentsSupervisedBy() throws Exception {
         final ProcessInstance processInstance = processInstances.get(2);
         buildAndAttachDocument(processInstance);
 
         skipTasks(processInstance);
+        waitForProcessToFinishAndBeArchived(processInstance);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
