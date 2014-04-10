@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +26,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
+import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -101,19 +101,24 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     protected void updateActivityInstanceVariables(final List<Operation> operations, final Map<String, Serializable> operationsContext,
             final long activityInstanceId, final Long processDefinitionID) throws SOperationExecutionException {
-        final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
-        final OperationService operationService = tenantAccessor.getOperationService();
-        final Iterator<Operation> iterator = operations.iterator();
-        final SExpressionContext sExpressionContext = new SExpressionContext();
+        SExpressionContext sExpressionContext = buildExpressionContext(operationsContext, activityInstanceId, processDefinitionID);
+        List<SOperation> sOperations = ModelConvertor.constructSOperations(operations);
+        getOperationService().execute(sOperations, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
+    }
+
+    private SExpressionContext buildExpressionContext(final Map<String, Serializable> operationsContext, final long activityInstanceId,
+            final Long processDefinitionID) {
+        SExpressionContext sExpressionContext = new SExpressionContext();
         sExpressionContext.setSerializableInputValues(operationsContext);
         sExpressionContext.setContainerId(activityInstanceId);
         sExpressionContext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
         sExpressionContext.setProcessDefinitionId(processDefinitionID);
-        while (iterator.hasNext()) {
-            final Operation entry = iterator.next();
-            operationService.execute(ModelConvertor.constructSOperation(entry), activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
-        }
+        return sExpressionContext;
+    }
+
+    private OperationService getOperationService() {
+        TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
+        return tenantAccessor.getOperationService();
     }
 
     protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger) throws SFlowNodeReadException,

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -44,6 +46,8 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private final File temporaryFolder;
 
+    private boolean isActive = true;
+    
     /**
      * Logger
      */
@@ -55,14 +59,14 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         this.type = type;
         this.id = id;
 
-        this.nonJarResources = new HashMap<String, byte[]>();
-        this.urls = new HashSet<URL>();
+        nonJarResources = new HashMap<String, byte[]>();
+        urls = new HashSet<URL>();
         this.temporaryFolder = new File(temporaryFolder);
         if (!this.temporaryFolder.exists()) {
             this.temporaryFolder.mkdirs();
         }
         addResources(resources);
-        addURLs(this.urls.toArray(new URL[this.urls.size()]));
+        addURLs(urls.toArray(new URL[urls.size()]));
     }
 
     protected void addResources(final Map<String, byte[]> resources) {
@@ -71,11 +75,11 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
                 if (resource.getKey().matches(".*\\.jar")) {
                     final byte[] data = resource.getValue();
                     try {
-                        final File file = IOUtil.createTempFile(resource.getKey(), null, this.temporaryFolder);
+                        final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryFolder);
                         IOUtil.write(file, data);
                         final String path = file.getAbsolutePath();
                         final URL url = new File(path).toURI().toURL();
-                        this.urls.add(url);
+                        urls.add(url);
                         file.deleteOnExit();
                     } catch (final MalformedURLException e) {
                         e.printStackTrace();
@@ -83,7 +87,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
                         e.printStackTrace();
                     }
                 } else {
-                    this.nonJarResources.put(resource.getKey(), resource.getValue());
+                    nonJarResources.put(resource.getKey(), resource.getValue());
                 }
             }
         }
@@ -91,6 +95,11 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public InputStream getResourceAsStream(final String name) {
+        /*
+        if (!isActive) {
+            throw new RuntimeException(this.toString() + " is not active anymore. Don't use it.");
+        }
+        */
         InputStream is = getInternalInputstream(name);
         if (is == null && name.length() > 0 && name.charAt(0) == '/') {
             is = getInternalInputstream(name.substring(1));
@@ -111,14 +120,19 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     private byte[] loadProcessResource(final String resourceName) {
-        if (this.nonJarResources == null) {
+        if (nonJarResources == null) {
             return new byte[0];
         }
-        return this.nonJarResources.get(resourceName);
+        return nonJarResources.get(resourceName);
     }
 
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+        /*
+        if (!isActive) {
+            throw new RuntimeException(this.toString() + " is not active anymore. Don't use it.");
+        }
+        */
         Class<?> c = null;
         c = findLoadedClass(name);
         if (c == null) {
@@ -147,25 +161,24 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     public void release() {
-        if (this.temporaryFolder.exists()) {
-            this.temporaryFolder.delete();
-        }
+        deleteQuietly(temporaryFolder);
+        isActive = false;
     }
 
     public long getId() {
-        return this.id;
+        return id;
     }
 
     public String getType() {
-        return this.type;
+        return type;
     }
 
     public File getTemporaryFolder() {
-        return this.temporaryFolder;
+        return temporaryFolder;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + this.type + ", id=" + this.id;
+        return super.toString() + ", type=" + type + ", id=" + id + ", isActive: " + isActive + ", parent= " + getParent();
     }
 }

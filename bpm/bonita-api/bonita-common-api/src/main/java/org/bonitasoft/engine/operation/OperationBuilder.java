@@ -59,6 +59,7 @@ public class OperationBuilder {
      * @param name
      *            the name of the left operand
      * @param external
+     *            is the data managed externally and thus should not be tried to be updated?
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
     public OperationBuilder setLeftOperand(final String name, final boolean external) {
@@ -109,6 +110,27 @@ public class OperationBuilder {
      */
     public Operation createSetDataOperation(final String dataName, final Expression expression) {
         return createNewInstance().setLeftOperand(dataName, false).setRightOperand(expression).setType(OperatorType.ASSIGNMENT).done();
+    }
+
+    /**
+     * Creates a new operation of type {@link OperatorType#BUSINESS_DATA_JAVA_SETTER} that allows to update a Business Data by calling a Java setter on one of
+     * its attributes.
+     * 
+     * @param businessDataName
+     *            the name of the business data to update.
+     * @param methodName
+     *            the Java setter method to call.
+     * @param methodParamType
+     *            the type of the Java setter method parameter (to be able to differenciate 2 methods with the same name but with different parameter types)
+     * @param expression
+     *            the Expression to evaluate that represents the new value to set.
+     * @return the newly created <code>Operation</code>.
+     * @see OperatorType#BUSINESS_DATA_JAVA_SETTER
+     */
+    public Operation createBusinessDataSetAttributeOperation(final String businessDataName, final String methodName, final String methodParamType,
+            final Expression expression) {
+        return createNewInstance().setLeftOperand(businessDataName, false).setRightOperand(expression).setType(OperatorType.BUSINESS_DATA_JAVA_SETTER)
+                .setOperator(methodName).setOperatorInputType(methodParamType).done();
     }
 
     /**

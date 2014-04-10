@@ -1,10 +1,10 @@
 DELETE FROM user_membership
 GO
 
-DELETE FROM p_metadata_val
+DELETE FROM custom_usr_inf_val
 GO
 
-DELETE FROM p_metadata_def
+DELETE FROM custom_usr_inf_def
 GO
 
 DELETE FROM user_contactinfo

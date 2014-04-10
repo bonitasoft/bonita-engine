@@ -138,8 +138,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 1000, 100);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
+        try {
         schedulerService.schedule(jobDescriptor2, parameters2, trigger1);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test(expected = SSchedulerException.class)
@@ -162,8 +165,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger2 = new RepeatXTimesTrigger("trigger1", now, 5, 80, 1000);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
+        try {
         schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test(expected = SSchedulerException.class)
@@ -186,8 +192,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().begin();
 
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
+        try {
         schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test
@@ -216,8 +225,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger = new OneExecutionTrigger(null, now, 10);
         getTransactionService().begin();
+        try {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test
@@ -246,8 +258,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger1 = new RepeatXTimesTrigger(null, now, 10, 1000, 100);
         getTransactionService().begin();
+        try {
         schedulerService.schedule(jobDescriptor, parameters, trigger1);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test
@@ -276,8 +291,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger = new UnixCronTrigger(null, now, 10, "0/1 * * * * ?");
         getTransactionService().begin();
+        try {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test
@@ -307,8 +325,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, -2, 100);
         getTransactionService().begin();
+        try {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test
@@ -340,8 +361,12 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, 0);
         getTransactionService().begin();
+        try {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
+        } finally {
         getTransactionService().complete();
+    }
+
     }
 
     @Test(expected = SSchedulerException.class)
@@ -356,8 +381,11 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, -1);
         getTransactionService().begin();
+        try {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
+        } finally {
         getTransactionService().complete();
+    }
     }
 
     @Test
@@ -407,9 +435,9 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().complete();
 
         final int value = IncrementItselfJob.getValue();
-      
+
         Thread.sleep(1500);
-      
+
         final int newValue = IncrementItselfJob.getValue();
         final int delta = newValue - value;
         assertTrue("expected 1,2 or 3 executions in 1.5 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
@@ -697,8 +725,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         changeToTenant1();
         getTransactionService().complete();
         now = new Date(System.currentTimeMillis() + 100);
-        jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
+        jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
         parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName3", jobName).done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "3").done());
@@ -713,8 +740,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().complete();
         // schedule on same group
         now = new Date(System.currentTimeMillis() + 100);
-        jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
+        jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
         parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName2", jobName).done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "2").done());

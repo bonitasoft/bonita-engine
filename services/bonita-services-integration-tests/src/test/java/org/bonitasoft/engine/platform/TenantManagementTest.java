@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.platform;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -69,8 +69,7 @@ public class TenantManagementTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                .createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
         long tenantId = getPlatformService().createTenant(tenant);
@@ -216,8 +215,7 @@ public class TenantManagementTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                .createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
         getPlatformService().createTenant(tenant);

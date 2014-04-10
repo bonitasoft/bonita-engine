@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+<xsd:schema xmlns="http://documentation.bonitasoft.com/organization-xml-schema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://documentation.bonitasoft.com/organization-xml-schema">
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			Organization Schema 1.0 for Bonita Open Solution.
@@ -11,13 +11,20 @@
 
 	<xsd:complexType name="Organization">
 		<xsd:sequence>
+			<xsd:element minOccurs="0" name="customUserInfoDefinitions" type="CustomUserInfoDefinitions" />
 			<xsd:element minOccurs="0" name="users" type="Users" />
 			<xsd:element minOccurs="0" name="roles" type="Roles" />
 			<xsd:element minOccurs="0" name="groups" type="Groups" />
 			<xsd:element minOccurs="0" name="memberships" type="Memberships" />
 		</xsd:sequence>
 	</xsd:complexType>
-
+	
+	<xsd:complexType name="CustomUserInfoDefinitions">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="customUserInfoDefinition" type="CustomUserInfoDefinition" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
 	<xsd:complexType name="Users">
 		<xsd:sequence>
 			<xsd:element maxOccurs="unbounded" name="user" type="User" />
@@ -39,6 +46,13 @@
 	<xsd:complexType name="Memberships">
 		<xsd:sequence>
 			<xsd:element maxOccurs="unbounded" minOccurs="0" name="membership" type="Membership" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="CustomUserInfoDefinition">
+		<xsd:sequence>
+			<xsd:element minOccurs="1" name="name" type="xsd:string" />
+			<xsd:element minOccurs="0" name="description" type="xsd:string" />
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -63,10 +77,18 @@
 			<xsd:element minOccurs="0" name="enabled" type="xsd:boolean" />
 			<xsd:element minOccurs="0" name="personalData" type="ContactData" />
 			<xsd:element minOccurs="0" name="professionalData" type="ContactData" />
+			<!-- the element metaDatas is deprecated, use customUserInfoDefinitions and customUserInfoValues instead -->
 			<xsd:element minOccurs="0" name="metaDatas">
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element maxOccurs="unbounded" minOccurs="0" name="metaData" type="Metadata" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="customUserInfoValues">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element maxOccurs="unbounded" minOccurs="0" name="customUserInfoValue" type="CustomUserInfoValue" />
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
@@ -91,6 +113,7 @@
 		</xsd:all>
 	</xsd:complexType>
 
+	<!-- the type MetaData is deprecated, use CustomUserInfoDefinition and CustomUserInfoValue instead -->
 	<xsd:complexType name="Metadata">
 		<xsd:attribute name="name" type="xsd:string" use="required" />
 		<xsd:attribute name="value" type="xsd:string" />
@@ -125,6 +148,13 @@
 			<xsd:element minOccurs="0" name="groupParentPath" type="xsd:string" />
 			<xsd:element minOccurs="0" name="assignedBy" type="xsd:string" />
 			<xsd:element minOccurs="0" name="assignedDate" type="xsd:long" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="CustomUserInfoValue">
+		<xsd:sequence>
+			<xsd:element minOccurs="1" name="name" type="xsd:string" />
+			<xsd:element minOccurs="1" name="value" type="xsd:string" />
 		</xsd:sequence>
 	</xsd:complexType>
 

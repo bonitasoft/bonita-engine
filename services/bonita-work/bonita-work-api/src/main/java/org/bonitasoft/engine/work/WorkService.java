@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
  * This service allows to trigger the execution of work asynchronously
@@ -21,8 +21,9 @@ import org.bonitasoft.engine.commons.ServiceWithLifecycle;
  * 
  * @author Charles Souillard
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public interface WorkService extends ServiceWithLifecycle {
+public interface WorkService extends TenantLifecycleService {
 
     /**
      * This operation MUST be called with an active transaction. If no active transaction is found, a SWorkRegisterException is thrown

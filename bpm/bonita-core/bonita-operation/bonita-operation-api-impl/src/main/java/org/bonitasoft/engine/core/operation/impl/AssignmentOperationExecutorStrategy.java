@@ -26,7 +26,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class AssignmentOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
+public class AssignmentOperationExecutorStrategy extends UpdateDataOperationExecutorStrategy {
 
     /**
      * The Operation type of this strategy, as a String

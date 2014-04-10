@@ -20,18 +20,18 @@ import java.util.Set;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
@@ -182,9 +182,9 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testGetProfileMetadataByName() throws Exception {
         getTransactionService().begin();
         final String name = "MyProfileMetadata";
-        final SProfileMetadataDefinition metadata = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance().setName(name).done();
-        identityService.createProfileMetadataDefinition(metadata);
-        final SProfileMetadataDefinition metadata2 = identityService.getProfileMetadataByName(name);
+        final SCustomUserInfoDefinition metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName(name).done();
+        identityService.createCustomUserInfoDefinition(metadata);
+        final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinitionByName(name);
         assertNotNull("can't find the profile metadata after adding it", metadata2);
         assertEquals("Does not retrieved the good profile metadata", name, metadata2.getName());
         getTransactionService().complete();
@@ -265,10 +265,10 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testGetProfileMetadata() throws Exception {
         getTransactionService().begin();
         final long id = new Date().getTime();
-        final SProfileMetadataDefinition testGetProfileMetadata = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance()
+        final SCustomUserInfoDefinition testGetProfileMetadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance()
                 .setName("testGetProfileMetadata").setId(id).done();
-        identityService.createProfileMetadataDefinition(testGetProfileMetadata);
-        final SProfileMetadataDefinition metadata2 = identityService.getProfileMetadataDefinition(id);
+        identityService.createCustomUserInfoDefinition(testGetProfileMetadata);
+        final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinition(id);
         getTransactionService().complete();
 
         assertNotNull("can't find the metadata after adding it", metadata2);
@@ -701,37 +701,37 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testGetProfileMetadataPaginated() throws Exception {
         getTransactionService().begin();
         long id;
-        SProfileMetadataDefinition metadata;
+        SCustomUserInfoDefinition metadata;
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + i;
-            metadata = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance().setName("testGetProfileMetadataPaginated" + i).setId(id).done();
-            identityService.createProfileMetadataDefinition(metadata);
+            metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetProfileMetadataPaginated" + i).setId(id).done();
+            identityService.createCustomUserInfoDefinition(metadata);
         }
 
-        List<SProfileMetadataDefinition> retrievedMetadata = identityService.getProfileMetadataDefinition(5, 5);
+        List<SCustomUserInfoDefinition> retrievedMetadata = identityService.getCustomUserInfoDefinitions(5, 5);
         assertNotNull("can't find the groups after adding them", retrievedMetadata);
         assertEquals("bad number of retrieved groups", 5, retrievedMetadata.size());
 
-        retrievedMetadata = identityService.getProfileMetadataDefinition(0, 20);
+        retrievedMetadata = identityService.getCustomUserInfoDefinitions(0, 20);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedMetadata);
         assertEquals("bad number of retrieved groups", 20, retrievedMetadata.size());
     }
 
     @Test
-    public void testGetNumberOfProfileMetadata() throws Exception {
+    public void testGetNumberOfCustomUserInfoDefinition() throws Exception {
         getTransactionService().begin();
-        final long numberOfMetadata = identityService.getNumberOfProfileMetadataDefinition();
+        final long numberOfMetadata = identityService.getNumberOfCustomUserInfoDefinition();
         long id;
-        SProfileMetadataDefinition metadata;
+        SCustomUserInfoDefinition info;
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + 50L + i;
-            metadata = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance().setName("testGetNumberOfProfileMetadata" + i).setId(id).done();
-            identityService.createProfileMetadataDefinition(metadata);
+            info = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetNumberOfCustomUserInfoDefinition" + i).setId(id).done();
+            identityService.createCustomUserInfoDefinition(info);
         }
-        assertEquals("bad count of metadata", numberOfMetadata + 30, identityService.getNumberOfProfileMetadataDefinition());
+        assertEquals("bad count of custom user info definition", numberOfMetadata + 30, identityService.getNumberOfCustomUserInfoDefinition());
         getTransactionService().complete();
     }
 
@@ -1172,10 +1172,10 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testAddProfileMetadata() throws Exception {
         getTransactionService().begin();
         final long metadataId = new Date().getTime();
-        final SProfileMetadataDefinition metadata = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance().setId(metadataId)
+        final SCustomUserInfoDefinition metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setId(metadataId)
                 .setName("testAddProfileMetadata").done();
-        identityService.createProfileMetadataDefinition(metadata);
-        final SProfileMetadataDefinition metadata2 = identityService.getProfileMetadataDefinition(metadataId);
+        identityService.createCustomUserInfoDefinition(metadata);
+        final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinition(metadataId);
         getTransactionService().complete();
         assertNotNull("can't retrieve the metadata", metadata2);
         assertEquals("retrieved not the good metadata", metadata.getId(), metadata2.getId());
@@ -1184,12 +1184,12 @@ public class IdentityServiceTest extends CommonServiceTest {
     @Test
     public void testUpdateProfileMetadata() throws Exception {
         getTransactionService().begin();
-        final SProfileMetadataDefinition metadata = identityService.getProfileMetadataDefinition(0, 1).get(0);
+        final SCustomUserInfoDefinition metadata = identityService.getCustomUserInfoDefinitions(0, 1).get(0);
         final long metadataId = metadata.getId();
         final String newName = "theNewName";
-        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SProfileMetadataDefinitionUpdateBuilderFactory.class).createNewInstance().updateName(newName).done();
-        identityService.updateProfileMetadataDefinition(metadata, changeDescriptor);
-        final SProfileMetadataDefinition metadata2 = identityService.getProfileMetadataDefinition(metadataId);
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance().updateName(newName).done();
+        identityService.updateCustomUserInfoDefinition(metadata, changeDescriptor);
+        final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinition(metadataId);
         getTransactionService().complete();
         assertNotNull("can't retrieve the metadata", metadata2);
         assertEquals("retrieved not the good metadata", metadata.getId(), metadata2.getId());
@@ -1267,11 +1267,11 @@ public class IdentityServiceTest extends CommonServiceTest {
     @Test(expected = SIdentityException.class)
     public void testDeleteProfileMetadata() throws Exception {
         getTransactionService().begin();
-        final SProfileMetadataDefinition metadataDefinition = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance().setName("kikooMetadata").done();
-        identityService.createProfileMetadataDefinition(metadataDefinition);
+        final SCustomUserInfoDefinition metadataDefinition = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("kikooMetadata").done();
+        identityService.createCustomUserInfoDefinition(metadataDefinition);
         final long id = metadataDefinition.getId();
-        identityService.deleteProfileMetadataDefinition(metadataDefinition);
-        assertNull("the profile metadata was not deleted", identityService.getProfileMetadataDefinition(id));
+        identityService.deleteCustomUserInfoDefinition(metadataDefinition);
+        assertNull("the profile metadata was not deleted", identityService.getCustomUserInfoDefinition(id));
         getTransactionService().complete();
     }
 

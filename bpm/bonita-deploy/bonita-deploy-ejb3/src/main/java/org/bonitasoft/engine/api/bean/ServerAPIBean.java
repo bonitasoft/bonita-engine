@@ -42,9 +42,9 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
         final ServerAPI apiImpl = ServerAPIFactory.getServerAPI();
         try {
-        	return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } catch(ServerWrappedException e){
-        	// merge stack trace of the server exception
+            return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        } catch (final ServerWrappedException e) {
+            // merge stack trace of the server exception
             throw StackTraceTransformer.mergeStackTraces(e);
         }
     }

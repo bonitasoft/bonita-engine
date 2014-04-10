@@ -299,6 +299,10 @@ public class IOUtil {
      */
     public static String read(final InputStream inputStream) {
         final Scanner scanner = new Scanner(inputStream, fEncoding);
+        return read(scanner);
+    }
+
+    private static String read(final Scanner scanner) {
         final StringBuilder text = new StringBuilder();
         try {
             boolean isFirst = true;
@@ -322,12 +326,8 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        FileInputStream inputStream = new FileInputStream(file);
-        try {
-            return read(inputStream);
-        } finally {
-            inputStream.close();
-        }
+         final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
+        return read(scanner);
     }
 
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {

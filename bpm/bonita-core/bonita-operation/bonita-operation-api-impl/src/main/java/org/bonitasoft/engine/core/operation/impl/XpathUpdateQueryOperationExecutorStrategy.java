@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-public class XpathUpdateQueryOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
+public class XpathUpdateQueryOperationExecutorStrategy extends UpdateDataOperationExecutorStrategy {
 
     public static final String TYPE_XPATH_UPDATE_QUERY = "XPATH_UPDATE_QUERY";
 

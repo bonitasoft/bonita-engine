@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,41 +16,48 @@ package org.bonitasoft.engine.identity.xml;
 import java.util.List;
 
 import org.bonitasoft.engine.identity.ExportedUser;
-import org.bonitasoft.engine.identity.GroupCreator;
-import org.bonitasoft.engine.identity.RoleCreator;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 
 /**
- * @author Baptiste Mesta
- * @author Frederic Bouquet
- * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class Organization {
 
+    private final List<SCustomUserInfoDefinition> customUserInfoDefinitions;
+    
     private final List<ExportedUser> users;
 
-    private final List<RoleCreator> roles;
+    private final List<Role> roles;
 
-    private final List<GroupCreator> groups;
+    private final List<Group> groups;
 
     private final List<UserMembership> memberships;
 
-    public Organization(final List<ExportedUser> users, final List<RoleCreator> roles, final List<GroupCreator> groups, final List<UserMembership> memberships) {
+    public Organization(final List<ExportedUser> users, final List<Role> roles, final List<Group> groups, final List<UserMembership> memberships,
+            List<SCustomUserInfoDefinition> customUserInfoDefinitions) {
         this.users = users;
         this.roles = roles;
         this.groups = groups;
         this.memberships = memberships;
+        this.customUserInfoDefinitions = customUserInfoDefinitions;
+    }
+    
+    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions() {
+        return customUserInfoDefinitions;
     }
 
     public List<ExportedUser> getUsers() {
         return users;
     }
 
-    public List<RoleCreator> getRoles() {
+    public List<Role> getRole() {
         return roles;
     }
 
-    public List<GroupCreator> getGroups() {
+    public List<Group> getGroup() {
         return groups;
     }
 

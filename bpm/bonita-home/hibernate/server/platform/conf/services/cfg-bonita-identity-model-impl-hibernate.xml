@@ -13,8 +13,8 @@
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
 				<entry key="org.bonitasoft.engine.identity.model.SRole" value="role" />
 				<entry key="org.bonitasoft.engine.identity.model.SGroup" value="group_" />
-				<entry key="org.bonitasoft.engine.identity.model.SProfileMetadataDefinition" value="p_metadata_def" />
-				<entry key="org.bonitasoft.engine.identity.model.SProfileMetadataValue" value="p_metadata_val" />
+				<entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" value="custom_usr_inf_def" />
+				<entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="custom_usr_inf_val" />
 				<entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
 				<entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
 			</map>
