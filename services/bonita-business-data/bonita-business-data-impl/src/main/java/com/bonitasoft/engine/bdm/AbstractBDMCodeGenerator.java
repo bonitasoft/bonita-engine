@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bdm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -24,14 +25,21 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.bonitasoft.engine.commons.StringUtil;
+
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
@@ -109,6 +117,9 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             addModifiers(entityClass, field);
         }
 
+        addDefaultConstructor(entityClass);
+        addCopyConstructor(entityClass, bo);
+
         addEqualsMethod(entityClass);
         addHashCodeMethod(entityClass);
 
@@ -131,6 +142,24 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         }
         if (alreadyInRuntime) {
             throw new IllegalArgumentException("Class " + qualifiedName + " already exists in target runtime environment.");
+        }
+    }
+
+    protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
+        final JMethod copyConstructor = entityClass.constructor(1);
+        final JVar param = copyConstructor.param(entityClass, StringUtil.firstCharToLowerCase(entityClass.name()));
+        final JBlock copyBody = copyConstructor.body();
+        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
+        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
+        for (final Field field : bo.getFields()) {
+            if (field.isCollection() != null && field.isCollection()) {
+                final JClass fieldClass = getModel().ref(field.getType().getClazz());
+                final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
+                copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz)
+                        .arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
+            } else {
+                copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
+            }
         }
     }
 

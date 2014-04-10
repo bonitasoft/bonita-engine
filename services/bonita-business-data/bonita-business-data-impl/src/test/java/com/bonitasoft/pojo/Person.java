@@ -29,6 +29,16 @@ public class Person implements com.bonitasoft.engine.bdm.Entity {
     @Column(name = "NICKNAMES", nullable = true, length = 15)
     private List<String> nickNames = new ArrayList<String>(10);
 
+    public Person() {
+        super();
+    }
+
+    public Person(final Person person) {
+        persistenceId = person.getPersistenceId();
+        persistenceVersion = person.getPersistenceVersion();
+        nickNames = person.getNickNames();
+    }
+
     public void setPersistenceId(final Long persistenceId) {
         this.persistenceId = persistenceId;
     }

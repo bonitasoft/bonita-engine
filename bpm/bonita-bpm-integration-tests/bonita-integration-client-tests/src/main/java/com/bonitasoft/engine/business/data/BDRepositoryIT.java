@@ -226,6 +226,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 new OperationBuilder().attachBusinessDataSetAttributeOperation(secondBizData, new ExpressionBuilder().createQueryBusinessDataExpression(
                         "oneEmployee", GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, EMPLOYEE_QUALIF_CLASSNAME,
                         new ExpressionBuilder().createConstantStringExpression("lastName", "Doe"))));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
 
         final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -235,6 +237,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 
         assignAndExecuteStep(userTask, matti);
+        waitForUserTask("step2", processInstance.getId());
         final String people = getEmployeeToString(secondBizData, processInstance.getId());
         assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 

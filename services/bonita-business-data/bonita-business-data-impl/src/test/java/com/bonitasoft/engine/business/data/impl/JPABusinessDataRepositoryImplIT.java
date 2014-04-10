@@ -175,8 +175,8 @@ public class JPABusinessDataRepositoryImplIT {
     @Test(expected = NonUniqueResultException.class)
     public void findShouldThrowExceptionWhenSeveralResultsMatch() throws Exception {
         final String lastName = "Kangaroo";
-        addEmployeeToRepository(anEmployee().withLastName(lastName).withId(698L).build());
-        addEmployeeToRepository(anEmployee().withLastName(lastName).withId(6448L).build());
+        addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        addEmployeeToRepository(anEmployee().withLastName(lastName).build());
 
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) lastName);
         businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
@@ -258,9 +258,9 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findList_should_return_employee_list() throws Exception {
-        final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").withId(698L).build());
-        final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").withId(61L).build());
-        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").withId(64L).build());
+        final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").build());
+        final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
+        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
 
         final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
                 null);
@@ -282,7 +282,7 @@ public class JPABusinessDataRepositoryImplIT {
     }
 
     @Test
-    public void romantic() throws Exception {
+    public void findBasedOnAMultipleAttributeShouldReturnTheEntity() throws Exception {
         final Person person = new Person();
         person.setNickNames(Arrays.asList("John", "James", "Jack"));
         final Person expected = entityManager.merge(person);

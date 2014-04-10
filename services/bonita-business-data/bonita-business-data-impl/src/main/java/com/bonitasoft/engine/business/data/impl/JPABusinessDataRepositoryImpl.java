@@ -9,6 +9,8 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,7 +120,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new SBusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
         }
         em.detach(entity);
-        return entity;
+        return copy(entity);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T extends Entity> T copy(final T entity) {
+        try {
+            final Constructor<? extends Entity> constructor = entity.getClass().getConstructor(entity.getClass());
+            return (T) constructor.newInstance(entity);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
@@ -134,8 +146,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         final EntityManager em = getEntityManager();
         try {
             final T entity = query.getSingleResult();
-            detachEntity(em, resultClass, entity);
-            return entity;
+            return detachEntity(em, resultClass, entity);
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
         } catch (final NoResultException e) {
@@ -186,15 +197,21 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         }
         final EntityManager em = getEntityManager();
         final List<T> resultList = query.getResultList();
+        final List<T> copyList = new ArrayList<T>();
         for (final T entity : resultList) {
-            detachEntity(em, resultClass, entity);
+            copyList.add(detachEntity(em, resultClass, entity));
         }
-        return resultList;
+        return copyList;
     }
 
-    private <T> void detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
-        if (!ClassUtils.isPrimitiveOrWrapper(resultClass)) {
+    @SuppressWarnings("unchecked")
+    private <T> T detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
+        if (ClassUtils.isPrimitiveOrWrapper(resultClass)) {
+            return entity;
+        } else {
             em.detach(entity);
+            final Entity e = (Entity) entity;
+            return (T) copy(e);
         }
     }
 

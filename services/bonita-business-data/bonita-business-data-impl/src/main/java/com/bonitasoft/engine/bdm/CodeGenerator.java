@@ -137,6 +137,10 @@ public class CodeGenerator {
         return listFieldVar;
     }
 
+    public void addDefaultConstructor(final JDefinedClass definedClass) {
+        definedClass.constructor(0);
+    }
+
     public JMethod addSetter(final JDefinedClass definedClass, final JFieldVar field) {
         final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
         method.param(field.type(), field.name());
@@ -196,6 +200,17 @@ public class CodeGenerator {
             builder.append("get");
         }
         builder.append(StringUtil.firstCharToUpperCase(field.name()));
+        return builder.toString();
+    }
+
+    public String getGetterName(final Field field) {
+        final StringBuilder builder = new StringBuilder();
+        if (FieldType.BOOLEAN.equals(field.getType())) {
+            builder.append("is");
+        } else {
+            builder.append("get");
+        }
+        builder.append(StringUtil.firstCharToUpperCase(field.getName()));
         return builder.toString();
     }
 
