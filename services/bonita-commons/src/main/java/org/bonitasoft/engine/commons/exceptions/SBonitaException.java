@@ -271,7 +271,7 @@ public abstract class SBonitaException extends Exception {
      *            The identifier of the user
      * @since 6.3
      */
-    public void setUserIdOnContext(final long userId) {
+    public void setUserIdOnContext(final Long userId) {
         context.put(SContext.USER_ID, userId);
     }
 
@@ -280,7 +280,7 @@ public abstract class SBonitaException extends Exception {
      *            The identifier of the group
      * @since 6.3
      */
-    public void setGroupIdOnContext(long groupId) {
+    public void setGroupIdOnContext(final Long groupId) {
         context.put(SContext.GROUP_ID, groupId);
     }
 
@@ -289,7 +289,7 @@ public abstract class SBonitaException extends Exception {
      *            The identifier of the role
      * @since 6.3
      */
-    public void setRoleIdOnContext(long roleId) {
+    public void setRoleIdOnContext(final Long roleId) {
         context.put(SContext.ROLE_ID, roleId);
     }
 
