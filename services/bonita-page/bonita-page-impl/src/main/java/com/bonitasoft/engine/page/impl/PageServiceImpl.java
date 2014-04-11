@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeoutException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -521,17 +520,17 @@ public class PageServiceImpl implements PageService {
                 true, now, -1, zipName);
     }
 
-    // @Override
-    public void stop() throws SBonitaException, TimeoutException {
+    @Override
+    public void stop() throws SBonitaException {
         // nothing to do
     }
 
-    // @Override
-    public void pause() throws SBonitaException, TimeoutException {
+    @Override
+    public void pause() throws SBonitaException {
         // nothing to do
     }
 
-    // @Override
+    @Override
     public void resume() throws SBonitaException {
         // nothing to do
     }
