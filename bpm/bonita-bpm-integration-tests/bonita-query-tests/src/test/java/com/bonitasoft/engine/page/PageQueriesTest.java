@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,7 +22,6 @@ public class PageQueriesTest {
     private PageRepository repository;
 
     @Test
-    @Ignore
     public void getPageContent_should_return_the_content_of_the_page() throws Exception {
         // given
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
@@ -36,7 +34,6 @@ public class PageQueriesTest {
     }
 
     @Test
-    @Ignore
     public void getPageByName_should_return_the_page_having_the_name() throws Exception {
         // given
         repository.add(aPage().withName("MyPage1").withContent("The content".getBytes()).build());
