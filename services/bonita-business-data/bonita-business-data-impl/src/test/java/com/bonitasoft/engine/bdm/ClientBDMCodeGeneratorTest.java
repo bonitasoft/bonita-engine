@@ -80,7 +80,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final Iterator<JClass> it = definedClass._implements();
         final JClass jClass = it.next();
         assertThat(jClass.fullName()).isEqualTo(com.bonitasoft.engine.bdm.Entity.class.getName());
-        assertThat(definedClass.annotations()).hasSize(2);
+        assertThat(definedClass.annotations()).hasSize(3);
         final Iterator<JAnnotationUse> iterator = definedClass.annotations().iterator();
         final JAnnotationUse entityAnnotation = iterator.next();
         assertThat(entityAnnotation.getAnnotationClass().fullName()).isEqualTo(Entity.class.getName());
