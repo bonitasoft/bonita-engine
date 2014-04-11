@@ -59,14 +59,17 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         String daoInterfaceClassName = toDaoInterfaceClassname(bo);
         JDefinedClass daoInterface = addInterface(daoInterfaceClassName);
         addInterface(daoInterface, BusinessObjectDAO.class.getName());
-        // Add method signature in interface for queries
+
+        // Add method signature in interface for provided queries
+        for (Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            createMethodForQuery(entity, daoInterface, q);
+        }
+
+        // Add method signature in interface for custom queries
         for (Query q : bo.getQueries()) {
             createMethodForQuery(entity, daoInterface, q);
         }
-        // Add method signature in interface for unique constraint
-        for (UniqueConstraint uc : bo.getUniqueConstraints()) {
-            createMethodForUniqueConstraint(bo, entity, daoInterface, uc);
-        }
+
         return daoInterface;
     }
 

@@ -97,13 +97,16 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
                 for (final String fieldName : uniqueConstraint.getFieldNames()) {
                     columnNamesParamArray.param(fieldName.toUpperCase());
                 }
-
-                // Generate a query for Unique Constraint
-                addNamedQuery(entityClass, valueArray, BDMQueryUtil.createQueryNameForUniqueConstraint(entityClass.name(), uniqueConstraint),
-                        BDMQueryUtil.createQueryContentForUniqueConstraint(entityClass.name(), uniqueConstraint));
             }
         }
 
+        // Add provided queries
+        for (Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            addNamedQuery(entityClass, valueArray, providedQuery.getName(),
+                    providedQuery.getContent());
+        }
+
+        // Add custom queries
         for (final Query query : queries) {
             addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
         }

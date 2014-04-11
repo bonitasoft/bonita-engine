@@ -3,6 +3,7 @@ package com.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -43,7 +44,41 @@ public class BDMQueryUtilTest {
         assertThat(query).isNotNull();
         assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
         assertThat(query.getName()).isEqualTo("getEmployeeByName");
+        assertThat(query.getReturnType()).isEqualTo(bo.getQualifiedName());
         assertThat(query.getQueryParameters()).hasSize(1);
     }
 
+    @Test
+    public void should_createQueryFoField_return_query_with_parameters() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final Field field = new Field();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+
+        final Query query = BDMQueryUtil.createQueryForField(bo, field);
+        assertThat(query).isNotNull();
+        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
+        assertThat(query.getName()).isEqualTo("getEmployeeByName");
+        assertThat(query.getReturnType()).isEqualTo(List.class.getName());
+        assertThat(query.getQueryParameters()).hasSize(1);
+    }
+
+    @Test
+    public void should_createSelectAllQueryreturn_query_without_parameters() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final Field field = new Field();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+
+        final Query query = BDMQueryUtil.createSelectAllQueryForBusinessObject(bo);
+        assertThat(query).isNotNull();
+        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e");
+        assertThat(query.getName()).isEqualTo("getAllEmployee");
+        assertThat(query.getReturnType()).isEqualTo(List.class.getName());
+        assertThat(query.getQueryParameters()).isEmpty();
+    }
 }
