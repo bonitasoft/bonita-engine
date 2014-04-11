@@ -112,6 +112,9 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public PageService getPageService() {
         return getInstanceOf(PageService.class);
+    }
+
+    @Override
     public RefBusinessDataService getRefBusinessDataService() {
         return getInstanceOf(RefBusinessDataService.class);
     }
