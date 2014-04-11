@@ -10,7 +10,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,10 +43,11 @@ import bitronix.tm.TransactionManagerServices;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.pojo.Employee;
+import com.bonitasoft.pojo.Person;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
-public class JPABusinessDataRepositoryImplIT {
+public class JPABusinessDataRepositoryImplITest {
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
@@ -86,14 +89,19 @@ public class JPABusinessDataRepositoryImplIT {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
-        final SchemaUpdater schemaUpdater = new SchemaUpdater(modelConfiguration, mock(TechnicalLoggerService.class));
+        final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaUpdater, null, null));
+                schemaManager, null, null));
         businessDataRepository = spy(new JPABusinessDataRepositoryImpl(businessDataModelRepositoryImpl, configuration));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
-        businessDataModelRepositoryImpl.updateSchema(Collections.singleton(Employee.class.getName()));
+
+        final Set<String> classNames = new HashSet<String>();
+        classNames.add(Employee.class.getName());
+        classNames.add(Person.class.getName());
+
+        businessDataModelRepositoryImpl.update(classNames);
         businessDataRepository.start();
         entityManager = businessDataRepository.getEntityManager();
     }
@@ -106,6 +114,7 @@ public class JPABusinessDataRepositoryImplIT {
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
         try {
             jdbcTemplate.update("drop table Employee");
+            jdbcTemplate.update("drop table Person");
         } catch (final Exception e) {
             // ignore drop of non-existing table
         }
@@ -166,8 +175,8 @@ public class JPABusinessDataRepositoryImplIT {
     @Test(expected = NonUniqueResultException.class)
     public void findShouldThrowExceptionWhenSeveralResultsMatch() throws Exception {
         final String lastName = "Kangaroo";
-        addEmployeeToRepository(anEmployee().withLastName(lastName).withId(698L).build());
-        addEmployeeToRepository(anEmployee().withLastName(lastName).withId(6448L).build());
+        addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        addEmployeeToRepository(anEmployee().withLastName(lastName).build());
 
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) lastName);
         businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
@@ -214,7 +223,7 @@ public class JPABusinessDataRepositoryImplIT {
     public void getEntityClassNames_should_return_the_classes_managed_by_the_bdr() throws Exception {
         final Set<String> classNames = businessDataRepository.getEntityClassNames();
 
-        assertThat(classNames).containsOnly(Employee.class.getName());
+        assertThat(classNames).containsExactly(Employee.class.getName(), Person.class.getName());
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
@@ -249,12 +258,12 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findList_should_return_employee_list() throws Exception {
-        final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").withId(698L).build());
-        final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").withId(61L).build());
-        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").withId(64L).build());
+        final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").build());
+        final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
+        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
 
         final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
-                null);
+                null, 0, 10);
 
         assertThat(employees).containsExactly(e2, e3, e1);
     }
@@ -263,13 +272,30 @@ public class JPABusinessDataRepositoryImplIT {
     public void findListShouldReturnEmptyListIfNoResults() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) "Jaakko");
         final List<Employee> employees = businessDataRepository.findList(Employee.class,
-                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters);
+                "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters, 0, 10);
         assertThat(employees).isEmpty();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void findListShouldThrowAnExceptionIfAtLeastOneQueryParameterIsNotSet() throws Exception {
-        businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null);
+        businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null, 0, 10);
+    }
+
+    @Test
+    public void findBasedOnAMultipleAttributeShouldReturnTheEntity() throws Exception {
+        final Person person = new Person();
+        person.setNickNames(Arrays.asList("John", "James", "Jack"));
+        final Person expected = entityManager.merge(person);
+
+        final Person actual = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
+        assertThat(actual).isEqualTo(expected);
+
+        actual.removeFrom("James");
+
+        entityManager.merge(actual);
+
+        final Person actual2 = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
+        assertThat(actual2).isNull();
     }
 
 }

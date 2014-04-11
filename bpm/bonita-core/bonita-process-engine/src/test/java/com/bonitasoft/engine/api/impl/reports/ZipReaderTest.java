@@ -18,19 +18,17 @@ import org.junit.Test;
 /**
  * @author Vincent Elcrin
  * @author Celine Souchet
- * 
  */
 public class ZipReaderTest {
 
     @Test
     public void should_extract_a_zip_and_expose_content() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
+        final ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
 
         zip.read(new Reader() {
 
-            @SuppressWarnings("unused")
             @Override
-            public void read(File zip, File unzipped) throws Exception {
+            public void read(final File zip, final File unzipped) throws Exception {
                 assertThat(unzipped).exists();
                 assertThat(Arrays.asList(unzipped.list()).toString()).isEqualTo("[myreport.properties]");
             }
@@ -39,14 +37,13 @@ public class ZipReaderTest {
 
     @Test
     public void should_remove_temporary_files_once_finish() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
+        final ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
         final File[] files = { null };
 
         zip.read(new Reader() {
 
-            @SuppressWarnings("unused")
             @Override
-            public void read(File zip, File unzipped) {
+            public void read(final File zip, final File unzipped) {
                 files[0] = unzipped;
             }
         });

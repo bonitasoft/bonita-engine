@@ -25,7 +25,6 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- * 
  * Factory that use a hazelcast executor
  * 
  * @author Baptiste Mesta
@@ -58,13 +57,13 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
     public Pair<ExecutorService, Queue<Runnable>> createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
-        BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
+        final BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
         return Pair.<ExecutorService, Queue<Runnable>> of(new ClusteredThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
                 TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue), queue);
     }
 
     private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
-        BlockingQueue<Runnable> workQueue = hazelcastInstance.getQueue("WorkQueue");
+        final BlockingQueue<Runnable> workQueue = hazelcastInstance.getQueue("WorkQueue");
         return workQueue;
     }
 
@@ -73,7 +72,6 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
         public QueueRejectedExecutionHandler() {
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             throw new RejectedExecutionException(

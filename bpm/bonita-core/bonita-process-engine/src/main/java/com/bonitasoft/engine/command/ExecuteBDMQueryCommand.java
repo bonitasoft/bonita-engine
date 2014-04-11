@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,7 +26,6 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Romain Bioteau
- * 
  */
 public class ExecuteBDMQueryCommand extends TenantCommand {
 
@@ -40,9 +37,13 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
 
     public static final String QUERY_NAME = "queryName";
 
+    public static final String START_INDEX = "startIndex";
+
+    public static final String MAX_RESULTS = "maxResults";
+
     @Override
-    public Serializable execute(Map<String, Serializable> parameters, TenantServiceAccessor serviceAccessor) throws SCommandParameterizationException,
-            SCommandExecutionException {
+    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+            throws SCommandParameterizationException, SCommandExecutionException {
         BusinessDataRepository businessDataRepository = getBusinessDataRepository(serviceAccessor);
         String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
         @SuppressWarnings("unchecked")
@@ -56,7 +57,9 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
         }
         Boolean returnsList = (Boolean) parameters.get(RETURNS_LIST);
         if (returnsList != null && returnsList) {
-            return (Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters);
+            Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
+            Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
+            return (Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters, startIndex, maxResults);
         } else {
             try {
                 return businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
@@ -66,12 +69,12 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
         }
     }
 
-    protected BusinessDataRepository getBusinessDataRepository(TenantServiceAccessor serviceAccessor) {
+    protected BusinessDataRepository getBusinessDataRepository(final TenantServiceAccessor serviceAccessor) {
         return serviceAccessor.getBusinessDataRepository();
     }
 
     @SuppressWarnings("unchecked")
-    protected Class<? extends Serializable> loadClass(String returnType) throws ClassNotFoundException {
+    protected Class<? extends Serializable> loadClass(final String returnType) throws ClassNotFoundException {
         return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(returnType);
     }
 

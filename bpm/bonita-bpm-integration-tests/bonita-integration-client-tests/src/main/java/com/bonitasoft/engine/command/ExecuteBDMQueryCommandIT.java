@@ -34,7 +34,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -62,11 +61,13 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     private static final String RETURN_TYPE = "returnType";
 
+    private static final String START_INDEX = "startIndex";
+
+    private static final String MAX_RESULTS = "maxResults";
+
     private static final String QUERY_NAME = "queryName";
 
     protected User businessUser;
-
-    private static boolean alreadyAdded = false;
 
     private ClassLoader contextClassLoader;
 
@@ -90,6 +91,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         employee.setDescription("Describe a simple employee");
         // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
+        employee.addQuery("getNoEmployees", "SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'", List.class.getName());
         employee.addQuery("getEmployees", "SELECT e FROM BonitaEmployee e", List.class.getName());
         employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName",
                 EMPLOYEE_QUALIF_CLASSNAME);
@@ -120,19 +122,16 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
         getTenantManagementAPI().pause();
-        getTenantManagementAPI().installBusinessDataRepository(zip);
+        getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
         logout();
         loginWith(USERNAME, PASSWORD);
 
         loadClientJars();
 
-        if (!alreadyAdded) {
-            addEmployee("Romain", "Bioteau");
-            addEmployee("Jules", "Bioteau");
-            addEmployee("Matthieu", "Chaffotte");
-            alreadyAdded = true;
-        }
+        addEmployee("Romain", "Bioteau");
+        addEmployee("Jules", "Bioteau");
+        addEmployee("Matthieu", "Chaffotte");
     }
 
     protected void loadClientJars() throws Exception {
@@ -152,7 +151,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         login();
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
-            getTenantManagementAPI().uninstallBusinessDataRepository();
+            getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
         deleteUser(businessUser.getId());
@@ -161,12 +160,13 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    @Ignore("Need to clean/remove operation on Business Data first")
     public void should_execute_returns_empty_list() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "getEmployees");
+        parameters.put(QUERY_NAME, "getNoEmployees");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(START_INDEX, 0);
+        parameters.put(MAX_RESULTS, 10);
         Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
         assertThat(result).isNotNull().isInstanceOf(List.class);
         assertThat((List<Serializable>) result).isEmpty();
@@ -179,9 +179,27 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         parameters.put(QUERY_NAME, "getEmployees");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(START_INDEX, 0);
+        parameters.put(MAX_RESULTS, 10);
         Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
         assertThat(result).isNotNull().isInstanceOf(List.class);
         assertThat((List<Serializable>) result).hasSize(3);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getListFromQueryShouldLimitToMaxResults() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(QUERY_NAME, "getEmployees");
+        parameters.put(RETURNS_LIST, true);
+        parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(START_INDEX, 0);
+        parameters.put(MAX_RESULTS, 2);
+        Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
+        assertThat(result).isNotNull().isInstanceOf(List.class);
+        assertThat((List<Serializable>) result).hasSize(2);
     }
 
     @Test

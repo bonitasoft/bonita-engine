@@ -58,15 +58,13 @@ public class BusinessObjectValidationRule implements ValidationRule {
             status.addError(qualifiedName + " must have at least one field declared");
         }
         Set<String> constraintNames = new HashSet<String>();
-        Set<String> queryNames = new HashSet<String>();
+        Set<String> queryNames = BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo);
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
             if (constraintNames.contains(uc.getName())) {
                 status.addError("The constraint named \"" + uc.getName() + "\" already exists for " + bo.getQualifiedName());
             } else {
                 constraintNames.add(uc.getName());
             }
-
-            queryNames.add(BDMQueryUtil.createQueryNameForUniqueConstraint(bo.getQualifiedName(), uc));
             for (final String fName : uc.getFieldNames()) {
                 final Field field = getField(bo, fName);
                 if (field == null) {

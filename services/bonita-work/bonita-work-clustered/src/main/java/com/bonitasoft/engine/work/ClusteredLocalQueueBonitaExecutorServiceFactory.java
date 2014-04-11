@@ -28,7 +28,6 @@ import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- * 
  * Factory that use a hazelcast executor
  * 
  * @author Baptiste Mesta
@@ -49,8 +48,7 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     private final long tenantId;
 
     public ClusteredLocalQueueBonitaExecutorServiceFactory(final TechnicalLoggerService logger, final long tenantId, final int corePoolSize,
-            final int maximumPoolSize,
-            final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+            final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
         this.logger = logger;
         this.tenantId = tenantId;
         this.hazelcastInstance = hazelcastInstance;
@@ -66,13 +64,13 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     public Pair<ExecutorService, Queue<Runnable>> createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
-        BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
+        final BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
         return Pair.<ExecutorService, Queue<Runnable>> of(new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
                 TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue), queue);
     }
 
     private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
-        Cluster cluster = hazelcastInstance.getCluster();
+        final Cluster cluster = hazelcastInstance.getCluster();
         return hazelcastInstance.getQueue(ClusteredThreadPoolExecutorLocalQueue.memberWorkQueueName(cluster.getLocalMember()));
     }
 
@@ -81,7 +79,6 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
         public QueueRejectedExecutionHandler() {
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (executor.isShutdown()) {
