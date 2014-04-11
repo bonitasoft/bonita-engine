@@ -9,7 +9,7 @@ import com.bonitasoft.engine.BOMBuilder;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 
-public class ServerBDMJarBuilderIT {
+public class ServerBDMJarBuilderITest {
 
     /* Just to test we have no errors in full chain. Must be improved */
     @Test

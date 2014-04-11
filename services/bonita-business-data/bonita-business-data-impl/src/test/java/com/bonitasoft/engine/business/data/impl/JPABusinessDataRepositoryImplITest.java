@@ -47,7 +47,7 @@ import com.bonitasoft.pojo.Person;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
-public class JPABusinessDataRepositoryImplIT {
+public class JPABusinessDataRepositoryImplITest {
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
