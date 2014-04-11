@@ -484,7 +484,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 }
             }
             fields.removeAll(specificFilters);
-            final Iterator<String> fieldIterator = fields.iterator();
+
             final List<String> terms = multipleFilter.getTerms();
             if (!fields.isEmpty()) {
                 if (!builder.toString().contains("WHERE")) {
@@ -492,17 +492,34 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 } else {
                     builder.append(" AND (");
                 }
+
+                final Iterator<String> fieldIterator = fields.iterator();
                 while (fieldIterator.hasNext()) {
-                    final Iterator<String> termIterator = terms.iterator();
                     final String currentField = fieldIterator.next();
+
+                    final Iterator<String> termIterator = terms.iterator();
                     while (termIterator.hasNext()) {
                         final String currentTerm = termIterator.next();
-                        builder.append(currentField).append(getLikeEscapeClause(currentTerm, enableWordSearch));
-                        if (termIterator.hasNext() || fieldIterator.hasNext()) {
+
+                        final String likeEscapedClause = buildLikeEscapeClause(currentTerm);
+
+                        // Search if a sentence starts with the term
+                        builder.append(currentField).append(likeEscapedClause);
+
+                        if (enableWordSearch) {
+                            // Search also if a word starts with the term
+                            builder.append(" OR ").append(currentField).append("% " + likeEscapedClause);
+                        }
+
+                        if (termIterator.hasNext()) {
                             builder.append(" OR ");
                         }
                     }
+                    if (fieldIterator.hasNext()) {
+                        builder.append(" OR ");
+                    }
                 }
+
                 builder.append(")");
             }
         }

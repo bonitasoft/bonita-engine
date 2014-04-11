@@ -323,17 +323,24 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     /**
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
-    protected String getLikeEscapeClause(final String term, final boolean enableWordSearch) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(" LIKE '");
+    protected String buildLikeEscapeClause(final String term) {
+        return " LIKE '" + escapeTerm(term)+ "%' ESCAPE '"+ likeEscapeCharacter + "'";
+    }
+
+    /**
+     * @param term
+     * @return
+     */
+    protected String escapeTerm(final String term) {
         // 1) escape ' character by adding another ' character
         // 2) protect escape character if this character is used in data
         // 3) escape % character (sql query wildcard) by adding escape character
         // 4) escape _ character (sql query wildcard) by adding escape character
-        builder.append(term.replaceAll("'", "''").replaceAll(likeEscapeCharacter, likeEscapeCharacter + likeEscapeCharacter)
-                .replaceAll("%", likeEscapeCharacter + "%").replaceAll("_", likeEscapeCharacter + "_"));
-        builder.append("%' ESCAPE '").append(likeEscapeCharacter).append('\'');
-        return builder.toString();
+        return term
+                .replaceAll("'", "''")
+                .replaceAll(likeEscapeCharacter, likeEscapeCharacter + likeEscapeCharacter)
+                .replaceAll("%", likeEscapeCharacter + "%")
+                .replaceAll("_", likeEscapeCharacter + "_");
     }
 
 }
