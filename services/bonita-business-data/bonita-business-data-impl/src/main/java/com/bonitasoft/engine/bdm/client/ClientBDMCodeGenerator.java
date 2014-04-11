@@ -8,8 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.client;
 
+import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule.FORBIDDEN_PARAMETER_NAMES;
+
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,14 +35,13 @@ import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
+ * @author Emmanuel Duchastenier
  */
 public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private static final String DAO_SUFFIX = "DAO";
 
     private static final String DAO_IMPL_SUFFIX = "DAOImpl";
-
-    private static final List<String> FILTERED_METHOD_PARAMS = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 
     public ClientBDMCodeGenerator(final BusinessObjectModel bom) {
         super(bom);
@@ -129,7 +129,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         body.invoke(commandParametersRef, "put").arg(JExpr.lit("returnsList")).arg(JExpr.lit(isCollection));
 
         if (isCollection) {
-            for (String param : FILTERED_METHOD_PARAMS) {
+            for (String param : FORBIDDEN_PARAMETER_NAMES) {
                 body.invoke(commandParametersRef, "put").arg(JExpr.lit(param)).arg(JExpr.ref(param));
             }
         }
@@ -145,7 +145,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         if (!method.params().isEmpty()) {
             JVar queryParametersRef = body.decl(mapClass, "queryParameters", JExpr._new(hashMapClass));
             for (JVar param : method.params()) {
-                if (!FILTERED_METHOD_PARAMS.contains(param.name())) {
+                if (!FORBIDDEN_PARAMETER_NAMES.contains(param.name())) {
                     body.invoke(queryParametersRef, "put").arg(JExpr.lit(param.name())).arg(param);
                 }
             }
@@ -168,7 +168,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {
         if (List.class.getName().equals(returnType)) {
-            for (String param : FILTERED_METHOD_PARAMS) {
+            for (String param : FORBIDDEN_PARAMETER_NAMES) {
                 queryMethod.param(getModel().ref(int.class.getName()), param);
             }
         }
@@ -182,7 +182,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         } else {
             returnType = getModel().ref(returnTypeName);
         }
-        JClass collectionType = (JClass) getModel().ref(Collection.class.getName());
+        JClass collectionType = getModel().ref(Collection.class.getName());
         if (returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)) {
             returnType = ((JClass) returnType).narrow(entity);
         }
