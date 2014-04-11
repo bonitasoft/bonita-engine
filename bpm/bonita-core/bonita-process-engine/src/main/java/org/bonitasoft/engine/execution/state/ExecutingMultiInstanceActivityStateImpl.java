@@ -215,7 +215,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         final int numberOfActiveInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfActiveInstances();
@@ -226,7 +225,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return numberOfActiveInstances > 0;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public final StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
@@ -237,13 +235,11 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return SStateCategory.NORMAL;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

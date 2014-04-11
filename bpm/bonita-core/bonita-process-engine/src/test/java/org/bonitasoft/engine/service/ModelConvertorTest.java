@@ -52,7 +52,7 @@ public class ModelConvertorTest {
 
         final User testUser = ModelConvertor.toUser(sUser);
 
-        assertThat(testUser.getPassword()).isEqualTo("");
+        assertThat(testUser.getPassword()).isEmpty();
         verify(sUser, never()).getPassword();
     }
 

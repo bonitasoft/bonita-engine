@@ -66,7 +66,6 @@ public class PlatformTest {
             LOGGER.info("Starting test: " + getClass().getName() + "." + d.getMethodName());
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void failed(final Throwable cause, final Description d) {
             LOGGER.info("Failed test: " + getClass().getName() + "." + d.getMethodName());
@@ -138,16 +137,16 @@ public class PlatformTest {
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "stop node then start it with same session.", jira = "")
     @Test
     public void stopNodeAndStartNode() throws Exception {
-        LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        APISession tenantSession = loginAPI.login("install", "install");
-        IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(tenantSession);
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        final APISession tenantSession = loginAPI.login("install", "install");
+        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(tenantSession);
         identityAPI.getNumberOfUsers();
         platformAPI.stopNode();
         platformAPI.startNode();
         try {
             identityAPI.getNumberOfUsers();
             fail("session should not work");
-        } catch (InvalidSessionException e) {
+        } catch (final InvalidSessionException e) {
             // ok
         }
     }

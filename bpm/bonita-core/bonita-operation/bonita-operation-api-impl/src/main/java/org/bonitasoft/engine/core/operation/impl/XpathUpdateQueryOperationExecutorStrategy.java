@@ -73,7 +73,6 @@ public class XpathUpdateQueryOperationExecutorStrategy extends UpdateDataOperati
         return segments[segments.length - 1].startsWith("@");
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
