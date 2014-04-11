@@ -391,7 +391,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     private String readGeneratedDAOFile() throws IOException {
-        File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replaceAll("\\.", File.separator) + "DAO.java");
+        File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replace(".", File.separator) + "DAO.java");
         return FileUtils.readFileToString(daoInterface);
     }
 
