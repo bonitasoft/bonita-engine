@@ -95,9 +95,6 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
 
-        final Query getEmployeesByLastName = employee.addQuery(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, "SELECT e FROM Employee e WHERE e.lastName=:lastName",
-                List.class.getName());
-        getEmployeesByLastName.addQueryParameter("lastName", String.class.getName());
         final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
                 "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
