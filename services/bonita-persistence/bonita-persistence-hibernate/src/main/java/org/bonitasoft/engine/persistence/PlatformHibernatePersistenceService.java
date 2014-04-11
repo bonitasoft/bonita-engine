@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -31,8 +32,10 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
 
     public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
-        super(name, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource);
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+        super(name, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter,
+                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
     }
 
     @Override

@@ -90,8 +90,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @SuppressWarnings("unchecked")
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
-        super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource);
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+        super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
+                wordSearchExclusionMappings);
         Configuration configuration;
         try {
             configuration = hbmConfigurationProvider.getConfiguration();
@@ -441,7 +443,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter) {
+    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter, final boolean enableWordSearch) {
         final StringBuilder builder = new StringBuilder(query);
         final Set<String> specificFilters = new HashSet<String>(filters.size());
         FilterOption previousFilter = null;
@@ -495,7 +497,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                     final String currentField = fieldIterator.next();
                     while (termIterator.hasNext()) {
                         final String currentTerm = termIterator.next();
-                        builder.append(currentField).append(getLikeEscapeClause(currentTerm));
+                        builder.append(currentField).append(getLikeEscapeClause(currentTerm, enableWordSearch));
                         if (termIterator.hasNext() || fieldIterator.hasNext()) {
                             builder.append(" OR ");
                         }
@@ -580,7 +582,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         return completeField;
     }
-    
+
     private String getInClause(StringBuilder completeField, FilterOption filterOption) {
         StringBuilder stb = new StringBuilder(completeField);
         stb.append(" in (");
@@ -595,7 +597,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             stb.append(element + ",");
         }
         String inValues = stb.toString();
-        return inValues.substring(0, inValues.length() -1);
+        return inValues.substring(0, inValues.length() - 1);
     }
 
     private <T> void appendOrderByClause(final StringBuilder builder, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
@@ -658,7 +660,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter());
+                final boolean enableWordSearch = this.isEnableWordSearch() && !getWordSearchExclusionMappings().contains(selectDescriptor.getEntityType());
+                builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
             }
             if (selectDescriptor.hasOrderByParameters()) {
                 builtQuery = getQueryWithOrderByClause(builtQuery, selectDescriptor);

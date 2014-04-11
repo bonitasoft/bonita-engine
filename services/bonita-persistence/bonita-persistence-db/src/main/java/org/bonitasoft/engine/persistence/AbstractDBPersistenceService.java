@@ -17,9 +17,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -67,19 +69,43 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected final DataSource datasource;
 
+    private final Set<Class<? extends PersistentObject>> wordSearchExclusionMappings = new HashSet<Class<? extends PersistentObject>>();
+
+    private final boolean enableWordSearch;
+
     public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
-            final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource) {
+            final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
         initTablesFiles(dbConfigurationsProvider, name);
         this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
+        this.enableWordSearch = enableWordSearch;
+        if (wordSearchExclusionMappings != null) {
+            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
+                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
+                if (!PersistentObject.class.isAssignableFrom(clazz)) {
+                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz + " because it does not implements "
+                            + PersistentObject.class);
+                }
+                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
+            }
+        }
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    public boolean isEnableWordSearch() {
+        return enableWordSearch;
+    }
+
+    public Set<Class<? extends PersistentObject>> getWordSearchExclusionMappings() {
+        return wordSearchExclusionMappings;
     }
 
     protected void initTablesFiles(final DBConfigurationsProvider dbConfigurationsProvider, final String persistenceDBConfigFilter) {
@@ -293,7 +319,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     /**
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
-    protected String getLikeEscapeClause(final String term) {
+    protected String getLikeEscapeClause(final String term, final boolean enableWordSearch) {
         final StringBuilder builder = new StringBuilder();
         builder.append(" LIKE '");
         // 1) escape ' character by adding another ' character
