@@ -529,61 +529,61 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
         }
         switch (type) {
-            case EQUALS:
-                if (fieldValue == null) {
-                    clause.append(completeField).append(" IS NULL");
-                } else {
-                    clause.append(completeField).append(" = ").append(fieldValue);
-                }
-                break;
-            case GREATER:
-                clause.append(completeField).append(" > ").append(fieldValue);
-                break;
-            case GREATER_OR_EQUALS:
-                clause.append(completeField).append(" >= ").append(fieldValue);
-                break;
-            case LESS:
-                clause.append(completeField).append(" < ").append(fieldValue);
-                break;
-            case LESS_OR_EQUALS:
-                clause.append(completeField).append(" <= ").append(fieldValue);
-                break;
-            case DIFFERENT:
-                clause.append(completeField).append(" != ").append(fieldValue);
-                break;
-            case IN:
-                clause.append(getInClause(completeField, filterOption));
-                break;
-            case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
-                final Object to = filterOption.getTo() instanceof String ? "'" + filterOption.getTo() + "'" : filterOption.getTo();
-                clause.append("(").append(from).append(" <= ").append(completeField);
-                clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
-                break;
-            case LIKE:
-                // TODO:write LIKE
-                clause.append(completeField).append(" LIKE '%").append(filterOption.getValue()).append("%'");
-                break;
-            case L_PARENTHESIS:
-                clause.append(" (");
-                break;
-            case R_PARENTHESIS:
-                clause.append(" )");
-                break;
-            case AND:
-                clause.append(" AND ");
-                break;
-            case OR:
-                clause.append(" OR ");
-                break;
-            default:
-                // TODO:do we want default behaviour?
-                break;
+        case EQUALS:
+            if (fieldValue == null) {
+                clause.append(completeField).append(" IS NULL");
+            } else {
+                clause.append(completeField).append(" = ").append(fieldValue);
+            }
+            break;
+        case GREATER:
+            clause.append(completeField).append(" > ").append(fieldValue);
+            break;
+        case GREATER_OR_EQUALS:
+            clause.append(completeField).append(" >= ").append(fieldValue);
+            break;
+        case LESS:
+            clause.append(completeField).append(" < ").append(fieldValue);
+            break;
+        case LESS_OR_EQUALS:
+            clause.append(completeField).append(" <= ").append(fieldValue);
+            break;
+        case DIFFERENT:
+            clause.append(completeField).append(" != ").append(fieldValue);
+            break;
+        case IN:
+            clause.append(getInClause(completeField, filterOption));
+            break;
+        case BETWEEN:
+            final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
+            final Object to = filterOption.getTo() instanceof String ? "'" + filterOption.getTo() + "'" : filterOption.getTo();
+            clause.append("(").append(from).append(" <= ").append(completeField);
+            clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
+            break;
+        case LIKE:
+            // TODO:write LIKE
+            clause.append(completeField).append(" LIKE '%").append(filterOption.getValue()).append("%'");
+            break;
+        case L_PARENTHESIS:
+            clause.append(" (");
+            break;
+        case R_PARENTHESIS:
+            clause.append(" )");
+            break;
+        case AND:
+            clause.append(" AND ");
+            break;
+        case OR:
+            clause.append(" OR ");
+            break;
+        default:
+            // TODO:do we want default behaviour?
+            break;
         }
         return completeField;
     }
 
-    private String getInClause(StringBuilder completeField, FilterOption filterOption) {
+    private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
         StringBuilder stb = new StringBuilder(completeField);
         stb.append(" in (");
         stb.append(getInValues(filterOption));
@@ -591,7 +591,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         return stb.toString();
     }
 
-    private String getInValues(FilterOption filterOption) {
+    private String getInValues(final FilterOption filterOption) {
         StringBuilder stb = new StringBuilder();
         for (Object element : filterOption.getIn()) {
             stb.append(element + ",");
