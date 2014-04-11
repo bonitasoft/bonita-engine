@@ -635,7 +635,7 @@
   	</query>
 		
   	<query name="searchSAProcessInstanceSupervisedBy">
-		SELECT ap
+		SELECT DISTINCT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
 		WHERE ap.archiveDate = (
