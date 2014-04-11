@@ -39,7 +39,8 @@ public class TenantMaintenanceLocalTestSP extends CommonAPISPTest {
         PlatformSession loginPlatform = loginPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
 
-        final long tenantId = platformAPI.createTenant(new TenantCreator("MyTenant", "desc", "icon", "iconPath", TECH_USER, TECH_USER));
+        final long tenantId = platformAPI.createTenant(new TenantCreator("MyTenant_" + System.currentTimeMillis(), "desc", "icon", "iconPath", TECH_USER,
+                TECH_USER));
         platformAPI.activateTenant(tenantId);
         logoutPlatform(loginPlatform);
 
