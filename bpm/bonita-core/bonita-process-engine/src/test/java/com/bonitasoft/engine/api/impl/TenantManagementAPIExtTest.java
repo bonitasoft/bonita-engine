@@ -132,6 +132,8 @@ public class TenantManagementAPIExtTest {
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
+        
+        doNothing().when(tenantManagementAPI).resolveDependenciesForAllProcesses();
     }
 
     @Test
@@ -180,6 +182,14 @@ public class TenantManagementAPIExtTest {
 
         // given a tenant moved to available mode
         tenantManagementAPI.resume();
+    }
+    
+    @Test
+    public void resume_tenant_should_resolve_dependecies_for_deployed_processes() throws Exception {
+        
+        tenantManagementAPI.resume();
+        
+        verify(tenantManagementAPI).resolveDependenciesForAllProcesses();
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -91,6 +92,12 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     @Override
     public void resume() throws UpdateException {
         setTenantPaused(false);
+        resolveDependenciesForAllProcesses();
+    }
+
+    protected void resolveDependenciesForAllProcesses() {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        tenantAccessor.getDependencyResolver().resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
     private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {

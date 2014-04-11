@@ -19,8 +19,10 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -130,6 +132,41 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         deleteUser(matti);
         logout();
+    }
+    
+    @Test
+    public void deploying_bdr_after_process_should_put_process_in_resolved_state() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonitasoft.test.Bo");
+        Field field = new Field();
+        field.setName("aField");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+        final BusinessObjectModel model = new BusinessObjectModel();
+        model.addBusinessObject(bo);
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        final byte[] zip = converter.zip(model);
+        
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, "org.bonitasoft.test.Bo", null);
+        
+        ProcessDefinition processDefinition = getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done()).done());
+        getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, matti.getId());
+        
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
+        
+        getTenantManagementAPI().pause();
+        getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
+        getTenantManagementAPI().installBusinessDataModel(zip);
+        getTenantManagementAPI().resume();
+        
+        processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
+        
+        deleteProcess(processDefinition);
     }
 
     @Test
@@ -422,6 +459,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         }
     }
 
+    
     private void addEmployee(final String firstName, final String lastName) throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
