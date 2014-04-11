@@ -180,9 +180,11 @@ public class BDMQueryUtil {
 
         }
         for (Field f : businessObject.getFields()) {
-            Query query = createQueryForField(businessObject, f);
-            if (!queryNames.contains(query.getName())) {
-                queries.add(query);
+            if (f.isCollection() == null || !f.isCollection()) {
+                Query query = createQueryForField(businessObject, f);
+                if (!queryNames.contains(query.getName())) {
+                    queries.add(query);
+                }
             }
         }
         queries.add(createSelectAllQueryForBusinessObject(businessObject));
