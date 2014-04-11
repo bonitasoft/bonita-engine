@@ -38,6 +38,7 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
@@ -144,7 +145,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
-        final JMethod copyConstructor = entityClass.constructor(1);
+        final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
         final JVar param = copyConstructor.param(entityClass, StringUtil.firstCharToLowerCase(entityClass.name()));
         final JBlock copyBody = copyConstructor.body();
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));

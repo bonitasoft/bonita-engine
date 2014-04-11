@@ -138,7 +138,7 @@ public class CodeGenerator {
     }
 
     public void addDefaultConstructor(final JDefinedClass definedClass) {
-        definedClass.constructor(0);
+        definedClass.constructor(JMod.PUBLIC);
     }
 
     public JMethod addSetter(final JDefinedClass definedClass, final JFieldVar field) {
