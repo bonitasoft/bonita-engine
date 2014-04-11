@@ -10,6 +10,12 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.impl.SUserImpl</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
@@ -21,7 +27,13 @@
                 <constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
-    <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.impl.SUserImpl</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
