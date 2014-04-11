@@ -26,6 +26,10 @@ public class BDMQueryUtil {
 
     private static final String WHERE = "WHERE";
 
+    public static final String MAX_RESULTS_PARAM_NAME = "maxResults";
+
+    public static final String START_INDEX_PARAM_NAME = "startIndex";
+
     public static String createQueryNameForUniqueConstraint(String businessObjectName, UniqueConstraint uniqueConstraint) {
         if (businessObjectName == null) {
             throw new IllegalArgumentException("businessObjectName cannot be null");

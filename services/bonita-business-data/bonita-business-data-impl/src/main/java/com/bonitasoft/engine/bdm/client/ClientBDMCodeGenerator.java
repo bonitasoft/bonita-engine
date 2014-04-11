@@ -41,7 +41,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private static final String DAO_IMPL_SUFFIX = "DAOImpl";
 
-    private static final List<String> FILTERED_METHOD_PARAMS = Arrays.asList("startIndex", "maxResults");
+    private static final List<String> FILTERED_METHOD_PARAMS = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 
     public ClientBDMCodeGenerator(final BusinessObjectModel bom) {
         super(bom);
