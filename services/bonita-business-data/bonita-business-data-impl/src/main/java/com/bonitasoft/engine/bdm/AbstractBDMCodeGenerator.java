@@ -80,14 +80,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         tableAnnotation.param("name", entityClass.name().toUpperCase());
         final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
 
-        final List<Query> queries = bo.getQueries();
-
-        JAnnotationArrayMember valueArray = null;
-        if (!queries.isEmpty() || !uniqueConstraints.isEmpty()) {
-            final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
-            valueArray = namedQueriesAnnotation.paramArray("value");
-        }
-
         if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
@@ -100,6 +92,9 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             }
         }
 
+        final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
+        JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
+
         // Add provided queries
         for (Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
             addNamedQuery(entityClass, valueArray, providedQuery.getName(),
@@ -107,7 +102,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         }
 
         // Add custom queries
-        for (final Query query : queries) {
+        for (final Query query : bo.getQueries()) {
             addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
         }
 
