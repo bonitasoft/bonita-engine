@@ -22,7 +22,6 @@ import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.QueryParameter;
-import com.bonitasoft.engine.bdm.UniqueConstraint;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
@@ -81,17 +80,18 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
         createSessionConstructor(implClass);
 
+        // Add method for provided queries
+        for (Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            JMethod method = createMethodForQuery(entity, daoInterface, q);
+            addQueryMethodBody(method, q.getName(), entity.fullName());
+        }
+
         // Add method for queries
         for (Query q : bo.getQueries()) {
             JMethod method = createMethodForQuery(entity, implClass, q);
             addQueryMethodBody(method, q.getName(), entity.fullName());
         }
 
-        // Add method for unique constraint
-        for (UniqueConstraint uc : bo.getUniqueConstraints()) {
-            JMethod method = createMethodForUniqueConstraint(bo, entity, implClass, uc);
-            addQueryMethodBody(method, BDMQueryUtil.createQueryNameForUniqueConstraint(entity.name(), uc), entity.fullName());
-        }
     }
 
     private void createSessionConstructor(final JDefinedClass implClass) {
@@ -156,16 +156,6 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private String toDaoImplClassname(final BusinessObject bo) {
         return bo.getQualifiedName() + DAO_IMPL_SUFFIX;
-    }
-
-    private JMethod createMethodForUniqueConstraint(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass targetClass,
-            final UniqueConstraint uc) throws ClassNotFoundException {
-        String name = BDMQueryUtil.createQueryNameForUniqueConstraint(entity.name(), uc);
-        JMethod queryMethod = createQueryMethod(entity, targetClass, name, entity.fullName());
-        for (String param : uc.getFieldNames()) {
-            queryMethod.param(getModel().parseType(getFieldType(param, bo)), param);
-        }
-        return queryMethod;
     }
 
     private JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query q) throws ClassNotFoundException {
