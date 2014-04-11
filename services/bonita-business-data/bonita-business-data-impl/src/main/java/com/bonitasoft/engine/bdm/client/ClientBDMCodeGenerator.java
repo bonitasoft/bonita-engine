@@ -81,7 +81,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
         // Add method for provided queries
         for (Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
-            JMethod method = createMethodForQuery(entity, daoInterface, q);
+            JMethod method = createMethodForQuery(entity, implClass, q);
             addQueryMethodBody(method, q.getName(), entity.fullName());
         }
 
@@ -176,7 +176,12 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private JMethod createQueryMethod(final JDefinedClass entity, final JDefinedClass targetClass, final String name, final String returnTypeName)
             throws ClassNotFoundException {
-        JType returnType = getModel().ref(returnTypeName);
+        JType returnType = null;
+        if (returnTypeName.equals(entity.fullName())) {
+            returnType = entity;
+        } else {
+            returnType = getModel().ref(returnTypeName);
+        }
         JClass collectionType = (JClass) getModel().ref(Collection.class.getName());
         if (returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)) {
             returnType = ((JClass) returnType).narrow(entity);
