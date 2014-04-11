@@ -100,12 +100,16 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         return name;
     }
 
-    public boolean isEnableWordSearch() {
-        return enableWordSearch;
-    }
-
-    public Set<Class<? extends PersistentObject>> getWordSearchExclusionMappings() {
-        return wordSearchExclusionMappings;
+    public boolean isWordSearchEnable(final Class<? extends PersistentObject> entityClass) {
+        if (!enableWordSearch) {
+            return false;
+        }
+        for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
+            if (exclusion.isAssignableFrom(entityClass)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void initTablesFiles(final DBConfigurationsProvider dbConfigurationsProvider, final String persistenceDBConfigFilter) {

@@ -660,7 +660,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                final boolean enableWordSearch = this.isEnableWordSearch() && !getWordSearchExclusionMappings().contains(selectDescriptor.getEntityType());
+                final boolean enableWordSearch = this.isWordSearchEnable(selectDescriptor.getEntityType());
                 builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
             }
             if (selectDescriptor.hasOrderByParameters()) {

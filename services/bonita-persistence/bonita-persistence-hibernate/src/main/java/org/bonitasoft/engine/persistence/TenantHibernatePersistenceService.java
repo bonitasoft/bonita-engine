@@ -180,7 +180,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
-            final boolean enableWordSearch = this.isEnableWordSearch() && !getWordSearchExclusionMappings().contains(entityClass);
+            final boolean enableWordSearch = this.isWordSearchEnable(entityClass);
             final Query query = session.createQuery(getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName)
                     + " WHERE tenantId= :tenantId", filters, null, enableWordSearch));
             query.setLong(TENANT_ID, getTenantId());
