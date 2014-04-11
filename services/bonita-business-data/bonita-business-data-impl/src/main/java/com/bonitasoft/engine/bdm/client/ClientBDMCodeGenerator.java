@@ -19,7 +19,6 @@ import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
@@ -161,24 +160,24 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     private JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query q) throws ClassNotFoundException {
         JMethod queryMethod = createQueryMethod(entity, targetClass, q.getName(), q.getReturnType());
         for (QueryParameter param : q.getQueryParameters()) {
-            queryMethod.param(getModel().parseType(param.getClassName()), param.getName());
+            queryMethod.param(getModel().ref(param.getClassName()), param.getName());
         }
         addOptionalPaginationParameters(queryMethod, q.getReturnType());
         return queryMethod;
     }
 
     private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {
-        if ("java.util.List".equals(returnType)) {
+        if (List.class.getName().equals(returnType)) {
             for (String param : FILTERED_METHOD_PARAMS) {
-                queryMethod.param(getModel().parseType(int.class.getName()), param);
+                queryMethod.param(getModel().ref(int.class.getName()), param);
             }
         }
     }
 
     private JMethod createQueryMethod(final JDefinedClass entity, final JDefinedClass targetClass, final String name, final String returnTypeName)
             throws ClassNotFoundException {
-        JType returnType = getModel().parseType(returnTypeName);
-        JClass collectionType = (JClass) getModel().parseType(Collection.class.getName());
+        JType returnType = getModel().ref(returnTypeName);
+        JClass collectionType = (JClass) getModel().ref(Collection.class.getName());
         if (returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)) {
             returnType = ((JClass) returnType).narrow(entity);
         }
@@ -191,15 +190,6 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         addThrows(method, "org.bonitasoft.engine.exception.ServerAPIException");
 
         return method;
-    }
-
-    private String getFieldType(final String param, final BusinessObject bo) {
-        for (Field f : bo.getFields()) {
-            if (f.getName().equals(param)) {
-                return f.getType().getClazz().getName();
-            }
-        }
-        return null;
     }
 
     private String toDaoInterfaceClassname(final BusinessObject bo) {

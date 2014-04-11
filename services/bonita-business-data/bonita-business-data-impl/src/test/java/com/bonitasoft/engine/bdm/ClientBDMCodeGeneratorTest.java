@@ -312,7 +312,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
         String daoContent = readGeneratedDAOFile();
         // String signature = getQueryMethodSignature(query, query.getReturnType(), EMPLOYEE_QUALIFIED_NAME, false);
-        assertThat(daoContent).contains("public Employee findByName(String name)");
+        assertThat(daoContent).contains("public " + EMPLOYEE_QUALIFIED_NAME + " findByName(String name)");
     }
 
     @Test
