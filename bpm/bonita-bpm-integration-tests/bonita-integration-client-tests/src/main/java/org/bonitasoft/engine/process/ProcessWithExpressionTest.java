@@ -20,7 +20,6 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -143,10 +142,8 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
-        final BusinessArchive businessArchive = builder.done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, john.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
             final ActivityInstance task;
@@ -194,11 +191,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         final DesignProcessDefinition done = pBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
         builder.addClasspathResource(myLibrary);
-        final BusinessArchive businessArchive = builder.done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, john.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
     }
 
     private BarResource getMyLibrary() throws IOException {

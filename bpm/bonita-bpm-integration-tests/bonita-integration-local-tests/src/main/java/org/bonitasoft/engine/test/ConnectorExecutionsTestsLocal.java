@@ -58,6 +58,7 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -105,7 +106,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", processInstance);
         assertTrue(VariableStorage.getInstance().getVariableValue(inputName).equals(valueOfInput1));
@@ -135,7 +136,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         processBuilder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, processBuilder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, processBuilder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance task1 = waitForUserTask("step1", processInstance);
 
@@ -170,7 +171,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                 input2Expression);
         processBuilder.addAutomaticTask("step2").addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, processBuilder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, processBuilder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitUntilStore2Variables(valueOfInput1, valueOfInput2, inputName1, inputName2);
@@ -199,7 +200,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                 input2Expression);
         processBuilder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, processBuilder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, processBuilder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance task1 = waitForUserTask("step1", processInstance);
@@ -249,7 +250,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         taskBuilder.addConnector("myConnector2", "org.bonitasoft.connector.testConnector3", "1.0", ConnectorEvent.ON_FINISH).addInput(inputName2,
                 input2Expression);
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, processBuilder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, processBuilder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitUntilStore2Variables(valueOfInput1, valueOfInput2, inputName1, inputName2);
@@ -290,7 +291,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         processBuilder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, processBuilder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, processBuilder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance task1 = waitForUserTask("step1", processInstance);
@@ -318,7 +319,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addAutomaticTask("step1")
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_FINISH).addInput(inputName, input1Expression);
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
         final WaitUntil waitUntil = waitForVariableStorage(50, DEFAULT_TIMEOUT, inputName, valueOfInput1);
@@ -340,7 +341,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_ENTER).addInput(inputName, input1Expression);
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         getProcessAPI().startProcess(processDefinition.getId());
 
         final WaitUntil waitUntil = waitForVariableStorage(50, DEFAULT_TIMEOUT, inputName, valueOfInput1);
@@ -355,7 +356,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         // deploy process
 
         final String taskName = "step1";
-        final ProcessDefinition processDefinition = deployProcessWithConnectorOnUserTask(johnUserId, taskName);
+        final ProcessDefinition processDefinition = deployProcessWithConnectorOnUserTask(johnUser, taskName);
 
         // start the process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -380,7 +381,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         return getProcessAPI().searchConnectorInstances(optionsBuilder.done());
     }
 
-    private ProcessDefinition deployProcessWithConnectorOnUserTask(final long userId, final String taskName) throws BonitaException, IOException {
+    private ProcessDefinition deployProcessWithConnectorOnUserTask(final User user, final String taskName) throws BonitaException, IOException {
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("valueOfInput1");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnStartOfAnAutomaticActivity", "1.0");
@@ -388,7 +389,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask(taskName, ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_ENTER).addInput("input1", input1Expression);
 
-        return deployProcessWithDefaultTestConnector(ACTOR_NAME, userId, designProcessDefinition, false);
+        return deployProcessWithDefaultTestConnector(ACTOR_NAME, user, designProcessDefinition, false);
     }
 
     @Cover(classes = { Connector.class, HumanTaskInstance.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "User task",
@@ -410,7 +411,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // Deploy and start process
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
@@ -461,7 +462,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // Deploy and start process
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
@@ -512,7 +513,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final WaitUntil waitUntil = waitForVariableStorage(50, DEFAULT_TIMEOUT, inputName, valueOfInput1);
@@ -535,7 +536,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_FINISH).addInput(inputName,
                 input1Expression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
@@ -555,9 +556,8 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
     @Test
     public void connectorsAreDeletedAfterProcessCompletion() throws Exception {
         // deploy the a process with a connector
-
         final String taskName = "step1";
-        final ProcessDefinition processDefinition = deployProcessWithConnectorOnFinish(johnUserId, ACTOR_NAME, taskName);
+        final ProcessDefinition processDefinition = deployProcessWithConnectorOnFinish(johnUser, ACTOR_NAME, taskName);
 
         // execute the process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -572,7 +572,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployProcessWithConnectorOnFinish(final long userId, final String ACTOR_NAME, final String taskName) throws BonitaException,
+    private ProcessDefinition deployProcessWithConnectorOnFinish(final User user, final String ACTOR_NAME, final String taskName) throws BonitaException,
             IOException {
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("valueOfInput1");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
@@ -581,7 +581,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_FINISH).addInput("input1",
                 input1Expression);
         designProcessDefinition.addUserTask(taskName, ACTOR_NAME);
-        return deployProcessWithDefaultTestConnector(ACTOR_NAME, userId, designProcessDefinition, false);
+        return deployProcessWithDefaultTestConnector(ACTOR_NAME, user, designProcessDefinition, false);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Automatic activity" }, story = "Test connector on start of an automatic activity.", jira = "")
@@ -598,7 +598,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final WaitUntil waitUntil = waitForVariableStorage(50, DEFAULT_TIMEOUT, inputName, valueOfInput1);
@@ -616,7 +616,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                 .addConnector("UnkownConnector", "unkownConnectorId", "1.0.0", ConnectorEvent.ON_ENTER);
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition.done()).done());
-        addMappingOfActorsForUser(ACTOR_NAME, johnUserId, processDefinition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, johnUserId);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         final List<Problem> processResolutionProblems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
@@ -642,7 +642,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
             businessArchiveBuilder.addConnectorImplementation(new BarResource("UnknownClassConnector.impl", IOUtils.toByteArray(BPMRemoteTests.class
                     .getResourceAsStream("/org/bonitasoft/engine/connectors/UnknownClassConnector.impl"))));
             final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-            addMappingOfActorsForUser(ACTOR_NAME, johnUserId, processDefinition);
+            getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, johnUserId);
             getProcessAPI().enableProcess(processDefinition.getId());
 
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -686,7 +686,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(ACTOR_NAME, johnUserId, processDefinition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, johnUserId);
         getProcessAPI().enableProcess(processDefinition.getId());
 
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
@@ -721,9 +721,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         businessArchiveBuilder.addConnectorImplementation(resources.get(0));
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(ACTOR_NAME, johnUserId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, johnUser);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", process);
         assertEquals("value", getProcessAPI().getProcessDataInstance("value", process.getId()).getValue());
@@ -748,7 +746,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         designProcessDefinition.addTransition("step1", "step2");
 
         // Deploy and start process
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         assertTrue(getProcessAPI().getProcessResolutionProblems(processDefinition.getId()).isEmpty());
 
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -786,7 +784,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                         new OperationBuilder().createNewInstance().setLeftOperand("resultProcess", false).setType(OperatorType.ASSIGNMENT)
                                 .setRightOperand(new ExpressionBuilder().createInputExpression("output1", Object.class.getName())).done());
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, processBuilder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, processBuilder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance task = waitForTaskToFail(processInstance);

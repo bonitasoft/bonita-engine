@@ -1962,7 +1962,9 @@ public class ModelConvertor {
         return themeImpl;
     }
 
+
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
     }
+
 }

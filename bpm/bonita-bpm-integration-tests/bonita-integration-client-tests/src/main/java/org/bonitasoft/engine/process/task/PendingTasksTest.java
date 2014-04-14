@@ -151,7 +151,6 @@ public class PendingTasksTest extends CommonAPITest {
     @Test
     public void getPendingHumanTaskInstancePriorityAndExpectedEndDate() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        final long userId = user.getId();
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final TaskPriority priority = TaskPriority.HIGHEST;
@@ -162,14 +161,12 @@ public class PendingTasksTest extends CommonAPITest {
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDesignDefinition).done();
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
         final Date before = new Date();
         Thread.sleep(100);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("deliver", startProcess);
-        final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, ActivityInstanceCriterion.DEFAULT);
+        final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
         Thread.sleep(100);
         final Date after = new Date();
         assertEquals(1, activityInstances.size());
@@ -178,7 +175,7 @@ public class PendingTasksTest extends CommonAPITest {
         final long time = humanTaskInstance.getExpectedEndDate().getTime();
         assertTrue(before.getTime() + oneDay < time && time < after.getTime() + oneDay);
         disableAndDeleteProcess(processDefinition);
-        deleteUser(userId);
+        deleteUser(user);
     }
 
     @Test

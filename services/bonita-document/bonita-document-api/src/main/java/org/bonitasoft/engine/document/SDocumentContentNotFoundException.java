@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.document;
 
 /**
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class SDocumentContentNotFoundException extends SDocumentException {
 
@@ -43,4 +44,8 @@ public class SDocumentContentNotFoundException extends SDocumentException {
         super(t);
     }
 
+    public SDocumentContentNotFoundException(final long id) {
+        super("The content of the document was not found !!");
+        setDocumentIdOnContext(id);
+    }
 }
