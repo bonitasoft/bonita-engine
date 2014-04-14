@@ -41,46 +41,45 @@ public class MockLoginModule implements LoginModule {
     public MockLoginModule() {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void initialize(final Subject subject, final CallbackHandler callbackHandler, final Map<String, ?> sharedState, final Map<String, ?> options) {
         this.callbackHandler = callbackHandler;
         subject.getPrincipals().add(new Group() {
-            
+
             Principal userPrincipal = new Principal() {
-                
+
                 @Override
                 public String getName() {
                     return "admin";
                 }
             };
-            
+
             @Override
             public String getName() {
                 return "CallerPrincipal";
             }
-            
+
             @Override
-            public boolean removeMember(Principal user) {
+            public boolean removeMember(final Principal user) {
                 // TODO Auto-generated method stub
                 return false;
             }
-            
+
             @Override
             public Enumeration<? extends Principal> members() {
-                Vector<Principal> principals = new Vector<Principal>();
+                final Vector<Principal> principals = new Vector<Principal>();
                 principals.add(userPrincipal);
                 return principals.elements();
             }
-            
+
             @Override
-            public boolean isMember(Principal member) {
+            public boolean isMember(final Principal member) {
                 // TODO Auto-generated method stub
                 return false;
             }
-            
+
             @Override
-            public boolean addMember(Principal user) {
+            public boolean addMember(final Principal user) {
                 // TODO Auto-generated method stub
                 return false;
             }

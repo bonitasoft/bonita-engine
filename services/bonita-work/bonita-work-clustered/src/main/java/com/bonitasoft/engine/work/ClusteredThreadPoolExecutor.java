@@ -30,7 +30,6 @@ import com.hazelcast.core.MultiMap;
  * If a node crash during the execution of a work, other members are notified and the first to be notified get all executing works of the failing node and
  * requeue them
  * 
- * 
  * @author Baptiste Mesta
  */
 public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements MembershipListener {
@@ -60,19 +59,16 @@ public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements M
         return null;
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void beforeExecute(final Thread t, final Runnable r) {
         executingWorks.put(localMemberUUID, r);
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void afterExecute(final Runnable r, final Throwable t) {
         executingWorks.remove(localMemberUUID, r);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void memberAdded(final MembershipEvent membershipEvent) {
     }
@@ -81,10 +77,10 @@ public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements M
     public void memberRemoved(final MembershipEvent membershipEvent) {
         // reschedule executing work that are on the node that is gone
         // will be done on all node but it's ok because we lock the map on this key
-        String memberUUID = membershipEvent.getMember().getUuid();
+        final String memberUUID = membershipEvent.getMember().getUuid();
         executingWorks.lock(memberUUID);
-        Collection<Runnable> collection = executingWorks.get(memberUUID);
-        for (Runnable runnable : collection) {
+        final Collection<Runnable> collection = executingWorks.get(memberUUID);
+        for (final Runnable runnable : collection) {
             workQueue.add(runnable);
         }
         executingWorks.unlock(memberUUID);

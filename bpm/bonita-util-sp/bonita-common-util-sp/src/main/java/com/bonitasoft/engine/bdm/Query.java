@@ -29,25 +29,25 @@ public class Query {
 
     @XmlAttribute(required = true)
     private String content;
-    
+
     @XmlAttribute(required = true)
     private String returnType;
 
     @XmlElementWrapper(name = "queryParameters")
     @XmlElement(name = "queryParameter")
     private List<QueryParameter> queryParameters;
-    
-    public Query(){
+
+    public Query() {
         queryParameters = new ArrayList<QueryParameter>();
     }
-    
-    public Query(String name,String content,String returnType){
+
+    public Query(final String name, final String content, final String returnType) {
         this();
-    	this.name = name;
-    	this.content = content;
-    	this.returnType = returnType;
+        this.name = name;
+        this.content = content;
+        this.returnType = returnType;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -56,36 +56,33 @@ public class Query {
         this.name = name;
     }
 
-	public String getContent() {
-		return content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setContent(final String content) {
+        this.content = content;
+    }
 
-	public QueryParameter addQueryParameter(String name,String className){
-	    QueryParameter parameter = new QueryParameter(name, className);
-	    queryParameters.add(parameter);
-	    return parameter;
-	}
-    
+    public QueryParameter addQueryParameter(final String name, final String className) {
+        QueryParameter parameter = new QueryParameter(name, className);
+        queryParameters.add(parameter);
+        return parameter;
+    }
+
     public List<QueryParameter> getQueryParameters() {
         return queryParameters;
     }
 
-    
-    public void setQueryParameters(List<QueryParameter> queryParameters) {
+    public void setQueryParameters(final List<QueryParameter> queryParameters) {
         this.queryParameters = queryParameters;
     }
 
-    
     public String getReturnType() {
         return returnType;
     }
 
-    
-    public void setReturnType(String returnType) {
+    public void setReturnType(final String returnType) {
         this.returnType = returnType;
     }
 
@@ -101,7 +98,7 @@ public class Query {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -132,7 +129,9 @@ public class Query {
         return true;
     }
 
-	
-
+    @Override
+    public String toString() {
+        return "Query [name=" + name + ", content=" + content + ", returnType=" + returnType + ", queryParameters=" + queryParameters + "]";
+    }
 
 }

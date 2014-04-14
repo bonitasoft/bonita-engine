@@ -23,22 +23,20 @@ public class EngineInitializerListenerSP implements ServletContextListener {
 
     private static final Logger LOGGER = Logger.getLogger(EngineInitializerListenerSP.class.getName());
 
-    @SuppressWarnings("unused")
     @Override
     public void contextDestroyed(final ServletContextEvent arg0) {
         try {
             new EngineInitializerSP(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
         try {
             new EngineInitializerSP(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             LOGGER.log(Level.SEVERE, "Error while initializing the Engine", e);
         }
     }

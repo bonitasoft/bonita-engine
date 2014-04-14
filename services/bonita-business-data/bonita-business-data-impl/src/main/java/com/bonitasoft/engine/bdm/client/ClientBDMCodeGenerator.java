@@ -8,19 +8,20 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.client;
 
+import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule.FORBIDDEN_PARAMETER_NAMES;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.QueryParameter;
-import com.bonitasoft.engine.bdm.UniqueConstraint;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
@@ -34,6 +35,7 @@ import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
+ * @author Emmanuel Duchastenier
  */
 public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
@@ -45,27 +47,31 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         super(bom);
     }
 
-    protected void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
+    @Override
+    protected void addDAO(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
         JDefinedClass daoInterface = createDAOInterface(bo, entity);
         createDAOImpl(bo, entity, daoInterface);
     }
 
-    private JDefinedClass createDAOInterface(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
+    private JDefinedClass createDAOInterface(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
         String daoInterfaceClassName = toDaoInterfaceClassname(bo);
         JDefinedClass daoInterface = addInterface(daoInterfaceClassName);
         addInterface(daoInterface, BusinessObjectDAO.class.getName());
-        // Add method signature in interface for queries
+
+        // Add method signature in interface for provided queries
+        for (Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            createMethodForQuery(entity, daoInterface, q);
+        }
+
+        // Add method signature in interface for custom queries
         for (Query q : bo.getQueries()) {
             createMethodForQuery(entity, daoInterface, q);
         }
-        // Add method signature in interface for unique constraint
-        for (UniqueConstraint uc : bo.getUniqueConstraints()) {
-            createMethodForUniqueConstraint(bo, entity, daoInterface, uc);
-        }
+
         return daoInterface;
     }
 
-    private JDefinedClass createDAOImpl(final BusinessObject bo, JDefinedClass entity, JDefinedClass daoInterface) throws JClassAlreadyExistsException,
+    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
             ClassNotFoundException {
         String daoImplClassName = toDaoImplClassname(bo);
         JDefinedClass implClass = addClass(daoImplClassName);
@@ -73,21 +79,21 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
         createSessionConstructor(implClass);
 
+        // Add method for provided queries
+        for (Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            JMethod method = createMethodForQuery(entity, implClass, q);
+            addQueryMethodBody(method, q.getName(), entity.fullName());
+        }
+
         // Add method for queries
         for (Query q : bo.getQueries()) {
             JMethod method = createMethodForQuery(entity, implClass, q);
             addQueryMethodBody(method, q.getName(), entity.fullName());
         }
 
-        // Add method for unique constraint
-        for (UniqueConstraint uc : bo.getUniqueConstraints()) {
-            JMethod method = createMethodForUniqueConstraint(bo, entity, implClass, uc);
-            addQueryMethodBody(method, BDMQueryUtil.createQueryNameForUniqueConstraint(entity.name(), uc), entity.fullName());
-        }
-        return daoInterface;
     }
 
-    private void createSessionConstructor(JDefinedClass implClass) {
+    private void createSessionConstructor(final JDefinedClass implClass) {
         JClass apiSessionJClass = getModel().ref("org.bonitasoft.engine.session.APISession");
         implClass.field(JMod.PRIVATE, apiSessionJClass, "session");
         JMethod constructor = implClass.constructor(JMod.PUBLIC);
@@ -96,14 +102,13 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         body.assign(JExpr.refthis("session"), JExpr.ref("session"));
     }
 
-    private void addQueryMethodBody(JMethod method, String queryName, String returnType) {
+    private void addQueryMethodBody(final JMethod method, final String queryName, final String returnType) {
         JBlock body = method.body();
 
         // Get CommandAPI
         JClass tenantApiAccessorClass = getModel().ref("com.bonitasoft.engine.api.TenantAPIAccessor");
         JClass commandApiType = getModel().ref("org.bonitasoft.engine.api.CommandAPI");
-        JVar commandApiRef = body.decl(commandApiType, "commandApi", tenantApiAccessorClass.staticInvoke("getCommandAPI").arg(
-                JExpr.ref("session")));
+        JVar commandApiRef = body.decl(commandApiType, "commandApi", tenantApiAccessorClass.staticInvoke("getCommandAPI").arg(JExpr.ref("session")));
 
         // Create command parameters
         JClass mapClass = getModel().ref(Map.class);
@@ -116,51 +121,68 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         body.invoke(commandParametersRef, "put").arg(JExpr.lit("returnType")).arg(JExpr.lit(returnType));
 
         // Set if should returns a List or a single value
-        boolean assignableFrom = false;
+        boolean isCollection = false;
         JClass collectionClass = getModel().ref(Collection.class);
         if (method.type() instanceof JClass) {
-            assignableFrom = collectionClass.isAssignableFrom((JClass) method.type());
+            isCollection = collectionClass.isAssignableFrom((JClass) method.type());
         }
-        body.invoke(commandParametersRef, "put").arg(JExpr.lit("returnsList")).arg(JExpr.lit(assignableFrom));
+        body.invoke(commandParametersRef, "put").arg(JExpr.lit("returnsList")).arg(JExpr.lit(isCollection));
+
+        if (isCollection) {
+            for (String param : FORBIDDEN_PARAMETER_NAMES) {
+                body.invoke(commandParametersRef, "put").arg(JExpr.lit(param)).arg(JExpr.ref(param));
+            }
+        }
 
         // Add query parameters
-        if (!method.params().isEmpty()) {
-            JVar queryParametersRef = body.decl(mapClass, "queryParameters", JExpr._new(hashMapClass));
-            for (JVar param : method.params()) {
-                body.invoke(queryParametersRef, "put").arg(JExpr.lit(param.name())).arg(param);
-            }
-            body.invoke(commandParametersRef, "put").arg(JExpr.lit("queryParameters")).arg(JExpr.cast(getModel().ref(Serializable.class), queryParametersRef));
-        }
+        addQueryParameters(method, body, mapClass, hashMapClass, commandParametersRef);
 
         // Execute command
         body._return(JExpr.cast(method.type(), commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef)));
     }
 
-    private String toDaoImplClassname(BusinessObject bo) {
+    protected void addQueryParameters(final JMethod method, final JBlock body, final JClass mapClass, final JClass hashMapClass, final JVar commandParametersRef) {
+        if (!method.params().isEmpty()) {
+            JVar queryParametersRef = body.decl(mapClass, "queryParameters", JExpr._new(hashMapClass));
+            for (JVar param : method.params()) {
+                if (!FORBIDDEN_PARAMETER_NAMES.contains(param.name())) {
+                    body.invoke(queryParametersRef, "put").arg(JExpr.lit(param.name())).arg(param);
+                }
+            }
+            body.invoke(commandParametersRef, "put").arg(JExpr.lit("queryParameters")).arg(JExpr.cast(getModel().ref(Serializable.class), queryParametersRef));
+        }
+    }
+
+    private String toDaoImplClassname(final BusinessObject bo) {
         return bo.getQualifiedName() + DAO_IMPL_SUFFIX;
     }
 
-    private JMethod createMethodForUniqueConstraint(final BusinessObject bo, JDefinedClass entity, JDefinedClass targetClass, UniqueConstraint uc)
-            throws ClassNotFoundException {
-        String name = BDMQueryUtil.createQueryNameForUniqueConstraint(entity.name(), uc);
-        JMethod queryMethod = createQueryMethod(entity, targetClass, name, entity.fullName());
-        for (String param : uc.getFieldNames()) {
-            queryMethod.param(getModel().parseType(getFieldType(param, bo)), param);
-        }
-        return queryMethod;
-    }
-
-    private JMethod createMethodForQuery(JDefinedClass entity, JDefinedClass targetClass, Query q) throws ClassNotFoundException {
+    private JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query q) throws ClassNotFoundException {
         JMethod queryMethod = createQueryMethod(entity, targetClass, q.getName(), q.getReturnType());
         for (QueryParameter param : q.getQueryParameters()) {
-            queryMethod.param(getModel().parseType(param.getClassName()), param.getName());
+            queryMethod.param(getModel().ref(param.getClassName()), param.getName());
         }
+        addOptionalPaginationParameters(queryMethod, q.getReturnType());
         return queryMethod;
     }
 
-    private JMethod createQueryMethod(JDefinedClass entity, JDefinedClass targetClass, String name, String returnTypeName) throws ClassNotFoundException {
-        JType returnType = getModel().parseType(returnTypeName);
-        JClass collectionType = (JClass) getModel().parseType(Collection.class.getName());
+    private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {
+        if (List.class.getName().equals(returnType)) {
+            for (String param : FORBIDDEN_PARAMETER_NAMES) {
+                queryMethod.param(getModel().ref(int.class.getName()), param);
+            }
+        }
+    }
+
+    private JMethod createQueryMethod(final JDefinedClass entity, final JDefinedClass targetClass, final String name, final String returnTypeName)
+            throws ClassNotFoundException {
+        JType returnType = null;
+        if (returnTypeName.equals(entity.fullName())) {
+            returnType = entity;
+        } else {
+            returnType = getModel().ref(returnTypeName);
+        }
+        JClass collectionType = getModel().ref(Collection.class.getName());
         if (returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)) {
             returnType = ((JClass) returnType).narrow(entity);
         }
@@ -175,16 +197,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         return method;
     }
 
-    private String getFieldType(String param, BusinessObject bo) {
-        for (Field f : bo.getFields()) {
-            if (f.getName().equals(param)) {
-                return f.getType().getClazz().getName();
-            }
-        }
-        return null;
-    }
-
-    private String toDaoInterfaceClassname(BusinessObject bo) {
+    private String toDaoInterfaceClassname(final BusinessObject bo) {
         return bo.getQualifiedName() + DAO_SUFFIX;
     }
 

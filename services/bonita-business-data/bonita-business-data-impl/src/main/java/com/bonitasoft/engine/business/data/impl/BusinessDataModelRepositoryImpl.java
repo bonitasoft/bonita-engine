@@ -13,11 +13,14 @@ import static java.util.Arrays.asList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -33,6 +36,7 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
@@ -45,6 +49,7 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.business.data.impl.filter.OnlyDAOFileFilter;
 import com.bonitasoft.engine.business.data.impl.filter.WithoutDAOFileFilter;
 import com.bonitasoft.engine.compiler.JDTCompiler;
+import com.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Colin PUY
@@ -61,16 +66,16 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private final DependencyService dependencyService;
 
-    private final SchemaUpdater schemaUpdater;
+    private final SchemaManager schemaManager;
 
     private final String compilationPath;
 
-    private String clientStoragePath;
+    private final String clientStoragePath;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaUpdater schemaUpdater, final String compilationPath,
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager, final String compilationPath,
             final String clientStoragePath) {
         this.dependencyService = dependencyService;
-        this.schemaUpdater = schemaUpdater;
+        this.schemaManager = schemaManager;
         this.compilationPath = compilationPath;
         this.clientStoragePath = clientStoragePath;
     }
@@ -81,7 +86,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         if (clientBDMJarFile.exists()) {
             try {
                 return IOUtil.getAllContentFrom(clientBDMJarFile);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new SBusinessDataRepositoryException(e);
             }
         }
@@ -90,6 +95,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private File getClientBDMZipFile() {
         return new File(clientStoragePath, CLIENT_BDM_ZIP_NAME);
+    }
+
+    @Override
+    public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
+        List<SDependency> searchBDMDependencies = searchBDMDependencies();
+        if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
+            return String.valueOf(searchBDMDependencies.get(0).getId());
+        }
+        return null;
     }
 
     private List<SDependency> searchBDMDependencies() throws SBusinessDataRepositoryException {
@@ -112,23 +126,33 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
+    public String install(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createClientBDMZip(model);
-        createAndDeployServerBDMJar(tenantId, model);
+        long bdmVersion = createAndDeployServerBDMJar(tenantId, model, bdmZip);
+        return String.valueOf(bdmVersion);
     }
 
-    protected void createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+    protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model, final byte[] bdmZip)
+            throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         final SDependency sDependency = createSDependency(tenantId, serverBdmJar);
         try {
             dependencyService.createDependency(sDependency);
             final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
             dependencyService.createDependencyMapping(sDependencyMapping);
-            updateSchema(model.getBusinessObjectsClassNames());
+            update(model.getBusinessObjectsClassNames());
+            return sDependency.getId();
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+    }
+
+    protected void update(final Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
+        final List<Exception> exceptions = schemaManager.update(annotatedClassNames);
+        if (!exceptions.isEmpty()) {
+            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
         }
     }
 
@@ -136,16 +160,16 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         byte[] clientBdmJar = null;
         try {
             clientBdmJar = generateClientBDMZip(model);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
-        File clientBDMJarFile = getClientBDMZipFile();
+        final File clientBDMJarFile = getClientBDMZipFile();
         if (clientBDMJarFile.exists()) {
             clientBDMJarFile.delete();
         }
         try {
             IOUtil.write(clientBDMJarFile, clientBdmJar);
-        } catch (IOException e1) {
+        } catch (final IOException e1) {
             throw new SBusinessDataRepositoryDeploymentException(e1);
         }
     }
@@ -162,7 +186,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     protected byte[] generateServerBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler, compilationPath);
-        IOFileFilter classFileAndXmlFilefilter = new SuffixFileFilter(Arrays.asList(".class", ".xml"));
+        final IOFileFilter classFileAndXmlFilefilter = new SuffixFileFilter(Arrays.asList(".class", ".xml"));
         return builder.build(model, classFileAndXmlFilefilter);
     }
 
@@ -170,13 +194,13 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, compilationPath);
 
-        Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         // Build jar with Model
-        byte[] modelJarContent = builder.build(model, new WithoutDAOFileFilter());
+        final byte[] modelJarContent = builder.build(model, new WithoutDAOFileFilter());
         resources.put(MODEL_JAR_NAME, modelJarContent);
 
         // Build jar with DAO
-        byte[] daoJarContent = builder.build(model, new OnlyDAOFileFilter());
+        final byte[] daoJarContent = builder.build(model, new OnlyDAOFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
 
         return IOUtil.generateZip(resources);
@@ -191,16 +215,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, ScopeType.TENANT).done();
     }
 
-    protected void updateSchema(final Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
-        schemaUpdater.execute(annotatedClassNames);
-        final List<Exception> updateExceptions = schemaUpdater.getExceptions();
-        if (!updateExceptions.isEmpty()) {
-            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + updateExceptions);
-        }
-    }
-
     @Override
-    public void undeploy(final long tenantId) throws SBusinessDataRepositoryException {
+    public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
         } catch (final SDependencyNotFoundException sde) {
@@ -209,6 +225,29 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throw new SBusinessDataRepositoryException(sde);
         }
         getClientBDMZipFile().delete();
+    }
+
+    @Override
+    public void dropAndUninstall(final long tenantId) throws SBusinessDataRepositoryException {
+        final URL resource = Thread.currentThread().getContextClassLoader().getResource("bom.xml");
+        if (resource != null) {
+            try {
+                final byte[] content = IOUtil.getAllContentFrom(resource);
+                final URL xsd = BusinessObjectModel.class.getResource("/bom.xsd");
+                final BusinessObjectModel model = IOUtils.unmarshallXMLtoObject(content, BusinessObjectModel.class, xsd);
+                final List<Exception> exceptions = schemaManager.drop(model.getBusinessObjectsClassNames());
+                if (!exceptions.isEmpty()) {
+                    throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
+                }
+                uninstall(tenantId);
+            } catch (final IOException ioe) {
+                throw new SBusinessDataRepositoryException(ioe);
+            } catch (final JAXBException jaxbe) {
+                throw new SBusinessDataRepositoryException(jaxbe);
+            } catch (final SAXException saxe) {
+                throw new SBusinessDataRepositoryException(saxe);
+            }
+        }
     }
 
 }

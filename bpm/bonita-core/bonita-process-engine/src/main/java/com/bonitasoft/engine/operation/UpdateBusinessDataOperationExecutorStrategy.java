@@ -26,27 +26,20 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
-public class UpdateBusinessDataOperationExecutorStrategy implements OperationExecutorStrategy {
+public class UpdateBusinessDataOperationExecutorStrategy extends BusinessDataOperation implements OperationExecutorStrategy {
 
     private final BusinessDataRepository businessDataRepository;
 
-    private final RefBusinessDataService refBusinessDataService;
-
-    private final FlowNodeInstanceService flowNodeInstanceService;
-
     public UpdateBusinessDataOperationExecutorStrategy(final BusinessDataRepository businessDataRepository,
             final RefBusinessDataService refBusinessDataService, final FlowNodeInstanceService flowNodeInstanceService) {
-        super();
+        super(refBusinessDataService, flowNodeInstanceService);
         this.businessDataRepository = businessDataRepository;
-        this.refBusinessDataService = refBusinessDataService;
-        this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
     @Override
@@ -109,7 +102,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
+    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         checkIsBusinessData(newValue);
         try {
@@ -123,13 +116,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
         }
     }
 
-    private SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
-            throws SFlowNodeNotFoundException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-        return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
-    }
-
-    private void checkIsBusinessData(Object newValue) throws SOperationExecutionException {
+    private void checkIsBusinessData(final Object newValue) throws SOperationExecutionException {
         if (!(newValue instanceof Entity)) {
             throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
         }

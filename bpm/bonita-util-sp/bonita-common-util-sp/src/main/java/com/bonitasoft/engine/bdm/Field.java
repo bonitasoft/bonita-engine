@@ -34,6 +34,9 @@ public class Field {
     @XmlAttribute
     private Integer length;
 
+    @XmlAttribute
+    private Boolean collection;
+
     public String getName() {
         return name;
     }
@@ -65,6 +68,14 @@ public class Field {
 
     public void setLength(final Integer length) {
         this.length = length;
+    }
+
+    public Boolean isCollection() {
+        return collection;
+    }
+
+    public void setCollection(final Boolean collection) {
+        this.collection = collection;
     }
 
     @Override
