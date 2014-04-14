@@ -59,7 +59,7 @@ public class BDMQueryUtilTest {
 
         final Query query = BDMQueryUtil.createQueryForField(bo, field);
         assertThat(query).isNotNull();
-        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
+        assertThat(query.getContent()).contains("SELECT e\nFROM Employee e\nWHERE e.name=:name");
         assertThat(query.getName()).isEqualTo("getEmployeeByName");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).hasSize(1);
@@ -76,9 +76,26 @@ public class BDMQueryUtilTest {
 
         final Query query = BDMQueryUtil.createSelectAllQueryForBusinessObject(bo);
         assertThat(query).isNotNull();
-        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e");
+        assertThat(query.getContent()).contains("SELECT e\nFROM Employee e");
+        assertThat(query.getContent()).doesNotContain("WHERE");
         assertThat(query.getName()).isEqualTo("getAllEmployee");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).isEmpty();
+    }
+
+    @Test
+    public void createSelectAllQueryShouldGenerateOrderByPersistenceId() throws Exception {
+        // when:
+        String queryContent = BDMQueryUtil.createSelectAllQueryContent("MyBizObject");
+        // then:
+        assertThat(queryContent).contains("ORDER BY m.persistenceId");
+    }
+
+    @Test
+    public void createDefaultQueryForFieldShouldGenerateOrderByPersistenceId() throws Exception {
+        // when:
+        String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new Field());
+        // then:
+        assertThat(queryContent).contains("ORDER BY n.persistenceId");
     }
 }
