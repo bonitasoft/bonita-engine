@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.profile.ExportedProfileBuilder;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
+import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 
 import com.bonitasoft.engine.service.impl.LicenseChecker;
@@ -57,6 +58,14 @@ public class ProfileBinding extends org.bonitasoft.engine.profile.xml.ProfileBin
                 profileBuilder.setProfileMapping((ExportedProfileMapping) value);
             }
         }
+    }
+
+    @Override
+    public ExportedProfile getObject() {
+        if (profileBuilder != null) {
+            return profileBuilder.done();
+        }
+        return null;
     }
 
 }
