@@ -41,12 +41,11 @@ public class DefaultReportListTest {
     @Test
     public void test_we_can_deploy_all_default_reports() throws Exception {
 
-        DefaultReportList defaultReports = new DefaultReportList(logger, "src/test/resources/reports");
+        final DefaultReportList defaultReports = new DefaultReportList(logger, "src/test/resources/reports");
         final List<String> reports = new ArrayList<String>();
 
         defaultReports.deploy(new ReportDeployer() {
 
-            @SuppressWarnings("unused")
             @Override
             public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) {
                 reports.add(name);
