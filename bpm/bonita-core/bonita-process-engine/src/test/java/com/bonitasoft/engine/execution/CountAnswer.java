@@ -23,7 +23,6 @@ public class CountAnswer implements Answer<Void> {
         return count;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Void answer(final InvocationOnMock invocation) {
         count++;

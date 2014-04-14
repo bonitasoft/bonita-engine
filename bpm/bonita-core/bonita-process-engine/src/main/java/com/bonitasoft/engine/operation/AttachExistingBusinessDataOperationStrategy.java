@@ -18,30 +18,30 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.operation.OperatorType;
 
 import com.bonitasoft.engine.bdm.Entity;
-import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
-public class InsertBusinessDataOperationExecutorStrategy extends BusinessDataOperation implements OperationExecutorStrategy {
+public class AttachExistingBusinessDataOperationStrategy extends BusinessDataOperation implements OperationExecutorStrategy {
 
-    private final BusinessDataRepository repository;
-
-    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRepository repository, final RefBusinessDataService refBusinessDataService,
-            final FlowNodeInstanceService flowNodeInstanceService) {
+    public AttachExistingBusinessDataOperationStrategy(final RefBusinessDataService refBusinessDataService, final FlowNodeInstanceService flowNodeInstanceService) {
         super(refBusinessDataService, flowNodeInstanceService);
-        this.repository = repository;
     }
 
     @Override
-    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
+    // Returns the persistenceId of the business data to set the ref with:
+    public Object getValue(final SOperation operation, final Object rightOperandValue, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
-        if (value == null) {
-            throw new SOperationExecutionException("Unable to insert/update a null business data");
+        if (rightOperandValue == null) {
+            throw new SOperationExecutionException("Unable to set a business data with a not existing reference");
         }
-        return value;
+        if (!(rightOperandValue instanceof Entity)) {
+            throw new SOperationExecutionException("Wrong usage of " + this.getClass().getSimpleName()
+                    + ": right operand must evaluate to a Business Data (subclass of " + Entity.class.getName() + ")");
+        }
+        return ((Entity) rightOperandValue).getPersistenceId();
     }
 
     @Override
@@ -49,10 +49,8 @@ public class InsertBusinessDataOperationExecutorStrategy extends BusinessDataOpe
             throws SOperationExecutionException {
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
-            final Long dataId = refBusinessDataInstance.getDataId();
-            if (dataId == null) {
-                Entity businessData = repository.merge((Entity) newValue);
-                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
+            if (newValue != null) {
+                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, (Long) newValue);
             }
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
@@ -61,7 +59,7 @@ public class InsertBusinessDataOperationExecutorStrategy extends BusinessDataOpe
 
     @Override
     public String getOperationType() {
-        return OperatorType.CREATE_BUSINESS_DATA.name();
+        return OperatorType.ATTACH_EXISTING_BUSINESS_DATA.name();
     }
 
     @Override

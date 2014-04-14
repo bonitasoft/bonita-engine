@@ -2,8 +2,6 @@ package com.bonitasoft.pojo;
 
 public class EmployeeBuilder {
 
-    private Long persistenceId = 1L;
-
     private String firstName = "aFirstName";
 
     private String lastName = "aLastName";
@@ -13,12 +11,7 @@ public class EmployeeBuilder {
     }
 
     public Employee build() {
-        return new Employee(persistenceId, firstName, lastName);
-    }
-
-    public EmployeeBuilder withId(final long id) {
-        persistenceId = id;
-        return this;
+        return new Employee(firstName, lastName);
     }
 
     public EmployeeBuilder withFirstName(final String firstName) {

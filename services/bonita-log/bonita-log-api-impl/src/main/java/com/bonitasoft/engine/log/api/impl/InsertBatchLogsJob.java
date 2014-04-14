@@ -58,7 +58,6 @@ public class InsertBatchLogsJob implements StatelessJob {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) {
     }

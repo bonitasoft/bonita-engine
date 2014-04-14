@@ -18,6 +18,7 @@
 				<ref bean="documentOperationExecutorStrategy" />
 				<ref bean="createBusinessDataOperationExecutorStrategy" />
 				<ref bean="businessDataUpdateOperationExecutorStrategy" />
+				<ref bean="attachExistingBusinessDataOperationStrategy" />
 			</list>
 		</constructor-arg>
 	</bean>
@@ -54,6 +55,11 @@
 
 	<bean id="businessDataUpdateOperationExecutorStrategy" class="com.bonitasoft.engine.operation.UpdateBusinessDataOperationExecutorStrategy">
 		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+	</bean>
+
+	<bean id="attachExistingBusinessDataOperationStrategy" class="com.bonitasoft.engine.operation.AttachExistingBusinessDataOperationStrategy">
 		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 	</bean>
