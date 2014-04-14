@@ -35,7 +35,8 @@ public class AddBreakpoint implements TransactionContentWithResult<SBreakpoint> 
     public AddBreakpoint(final BreakpointService breakpointService, final long definitionId,
             final String elementName, final int idOfTheStateToInterrupt, final int idOfTheInterruptingState) {
         this.breakpointService = breakpointService;
-        breakpoint = BuilderFactory.get(SBreakpointBuilderFactory.class).createNewInstance(definitionId, elementName, idOfTheStateToInterrupt, idOfTheInterruptingState)
+        breakpoint = BuilderFactory.get(SBreakpointBuilderFactory.class)
+                .createNewInstance(definitionId, elementName, idOfTheStateToInterrupt, idOfTheInterruptingState)
                 .done();
     }
 

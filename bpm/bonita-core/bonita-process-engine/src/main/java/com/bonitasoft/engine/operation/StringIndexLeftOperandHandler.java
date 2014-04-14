@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -43,9 +45,9 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
+    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        final String name = leftOperand.getName();
+        final String name = sLeftOperand.getName();
         Integer index;
         try {
             index = Integer.valueOf(name);
@@ -96,7 +98,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public Map<String, Object> retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
         // don't retrieve it, not useful
         return null;
     }

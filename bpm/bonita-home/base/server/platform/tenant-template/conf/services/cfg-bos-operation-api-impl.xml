@@ -18,6 +18,7 @@
 				<ref bean="externalDataLeftOperandHandler" />
 				<ref bean="documentLeftOperandHandler" />
 				<ref bean="stringIndexLeftOperandHandler" />
+				<ref bean="businessDataLeftOperandHandler" />
 			</list>
 		</property>
 	</bean>
@@ -34,7 +35,7 @@
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
 	</bean>
-
+	
 	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
 	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy" />
@@ -46,6 +47,12 @@
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="businessDataLeftOperandHandler" class="com.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
+		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 	</bean>
 
 	<bean id="stringIndexLeftOperandHandler" class="com.bonitasoft.engine.operation.StringIndexLeftOperandHandler">

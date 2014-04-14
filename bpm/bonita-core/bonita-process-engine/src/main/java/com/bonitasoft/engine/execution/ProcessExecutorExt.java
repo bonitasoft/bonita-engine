@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -26,6 +26,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
@@ -58,8 +59,13 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.work.WorkService;
 
+import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
+import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDataInstanceBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -71,20 +77,26 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class ProcessExecutorExt extends ProcessExecutorImpl {
 
-    public ProcessExecutorExt(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
-            final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
+    private final BusinessDataRepository businessDataRepository;
+
+    private final RefBusinessDataService refBusinessDataService;
+
+    public ProcessExecutorExt(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
+            final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
+            final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
-            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
-            final BPMInstancesCreator bpmInstancesCreator, final TokenService tokenService, final EventsHandler eventsHandler,
-            final FlowNodeStateManager flowNodeStateManager) {
+            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
+            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
+            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, eventService, handlers, processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
                 tokenService, eventsHandler, flowNodeStateManager);
+        this.businessDataRepository = businessDataRepository;
+        this.refBusinessDataService = refBusinessDataService;
     }
 
     @Override
@@ -92,6 +104,10 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
             throws SProcessInstanceCreationException {
+        if (expressionContext == null) {
+            expressionContext = new SExpressionContext();
+        }
+        expressionContext.setProcessDefinitionId(sDefinition.getId());
         try {
             // Create SDataInstances
             bpmInstancesCreator.createDataInstances(sInstance, processContainer, sDefinition, expressionContext, operations, context);
@@ -100,12 +116,24 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             } catch (final SBonitaException e) {
                 throw new SProcessInstanceCreationException("Unable to initialize string index on process instance.", e);
             }
+
+            final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
+            for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
+                final SExpression expression = bdd.getDefaultValueExpression();
+                Long primaryKey = null;
+                if (expression != null) {
+                    Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                    businessData = businessDataRepository.merge(businessData);
+                    primaryKey = businessData.getPersistenceId();
+                }
+                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
+                        .done();
+                refBusinessDataService.addRefBusinessDataInstance(instance);
+            }
             createDocuments(sDefinition, sInstance, userId);
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
-            }
-            if (expressionContext == null) {
-                expressionContext = new SExpressionContext();
             }
             executeOperations(operations, context, expressionContext, sInstance);
 

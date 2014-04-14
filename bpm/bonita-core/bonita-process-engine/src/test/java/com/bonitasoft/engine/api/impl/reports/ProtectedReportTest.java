@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -21,7 +21,6 @@ import com.bonitasoft.engine.service.impl.LicenseChecker;
 /**
  * @author Vincent Elcrin
  * @author Celine Souchet
- * 
  */
 public class ProtectedReportTest {
 
@@ -36,21 +35,20 @@ public class ProtectedReportTest {
     @Test(expected = IllegalStateException.class)
     public void should_throw_an_illegal_state_exception_if_license_is_not_valid() throws Exception {
         doThrow(IllegalStateException.class).when(checker).checkLicenceAndFeature("feature");
-        ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
+        final ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
         report.deploy("path/to/report", null);
     }
 
     @Test
     public void should_deploy_report_if_license_is_valid() throws Exception {
-        ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
+        final ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
         report.deploy("src/test/resources/reports", new ReportDeployer() {
 
-            @SuppressWarnings("unused")
             @Override
-            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws Exception {
-                assertEquals("myreport", name);
+            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws Exception {
+                assertThat(name).isEqualTo("myreport");
             }
         });
     }

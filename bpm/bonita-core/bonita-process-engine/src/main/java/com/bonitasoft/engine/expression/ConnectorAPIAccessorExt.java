@@ -63,6 +63,7 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
         return ServerAPIFactory.getServerAPI(false);
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> T getAPI(final Class<T> clazz, final APISession session) {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);

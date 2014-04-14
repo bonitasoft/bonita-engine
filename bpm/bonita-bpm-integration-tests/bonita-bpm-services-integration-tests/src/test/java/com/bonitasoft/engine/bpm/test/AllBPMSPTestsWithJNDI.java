@@ -30,13 +30,13 @@ public class AllBPMSPTestsWithJNDI {
 
     @BeforeClass
     public static void beforeClass() {
-        System.err.println("=================== AllBPMTests.beforeClass()");
+        System.err.println("=================== AllBPMSPTestsWithJNDI.beforeClass()");
         setupSpringContext();
     }
 
     @AfterClass
     public static void afterClass() {
-        System.err.println("=================== AllBPMTests.afterClass()");
+        System.err.println("=================== AllBPMSPTestsWithJNDI.afterClass()");
 
         closeSpringContext();
     }

@@ -76,7 +76,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             executeActivity(flowNodeInstance, logger);
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
-                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminate(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
+                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTaskExt(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
                     e);
         }
         return null;

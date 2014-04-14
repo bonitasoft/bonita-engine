@@ -13,4 +13,15 @@
 			</props>
 		</property>
 	</bean>
+	
+	<bean id="driverPropertiesBD" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="user">${db.user}</prop>
+				<prop key="password">${db.password}</prop>
+				<prop key="URL">${db.url}</prop>
+			</props>
+		</property>
+	</bean>
+
 </beans>
