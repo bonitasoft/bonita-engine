@@ -53,7 +53,7 @@ public class AssignmentOperationExecutorStrategyTest {
         initMocks();
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
         when(leftOperand.getType()).thenReturn(SLeftOperand.DATA);
-        Object returnedValue = assignmentOperationExecutorStrategy.getValue(operation, value, expressionContext);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
         assertEquals("value", returnedValue);
     }
 
@@ -63,7 +63,7 @@ public class AssignmentOperationExecutorStrategyTest {
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.EXTERNAL_DATA);
-        Object returnedValue = assignmentOperationExecutorStrategy.getValue(operation, value, expressionContext);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
         assertEquals("value", returnedValue);
     }
 
@@ -73,7 +73,7 @@ public class AssignmentOperationExecutorStrategyTest {
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.DATA);
-        assignmentOperationExecutorStrategy.getValue(operation, value, expressionContext);
+        assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
     }
 
     private void initMocks() {

@@ -1444,7 +1444,7 @@ public class APITestUtil {
     public Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
             throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
-                .setType(isTransient ? LeftOperand.TRANSIENT_DATA : LeftOperand.DATA).done();
+                .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done();
         final Expression expression = new ExpressionBuilder().createConstantStringExpression(newConstantValue);
         final Operation operation;
         operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
@@ -1481,7 +1481,7 @@ public class APITestUtil {
         operationBuilder.setRightOperand(rightOperand);
         operationBuilder.setType(operatorType);
         operationBuilder.setLeftOperand(new LeftOperandBuilder().createNewInstance(dataName)
-                .setType(isTransient ? LeftOperand.TRANSIENT_DATA : LeftOperand.DATA).done());
+                .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done());
         return operationBuilder.done();
     }
 

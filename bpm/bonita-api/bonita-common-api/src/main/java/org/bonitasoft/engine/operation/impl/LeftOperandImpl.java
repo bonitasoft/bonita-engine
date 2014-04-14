@@ -30,7 +30,7 @@ public class LeftOperandImpl implements LeftOperand {
 
     public LeftOperandImpl() {
         // default when not set
-        type = LeftOperand.DATA;
+        type = LeftOperand.TYPE_DATA;
     }
 
     public void setName(final String name) {
@@ -61,7 +61,7 @@ public class LeftOperandImpl implements LeftOperand {
 
     @Override
     public boolean isExternal() {
-        return LeftOperand.EXTERNAL_DATA.equals(type);
+        return LeftOperand.TYPE_EXTERNAL_DATA.equals(type);
     }
 
     @Override

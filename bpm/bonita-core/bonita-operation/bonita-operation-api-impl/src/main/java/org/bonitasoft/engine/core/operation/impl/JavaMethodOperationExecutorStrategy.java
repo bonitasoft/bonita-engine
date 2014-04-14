@@ -84,7 +84,7 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
     }
 
     @Override
-    public Object getValue(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext)
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         final String dataToSet = operation.getLeftOperand().getName();
         final Object objectToInvokeJavaMethodOn = expressionContext.getInputValues().get(dataToSet);

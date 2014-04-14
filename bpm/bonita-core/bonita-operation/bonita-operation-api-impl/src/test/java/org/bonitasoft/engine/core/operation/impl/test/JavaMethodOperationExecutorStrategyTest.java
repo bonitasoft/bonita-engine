@@ -48,7 +48,7 @@ public class JavaMethodOperationExecutorStrategyTest {
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         expressionContext.setInputValues(Collections.<String, Object> emptyMap());
-        strategy.getValue(operation, "Update", expressionContext);
+        strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext);
     }
 
 }

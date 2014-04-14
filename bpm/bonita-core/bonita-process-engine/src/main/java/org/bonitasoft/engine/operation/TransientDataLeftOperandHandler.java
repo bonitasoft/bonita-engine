@@ -66,7 +66,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     @Override
     public String getType() {
-        return LeftOperand.TRANSIENT_DATA;
+        return LeftOperand.TYPE_TRANSIENT_DATA;
     }
 
     @Override

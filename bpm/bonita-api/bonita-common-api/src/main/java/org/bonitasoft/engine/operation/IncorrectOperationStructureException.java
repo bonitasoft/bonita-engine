@@ -17,7 +17,9 @@ import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Zhang Bole
+ * @deprecated not used anymore
  */
+@Deprecated
 public class IncorrectOperationStructureException extends BonitaException {
 
     private static final long serialVersionUID = 7138323724652814335L;

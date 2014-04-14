@@ -180,7 +180,7 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
 
     private void updateDataWithOperation(final HumanTaskInstance step1, final String value, final String name) throws InvalidExpressionException,
             UpdateException {
-        Operation operation = new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperand.TRANSIENT_DATA)
+        Operation operation = new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
                 .setRightOperand(new ExpressionBuilder().createConstantStringExpression(value)).setType(OperatorType.ASSIGNMENT).done();
         getProcessAPI().updateActivityInstanceVariables(Arrays.asList(operation), step1.getId(), null);
     }

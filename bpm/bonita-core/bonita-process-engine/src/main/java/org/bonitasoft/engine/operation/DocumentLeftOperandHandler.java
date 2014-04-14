@@ -140,7 +140,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     @Override
     public String getType() {
-        return LeftOperand.DOCUMENT;
+        return LeftOperand.TYPE_DOCUMENT;
     }
 
     @Override

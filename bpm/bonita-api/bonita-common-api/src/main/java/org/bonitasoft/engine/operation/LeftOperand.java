@@ -23,15 +23,15 @@ import java.io.Serializable;
  */
 public interface LeftOperand extends Serializable {
 
-    static String DATA = "DATA";
+    static String TYPE_DATA = "DATA";
 
-    static String SEARCH_INDEX = "SEARCH_INDEX";
+    static String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
 
-    static String DOCUMENT = "DOCUMENT";
+    static String TYPE_DOCUMENT = "DOCUMENT";
 
-    static String EXTERNAL_DATA = "EXTERNAL_DATA";
+    static String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
 
-    static String TRANSIENT_DATA = "TRANSIENT_DATA";
+    static String TYPE_TRANSIENT_DATA = "TRANSIENT_DATA";
 
     String getName();
 
@@ -51,6 +51,10 @@ public interface LeftOperand extends Serializable {
      */
     String getType();
 
+    /**
+     * 
+     * @deprecated As of 6.3.0 replaced by {@link #getType()}
+     */
     @Deprecated
     boolean isExternal();
 }

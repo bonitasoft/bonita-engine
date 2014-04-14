@@ -93,7 +93,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step1", actorName);
         designProcessDefinition.addUserTask("step3", actorName);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
-        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(1).with((Expression) null).done());
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1, null));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.done();

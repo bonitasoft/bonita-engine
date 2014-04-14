@@ -88,12 +88,12 @@ public class LeftOperandBuilder {
      */
     @Deprecated
     public LeftOperandBuilder setExternal(final boolean external) {
-        if (leftOperand.getType() != null && !LeftOperand.DATA.equals(leftOperand.getType())
-                && !LeftOperand.EXTERNAL_DATA.equals(leftOperand.getType())) {
+        if (leftOperand.getType() != null && !LeftOperand.TYPE_DATA.equals(leftOperand.getType())
+                && !LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
             throw new IllegalStateException(
                     "Can't set left operand to external when the type is not input or data this method is deprecated, it's not usefull to use it anymore");
         }
-        leftOperand.setType(external ? LeftOperand.EXTERNAL_DATA : LeftOperand.DATA);
+        leftOperand.setType(external ? LeftOperand.TYPE_EXTERNAL_DATA : LeftOperand.TYPE_DATA);
         return this;
     }
 
@@ -102,7 +102,7 @@ public class LeftOperandBuilder {
     }
 
     public LeftOperand createSearchIndexLeftOperand(final int index) {
-        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperand.SEARCH_INDEX).done();
+        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperand.TYPE_SEARCH_INDEX).done();
     }
 
     /**
@@ -114,9 +114,9 @@ public class LeftOperandBuilder {
     @Deprecated
     public LeftOperand createDataLeftOperand(final String dataName, final boolean external) {
         if (external) {
-            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.EXTERNAL_DATA).done();
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_EXTERNAL_DATA).done();
         } else {
-            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.DATA).done();
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
         }
     }
 
@@ -128,7 +128,7 @@ public class LeftOperandBuilder {
      * @return the newly created <code>LeftOperand</code> object
      */
     public LeftOperand createDataLeftOperand(final String dataName) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.DATA).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
     }
 
 }

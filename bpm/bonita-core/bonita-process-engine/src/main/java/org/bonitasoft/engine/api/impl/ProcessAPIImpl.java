@@ -3250,7 +3250,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 operationService.execute(sOperation, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
                 // return the value of the data if it's an external data
                 final LeftOperand leftOperand = operation.getLeftOperand();
-                if (LeftOperand.EXTERNAL_DATA.equals(leftOperand.getType())) {
+                if (LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
                 }
             }

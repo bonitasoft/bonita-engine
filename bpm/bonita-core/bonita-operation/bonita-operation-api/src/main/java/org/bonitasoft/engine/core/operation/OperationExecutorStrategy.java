@@ -25,7 +25,19 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
  */
 public interface OperationExecutorStrategy {
 
-    Object getValue(SOperation operation, Object value, SExpressionContext expressionContext)
+    /**
+     * 
+     * Calculate the new value of the left operand base of right operand expression value
+     * 
+     * @param operation
+     * @param rightOperandValue
+     *            result of the evaluation of right operand expression
+     * @param expressionContext
+     * @return
+     *         the new value to set the left operand with
+     * @throws SOperationExecutionException
+     */
+    Object computeNewValueForLeftOperand(SOperation operation, Object rightOperandValue, SExpressionContext expressionContext)
             throws SOperationExecutionException;
 
     String getOperationType();

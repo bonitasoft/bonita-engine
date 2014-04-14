@@ -106,11 +106,11 @@ public class OperationServiceImpl implements OperationService {
     void executeOperators(final List<SOperation> operations,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         for (final SOperation operation : operations) {
-            final Object operationValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
+            final Object rightOperandValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
             final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
-            final Object value = operationExecutorStrategy.getValue(operation, operationValue, expressionContext);
+            final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext);
             expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
-            logOperation(TechnicalLogSeverity.DEBUG, operation, operationValue, expressionContext);
+            logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
         }
     }
 
