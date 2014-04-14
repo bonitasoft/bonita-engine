@@ -63,8 +63,7 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     private final StateBehaviors stateBehaviors;
 
     public InitializingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService, final BPMInstancesCreator bpmInstancesCreator,
-            final ActivityInstanceService activityInstanceService, final DataInstanceService dataInstanceService,
-            final StateBehaviors stateBehaviors) {
+            final ActivityInstanceService activityInstanceService, final DataInstanceService dataInstanceService, final StateBehaviors stateBehaviors) {
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.activityInstanceService = activityInstanceService;
@@ -160,8 +159,8 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     }
 
     static List<SFlowNodeInstance> createInnerInstances(final BPMInstancesCreator bpmInstancesCreator, final ActivityInstanceService activityInstanceService,
-            final long processDefinitionId, final SActivityDefinition activity, final SFlowNodeInstance flowNodeInstance,
-            final int numberOfInstanceToCreate) throws SBonitaException {
+            final long processDefinitionId, final SActivityDefinition activity, final SFlowNodeInstance flowNodeInstance, final int numberOfInstanceToCreate)
+            throws SBonitaException {
         final SMultiInstanceActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
         final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
         final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
@@ -206,13 +205,11 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
         return "initializing";
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;
@@ -223,13 +220,11 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
         return SStateCategory.NORMAL;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

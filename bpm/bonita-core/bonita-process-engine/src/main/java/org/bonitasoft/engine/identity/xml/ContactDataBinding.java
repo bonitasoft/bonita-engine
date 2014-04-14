@@ -31,12 +31,10 @@ public abstract class ContactDataBinding extends ElementBinding {
         contactDataBuilder = new ContactDataBuilder();
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLContactDataMapping.EMAIL.equals(name)) {
@@ -66,7 +64,6 @@ public abstract class ContactDataBinding extends ElementBinding {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

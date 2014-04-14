@@ -46,7 +46,6 @@ public class JobWrapper implements StatelessJob {
             // Nothing to do
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final TransactionState txState) {
             sessionAccessor.deleteTenantId();
@@ -73,9 +72,8 @@ public class JobWrapper implements StatelessJob {
 
     private final TransactionService transactionService;
 
-    public JobWrapper(final String name, final StatelessJob statelessJob, final TechnicalLoggerService logger,
-            final long tenantId, final EventService eventService,
-            final SessionAccessor sessionAccessor, final TransactionService transactionService) {
+    public JobWrapper(final String name, final StatelessJob statelessJob, final TechnicalLoggerService logger, final long tenantId,
+            final EventService eventService, final SessionAccessor sessionAccessor, final TransactionService transactionService) {
         this.name = name;
         this.sessionAccessor = sessionAccessor;
         this.statelessJob = statelessJob;
@@ -125,7 +123,7 @@ public class JobWrapper implements StatelessJob {
             }
             try {
                 transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation());
-            } catch (STransactionNotFoundException e) {
+            } catch (final STransactionNotFoundException e) {
                 e.printStackTrace();
             }
         }

@@ -33,7 +33,6 @@ import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformTableContent;
@@ -85,7 +84,6 @@ import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.STenantActivationException;
 import org.bonitasoft.engine.platform.STenantCreationException;
-import org.bonitasoft.engine.platform.STenantDeactivationException;
 import org.bonitasoft.engine.platform.STenantDeletionException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.StartNodeException;
@@ -815,38 +813,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
         } else {
             e.printStackTrace();
-        }
-    }
-
-    private void deactiveTenant(final long tenantId) throws STenantDeactivationException {
-        // TODO : Reduce number of transactions
-        PlatformServiceAccessor platformAccessor = null;
-        SessionAccessor sessionAccessor = null;
-        long platformSessionId = -1;
-        try {
-            platformAccessor = getPlatformAccessor();
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
-            // final WorkService workService = platformAccessor.getWorkService();
-            final long sessionId = createSession(tenantId, sessionService);
-
-            platformSessionId = sessionAccessor.getSessionId();
-            sessionAccessor.deleteSessionId();
-
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
-            transactionContent.execute();
-            sessionService.deleteSession(sessionId);
-            sessionService.deleteSessionsOfTenant(tenantId);
-        } catch (final STenantDeactivationException stde) {
-            log(platformAccessor, stde);
-            throw stde;
-        } catch (final Exception e) {
-            log(platformAccessor, e);
-            throw new STenantDeactivationException("Tenant deactivation failed.", e);
-        } finally {
-            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 

@@ -97,7 +97,7 @@ public class TransactionExecutorImplTest {
             begin();
             try {
                 return callable.call();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 setRollbackOnly();
                 throw e;
             } finally {
@@ -105,16 +105,14 @@ public class TransactionExecutorImplTest {
             }
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
             // TODO Auto-generated method stub
 
         }
 
-        @SuppressWarnings("unused")
         @Override
-        public void registerBeforeCommitCallable(Callable<Void> callable) {
+        public void registerBeforeCommitCallable(final Callable<Void> callable) {
             // TODO Auto-generated method stub
 
         }

@@ -26,7 +26,7 @@ public class MyTransactionManager implements TransactionManager {
     @Override
     public void begin() throws SystemException {
         if (transaction == null) {
-            transaction = this.mockTransaction != null ? mockTransaction : new MyTransaction();
+            transaction = mockTransaction != null ? mockTransaction : new MyTransaction();
         } else {
             throw new SystemException("A transaction has already begun.");
         }
@@ -65,7 +65,6 @@ public class MyTransactionManager implements TransactionManager {
         transaction.setRollbackOnly();
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setTransactionTimeout(final int seconds) {
         throw new RuntimeException("Not yet implemented");
@@ -73,7 +72,7 @@ public class MyTransactionManager implements TransactionManager {
 
     @Override
     public Transaction suspend() {
-        Transaction result = transaction;
+        final Transaction result = transaction;
         transaction = null;
         return result;
     }
@@ -89,7 +88,7 @@ public class MyTransactionManager implements TransactionManager {
             if (status == Status.STATUS_ACTIVE) {
                 status = Status.STATUS_COMMITTING;
 
-                for (Synchronization synchro : synchros) {
+                for (final Synchronization synchro : synchros) {
                     synchro.beforeCompletion();
                 }
 
@@ -97,7 +96,7 @@ public class MyTransactionManager implements TransactionManager {
                 try {
                     status = internalCommit();
                 } finally {
-                    for (Synchronization synchro : synchros) {
+                    for (final Synchronization synchro : synchros) {
                         synchro.afterCompletion(Status.STATUS_COMMITTED);
                     }
                 }
@@ -107,18 +106,15 @@ public class MyTransactionManager implements TransactionManager {
         }
 
         // Extension point during the commit phase, between the synchros executions.
-        @SuppressWarnings("unused")
         int internalCommit() throws SystemException {
             return Status.STATUS_COMMITTED;
         }
 
-        @SuppressWarnings("unused")
         @Override
         public boolean delistResource(final XAResource xaRes, final int flag) throws IllegalStateException {
             return false;
         }
 
-        @SuppressWarnings("unused")
         @Override
         public boolean enlistResource(final XAResource xaRes) throws IllegalStateException {
             return false;
@@ -139,7 +135,7 @@ public class MyTransactionManager implements TransactionManager {
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 status = Status.STATUS_ROLLING_BACK;
 
-                for (Synchronization synchro : synchros) {
+                for (final Synchronization synchro : synchros) {
                     synchro.beforeCompletion();
                 }
 
@@ -147,7 +143,7 @@ public class MyTransactionManager implements TransactionManager {
                 try {
                     status = internalRollback();
                 } finally {
-                    for (Synchronization synchro : synchros) {
+                    for (final Synchronization synchro : synchros) {
                         synchro.afterCompletion(Status.STATUS_ROLLEDBACK);
                     }
                 }

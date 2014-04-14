@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -50,9 +49,8 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
         return KIND_CONSTANT;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         Serializable result;
@@ -85,11 +83,11 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions));
         }
         return list;
     }
@@ -100,13 +98,12 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     }
 
     /**
-     * 
      * @param dateToParse
      * @return null if not a Date, new Date with properties is ISO format is recognized
      */
-    private Date parseDate(String dateToParse) {
+    private Date parseDate(final String dateToParse) {
         if (dateToParse.matches(REGEX_PARSE_DATE)) {
-            final Calendar calendar = GregorianCalendar.getInstance();
+            final Calendar calendar = Calendar.getInstance();
             final String year = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$1");
             if (year != null && !year.isEmpty() && Integer.valueOf(year) > 1900) {
                 calendar.set(Calendar.YEAR, Integer.valueOf(year));

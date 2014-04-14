@@ -27,7 +27,6 @@ public abstract class QuartzJob implements org.quartz.Job {
 
     private StatelessJob bosJob;
 
-    @SuppressWarnings("unused")
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
@@ -41,7 +40,7 @@ public abstract class QuartzJob implements org.quartz.Job {
         return bosJob;
     }
 
-    public void setBosJob(StatelessJob bosJob) {
+    public void setBosJob(final StatelessJob bosJob) {
         this.bosJob = bosJob;
     }
 
