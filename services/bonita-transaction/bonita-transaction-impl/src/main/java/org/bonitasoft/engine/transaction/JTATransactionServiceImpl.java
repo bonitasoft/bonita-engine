@@ -50,13 +50,13 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new IllegalArgumentException("The parameter txManager can't be null.");
         }
         this.txManager = txManager;
-        this.txContextThreadLocal = new TransactionServiceContextThreadLocal(txManager);
+        txContextThreadLocal = new TransactionServiceContextThreadLocal(txManager);
     }
 
     @Override
     public void begin() throws STransactionCreationException {
         try {
-            TransactionServiceContext txContext = txContextThreadLocal.get();
+            final TransactionServiceContext txContext = txContextThreadLocal.get();
             if (txContext.reentrantCounter() == 1) {
                 throw new STransactionCreationException("We do not support nested calls to the transaction service.");
             }
@@ -64,7 +64,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
             if (!txContext.isAlreadyManaged()) {
                 beforeCommitCallables.remove();
-                boolean transactionStarted = false;
+                final boolean transactionStarted = false;
                 createTransaction(transactionStarted);
             }
 
@@ -88,9 +88,9 @@ public class JTATransactionServiceImpl implements TransactionService {
 
             // Then the monitoring of numberOfActiveTransactions is up-to-date.
             tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             throw new STransactionCreationException(e);
-        } catch (RollbackException e) {
+        } catch (final RollbackException e) {
             throw new STransactionCreationException(e);
         }
     }
@@ -102,8 +102,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                 final Transaction tx = txManager.getTransaction();
-                logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                        "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
             }
 
             numberOfActiveTransactions.getAndIncrement();
@@ -170,8 +169,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             txManager.rollback();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                        "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
             }
         } catch (final IllegalStateException e) {
             throw new STransactionRollbackException(e);
@@ -314,7 +312,6 @@ public class JTATransactionServiceImpl implements TransactionService {
             // Nothing to do
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final int status) {
             // Whatever the tx status, reset the context
@@ -335,7 +332,6 @@ public class JTATransactionServiceImpl implements TransactionService {
             // Nothing to do
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final int status) {
             // Whatever the status, decrement the number of active transactions
@@ -382,7 +378,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         protected TransactionServiceContext initialValue() {
             try {
                 return new TransactionServiceContext(txManager.getStatus() == Status.STATUS_ACTIVE);
-            } catch (SystemException e) {
+            } catch (final SystemException e) {
                 throw new SBonitaRuntimeException(e);
             }
         }

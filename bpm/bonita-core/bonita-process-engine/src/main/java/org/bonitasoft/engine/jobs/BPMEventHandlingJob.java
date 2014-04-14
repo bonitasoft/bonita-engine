@@ -126,7 +126,6 @@ public class BPMEventHandlingJob extends InternalJob {
         return pairs;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         eventInstanceService = getTenantServiceAccessor().getEventInstanceService();

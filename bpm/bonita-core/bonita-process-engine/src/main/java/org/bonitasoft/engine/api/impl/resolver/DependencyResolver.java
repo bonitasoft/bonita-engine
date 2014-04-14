@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.resolver;
 
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.ERROR;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
@@ -78,6 +81,22 @@ public class DependencyResolver {
         return resolved;
     }
 
+    public void resolveDependenciesForAllProcesses(TenantServiceAccessor tenantAccessor) {
+        final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
+        try {
+            List<Long> processDefinitionIds = tenantAccessor.getProcessDefinitionService().getProcessDefinitionIds(0, Integer.MAX_VALUE);
+            resolveDependencies(processDefinitionIds, tenantAccessor);
+        } catch (SProcessDefinitionReadException e) {
+            loggerService.log(DependencyResolver.class, ERROR, "Unable to retrieve tenant process definitions, dependency resolution aborted");
+        }
+    }
+    
+    private void resolveDependencies(final List<Long> processDefinitionIds, final TenantServiceAccessor tenantAccessor) {
+        for (Long id : processDefinitionIds) {
+            resolveDependencies(id, tenantAccessor);
+        }
+    }
+    
     /*
      * Done in a separated transaction
      * We try here to check if now the process is resolved so it must not be done in the same transaction that did the modification

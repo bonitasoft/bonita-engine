@@ -10,7 +10,6 @@ import org.bonitasoft.engine.filter.AbstractUserFilter;
  */
 public class TestFilter extends AbstractUserFilter {
 
-    @SuppressWarnings("unused")
     @Override
     public List<Long> filter(final String actorName) {
         return Collections.singletonList((Long) getInputParameter("userId"));

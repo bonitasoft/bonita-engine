@@ -75,9 +75,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
         numericTypes.add(byte.class.getName());
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final List<SExpression> dependencies = expression.getDependencies();
         final String content = expression.getContent();
@@ -203,11 +202,11 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final List<Object> evaluatedExpressions = new ArrayList<Object>(expressions.size());
         for (final SExpression sExpression : expressions) {
-            evaluatedExpressions.add(evaluate(sExpression, dependencyValues, resolvedExpressions));
+            evaluatedExpressions.add(evaluate(sExpression, context, resolvedExpressions));
         }
         return evaluatedExpressions;
     }

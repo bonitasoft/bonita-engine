@@ -26,7 +26,6 @@ public class TestImplemOfServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) {

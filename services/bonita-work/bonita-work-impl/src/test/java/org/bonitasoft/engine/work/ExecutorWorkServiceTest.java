@@ -70,8 +70,7 @@ public class ExecutorWorkServiceTest {
         doReturn(false).when(executorService).isShutdown();
         doReturn(true).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
 
-        workService = spy(new ExecutorWorkService(transactionService, workSynchronizationFactory, loggerService, sessionAccessor,
-                bonitaExecutorServiceFactory));
+        workService = spy(new ExecutorWorkService(transactionService, workSynchronizationFactory, loggerService, sessionAccessor, bonitaExecutorServiceFactory));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class ExecutorWorkServiceTest {
 
     @Test
     public void should_pause_shutdown_ThreadPool_and_clear_queue() throws InterruptedException, SBonitaException {
-        InOrder inOrder = inOrder(executorService, workService, queue);
+        final InOrder inOrder = inOrder(executorService, workService, queue);
         // given
         workService.start();
 
@@ -104,7 +103,7 @@ public class ExecutorWorkServiceTest {
 
     @Test
     public void should_stop_shutdown_ThreadPool_and_clear_queue() throws InterruptedException {
-        InOrder inOrder = inOrder(executorService, workService, queue);
+        final InOrder inOrder = inOrder(executorService, workService, queue);
         // given
         workService.start();
 
@@ -227,12 +226,10 @@ public class ExecutorWorkServiceTest {
 
             private static final long serialVersionUID = 1L;
 
-            @SuppressWarnings("unused")
             @Override
             public void work(final Map<String, Object> context) {
             }
 
-            @SuppressWarnings("unused")
             @Override
             public void handleFailure(final Exception e, final Map<String, Object> context) {
 

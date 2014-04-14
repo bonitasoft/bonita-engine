@@ -40,9 +40,8 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
 
     private long count;
 
-    public TransactionalProcessInstanceInterruptor(final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService flowNodeInstanceService, final ProcessExecutor processExecutor,
-            final TechnicalLoggerService logger) {
+    public TransactionalProcessInstanceInterruptor(final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService,
+            final ProcessExecutor processExecutor, final TechnicalLoggerService logger) {
         super(logger);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -82,13 +81,11 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
         return children;
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected long getNumberOfChildren(final long processInstanceId) {
         return count;
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected long getNumberOfChildrenExcept(final long processInstanceId, final long childExceptionId) {
         return count;

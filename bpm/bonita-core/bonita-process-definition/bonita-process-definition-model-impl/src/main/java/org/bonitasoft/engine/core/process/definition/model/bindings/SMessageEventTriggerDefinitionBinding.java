@@ -37,7 +37,6 @@ public abstract class SMessageEventTriggerDefinitionBinding extends ElementBindi
         messageName = attributes.get(XMLSProcessDefinition.NAME);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

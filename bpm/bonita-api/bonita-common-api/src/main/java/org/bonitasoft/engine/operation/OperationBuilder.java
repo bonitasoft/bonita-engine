@@ -134,6 +134,21 @@ public class OperationBuilder {
     }
 
     /**
+     * Creates a new operation of type {@link OperatorType#ATTACH_EXISTING_BUSINESS_DATA} that associates an existing Business Data to the current process.
+     * 
+     * @param businessDataName
+     *            the name of the reference in the process.
+     * @param expressionReturningBusinessData
+     *            the expression returning an existing business data.
+     * @return the newly created <code>Operation</code>.
+     * @see OperatorType#ATTACH_EXISTING_BUSINESS_DATA
+     */
+    public Operation attachBusinessDataSetAttributeOperation(final String businessDataName, final Expression expressionReturningBusinessData) {
+        return createNewInstance().setLeftOperand(businessDataName, false).setRightOperand(expressionReturningBusinessData)
+                .setType(OperatorType.ATTACH_EXISTING_BUSINESS_DATA).done();
+    }
+
+    /**
      * @param docName
      * @param expression
      * @return the newly created <code>Operation</code>.

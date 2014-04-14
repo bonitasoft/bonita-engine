@@ -26,7 +26,6 @@ public class DoNothingJob implements StatelessJob {
     public void execute() {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) {
     }

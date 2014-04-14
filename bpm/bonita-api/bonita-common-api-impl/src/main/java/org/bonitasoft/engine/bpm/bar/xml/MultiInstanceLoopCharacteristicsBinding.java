@@ -47,7 +47,6 @@ public class MultiInstanceLoopCharacteristicsBinding extends ElementBinding {
         loopDataOutput = attributes.get(XMLProcessDefinition.MULTI_INSTANCE_LOOP_DATA_OUTPUT);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

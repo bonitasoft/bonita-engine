@@ -13,7 +13,6 @@ public class SimpleMemoryContextFactory implements InitialContextFactory {
 
     private static final SimpleMemoryContext context = new SimpleMemoryContext();
 
-    @SuppressWarnings("unused")
     @Override
     public Context getInitialContext(final Hashtable<?, ?> environment) {
         return context;

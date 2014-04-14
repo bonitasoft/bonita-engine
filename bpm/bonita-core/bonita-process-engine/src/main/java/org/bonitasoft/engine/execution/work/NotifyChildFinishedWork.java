@@ -24,9 +24,7 @@ import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
- * 
  * Work that notify a container that a flow node is in completed state
- * 
  * e.g. when a flow node of a process finish we evaluate the outgoing transitions of this flow node.
  * 
  * @author Baptiste Mesta
@@ -73,7 +71,6 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();

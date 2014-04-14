@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -68,6 +68,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_BUSINESS_DATA = "TYPE_BUSINESS_DATA";
 
+    String TYPE_QUERY_BUSINESS_DATA = "TYPE_QUERY_BUSINESS_DATA";
+
     ExpressionKind KIND_CONSTANT = new ExpressionKind(TYPE_CONSTANT);
 
     ExpressionKind KIND_READ_ONLY_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_SCRIPT, INTERPRETER_GROOVY);
@@ -92,6 +94,8 @@ public interface ExpressionExecutorStrategy {
 
     ExpressionKind KIND_BUSINESS_DATA = new ExpressionKind(TYPE_BUSINESS_DATA);
 
+    ExpressionKind KIND_QUERY_BUSINESS_DATA = new ExpressionKind(TYPE_QUERY_BUSINESS_DATA);
+
     /**
      * This list must contain only types with no dependencies
      */
@@ -101,7 +105,7 @@ public interface ExpressionExecutorStrategy {
     /**
      * @param expression
      *            the expression to evaluate
-     * @param dependencyValues
+     * @param context
      *            map containing the result of the evaluation of dependencies
      *            and also informations about the context of evaluation given by {@link #CONTAINER_ID_KEY} and {@link #CONTAINER_TYPE_KEY}
      * @return
@@ -109,8 +113,8 @@ public interface ExpressionExecutorStrategy {
      * @throws SExpressionEvaluationException
      * @throws SExpressionDependencyMissingException
      */
-    Object evaluate(SExpression expression, Map<String, Object> dependencyValues, Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException;
+    Object evaluate(SExpression expression, Map<String, Object> context, Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException,
+            SExpressionDependencyMissingException;
 
     /**
      * Validate the expression, an exception is thrown it is invalid
@@ -125,7 +129,7 @@ public interface ExpressionExecutorStrategy {
 
     ExpressionKind getExpressionKind();
 
-    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> dependencyValues, Map<Integer, Object> resolvedExpressions)
+    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> context, Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**

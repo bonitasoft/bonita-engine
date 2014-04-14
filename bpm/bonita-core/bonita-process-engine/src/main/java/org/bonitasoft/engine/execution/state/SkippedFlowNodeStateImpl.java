@@ -28,7 +28,6 @@ public class SkippedFlowNodeStateImpl implements FlowNodeState {
     public SkippedFlowNodeStateImpl() {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) {
         return StateCode.DONE;
@@ -59,13 +58,11 @@ public class SkippedFlowNodeStateImpl implements FlowNodeState {
         return true;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;

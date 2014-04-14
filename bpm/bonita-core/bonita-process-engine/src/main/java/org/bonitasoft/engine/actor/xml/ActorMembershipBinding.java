@@ -30,12 +30,10 @@ public class ActorMembershipBinding extends ElementBinding {
     public ActorMembershipBinding() {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("role".equals(name)) {
@@ -46,7 +44,6 @@ public class ActorMembershipBinding extends ElementBinding {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

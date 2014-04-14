@@ -36,7 +36,6 @@ public class RoleBinding extends ElementBinding {
         roleCreator = new RoleCreator(name);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.DISPLAY_NAME.equals(name)) {
@@ -50,7 +49,6 @@ public class RoleBinding extends ElementBinding {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }
