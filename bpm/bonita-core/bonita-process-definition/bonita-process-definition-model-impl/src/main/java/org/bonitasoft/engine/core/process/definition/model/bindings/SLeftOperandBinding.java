@@ -39,12 +39,10 @@ public class SLeftOperandBinding extends ElementBinding {
         type = attributes.get(XMLSProcessDefinition.LEFT_OPERAND_TYPE);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

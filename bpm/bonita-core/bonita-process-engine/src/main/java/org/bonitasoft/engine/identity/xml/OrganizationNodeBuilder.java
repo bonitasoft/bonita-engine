@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.identity.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.XMLNode;
 
@@ -33,52 +35,103 @@ public class OrganizationNodeBuilder {
 
     static final List<Class<? extends ElementBinding>> BINDINGS = new ArrayList<Class<? extends ElementBinding>>();
 
-    private static final String NAMESPACE = "http://www.bonitasoft.org/ns/organization/6.0.0-beta-016";
+    private static final String NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema";
 
     private static final String NS_PREFIX = "organization";
 
     static {
         BINDINGS.add(OrganizationBinding.class);
+        BINDINGS.add(CustomUserInfoDefinitionBinding.class);
         BINDINGS.add(UserBinding.class);
         BINDINGS.add(PersonalContactDataBinding.class);
         BINDINGS.add(ProfessionalContactDataBinding.class);
+        BINDINGS.add(CustomUserInfoValueBinding.class);
         BINDINGS.add(RoleBinding.class);
         BINDINGS.add(GroupBinding.class);
         BINDINGS.add(MembershipBinding.class);
     }
+    
+    
+    private OrganizationNodeBuilder() {
+    }
 
-    public static XMLNode getDocument(final List<ExportedUser> users, final Map<Long, String> userNames, final List<Group> groups,
-            final Map<Long, String> groupIdParentPath, final List<Role> roles, final List<UserMembership> userMemberships) {
+    public static XMLNode getDocument(Organization organization, final Map<Long, String> userNames, final Map<Long, String> groupIdParentPath) {
         final XMLNode document = getRootNode();
+        addCustomUserInfoDefinitions(organization.getCustomUserInfoDefinitions(), document);
+        addUsers(organization.getUsers(), document);
+        addRoles(organization.getRole(), document);
+        addGroups(organization.getGroup(), document);
+        addMemberships(userNames, groupIdParentPath, organization.getMemberships(), document);
+        return document;
+    }
 
+    private static void addCustomUserInfoDefinitions(List<SCustomUserInfoDefinition> customUserInfoDefinitions, XMLNode document) {
+        final XMLNode userInfoDefsNode = new XMLNode(OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITIONS);
+        document.addChild(userInfoDefsNode);
+        for (final SCustomUserInfoDefinition userInfoDef : customUserInfoDefinitions) {
+            final XMLNode userNode = getCustomUserInfoDefinitionNode(userInfoDef);
+            userInfoDefsNode.addChild(userNode);
+        }
+    }
+
+    private static XMLNode getCustomUserInfoDefinitionNode(SCustomUserInfoDefinition userInfoDef) {
+        final XMLNode userInfDefNode = new XMLNode(OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITION);
+        addCustomUserInfoDefinitionName(userInfoDef, userInfDefNode);
+        addCustomUserInfoDefinitionDescription(userInfoDef, userInfDefNode);
+        return userInfDefNode;
+    }
+
+    private static void addCustomUserInfoDefinitionName(SCustomUserInfoDefinition userInfoDef, final XMLNode userInfDefNode) {
+        if (userInfoDef.getName() != null) {
+            final XMLNode node = new XMLNode(OrganizationMappingConstants.NAME);
+            node.setContent(userInfoDef.getName());
+            userInfDefNode.addChild(node);
+        }
+    }
+
+    private static void addCustomUserInfoDefinitionDescription(SCustomUserInfoDefinition userInfoDef, final XMLNode userInfDefNode) {
+        if (userInfoDef.getDescription() != null) {
+            final XMLNode node = new XMLNode(OrganizationMappingConstants.DESCRIPTION);
+            node.setContent(userInfoDef.getDescription());
+            userInfDefNode.addChild(node);
+        }
+    }
+
+    private static void addUsers(final List<ExportedUser> users, final XMLNode document) {
         final XMLNode usersNode = new XMLNode(OrganizationMappingConstants.USERS);
         document.addChild(usersNode);
         for (final ExportedUser user : users) {
             final XMLNode userNode = getUserNode(user);
             usersNode.addChild(userNode);
         }
+    }
 
+    private static void addRoles(final List<Role> roles, final XMLNode document) {
         final XMLNode rolesNodes = new XMLNode(OrganizationMappingConstants.ROLES);
         document.addChild(rolesNodes);
         for (final Role role : roles) {
             final XMLNode roleNode = getRoleNode(role);
             rolesNodes.addChild(roleNode);
         }
+    }
 
+    private static void addGroups(final List<Group> groups, final XMLNode document) {
         final XMLNode groupsNode = new XMLNode(OrganizationMappingConstants.GROUPS);
         document.addChild(groupsNode);
         for (final Group group : groups) {
             final XMLNode groupNode = getGroupNode(group);
             groupsNode.addChild(groupNode);
         }
+    }
 
+    private static void addMemberships(final Map<Long, String> userNames, final Map<Long, String> groupIdParentPath,
+            final List<UserMembership> userMemberships, final XMLNode document) {
         final XMLNode membershipsNode = new XMLNode(OrganizationMappingConstants.MEMBERSHIPS);
         document.addChild(membershipsNode);
         for (final UserMembership userMembership : userMemberships) {
             final XMLNode membershipNode = getMembershipNode(userNames, groupIdParentPath, userMembership);
             membershipsNode.addChild(membershipNode);
         }
-        return document;
     }
 
     private static XMLNode getMembershipNode(final Map<Long, String> userNames, final Map<Long, String> groupIdParentPath, final UserMembership membership) {
@@ -170,56 +223,102 @@ public class OrganizationNodeBuilder {
     private static XMLNode getUserNode(final ExportedUser user) {
         final XMLNode userNode = new XMLNode(OrganizationMappingConstants.USER);
         userNode.addAttribute(OrganizationMappingConstants.USER_NAME, user.getUserName());
+        addPasswordNode(user, userNode);
+        addFirstNameNode(user, userNode);
+        addLastNameNode(user, userNode);
+        addIconNameNode(user, userNode);
+        addIconPathNode(user, userNode);
+        addTitleNode(user, userNode);
+        addJobTitleNode(user, userNode);
+        addEnabledNode(user, userNode);
+        addPersonalDataNode(user, userNode);
+        addProfessionalDataNode(user, userNode);
+        addCustomUserInfoValuesNode(user.getCustomUserInfoValues(), userNode);
+        addManagerNode(user, userNode);
+        return userNode;
+    }
+
+    private static void addCustomUserInfoValuesNode(List<ExportedCustomUserInfoValue> userInfoValues, XMLNode userNode) {
+        userNode.addChild(CustomUserInfoValueNodeBuilder.buildNode(userInfoValues));
+    }
+
+    private static void addPasswordNode(final ExportedUser user, final XMLNode userNode) {
         final XMLNode nodePassword = new XMLNode(OrganizationMappingConstants.PASSWORD);
         nodePassword.addAttribute(OrganizationMappingConstants.PASSWORD_ENCRYPTED, "true");
         nodePassword.setContent(user.getPassword());
         userNode.addChild(nodePassword);
+    }
+
+    private static void addFirstNameNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getFirstName() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.FIRST_NAME);
             node.setContent(user.getFirstName());
             userNode.addChild(node);
         }
+    }
+
+    private static void addLastNameNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getLastName() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.LAST_NAME);
             node.setContent(user.getLastName());
             userNode.addChild(node);
         }
+    }
+
+    private static void addIconNameNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getIconName() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_NAME);
             node.setContent(user.getIconName());
             userNode.addChild(node);
         }
+    }
+
+    private static void addIconPathNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getIconPath() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_PATH);
             node.setContent(user.getIconPath());
             userNode.addChild(node);
         }
+    }
+
+    private static void addTitleNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getTitle() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.TITLE);
             node.setContent(user.getTitle());
             userNode.addChild(node);
         }
+    }
+
+    private static void addJobTitleNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getJobTitle() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.JOB_TITLE);
             node.setContent(user.getJobTitle());
             userNode.addChild(node);
         }
+    }
+
+    private static void addEnabledNode(final ExportedUser user, final XMLNode userNode) {
         final XMLNode enabledNode = new XMLNode(OrganizationMappingConstants.ENABLED);
         enabledNode.setContent(user.isEnabled() ? "true" : "false");
         userNode.addChild(enabledNode);
+    }
 
+    private static void addPersonalDataNode(final ExportedUser user, final XMLNode userNode) {
         final XMLNode personalDataNode = getPersonalDataNode(user);
         userNode.addChild(personalDataNode);
+    }
 
+    private static void addProfessionalDataNode(final ExportedUser user, final XMLNode userNode) {
         final XMLNode professionalDataNode = getProfessionalDataNode(user);
         userNode.addChild(professionalDataNode);
+    }
 
+    private static void addManagerNode(final ExportedUser user, final XMLNode userNode) {
         if (user.getManagerUserName() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.MANAGER);
             node.setContent(user.getManagerUserName());
             userNode.addChild(node);
         }
-        return userNode;
     }
 
     private static XMLNode getPersonalDataNode(final ExportedUser user) {

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStra
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -48,9 +49,18 @@ public class AssignmentOperationExecutorStrategyTest {
 
     private SExpressionContext expressionContext;
 
+    @Before
+    public void initMocks() {
+        operation = mock(SOperation.class);
+        value = "value";
+        expressionContext = mock(SExpressionContext.class);
+        leftOperand = mock(SLeftOperand.class);
+        when(operation.getLeftOperand()).thenReturn(leftOperand);
+        when(leftOperand.getName()).thenReturn("var");
+    }
+
     @Test
     public void testGetValue() throws Exception {
-        initMocks();
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
         when(leftOperand.getType()).thenReturn(SLeftOperand.DATA);
         Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
@@ -59,7 +69,6 @@ public class AssignmentOperationExecutorStrategyTest {
 
     @Test
     public void testGetValueOnExternalData() throws Exception {
-        initMocks();
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.EXTERNAL_DATA);
@@ -69,19 +78,10 @@ public class AssignmentOperationExecutorStrategyTest {
 
     @Test(expected = SOperationExecutionException.class)
     public void testGetValueWithWrongType() throws Exception {
-        initMocks();
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.DATA);
         assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
     }
 
-    private void initMocks() {
-        operation = mock(SOperation.class);
-        value = "value";
-        expressionContext = mock(SExpressionContext.class);
-        leftOperand = mock(SLeftOperand.class);
-        when(operation.getLeftOperand()).thenReturn(leftOperand);
-        when(leftOperand.getName()).thenReturn("var");
-    }
 }

@@ -21,6 +21,8 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
  */
 public class ServerAPIFactory {
 
+    private static final String SERVER_API_CLASS_NOT_FOUND = "Cannot load class %s. Platform property 'serverApi' may not be set.";
+
     private static ServerAPIFactory _instance;
 
     private final BonitaHomeServer bonitaHomeServer;
@@ -42,9 +44,9 @@ public class ServerAPIFactory {
         try {
             return (ServerAPI) Class.forName(serverAPIClassName).newInstance();
         } catch (RuntimeException e) {
-            throw e;
+            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         } catch (Exception e) {
-            throw new ExceptionInInitializerError(e);
+            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         }
     }
 
@@ -54,9 +56,9 @@ public class ServerAPIFactory {
             Class<?> serverApiClass = Class.forName(serverAPIClassName);
             return (ServerAPI) serverApiClass.getConstructor(boolean.class).newInstance(cleanSession);
         } catch (RuntimeException e) {
-            throw e;
+            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         } catch (Exception e) {
-            throw new ExceptionInInitializerError(e);
+            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         }
     }
 

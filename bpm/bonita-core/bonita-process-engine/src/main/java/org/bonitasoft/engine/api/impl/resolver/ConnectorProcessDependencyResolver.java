@@ -34,9 +34,8 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ConnectorProcessDependencyResolver extends ProcessDependencyResolver {
+public class ConnectorProcessDependencyResolver implements ProcessDependencyResolver {
 
-    @SuppressWarnings("unused")
     @Override
     public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
             throws ConnectorException {

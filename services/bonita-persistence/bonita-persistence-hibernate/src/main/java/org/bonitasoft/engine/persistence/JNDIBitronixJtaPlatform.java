@@ -15,7 +15,7 @@ package org.bonitasoft.engine.persistence;
 
 import javax.transaction.TransactionManager;
 
-import org.hibernate.engine.transaction.jta.platform.internal.BitronixJtaPlatform;
+import org.hibernate.service.jta.platform.internal.BitronixJtaPlatform;
 
 /**
  * @author Laurent Vaills

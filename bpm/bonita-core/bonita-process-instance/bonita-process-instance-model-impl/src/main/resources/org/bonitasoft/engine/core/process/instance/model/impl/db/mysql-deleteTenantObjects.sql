@@ -8,3 +8,4 @@ DELETE FROM process_instance WHERE tenantid = ${tenantid};
 DELETE FROM flownode_instance WHERE tenantid = ${tenantid};
 DELETE FROM token WHERE tenantid = ${tenantid};
 DELETE FROM breakpoint WHERE tenantid = ${tenantid};
+DELETE FROM ref_biz_data_inst WHERE tenantid = ${tenantid};

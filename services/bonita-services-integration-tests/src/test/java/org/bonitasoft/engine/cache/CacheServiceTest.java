@@ -78,22 +78,18 @@ public class CacheServiceTest {
         cacheConfigurations.setConfigurations(configurationsList);
         return new EhCacheCacheService(new TechnicalLoggerService() {
 
-            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
             }
 
-            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
             }
 
-            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
             }
 
-            @SuppressWarnings("unused")
             @Override
             public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
                 return false;

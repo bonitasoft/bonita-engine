@@ -21,23 +21,14 @@ import org.bonitasoft.engine.identity.model.SNamedElement;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class SNamedElementImpl extends SPersistentObjectImpl implements SNamedElement {
+public abstract class SNamedElementImpl extends SSingleNamedElementImpl implements SNamedElement {
 
     private static final long serialVersionUID = 4982939032656177720L;
 
-    private String name;
-
     private String displayName;
-
-    private String description;
 
     public SNamedElementImpl() {
         super();
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 
     @Override
@@ -45,61 +36,32 @@ public abstract class SNamedElementImpl extends SPersistentObjectImpl implements
         return this.displayName;
     }
 
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
     @Override
-    public boolean equals(final Object obj) {
-        if (!super.equals(obj)) {
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final SNamedElementImpl other = (SNamedElementImpl) obj;
-        if (this.description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!this.description.equals(other.description)) {
+        if (!super.equals(o)) {
             return false;
         }
-        if (this.displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!this.displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (this.name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!this.name.equals(other.name)) {
-            return false;
-        }
-        return true;
+
+        SNamedElementImpl that = (SNamedElementImpl) o;
+
+        return !(displayName != null ? !displayName.equals(that.displayName) : that.displayName != null);
+
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (this.description == null ? 0 : this.description.hashCode());
-        result = prime * result + (this.displayName == null ? 0 : this.displayName.hashCode());
-        result = prime * result + (this.name == null ? 0 : this.name.hashCode());
+        int result = super.hashCode();
+        result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
         return result;
     }
-
 }

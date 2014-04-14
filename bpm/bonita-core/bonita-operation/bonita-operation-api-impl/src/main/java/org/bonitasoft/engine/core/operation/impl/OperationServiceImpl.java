@@ -80,11 +80,7 @@ public class OperationServiceImpl implements OperationService {
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         // retrieve all left operand to set and put it in context
         // TODO implement batch retrieve in leftOperandHandlers
-        try {
-            retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
-        } catch (SBonitaReadException e) {
-            throw new SOperationExecutionException("Unable to retrieve value for all operations", e);
-        }
+        retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
 
         // execute operation and put it in context again
         executeOperators(operations, expressionContext);
@@ -98,7 +94,7 @@ public class OperationServiceImpl implements OperationService {
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         for (SOperation operation : operations) {
             SLeftOperand leftOperand = operation.getLeftOperand();
-            getLeftOperandHandler(leftOperand).update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()), leftOperandContainerId,
+            getLeftOperandHandler(leftOperand).update(leftOperand, expressionContext.getInputValues(), leftOperandContainerId,
                     leftOperandContainerType);
         }
     }
@@ -124,17 +120,23 @@ public class OperationServiceImpl implements OperationService {
 
     private void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long dataContainerId,
             final String dataContainerType, final SExpressionContext expressionContext)
-            throws SOperationExecutionException, SBonitaReadException {
+            throws SOperationExecutionException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
 
         for (final SOperation operation : operations) {
             // this operation will set a data, we retrieve it and put it in context
             SLeftOperand leftOperand = operation.getLeftOperand();
-            Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
-                    new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
+            Object retrieve;
+            try {
+                retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
+                        new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
+            } catch (SBonitaReadException e) {
+                throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
+            }
             if (retrieve != null /* some left operand don't retrieve it, e.g. document, it's heavy */&& !inputValues.containsKey(leftOperand.getName())) {
                 inputValues.put(leftOperand.getName(), retrieve);
             }
+
         }
     }
 

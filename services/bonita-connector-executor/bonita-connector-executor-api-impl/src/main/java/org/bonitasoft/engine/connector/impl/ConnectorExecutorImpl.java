@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -117,7 +118,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
-    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }
@@ -160,7 +160,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                     final long sessionId = sessionAccessor.getSessionId();
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(sessionId);
-                } catch (SessionIdNotSetException e) {
+                } catch (final SessionIdNotSetException e) {
                     // nothing, no session has been created
                 }
             }
@@ -205,19 +205,19 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                 if (!threadPoolExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
                     loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout (5s) trying to stop the connector executor thread pool.");
                 }
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool.", e);
             }
         }
     }
 
     @Override
-    public void pause() {
+    public void pause() throws SBonitaException {
         // nothing to do
     }
 
     @Override
-    public void resume() {
+    public void resume() throws SBonitaException {
         // nothing to do
     }
 }

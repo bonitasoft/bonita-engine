@@ -69,14 +69,12 @@ public abstract class FlowElementInstanceServiceImpl implements FlowElementInsta
         return persistenceRead;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public List<SAFlowElementInstance> searchArchivedFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions) {
         // FIXME Implement me!
         return null;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public long getNumberOfArchivedFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions countOptions) {
         // FIXME Implement me!

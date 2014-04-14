@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.expression.model;
 
 /**
+ * FIXME: this class is only used in tests. Delete it.
+ * 
  * @author Zhao na
  * @author Emmanuel Duchastenier
  */

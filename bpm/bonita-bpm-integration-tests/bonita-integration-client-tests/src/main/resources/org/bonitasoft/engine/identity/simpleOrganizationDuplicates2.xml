@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+	<customUserInfoDefinitions>
+		<customUserInfoDefinition>
+			<name>Office location</name>
+			<description>The office location</description>
+		</customUserInfoDefinition>
+		<customUserInfoDefinition>
+			<name>Skills</name>
+			<description>The user skills were updated</description>
+		</customUserInfoDefinition>
+	</customUserInfoDefinitions>
   <users>
     <user userName="johnnyfootball">
       <password encrypted="false">bpm</password>
@@ -13,6 +23,16 @@
       <enabled>true</enabled>
       <personalData/>
       <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java, Groovy</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
     </user>
   </users>
   <roles>

@@ -131,4 +131,15 @@ public class LeftOperandBuilder {
         return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
     }
 
+    /**
+     * creates a <code>LeftOperand</code> object to set a data, with a default value of external to false (data will be updated in Bonita system)
+     * 
+     * @param dataName
+     *            the name of the data to set
+     * @return the newly created <code>LeftOperand</code> object
+     */
+    public LeftOperand createBusinessDataLeftOperand(final String dataName) {
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
+    }
+
 }

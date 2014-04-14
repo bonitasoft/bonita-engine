@@ -29,6 +29,8 @@ public interface SLeftOperand extends Serializable {
 
     public static String DATA = "DATA";
 
+    public static String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
+
     String getName();
 
     String getType();

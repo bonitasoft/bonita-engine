@@ -33,6 +33,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ActorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ActorInitiatorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.AutomaticTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.BoundaryEventDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.BusinessDataDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CallActivityDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CallableElementBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CallableElementVersionBinding;
@@ -139,6 +140,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(ExpressionBinding.class);
         bindings.add(ConditionalExpressionBinding.class);
         bindings.add(DataDefinitionBinding.class);
+        bindings.add(BusinessDataDefinitionBinding.class);
         bindings.add(TextDataDefinitionBinding.class);
         bindings.add(DocumentDefinitionBinding.class);
         bindings.add(DefaultValueBinding.class);

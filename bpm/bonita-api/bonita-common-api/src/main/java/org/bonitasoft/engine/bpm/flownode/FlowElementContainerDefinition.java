@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.BaseElement;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -77,5 +78,7 @@ public interface FlowElementContainerDefinition extends BaseElement {
     FlowNodeDefinition getFlowNode(long sourceId);
 
     FlowNodeDefinition getFlowNode(String sourceName);
+    
+    List<BusinessDataDefinition> getBusinessDataDefinitions();
 
 }

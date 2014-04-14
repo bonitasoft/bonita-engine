@@ -1,24 +1,25 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-    <bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
-        <property name="shouldStartScheduler" value="true" />
-        <property name="shouldRestartElements" value="true" />
-        <property name="TenantRestartHandlers">
-            <list>
-                <bean class="org.bonitasoft.engine.execution.work.RestartFlowNodesHandler" />
-                <bean class="org.bonitasoft.engine.execution.work.RestartProcessHandler" />
-                <bean class="org.bonitasoft.engine.execution.work.BPMEventWorksHandler" />
-            </list>
-        </property>
-      
-        <property name="restartHandlers">
-            <list>
-                <ref bean="schedulerServiceRestartHandler" />
-            </list>
-        </property>
-    </bean>
-    <bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
-        <constructor-arg name="schedulerService" ref="scheduler" />
-    </bean>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
+		<property name="shouldStartScheduler" value="true" />
+		<property name="shouldRestartElements" value="true" />
+		<property name="TenantRestartHandlers">
+			<list>
+				<bean class="org.bonitasoft.engine.execution.work.RestartFlowNodesHandler" />
+				<bean class="org.bonitasoft.engine.execution.work.RestartProcessHandler" />
+				<bean class="org.bonitasoft.engine.execution.work.BPMEventWorksHandler" />
+			</list>
+		</property>
+		<property name="restartHandlers">
+			<list>
+				<ref bean="schedulerServiceRestartHandler" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
+		<constructor-arg name="schedulerService" ref="scheduler" />
+	</bean>
+
 </beans>

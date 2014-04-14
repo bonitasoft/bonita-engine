@@ -31,9 +31,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final SExpression dependency = expression.getDependencies().get(0);
         final Object object = resolvedExpressions.get(dependency.getDiscriminant());
@@ -60,11 +59,11 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final List<Object> result = new ArrayList<Object>(2);
         for (final SExpression expression : expressions) {
-            result.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            result.add(evaluate(expression, context, resolvedExpressions));
         }
         return result;
     }

@@ -55,7 +55,6 @@ public class SMigrationPlanBinding extends ElementBinding {
         targetVersion = attributes.get(XMLSMigrationPlan.TARGET_VERSION);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2104 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,10 +13,13 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.SIdentityException;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -25,6 +28,7 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public interface ImportOrganizationStrategy {
 
@@ -32,8 +36,10 @@ public interface ImportOrganizationStrategy {
 
     void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws ImportDuplicateInOrganizationException, SIdentityException;
 
-    void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException, SIdentityException;
+    void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SBonitaException;
 
     void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException, SIdentityException;
+
+    void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition, CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException;
 
 }

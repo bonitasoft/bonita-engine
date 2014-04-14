@@ -43,7 +43,6 @@ public abstract class SFlowNodeDefinitionBinding extends SNamedElementBinding {
 
     private SExpression displayDescriptionAfterCompletion;
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

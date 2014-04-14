@@ -25,10 +25,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
- * 
- * 
  * Work that is responsible of executing a flow node.
- * 
  * If the execution fails it will put the flow node in failed state
  * 
  * @author Baptiste Mesta
@@ -40,7 +37,8 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     private static final long serialVersionUID = -5873526992671300038L;
 
     public static enum Type {
-        PROCESS, FLOWNODE;
+        PROCESS,
+        FLOWNODE;
     }
 
     private final long flowNodeInstanceId;
@@ -51,8 +49,8 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     private final long processInstanceId;
 
-    ExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations,
-            final SExpressionContext contextDependency, final long processInstanceId) {
+    ExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations, final SExpressionContext contextDependency,
+            final long processInstanceId) {
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.operations = operations;
         this.contextDependency = contextDependency;
@@ -75,13 +73,12 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
         tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
-        UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
+        final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
         userTransactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 

@@ -13,10 +13,13 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import java.util.List;
+
 /**
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public interface ExportedUser {
 
@@ -101,5 +104,7 @@ public interface ExportedUser {
     String getProfessionalCountry();
 
     String getProfessionalWebsite();
+    
+    List<ExportedCustomUserInfoValue> getCustomUserInfoValues();
 
 }

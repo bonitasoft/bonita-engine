@@ -15,6 +15,9 @@
  */
 package org.bonitasoft.engine.core.operation;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -33,9 +36,26 @@ public interface LeftOperandHandler {
 
     String getType();
 
+    /**
+     * 
+     * @param sLeftOperand
+     * @param inputValues
+     *            contains value(s) given by the strategy to udpdate the left operand with
+     * @param containerId
+     * @param containerType
+     * @throws SOperationExecutionException
+     */
     // TODO batch method
     void update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
-
+    
+    /**
+     * 
+     * @param sLeftOperand
+     * @param expressionContext
+     * @return
+     *         objects retrieved by this handler to be put in the context for further updates
+     * @throws SBonitaReadException
+     */
     // TODO batch method
     Object retrieve(SLeftOperand sLeftOperand, SExpressionContext expressionContext) throws SBonitaReadException;
 }

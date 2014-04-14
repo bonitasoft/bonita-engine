@@ -48,7 +48,6 @@ public class SProcessDefinitionBinding extends SNamedElementBinding {
         version = attributes.get(XMLSProcessDefinition.VERSION);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

@@ -49,9 +49,9 @@ ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId
 GO
 -- ALTER TABLE migration_plan DROP CONSTRAINT fk_migration_plan_tenantId
 GO
-ALTER TABLE p_metadata_def DROP CONSTRAINT fk_p_metadata_def_tenantId
+ALTER TABLE custom_usr_inf_def DROP CONSTRAINT fk_custom_usr_inf_def_tenantId
 GO
-ALTER TABLE p_metadata_val DROP CONSTRAINT fk_p_metadata_val_tenantId
+ALTER TABLE custom_usr_inf_val DROP CONSTRAINT fk_custom_usr_inf_val_tenantId
 GO
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_tenantId
 GO
@@ -70,6 +70,8 @@ GO
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_tenantId
 GO
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId
+GO
+ALTER TABLE ref_biz_data_inst DROP CONSTRAINT fk_ref_biz_data_inst_tenantId
 GO
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId
 GO

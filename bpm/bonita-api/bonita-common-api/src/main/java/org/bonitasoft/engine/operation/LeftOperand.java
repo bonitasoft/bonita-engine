@@ -25,6 +25,8 @@ public interface LeftOperand extends Serializable {
 
     static String TYPE_DATA = "DATA";
 
+    static String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
+
     static String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
 
     static String TYPE_DOCUMENT = "DOCUMENT";
