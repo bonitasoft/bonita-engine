@@ -94,7 +94,7 @@ public class OperationServiceImpl implements OperationService {
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         for (SOperation operation : operations) {
             SLeftOperand leftOperand = operation.getLeftOperand();
-            getLeftOperandHandler(leftOperand).update(leftOperand, expressionContext.getInputValues(), leftOperandContainerId,
+            getLeftOperandHandler(leftOperand).update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()), leftOperandContainerId,
                     leftOperandContainerType);
         }
     }
