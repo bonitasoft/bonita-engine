@@ -138,8 +138,8 @@ public class ClusterTests extends CommonAPISPTest {
         // Input expression
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
-        designProcessDefinition.addActor("actor");
-        UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", "actor");
+        designProcessDefinition.addActor(ACTOR_NAME);
+        UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
                 .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
@@ -154,9 +154,7 @@ public class ClusterTests extends CommonAPISPTest {
                 "TestConnectorWithOutput.impl",
                 TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser("actor", user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
 
         // start it on node 2
         changeToNode2();
@@ -183,7 +181,7 @@ public class ClusterTests extends CommonAPISPTest {
         // Input expression
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
-        designProcessDefinition.addActor("actor");
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addStartEvent("start");
         // create 10 tasks that set a data with the node name
         for (int i = 1; i <= 10; i++) {
@@ -193,12 +191,12 @@ public class ClusterTests extends CommonAPISPTest {
                             "data" + i,
                             new ExpressionBuilder().createGroovyScriptExpression("getNodeName", "return System.getProperty(\"node.name\");",
                                     String.class.getName())));
-            designProcessDefinition.addUserTask("step" + i, "actor");
+            designProcessDefinition.addUserTask("step" + i, ACTOR_NAME);
             designProcessDefinition.addTransition("start", "autoStep" + i);
             designProcessDefinition.addTransition("autoStep" + i, "step" + i);
         }
 
-        ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "actor", user);
+        ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait the all automatic task finish
         waitForPendingTasks(user.getId(), 10);
@@ -339,7 +337,7 @@ public class ClusterTests extends CommonAPISPTest {
             InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
-        designProcessDefinition.addActor("actor");
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addStartEvent("start");
         designProcessDefinition.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("none"));
         designProcessDefinition.addIntermediateCatchEvent("timer1").addTimerEventTriggerDefinition(TimerType.DURATION,
@@ -352,14 +350,13 @@ public class ClusterTests extends CommonAPISPTest {
                         new ExpressionBuilder().createGroovyScriptExpression("getNodeName",
                                 "System.setProperty('" + systemProperty + "','true');return System.getProperty(\"node.name\");",
                                 String.class.getName())));
-        designProcessDefinition.addUserTask("step", "actor");
+        designProcessDefinition.addUserTask("step", ACTOR_NAME);
         designProcessDefinition.addTransition("start", "timer1");
         designProcessDefinition.addTransition("timer1", "timer2");
         designProcessDefinition.addTransition("timer2", "autoStep");
         designProcessDefinition.addTransition("autoStep", "step");
 
-        ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "actor", user);
-        return processDefinition;
+        return deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
     }
 
 }

@@ -27,7 +27,6 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -129,7 +128,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         designProcessDefinition.addIntegerData(dataName, null);
-        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, businessUser.getId());
+        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, businessUser);
     }
 
     private void createAndDeployProcess2() throws Exception {
@@ -145,7 +144,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
-        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, businessUser.getId());
+        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, businessUser);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
@@ -367,7 +366,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         subProcessDefinitionBuilder.addShortTextData("subProcessData", null);
         subProcessDefinitionBuilder.addUserTask("step2", ACTOR_NAME).addEndEvent("end").addTerminateEventTrigger();
         subProcessDefinitionBuilder.addTransition("step2", "end");
-        final ProcessDefinition subProcessDefinition = deployProcessWithExternalTestConnector(subProcessDefinitionBuilder, ACTOR_NAME, businessUser.getId());
+        final ProcessDefinition subProcessDefinition = deployProcessWithExternalTestConnector(subProcessDefinitionBuilder, ACTOR_NAME, businessUser);
 
         final String inputName1 = "valueOfInput1";
         final String mainInputName1 = "param1";
@@ -550,18 +549,15 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         return inputValues;
     }
 
-    private ProcessDefinition deployProcessWithExternalTestConnector(final ProcessDefinitionBuilder designProcessDefinition, final String delivery,
-            final long userId) throws BonitaException, IOException {
+    private ProcessDefinition deployProcessWithExternalTestConnector(final ProcessDefinitionBuilder designProcessDefinition, final String actorName,
+            final User user) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
 
         addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestExternalConnector.impl", "TestExternalConnector.impl",
                 TestExternalConnector.class, "TestExternalConnector.jar");
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
@@ -587,10 +583,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
-        final BusinessArchive businessArchive = builder.done();
-        processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser("myActor", businessUser.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        processDefinition = deployAndEnableWithActor(builder.done(), "myActor", businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
         final ActivityInstance userTaskInstance = waitForUserTask("Request", processInstance);
