@@ -47,7 +47,6 @@ public abstract class CommonAPITest extends APITestUtil {
             LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void failed(final Throwable cause, final Description d) {
             try {

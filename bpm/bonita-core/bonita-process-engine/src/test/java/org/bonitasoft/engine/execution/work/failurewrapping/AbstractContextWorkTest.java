@@ -37,7 +37,6 @@ import org.mockito.Spy;
 
 /**
  * @author Aurelien Pupier
- * 
  */
 public abstract class AbstractContextWorkTest {
 
@@ -64,7 +63,6 @@ public abstract class AbstractContextWorkTest {
 
     protected TxInHandleFailureWrappingWork txBonitawork;
 
-    @SuppressWarnings("unused")
     @Before
     public void before() throws SBonitaException {
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);

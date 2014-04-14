@@ -32,13 +32,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
-    public AbortingCallActivityStateImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final SCommentService commentService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService) {
-        super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService,
-                dataInstanceService, documentMappingService, logger, processDefinitionService, connectorInstanceService);
+    public AbortingCallActivityStateImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
+            final ContainerRegistry containerRegistry, final ArchiveService archiveService, final SCommentService commentService,
+            final DataInstanceService dataInstanceService, final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
+        super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService, dataInstanceService, documentMappingService,
+                logger, processDefinitionService, connectorInstanceService);
     }
 
     @Override
@@ -56,13 +55,11 @@ public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionSt
         return SStateCategory.ABORTING;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "aborting call activity";

@@ -28,7 +28,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
-public class QuartzSchedulerExecutorIT {
+public class QuartzSchedulerExecutorITest {
 
     private Scheduler scheduler;
 

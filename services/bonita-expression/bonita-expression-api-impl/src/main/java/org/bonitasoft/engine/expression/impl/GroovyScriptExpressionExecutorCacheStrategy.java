@@ -72,8 +72,9 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
         if (script != null && script.getClass().getClassLoader() != shell.getClassLoader()) {
             script = null;
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG))
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Invalidating script from cache because of outdated ClassLoader ...");
+            }
         }
 
         if (script == null) {
@@ -103,15 +104,14 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         return shell;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         final String expressionName = expression.getName();
         try {
-            final Script script = getScriptFromCache(expressionContent, (Long) dependencyValues.get(DEFINITION_ID));
-            final Binding binding = new Binding(dependencyValues);
+            final Script script = getScriptFromCache(expressionContent, (Long) context.get(DEFINITION_ID));
+            final Binding binding = new Binding(context);
             script.setBinding(binding);
             return script.run();
         } catch (final MissingPropertyException e) {
@@ -143,11 +143,11 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions));
         }
         return list;
     }

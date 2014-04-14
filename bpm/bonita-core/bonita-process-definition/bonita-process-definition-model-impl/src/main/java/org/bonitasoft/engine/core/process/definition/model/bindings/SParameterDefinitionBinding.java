@@ -44,7 +44,6 @@ public class SParameterDefinitionBinding extends SNamedElementBinding {
         return XMLSProcessDefinition.PARAMETER_NODE;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DESCRIPTION.equals(name)) {
@@ -52,7 +51,6 @@ public class SParameterDefinitionBinding extends SNamedElementBinding {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

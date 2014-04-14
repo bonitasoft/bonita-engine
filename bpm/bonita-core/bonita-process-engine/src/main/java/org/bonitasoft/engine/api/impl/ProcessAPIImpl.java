@@ -1549,8 +1549,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private Set<Long> getActorsForUser(final long userId, final ActorMappingService actorMappingService, final ProcessDefinitionService definitionService)
             throws SBonitaReadException, SProcessDefinitionReadException {
-        final long numberOfProcesses = definitionService.getNumberOfProcessDeploymentInfo(ActivationState.ENABLED);
-        final List<Long> processDefIds = definitionService.getProcessDefinitionIds(ActivationState.ENABLED, 0, numberOfProcesses);// FIXME dirty....
+        final List<Long> processDefIds = definitionService.getProcessDefinitionIds(ActivationState.ENABLED, 0, Integer.MAX_VALUE);
         final HashSet<Long> processDefinitionIds = new HashSet<Long>(processDefIds);
         if (processDefinitionIds.isEmpty()) {
             return Collections.emptySet();
@@ -2103,8 +2102,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            final long numberOfProcessDefinitions = processDefinitionService.getNumberOfProcessDeploymentInfos();
-            final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, numberOfProcessDefinitions);
+            final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE);
             long number;
             if (processDefinitionIds.isEmpty()) {
                 number = 0;
@@ -2125,8 +2123,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            final long numberOfProcessDefinitions = processDefinitionService.getNumberOfProcessDeploymentInfos();
-            final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, numberOfProcessDefinitions);
+            final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE);
             processDefinitionIds.removeAll(categoryService.getCategorizedProcessIds(processDefinitionIds));
             OrderByType order;
             switch (sortCriterion) {

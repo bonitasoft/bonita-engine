@@ -208,7 +208,7 @@ public interface ProcessDefinitionService {
      * @return the paginated list of process definition identifiers or an empty list
      * @throws SProcessDefinitionReadException
      */
-    List<Long> getProcessDefinitionIds(ActivationState activationState, int fromIndex, long numberOfResult) throws SProcessDefinitionReadException;
+    List<Long> getProcessDefinitionIds(ActivationState activationState, int fromIndex, int numberOfResult) throws SProcessDefinitionReadException;
 
     /**
      * Get the process definition identifiers.
@@ -220,7 +220,7 @@ public interface ProcessDefinitionService {
      * @return the paginated list of process definition identifiers or an empty list
      * @throws SProcessDefinitionReadException
      */
-    List<Long> getProcessDefinitionIds(int fromIndex, long numberOfResult) throws SProcessDefinitionReadException;
+    List<Long> getProcessDefinitionIds(int fromIndex, int numberOfResult) throws SProcessDefinitionReadException;
 
     /**
      * Get target flow node for the given source flow node in the specific process

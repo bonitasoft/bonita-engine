@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -47,9 +47,9 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> map, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        return evaluate(Collections.singletonList(expression), map, resolvedExpressions).get(0);
+        return evaluate(Collections.singletonList(expression), context, resolvedExpressions).get(0);
     }
 
     @Override
@@ -66,17 +66,16 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         return KIND_VARIABLE;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         final int maxExpressionSize = expressions.size();
         final ArrayList<String> dataNames = new ArrayList<String>(maxExpressionSize);
         final HashMap<String, Serializable> results = new HashMap<String, Serializable>(maxExpressionSize);
         for (final SExpression sExpression : expressions) {
             final String dataName = sExpression.getContent();
-            if (dependencyValues.containsKey(dataName)) {
-                final Serializable value = (Serializable) dependencyValues.get(dataName);
+            if (context.containsKey(dataName)) {
+                final Serializable value = (Serializable) context.get(dataName);
                 results.put(dataName, value);
             } else {
                 dataNames.add(dataName);
@@ -86,13 +85,13 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         if (dataNames.isEmpty()) {
             return buildExpressionResultSameOrderAsInputList(expressions, results);
         }
-        if (dependencyValues == null || !dependencyValues.containsKey(CONTAINER_ID_KEY) || !dependencyValues.containsKey(CONTAINER_TYPE_KEY)) {
+        if (context == null || !context.containsKey(CONTAINER_ID_KEY) || !context.containsKey(CONTAINER_TYPE_KEY)) {
             throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
         }
         try {
-            final long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
-            final String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
-            final Long time = (Long) dependencyValues.get(TIME);
+            final long containerId = (Long) context.get(CONTAINER_ID_KEY);
+            final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
+            final Long time = (Long) context.get(TIME);
             if (time != null) {
                 final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType, dataNames, time);
                 for (final SADataInstance dataInstance : dataInstances) {

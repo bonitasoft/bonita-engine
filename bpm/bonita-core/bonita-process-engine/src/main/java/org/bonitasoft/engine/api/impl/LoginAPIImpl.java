@@ -87,7 +87,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     public APISession login(final Map<String, Serializable> credentials) throws LoginException {
         checkCredentials(credentials);
         try {
-            final Long tenantId = (NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))) ? NumberUtils.toLong(String
+            final Long tenantId = NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) ? NumberUtils.toLong(String
                     .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
             return loginInternal(tenantId, credentials);
         } catch (final LoginException e) {
@@ -106,7 +106,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     }
 
     protected APISession loginInternal(final Long tenantId, final Map<String, Serializable> credentials) throws Exception {
-        final String userName = (credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) ? String.valueOf(credentials
+        final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null ? String.valueOf(credentials
                 .get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
@@ -150,7 +150,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
     }
 
-    @SuppressWarnings("unused")
     protected void checkThatWeCanLogin(final String userName, final PlatformService platformService, final STenant sTenant) throws LoginException {
         if (!platformService.isTenantActivated(sTenant)) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
@@ -165,8 +164,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
         private final Map<String, Serializable> credentials;
 
-        public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService,
-                final Map<String, Serializable> credentials) {
+        public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService, final Map<String, Serializable> credentials) {
             this.loginService = loginService;
             this.identityService = identityService;
             this.credentials = credentials;
@@ -179,8 +177,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
             try {
                 session = loginService.login(credentials);
                 if (!session.isTechnicalUser()) {
-                    Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(
-                            AuthenticationConstants.BASIC_TENANT_ID)), 0L);
+                    final Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), 0L);
                     sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
                     sessionAccessor.setSessionInfo(session.getId(), tenantId);
                     final SUser sUser = identityService.getUserByUserName(session.getUserName());

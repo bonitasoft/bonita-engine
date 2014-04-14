@@ -35,7 +35,6 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
         this.stateBehaviors = stateBehaviors;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         if (flowNodeInstance.getTokenCount() > 0) {
@@ -49,13 +48,11 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
         return flowNodeInstance.getTokenCount() > 0;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         return StateCode.DONE;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return parentInstance.getTokenCount() == 0;

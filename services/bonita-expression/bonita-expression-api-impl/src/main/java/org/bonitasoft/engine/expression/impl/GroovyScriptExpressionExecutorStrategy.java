@@ -36,9 +36,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         final ClassLoader scriptClassLoader = Thread.currentThread().getContextClassLoader();
@@ -46,7 +45,7 @@ public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpre
         try {
             final GroovyShell shell = new GroovyShell(scriptClassLoader);
             final Script script = shell.parse(expressionContent);// can put the name here
-            final Binding binding = new Binding(dependencyValues);
+            final Binding binding = new Binding(context);
             script.setBinding(binding);
             return script.evaluate(expressionContent);// .evaluate(expressionContent);run()
         } catch (final MissingPropertyException e) {
@@ -68,11 +67,11 @@ public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpre
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions));
         }
         return list;
     }

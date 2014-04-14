@@ -37,7 +37,6 @@ public class BatchArchiveSynchronization implements BonitaTransactionSynchroniza
         this.batchArchiveCallable = batchArchiveCallable;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void afterCompletion(final TransactionState status) {
         // NOTHING
@@ -45,10 +44,10 @@ public class BatchArchiveSynchronization implements BonitaTransactionSynchroniza
 
     @Override
     public void beforeCommit() {
-        if (this.batchArchiveCallable.hasObjects()) {
+        if (batchArchiveCallable.hasObjects()) {
             try {
-                this.batchArchiveCallable.call();
-                this.persistenceService.flushStatements();
+                batchArchiveCallable.call();
+                persistenceService.flushStatements();
             } catch (final Exception e) {
                 throw new SBonitaRuntimeException(e);
             }
