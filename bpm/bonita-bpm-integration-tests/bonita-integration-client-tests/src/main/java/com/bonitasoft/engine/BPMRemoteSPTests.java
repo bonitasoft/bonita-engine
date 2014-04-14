@@ -33,7 +33,7 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         // SPIdentityTests.class, // slow execution test suite only
         // SPProcessManagementTest.class, // slow execution test suite only
         PageAPIIT.class,
-        TenantTestSpITest.class,
+        TenantRemoteTestSpITest.class,
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
