@@ -6,7 +6,7 @@
 
 	<!-- Start the H2 server -->
 	<bean id="h2Server" class="org.h2.tools.Server" factory-method="createTcpServer" init-method="start" destroy-method="stop" scope="singleton">
-		<constructor-arg value="-tcp,-tcpAllowOthers,-tcpPort,${h2.port:1234}" />
+		<constructor-arg value="-tcp,-tcpAllowOthers,-tcpPort,${db.server.port}" />
 	</bean>
 	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">

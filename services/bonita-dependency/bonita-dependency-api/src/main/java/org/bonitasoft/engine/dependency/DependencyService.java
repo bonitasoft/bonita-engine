@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.dependency;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -149,7 +148,7 @@ public interface DependencyService {
      * @throws SDependencyMappingNotFoundException
      *             Error thrown if no dependencyMapping have an id corresponding to the parameter.
      */
-    void deleteDependencyMapping(long id) throws SDependencyException, SDependencyMappingNotFoundException;
+    void deleteDependencyMapping(long id) throws SDependencyException;
 
     /**
      * Delete the specific dependencyMapping
@@ -278,10 +277,8 @@ public interface DependencyService {
      * @param id
      * @param type
      * @throws SDependencyException
-     * @throws SDependencyNotFoundException
-     * @throws SDependencyDeletionException
      */
-    void deleteDependencies(long id, ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException;
+    void deleteDependencies(long id, ScopeType type) throws SDependencyException;
 
     void refreshClassLoader(ScopeType type, long id) throws SDependencyException;
 
@@ -298,6 +295,6 @@ public interface DependencyService {
      * @param dependencies
      * @throws SDependencyException
      */
-    void updateDependenciesOfArtifact(long id, ScopeType type, ArrayList<SDependency> dependencies) throws SDependencyException;
+    void updateDependenciesOfArtifact(long id, ScopeType type, List<SDependency> dependencies) throws SDependencyException;
 
 }

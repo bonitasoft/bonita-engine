@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -737,7 +737,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final List<SDependency> dependencies) throws SDependencyException {
         final Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
         final List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
         if (!dependencyIds.isEmpty()) {
@@ -781,7 +781,7 @@ public class DependencyServiceImpl implements DependencyService {
         deleteDependency(dependency);
     }
 
-    private Map<String, SDependency> getMapOfNames(final ArrayList<SDependency> dependencies) {
+    private Map<String, SDependency> getMapOfNames(final List<SDependency> dependencies) {
         final HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
         for (final SDependency sDependency : dependencies) {
             hashMap.put(sDependency.getName(), sDependency);

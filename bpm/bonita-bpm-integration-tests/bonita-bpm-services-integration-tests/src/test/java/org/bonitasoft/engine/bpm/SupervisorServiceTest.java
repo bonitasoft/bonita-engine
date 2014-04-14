@@ -131,7 +131,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     @Test(expected = SSupervisorNotFoundException.class)
     public void testGetSupervisorThrowException() throws Exception {
         this.transactionService.begin();
-        supervisorService.getSupervisor(-1);
+        supervisorService.getProcessSupervisor(-1);
         this.transactionService.complete();
     }
 
@@ -139,11 +139,11 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         final SUser user = createSUser("zeca", "bpm");
         final SProcessSupervisor createdSupervisor = createUserSupervisors(Collections.singletonList(user)).get(0);
         this.transactionService.begin();
-        final SProcessSupervisor gotSupervisor = supervisorService.getSupervisor(createdSupervisor.getId());
+        final SProcessSupervisor gotSupervisor = supervisorService.getProcessSupervisor(createdSupervisor.getId());
         Assert.assertEquals(createdSupervisor, gotSupervisor);
-        supervisorService.deleteSupervisor(gotSupervisor.getId());
+        supervisorService.deleteProcessSupervisor(gotSupervisor.getId());
         try {
-            supervisorService.getSupervisor(createdSupervisor.getId());
+            supervisorService.getProcessSupervisor(createdSupervisor.getId());
             Assert.fail("supervisor not deleted successfully!");
         } catch (final SSupervisorNotFoundException e) {
         } finally {
@@ -155,7 +155,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     @Test(expected = SSupervisorNotFoundException.class)
     public void testDeleteSupervisorThrowException() throws Exception {
         this.transactionService.begin();
-        supervisorService.deleteSupervisor(-1);
+        supervisorService.deleteProcessSupervisor(-1);
         this.transactionService.complete();
     }
 
@@ -173,7 +173,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         this.transactionService.begin();
         SProcessSupervisor createdSupervisor = null;
         try {
-            createdSupervisor = supervisorService.createSupervisor(supervisor);
+            createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
         } finally {
             this.transactionService.complete();
         }
@@ -185,7 +185,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         this.transactionService.begin();
         for (final SRole sRole : roles) {
             final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setRoleId(sRole.getId()).done();
-            final SProcessSupervisor createdSupervisor = supervisorService.createSupervisor(supervisor);
+            final SProcessSupervisor createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
         }
         this.transactionService.complete();
@@ -197,7 +197,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         this.transactionService.begin();
         for (final SGroup sGroup : groups) {
             final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setGroupId(sGroup.getId()).done();
-            final SProcessSupervisor createdSupervisor = supervisorService.createSupervisor(supervisor);
+            final SProcessSupervisor createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
         }
         this.transactionService.complete();
@@ -210,7 +210,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         for (final Entry<Long, Long> roleGroup : roleGroupMap.entrySet()) {
             final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setRoleId(roleGroup.getKey())
                     .setGroupId(roleGroup.getValue()).done();
-            final SProcessSupervisor createdSupervisor = supervisorService.createSupervisor(supervisor);
+            final SProcessSupervisor createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
         }
         this.transactionService.complete();
@@ -236,7 +236,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
 
         // test ASC
         final QueryOptions searchOptions = new QueryOptions(0, 6, oderByOptions, filterOptions, null);
-        final List<SProcessSupervisor> gotSupervisorList1 = supervisorService.searchProcessDefSupervisors(searchOptions);
+        final List<SProcessSupervisor> gotSupervisorList1 = supervisorService.searchProcessSupervisors(searchOptions);
         assertEquals(5, gotSupervisorList1.size());
         assertEquals(createdSupervisorList.get(4).getId(), gotSupervisorList1.get(0).getId());
         assertEquals(createdSupervisorList.get(3).getId(), gotSupervisorList1.get(1).getId());
@@ -245,7 +245,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         assertEquals(createdSupervisorList.get(0).getId(), gotSupervisorList1.get(4).getId());
 
         for (final SProcessSupervisor supervisor : createdSupervisorList) {
-            supervisorService.deleteSupervisor(supervisor.getId());
+            supervisorService.deleteProcessSupervisor(supervisor.getId());
         }
         this.transactionService.complete();
 
@@ -333,14 +333,14 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
 
     private SProcessSupervisor getSSupevisor(final long superviserId) throws SBonitaException {
         this.transactionService.begin();
-        final SProcessSupervisor supervisor = supervisorService.getSupervisor(superviserId);
+        final SProcessSupervisor supervisor = supervisorService.getProcessSupervisor(superviserId);
         this.transactionService.complete();
         return supervisor;
     }
 
     private void deleteSupervisor(final SProcessSupervisor supervisor) throws SBonitaException {
         this.transactionService.begin();
-        supervisorService.deleteSupervisor(supervisor);
+        supervisorService.deleteProcessSupervisor(supervisor);
         this.transactionService.complete();
     }
 

@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
 
 import java.io.IOException;
 import java.net.URL;
