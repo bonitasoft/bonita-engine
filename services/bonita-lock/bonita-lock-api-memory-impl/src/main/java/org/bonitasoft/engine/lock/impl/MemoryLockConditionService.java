@@ -61,7 +61,7 @@ public final class MemoryLockConditionService implements LockService {
 
         final AtomicInteger count = new AtomicInteger(1);
 
-        public Pair(Condition condition) {
+        public Pair(final Condition condition) {
             super();
             this.condition = condition;
         }
@@ -74,7 +74,6 @@ public final class MemoryLockConditionService implements LockService {
     }
 
     /**
-     * 
      * @param logger
      * @param sessionAccessor
      * @param lockTimeout
@@ -85,9 +84,9 @@ public final class MemoryLockConditionService implements LockService {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
-        this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
-        this.traceEnable = true;// logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
-        this.waiters = new HashMap<String, Pair>();
+        debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+        traceEnable = true;// logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+        waiters = new HashMap<String, Pair>();
         this.lockPoolSize = lockPoolSize;
 
         // the goal of this map of mutexs is not to solve completely the competition between keys
@@ -97,7 +96,7 @@ public final class MemoryLockConditionService implements LockService {
         for (int i = 0; i < lockPoolSize; i++) {
             tmpLocks.put(i, new MemoryLockConditionServiceReentrantLock());
         }
-        this.locks = Collections.unmodifiableMap(tmpLocks);
+        locks = Collections.unmodifiableMap(tmpLocks);
 
     }
 
@@ -109,15 +108,14 @@ public final class MemoryLockConditionService implements LockService {
 
     private Lock getLock(final long objectToLockId) {
         final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
-        if (!this.locks.containsKey(poolKeyForThisObjectId)) {
+        if (!locks.containsKey(poolKeyForThisObjectId)) {
             throw new RuntimeException("No lock defined for objectToLockId '" + objectToLockId + "' with generated key '" + poolKeyForThisObjectId + "'");
         }
-        return this.locks.get(poolKeyForThisObjectId);
+        return locks.get(poolKeyForThisObjectId);
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) {
+    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
         try {
             return innerTryLock(objectToLockId, objectType, timeout, timeUnit);
         } catch (final SLockException e) {
@@ -125,9 +123,8 @@ public final class MemoryLockConditionService implements LockService {
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public BonitaLock lock(final long objectToLockId, final String objectType, long tenantId) throws SLockException {
+    public BonitaLock lock(final long objectToLockId, final String objectType, final long tenantId) throws SLockException {
         return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
     }
 
@@ -166,7 +163,7 @@ public final class MemoryLockConditionService implements LockService {
                                 + " on condition: " + condition);
                     }
 
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
 
                 }
                 if (!lockObtained) {
@@ -198,9 +195,8 @@ public final class MemoryLockConditionService implements LockService {
         return new BonitaLock(lock, objectType, objectToLockId);
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public void unlock(final BonitaLock bonitaLock, long tenantId) throws SLockException {
+    public void unlock(final BonitaLock bonitaLock, final long tenantId) throws SLockException {
         final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
@@ -250,7 +246,7 @@ public final class MemoryLockConditionService implements LockService {
     protected String buildKey(final long objectToLockId, final String objectType) {
         try {
             return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-        } catch (STenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new IllegalStateException("Tenant not set");
         }
     }

@@ -2,8 +2,6 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -102,8 +100,7 @@ public class SchedulerServiceImplTest {
         when(sLogBuilder.severity(any(SQueriableLogSeverity.class))).thenReturn(sLogBuilder);
         when(sLogBuilder.rawMessage(anyString())).thenReturn(sLogBuilder);
         servicesResolver = mock(ServicesResolver.class);
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService,
-                transactionService, sessionAccessor, servicesResolver);
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver);
     }
 
     @Test
@@ -189,7 +186,7 @@ public class SchedulerServiceImplTest {
 
     @Test(expected = SSchedulerException.class)
     public void cannot_schedule_a_null_job() throws Exception {
-        Trigger trigger = mock(Trigger.class);
+        final Trigger trigger = mock(Trigger.class);
         when(jobService.createJobDescriptor(any(SJobDescriptor.class), any(Long.class))).thenThrow(new SJobDescriptorCreationException(""));
 
         schedulerService.schedule(null, trigger);
@@ -211,21 +208,21 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void should_pauseJobs_of_tenant_call_schedulerExecutor_rethrow_exception() throws Exception {
-        SSchedulerException theException = new SSchedulerException("My exception");
+        final SSchedulerException theException = new SSchedulerException("My exception");
         doThrow(theException).when(schedulerExecutor).resumeJobs(123l);
         try {
             schedulerService.resumeJobs(123l);
             fail("should have rethrown the exception");
-        } catch (SSchedulerException e) {
+        } catch (final SSchedulerException e) {
             assertEquals(theException, e);
         }
     }
 
     @Test
     public void should_injectService_inject_setter_hacing_the_annotation() throws Exception {
-        BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
+        final BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
 
-        Long myService = new Long(1);
+        final Long myService = new Long(1);
         when(servicesResolver.lookup("myService")).thenReturn(myService);
 
         schedulerService.injectServices(beanThatNeedMyService);
@@ -263,7 +260,6 @@ public class SchedulerServiceImplTest {
         public void execute() {
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void setAttributes(final Map<String, Serializable> attributes) {
         }

@@ -82,7 +82,6 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
         return enumClass;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session, final Object owner) throws HibernateException,
             SQLException {
@@ -127,7 +126,6 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
         return sqlTypes;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Object assemble(final Serializable cached, final Object owner) {
         return cached;
@@ -158,7 +156,6 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Object replace(final Object original, final Object target, final Object owner) {
         return original;

@@ -495,13 +495,13 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<Long> getProcessDefinitionIds(final ActivationState activationState, final int fromIndex, final long numberOfResults)
+    public List<Long> getProcessDefinitionIds(final ActivationState activationState, final int fromIndex, final int numberOfResults)
             throws SProcessDefinitionReadException {
         // FIXME
         final Map<String, Object> parameters = Collections.singletonMap("activationState", (Object) activationState.name());
         final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SProcessDefinitionDeployInfo.class, "id", OrderByType.ASC));
         final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<Long>("getProcessDefinitionsIdsInActivationState", parameters,
-                SProcessDefinitionDeployInfo.class, new QueryOptions(fromIndex, (int) numberOfResults, orderByOptions));
+                SProcessDefinitionDeployInfo.class, new QueryOptions(fromIndex, numberOfResults, orderByOptions));
         try {
             return persistenceService.selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
@@ -510,12 +510,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<Long> getProcessDefinitionIds(final int fromIndex, final long numberOfResults) throws SProcessDefinitionReadException {
+    public List<Long> getProcessDefinitionIds(final int fromIndex, final int numberOfResults) throws SProcessDefinitionReadException {
         // FIXME
         final Map<String, Object> parameters = Collections.emptyMap();
         final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SProcessDefinitionDeployInfo.class, "id", OrderByType.ASC));
         final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<Long>("getProcessDefinitionsIds", parameters,
-                SProcessDefinitionDeployInfo.class, new QueryOptions(fromIndex, (int) numberOfResults, orderByOptions));
+                SProcessDefinitionDeployInfo.class, new QueryOptions(fromIndex, numberOfResults, orderByOptions));
         try {
             return persistenceService.selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {

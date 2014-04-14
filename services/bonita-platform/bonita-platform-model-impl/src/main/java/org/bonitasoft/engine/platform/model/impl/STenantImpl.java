@@ -42,7 +42,6 @@ public class STenantImpl implements STenant {
 
     private boolean defaultTenant;
 
-    @SuppressWarnings("unused")
     private STenantImpl() {
     }
 

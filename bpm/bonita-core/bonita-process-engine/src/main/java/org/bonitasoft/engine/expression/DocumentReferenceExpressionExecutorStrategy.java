@@ -51,9 +51,9 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        return evaluate(Collections.singletonList(expression), dependencyValues, resolvedExpressions).get(0);
+        return evaluate(Collections.singletonList(expression), context, resolvedExpressions).get(0);
     }
 
     @Override
@@ -61,13 +61,12 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         return KIND_DOCUMENT;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        final Long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
-        final String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
-        final Long time = (Long) dependencyValues.get("time");
+        final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
+        final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
+        final Long time = (Long) context.get("time");
 
         try {
             final long processInstanceId = getProcessInstance(containerId, containerType);
@@ -83,7 +82,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private Document getDocument(long processInstanceId, SExpression expression, Long time) {
+    private Document getDocument(final long processInstanceId, final SExpression expression, final Long time) {
         try {
             SProcessDocument document;
             if (time != null) {
@@ -97,7 +96,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private long getProcessInstance(Long containerId, String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+    private long getProcessInstance(final Long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException,
             SExpressionDependencyMissingException {
         if (containerId == null || containerType == null) {
             throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
