@@ -10,11 +10,14 @@ package com.bonitasoft.engine.bdm.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -52,6 +55,13 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
         final Document document = builder.done();
         final File metaInf = IOUtils.createSubDirectory(directory, "META-INF");
         IOUtils.saveDocument(document, new File(metaInf, "persistence.xml"));
+    }
+
+    @Override
+    protected void addBOMFile(final File directory, final BusinessObjectModel bom) throws IOException, JAXBException, SAXException {
+        final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
+        final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
+        IOUtil.write(new File(directory, "bom.xml"), bomXML);
     }
 
 }

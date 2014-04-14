@@ -9,7 +9,7 @@ import com.bonitasoft.engine.BOMBuilder;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 
-public class ServerBDMJarBuilderIT {
+public class ServerBDMJarBuilderITest {
 
     /* Just to test we have no errors in full chain. Must be improved */
     @Test
@@ -25,6 +25,14 @@ public class ServerBDMJarBuilderIT {
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();
         bdmJarBuilder.build(builder.buildComplex(), TrueFileFilter.TRUE);
+    }
+
+    @Test
+    public void jar_builder_should_goes_well_without_errors_with_queries2() throws Exception {
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
+        final BOMBuilder builder = new BOMBuilder();
+        bdmJarBuilder.build(builder.buildPerson(), TrueFileFilter.TRUE);
     }
 
 }

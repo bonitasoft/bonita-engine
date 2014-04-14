@@ -45,6 +45,7 @@
 
   <xs:complexType name="field">
     <xs:sequence/>
+    <xs:attribute name="collection" type="xs:boolean"/>
     <xs:attribute name="length" type="xs:int"/>
     <xs:attribute name="nullable" type="xs:boolean"/>
     <xs:attribute name="type" type="fieldType" use="required"/>

@@ -53,12 +53,13 @@ public interface TenantManagementAPI {
      * 
      * @param zip
      *            the binary content of the business object model.
+     * @return the version of the Business Data Model just deployed.
      * @throws InvalidBusinessDataModelException
      *             if the Business Data Model content passed as parameter is invalid.
      * @throws BusinessDataRepositoryDeploymentException
      *             if the deployment cannot be fulfilled completely.
      */
-    void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
+    String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
     /**
      * Uninstalls the business data model.
@@ -66,12 +67,29 @@ public interface TenantManagementAPI {
      * @throws BusinessDataRepositoryDeploymentException
      *             if the deployment cannot be fulfilled completely.
      */
-    void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException;
+    void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException;
 
     /**
+     * Deletes all business data and uninstalls the business data model.
      * 
+     * @throws BusinessDataRepositoryDeploymentException
+     *             if the deployment cannot be fulfilled completely.
+     */
+    void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException;
+
+    /**
      * @return zip content of the deployed client Business data model, null if no Business data model has been deployed
      * @throws BusinessDataRepositoryException
+     *             if the Business Data Model cannot be retrieved.
      */
     byte[] getClientBDMZip() throws BusinessDataRepositoryException;
+
+    /**
+     * Returns the current Business Data Model version, if any, or null if no Business Data Model is currently deployed.
+     * 
+     * @return the current Business Data Model version, if any, or null if no Business Data Model is currently deployed
+     * @throws BusinessDataRepositoryException
+     *             if the BDM version cannot be retrieved properly.
+     */
+    String getBusinessDataModelVersion() throws BusinessDataRepositoryException;
 }

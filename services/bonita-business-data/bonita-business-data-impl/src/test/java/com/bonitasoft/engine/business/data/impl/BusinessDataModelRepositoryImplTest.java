@@ -33,7 +33,7 @@ public class BusinessDataModelRepositoryImplTest {
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaUpdater.class), null, null));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), null, null));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(sDependency).when(businessDataModelRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(businessDataModelRepository).createDependencyMapping(1, sDependency);
 
-        businessDataModelRepository.createAndDeployServerBDMJar(1, BOMBuilder.aBOM().build());
+        businessDataModelRepository.createAndDeployServerBDMJar(1, BOMBuilder.aBOM().build(), null);
 
         verify(dependencyService).createDependency(sDependency);
         verify(dependencyService).createDependencyMapping(dependencyMapping);
@@ -51,7 +51,7 @@ public class BusinessDataModelRepositoryImplTest {
 
     @Test
     public void uninstall_should_delete_a_dependency() throws Exception {
-        businessDataModelRepository.undeploy(45l);
+        businessDataModelRepository.uninstall(45l);
 
         verify(dependencyService).deleteDependency("BDR");
     }
@@ -60,13 +60,13 @@ public class BusinessDataModelRepositoryImplTest {
     public void uninstall_should_ignore_exception_if_the_dependency_does_not_exist() throws Exception {
         doThrow(new SDependencyNotFoundException("error")).when(dependencyService).deleteDependency("BDR");
 
-        businessDataModelRepository.undeploy(45l);
+        businessDataModelRepository.uninstall(45l);
     }
 
     @Test(expected = SBusinessDataRepositoryException.class)
     public void uninstall_should_throw_an_exception_if_an_exception_occurs_during_the_dependency_deletion() throws Exception {
         doThrow(new SDependencyDeletionException("error")).when(dependencyService).deleteDependency("BDR");
 
-        businessDataModelRepository.undeploy(45l);
+        businessDataModelRepository.uninstall(45l);
     }
 }

@@ -17,6 +17,7 @@ import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -54,6 +55,14 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 @AvailableWhenTenantIsPaused
 public class TenantManagementAPIExt implements TenantManagementAPI {
 
+    protected PlatformServiceAccessor getPlatformAccessorNoException() {
+        try {
+            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
+
     protected long getTenantId() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -83,6 +92,12 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     @Override
     public void resume() throws UpdateException {
         setTenantPaused(false);
+        resolveDependenciesForAllProcesses();
+    }
+
+    protected void resolveDependenciesForAllProcesses() {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        tenantAccessor.getDependencyResolver().resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
     private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {
@@ -179,14 +194,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    protected PlatformServiceAccessor getPlatformAccessorNoException() {
-        try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-    }
-
     protected void updateTenant(final PlatformService platformService, final EntityUpdateDescriptor descriptor, final STenant tenant) throws UpdateException {
         try {
             platformService.updateTenant(tenant, descriptor);
@@ -206,12 +213,23 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     @Override
+    @AvailableWhenTenantIsPaused
+    public String getBusinessDataModelVersion() throws BusinessDataRepositoryException {
+        try {
+            final BusinessDataModelRepository modelRepository = getTenantAccessor().getBusinessDataModelRepository();
+            return modelRepository.getInstalledBDMVersion();
+        } catch (final SBusinessDataRepositoryException e) {
+            throw new BusinessDataRepositoryException(e);
+        }
+    }
+
+    @Override
     @AvailableWhenTenantIsPaused(only = true)
-    public void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
+    public String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            bdmRepository.deploy(zip, tenantAccessor.getTenantId());
+            return bdmRepository.install(zip, tenantAccessor.getTenantId());
         } catch (final IllegalStateException e) {
             throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {
@@ -221,11 +239,23 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableWhenTenantIsPaused(only = true)
-    public void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException {
+    public void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            bdmRepository.undeploy(tenantAccessor.getTenantId());
+            bdmRepository.uninstall(tenantAccessor.getTenantId());
+        } catch (final SBusinessDataRepositoryException sbdre) {
+            throw new BusinessDataRepositoryDeploymentException(sbdre);
+        }
+    }
+
+    @Override
+    @AvailableWhenTenantIsPaused(only = true)
+    public void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
+            bdmRepository.dropAndUninstall(tenantAccessor.getTenantId());
         } catch (final SBusinessDataRepositoryException sbdre) {
             throw new BusinessDataRepositoryDeploymentException(sbdre);
         }
@@ -237,15 +267,9 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
         try {
             return bdmRepository.getClientBDMZip();
-        } catch (SBusinessDataRepositoryException e) {
+        } catch (final SBusinessDataRepositoryException e) {
             throw new BusinessDataRepositoryException(e);
         }
-    }
-
-    protected PlatformService getPlatformService() {
-        final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        return platformService;
     }
 
 }

@@ -129,7 +129,6 @@ public class ReportingServiceImplTest {
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         doAnswer(new Answer<Object>() {
 
-            @SuppressWarnings("unused")
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
                 throw new SQLException();
@@ -255,7 +254,6 @@ public class ReportingServiceImplTest {
 
         doAnswer(new Answer<Object>() {
 
-            @SuppressWarnings("unused")
             @Override
             public Object answer(final InvocationOnMock invocation) {
                 // Deletion OK
@@ -284,7 +282,6 @@ public class ReportingServiceImplTest {
 
         doAnswer(new Answer<Object>() {
 
-            @SuppressWarnings("unused")
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
                 throw new SRecorderException("ouch !");

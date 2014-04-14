@@ -132,6 +132,8 @@ public class TenantManagementAPIExtTest {
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
+        
+        doNothing().when(tenantManagementAPI).resolveDependenciesForAllProcesses();
     }
 
     @Test
@@ -180,6 +182,14 @@ public class TenantManagementAPIExtTest {
 
         // given a tenant moved to available mode
         tenantManagementAPI.resume();
+    }
+    
+    @Test
+    public void resume_tenant_should_resolve_dependecies_for_deployed_processes() throws Exception {
+        
+        tenantManagementAPI.resume();
+        
+        verify(tenantManagementAPI).resolveDependenciesForAllProcesses();
     }
 
     @Test
@@ -312,22 +322,21 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void installBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
-        final Method method = TenantManagementAPIExt.class.getMethod("installBusinessDataRepository", byte[].class);
+        final Method method = TenantManagementAPIExt.class.getMethod("installBusinessDataModel", byte[].class);
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.only();
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataRepository(byte[])'")
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataModel(byte[])'")
                 .isTrue();
     }
 
     @Test
     public void uninstallBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
-        final Method method = TenantManagementAPIExt.class.getMethod("uninstallBusinessDataRepository");
+        final Method method = TenantManagementAPIExt.class.getMethod("uninstallBusinessDataModel");
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.only();
-        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataRepository()'")
-                .isTrue();
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataModel()'").isTrue();
 
     }
 
@@ -339,21 +348,21 @@ public class TenantManagementAPIExtTest {
         doReturn(accessor).when(tenantManagementAPI).getTenantAccessor();
         when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
 
-        tenantManagementAPI.uninstallBusinessDataRepository();
+        tenantManagementAPI.uninstallBusinessDataModel();
 
-        verify(repository).undeploy(anyLong());
+        verify(repository).uninstall(anyLong());
     }
 
     @Test(expected = BusinessDataRepositoryException.class)
-    public void uninstallBusinessDataRepositoryThrowException() throws Exception {
+    public void uninstallBusinessDataModelThrowException() throws Exception {
         final TenantServiceAccessor accessor = mock(TenantServiceAccessor.class);
         final BusinessDataModelRepository repository = mock(BusinessDataModelRepository.class);
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
         doReturn(accessor).when(tenantManagementAPI).getTenantAccessor();
         when(accessor.getBusinessDataModelRepository()).thenReturn(repository);
-        doThrow(new SBusinessDataRepositoryException("error")).when(repository).undeploy(anyLong());
+        doThrow(new SBusinessDataRepositoryException("error")).when(repository).uninstall(anyLong());
 
-        tenantManagementAPI.uninstallBusinessDataRepository();
+        tenantManagementAPI.uninstallBusinessDataModel();
     }
 
     @Test
@@ -370,7 +379,7 @@ public class TenantManagementAPIExtTest {
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         doNothing().when(tenantManagementAPI).updateTenant(eq(platformService), any(EntityUpdateDescriptor.class), any(STenant.class));
         doNothing().when(tenantManagementAPI).pauseServicesForTenant(eq(platformServiceAccessor), any(BroadcastService.class), eq(tenantId));
-        doReturn(platformService).when(tenantManagementAPI).getPlatformService();
+        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
 
         tenantManagementAPI.pause();
 

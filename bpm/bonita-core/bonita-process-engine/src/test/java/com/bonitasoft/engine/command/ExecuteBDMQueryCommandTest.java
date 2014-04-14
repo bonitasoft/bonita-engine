@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,7 +35,6 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Romain Bioteau
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ExecuteBDMQueryCommandTest {
@@ -96,10 +93,12 @@ public class ExecuteBDMQueryCommandTest {
         parameters.put(ExecuteBDMQueryCommand.RETURN_TYPE, String.class.getName());
         parameters.put(ExecuteBDMQueryCommand.QUERY_PARAMETERS, (Serializable) queryParameters);
         parameters.put(ExecuteBDMQueryCommand.RETURNS_LIST, returnsList);
+        parameters.put(ExecuteBDMQueryCommand.START_INDEX, 0);
+        parameters.put(ExecuteBDMQueryCommand.MAX_RESULTS, 10);
 
         command.execute(parameters, tenantServiceAccessor);
 
-        verify(bdrService).findListByNamedQuery(queryName, resultClass, queryParameters);
+        verify(bdrService).findListByNamedQuery(queryName, resultClass, queryParameters, 0, 10);
     }
 
     @Test(expected = SCommandParameterizationException.class)

@@ -36,8 +36,7 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
 
     private final ActivityInstanceService activityInstanceService;
 
-    public StringIndexOperationExecutorStrategy(final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService) {
+    public StringIndexOperationExecutorStrategy(final ProcessInstanceService processInstanceService, final ActivityInstanceService activityInstanceService) {
         this.processInstanceService = processInstanceService;
         this.activityInstanceService = activityInstanceService;
     }
@@ -52,7 +51,6 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) {

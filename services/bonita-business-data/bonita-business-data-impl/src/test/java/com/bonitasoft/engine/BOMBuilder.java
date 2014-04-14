@@ -64,6 +64,22 @@ public class BOMBuilder {
         return bom;
     }
 
+    public BusinessObjectModel buildPerson() {
+        final Field nickNames = new Field();
+        nickNames.setName("nickNames");
+        nickNames.setType(FieldType.STRING);
+        nickNames.setLength(Integer.valueOf(15));
+        nickNames.setCollection(Boolean.TRUE);
+
+        final BusinessObject employee = new BusinessObject();
+        employee.setQualifiedName("com.bonitasoft.Person");
+        employee.addField(nickNames);
+
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(employee);
+        return bom;
+    }
+
     public byte[] buildZip() {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         try {

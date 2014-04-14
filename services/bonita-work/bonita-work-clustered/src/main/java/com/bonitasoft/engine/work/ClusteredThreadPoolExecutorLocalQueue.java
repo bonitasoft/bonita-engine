@@ -26,14 +26,11 @@ import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 
 /**
- * 
  * A work factory that use a clustered Queue and a clustered executing work map
  * <p>
  * There is one shared queue by member.<br/>
  * If a node crash during the execution of a work, other members are notified and the first to be notified get all executing works and queued works for himself
- * 
  * There is multiple shared queue to avoid collisions that happens when there is only one
- * 
  * 
  * @author Baptiste Mesta
  * @author Laurent Vaills
@@ -54,10 +51,10 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
             throw new IllegalStateException("The clustering is not an active feature.");
         }
         this.hazelcastInstance = hazelcastInstance;
-        Cluster cluster = hazelcastInstance.getCluster();
+        final Cluster cluster = hazelcastInstance.getCluster();
         cluster.addMembershipListener(this);
-        this.workQueue = queue;
-        this.executingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(cluster.getLocalMember()));
+        workQueue = queue;
+        executingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(cluster.getLocalMember()));
         // Do we have to check is the queue is empty or not ? If not, what to do ?
     }
 
@@ -83,7 +80,6 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         return null;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void shutdown() {
         workQueue.clear();
@@ -103,29 +99,27 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         executingRunnable.offer(r);
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void afterExecute(final Runnable r, final Throwable t) {
         executingRunnable.remove(r);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void memberAdded(final MembershipEvent membershipEvent) {
     }
 
     @Override
     public void memberRemoved(final MembershipEvent membershipEvent) {
-        Member member = membershipEvent.getMember();
-        ILock lock = hazelcastInstance.getLock("WorkLock@" + member.getUuid());
+        final Member member = membershipEvent.getMember();
+        final ILock lock = hazelcastInstance.getLock("WorkLock@" + member.getUuid());
         lock.lock();
         try {
             // Transfer the member's queues into my own queues
-            IQueue<Runnable> memberExecutingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(member));
+            final IQueue<Runnable> memberExecutingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(member));
             executingRunnable.addAll(memberExecutingRunnable);
             memberExecutingRunnable.clear(); // No way to drop completely the queue ?
 
-            IQueue<Runnable> memberWorkQueue = hazelcastInstance.getQueue(memberWorkQueueName(member));
+            final IQueue<Runnable> memberWorkQueue = hazelcastInstance.getQueue(memberWorkQueueName(member));
             workQueue.addAll(memberWorkQueue);
             memberWorkQueue.clear(); // No way to drop completely the queue ?
         } finally {

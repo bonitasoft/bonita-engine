@@ -15,7 +15,10 @@ public class BusinessDataUpdateConnector extends AbstractConnector {
     protected void executeBusinessLogic() throws ConnectorException {
         final Object bizData = getInputParameter("bizData");
         try {
-            final Method method = bizData.getClass().getMethod("setLastName", String.class);
+            Method method = bizData.getClass().getMethod("addToPhoneNumbers", String.class);
+            method.invoke(bizData, "48665421");
+
+            method = bizData.getClass().getMethod("setLastName", String.class);
             method.invoke(bizData, "Hakkinen");
             setOutputParameter("output1", bizData);
         } catch (final Exception e) {
