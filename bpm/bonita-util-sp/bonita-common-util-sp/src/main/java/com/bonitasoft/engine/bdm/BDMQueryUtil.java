@@ -14,6 +14,11 @@ import java.util.Set;
  */
 public class BDMQueryUtil {
 
+    /**
+     * 
+     */
+    private static final String GET_ALL = "getAll";
+
     private static final String AND_SEPARATOR = "And";
 
     private static final String LOGIC_AND = " AND ";
@@ -92,7 +97,7 @@ public class BDMQueryUtil {
             throw new IllegalArgumentException("field cannot be null");
         }
         businessObjectName = getSimpleBusinessObjectName(businessObjectName);
-        StringBuilder sb = new StringBuilder("get" + businessObjectName + "By");
+        StringBuilder sb = new StringBuilder(GET_ALL + businessObjectName + "By");
         String fName = field.getName();
         fName = Character.toUpperCase(fName.charAt(0)) + fName.substring(1);
         sb.append(fName);
@@ -191,8 +196,9 @@ public class BDMQueryUtil {
         }
         for (Field f : businessObject.getFields()) {
             if (f.isCollection() == null || !f.isCollection()) {
-                Query query = createQueryForField(businessObject, f);
-                if (!queryNames.contains(query.getName())) {
+                String potentialConflictingQueryName = createQueryNameForField(businessObject.getQualifiedName(), f).replace(GET_ALL, "get");
+                if (!queryNames.contains(potentialConflictingQueryName)) {
+                    Query query = createQueryForField(businessObject, f);
                     queries.add(query);
                 }
             }
@@ -243,6 +249,6 @@ public class BDMQueryUtil {
     }
 
     public static String createSelectAllQueryName(final BusinessObject businessObject) {
-        return "getAll" + getSimpleBusinessObjectName(businessObject.getQualifiedName());
+        return GET_ALL + getSimpleBusinessObjectName(businessObject.getQualifiedName());
     }
 }
