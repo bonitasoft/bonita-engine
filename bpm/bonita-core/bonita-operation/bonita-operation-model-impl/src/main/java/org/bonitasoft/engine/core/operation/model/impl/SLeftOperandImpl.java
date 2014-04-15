@@ -28,7 +28,7 @@ public class SLeftOperandImpl implements SLeftOperand {
     private String type;
 
     public SLeftOperandImpl() {
-        type = SLeftOperand.DATA;
+        type = SLeftOperand.TYPE_DATA;
     }
 
     @Override

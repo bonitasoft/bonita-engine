@@ -46,7 +46,7 @@ public class JavaMethodOperationExecutorStrategyTest {
 
         when(operation.getLeftOperand()).thenReturn(leftOperand);
         when(leftOperand.getName()).thenReturn("unknownData");
-        when(leftOperand.getType()).thenReturn(SLeftOperand.EXTERNAL_DATA);
+        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
         when(operation.getRightOperand()).thenReturn(rightOperand);
         when(operation.getOperator()).thenReturn("=");
         when(rightOperand.getReturnType()).thenReturn(Object.class.getName());

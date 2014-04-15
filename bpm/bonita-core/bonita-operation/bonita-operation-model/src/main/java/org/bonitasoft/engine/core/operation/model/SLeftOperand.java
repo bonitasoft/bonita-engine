@@ -21,13 +21,13 @@ import java.io.Serializable;
  */
 public interface SLeftOperand extends Serializable {
 
-    public static String EXTERNAL_DATA = "EXTERNAL_DATA";
+    public static String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
 
-    public static String DOCUMENT = "DOCUMENT";
+    public static String TYPE_DOCUMENT = "DOCUMENT";
 
-    public static String SEARCH_INDEX = "SEARCH_INDEX";
+    public static String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
 
-    public static String DATA = "DATA";
+    public static String TYPE_DATA = "DATA";
 
     public static String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
 

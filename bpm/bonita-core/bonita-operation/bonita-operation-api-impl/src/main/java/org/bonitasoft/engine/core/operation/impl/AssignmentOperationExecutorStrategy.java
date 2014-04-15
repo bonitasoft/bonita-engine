@@ -46,7 +46,7 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
     @Override
     public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext) throws SOperationExecutionException {
         // do not check if value is external, see ENGINE-1739
-        if (operation.getLeftOperand().getType().equals(SLeftOperand.DATA)) {
+        if (operation.getLeftOperand().getType().equals(SLeftOperand.TYPE_DATA)) {
             checkReturnType(value, operation, expressionContext);
         }
         // no processing on the value, just return it

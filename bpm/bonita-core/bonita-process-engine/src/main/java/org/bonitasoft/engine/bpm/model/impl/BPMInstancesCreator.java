@@ -647,7 +647,7 @@ public class BPMInstancesCreator {
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final SOperation operation = iterator.next();
-            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && SLeftOperand.DATA == operation.getLeftOperand().getType()
+            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && SLeftOperand.TYPE_DATA == operation.getLeftOperand().getType()
                     && dataName.equals(operation.getLeftOperand().getName())) {
                 found = true;
                 dataOperation = operation;
