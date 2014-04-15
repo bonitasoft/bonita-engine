@@ -35,6 +35,10 @@
 					<groupId>org.bonitasoft.engine</groupId>
 					<artifactId>bonita-server</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+			        <artifactId>hazelcast-hibernate</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

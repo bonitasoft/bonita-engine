@@ -74,7 +74,7 @@ public class LocalLogTest extends CommonAPISPTest {
 
     @Test
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutputUsingAPIAccessor() throws Exception {
-        createUser(USERNAME, PASSWORD);
+        final User user = createUser(USERNAME, PASSWORD);
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantLongExpression(0);
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
@@ -111,12 +111,11 @@ public class LocalLogTest extends CommonAPISPTest {
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
 
-        final long userId = getIdentityAPI().getUserByUserName(USERNAME).getId();
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess.getId(), userId);
+        waitForUserTaskAndExecuteIt("step0", startProcess, user);
         waitForUserTask("step2", startProcess);
 
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
@@ -134,7 +133,7 @@ public class LocalLogTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployProcessWithDefaultTestConnector(final String ACTOR_NAME, final long userId,
+    private ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final User user,
             final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -148,10 +147,7 @@ public class LocalLogTest extends CommonAPISPTest {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(ACTOR_NAME, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     private List<BarResource> generateDefaultConnectorImplementations() throws IOException {

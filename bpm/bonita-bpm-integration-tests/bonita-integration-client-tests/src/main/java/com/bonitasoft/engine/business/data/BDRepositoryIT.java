@@ -525,11 +525,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         barResource = buildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
         businessArchiveBuilder.addClasspathResource(barResource);
-
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(ACTOR_NAME, matti.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+       
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, matti);
     }
 
     private BarResource getResource(final String path, final String name) throws IOException {
