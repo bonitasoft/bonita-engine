@@ -17,8 +17,8 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
@@ -100,7 +100,7 @@ public class DataServiceImpl implements DataService {
 
         if (!dataSource.getState().equals(SDataSourceState.ACTIVE)) {
             throw new SDataSourceInactiveException("Unable to retrieve datasource implementation for datasource <" + dataSource
-                    + ">, because it is not active <" + dataSource.getState() + ">", dataSource.getState());
+                    + ">, because it is not active <" + dataSource.getState() + ">");
         }
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {

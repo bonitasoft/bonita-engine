@@ -17,7 +17,6 @@ package org.bonitasoft.engine.document;
 import java.io.Serializable;
 import java.util.Collection;
 
-
 /**
  * @author Baptiste Mesta
  */
@@ -36,6 +35,16 @@ public class DocumentCriterion implements Serializable {
     private Object from;
 
     private Collection<?> in;
+
+    /**
+     * @param index
+     * @param builder
+     */
+    public DocumentCriterion(final DocumentField index, final DocumentQueryBuilder builder) {
+        this.fieldName = index;
+        this.builder = builder;
+
+    }
 
     /**
      * @return the fieldName
@@ -63,16 +72,6 @@ public class DocumentCriterion implements Serializable {
      */
     public Object getFrom() {
         return from;
-    }
-
-    /**
-     * @param index
-     * @param builder
-     */
-    public DocumentCriterion(final DocumentField index, final DocumentQueryBuilder builder) {
-        this.fieldName = index;
-        this.builder = builder;
-
     }
 
     public DocumentCriterion equalsTo(final Object value) {
