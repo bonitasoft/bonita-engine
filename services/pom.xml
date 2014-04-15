@@ -52,6 +52,7 @@
 		<module>bonita-incident</module>
 		<module>bonita-builder</module>
 		<module>bonita-theme</module>
+		<module>bonita-page</module>
 	</modules>
 	
 	<profiles>
