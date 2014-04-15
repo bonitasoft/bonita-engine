@@ -109,7 +109,6 @@ public class ProcessExecutionTest extends CommonAPITest {
         deleteUser(user);
     }
 
-    // @Ignore
     @Test
     public void startProcessOnBehalfOf() throws Exception {
         final User user = createUser("john", "bpm");
@@ -119,7 +118,8 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         // Check that the given user name is the one used to start the process:
-        assertEquals(user.getId(), processInstance.getStartedBy());
+        assertEquals(user.getId(), processInstance.getStartedByDelegate());
+        assertEquals(-1, processInstance.getStartedBy());
 
         // Clean up
         waitForUserTask("step1", processInstance);

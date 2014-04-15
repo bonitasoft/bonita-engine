@@ -59,6 +59,4 @@ public interface DocumentService {
      */
     void deleteDocumentContent(String documentId) throws SDocumentDeletionException, SDocumentException;
 
-    // TODO delete method
-
 }

@@ -34,9 +34,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
-import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -65,7 +65,7 @@ public class ProcessStarter {
     private final Filter<SFlowNodeDefinition> filter;
 
     private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
-           final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
+            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
@@ -88,12 +88,12 @@ public class ProcessStarter {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SProcessDefinition sProcessDefinition = retrieveProcessDefinition(processDefinitionService);
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final long starterId;
+        final long starterDelegateId;
         final long userIdFromSession = SessionInfos.getUserIdFromSession();
         if (userId == 0) {
-            starterId = userIdFromSession;
+            starterDelegateId = userIdFromSession;
         } else {
-            starterId = userId;
+            starterDelegateId = userId;
         }
         final SProcessInstance startedInstance;
         try {
@@ -104,15 +104,15 @@ public class ProcessStarter {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(starterId, userIdFromSession, sOperations, operationContext, null, new FlowNodeSelector(sProcessDefinition,
-                    filter));
+            startedInstance = processExecutor.start(userIdFromSession, starterDelegateId, sOperations, operationContext, null, new FlowNodeSelector(
+                    sProcessDefinition, filter));
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }
 
         final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logInstanceStarted(sProcessDefinition, starterId, userIdFromSession, processInstance, logger);
+        logInstanceStarted(sProcessDefinition, userIdFromSession, starterDelegateId, processInstance, logger);
         return processInstance;
     }
 
@@ -133,15 +133,15 @@ public class ProcessStarter {
         return sProcessDefinition;
     }
 
-    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long userIdFromSession, final ProcessInstance processInstance,
-            final TechnicalLoggerService logger) {
+    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
+            final ProcessInstance processInstance, final TechnicalLoggerService logger) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
             stb.append(SessionInfos.getUserNameFromSession());
-            if (starterId != userIdFromSession) {
+            if (starterId != starterDelegateId) {
                 stb.append("> acting as delegate of user with id <");
-                stb.append(starterId);
+                stb.append(starterDelegateId);
             }
             stb.append("> has started instance <");
             stb.append(processInstance.getId());
