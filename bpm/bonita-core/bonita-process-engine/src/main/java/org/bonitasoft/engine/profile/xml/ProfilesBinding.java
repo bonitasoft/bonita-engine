@@ -39,7 +39,7 @@ public class ProfilesBinding extends ElementBinding {
 
     @Override
     public void setChildObject(final String name, final Object value) {
-        if ("profile".equals(name)) {
+        if (value != null && "profile".equals(name)) {
             profiles.add((ExportedProfile) value);
         }
     }

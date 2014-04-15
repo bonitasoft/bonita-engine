@@ -13,21 +13,24 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -40,10 +43,15 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
+import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -128,7 +136,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         getProcessAPI().getProcessInstance(process2.getId());
         try {
             getProcessAPI().getProcessInstance(process1.getId());
-            fail("this instance should be deleted");
+            Assert.fail("this instance should be deleted");
         } catch (final ProcessInstanceNotFoundException e) {
             // ok
         }
@@ -574,6 +582,39 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(jira = "BS-8397", classes = { DataInstance.class, ProcessInstance.class }, concept = BPMNConcept.DATA, keywords = { "initilize process data behalf" })
+    @Test
+    public void startProcessUsingInitialVariableValuesOnBehalfUserId() throws Exception {
+        final User jack = createUserAndLogin(USERNAME, USERNAME);
+
+        final String otherUserName = "other";
+        final User otherUser = createUser(otherUserName, "user");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Process to test archiving mechanism");
+        processBuilder.addDoubleData("D", new ExpressionBuilder().createConstantDoubleExpression(3.14));
+        processBuilder.addData("bigD", BigDecimal.class.getName(), null);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
+
+        final Map<String, Serializable> variables = new HashMap<String, Serializable>();
+        variables.put("bigD", new BigDecimal("3.141592653589793"));
+        final ProcessInstance instance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(), variables);
+        final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(instance.getId());
+
+        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("bigD", instance.getId());
+        assertEquals(new BigDecimal("3.141592653589793"), dataInstance.getValue());
+        dataInstance = getProcessAPI().getProcessDataInstance("D", instance.getId());
+        assertEquals(Double.valueOf(3.14), dataInstance.getValue());
+
+        assertEquals(otherUser.getId(), processInstance2.getStartedByDelegate());
+        assertEquals(jack.getId(), processInstance2.getStartedBy());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(jack.getId());
+        deleteUser(otherUser.getId());
+    }
+
     @Test
     public void startProcessInstanceOnBehalfUserId() throws Exception {
         logoutThenloginAs("pedro", "secreto");
@@ -615,6 +656,43 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     private List<ProcessDefinition> createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(final int nbProcess, final User user) throws BonitaException {
         return createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(nbProcess, user, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+    }
+
+    @Test
+    public void getNumberOfUsersCanExecutePendingHumanTaskDeploymentInfo() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+
+        final String otherUserName = "other";
+        final User otherUser = createUser(otherUserName, "user");
+
+        // create process definition with integer data;
+        final String dataName = "var1";
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addIntegerData(dataName, new ExpressionBuilder().createConstantIntegerExpression(1)).addUserTask("step1", ACTOR_NAME)
+                .addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
+        // final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME), Lists.newArrayList(pedro, otherUser));
+
+        // create Operation keyed map
+        final Operation integerOperation = buildIntegerOperation(dataName, 2);
+        final List<Operation> operations = new ArrayList<Operation>();
+        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
+        contexts.put("page", "1");
+        operations.add(integerOperation);
+        final long processDefinitionId = processDefinition.getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinitionId, operations, contexts);
+
+        List<HumanTaskInstance> humanTaskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "step1", 0, 10);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> results = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(humanTaskInstances.get(0).getId(), builder.done());
+        assertThat(results.getCount()).isSameAs(2L);
+        assertThat(results.getResult()).isNotEmpty();
+        assertThat(results.getResult().get(0).getId()).isSameAs(pedro.getId());
+        assertThat(results.getResult().get(1).getId()).isSameAs(otherUser.getId());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(otherUser);
     }
 
 }
