@@ -32,8 +32,6 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class StringIndexLeftOperandHandler implements LeftOperandHandler {
 
-    public static final String TYPE_STRING_INDEX = "STRING_INDEX";
-
     private final ProcessInstanceService processInstanceService;
 
     private final ActivityInstanceService activityInstanceService;
@@ -94,7 +92,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
 
     @Override
     public String getType() {
-        return TYPE_STRING_INDEX;
+        return SLeftOperand.TYPE_SEARCH_INDEX;
     }
 
     @Override
