@@ -1297,6 +1297,7 @@
 					WHERE (at.logicalGroup2 = p.id AND at.executedBy = :userId)
 				)
 				OR p.startedBy = :userId
+				OR p.startedByDelegate = :userId
 		)
 	</query>
 
@@ -1309,6 +1310,7 @@
 					WHERE (at.logicalGroup2 = p.id AND at.executedBy = :userId)
 				)
 				OR p.startedBy = :userId
+				OR p.startedByDelegate = :userId
 		)
 	</query>
 
@@ -1322,7 +1324,7 @@
 				WHERE at.executedBy = u.id
 					AND u.managerUserId = :managerUserId
 				)
-			OR (p.startedBy = u.id
+			OR ((p.startedBy = u.id OR p.startedByDelegate = u.id)
 				AND u.managerUserId = :managerUserId
 				)
 			)
@@ -1338,7 +1340,7 @@
 				WHERE at.executedBy = u.id
 					AND u.managerUserId = :managerUserId
 				)
-			OR (p.startedBy = u.id
+			OR ((p.startedBy = u.id OR p.startedByDelegate = u.id)
 				AND u.managerUserId = :managerUserId
 				)
 			)

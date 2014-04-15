@@ -271,9 +271,11 @@
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-		OR (usertask.rootContainerId = ap.sourceObjectId
-			AND usertask.stable = TRUE
-			AND usertask.assigneeId = :userId) )
+			OR ap.startedByDelegate = :userId
+			OR (usertask.rootContainerId = ap.sourceObjectId
+				AND usertask.stable = TRUE
+				AND usertask.assigneeId = :userId) 
+		)
   	</query>
   
   	<query name="searchSAProcessInstancewithSUserTaskInstance">
@@ -286,9 +288,11 @@
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-		OR (usertask.rootContainerId = ap.sourceObjectId
-			AND usertask.stable = TRUE
-			AND usertask.assigneeId = :userId) )
+			OR ap.startedByDelegate = :userId
+			OR (usertask.rootContainerId = ap.sourceObjectId
+				AND usertask.stable = TRUE
+				AND usertask.assigneeId = :userId) 
+		)
 	</query>
 
 	<query name="searchSAHumanTaskInstancewithSAActivityInstance">
@@ -585,6 +589,7 @@
 						WHERE (at.logicalGroup2 = ap.sourceObjectId AND at.executedBy = :userId)
 					)
 					OR ap.startedBy = :userId
+					OR ap.startedByDelegate = :userId
 				)
 			)
   	</query>
@@ -600,6 +605,7 @@
 						WHERE (at.logicalGroup2 = ap.sourceObjectId AND at.executedBy = :userId)
 					)
 					OR ap.startedBy = :userId
+					OR ap.startedByDelegate = :userId
 				)
 			)
   	</query>
