@@ -813,19 +813,17 @@ public class ProcessManagementTest extends CommonAPITest {
         final User user = createUser(USERNAME, PASSWORD);
         final long userId = user.getId();
 
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("stepX", "stepXX"),
-                Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
-        final long activityInstanceId = activityInstances.get(0).getId();
-        Thread.sleep(100);
-        boolean boo = getProcessAPI().canExecuteTask(activityInstanceId, userId);
-        assertFalse(boo);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        assertFalse("The user " + USERNAME + " shouldn't be able to execute the task step1.", getProcessAPI().canExecuteTask(activityInstanceId, userId));
 
-        getProcessAPI().assignUserTask(activityInstanceId, user.getId());
-        boo = getProcessAPI().canExecuteTask(activityInstanceId, userId);
-        assertTrue(boo);
+        getProcessAPI().assignUserTask(activityInstanceId, userId);
+        Thread.sleep(100);
+        assertTrue("The user " + USERNAME + " should be able to execute the task step1.", getProcessAPI().canExecuteTask(activityInstanceId, userId));
+
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
