@@ -71,7 +71,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public SProcessSupervisor createSupervisor(final SProcessSupervisor supervisor) throws SSupervisorCreationException {
+    public SProcessSupervisor createProcessSupervisor(final SProcessSupervisor supervisor) throws SSupervisorCreationException {
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new supervisor");
         final InsertRecord insertRecord = new InsertRecord(supervisor);
         SInsertEvent insertEvent = null;
@@ -89,7 +89,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public SProcessSupervisor getSupervisor(final long supervisorId) throws SSupervisorNotFoundException {
+    public SProcessSupervisor getProcessSupervisor(final long supervisorId) throws SSupervisorNotFoundException {
         final SelectByIdDescriptor<SProcessSupervisor> selectByIdDescriptor = SelectDescriptorBuilder.getSupervisor(supervisorId);
         try {
             final SProcessSupervisor supervisor = persistenceService.selectById(selectByIdDescriptor);
@@ -103,13 +103,13 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public void deleteSupervisor(final long supervisorId) throws SSupervisorNotFoundException, SSupervisorDeletionException {
-        final SProcessSupervisor sSupervisor = getSupervisor(supervisorId);
-        deleteSupervisor(sSupervisor);
+    public void deleteProcessSupervisor(final long supervisorId) throws SSupervisorNotFoundException, SSupervisorDeletionException {
+        final SProcessSupervisor sSupervisor = getProcessSupervisor(supervisorId);
+        deleteProcessSupervisor(sSupervisor);
     }
 
     @Override
-    public void deleteSupervisor(final SProcessSupervisor supervisor) throws SSupervisorDeletionException {
+    public void deleteProcessSupervisor(final SProcessSupervisor supervisor) throws SSupervisorDeletionException {
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(SUPERVISOR, EventActionType.DELETED)) {
             deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUPERVISOR).setObject(supervisor).done();
@@ -126,7 +126,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public void deleteAllSupervisors() throws SSupervisorDeletionException {
+    public void deleteAllProcessSupervisors() throws SSupervisorDeletionException {
         try {
             final DeleteAllRecord record = new DeleteAllRecord(SProcessSupervisor.class, null);
             recorder.recordDeleteAll(record);
@@ -158,7 +158,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public List<SProcessSupervisor> searchProcessDefSupervisors(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SProcessSupervisor> searchProcessSupervisors(final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
             return persistenceService.searchEntity(SProcessSupervisor.class, null, queryOptions, null);
         } catch (final SBonitaReadException bre) {
@@ -167,7 +167,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public long getNumberOfProcessDefSupervisors(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long getNumberOfProcessSupervisors(final QueryOptions searchOptions) throws SBonitaSearchException {
         try {
             return persistenceService.getNumberOfEntities(SProcessSupervisor.class, null, searchOptions, null);
         } catch (final SBonitaReadException bre) {

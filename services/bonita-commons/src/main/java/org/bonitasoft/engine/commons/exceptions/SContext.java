@@ -93,6 +93,14 @@ public enum SContext {
      */
     USER_ID,
     /**
+     * Corresponding to the identifier of the group
+     */
+    GROUP_ID,
+    /**
+     * Corresponding to the identifier of the role
+     */
+    ROLE_ID,
+    /**
      * Corresponding to the identifier of the thread
      */
     THREAD_ID,
@@ -103,6 +111,10 @@ public enum SContext {
     /**
      * Corresponding to the identifier of the tenant
      */
-    TENANT_ID;
+    TENANT_ID,
+    /**
+     * Corresponding to the identifier of the document
+     */
+    DOCUMENT_ID;
 
 }

@@ -35,7 +35,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
-import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstanceServiceImpl;
+import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstancesServiceImpl;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
@@ -78,7 +78,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  * @author Frederic Bouquet
  * @author Celine Souchet
  */
-public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl implements EventInstanceService {
+public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl implements EventInstanceService {
 
     private final EventService eventService;
 

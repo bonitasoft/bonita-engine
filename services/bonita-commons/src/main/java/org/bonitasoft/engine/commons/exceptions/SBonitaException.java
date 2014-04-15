@@ -267,12 +267,39 @@ public abstract class SBonitaException extends Exception {
     }
 
     /**
+     * @param id
+     *            The identifier of the document
+     * @since 6.3
+     */
+    public void setDocumentIdOnContext(final long id) {
+        context.put(SContext.DOCUMENT_ID, id);
+    }
+
+    /**
      * @param userId
      *            The identifier of the user
      * @since 6.3
      */
-    public void setUserIdOnContext(final long userId) {
+    public void setUserIdOnContext(final Long userId) {
         context.put(SContext.USER_ID, userId);
+    }
+
+    /**
+     * @param groupId
+     *            The identifier of the group
+     * @since 6.3
+     */
+    public void setGroupIdOnContext(final Long groupId) {
+        context.put(SContext.GROUP_ID, groupId);
+    }
+
+    /**
+     * @param roleId
+     *            The identifier of the role
+     * @since 6.3
+     */
+    public void setRoleIdOnContext(final Long roleId) {
+        context.put(SContext.ROLE_ID, roleId);
     }
 
     /**

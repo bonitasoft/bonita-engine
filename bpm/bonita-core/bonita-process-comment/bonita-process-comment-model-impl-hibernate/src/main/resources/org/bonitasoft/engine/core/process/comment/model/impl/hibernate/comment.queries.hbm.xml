@@ -36,26 +36,11 @@
 	<query name="getNumberOfSCommentSupervisedBy">
 		SELECT COUNT(DISTINCT comment)
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-		     org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		     org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
-		WHERE comment.userId = u.id
-		AND comment.processInstanceId = ap.sourceObjectId
-		AND ap.archiveDate = (
-			SELECT MAX(aa2.archiveDate)
-			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.id = (
-			SELECT MAX(api.id)
-			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+		WHERE (
+			supervisor.userId = :supervisorId
 			OR supervisor.id IN (
-				SELECT processsupervisor.id
+				SELECT DISTINCT processsupervisor.id
 				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
 					 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
 				WHERE user_membership.userId = :supervisorId
@@ -66,31 +51,31 @@
 				)
 			)
 		)
+		AND (
+			comment.processInstanceId IN (
+				SELECT DISTINCT pi.id
+				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS pi
+				WHERE pi.processDefinitionId = supervisor.processDefId
+				AND pi.tenantId = supervisor.tenantId
+			)
+			OR comment.processInstanceId IN (
+				SELECT DISTINCT api.sourceObjectId
+				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
+				WHERE api.processDefinitionId = supervisor.processDefId
+				AND api.tenantId = supervisor.tenantId
+			)
+		)
+		AND comment.tenantId = supervisor.tenantId
 	</query>
 
 	<query name="searchSCommentSupervisedBy">
 		SELECT DISTINCT comment
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-			 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap, 
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
-		WHERE comment.userId = u.id
-		AND comment.processInstanceId = ap.sourceObjectId
-		AND	ap.archiveDate = (
-			SELECT MAX(aa2.archiveDate)
-			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.id = (
-			SELECT MAX(api.id)
-			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+		WHERE (
+			supervisor.userId = :supervisorId
 			OR supervisor.id IN (
-				SELECT processsupervisor.id
+				SELECT DISTINCT processsupervisor.id
 				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
 					 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
 				WHERE user_membership.userId = :supervisorId
@@ -101,6 +86,21 @@
 				)
 			)
 		)
+		AND (
+			comment.processInstanceId IN (
+				SELECT DISTINCT pi.id
+				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS pi
+				WHERE pi.processDefinitionId = supervisor.processDefId
+				AND pi.tenantId = supervisor.tenantId
+			)
+			OR comment.processInstanceId IN (
+				SELECT DISTINCT api.sourceObjectId
+				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
+				WHERE api.processDefinitionId = supervisor.processDefId
+				AND api.tenantId = supervisor.tenantId
+			)
+		)
+		AND comment.tenantId = supervisor.tenantId
 	</query>
 
 	<query name="getNumberOfSCommentInvolvingUser">

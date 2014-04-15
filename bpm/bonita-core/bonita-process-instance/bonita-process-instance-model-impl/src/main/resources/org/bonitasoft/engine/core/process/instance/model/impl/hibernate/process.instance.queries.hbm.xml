@@ -647,8 +647,7 @@
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-		WHERE a.assigneeId > 0
-		AND a.deleted = FALSE
+		WHERE a.deleted = FALSE
 		AND a.rootContainerId = p.id
 		AND p.processDefinitionId IN (
 			SELECT supervisor.processDefId
@@ -673,8 +672,7 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-		WHERE a.assigneeId > 0
-		AND a.deleted = FALSE
+		WHERE a.deleted = FALSE
 		AND a.rootContainerId = p.id
 		AND p.processDefinitionId IN (
 			SELECT supervisor.processDefId
@@ -701,8 +699,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
 		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
-		WHERE a.assigneeId = 0
-		AND a.deleted = FALSE
+		WHERE a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.rootContainerId = p.id
 		AND p.processDefinitionId IN (
@@ -730,8 +727,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
 		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor 
-		WHERE a.assigneeId = 0
-		AND a.deleted = FALSE
+		WHERE a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.rootContainerId = p.id
 		AND p.processDefinitionId IN (
@@ -934,10 +930,60 @@
 		WHERE f.deleted = FALSE
 	</query>
 	
+	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">
+		SELECT count(DISTINCT f)
+			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
+			     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+			WHERE f.deleted = FALSE
+			AND f.rootContainerId = p.id
+			AND p.processDefinitionId IN (
+				SELECT supervisor.processDefId
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+				WHERE (supervisor.userId = :supervisorId)
+				OR (supervisor.id IN (
+						SELECT supervisor.id
+						FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+						org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+						WHERE um.userId = :supervisorId
+						AND (
+							(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+							OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+							OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+						)
+					)
+				)
+			)
+	</query>
+	
 	<query name="searchSFlowNodeInstance">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.deleted = FALSE
+	</query>
+	
+	<query name="searchSFlowNodeInstanceSupervisedBy">
+		SELECT DISTINCT f
+			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
+			     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+			WHERE f.deleted = FALSE
+			AND f.rootContainerId = p.id
+			AND p.processDefinitionId IN (
+				SELECT supervisor.processDefId
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+				WHERE (supervisor.userId = :supervisorId)
+				OR (supervisor.id IN (
+						SELECT supervisor.id
+						FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+						org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+						WHERE um.userId = :supervisorId
+						AND (
+							(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+							OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+							OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+						)
+					)
+				)
+			)
 	</query>
 
 	<query name="getNumberOfSAutomaticTaskInstance">
