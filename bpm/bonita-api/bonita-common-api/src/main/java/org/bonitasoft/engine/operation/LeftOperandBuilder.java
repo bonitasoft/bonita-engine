@@ -139,7 +139,7 @@ public class LeftOperandBuilder {
      * @return the newly created <code>LeftOperand</code> object
      */
     public LeftOperand createBusinessDataLeftOperand(final String dataName) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_BUSINESS_DATA).done();
     }
 
 }
