@@ -71,4 +71,12 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
     @Override
     ThemeAPI getThemeAPI();
 
+    /**
+     * Gives access to Page API
+     * 
+     * @return
+     * @since 6.3
+     */
+    PageAPI getPageAPI();
+
 }
