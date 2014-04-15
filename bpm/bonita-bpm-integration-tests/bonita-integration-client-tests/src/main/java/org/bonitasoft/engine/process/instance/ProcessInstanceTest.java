@@ -16,6 +16,7 @@ package org.bonitasoft.engine.process.instance;
 import static org.junit.Assert.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -575,6 +577,39 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         waitForProcessToFinish(processInstance2);
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8397", classes = { DataInstance.class, ProcessInstance.class }, concept = BPMNConcept.DATA, keywords = { "initilize process data behalf" })
+    @Test
+    public void startProcessUsingInitialVariableValuesOnBehalfUserId() throws Exception {
+        final User jack = createUserAndLogin(USERNAME, USERNAME);
+
+        final String otherUserName = "other";
+        final User otherUser = createUser(otherUserName, "user");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Process to test archiving mechanism");
+        processBuilder.addDoubleData("D", new ExpressionBuilder().createConstantDoubleExpression(3.14));
+        processBuilder.addData("bigD", BigDecimal.class.getName(), null);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
+
+        final Map<String, Serializable> variables = new HashMap<String, Serializable>();
+        variables.put("bigD", new BigDecimal("3.141592653589793"));
+        final ProcessInstance instance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(), variables);
+        final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(instance.getId());
+
+        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("bigD", instance.getId());
+        assertEquals(new BigDecimal("3.141592653589793"), dataInstance.getValue());
+        dataInstance = getProcessAPI().getProcessDataInstance("D", instance.getId());
+        assertEquals(Double.valueOf(3.14), dataInstance.getValue());
+
+        assertEquals(otherUser.getId(), processInstance2.getStartedByDelegate());
+        assertEquals(jack.getId(), processInstance2.getStartedBy());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(jack.getId());
+        deleteUser(otherUser.getId());
     }
 
     @Test
