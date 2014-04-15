@@ -59,6 +59,7 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -106,6 +107,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     private static final String PENDING_OR_ASSIGNED = "PendingOrAssigned";
 
     private static final String ACTIVITYINSTANCE_ASSIGNEE = "ACTIVITYINSTANCE_ASSIGNEE";
+
+    private static final String WHOCANSTART_PENDING_TASK_SUFFIX = "WhoCanStartPendingTask";
 
     private static final int BATCH_SIZE = 100;
 
@@ -1114,6 +1117,27 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         try {
             final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
             return (List<SAActivityInstance>) getPersistenceRead().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", (Object) humanTaskInstanceId);
+            return getPersistenceRead().getNumberOfEntities(SUser.class, WHOCANSTART_PENDING_TASK_SUFFIX, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SUser> searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", (Object) humanTaskInstanceId);
+            return getPersistenceRead().searchEntity(SUser.class, WHOCANSTART_PENDING_TASK_SUFFIX, searchOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
         }

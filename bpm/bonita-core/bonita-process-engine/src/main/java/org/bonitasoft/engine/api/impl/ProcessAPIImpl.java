@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Collections.singletonMap;
+import static java.util.Collections.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -339,6 +339,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.job.FailedJob;
@@ -389,6 +390,7 @@ import org.bonitasoft.engine.search.document.SearchDocuments;
 import org.bonitasoft.engine.search.document.SearchDocumentsSupervisedBy;
 import org.bonitasoft.engine.search.flownode.SearchArchivedFlowNodeInstances;
 import org.bonitasoft.engine.search.flownode.SearchFlowNodeInstances;
+import org.bonitasoft.engine.search.identity.SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo;
 import org.bonitasoft.engine.search.identity.SearchUsersWhoCanStartProcessDeploymentInfo;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
@@ -3193,6 +3195,34 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public ProcessInstance startProcess(long userId, long processDefinitionId, Map<String, Serializable> initialVariables) throws UserNotFoundException,
+            ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+        final ClassLoaderService classLoaderService = getTenantAccessor().getClassLoaderService();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final List<Operation> operations = new ArrayList<Operation>();
+        try {
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+            Thread.currentThread().setContextClassLoader(localClassLoader);
+            if (initialVariables != null) {
+                for (final Entry<String, Serializable> initialVariable : initialVariables.entrySet()) {
+                    final String name = initialVariable.getKey();
+                    final Serializable value = initialVariable.getValue();
+                    final Expression expression = new ExpressionBuilder().createExpression(name, name, value.getClass().getName(), ExpressionType.TYPE_INPUT);
+                    final Operation operation = new OperationBuilder().createSetDataOperation(name, expression);
+                    operations.add(operation);
+                }
+            }
+        } catch (final SClassLoaderException cle) {
+            throw new ProcessExecutionException(cle);
+        } catch (final InvalidExpressionException iee) {
+            throw new ProcessExecutionException(iee);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+        return startProcess(userId, processDefinitionId, operations, initialVariables);
+    }
+
+    @Override
     public ProcessInstance startProcess(final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context)
             throws ProcessExecutionException, ProcessDefinitionNotFoundException, ProcessActivationException {
         try {
@@ -5649,4 +5679,20 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @Override
+    public SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, SearchOptions searchOptions) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final SearchUserDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchUserDescriptor();
+        final SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo searcher = new SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(
+                humanTaskInstanceId, activityInstanceService,
+                searchDescriptor, searchOptions);
+        try {
+            searcher.execute();
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+        return searcher.getResult();
+    }
 }
