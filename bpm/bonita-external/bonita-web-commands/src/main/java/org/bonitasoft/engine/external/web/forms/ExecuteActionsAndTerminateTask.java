@@ -87,7 +87,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         return null;
     }
     
-    private Long getExecuteForUserId(final Map<String, Serializable> parameters) {
+    protected Long getExecuteForUserId(final Map<String, Serializable> parameters) {
         Serializable executeForUserId = parameters.get(USER_ID_KEY);
         // executeForUserId is not defined when the use is doing the task by himself
         if ( executeForUserId == null ) {
