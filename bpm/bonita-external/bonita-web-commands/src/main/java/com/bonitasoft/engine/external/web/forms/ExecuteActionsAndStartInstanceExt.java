@@ -89,12 +89,12 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SessionInfos session = SessionInfos.getSessionInfos();
 
-        final long starterId = session.getUserId();
-        final long starterForId;
+        final long starterForUserId = session.getUserId();
+        final long starterUserId;
         if (userId == 0) {
-            starterForId = starterId;
+            starterUserId = starterForUserId;
         } else {
-            starterForId = userId;
+            starterUserId = userId;
         }
         // Retrieval of the process definition:
         final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
@@ -106,7 +106,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance = null;
         try {
             final List<SOperation> sOperations = toSOperation(operations);
-            startedInstance = processExecutor.start(starterId, starterForId, sOperations, context, connectorsWithInput, new FlowNodeSelector(
+            startedInstance = processExecutor.start(starterUserId, starterForUserId, sOperations, context, connectorsWithInput, new FlowNodeSelector(
                     sDefinition, new StartFlowNodeFilter()));
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
@@ -117,9 +117,9 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
             stb.append(session.getUsername());
-            if (starterForId != starterId) {
+            if (starterUserId != starterForUserId) {
                 stb.append("> acting as delegate of user with id <");
-                stb.append(starterForId);
+                stb.append(starterUserId);
             }
             stb.append("> has started instance <");
             stb.append(startedInstance.getId());
