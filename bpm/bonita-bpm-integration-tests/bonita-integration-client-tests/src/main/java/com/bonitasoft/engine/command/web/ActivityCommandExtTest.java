@@ -257,8 +257,8 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final String activityName = userTaskInstance.getName();
         assertNotNull(activityName);
         assertEquals("step2", activityName);
-        assertEquals(businessUser.getId(), processInstance.getStartedBy());
-        assertEquals(firstUser.getId(), processInstance.getStartedFor());
+        assertEquals(businessUser.getId(), processInstance.getStartedBySubstitute());
+        assertEquals(firstUser.getId(), processInstance.getStartedBy());
         deleteUser(firstUser);
     }
 
