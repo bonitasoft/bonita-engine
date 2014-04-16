@@ -193,12 +193,17 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void pauseTenant_should_pause_jobs() throws Exception {
+    // public void should_setMaintenanceMode_to_MAINTENANCE_pause_jobs() throws Exception {
+    public void setTenantMaintenanceModeShouldUpdateMaintenanceField() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
         tenantManagementAPI.pause();
 
-        verify(schedulerService).pauseJobs(tenantId);
+        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        final String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
+        entityUpdateDescriptor.addField(inMaintenanceKey, STenant.PAUSED);
+
+        verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
     @Test
@@ -246,24 +251,33 @@ public class TenantManagementAPIExtTest {
                 .isTrue();
     }
 
+    // @Test
+    //
+    // final Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
+    //
+    // // then:
+    // assertThat(method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+    // "Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(long, String, String)").isTrue();
+    // }
+    //
+    // @Test
+    // public void loginWithT final Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
+    // final Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
+    //
+    // // then:
+    // assertThat(method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+    // "Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(String, String)").isTrue();
+    // }
+
     @Test
-    public void loginShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
+    public void pageApi_shouldBeAvailable_in_maintenance_mode() throws Exception {
         // given:
-        final Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
+        final Class<PageAPIExt> classPageApiExt = PageAPIExt.class;
 
         // then:
-        assertThat(method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
-                "Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(long, String, String)").isTrue();
-    }
+        assertThat(classPageApiExt.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+                "Annotation @AvailableOnMaintenanceTenant should be present on PageAPIExt");
 
-    @Test
-    public void loginWithTenantIdShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
-        // given:
-        final Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
-
-        // then:
-        assertThat(method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
-                "Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(String, String)").isTrue();
     }
 
     @Test(expected = UpdateException.class)

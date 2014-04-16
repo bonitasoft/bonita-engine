@@ -20,13 +20,14 @@ import org.bonitasoft.engine.session.APISession;
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
+import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
+import com.bonitasoft.engine.api.ThemeAPI;
 
 /**
  * @author Baptiste Mesta
@@ -98,6 +99,11 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
     @Override
     public ThemeAPI getThemeAPI() {
         return getAPI(ThemeAPI.class, getAPISession());
+    }
+
+    @Override
+    public PageAPI getPageAPI() {
+        return getAPI(PageAPI.class, getAPISession());
     }
 
 }
