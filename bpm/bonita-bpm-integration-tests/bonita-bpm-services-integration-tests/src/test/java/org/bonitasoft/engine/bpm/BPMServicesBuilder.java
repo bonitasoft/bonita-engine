@@ -56,7 +56,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -164,11 +163,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public PlatformService getPlatformService() {
         return getInstanceOf(PlatformService.class);
-    }
-
-    @Override
-    public DataService getDataService() {
-        return getInstanceOf(DataService.class);
     }
 
     @Override
@@ -550,7 +544,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public TransientDataService getTransientDataService() {
         return getInstanceOf(TransientDataService.class);
     }
-
 
     @Override
     public TenantConfiguration getTenantConfiguration() {

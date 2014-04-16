@@ -13,22 +13,8 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-
-import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceVisibilityMappingBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
-import org.bonitasoft.engine.recorder.Recorder;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * @author Emmanuel Duchastenier
@@ -37,50 +23,60 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
 
     private static DataInstanceServiceImpl dataInstanceServiceImpl;
 
-    @BeforeClass
-    public static void setupImplementation() {
-        Recorder recorder = getServicesBuilder().buildRecorder();
-        TenantHibernatePersistenceService persistenceService = getServicesBuilder().buildTenantPersistenceService();
-        TechnicalLoggerService technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
-        ArchiveService archiveService = getServicesBuilder().buildArchiveService();
-        dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, recorder, persistenceService, archiveService, technicalLoggerService);
-        CacheService cacheService = getServicesBuilder().buildCacheService();
-        try {
-            cacheService.start();
-        } catch (SBonitaException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.data.instance.DataInstanceServiceTest#getDataInstanceServiceImplementation()
+     */
     @Override
-    public DataInstanceService getDataInstanceServiceImplementation() {
-        return dataInstanceServiceImpl;
+    protected DataInstanceService getDataInstanceServiceImplementation() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    @Test
-    public void shouldBeAbleToInsertSameDataVisibilityOnDifferentTenant() throws Exception {
-        // given:
-        long containerId = 654154L;
-        String containerType = "monProcess";
-        String dataName = "anyData";
-        long dataInstanceId = 95446L;
-        SDataInstanceVisibilityMapping mapping = BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class)
-                .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
-        mapping.setTenantId(1);
-        DataInstanceServiceImpl spy = spy(dataInstanceServiceImpl);
-        doReturn(mapping).when(spy).createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
-
-        // when:
-        getTransactionService().begin();
-        spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L);
-        getTransactionService().complete();
-
-        mapping.setTenantId(2);
-        getTransactionService().begin();
-        spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L);
-        getTransactionService().complete();
-
-        // then:
-        // no integrity constraint violation
-    }
+    // @BeforeClass
+    // public static void setupImplementation() {
+    // Recorder recorder = getServicesBuilder().buildRecorder();
+    // TenantHibernatePersistenceService persistenceService = getServicesBuilder().buildTenantPersistenceService();
+    // TechnicalLoggerService technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
+    // ArchiveService archiveService = getServicesBuilder().buildArchiveService();
+    // dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, recorder, persistenceService, archiveService, technicalLoggerService);
+    // CacheService cacheService = getServicesBuilder().buildCacheService();
+    // try {
+    // cacheService.start();
+    // } catch (SBonitaException e) {
+    // throw new RuntimeException(e);
+    // }
+    // }
+    //
+    // @Override
+    // public DataInstanceService getDataInstanceServiceImplementation() {
+    // return dataInstanceServiceImpl;
+    // }
+    //
+    // @Test
+    // public void shouldBeAbleToInsertSameDataVisibilityOnDifferentTenant() throws Exception {
+    // // given:
+    // long containerId = 654154L;
+    // String containerType = "monProcess";
+    // String dataName = "anyData";
+    // long dataInstanceId = 95446L;
+    // SDataInstanceVisibilityMapping mapping = BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class)
+    // .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
+    // mapping.setTenantId(1);
+    // DataInstanceServiceImpl spy = spy(dataInstanceServiceImpl);
+    // doReturn(mapping).when(spy).createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
+    //
+    // // when:
+    // getTransactionService().begin();
+    // spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L);
+    // getTransactionService().complete();
+    //
+    // mapping.setTenantId(2);
+    // getTransactionService().begin();
+    // spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L);
+    // getTransactionService().complete();
+    //
+    // // then:
+    // // no integrity constraint violation
+    // }
 }

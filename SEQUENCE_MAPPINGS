@@ -25,10 +25,6 @@ LOG
 queriable_log -> 30
 queriable_log_parameter -> 31 
 
-DATA
-dataSource -> 50
-dataSourceParameter -> 51
-
 Archive
 employee -> 60
 laptop -> 61

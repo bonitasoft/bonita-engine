@@ -57,12 +57,6 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.SDataException;
-import org.bonitasoft.engine.data.SDataSourceAlreadyExistException;
-import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -575,9 +569,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
-            // Create default data source
-            createDefaultDataSource(tenantServiceAccessor);
-
             // Create default commands
             createDefaultCommands(tenantServiceAccessor);
 
@@ -682,20 +673,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation()).setSystem(true).done();
             commandService.create(sCommand);
         }
-    }
-
-    protected void createDefaultDataSource(final TenantServiceAccessor tenantServiceAccessor) throws SDataSourceAlreadyExistException, SDataException {
-        final DataService dataService = tenantServiceAccessor.getDataService();
-        final SDataSource bonitaDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
-                .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
-                .done();
-        dataService.createDataSource(bonitaDataSource);
-
-        final SDataSource transientDataSource = BuilderFactory
-                .get(SDataSourceBuilderFactory.class)
-                .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
-                        "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
-        dataService.createDataSource(transientDataSource);
     }
 
     private String getUserName(final long tenantId) throws IOException, BonitaHomeNotSetException {

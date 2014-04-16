@@ -19,10 +19,6 @@ ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId
 GO
 ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId
 GO
-ALTER TABLE datasource DROP CONSTRAINT fk_datasource_tenantId
-GO
-ALTER TABLE datasourceparameter DROP CONSTRAINT fk_datasourceparameter_tenantId
-GO
 ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId
 GO
 ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId

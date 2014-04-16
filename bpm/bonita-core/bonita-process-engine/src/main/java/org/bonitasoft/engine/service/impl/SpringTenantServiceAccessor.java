@@ -53,7 +53,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -169,8 +168,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ProfileService profileService;
 
     private DataInstanceService dataInstanceService;
-
-    private DataService dataService;
 
     private ParserFactory parserFactory;
 
@@ -515,14 +512,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public DataService getDataService() {
-        if (dataService == null) {
-            dataService = beanAccessor.getService(DataService.class);
-        }
-        return dataService;
-    }
-
-    @Override
     public ParserFactory getParserFactgory() {
         if (parserFactory == null) {
             parserFactory = beanAccessor.getService(ParserFactory.class);
@@ -775,6 +764,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     public void destroy() {
         beanAccessor.destroy();
     }
+
     @Override
     public TenantConfiguration getTenantConfiguration() {
         if (tenantConfiguration == null) {

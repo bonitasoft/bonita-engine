@@ -41,7 +41,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -152,8 +151,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DataInstanceService getDataInstanceService();
 
     TransientDataService getTransientDataService();
-
-    DataService getDataService();
 
     ParserFactory getParserFactgory();
 

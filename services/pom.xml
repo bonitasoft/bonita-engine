@@ -28,7 +28,6 @@
 		<module>bonita-document</module>
 		<module>bonita-xml</module>
 		<module>bonita-events</module>
-		<module>bonita-data</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
 		<module>bonita-test-util</module>
