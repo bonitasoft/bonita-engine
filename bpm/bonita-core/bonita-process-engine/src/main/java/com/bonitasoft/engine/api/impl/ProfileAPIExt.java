@@ -391,10 +391,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         SProfileEntry sProfileEntry;
-        final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, creator);
         try {
-            createProfileEntry.execute();
-            sProfileEntry = createProfileEntry.getResult();
+            sProfileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
