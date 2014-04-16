@@ -2180,6 +2180,6 @@ public interface ProcessRuntimeAPI {
      *             If an exception occurs while retrieving the users
      * @since 6.3
      */
-    SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long processDefinitionId, SearchOptions searchOptions);
+    SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, SearchOptions searchOptions);
 
 }
