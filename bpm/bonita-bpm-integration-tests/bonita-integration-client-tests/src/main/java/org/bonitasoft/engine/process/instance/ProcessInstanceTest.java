@@ -689,8 +689,8 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         SearchResult<User> results = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(humanTaskInstances.get(0).getId(), builder.done());
         assertThat(results.getCount()).isSameAs(2L);
         assertThat(results.getResult()).isNotEmpty();
-        assertThat(results.getResult().get(0).getId()).isSameAs(pedro.getId());
-        assertThat(results.getResult().get(1).getId()).isSameAs(otherUser.getId());
+        assertThat(results.getResult().get(0).getId()).isEqualTo(pedro.getId());
+        assertThat(results.getResult().get(1).getId()).isEqualTo(otherUser.getId());
         disableAndDeleteProcess(processDefinition);
         deleteUser(otherUser);
     }

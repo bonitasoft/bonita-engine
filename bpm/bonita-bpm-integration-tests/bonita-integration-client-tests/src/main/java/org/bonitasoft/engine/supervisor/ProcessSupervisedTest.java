@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -169,7 +167,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         builder.filter("priority", TaskPriority.NORMAL);
 
         final SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchAssignedTasksSupervisedBy(matti.getId(), builder.done());
-        assertEquals(2, searchResult.getResult().size());
+        assertEquals(3, searchResult.getResult().size());
         final UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
         assertEquals("step1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
@@ -353,11 +351,13 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
         final SearchResult<HumanTaskInstance> result = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions.done());
         assertNotNull(result);
-        assertEquals(1, result.getCount());
+        assertEquals(3, result.getCount());
         final List<HumanTaskInstance> humanTaskInstanceList = result.getResult();
         assertNotNull(humanTaskInstanceList);
-        assertEquals(1, humanTaskInstanceList.size());
-        assertEquals(activityInstanceId, humanTaskInstanceList.get(0).getId());
+        assertEquals(3, humanTaskInstanceList.size());
+        assertEquals(getProcessAPI().getActivities(processInstances.get(0).getId(), 0, 10).get(0).getId(), humanTaskInstanceList.get(0).getId());
+        assertEquals(getProcessAPI().getActivities(processInstances.get(1).getId(), 0, 10).get(0).getId(), humanTaskInstanceList.get(1).getId());
+        assertEquals(getProcessAPI().getActivities(processInstances.get(2).getId(), 0, 10).get(0).getId(), humanTaskInstanceList.get(2).getId());
     }
 
     @Test
