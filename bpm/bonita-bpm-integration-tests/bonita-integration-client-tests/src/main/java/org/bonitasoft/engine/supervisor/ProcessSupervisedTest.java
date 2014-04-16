@@ -167,8 +167,12 @@ public class ProcessSupervisedTest extends CommonAPITest {
         builder.filter("priority", TaskPriority.NORMAL);
 
         final SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchAssignedTasksSupervisedBy(matti.getId(), builder.done());
-        assertEquals(3, searchResult.getResult().size());
-        final UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
+        assertEquals(2, searchResult.getResult().size());
+        UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
+        assertEquals("step1", taskInstance.getName());
+        assertEquals(john.getId(), taskInstance.getAssigneeId());
+
+        taskInstance = (UserTaskInstance) searchResult.getResult().get(1);
         assertEquals("step1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
     }

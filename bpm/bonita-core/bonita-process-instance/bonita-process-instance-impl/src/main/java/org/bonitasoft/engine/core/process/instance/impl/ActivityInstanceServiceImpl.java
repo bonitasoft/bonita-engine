@@ -72,6 +72,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -515,6 +516,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public long getNumberOfAssignedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            queryOptions.getFilters().add(new FilterOption(SHumanTaskInstance.class, "assigneeId", 0, FilterOperationType.GREATER));
             return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
@@ -525,6 +527,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public List<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            queryOptions.getFilters().add(new FilterOption(SHumanTaskInstance.class, "assigneeId", 0, FilterOperationType.GREATER));
             return getPersistenceRead().searchEntity(SHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
