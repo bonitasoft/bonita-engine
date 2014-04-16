@@ -73,8 +73,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            long executedForUserId = getExecuteForUserId(parameters);
-            executeActivity(flowNodeInstance, logger, executedForUserId);
+            long executedByUserId = getExecuteByUserId(parameters);
+            executeActivity(flowNodeInstance, logger, executedByUserId);
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTaskExt(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
