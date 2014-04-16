@@ -24,7 +24,6 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -65,7 +64,6 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * General mechanism for lookup is to look in specific flow node to search a data instance. When refering to "local" data instance, it means the lookup is
@@ -91,8 +89,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     protected final TechnicalLoggerService logger;
 
     public DataInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final ArchiveService archiveService, final TechnicalLoggerService logger, final ClassLoaderService classLoaderService,
-            final QueriableLoggerService queriableLoggerService) {
+            final ArchiveService archiveService, final TechnicalLoggerService logger) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.archiveService = archiveService;
@@ -109,6 +106,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
                 archiveService.recordInsert(archiveDate, archiveInsertRecord);
+                System.out.println("inserted data " + sDataInstance.getName() + " with value " + sDataInstance.getValue() + " at " + archiveDate);
             } catch (final SDefinitiveArchiveNotFound e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
@@ -685,6 +683,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         } catch (final SRecorderException e) {
             throw new SCreateDataInstanceException("Impossible to create data instance.", e);
         }
+        archiveDataInstance(dataInstance);
     }
 
     @Override

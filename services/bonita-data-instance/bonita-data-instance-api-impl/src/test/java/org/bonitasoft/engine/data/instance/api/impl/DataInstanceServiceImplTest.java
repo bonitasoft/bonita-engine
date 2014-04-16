@@ -58,7 +58,7 @@ public class DataInstanceServiceImplTest {
         logger = mock(TechnicalLoggerService.class);
         archiveService = mock(ArchiveService.class);
         dataInstanceServiceImpl = new DataInstanceServiceImpl(recorder, persistenceService,
-                archiveService, logger, null, null);
+                archiveService, logger);
     }
 
     // /**
