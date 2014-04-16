@@ -183,14 +183,12 @@
 		AND (process_definition.processId IN (
 				SELECT aprocessInstance.processDefinitionId
 		        FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS aprocessInstance
-		        WHERE aprocessInstance.startedBy = :startedBy
-		        OR aprocessInstance.startedFor = :startedBy)
+		        WHERE aprocessInstance.startedBy = :startedBy)
 	        OR
 		    process_definition.processId IN (
 		        SELECT processInstance.processDefinitionId
 		        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS processInstance
-		        WHERE processInstance.startedBy = :startedBy
-		        OR processInstance.startedFor = :startedBy)
+		        WHERE processInstance.startedBy = :startedBy)
 	        )
 	</query>
 
@@ -201,14 +199,12 @@
 		AND (process_definition.processId IN (
 				SELECT aprocessInstance.processDefinitionId
 		        FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS aprocessInstance
-		        WHERE aprocessInstance.startedBy = :startedBy
-		        OR aprocessInstance.startedFor = :startedBy)
+		        WHERE aprocessInstance.startedBy = :startedBy)
 	        OR
 		    process_definition.processId IN (
 		        SELECT processInstance.processDefinitionId
 		        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS processInstance
-		        WHERE processInstance.startedBy = :startedBy
-		        OR processInstance.startedFor = :startedBy)
+		        WHERE processInstance.startedBy = :startedBy)
 	        )
 	</query>
 

@@ -85,8 +85,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
                 Arrays.asList(true, true));
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, user1);
         final ProcessInstance pi1 = getProcessAPI().startProcess(user1.getId(), processDefinition1.getId());
-        assertEquals(user1.getId(), pi1.getStartedFor());
-        assertEquals(-1, pi1.getStartedBy());
+        assertEquals(user1.getId(), pi1.getStartedBy());
+        assertEquals(-1, pi1.getStartedBySubstitute());
         waitForUserTask("step1", pi1);
 
         // create process2
@@ -94,8 +94,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, ACTOR_NAME, user1);
         final ProcessInstance pi2 = getProcessAPI().startProcess(user1.getId(), processDefinition2.getId());
-        assertEquals(user1.getId(), pi2.getStartedFor());
-        assertEquals(-1, pi2.getStartedBy());
+        assertEquals(user1.getId(), pi2.getStartedBy());
+        assertEquals(-1, pi2.getStartedBySubstitute());
         waitForUserTask("step1", pi2);
 
         final SearchOptions searchOptions = new SearchOptionsImpl(0, 5);

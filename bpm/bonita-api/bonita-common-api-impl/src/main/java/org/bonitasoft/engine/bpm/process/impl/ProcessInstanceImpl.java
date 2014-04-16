@@ -33,7 +33,7 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
 
     private long startedBy;
 
-    private long startedFor;
+    private long startedBySubstitute;
 
     private Date endDate;
 
@@ -99,23 +99,23 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
     }
 
     @Override
-    public long getStartedFor() {
-        return startedFor;
+    public long getStartedBySubstitute() {
+        return startedBySubstitute;
     }
 
-    public void setStartedFor(final long startedFor) {
-        this.startedFor = startedFor;
+    public void setStartedBySubstitute(final long startedBySubstitute) {
+        this.startedBySubstitute = startedBySubstitute;
     }
 
     @Deprecated
     @Override
     public long getStartedByDelegate() {
-        return getStartedFor();
+        return getStartedBySubstitute();
     }
 
     @Deprecated
     public void setStartedByDelegate(long startedByDelegate) {
-        setStartedFor(startedByDelegate);
+        setStartedBySubstitute(startedByDelegate);
     }
 
     @Override

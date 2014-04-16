@@ -1290,10 +1290,9 @@
 		WHERE (EXISTS 
 				(SELECT at.id 
 					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedFor = :userId))
+					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 				)
 				OR p.startedBy = :userId
-				OR p.startedFor = :userId
 		)
 	</query>
 
@@ -1303,10 +1302,9 @@
 		WHERE (EXISTS 
 				(SELECT at.id 
 					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedFor = :userId))
+					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 				)
 				OR p.startedBy = :userId
-				OR p.startedFor = :userId
 		)
 	</query>
 
@@ -1317,12 +1315,10 @@
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-				WHERE (at.executedBy = u.id OR at.executedFor = u.id)
+				WHERE (at.executedBy = u.id OR at.executedBySubstitute = u.id)
 					AND u.managerUserId = :managerUserId
 				)
-			OR ((p.startedBy = u.id OR p.startedFor = u.id)
-				AND u.managerUserId = :managerUserId
-				)
+			OR (p.startedBy = u.id AND u.managerUserId = :managerUserId)
 			)
 	</query>
 
@@ -1333,12 +1329,10 @@
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-				WHERE (at.executedBy = u.id OR at.executedFor = u.id)
+				WHERE (at.executedBy = u.id OR at.executedBySubstitute = u.id)
 					AND u.managerUserId = :managerUserId
 				)
-			OR ((p.startedBy = u.id OR p.startedFor = u.id)
-				AND u.managerUserId = :managerUserId
-				)
+			OR (p.startedBy = u.id AND u.managerUserId = :managerUserId)
 			)
 	</query>
 

@@ -61,7 +61,7 @@ public interface FlowNodeInstanceService {
 
     static final String EXECUTED_BY_MODIFIED = "EXECUTED_BY_MODIFIED";
 
-    static final String EXECUTED_FOR_MODIFIED = "EXECUTED_FOR_MODIFIED";
+    static final String EXECUTED_BY_SUBSTITUTE_MODIFIED = "EXECUTED_BY_SUBSTITUTE_MODIFIED";
 
     static final String EXPECTED_END_DATE_MODIFIED = "EXPECTED_END_DATE_MODIFIED";
 
@@ -189,12 +189,12 @@ public interface FlowNodeInstanceService {
      * 
      * @param flowNodeInstance
      *            the flowNodeInstance will be updated
-     * @param executerForId
-     *            value for executedFor
+     * @param executerSubstituteId
+     *            value for executedBySubstitute
      * @throws SFlowNodeModificationException
      * @since 6.0.1
      */
-    void setExecutedFor(SFlowNodeInstance sFlowNodeInstance, long executerForId) throws SFlowNodeModificationException;
+    void setExecutedBySubstitute(SFlowNodeInstance sFlowNodeInstance, long executerSubstituteId) throws SFlowNodeModificationException;
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.

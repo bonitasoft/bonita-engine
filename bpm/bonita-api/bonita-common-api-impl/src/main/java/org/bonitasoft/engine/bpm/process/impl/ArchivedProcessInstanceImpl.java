@@ -35,7 +35,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
 
     private long startedBy;
 
-    private long startedFor;
+    private long startedBySubstitute;
 
     private Date endDate;
 
@@ -87,23 +87,23 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
     }
 
     @Override
-    public long getStartedFor() {
-        return startedFor;
+    public long getStartedBySubstitute() {
+        return startedBySubstitute;
     }
 
-    public void setStartedFor(long startedFor) {
-        this.startedFor = startedFor;
+    public void setStartedBySubstitute(long startedBySubstitute) {
+        this.startedBySubstitute = startedBySubstitute;
     }
 
     @Deprecated
     @Override
     public long getStartedByDelegate() {
-        return getStartedFor();
+        return getStartedBySubstitute();
     }
 
     @Deprecated
     public void setStartedByDelegate(long startedByDelegate) {
-        setStartedFor(startedByDelegate);
+        setStartedBySubstitute(startedByDelegate);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         result = prime * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
         result = prime * result + (startDate == null ? 0 : startDate.hashCode());
         result = prime * result + (int) (startedBy ^ startedBy >>> 32);
-        result = prime * result + (int) (startedFor ^ startedFor >>> 32);
+        result = prime * result + (int) (startedBySubstitute ^ startedBySubstitute >>> 32);
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + stateId;
         return result;
@@ -261,7 +261,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         if (startedBy != other.startedBy) {
             return false;
         }
-        if (startedFor != other.startedFor) {
+        if (startedBySubstitute != other.startedBySubstitute) {
             return false;
         }
         if (state == null) {

@@ -60,8 +60,8 @@ public class ProcessInstanceBuilder {
         return this;
     }
 
-    public ProcessInstanceBuilder setStartedFor(final long startedFor) {
-        processInstance.setStartedFor(startedFor);
+    public ProcessInstanceBuilder setStartedBySubstitute(final long startedBySubstitute) {
+        processInstance.setStartedBySubstitute(startedBySubstitute);
         return this;
     }
 

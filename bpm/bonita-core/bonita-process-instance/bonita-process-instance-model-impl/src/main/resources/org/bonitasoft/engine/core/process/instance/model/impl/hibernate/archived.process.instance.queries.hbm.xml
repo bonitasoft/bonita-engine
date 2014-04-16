@@ -271,7 +271,6 @@
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-			OR ap.startedFor = :userId
 			OR (usertask.rootContainerId = ap.sourceObjectId
 				AND usertask.stable = TRUE
 				AND usertask.assigneeId = :userId) 
@@ -288,7 +287,6 @@
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-			OR ap.startedFor = :userId
 			OR (usertask.rootContainerId = ap.sourceObjectId
 				AND usertask.stable = TRUE
 				AND usertask.assigneeId = :userId) 
@@ -586,10 +584,9 @@
 				(
 					 EXISTS (SELECT at.id 
 						FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedFor = :userId))
+						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 					)
 					OR ap.startedBy = :userId
-					OR ap.startedFor = :userId
 				)
 			)
   	</query>
@@ -602,10 +599,9 @@
 				(
 					 EXISTS (SELECT at.id 
 						FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedFor = :userId))
+						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 					)
 					OR ap.startedBy = :userId
-					OR ap.startedFor = :userId
 				)
 			)
   	</query>

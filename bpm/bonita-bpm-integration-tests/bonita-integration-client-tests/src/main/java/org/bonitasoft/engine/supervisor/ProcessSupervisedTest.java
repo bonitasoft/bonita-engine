@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -447,8 +449,8 @@ public class ProcessSupervisedTest extends CommonAPITest {
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());
-        assertEquals(john.getId(), result.getResult().get(0).getStartedFor());
-        assertEquals(matti.getId(), result.getResult().get(0).getStartedBy());
+        assertEquals(john.getId(), result.getResult().get(0).getStartedBy());
+        assertEquals(matti.getId(), result.getResult().get(0).getStartedBySubstitute());
 
         getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
         getProcessAPI().executeFlowNode(matti.getId(), pendingTask.getId());
@@ -461,8 +463,8 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final SearchResult<ArchivedProcessInstance> result2 = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result2);
         assertEquals(1, result2.getCount());
-        assertEquals(john.getId(), result2.getResult().get(0).getStartedFor());
-        assertEquals(matti.getId(), result2.getResult().get(0).getStartedBy());
+        assertEquals(john.getId(), result2.getResult().get(0).getStartedBy());
+        assertEquals(matti.getId(), result2.getResult().get(0).getStartedBySubstitute());
     }
 
     @Test

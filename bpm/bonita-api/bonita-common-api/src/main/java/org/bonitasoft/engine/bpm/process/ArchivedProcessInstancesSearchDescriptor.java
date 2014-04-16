@@ -36,7 +36,7 @@ public class ArchivedProcessInstancesSearchDescriptor {
 
     public static final String STARTED_BY = "startedBy";
 
-    public static final String STARTED_FOR = "startedFor";
+    public static final String STARTED_BY_SUBSTITUTE = "startedBySubstitute";
 
     public static final String START_DATE = "startDate";
 

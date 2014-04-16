@@ -905,10 +905,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             public void execute() throws SBonitaException {
                 final SSession session = SessionInfos.getSession();
                 if (session != null) {
-                    final long executerForUserId = session.getUserId();
+                    final long executerSubstituteUserId = session.getUserId();
                     final long executerByUserId;
                     if (userId == 0) {
-                        executerByUserId = executerForUserId;
+                        executerByUserId = executerSubstituteUserId;
                     } else {
                         executerByUserId = userId;
                     }
@@ -917,9 +917,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     final boolean isFirstState = flowNodeInstance.getStateId() == 0;
                     // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                     processExecutor
-                            .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerByUserId, executerForUserId);
+                            .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerByUserId, executerSubstituteUserId);
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                        final String message = LogMessageBuilder.builUserActionPrefix(session, executerForUserId) + "has performed the task"
+                        final String message = LogMessageBuilder.builUserActionPrefix(session, executerSubstituteUserId) + "has performed the task"
                                 + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                         logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                     }

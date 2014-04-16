@@ -134,13 +134,13 @@ public class ProcessStarter {
         return sProcessDefinition;
     }
 
-    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long starterForId,
+    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long starterSubstituteId,
             final ProcessInstance processInstance, final TechnicalLoggerService logger) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
             stb.append(SessionInfos.getUserNameFromSession());
-            if (starterId != starterForId) {
+            if (starterId != starterSubstituteId) {
                 stb.append("> acting as delegate of user with id <");
                 stb.append(starterId);
             }

@@ -38,6 +38,6 @@ public interface SFlowNodeInstanceBuilderFactory extends SFlowElementInstanceBui
 
     String getExecutedBy();
 
-    String getExecutedFor();
+    String getExecutedBySubstitute();
 
 }

@@ -38,15 +38,15 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     long getStartedBy();
 
     /**
-     * @return The identifier of the user for whom the process has been started.
+     * @return The identifier of the substitute user who started the process.
      * @since 6.3.0
      */
-    long getStartedFor();
+    long getStartedBySubstitute();
 
     /**
-     * @return The identifier of the user for whom the process has been started.
+     * @return The identifier of the substitute user who started the process.
      * @since 6.0.1
-     * @deprecated since 6.3.0, use {@link ArchivedProcessInstance#getStartedFor()}
+     * @deprecated since 6.3.0, use {@link ArchivedProcessInstance#getStartedBySubstitute()}
      */
     @Deprecated
     long getStartedByDelegate();
