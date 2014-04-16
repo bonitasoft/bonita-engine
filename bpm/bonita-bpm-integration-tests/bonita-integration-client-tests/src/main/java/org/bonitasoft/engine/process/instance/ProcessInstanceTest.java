@@ -638,7 +638,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinitionId, operations, contexts);
         final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(processInstance.getId());
-        assertEquals(otherUser.getId(), processInstance2.getStartedByDelegate());
+        assertEquals(otherUser.getId(), processInstance2.getStartedFor());
         assertEquals(pedro.getId(), processInstance2.getStartedBy());
 
         disableAndDeleteProcess(processDefinition);

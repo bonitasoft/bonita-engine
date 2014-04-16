@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +53,8 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     public static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
+
     public static final String USER_ID_KEY = "USER_ID_KEY";
-    
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor tenantAccessor)
@@ -86,13 +87,12 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         }
         return null;
     }
-    
+
     protected Long getExecuteForUserId(final Map<String, Serializable> parameters) {
         Serializable executeForUserId = parameters.get(USER_ID_KEY);
         // executeForUserId is not defined when the use is doing the task by himself
-        if ( executeForUserId == null ) {
-            final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
-            return sessionInfos.getUserId();   
+        if (executeForUserId == null) {
+            return SessionInfos.getSessionInfos().getUserId();
         }
         return (Long) executeForUserId;
     }
@@ -104,12 +104,20 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     protected List<Operation> getOperations(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
         final String message = "Mandatory parameter " + OPERATIONS_LIST_KEY + " is missing or not convertible to List.";
-        return getParameter(parameters, OPERATIONS_LIST_KEY, message);
+        final List<Operation> operations = getParameter(parameters, OPERATIONS_LIST_KEY, message);
+        if (operations == null) {
+            return Collections.emptyList();
+        }
+        return operations;
     }
 
     protected Map<String, Serializable> getOperationsContext(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
         final String message = "Mandatory parameter " + OPERATIONS_INPUT_KEY + " is missing or not convertible to Map.";
-        return getParameter(parameters, OPERATIONS_INPUT_KEY, message);
+        final Map<String, Serializable> operations = getParameter(parameters, OPERATIONS_INPUT_KEY, message);
+        if (operations == null) {
+            return Collections.emptyMap();
+        }
+        return operations;
     }
 
     protected void updateActivityInstanceVariables(final List<Operation> operations, final Map<String, Serializable> operationsContext,
@@ -134,7 +142,8 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         return tenantAccessor.getOperationService();
     }
 
-    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger, long executedForUserId) throws SFlowNodeReadException,
+    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger, long executedForUserId)
+            throws SFlowNodeReadException,
             SFlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();

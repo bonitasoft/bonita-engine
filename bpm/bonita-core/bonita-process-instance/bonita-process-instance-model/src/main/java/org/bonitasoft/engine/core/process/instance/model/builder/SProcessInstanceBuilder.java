@@ -29,7 +29,7 @@ public interface SProcessInstanceBuilder {
 
     SProcessInstanceBuilder setStartedBy(long startedBy);
 
-    SProcessInstanceBuilder setStartedByDelegate(long startedByDelegate);
+    SProcessInstanceBuilder setStartedFor(long startedFor);
 
     @Deprecated
     SProcessInstanceBuilder setContainerId(long id);

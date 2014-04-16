@@ -45,7 +45,7 @@ public class SProcessInstanceBuilderFactoryImpl implements SProcessInstanceBuild
 
     private static final String STARTED_BY_KEY = "startedBy";
 
-    private static final String STARTED_BY_DELEGATE_KEY = "startedByDelegate";
+    private static final String STARTED_FOR_KEY = "startedFor";
 
     private static final String START_DATE_KEY = "startDate";
 
@@ -113,8 +113,8 @@ public class SProcessInstanceBuilderFactoryImpl implements SProcessInstanceBuild
     }
 
     @Override
-    public String getStartedByDelegateKey() {
-        return STARTED_BY_DELEGATE_KEY;
+    public String getStartedForKey() {
+        return STARTED_FOR_KEY;
     }
 
     @Override

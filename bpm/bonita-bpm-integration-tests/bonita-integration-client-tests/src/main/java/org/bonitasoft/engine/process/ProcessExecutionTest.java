@@ -118,7 +118,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         // Check that the given user name is the one used to start the process:
-        assertEquals(user.getId(), processInstance.getStartedByDelegate());
+        assertEquals(user.getId(), processInstance.getStartedFor());
         assertEquals(-1, processInstance.getStartedBy());
 
         // Clean up
@@ -184,52 +184,6 @@ public class ProcessExecutionTest extends CommonAPITest {
         return user;
     }
 
-    // @Test
-    // public void createAndExecuteProcessWith2Branches() throws Exception {
-    // final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My_Process_with_branches", "1.0")
-    // .addAutomaticTask("step1")
-    // .addUserTask("step2", "admin")
-    // .addUserTask("step3", "admin")
-    // .addTransition("step1", "step2")
-    // .addTransition("step1", "step3")
-    // .getProcess();
-    //
-    // final ProcessDefinition processDefinition = deployAndEnable(designProcessDefinition);
-    // final ProcessInstance processInstance = processManagementAPI.start(-1, processDefinition.getId());
-    //
-    // assertTrue("expected 2 activities", new CheckNbOfActivities(20, 500, true, processInstance, 2).waitUntil());
-    // final Set<ActivityInstance> activities = processRuntimeAPI.getActivities(processInstance.getId(), 0, 200);
-    // assertEquals(2, activities.size());
-    // final Iterator<ActivityInstance> iterator = activities.iterator();
-    // final ActivityInstance step = iterator.next();
-    // ActivityInstance step2;
-    // ActivityInstance step3;
-    // if (step.getName().equals("step2")) {
-    // step2 = step;
-    // step3 = iterator.next();
-    // } else {
-    // step2 = iterator.next();
-    // step3 = step;
-    // }
-    //
-    // assertEquals(TestStates.getStartedState(processInstance), processInstance.getStateId());
-    //
-    // assertEquals("step2", step2.getName());
-    // assertEquals(TestStates.getReadyState(step2), step2.getStateId());
-    // processRuntimeAPI.executeActivity(step2.getId());
-    // step2 = processRuntimeAPI.getActivityInstance(step2.getId());
-    // assertEquals(TestStates.getNormalFinalState(step2), step2.getStateId());
-    //
-    // assertEquals("step3", step3.getName());
-    // assertEquals(TestStates.getReadyState(step3), step3.getStateId());
-    // processRuntimeAPI.executeActivity(step3.getId());
-    // final ArchivedActivityInstance archivedStep3 = processRuntimeAPI.getArchivedActivityInstance(step3.getId());
-    // assertEquals(TestStates.getNormalFinalState(archivedStep3), archivedStep3.getStateId());
-    //
-    // assertEquals(TestStates.getNormalFinalState(), processRuntimeAPI.getArchivedProcessInstance(processInstance.getId()).getStateId());
-    // disableAndDelete(processDefinition);
-    // }
-
     @Test
     public void createAndExecuteProcessWithAutomaticSteps() throws Exception {
         final User user = createUser("john", "bpm");
@@ -243,31 +197,6 @@ public class ProcessExecutionTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
         deleteUser(user.getId());
     }
-
-    // @Test
-    // public void createAndExecuteProcessWithAutomaticStepsAndUserTask() throws Exception {
-    // final DesignProcessDefinition designProcessDefinition = BPMTestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.2",
-    // Arrays.asList("step1", "step2"), Arrays.asList(false, true));
-    //
-    // final ProcessDefinition processDefinition = deployAndEnable(designProcessDefinition);
-    // final ProcessInstance processInstance = processRuntimeAPI.start(processDefinition.getId());
-    //
-    // assertNotSame(TestStates.getNormalFinalState(), processInstance.getStateId());// FIXME
-    //
-    // assertTrue("expected 1 activities", new CheckNbOfActivities(20, 500, true, processInstance, 1).waitUntil());
-    //
-    // final Set<ActivityInstance> activities = processRuntimeAPI.getActivities(processInstance.getId(), 0, 200);
-    // final ActivityInstance step2 = activities.iterator().next();
-    //
-    // assertEquals("step2", step2.getName());
-    //
-    // processRuntimeAPI.executeActivity(step2.getId());
-    //
-    // assertEquals(TestStates.getNormalFinalState(), processRuntimeAPI.getArchivedProcessInstance(processInstance.getId()).getStateId());//
-    // FIXME
-    //
-    // disableAndDelete(processDefinition);
-    // }
 
     @Test
     public void deleteUnknownProcess() throws Exception {
@@ -528,27 +457,30 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Test
-    public void executeTaskOnBehalf() throws Exception {
+    public void executeTaskFor() throws Exception {
         final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final String johnName = "john";
-        final User user = createUserAndLoginWith(johnName);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, user);
+        final User john = createUserAndLoginWith(johnName);
+        final User jack = createUser("jack", PASSWORD);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // execute step 1 using john
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assertEquals(0, step1.getExecutedBy());
-        assignAndExecuteStep(step1, user.getId());
+        getProcessAPI().assignUserTask(step1.getId(), jack.getId());
+        getProcessAPI().executeFlowNode(jack.getId(), step1.getId());
         waitForUserTask("step2", processInstance);
 
         // check that the step1 was executed by john
         final ArchivedActivityInstance step1Archived = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(user.getId(), step1Archived.getExecutedBy());
+        assertEquals(john.getId(), step1Archived.getExecutedBy());
+        assertEquals(jack.getId(), step1Archived.getExecutedFor());
 
         // clean
         disableAndDeleteProcess(processDefinition);
-        deleteUser(johnName);
+        deleteUsers(john, jack);
     }
 
     @Test

@@ -1,3 +1,17 @@
+/**
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.bonitasoft.engine.command.web;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +35,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -135,6 +150,32 @@ public class ActivityCommandTest extends CommonAPITest {
 
         // Clean
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate.", jira = "")
+    @Test
+    public void executeActionsAndTerminateFor() throws Exception {
+        final User john = createUser("john", PASSWORD);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        // wait for first task and assign it
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
+
+        // execute it with operation using the command
+        final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("ACTIVITY_INSTANCE_ID_KEY", activityInstanceId);
+        parameters.put("USER_ID_KEY", john.getId());
+        getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE, parameters);
+
+        // check we have the other task ready and the operation was executed
+        waitForUserTask("step2", processInstance);
+        final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(activityInstanceId);
+        Assert.assertEquals(businessUser.getId(), archivedActivityInstance.getExecutedBy());
+        Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedFor());
+
+        // Clean
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(john);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Wrong parameter" }, story = "Execute activity command with wrong parameter", jira = "ENGINE-586")

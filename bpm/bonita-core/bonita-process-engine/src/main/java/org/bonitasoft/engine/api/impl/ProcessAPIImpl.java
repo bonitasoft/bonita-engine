@@ -904,22 +904,25 @@ public class ProcessAPIImpl implements ProcessAPI {
             @Override
             public void execute() throws SBonitaException {
                 final SSession session = SessionInfos.getSession();
-                final long starterId;
-                if (userId == 0) {
-                    // the current user or SYSTEM
-                    starterId = session != null ? session.getUserId() : -1;
-                } else {
-                    starterId = userId;
-                }
+                if (session != null) {
+                    final long executerId = session.getUserId();
+                    final long executerForId;
+                    if (userId == 0) {
+                        executerForId = executerId;
+                    } else {
+                        executerForId = userId;
+                    }
 
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-                processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId, session.getId());
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                    final String message = LogMessageBuilder.builUserActionPrefix(session, starterId) + "has performed the task"
-                            + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+                    final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                    final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+                    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
+                    processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerId,
+                            executerForId);
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
+                        final String message = LogMessageBuilder.builUserActionPrefix(session, executerId) + "has performed the task"
+                                + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+                    }
                 }
             }
         };
@@ -1570,7 +1573,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedActivityInstance getArchivedActivityInstance(final long activityInstanceId) throws ActivityInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final GetArchivedActivityInstance getActivityInstance = new GetArchivedActivityInstance(activityInstanceService, activityInstanceId);

@@ -326,7 +326,7 @@ public class ModelConvertor {
         flowNode.setDisplayDescription(sflowNode.getDisplayDescription());
         flowNode.setDescription(sflowNode.getDescription());
         flowNode.setExecutedBy(sflowNode.getExecutedBy());
-        flowNode.setExecutedByDelegate(sflowNode.getExecutedByDelegate());
+        flowNode.setExecutedFor(sflowNode.getExecutedFor());
         flowNode.setStateCategory(StateCategory.valueOf(sflowNode.getStateCategory().name()));
     }
 
@@ -552,7 +552,7 @@ public class ModelConvertor {
             clientProcessInstanceBuilder.setStartDate(sInstance.getStartDate());
         }
         clientProcessInstanceBuilder.setStartedBy(sInstance.getStartedBy());
-        clientProcessInstanceBuilder.setStartedByDelegate(sInstance.getStartedByDelegate());
+        clientProcessInstanceBuilder.setStartedFor(sInstance.getStartedFor());
         if (sInstance.getEndDate() > 0) {
             clientProcessInstanceBuilder.setEndDate(sInstance.getEndDate());
         }
@@ -674,7 +674,7 @@ public class ModelConvertor {
             aFlowNode.setArchiveDate(new Date(saFlowNode.getArchiveDate()));
         }
         aFlowNode.setExecutedBy(saFlowNode.getExecutedBy());
-        aFlowNode.setExecutedByDelegate(saFlowNode.getExecutedByDelegate());
+        aFlowNode.setExecutedFor(saFlowNode.getExecutedFor());
         aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlowNodeDefinitionId());
         aFlowNode.setTerminal(saFlowNode.isTerminal());
     }
@@ -827,7 +827,7 @@ public class ModelConvertor {
             archivedInstance.setStartDate(new Date(sInstance.getStartDate()));
         }
         archivedInstance.setStartedBy(sInstance.getStartedBy());
-        archivedInstance.setStartedByDelegate(sInstance.getStartedByDelegate());
+        archivedInstance.setStartedFor(sInstance.getStartedFor());
         if (sInstance.getEndDate() > 0) {
             archivedInstance.setEndDate(new Date(sInstance.getEndDate()));
         }

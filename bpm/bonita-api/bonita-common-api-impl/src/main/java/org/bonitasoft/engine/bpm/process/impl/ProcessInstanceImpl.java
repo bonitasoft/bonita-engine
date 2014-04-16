@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -33,7 +33,7 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
 
     private long startedBy;
 
-    private long startedByDelegate;
+    private long startedFor;
 
     private Date endDate;
 
@@ -99,12 +99,23 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
     }
 
     @Override
-    public long getStartedByDelegate() {
-        return startedByDelegate;
+    public long getStartedFor() {
+        return startedFor;
     }
 
-    public void setStartedByDelegate(final long startedByDelegate) {
-        this.startedByDelegate = startedByDelegate;
+    public void setStartedFor(final long startedFor) {
+        this.startedFor = startedFor;
+    }
+
+    @Deprecated
+    @Override
+    public long getStartedByDelegate() {
+        return getStartedFor();
+    }
+
+    @Deprecated
+    public void setStartedByDelegate(long startedByDelegate) {
+        setStartedFor(startedByDelegate);
     }
 
     @Override

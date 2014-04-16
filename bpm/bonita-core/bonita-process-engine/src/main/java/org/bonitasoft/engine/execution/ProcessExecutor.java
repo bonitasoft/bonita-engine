@@ -37,15 +37,15 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface ProcessExecutor extends ContainerExecutor {
 
-    SProcessInstance start(long processDefinitionId, long targetSFlowNodeDefinitionId, long starterId, long starterDelegateId,
+    SProcessInstance start(long processDefinitionId, long targetSFlowNodeDefinitionId, long starterId, long starterForId,
             SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
             List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId) throws SProcessInstanceCreationException;
 
-    SProcessInstance start(long starterId, long starterDelegateId, List<SOperation> operations,
+    SProcessInstance start(long starterId, long starterForId, List<SOperation> operations,
             Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector)
             throws SProcessInstanceCreationException;
 
-    SProcessInstance start(long starterId, long starterDelegateId,
+    SProcessInstance start(long starterId, long starterForId,
             SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
             List<ConnectorDefinitionWithInputValues> connectors, long callerId, FlowNodeSelector selector) throws SProcessInstanceCreationException;
 

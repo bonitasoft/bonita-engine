@@ -46,7 +46,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
 
     private long executedBy;
 
-    private long executedByDelegate;
+    private long executedFor;
 
     private long flownodeDefinitionId;
 
@@ -147,12 +147,23 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
     }
 
     @Override
-    public long getExecutedByDelegate() {
-        return executedByDelegate;
+    public long getExecutedFor() {
+        return executedFor;
     }
 
-    public void setExecutedByDelegate(long executedByDelegate) {
-        this.executedByDelegate = executedByDelegate;
+    public void setExecutedFor(long executedFor) {
+        this.executedFor = executedFor;
+    }
+
+    @Deprecated
+    @Override
+    public long getExecutedByDelegate() {
+        return getExecutedFor();
+    }
+
+    @Deprecated
+    public void setExecutedByDelegate(long executedFor) {
+        setExecutedFor(executedFor);
     }
 
     @Override
@@ -172,7 +183,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
-        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
+        result = prime * result + (int) (executedFor ^ executedFor >>> 32);
         result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
         result = prime * result + (int) (parentProcessInstanceId ^ parentProcessInstanceId >>> 32);
         result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
@@ -219,7 +230,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         if (executedBy != other.executedBy) {
             return false;
         }
-        if (executedByDelegate != other.executedByDelegate) {
+        if (executedFor != other.executedFor) {
             return false;
         }
         if (parentContainerId != other.parentContainerId) {

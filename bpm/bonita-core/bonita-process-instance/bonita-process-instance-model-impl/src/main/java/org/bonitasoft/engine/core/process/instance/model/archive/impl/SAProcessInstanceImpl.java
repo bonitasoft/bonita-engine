@@ -36,7 +36,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
 
     private long startedBy;
 
-    private long startedByDelegate;
+    private long startedFor;
 
     private long endDate;
 
@@ -69,7 +69,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         startDate = processInstance.getStartDate();
         endDate = processInstance.getEndDate();
         startedBy = processInstance.getStartedBy();
-        startedByDelegate = processInstance.getStartedByDelegate();
+        startedFor = processInstance.getStartedFor();
         lastUpdate = processInstance.getLastUpdate();
         stateId = processInstance.getStateId();
         rootProcessInstanceId = processInstance.getRootProcessInstanceId();
@@ -132,12 +132,12 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         this.startedBy = startedBy;
     }
 
-    public long getStartedByDelegate() {
-        return startedByDelegate;
+    public long getStartedFor() {
+        return startedFor;
     }
 
-    public void setStartedByDelegate(long startedByDelegate) {
-        this.startedByDelegate = startedByDelegate;
+    public void setStartedFor(long startedFor) {
+        this.startedFor = startedFor;
     }
 
     @Override
@@ -241,7 +241,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         result = prime * result + (int) (rootProcessInstanceId ^ rootProcessInstanceId >>> 32);
         result = prime * result + (int) (startDate ^ startDate >>> 32);
         result = prime * result + (int) (startedBy ^ startedBy >>> 32);
-        result = prime * result + (int) (startedByDelegate ^ startedByDelegate >>> 32);
+        result = prime * result + (int) (startedFor ^ startedFor >>> 32);
         result = prime * result + stateId;
         result = prime * result + (stringIndex1 == null ? 0 : stringIndex1.hashCode());
         result = prime * result + (stringIndex2 == null ? 0 : stringIndex2.hashCode());
@@ -284,7 +284,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         if (startedBy != other.startedBy) {
             return false;
         }
-        if (startedByDelegate != other.startedByDelegate) {
+        if (startedFor != other.startedFor) {
             return false;
         }
         if (stateId != other.stateId) {

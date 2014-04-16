@@ -447,7 +447,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());
-        assertEquals(john.getId(), result.getResult().get(0).getStartedByDelegate());
+        assertEquals(john.getId(), result.getResult().get(0).getStartedFor());
         assertEquals(matti.getId(), result.getResult().get(0).getStartedBy());
 
         getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
@@ -461,7 +461,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final SearchResult<ArchivedProcessInstance> result2 = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result2);
         assertEquals(1, result2.getCount());
-        assertEquals(john.getId(), result2.getResult().get(0).getStartedByDelegate());
+        assertEquals(john.getId(), result2.getResult().get(0).getStartedFor());
         assertEquals(matti.getId(), result2.getResult().get(0).getStartedBy());
     }
 

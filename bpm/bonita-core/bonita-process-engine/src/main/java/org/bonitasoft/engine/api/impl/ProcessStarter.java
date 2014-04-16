@@ -88,12 +88,12 @@ public class ProcessStarter {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SProcessDefinition sProcessDefinition = retrieveProcessDefinition(processDefinitionService);
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final long starterDelegateId;
+        final long starterForId;
         final long userIdFromSession = SessionInfos.getUserIdFromSession();
         if (userId == 0) {
-            starterDelegateId = userIdFromSession;
+            starterForId = userIdFromSession;
         } else {
-            starterDelegateId = userId;
+            starterForId = userId;
         }
         final SProcessInstance startedInstance;
         try {
@@ -104,7 +104,7 @@ public class ProcessStarter {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(userIdFromSession, starterDelegateId, sOperations, operationContext, null, new FlowNodeSelector(
+            startedInstance = processExecutor.start(userIdFromSession, starterForId, sOperations, operationContext, null, new FlowNodeSelector(
                     sProcessDefinition, filter));
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
@@ -112,7 +112,7 @@ public class ProcessStarter {
 
         final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logInstanceStarted(sProcessDefinition, userIdFromSession, starterDelegateId, processInstance, logger);
+        logInstanceStarted(sProcessDefinition, userIdFromSession, starterForId, processInstance, logger);
         return processInstance;
     }
 
@@ -133,15 +133,15 @@ public class ProcessStarter {
         return sProcessDefinition;
     }
 
-    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
+    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long starterForId,
             final ProcessInstance processInstance, final TechnicalLoggerService logger) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
             stb.append(SessionInfos.getUserNameFromSession());
-            if (starterId != starterDelegateId) {
+            if (starterId != starterForId) {
                 stb.append("> acting as delegate of user with id <");
-                stb.append(starterDelegateId);
+                stb.append(starterForId);
             }
             stb.append("> has started instance <");
             stb.append(processInstance.getId());
