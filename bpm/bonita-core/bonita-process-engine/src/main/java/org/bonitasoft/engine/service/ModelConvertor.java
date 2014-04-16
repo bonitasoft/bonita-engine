@@ -1885,6 +1885,7 @@ public class ModelConvertor {
         profileEntryImpl.setPage(sProfileEntry.getPage());
         profileEntryImpl.setParentId(sProfileEntry.getParentId());
         profileEntryImpl.setType(sProfileEntry.getType());
+        profileEntryImpl.setCustom(sProfileEntry.isCustom());
         return profileEntryImpl;
     }
 

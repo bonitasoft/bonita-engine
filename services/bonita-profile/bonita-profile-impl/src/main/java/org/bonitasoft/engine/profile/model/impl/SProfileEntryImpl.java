@@ -40,6 +40,8 @@ public class SProfileEntryImpl implements SProfileEntry {
 
     private String page;
 
+    private boolean custom;
+
     public SProfileEntryImpl() {
         super();
     }
@@ -59,6 +61,7 @@ public class SProfileEntryImpl implements SProfileEntry {
         index = profileEntry.getIndex();
         page = profileEntry.getPage();
         type = profileEntry.getType();
+        custom = profileEntry.isCustom();
     }
 
     public long getTenantId() {
@@ -101,6 +104,15 @@ public class SProfileEntryImpl implements SProfileEntry {
 
     public void setProfileId(final long profileId) {
         this.profileId = profileId;
+    }
+
+    public void setCustom(final boolean custom) {
+        this.custom = custom;
+    }
+
+    @Override
+    public boolean isCustom() {
+        return custom;
     }
 
     @Override
@@ -152,6 +164,7 @@ public class SProfileEntryImpl implements SProfileEntry {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (custom ? 1231 : 1237);
         result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (int) (id ^ id >>> 32);
         result = prime * result + (int) (index ^ index >>> 32);
@@ -175,7 +188,10 @@ public class SProfileEntryImpl implements SProfileEntry {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SProfileEntryImpl other = (SProfileEntryImpl) obj;
+        SProfileEntryImpl other = (SProfileEntryImpl) obj;
+        if (custom != other.custom) {
+            return false;
+        }
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -220,6 +236,12 @@ public class SProfileEntryImpl implements SProfileEntry {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "SProfileEntryImpl [id=" + id + ", tenantId=" + tenantId + ", profileId=" + profileId + ", parentId=" + parentId + ", name=" + name
+                + ", description=" + description + ", index=" + index + ", type=" + type + ", page=" + page + ", custom=" + custom + "]";
     }
 
 }

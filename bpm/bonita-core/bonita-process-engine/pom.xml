@@ -245,9 +245,9 @@
             <scope>test</scope>
         </dependency>
 		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-            <scope>test</scope>
+			  <groupId>org.assertj</groupId>
+			  <artifactId>assertj-core</artifactId>
+			  <scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -272,8 +272,13 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
          <dependency>
-            <!-- because we need the builderfactory impl-->
+        	<groupId>org.apache.commons</groupId>
+        	<artifactId>commons-lang3</artifactId>
+        	<version>3.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.identity</groupId>
             <artifactId>bonita-identity-model-impl</artifactId>
             <version>${project.version}</version>
@@ -309,11 +314,7 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-        	<groupId>org.apache.commons</groupId>
-        	<artifactId>commons-lang3</artifactId>
-        	<version>3.2.1</version>
-        </dependency>
     </dependencies>
+
 
 </project>

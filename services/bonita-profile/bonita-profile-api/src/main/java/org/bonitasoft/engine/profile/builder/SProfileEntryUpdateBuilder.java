@@ -34,6 +34,8 @@ public interface SProfileEntryUpdateBuilder {
 
     SProfileEntryUpdateBuilder setIndex(long index);
 
+    SProfileEntryUpdateBuilder setCustom(boolean custom);
+
     EntityUpdateDescriptor done();
 
 }
