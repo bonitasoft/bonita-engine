@@ -34,6 +34,7 @@
 		<property name="index" column="index_"/>
 		<property name="type" column="type"/>
 		<property name="page" column="page"/>
+		<property name="custom" column="custom"/>
 		<filter name="tenantFilter" />
 	</class>
 
