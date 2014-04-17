@@ -126,11 +126,6 @@ public class OperationServiceImplTest {
     }
 
     @Test
-    public void testExecuteSOperationLongStringSExpressionContext() throws Exception {
-        throw new RuntimeException("not yet implemented");
-    }
-
-    @Test
     public void should_UpdateLeftOperands_call_leftOperandHandlers() throws Exception {
         // given
         SOperation op1 = createOperation("type1", "data1", SOperatorType.ASSIGNMENT);
@@ -245,16 +240,6 @@ public class OperationServiceImplTest {
         sOperationImpl.setLeftOperand(leftOperand);
         sOperationImpl.setType(operatorType);
         return sOperationImpl;
-    }
-
-    @Test
-    public void testExecuteOperators() throws Exception {
-        throw new RuntimeException("not yet implemented");
-    }
-
-    @Test
-    public void testGetOperationValue() throws Exception {
-        throw new RuntimeException("not yet implemented");
     }
 
 }
