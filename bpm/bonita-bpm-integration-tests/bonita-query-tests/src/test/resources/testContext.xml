@@ -41,5 +41,9 @@
    <bean id="processInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
+    
+   <bean id="messageAndEventRepository" class="org.bonitasoft.engine.test.persistence.repository.MessageAndEventRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
 
 </beans>

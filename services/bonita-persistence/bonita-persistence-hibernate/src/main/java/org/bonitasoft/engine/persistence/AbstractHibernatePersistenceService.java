@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
 
 import java.io.IOException;
 import java.net.URL;
@@ -245,6 +247,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SRetryableException(lae);
         } catch (final StaleStateException sse) {
             throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    @Override
+    public int update(final String updateQueryName) throws SPersistenceException {
+        final Query query = getSession(true).getNamedQuery(updateQueryName);
+        try {
+            return query.executeUpdate();
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
         }
@@ -578,8 +590,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         return completeField;
     }
-    
-    private String getInClause(StringBuilder completeField, FilterOption filterOption) {
+
+    private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
         StringBuilder stb = new StringBuilder(completeField);
         stb.append(" in (");
         stb.append(getInValues(filterOption));
@@ -587,13 +599,13 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         return stb.toString();
     }
 
-    private String getInValues(FilterOption filterOption) {
+    private String getInValues(final FilterOption filterOption) {
         StringBuilder stb = new StringBuilder();
         for (Object element : filterOption.getIn()) {
             stb.append(element + ",");
         }
         String inValues = stb.toString();
-        return inValues.substring(0, inValues.length() -1);
+        return inValues.substring(0, inValues.length() - 1);
     }
 
     private <T> void appendOrderByClause(final StringBuilder builder, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {

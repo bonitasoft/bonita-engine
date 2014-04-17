@@ -13,28 +13,13 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import java.util.List;
-
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * Resets all "In Progress" BPMN Message couples so that they can be triggered again on next cron.
- * 
  * Restart work {@link ExecuteMessageCoupleWork}
  * 
  * @author Emmanuel Duchastenier
@@ -46,33 +31,14 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
         final EventInstanceService eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         try {
             // Reset of all SMessageInstance:
-            final List<SMessageInstance> inProgressMessageInstances = eventInstanceService.getInProgressMessageInstances();
-            for (SMessageInstance sMessageInstance : inProgressMessageInstances) {
-                resetMessageInstance(sMessageInstance, eventInstanceService);
+            eventInstanceService.resetProgressMessageInstances();
 
-            }
             // Reset of all SWaitingMessageEvent:
-            final List<SWaitingMessageEvent> inProgressWaitingEvents = eventInstanceService.getInProgressWaitingMessageEvents();
-            for (SWaitingMessageEvent sWaitingEvent : inProgressWaitingEvents) {
-                resetWaitingMessage(sWaitingEvent, eventInstanceService);
-            }
+            eventInstanceService.resetInProgressWaitingEvents();
+
         } catch (final SBonitaException e) {
             handleException("Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped", e);
         }
-    }
-
-    private void resetMessageInstance(final SMessageInstance messageInstanceToUpdate, final EventInstanceService eventInstanceService) throws SMessageModificationException, SMessageInstanceNotFoundException, SMessageInstanceReadException {
-        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceToUpdate.getId());
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), false);
-        eventInstanceService.updateMessageInstance(messageInstance, descriptor);
-    }
-
-    private void resetWaitingMessage(final SWaitingMessageEvent waitingMessage, final EventInstanceService eventInstanceService) throws SWaitingEventModificationException, SWaitingEventNotFoundException, SWaitingEventReadException {
-        final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessage.getId());
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
-        eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
     private void handleException(final String message, final Exception e) throws RestartException {
