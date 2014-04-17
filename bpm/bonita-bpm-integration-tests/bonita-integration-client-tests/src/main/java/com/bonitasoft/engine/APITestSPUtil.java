@@ -85,12 +85,12 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    protected PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return PlatformAPIAccessor.getPlatformAPI(session);
     }
 
     @Override
-    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getLoginAPI();
     }
 
@@ -115,7 +115,7 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    protected ThemeAPI getThemeAPI() {
+    public ThemeAPI getThemeAPI() {
         return themeAPI;
     }
 
@@ -160,13 +160,13 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    protected void loginWith(final String userName, final String password) throws BonitaException {
+    public void loginWith(final String userName, final String password) throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant(userName, password));
         setAPIs();
     }
 
     @Override
-    protected void login() throws BonitaException {
+    public void login() throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant());
         setAPIs();
     }
@@ -199,7 +199,7 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    protected void logout() throws BonitaException {
+    public void logout() throws BonitaException {
         SPBPMTestUtil.logoutTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
