@@ -36,7 +36,7 @@ public abstract class SFlowNodeInstanceBuilderFactoryImpl extends SFlowElementIn
 
     protected static final String EXECUTE_BY_KEY = "executedBy";
 
-    protected static final String EXECUTE_FOR_KEY = "executedFor";
+    protected static final String EXECUTE_FOR_KEY = "executedBySubstitute";
 
     protected static final String STATE_EXECUTING_KEY = "stateExecuting";
 
@@ -62,7 +62,7 @@ public abstract class SFlowNodeInstanceBuilderFactoryImpl extends SFlowElementIn
     }
 
     @Override
-    public String getExecutedFor() {
+    public String getExecutedBySubstitute() {
         return EXECUTE_FOR_KEY;
     }
 

@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -607,8 +608,8 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         dataInstance = getProcessAPI().getProcessDataInstance("D", instance.getId());
         assertEquals(Double.valueOf(3.14), dataInstance.getValue());
 
-        assertEquals(otherUser.getId(), processInstance2.getStartedByDelegate());
-        assertEquals(jack.getId(), processInstance2.getStartedBy());
+        assertEquals(otherUser.getId(), processInstance2.getStartedBy());
+        assertEquals(jack.getId(), processInstance2.getStartedBySubstitute());
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(jack.getId());
@@ -638,8 +639,8 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinitionId, operations, contexts);
         final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(processInstance.getId());
-        assertEquals(otherUser.getId(), processInstance2.getStartedFor());
-        assertEquals(pedro.getId(), processInstance2.getStartedBy());
+        assertEquals(otherUser.getId(), processInstance2.getStartedBy());
+        assertEquals(pedro.getId(), processInstance2.getStartedBySubstitute());
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(otherUser);
@@ -671,7 +672,8 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .addIntegerData(dataName, new ExpressionBuilder().createConstantIntegerExpression(1)).addUserTask("step1", ACTOR_NAME)
                 .addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
         // final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, pedro);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME), Lists.newArrayList(pedro, otherUser));
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro, otherUser));
 
         // create Operation keyed map
         final Operation integerOperation = buildIntegerOperation(dataName, 2);

@@ -50,8 +50,8 @@ public class SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
     }
 
     @Override
-    public SProcessInstanceBuilder setStartedFor(long startedFor) {
-        entity.setStartedFor(startedFor);
+    public SProcessInstanceBuilder setStartedBySubstitute(long startedBySubstitute) {
+        entity.setStartedBySubstitute(startedBySubstitute);
         return this;
     }
 

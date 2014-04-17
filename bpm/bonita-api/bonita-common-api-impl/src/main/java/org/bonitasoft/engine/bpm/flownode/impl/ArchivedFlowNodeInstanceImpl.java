@@ -50,7 +50,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
 
     private long executedBy;
 
-    private long executedFor;
+    private long executedBySubstitute;
 
     private long flownodeDefinitionId;
 
@@ -169,23 +169,23 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     }
 
     @Override
-    public long getExecutedFor() {
-        return executedFor;
+    public long getExecutedBySubstitute() {
+        return executedBySubstitute;
     }
 
-    public void setExecutedFor(long executedFor) {
-        this.executedFor = executedFor;
+    public void setExecutedBySubstitute(long executedBySubstitute) {
+        this.executedBySubstitute = executedBySubstitute;
     }
 
     @Deprecated
     @Override
     public long getExecutedByDelegate() {
-        return getExecutedFor();
+        return getExecutedBySubstitute();
     }
 
     @Deprecated
-    public void setExecutedByDelegate(long executedFor) {
-        setExecutedFor(executedFor);
+    public void setExecutedByDelegate(long executedBySubstitute) {
+        setExecutedBySubstitute(executedBySubstitute);
     }
 
     @Override
@@ -215,7 +215,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
-        result = prime * result + (int) (executedFor ^ executedFor >>> 32);
+        result = prime * result + (int) (executedBySubstitute ^ executedBySubstitute >>> 32);
         result = prime * result + (int) (flownodeDefinitionId ^ flownodeDefinitionId >>> 32);
         result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
         result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
@@ -270,7 +270,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         if (executedBy != other.executedBy) {
             return false;
         }
-        if (executedFor != other.executedFor) {
+        if (executedBySubstitute != other.executedBySubstitute) {
             return false;
         }
         if (flownodeDefinitionId != other.flownodeDefinitionId) {

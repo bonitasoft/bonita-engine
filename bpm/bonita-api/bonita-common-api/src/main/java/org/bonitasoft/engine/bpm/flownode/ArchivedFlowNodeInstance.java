@@ -53,15 +53,15 @@ public interface ArchivedFlowNodeInstance extends NamedElement, BaseElement, Arc
     long getExecutedBy();
 
     /**
-     * @return The identifier of the user for whom the flow node has been executed.
+     * @return The identifier of the substitute user who executed the flow node.
      * @since 6.3.0
      */
-    long getExecutedFor();
+    long getExecutedBySubstitute();
 
     /**
-     * @return The identifier of the user for whom the flow node has been executed.
+     * @return The identifier of the substitute user who executed the flow node.
      * @since 6.0.1
-     * @deprecated since 6.3.0, use {@link ArchivedFlowNodeInstance#getExecutedFor()}
+     * @deprecated since 6.3.0, use {@link ArchivedFlowNodeInstance#getExecutedBySubstitute()}
      */
     @Deprecated
     long getExecutedByDelegate();

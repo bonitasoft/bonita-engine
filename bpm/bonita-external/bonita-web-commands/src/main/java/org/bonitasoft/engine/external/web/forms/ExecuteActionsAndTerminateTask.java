@@ -77,8 +77,8 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            long executedForUserId = getExecuteForUserId(parameters);
-            executeActivity(flowNodeInstance, logger, executedForUserId);
+            long executedByUserId = getExecuteByUserId(parameters);
+            executeActivity(flowNodeInstance, logger, executedByUserId);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new SCommandExecutionException(
@@ -88,13 +88,13 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         return null;
     }
 
-    protected Long getExecuteForUserId(final Map<String, Serializable> parameters) {
-        Serializable executeForUserId = parameters.get(USER_ID_KEY);
-        // executeForUserId is not defined when the use is doing the task by himself
-        if (executeForUserId == null) {
+    protected Long getExecuteByUserId(final Map<String, Serializable> parameters) {
+        Serializable executeByUserId = parameters.get(USER_ID_KEY);
+        // executeByUserId is not defined when the use is doing the task by himself
+        if (executeByUserId == null) {
             return SessionInfos.getSessionInfos().getUserId();
         }
-        return (Long) executeForUserId;
+        return (Long) executeByUserId;
     }
 
     protected Long getActivityInstanceId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
@@ -142,15 +142,14 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         return tenantAccessor.getOperationService();
     }
 
-    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger, long executedForUserId)
-            throws SFlowNodeReadException,
-            SFlowNodeExecutionException {
+    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger, long executedByUserId)
+            throws SFlowNodeReadException, SFlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
         final long userId = sessionInfos.getUserId();
         // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), userId, executedForUserId);
+        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), executedByUserId, userId);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
             final String message = "The user <" + sessionInfos.getUsername() + "> has performed the task"
                     + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);

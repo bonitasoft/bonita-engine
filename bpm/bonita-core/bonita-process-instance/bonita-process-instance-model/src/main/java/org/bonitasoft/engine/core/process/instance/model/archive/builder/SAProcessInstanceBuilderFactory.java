@@ -47,7 +47,7 @@ public interface SAProcessInstanceBuilderFactory {
 
     String getStartedByKey();
 
-    String getStartedForKey();
+    String getStartedBySubstituteKey();
 
     String getStateIdKey();
 

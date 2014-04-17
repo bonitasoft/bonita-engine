@@ -170,8 +170,8 @@ public class ActivityCommandTest extends CommonAPITest {
         // check we have the other task ready and the operation was executed
         waitForUserTask("step2", processInstance);
         final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(activityInstanceId);
-        Assert.assertEquals(businessUser.getId(), archivedActivityInstance.getExecutedBy());
-        Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedFor());
+        Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedBy());
+        Assert.assertEquals(businessUser.getId(), archivedActivityInstance.getExecutedBySubstitute());
 
         // Clean
         disableAndDeleteProcess(processDefinition);

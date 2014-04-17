@@ -118,8 +118,8 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         // Check that the given user name is the one used to start the process:
-        assertEquals(user.getId(), processInstance.getStartedFor());
-        assertEquals(-1, processInstance.getStartedBy());
+        assertEquals(user.getId(), processInstance.getStartedBy());
+        assertEquals(-1, processInstance.getStartedBySubstitute());
 
         // Clean up
         waitForUserTask("step1", processInstance);
@@ -475,8 +475,8 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         // check that the step1 was executed by john
         final ArchivedActivityInstance step1Archived = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(john.getId(), step1Archived.getExecutedBy());
-        assertEquals(jack.getId(), step1Archived.getExecutedFor());
+        assertEquals(jack.getId(), step1Archived.getExecutedBy());
+        assertEquals(john.getId(), step1Archived.getExecutedBySubstitute());
 
         // clean
         disableAndDeleteProcess(processDefinition);

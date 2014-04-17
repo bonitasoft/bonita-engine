@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singletonMap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -905,21 +905,21 @@ public class ProcessAPIImpl implements ProcessAPI {
             public void execute() throws SBonitaException {
                 final SSession session = SessionInfos.getSession();
                 if (session != null) {
-                    final long executerId = session.getUserId();
-                    final long executerForId;
+                    final long executerSubstituteUserId = session.getUserId();
+                    final long executerByUserId;
                     if (userId == 0) {
-                        executerForId = executerId;
+                        executerByUserId = executerSubstituteUserId;
                     } else {
-                        executerForId = userId;
+                        executerByUserId = userId;
                     }
 
                     final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
                     final boolean isFirstState = flowNodeInstance.getStateId() == 0;
                     // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-                    processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerId,
-                            executerForId);
+                    processExecutor
+                            .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerByUserId, executerSubstituteUserId);
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                        final String message = LogMessageBuilder.builUserActionPrefix(session, executerId) + "has performed the task"
+                        final String message = LogMessageBuilder.builUserActionPrefix(session, executerSubstituteUserId) + "has performed the task"
                                 + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                         logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                     }
