@@ -148,13 +148,14 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @throws SMessageModificationException
      *             if an error occurs when resetting the 'handled' flag.
      */
-    void resetProgressMessageInstances() throws SMessageModificationException;
+    int resetProgressMessageInstances() throws SMessageModificationException;
 
     /**
      * Resets all Waiting Message Events marked as 'in progress", so that they are elligible to match Message Instances again.
      * 
+     * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException
      *             if an error occurs when resetting the 'progress' flag.
      */
-    void resetInProgressWaitingEvents() throws SWaitingEventModificationException;
+    int resetInProgressWaitingEvents() throws SWaitingEventModificationException;
 }

@@ -15,6 +15,8 @@ package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -29,16 +31,26 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
         final EventInstanceService eventInstanceService = tenantServiceAccessor.getEventInstanceService();
+        TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
+
         try {
             // Reset of all SMessageInstance:
-            eventInstanceService.resetProgressMessageInstances();
+            logInfo(technicalLoggerService, "Reinitializing message instances in non-stable state to make them reworked by BPMEventHandlingJob");
+            int nbMessagesReset = eventInstanceService.resetProgressMessageInstances();
+            logInfo(technicalLoggerService, nbMessagesReset + " message instances found and reset.");
 
             // Reset of all SWaitingMessageEvent:
-            eventInstanceService.resetInProgressWaitingEvents();
+            logInfo(technicalLoggerService, "Reinitializing waiting message events in non-stable state to make them reworked by BPMEventHandlingJob");
+            int nbWaitingEventsReset = eventInstanceService.resetInProgressWaitingEvents();
+            logInfo(technicalLoggerService, nbWaitingEventsReset + " waiting message events found and reset.");
 
         } catch (final SBonitaException e) {
             handleException("Unable to reset MessageInstances / WaitingMessageEvents that were 'In Progress' when the node stopped", e);
         }
+    }
+
+    protected void logInfo(final TechnicalLoggerService technicalLoggerService, final String msg) {
+        technicalLoggerService.log(BPMEventWorksHandler.class, TechnicalLogSeverity.INFO, msg);
     }
 
     private void handleException(final String message, final Exception e) throws RestartException {

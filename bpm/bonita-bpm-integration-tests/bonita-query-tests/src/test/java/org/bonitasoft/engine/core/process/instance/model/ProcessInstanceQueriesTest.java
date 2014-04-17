@@ -200,4 +200,36 @@ public class ProcessInstanceQueriesTest {
         assertThat(messageAndEventRepository.getInProgressWaitingEvents()).hasSize(0);
     }
 
+    @Test
+    public void resetWaitingEventsShouldReturnNumberOfRowsUpdated() {
+        // given:
+        for (int i = 0; i < MORE_THAN_DEFAULT_PAGE_SIZE; i++) {
+            messageAndEventRepository.add(aWaitingEvent().inProgress(true).build());
+        }
+        messageAndEventRepository.add(aWaitingEvent().inProgress(false).build());
+        messageAndEventRepository.add(aWaitingEvent().inProgress(false).build());
+
+        // when:
+        int resetInProgressWaitingEvents = messageAndEventRepository.resetInProgressWaitingEvents();
+
+        // then:
+        assertThat(resetInProgressWaitingEvents).as("wrong result").isEqualTo(MORE_THAN_DEFAULT_PAGE_SIZE);
+    }
+
+    @Test
+    public void resetMessageInstancesShouldReturnNumberOfRowsUpdated() {
+        // given:
+        for (int i = 0; i < MORE_THAN_DEFAULT_PAGE_SIZE; i++) {
+            messageAndEventRepository.add(aMessageInstance().handled(true).build());
+        }
+        messageAndEventRepository.add(aMessageInstance().handled(false).build());
+        messageAndEventRepository.add(aMessageInstance().handled(false).build());
+
+        // when:
+        int resetMessageInstances = messageAndEventRepository.resetProgressMessageInstances();
+
+        // then:
+        assertThat(resetMessageInstances).as("wrong result").isEqualTo(MORE_THAN_DEFAULT_PAGE_SIZE);
+    }
+
 }

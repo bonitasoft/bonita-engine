@@ -352,18 +352,18 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     }
 
     @Override
-    public void resetProgressMessageInstances() throws SMessageModificationException {
+    public int resetProgressMessageInstances() throws SMessageModificationException {
         try {
-            getPersistenceService().update(QUERY_RESET_PROGRESS_MESSAGE_INSTANCES);
+            return getPersistenceService().update(QUERY_RESET_PROGRESS_MESSAGE_INSTANCES);
         } catch (SPersistenceException e) {
             throw new SMessageModificationException(e);
         }
     }
 
     @Override
-    public void resetInProgressWaitingEvents() throws SWaitingEventModificationException {
+    public int resetInProgressWaitingEvents() throws SWaitingEventModificationException {
         try {
-            getPersistenceService().update(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
+            return getPersistenceService().update(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
         } catch (SPersistenceException e) {
             throw new SWaitingEventModificationException(e);
         }
