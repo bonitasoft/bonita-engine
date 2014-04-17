@@ -23,6 +23,8 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.TransientDataLeftOperandHandler;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -40,12 +42,15 @@ public class ReevaluatingTransientDataExpressionExecutorStrategy extends Transie
 
     private final TransientDataService transientDataService;
 
+    private final TechnicalLoggerService logger;
+
     /**
      * @param transientDataService
      */
-    public ReevaluatingTransientDataExpressionExecutorStrategy(final TransientDataService transientDataService) {
+    public ReevaluatingTransientDataExpressionExecutorStrategy(final TransientDataService transientDataService, final TechnicalLoggerService logger) {
         super(transientDataService);
         this.transientDataService = transientDataService;
+        this.logger = logger;
 
     }
 
@@ -64,9 +69,9 @@ public class ReevaluatingTransientDataExpressionExecutorStrategy extends Transie
     @Override
     protected SDataInstance handleDataNotFound(final String name, final long containerId, final String containerType, final SDataInstanceNotFoundException e)
             throws SBonitaReadException, SDataInstanceException {
+        logger.log(getClass(), TechnicalLogSeverity.WARNING, "The value of the transient data " + name + " of " + containerId + " " + containerType);
         TransientDataLeftOperandHandler
                 .reevaluateTransientData(name, containerId, containerType, flownodeInstanceService, processDefinitionService, bpmInstancesCreator);
         return transientDataService.getDataInstance(name, containerId, containerType);
     }
-
 }

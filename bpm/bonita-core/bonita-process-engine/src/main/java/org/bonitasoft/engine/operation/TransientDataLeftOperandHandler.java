@@ -39,6 +39,8 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -56,12 +58,15 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     private final BPMInstancesCreator bpmInstancesCreator;
 
+    private final TechnicalLoggerService logger;
+
     public TransientDataLeftOperandHandler(final TransientDataService transientDataService, final FlowNodeInstanceService flownodeInstanceService,
-            final ProcessDefinitionService processDefinitionService, final BPMInstancesCreator bpmInstancesCreator) {
+            final ProcessDefinitionService processDefinitionService, final BPMInstancesCreator bpmInstancesCreator, final TechnicalLoggerService logger) {
         this.transientDataService = transientDataService;
         this.flownodeInstanceService = flownodeInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.bpmInstancesCreator = bpmInstancesCreator;
+        this.logger = logger;
     }
 
     @Override
@@ -77,7 +82,17 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             dataInstance = transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
             EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField("value", newValue);
-
+            logger.log(
+                    getClass(),
+                    TechnicalLogSeverity.WARNING,
+                    "The value of the transient data "
+                            + sLeftOperand.getName()
+                            + " of "
+                            + containerId
+                            + " "
+                            + containerType
+                            + " is being updated, be carefull if the application server is restarted this new value will be lost and the data will be reset to its initial value. "
+                            + "We advise you to change the design of your process. If you understand the risks and want to hide this warning, change the logging level of this class to error.");
             transientDataService.updateDataInstance(dataInstance, descriptor);
         } catch (SDataInstanceException e) {
             throw new SOperationExecutionException("Unable to update the transient data", e);
@@ -91,6 +106,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             return transientDataService.getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType());
         } catch (SDataInstanceNotFoundException e) {
             try {
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "The value of the transient data " + sLeftOperand.getName() + "  " + expressionContext);
                 reevaluateTransientData(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType(),
                         flownodeInstanceService, processDefinitionService,
                         bpmInstancesCreator);
@@ -105,7 +121,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     /**
      * @param name
-     * @param containerType
+     * @param containerTypeœ
      * @param expressionContext
      */
     public static void reevaluateTransientData(final String name, final long containerId,

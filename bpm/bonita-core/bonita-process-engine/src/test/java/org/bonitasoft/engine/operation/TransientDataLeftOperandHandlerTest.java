@@ -2,6 +2,7 @@ package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -27,6 +28,8 @@ import org.bonitasoft.engine.data.definition.model.impl.STextDefinitionImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +52,9 @@ public class TransientDataLeftOperandHandlerTest {
     @Mock
     private BPMInstancesCreator bpmInstancesCreator;
 
+    @Mock
+    private TechnicalLoggerService logger;
+
     @InjectMocks
     private TransientDataLeftOperandHandler transientDataLeftOperandHandler;
 
@@ -64,6 +70,7 @@ public class TransientDataLeftOperandHandlerTest {
         EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField("value", "new Value");
         verify(transientDataService, times(1)).updateDataInstance(eq(data), eq(entityUpdateDescriptor));
+        verify(logger, times(1)).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
     }
 
     private SLeftOperandImpl createLeftOperand(final String name) {
@@ -122,5 +129,6 @@ public class TransientDataLeftOperandHandlerTest {
         verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition> asList(sTextDefinitionImpl)), eq(taskId),
                 eq(DataInstanceContainer.ACTIVITY_INSTANCE),
                 any(SExpressionContext.class));
+        verify(logger).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
     }
 }

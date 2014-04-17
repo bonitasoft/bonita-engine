@@ -192,4 +192,11 @@ public class SExpressionContext implements Serializable {
         return evaluateInDefinition;
     }
 
+    @Override
+    public String toString() {
+        return "context [containerId=" + containerId + ", containerType=" + containerType + ", processDefinitionId="
+                + processDefinitionId
+                + (processDefinition != null ? ", processDefinition=" + processDefinition.getName() + " -- " + processDefinition.getVersion() : "") + "]";
+    }
+
 }
