@@ -25,14 +25,6 @@ public enum SOperatorType {
 
     JAVA_METHOD,
 
-    XPATH_UPDATE_QUERY,
-
-    CREATE_BUSINESS_DATA,
-
-    // Allows to set a Business Data attribute by calling a Java method on it:
-    BUSINESS_DATA_JAVA_SETTER,
-
-    // Attach an existing Business Data to the current process:
-    ATTACH_EXISTING_BUSINESS_DATA
+    XPATH_UPDATE_QUERY
 
 }

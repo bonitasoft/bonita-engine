@@ -59,6 +59,12 @@ public class LeftOperandBuilder {
     }
 
     /**
+     * Set the type of the left operand
+     * It can be {@link LeftOperand#TYPE_DATA} {@link LeftOperand#TYPE_BUSINESS_DATA} {@link LeftOperand#TYPE_DOCUMENT} {@link LeftOperand#TYPE_EXTERNAL_DATA}
+     * {@link LeftOperand#TYPE_SEARCH_INDEX} {@link LeftOperand#TYPE_TRANSIENT_DATA}
+     * 
+     * or an other type of org.bonitasoft.engine.core.operation.LeftOperandHandler registered in the configuration
+     * 
      * 
      * @param type
      * @return
@@ -106,7 +112,7 @@ public class LeftOperandBuilder {
     }
 
     /**
-     * @deprecated use createDataLeftOperand or createExternalDataLeftOperand instead
+     * @deprecated use {@link #createDataLeftOperand(String)}
      * @param dataName
      * @param external
      * @return

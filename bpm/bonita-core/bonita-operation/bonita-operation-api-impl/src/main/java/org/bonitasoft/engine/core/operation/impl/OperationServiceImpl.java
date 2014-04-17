@@ -118,7 +118,7 @@ public class OperationServiceImpl implements OperationService {
         return leftOperandHandler;
     }
 
-    private void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long dataContainerId,
+    void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long dataContainerId,
             final String dataContainerType, final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();

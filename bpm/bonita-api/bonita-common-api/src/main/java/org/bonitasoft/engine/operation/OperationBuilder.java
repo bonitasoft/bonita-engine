@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.operation;
 
+import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 
@@ -184,8 +185,13 @@ public class OperationBuilder {
     }
 
     /**
+     * 
+     * create an operation that update a document
+     * 
      * @param docName
+     *            the name of the document
      * @param expression
+     *            the expression that returns a {@link DocumentValue}
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocument(final String docName, final Expression expression) {
@@ -193,9 +199,15 @@ public class OperationBuilder {
     }
 
     /**
+     * 
+     * create an operation that update an xml data using a xpath expression
+     * 
      * @param xmlName
+     *            name of the data
      * @param xPath
+     *            the xpath expression
      * @param setValue
+     *            the value to set the node in the data with
      * @return the newly created <code>Operation</code>.
      */
     public Operation createXPathOperation(final String xmlName, final String xPath, final Expression setValue) {
@@ -204,10 +216,17 @@ public class OperationBuilder {
     }
 
     /**
+     * 
+     * create an operation that update a data that contains a java object
+     * 
      * @param objectName
+     *            the name of the data
      * @param methodName
+     *            the method to call on this data to update it
      * @param methodParamType
+     *            the type of the parameter of the method
      * @param methodParams
+     *            the value to call the method with
      * @return the newly created <code>Operation</code>.
      */
     public Operation createJavaMethodOperation(final String objectName, final String methodName, final String methodParamType, final Expression methodParams) {
