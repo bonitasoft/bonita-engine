@@ -106,7 +106,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
                 archiveService.recordInsert(archiveDate, archiveInsertRecord);
-                System.out.println("inserted data " + sDataInstance.getName() + " with value " + sDataInstance.getValue() + " at " + archiveDate);
             } catch (final SDefinitiveArchiveNotFound e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
