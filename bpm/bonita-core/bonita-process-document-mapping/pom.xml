@@ -19,6 +19,5 @@
 		<module>bonita-process-document-mapping-api-impl</module>
 		<module>bonita-process-document-mapping-model</module>
 		<module>bonita-process-document-mapping-model-impl</module>
-		<module>bonita-process-document-mapping-model-impl-hibernate</module>
 	</modules>
 </project>

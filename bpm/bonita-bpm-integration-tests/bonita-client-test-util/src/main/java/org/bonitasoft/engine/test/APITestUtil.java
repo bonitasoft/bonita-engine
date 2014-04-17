@@ -151,18 +151,6 @@ public class APITestUtil {
 
     public static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
 
-    private APISession session;
-
-    private ProcessAPI processAPI;
-
-    private IdentityAPI identityAPI;
-
-    private CommandAPI commandAPI;
-
-    private ProfileAPI profileAPI;
-
-    private ThemeAPI themeAPI;
-
     public static final String DEFAULT_TENANT = "default";
 
     public static final String ACTOR_NAME = "Employee actor";
@@ -177,9 +165,25 @@ public class APITestUtil {
 
     public static final String USERNAME = "william.jobs";
 
+    public static final String GROUP_NAME = "R&D";
+
+    public static final String ROLE_NAME = "Developper";
+
     public static final int DEFAULT_REPEAT_EACH = 500;
 
     public static final int DEFAULT_TIMEOUT;
+
+    private APISession session;
+
+    private ProcessAPI processAPI;
+
+    private IdentityAPI identityAPI;
+
+    private CommandAPI commandAPI;
+
+    private ProfileAPI profileAPI;
+
+    private ThemeAPI themeAPI;
 
     static {
         String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");

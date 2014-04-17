@@ -31,7 +31,10 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -73,18 +76,14 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance instance3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
-        // prepare searchOptions
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        waitForUserTask("step1", instance1);
+        waitForUserTask("step1", instance2);
+        waitForUserTask("step1", instance3);
+        waitForUserTask("step1", instance4);
+        waitForUserTask("step1", instance5);
+
         // search and check result ASC
-        assertTrue("no started process instances are found", new WaitUntil(500, 5000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                return getProcessAPI().searchOpenProcessInstances(searchOptions.done()).getCount() == 5;
-            }
-        }.waitUntil());
         final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 2, ProcessInstanceSearchDescriptor.ID, Order.ASC);
-
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstances(searchOptions1.done());
         assertNotNull(result);
         assertEquals(5, result.getCount());
@@ -987,6 +986,90 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Group", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
+    @Test
+    public void searchUsersWhoCanStartProcessInAGroup() throws Exception {
+        final User john = createUser(USERNAME, PASSWORD);
+        final Group group = createGroup(GROUP_NAME);
+        final Role role = createRole(ROLE_NAME);
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
+
+        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION,
+                Arrays.asList("step1"), Arrays.asList(true), ACTOR_NAME, true);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, group);
+
+        // Search
+        final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
+        searchBuilder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanStartProcessDefinition(processDefinition.getId(), searchBuilder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> users = searchResult.getResult();
+        assertEquals(john.getId(), users.get(0).getId());
+
+        // clean up
+        disableAndDeleteProcess(processDefinition.getId());
+        deleteUserMemberships(userMembership);
+        deleteUsers(john);
+        deleteGroups(group);
+        deleteRoles(role);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Group", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
+    @Test
+    public void searchUsersWhoCanStartProcessInARole() throws Exception {
+        final User john = createUser(USERNAME, PASSWORD);
+        final Group group = createGroup(GROUP_NAME);
+        final Role role = createRole(ROLE_NAME);
+        final UserMembership userMembership = getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
+
+        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION,
+                Arrays.asList("step1"), Arrays.asList(true), ACTOR_NAME, true);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, role);
+
+        // Search
+        final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
+        searchBuilder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanStartProcessDefinition(processDefinition.getId(), searchBuilder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> users = searchResult.getResult();
+        assertEquals(john.getId(), users.get(0).getId());
+
+        // clean up
+        disableAndDeleteProcess(processDefinition.getId());
+        deleteUserMemberships(userMembership);
+        deleteUsers(john);
+        deleteGroups(group);
+        deleteRoles(role);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Group", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
+    @Test
+    public void searchUsersWhoCanStartProcessInARoleAndAGroup() throws Exception {
+        final User john = createUser(USERNAME, PASSWORD);
+        final Group group = createGroup(GROUP_NAME);
+        final Role role = createRole(ROLE_NAME);
+        final UserMembership userMembership = createUserMembership(USERNAME, ROLE_NAME, GROUP_NAME);
+
+        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION,
+                Arrays.asList("step1"), Arrays.asList(true), ACTOR_NAME, true);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, role, group);
+
+        // Search
+        final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
+        searchBuilder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanStartProcessDefinition(processDefinition.getId(), searchBuilder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> users = searchResult.getResult();
+        assertEquals(john.getId(), users.get(0).getId());
+
+        // clean up
+        disableAndDeleteProcess(processDefinition.getId());
+        deleteUserMemberships(userMembership);
+        deleteUsers(john);
+        deleteGroups(group);
+        deleteRoles(role);
+    }
+
     private ProcessDefinition createArchivedProcInstInAbortedState() throws Exception {
         final String userTaskName = "step1";
         final String subProcTaskName = "subStep";
@@ -1044,7 +1127,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void searchArchivedFlowNodeInstances() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance("EventSubProcess", "1.0");
         processBuilder.addStartEvent("start");
