@@ -36,13 +36,13 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     long getStartedBy();
 
     /**
-     * @return The identifier of the substitute user who started the process.
+     * @return The identifier of the substitute user (as Process manager or Administrator) who started the process.
      * @since 6.3.0
      */
     long getStartedBySubstitute();
 
     /**
-     * @return The identifier of the substitute user who started the process.
+     * @return The identifier of the substitute user (as Process manager or Administrator) who started the process.
      * @since 6.0.1
      * @deprecated since 6.3.0, use {@link ProcessInstance#getStartedBySubstitute()}
      */
