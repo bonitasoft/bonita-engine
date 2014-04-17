@@ -641,6 +641,53 @@ public class PendingTasksTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
+            "possible users", "human task" })
+    @Test
+    public void searchPossibleUsersShouldReturnThoseStartingWithSearchedNamed() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Group group2 = createGroup("gr", group.getPath());
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jack.getUserName(), role.getName(), group.getPath());
+        createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        builder.searchTerm("jac");
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        List<User> possibleUsers = searchResult.getResult();
+
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jack, possibleUsers.get(0));
+
+        builder = new SearchOptionsBuilder(0, 1);
+        builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        builder.searchTerm("jaa");
+
+        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        possibleUsers = searchResult.getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
     @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
