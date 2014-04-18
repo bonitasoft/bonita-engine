@@ -28,6 +28,8 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
+import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -129,7 +131,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     private SExpressionContext buildExpressionContext(final Map<String, Serializable> operationsContext, final long activityInstanceId,
             final Long processDefinitionID) {
-        SExpressionContext sExpressionContext = new SExpressionContext();
+        final SExpressionContext sExpressionContext = new SExpressionContext();
         sExpressionContext.setSerializableInputValues(operationsContext);
         sExpressionContext.setContainerId(activityInstanceId);
         sExpressionContext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
@@ -138,7 +140,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
     }
 
     private OperationService getOperationService() {
-        TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
+        final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         return tenantAccessor.getOperationService();
     }
 
@@ -146,14 +148,28 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final SCommentService commentService = tenantAccessor.getCommentService();
         final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
+
         final long executerSubstituteId = sessionInfos.getUserId();
         // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
         processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), executerUserId, executerSubstituteId);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
-            final String message = LogMessageBuilder.buildDoTaskForContextMessage(flowNodeInstance, sessionInfos.getUsername(), executerUserId,
+            final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, sessionInfos.getUsername(), executerUserId,
                     executerSubstituteId);
             logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+        }
+
+        if (executerUserId != executerSubstituteId) {
+            try {
+                final StringBuilder stb = new StringBuilder();
+                stb.append("The user <" + sessionInfos.getUsername() + "> ");
+                stb.append("acting as delegate of user with id <" + executerUserId + "> ");
+                stb.append("has done the task.");
+                commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
+            } catch (final SCommentAddException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            }
         }
     }
 }

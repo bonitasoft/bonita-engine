@@ -124,6 +124,7 @@ public class ProcessExecutionTest extends CommonAPITest {
             // Check that the given user name is the one used to start the process:
             assertEquals(user.getId(), processInstance.getStartedBy());
             assertEquals(-1, processInstance.getStartedBySubstitute());
+
             // Check system comment
             final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
                     done();
@@ -477,21 +478,35 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        // execute step 1 using john
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        assertEquals(0, step1.getExecutedBy());
-        getProcessAPI().assignUserTask(step1.getId(), jack.getId());
-        getProcessAPI().executeFlowNode(jack.getId(), step1.getId());
-        waitForUserTask("step2", processInstance);
+        try {
+            // execute step 1 using john
+            final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+            assertEquals(0, step1.getExecutedBy());
 
-        // check that the step1 was executed by john
-        final ArchivedActivityInstance step1Archived = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(jack.getId(), step1Archived.getExecutedBy());
-        assertEquals(john.getId(), step1Archived.getExecutedBySubstitute());
+            getProcessAPI().assignUserTask(step1.getId(), jack.getId());
+            getProcessAPI().executeFlowNode(jack.getId(), step1.getId());
+            waitForUserTask("step2", processInstance);
 
-        // clean
-        disableAndDeleteProcess(processDefinition);
-        deleteUsers(john, jack);
+            // check that the step1 was executed by john
+            final ArchivedActivityInstance step1Archived = getProcessAPI().getArchivedActivityInstance(step1.getId());
+            assertEquals(jack.getId(), step1Archived.getExecutedBy());
+            assertEquals(john.getId(), step1Archived.getExecutedBySubstitute());
+
+            // Check system comment
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
+                    done();
+            final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
+            boolean haveCommentForDelegate = false;
+            for (final Comment comment : comments) {
+                haveCommentForDelegate = haveCommentForDelegate
+                        || comment.getContent().contains(" acting as delegate of user with id <" + step1Archived.getExecutedBy() + "> has done the task.");
+            }
+            assertTrue(haveCommentForDelegate);
+        } finally {
+            // clean
+            disableAndDeleteProcess(processDefinition);
+            deleteUsers(john, jack);
+        }
     }
 
     @Test

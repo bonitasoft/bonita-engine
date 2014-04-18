@@ -16,6 +16,7 @@ package org.bonitasoft.engine.command.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -32,6 +33,8 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -55,6 +58,8 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -161,21 +166,35 @@ public class ActivityCommandTest extends CommonAPITest {
         // wait for first task and assign it
         final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
 
-        // execute it with operation using the command
-        final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("ACTIVITY_INSTANCE_ID_KEY", activityInstanceId);
-        parameters.put("USER_ID_KEY", john.getId());
-        getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE, parameters);
+        try {
+            // execute it with operation using the command
+            final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
+            parameters.put("ACTIVITY_INSTANCE_ID_KEY", activityInstanceId);
+            parameters.put("USER_ID_KEY", john.getId());
+            getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE, parameters);
 
-        // check we have the other task ready and the operation was executed
-        waitForUserTask("step2", processInstance);
-        final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(activityInstanceId);
-        Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedBy());
-        Assert.assertEquals(businessUser.getId(), archivedActivityInstance.getExecutedBySubstitute());
+            // check we have the other task ready and the operation was executed
+            waitForUserTask("step2", processInstance);
+            final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(activityInstanceId);
+            Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedBy());
+            Assert.assertEquals(businessUser.getId(), archivedActivityInstance.getExecutedBySubstitute());
 
-        // Clean
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(john);
+            // Check system comment
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
+                    done();
+            final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
+            boolean haveCommentForDelegate = false;
+            for (final Comment comment : comments) {
+                haveCommentForDelegate = haveCommentForDelegate
+                        || comment.getContent().contains(
+                                " acting as delegate of user with id <" + archivedActivityInstance.getExecutedBy() + "> has done the task.");
+            }
+            assertTrue(haveCommentForDelegate);
+        } finally {
+            // Clean
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(john);
+        }
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Wrong parameter" }, story = "Execute activity command with wrong parameter", jira = "ENGINE-586")

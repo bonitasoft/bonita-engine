@@ -240,6 +240,7 @@ import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
@@ -898,6 +899,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final LockService lockService = tenantAccessor.getLockService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final SCommentService commentService = tenantAccessor.getCommentService();
         final TransactionContent transactionContent = new TransactionContent() {
 
             @Override
@@ -919,9 +921,21 @@ public class ProcessAPIImpl implements ProcessAPI {
                             .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
                                     executerSubstituteUserId);
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                        final String message = LogMessageBuilder.buildDoTaskForContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
+                        final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
                                 executerSubstituteUserId);
                         logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+                    }
+
+                    if (executerUserId != executerSubstituteUserId) {
+                        try {
+                            final StringBuilder stb = new StringBuilder();
+                            stb.append("The user <" + session.getUserName() + "> ");
+                            stb.append("acting as delegate of user with id <" + executerUserId + "> ");
+                            stb.append("has done the task.");
+                            commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
+                        } catch (final SCommentAddException e) {
+                            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+                        }
                     }
                 }
             }
