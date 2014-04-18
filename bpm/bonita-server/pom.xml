@@ -330,6 +330,14 @@
 			<artifactId>bonita-operation-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Page -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.page</groupId>
+			<artifactId>bonita-page</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 
 		<!-- Persistence -->
 		<dependency>
@@ -618,7 +626,7 @@
 		<!-- Web Profile -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.profile</groupId>
-			<artifactId>bonita-profile-impl-hibernate</artifactId>
+			<artifactId>bonita-profile-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
@@ -771,6 +779,8 @@
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-api-impl</include>
+									<!-- Page -->
+									<include>org.bonitasoft.engine.page:bonita-page</include>
 									<!-- Persistence -->
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>
@@ -884,7 +894,6 @@
 									<!-- Web Profile -->
 									<include>org.bonitasoft.engine.profile:bonita-profile-api</include>
 									<include>org.bonitasoft.engine.profile:bonita-profile-impl</include>
-									<include>org.bonitasoft.engine.profile:bonita-profile-impl-hibernate</include>
 									<!-- Web Theme -->
 									<include>org.bonitasoft.engine.theme:bonita-theme-api</include>
 									<include>org.bonitasoft.engine.theme:bonita-theme-impl</include>

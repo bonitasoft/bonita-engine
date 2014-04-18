@@ -17,6 +17,5 @@
 	<modules>
 		<module>bonita-profile-api</module>
 		<module>bonita-profile-impl</module>
-		<module>bonita-profile-impl-hibernate</module>
 	</modules>
 </project>
