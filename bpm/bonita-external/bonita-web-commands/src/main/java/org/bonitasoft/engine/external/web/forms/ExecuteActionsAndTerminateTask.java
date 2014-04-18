@@ -78,7 +78,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
             long executedByUserId = getExecuteByUserId(parameters);
-            executeActivity(flowNodeInstance, logger, executedByUserId);
+            executeActivity(flowNodeInstance, executedByUserId);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new SCommandExecutionException(
@@ -142,17 +142,17 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         return tenantAccessor.getOperationService();
     }
 
-    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger, long executedByUserId)
-            throws SFlowNodeReadException, SFlowNodeExecutionException {
+    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, long executerUserId) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
-        final long userId = sessionInfos.getUserId();
+        final long executerSubstituteId = sessionInfos.getUserId();
         // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), executedByUserId, userId);
+        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), executerUserId, executerSubstituteId);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
-            final String message = "The user <" + sessionInfos.getUsername() + "> has performed the task"
-                    + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+            final String message = LogMessageBuilder.buildDoTaskForContextMessage(flowNodeInstance, sessionInfos.getUsername(), executerUserId,
+                    executerSubstituteId);
             logger.log(getClass(), TechnicalLogSeverity.INFO, message);
         }
     }

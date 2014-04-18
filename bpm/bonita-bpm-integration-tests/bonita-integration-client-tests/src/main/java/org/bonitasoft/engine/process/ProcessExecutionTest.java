@@ -19,6 +19,7 @@ import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -110,21 +112,32 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Test
-    public void startProcessOnBehalfOf() throws Exception {
+    public void startProcessFor() throws Exception {
         final User user = createUser("john", "bpm");
         final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
-        // Check that the given user name is the one used to start the process:
-        assertEquals(user.getId(), processInstance.getStartedBy());
-        assertEquals(-1, processInstance.getStartedBySubstitute());
-
-        // Clean up
-        waitForUserTask("step1", processInstance);
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(user);
+        try {
+            waitForUserTask("step1", processInstance);
+            // Check that the given user name is the one used to start the process:
+            assertEquals(user.getId(), processInstance.getStartedBy());
+            assertEquals(-1, processInstance.getStartedBySubstitute());
+            // Check system comment
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
+                    done();
+            final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
+            boolean haveCommentForDelegate = false;
+            for (final Comment comment : comments) {
+                haveCommentForDelegate = haveCommentForDelegate || comment.getContent().contains(" acting as delegate of user with id");
+            }
+            assertTrue(haveCommentForDelegate);
+        } finally {
+            // Clean up
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(user);
+        }
     }
 
     @Test
@@ -136,11 +149,9 @@ public class ProcessExecutionTest extends CommonAPITest {
         final String johnName = "john";
         createUserAndLoginWith(johnName);
         assignFirstActorToMe(processDefinition);
-
         getProcessAPI().enableProcess(processDefinition.getId());
-
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("expected an activity", new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        waitForUserTask("step1", processInstance);
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
@@ -209,7 +220,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.3",
                 Collections.<String> emptyList(), Collections.<Boolean> emptyList());
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processDefinition.getId(), 0, 200);
         assertEquals(0, activities.size());
 

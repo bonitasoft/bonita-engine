@@ -339,7 +339,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.job.FailedJob;
@@ -906,21 +905,22 @@ public class ProcessAPIImpl implements ProcessAPI {
                 final SSession session = SessionInfos.getSession();
                 if (session != null) {
                     final long executerSubstituteUserId = session.getUserId();
-                    final long executerByUserId;
+                    final long executerUserId;
                     if (userId == 0) {
-                        executerByUserId = executerSubstituteUserId;
+                        executerUserId = executerSubstituteUserId;
                     } else {
-                        executerByUserId = userId;
+                        executerUserId = userId;
                     }
 
                     final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
                     final boolean isFirstState = flowNodeInstance.getStateId() == 0;
                     // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                     processExecutor
-                            .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerByUserId, executerSubstituteUserId);
+                            .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
+                                    executerSubstituteUserId);
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                        final String message = LogMessageBuilder.builUserActionPrefix(session, executerSubstituteUserId) + "has performed the task"
-                                + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                        final String message = LogMessageBuilder.buildDoTaskForContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
+                                executerSubstituteUserId);
                         logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                     }
                 }
@@ -3171,34 +3171,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcess(final long processDefinitionId, final Map<String, Serializable> initialVariables)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
-        final ClassLoaderService classLoaderService = getTenantAccessor().getClassLoaderService();
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        final List<Operation> operations = new ArrayList<Operation>();
-        try {
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
-            Thread.currentThread().setContextClassLoader(localClassLoader);
-            if (initialVariables != null) {
-                for (final Entry<String, Serializable> initialVariable : initialVariables.entrySet()) {
-                    final String name = initialVariable.getKey();
-                    final Serializable value = initialVariable.getValue();
-                    final Expression expression = new ExpressionBuilder().createExpression(name, name, value.getClass().getName(), ExpressionType.TYPE_INPUT);
-                    final Operation operation = new OperationBuilder().createSetDataOperation(name, expression);
-                    operations.add(operation);
-                }
-            }
-        } catch (final SClassLoaderException cle) {
-            throw new ProcessExecutionException(cle);
-        } catch (final InvalidExpressionException iee) {
-            throw new ProcessExecutionException(iee);
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
-        }
+        final List<Operation> operations = createSetDataOperation(processDefinitionId, initialVariables);
         return startProcess(processDefinitionId, operations, initialVariables);
     }
 
     @Override
-    public ProcessInstance startProcess(long userId, long processDefinitionId, Map<String, Serializable> initialVariables) throws UserNotFoundException,
-            ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+    public ProcessInstance startProcess(final long userId, final long processDefinitionId, final Map<String, Serializable> initialVariables)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+        final List<Operation> operations = createSetDataOperation(processDefinitionId, initialVariables);
+        return startProcess(userId, processDefinitionId, operations, initialVariables);
+    }
+
+    protected List<Operation> createSetDataOperation(final long processDefinitionId, final Map<String, Serializable> initialVariables)
+            throws ProcessExecutionException {
         final ClassLoaderService classLoaderService = getTenantAccessor().getClassLoaderService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         final List<Operation> operations = new ArrayList<Operation>();
@@ -3221,7 +3206,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return startProcess(userId, processDefinitionId, operations, initialVariables);
+        return operations;
     }
 
     @Override

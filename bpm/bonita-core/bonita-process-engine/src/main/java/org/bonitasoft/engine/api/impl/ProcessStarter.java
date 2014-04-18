@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
@@ -26,11 +27,16 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
+import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -83,77 +89,111 @@ public class ProcessStarter {
     }
 
     public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SProcessDefinition sProcessDefinition = retrieveProcessDefinition(processDefinitionService);
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-
-        final long userIdFromSession = SessionInfos.getUserIdFromSession();
-        final long starterByUserId;
-        if (userId == 0) {
-            starterByUserId = userIdFromSession;
-        } else {
-            starterByUserId = userId;
-        }
-        final SProcessInstance startedInstance;
         try {
-            final List<SOperation> sOperations = ModelConvertor.toSOperation(operations);
-            Map<String, Object> operationContext;
-            if (context != null) {
-                operationContext = new HashMap<String, Object>(context);
-            } else {
-                operationContext = Collections.emptyMap();
-            }
-            startedInstance = processExecutor.start(starterByUserId, userIdFromSession, sOperations, operationContext, null, new FlowNodeSelector(
-                    sProcessDefinition, filter));
+            return start(null);
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final SProcessDefinitionReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SProcessDefinitionException e) {
+            throw new ProcessActivationException(e);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }
-
-        final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logInstanceStarted(sProcessDefinition, userIdFromSession, starterByUserId, processInstance, logger);
-        return processInstance;
     }
 
-    private SProcessDefinition retrieveProcessDefinition(final ProcessDefinitionService processDefinitionService) throws ProcessActivationException,
-            ProcessDefinitionNotFoundException {
-        final SProcessDefinition sProcessDefinition;
+    // For commands
+    public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SProcessInstanceCreationException,
+            SProcessDefinitionReadException, SProcessDefinitionException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+
+        final SProcessDefinition sProcessDefinition = getProcessDefinition();
+        final Map<String, Object> operationContext = getContext();
+        final long starterSubstituteUserId = SessionInfos.getUserIdFromSession();
+        final long starterUserId = getStarterUserId(starterSubstituteUserId);
+
+        final SProcessInstance startedSProcessInstance;
         try {
-            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
-            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
-                throw new ProcessActivationException("Process disabled");
-            }
-            sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
+            final List<SOperation> sOperations = ModelConvertor.toSOperation(operations);
+            startedSProcessInstance =
+                    processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
+                            new FlowNodeSelector(sProcessDefinition, filter));
+        } catch (final SProcessInstanceCreationException e) {
+            log(tenantAccessor, e);
+            e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
+            e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
+            e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
+            throw e;
         }
-        return sProcessDefinition;
+
+        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterSubstituteUserId, starterUserId, startedSProcessInstance);
+        return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
     }
 
-    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long starterSubstituteId,
-            final ProcessInstance processInstance, final TechnicalLoggerService logger) {
+    protected void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+    }
+
+    protected long getStarterUserId(final long starterSubstituteUserId) {
+        if (userId == 0) {
+            return starterSubstituteUserId;
+        }
+        return userId;
+    }
+
+    protected Map<String, Object> getContext() {
+        if (context != null) {
+            return new HashMap<String, Object>(context);
+        }
+        return Collections.emptyMap();
+    }
+
+    private SProcessDefinition getProcessDefinition() throws SProcessDefinitionReadException, SProcessDefinitionException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
+                    deployInfo.getVersion());
+        }
+        return processDefinitionService.getProcessDefinition(processDefinitionId);
+    }
+
+    private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition, final long starterId, final long starterSubstituteId,
+            final SProcessInstance sProcessInstance) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final SCommentService commentService = tenantAccessor.getCommentService();
+
+        final StringBuilder stb = new StringBuilder();
+        stb.append("The user <");
+        stb.append(SessionInfos.getUserNameFromSession());
+        if (starterId != starterSubstituteId) {
+            stb.append("> acting as delegate of user with id <");
+            stb.append(starterId);
+        }
+        stb.append("> has started instance <");
+        stb.append(sProcessInstance.getId());
+        stb.append("> of process <");
+        stb.append(sProcessDefinition.getName());
+        stb.append("> in version <");
+        stb.append(sProcessDefinition.getVersion());
+        stb.append("> and id <");
+        stb.append(sProcessDefinition.getId());
+        stb.append(">");
+
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            final StringBuilder stb = new StringBuilder();
-            stb.append("The user <");
-            stb.append(SessionInfos.getUserNameFromSession());
-            if (starterId != starterSubstituteId) {
-                stb.append("> acting as delegate of user with id <");
-                stb.append(starterId);
-            }
-            stb.append("> has started instance <");
-            stb.append(processInstance.getId());
-            stb.append("> of process <");
-            stb.append(sProcessDefinition.getName());
-            stb.append("> in version <");
-            stb.append(sProcessDefinition.getVersion());
-            stb.append("> and id <");
-            stb.append(sProcessDefinition.getId());
-            stb.append(">");
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
+        }
+
+        if (starterId != starterSubstituteId) {
+            try {
+                commentService.addSystemComment(sProcessInstance.getId(), stb.toString());
+            } catch (final SCommentAddException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            }
         }
     }
 

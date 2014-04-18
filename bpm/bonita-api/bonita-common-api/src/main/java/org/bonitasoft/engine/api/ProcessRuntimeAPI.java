@@ -467,14 +467,12 @@ public interface ProcessRuntimeAPI {
      *             If no matching process definition is found.
      * @throws ProcessActivationException
      *             If an exception occurs during activation.
-     * @throws UserNotFoundException
-     *             If there is no user with the specified userId.
      * @throws ProcessExecutionException
      *             If a problem occurs when starting the process.
      * @since 6.0
      */
     ProcessInstance startProcess(final long userId, final long processDefinitionId, final Map<String, Serializable> initialVariables)
-            throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+            throws  ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
      * Execute an activity that is in an unstable state.
