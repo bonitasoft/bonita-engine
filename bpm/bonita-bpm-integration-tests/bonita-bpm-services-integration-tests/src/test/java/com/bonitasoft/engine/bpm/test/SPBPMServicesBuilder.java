@@ -20,6 +20,7 @@ import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
+import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
@@ -106,6 +107,11 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public BroadcastService getBroadcastService() {
         return getInstanceOf(BroadcastService.class);
+    }
+
+    @Override
+    public PageService getPageService() {
+        return getInstanceOf(PageService.class);
     }
 
     @Override
