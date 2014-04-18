@@ -28,6 +28,8 @@ import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
@@ -55,6 +57,8 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -193,7 +197,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
-    public void executeActionsAndStartInstanceExt() throws Exception {
+    public void executeActionsAndStartInstanceExtFor() throws Exception {
         final User firstUser = createUser("plop", PASSWORD);
 
         createAndDeployProcess();
@@ -244,6 +248,17 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
         final ProcessInstance processInstance = getProcessAPI().getProcessInstance(processInstanceId);
 
+        // Check system comment
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
+                done();
+        final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
+        boolean haveCommentForDelegate = false;
+        for (final Comment comment : comments) {
+            haveCommentForDelegate = haveCommentForDelegate || comment.getContent().contains(" acting as delegate of user with id");
+        }
+        assertTrue(haveCommentForDelegate);
+
+        // Check data
         assertEquals("welcome Lily and Lucy and Mett", getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
         assertEquals(2, getProcessAPI().getProcessDataInstance(dataName, processInstanceId).getValue());
 

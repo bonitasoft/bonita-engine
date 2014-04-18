@@ -27,7 +27,6 @@ import java.util.zip.ZipOutputStream;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
@@ -75,7 +74,11 @@ import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -104,7 +107,6 @@ import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -128,7 +130,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderF
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
-import com.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
 import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
@@ -138,7 +139,6 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.parameter.SParameter;
@@ -342,41 +342,54 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public ManualTaskInstance addManualUserTask(final ManualTaskCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
-        TenantServiceAccessor tenantAccessor = null;
-        final Map<ManualTaskField, Serializable> fields = creator.getFields();
-        final TaskPriority prio = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY) : TaskPriority.NORMAL;
-        try {
-            final String userName = SessionInfos.getUserNameFromSession();
-            tenantAccessor = getTenantAccessor();
-            final IdentityService identityService = tenantAccessor.getIdentityService();
-            final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-            final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-            final GetSUser getSUser = new GetSUser(identityService, userName);
-            getSUser.execute();
-            final long userId = getSUser.getResult().getId();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
 
-            final long humanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
+        final Map<ManualTaskField, Serializable> fields = creator.getFields();
+        final TaskPriority taskPriority = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY)
+                : TaskPriority.NORMAL;
+        final long humanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
+        final long loggedUserId = SessionInfos.getUserIdFromSession();
+        try {
             final SActivityInstance activityInstance = getSActivityInstance(humanTaskId);
             if (!(activityInstance instanceof SHumanTaskInstance)) {
                 throw new CreationException("The parent activity is not a Human task");
             }
-            if (((SHumanTaskInstance) activityInstance).getAssigneeId() != userId) {
+            if (((SHumanTaskInstance) activityInstance).getAssigneeId() != loggedUserId) {
                 throw new CreationException("Unable to create a child task from this task, it's not assigned to you!");
             }
-            final TransactionContentWithResult<SManualTaskInstance> createManualUserTask = new CreateManualUserTask(activityInstanceService,
-                    (String) fields.get(ManualTaskField.TASK_NAME), -1L, (String) fields.get(ManualTaskField.DISPLAY_NAME), humanTaskId,
-                    (Long) fields.get(ManualTaskField.ASSIGN_TO), (String) fields.get(ManualTaskField.DESCRIPTION),
-                    (Date) fields.get(ManualTaskField.DUE_DATE), STaskPriority.valueOf(prio.name()));
-            createManualUserTask.execute();
-            final long id = createManualUserTask.getResult().getId();
-            executeFlowNode(userId, id, false /* wrapInTransaction */);// put it in ready
-            final AddActivityInstanceTokenCount addActivityInstanceTokenCount = new AddActivityInstanceTokenCount(activityInstanceService, humanTaskId, 1);
-            addActivityInstanceTokenCount.execute();
-            return ModelConvertor.toManualTask(createManualUserTask.getResult(), flowNodeStateManager);
+
+            final SManualTaskInstance createManualUserTask = createManualUserTask(activityInstanceService, fields, taskPriority, humanTaskId);
+            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */);// put it in ready
+            addActivityInstanceTokenCount(activityInstanceService, activityInstance);
+
+            return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
         } catch (final Exception e) {
             log(tenantAccessor, e);
             throw new CreationException(e.getMessage());
         }
+    }
+
+    private void addActivityInstanceTokenCount(final ActivityInstanceService activityInstanceService, final SActivityInstance activityInstance)
+            throws SFlowNodeModificationException {
+        final int tokenCount = activityInstance.getTokenCount() + 1;
+        activityInstanceService.setTokenCount(activityInstance, tokenCount);
+    }
+
+    private SManualTaskInstance createManualUserTask(final ActivityInstanceService activityInstanceService, final Map<ManualTaskField, Serializable> fields,
+            final TaskPriority taskPriority, final long humanTaskId) throws SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException {
+        final Date dueDate = (Date) fields.get(ManualTaskField.DUE_DATE);
+        long dueTime = 0L;
+        if (dueDate != null) {
+            dueTime = dueDate.getTime();
+        }
+        final SManualTaskInstance createManualUserTask = activityInstanceService.createManualUserTask(humanTaskId,
+                (String) fields.get(ManualTaskField.TASK_NAME), -1L,
+                (String) fields.get(ManualTaskField.DISPLAY_NAME), (Long) fields.get(ManualTaskField.ASSIGN_TO),
+                (String) fields.get(ManualTaskField.DESCRIPTION), dueTime,
+                STaskPriority.valueOf(taskPriority.name()));
+        return createManualUserTask;
     }
 
     @Override
