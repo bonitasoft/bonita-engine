@@ -35,15 +35,11 @@ import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
+import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.profile.xml.ProfileBinding;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
-
-/**
- * @author Matthieu Chaffotte
- * @author Celine Souchet
- */
 public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ParameterService parameterService;
@@ -56,6 +52,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
 
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
 
+    private PageService pageService;
     private BusinessDataRepository businessDataRespository;
 
     private RefBusinessDataService refBusinessDataService;
@@ -124,6 +121,17 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
             businessDataModelRespository = lookupService(BusinessDataModelRepository.class);
         }
         return businessDataModelRespository;
+    }
+
+    /**
+     * might not be an available service
+     */
+    @Override
+    public PageService getPageService() {
+        if (pageService == null) {
+            pageService = lookupService(PageService.class);
+        }
+        return pageService;
     }
 
     @Override

@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
@@ -75,6 +76,8 @@ public class APITestSPUtil extends APITestUtil {
     private ThemeAPI themeAPI;
 
     private TenantManagementAPI tenantManagementAPI;
+
+    private PageAPI pageAPI;
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -180,10 +183,19 @@ public class APITestSPUtil extends APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
+    }
+
+    protected void setPageAPI(final PageAPI pageAPI) {
+        this.pageAPI = pageAPI;
+    }
+
+    public PageAPI getPageAPI() {
+        return pageAPI;
     }
 
     @Override
@@ -290,7 +302,7 @@ public class APITestSPUtil extends APITestUtil {
      * @throws BonitaException
      */
     public Collection<? extends String> checkNoDataMappings() throws BonitaException {
-        Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
+        final Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
         if (count == 0) {
             return Collections.emptyList();
         }

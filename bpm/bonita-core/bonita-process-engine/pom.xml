@@ -52,6 +52,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.bonitasoft.engine.page</groupId>
+			<artifactId>bonita-page-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.bonitasoft.engine.data</groupId>
 			<artifactId>bonita-business-data-api</artifactId>
 			<version>${project.version}</version>
