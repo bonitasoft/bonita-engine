@@ -45,20 +45,17 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ProcessActorTest extends CommonAPITest {
 
-    private static final String JOHN = "john";
-
-    private User john;
+    private User user;
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
+        deleteUser(USERNAME);
         VariableStorage.clearAll();
         logout();
     }
@@ -66,7 +63,7 @@ public class ProcessActorTest extends CommonAPITest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        john = createUser(JOHN, "bpm");
+        user = createUser(USERNAME, PASSWORD);
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -131,7 +128,7 @@ public class ProcessActorTest extends CommonAPITest {
     public void johnHasGotAPendingTask() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("deliver", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -142,9 +139,9 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals(DESCRIPTION, actor.getDescription());
 
         getProcessAPI().startProcess(processDefinition.getId());
-        waitForPendingTasks(john.getId(), 1);
+        waitForPendingTasks(user.getId(), 1);
 
-        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
 
         // Clean up
@@ -183,8 +180,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Problem problem = processResolutionProblems.get(0);
         assertEquals("actor", problem.getResource());
         final List<ActorInstance> actors = getProcessAPI().getActors(processDeploymentInfo.getProcessId(), 0, 50, ActorCriterion.NAME_ASC);
-        final ActorInstance ACTOR_NAMEActor = actors.get(0);
-        getProcessAPI().addUserToActor(ACTOR_NAMEActor.getId(), john.getId());
+        getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
         getProcessAPI().enableProcess(processDeploymentInfo.getProcessId());
         assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDeploymentInfo.getProcessId()).getActivationState());
 
@@ -194,38 +190,39 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void butJamesHasNoPendingTask() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
+        final User plop = createUser("plop", PASSWORD);
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(designProcessDefinition);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(1000);
 
-        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
+        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(plop.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
 
         // Clean up
-        deleteUser(user);
         disableAndDeleteProcess(processDefinition);
+        deleteUser(plop);
     }
 
     @Test
     public void eliasHasAssignedAndPendingUserTasks() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
                 .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, user);
 
-        final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
-        checkNbOfActivitiesInReadyState(startedProcess, 3);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask("userTask1", processInstance);
+        waitForUserTask("userTask2", processInstance);
+        waitForUserTask("userTask3", processInstance);
 
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(startedProcess.getId(), 0, 10);
+        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         // assign first 2 user tasks to user:
         getProcessAPI().assignUserTask(activities.get(0).getId(), user.getId());
         getProcessAPI().assignUserTask(activities.get(1).getId(), user.getId());
@@ -237,7 +234,6 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals(1L, actorPendingTasksNb);
 
         disableAndDeleteProcess(definition);
-        deleteUser(user);
     }
 
     private ProcessDefinition preparationBeforeTest(final String actorName) throws Exception {
@@ -251,7 +247,7 @@ public class ProcessActorTest extends CommonAPITest {
             file.delete();
             BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive.done(), file);
             final BusinessArchive archive = BusinessArchiveFactory.readBusinessArchive(file);
-            return deployAndEnableWithActor(archive.getProcessDefinition(), actorName, john);
+            return deployAndEnableWithActor(archive.getProcessDefinition(), actorName, user);
         } finally {
             file.delete();
         }
@@ -274,7 +270,6 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void getActors() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final List<String> actorNameList = initActorAndDescription(processBuilder, 5);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), actorNameList,
@@ -308,12 +303,10 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals(actorNameList.get(3), actors.get(1).getName());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
     }
 
     @Test
     public void getActorsByIds() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription("actor description1");
         processBuilder.addActor("actor2").addDescription("actor description2");
@@ -345,7 +338,6 @@ public class ProcessActorTest extends CommonAPITest {
         }
         assertTrue(isHas1 && isHas2);
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
     }
 
     @Test
@@ -394,7 +386,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -408,12 +400,95 @@ public class ProcessActorTest extends CommonAPITest {
         final List<ActorMember> actorMembers = getProcessAPI().getActorMembers(actor.getId(), 0, 10);
         assertEquals(1, actorMembers.size());
         final ActorMember actorMember = actorMembers.get(0);
-        assertEquals(john.getId(), actorMember.getUserId());
+        assertEquals(user.getId(), actorMember.getUserId());
         assertEquals(-1, actorMember.getGroupId());
         assertEquals(-1, actorMember.getRoleId());
 
         getProcessAPI().removeActorMember(actorMember.getId());
         disableAndDeleteProcess(definition);
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void cantAddTwiceUserToActor() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
+        getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, user.getId());
+        getProcessAPI().enableProcess(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDefinition.getId()).getActivationState());
+
+        try {
+            getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, user.getId());
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void cantAddTwiceRoleToActor() throws Exception {
+        final Role role = createRole("Quality Manager");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
+        getProcessAPI().addRoleToActor(ACTOR_NAME, processDefinition, role.getId());
+        getProcessAPI().enableProcess(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDefinition.getId()).getActivationState());
+
+        try {
+            getProcessAPI().addRoleToActor(ACTOR_NAME, processDefinition, role.getId());
+        } finally {
+            deleteRoles(role);
+            disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void cantAddTwiceGroupToActor() throws Exception {
+        final Group group = createGroup("Ergonomists");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
+        getProcessAPI().addGroupToActor(ACTOR_NAME, group.getId(), processDefinition);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDefinition.getId()).getActivationState());
+
+        try {
+            getProcessAPI().addGroupToActor(ACTOR_NAME, group.getId(), processDefinition);
+        } finally {
+            deleteGroups(group);
+            disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void cantAddTwiceMembershipToActor() throws Exception {
+        final Role role = createRole("Quality Manager");
+        final Group group = createGroup("Ergonomists");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
+        getProcessAPI().addRoleAndGroupToActor(ACTOR_NAME, processDefinition, role.getId(), group.getId());
+        getProcessAPI().enableProcess(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDefinition.getId()).getActivationState());
+
+        try {
+            getProcessAPI().addRoleAndGroupToActor(ACTOR_NAME, processDefinition, role.getId(), group.getId());
+        } finally {
+            deleteGroups(group);
+            deleteRoles(role);
+            disableAndDeleteProcess(processDefinition);
+        }
     }
 
     @Cover(classes = { User.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Users", "Actor" }, jira = "ENGINE-681")
@@ -427,8 +502,8 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForUser(ACTOR_NAME, user1.getId(), definition);
-        addMappingOfActorsForUser(ACTOR_NAME, user2.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, user2.getId());
         getProcessAPI().enableProcess(definition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
@@ -536,7 +611,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userMembershipTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForUser(ACTOR_NAME, user1.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
         addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group1.getId(), definition);
         addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group2.getId(), definition);
         getProcessAPI().enableProcess(definition.getId());
@@ -570,7 +645,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
         final Set<Long> actorIds = new HashSet<Long>();
@@ -590,7 +665,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
         final Set<Long> actorIds = new HashSet<Long>();
@@ -614,7 +689,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addTransition(userTaskName, "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
-        final ProcessDefinition processDef = deployAndEnableWithActor(designProcessDefinition, actorName, john);
+        final ProcessDefinition processDef = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDef.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -628,14 +703,13 @@ public class ProcessActorTest extends CommonAPITest {
 
         final Group group = getIdentityAPI().createGroup("group1", null);
         final Role role = getIdentityAPI().createRole("role1");
-        getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
+        getIdentityAPI().addUserMembership(user.getId(), group.getId(), role.getId());
 
         getProcessAPI().addGroupToActor(actor.getId(), group.getId());
 
         getProcessAPI().startProcess(definition.getId());
-        assertTrue("no new activity found", new CheckNbPendingTaskOf(getProcessAPI(), 20, 1500, false, 1, john).waitUntil());
-
-        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        waitForUserTask("deliver");
+        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
 
         cleanUserGroupAndRole(group, role);
@@ -650,12 +724,13 @@ public class ProcessActorTest extends CommonAPITest {
         final Group parent = createGroup("parent");
         final Group sub = createGroup("sub", "/parent");
         final Role role = getIdentityAPI().createRole("role1");
-        getIdentityAPI().addUserMembership(john.getId(), sub.getId(), role.getId());
+        getIdentityAPI().addUserMembership(user.getId(), sub.getId(), role.getId());
 
         getProcessAPI().addGroupToActor(actor.getId(), parent.getId());
 
         getProcessAPI().startProcess(definition.getId());
-        waitForPendingTasks(john.getId(), 1);// should have 1 task because john is in the parent
+        waitForPendingTasks(user.getId(), 1);// should have 1 task because john is in the parent
+
         deleteGroups(parent);
         deleteRoles(role);
         disableAndDeleteProcess(definition);
@@ -668,15 +743,15 @@ public class ProcessActorTest extends CommonAPITest {
 
         final Group group = getIdentityAPI().createGroup("group1", null);
         final Role role = getIdentityAPI().createRole("role1");
-        getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
+        getIdentityAPI().addUserMembership(user.getId(), group.getId(), role.getId());
 
         getProcessAPI().addRoleToActor(actor.getId(), role.getId());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask("deliver", processInstance);
-        waitForPendingTasks(john.getId(), 1);
+        waitForPendingTasks(user.getId(), 1);
 
-        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
 
         cleanUserGroupAndRole(group, role);
@@ -691,14 +766,14 @@ public class ProcessActorTest extends CommonAPITest {
 
         final Group group = getIdentityAPI().createGroup("group1", null);
         final Role role = getIdentityAPI().createRole("role1");
-        getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
+        getIdentityAPI().addUserMembership(user.getId(), group.getId(), role.getId());
 
         getProcessAPI().addRoleAndGroupToActor(actor.getId(), role.getId(), group.getId());
 
         getProcessAPI().startProcess(definition.getId());
-        waitForPendingTasks(john.getId(), 1);
+        waitForPendingTasks(user.getId(), 1);
 
-        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
 
         cleanUserGroupAndRole(group, role);
@@ -726,7 +801,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Group group2 = getIdentityAPI().createGroup("group2", null);
         final Role role1 = getIdentityAPI().createRole("role1");
         final Role role2 = getIdentityAPI().createRole("role2");
-        getIdentityAPI().addUserMembership(john.getId(), group1.getId(), role1.getId());
+        getIdentityAPI().addUserMembership(user.getId(), group1.getId(), role1.getId());
 
         getProcessAPI().addRoleAndGroupToActor(actor.getId(), role1.getId(), group2.getId());
         getProcessAPI().addRoleAndGroupToActor(actor.getId(), role2.getId(), group1.getId());
@@ -738,7 +813,7 @@ public class ProcessActorTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask("deliver", processInstance);
 
-        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
 
         cleanUserGroupAndRole(group1, role1);
@@ -749,8 +824,6 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void getNumberOfActors() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
-
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         processBuilder.addActor("Actor2").addDescription(DESCRIPTION + 2);
@@ -783,7 +856,6 @@ public class ProcessActorTest extends CommonAPITest {
 
         // clean all data for test
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
     }
 
     private ActorInstance checkActors(final String ACTOR_NAME, final ProcessDefinition definition) {
@@ -825,7 +897,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        return deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        return deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
     }
 
 }

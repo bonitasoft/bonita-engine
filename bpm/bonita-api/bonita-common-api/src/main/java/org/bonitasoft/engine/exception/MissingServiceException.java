@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,22 +10,27 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.profile.impl;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+ ** 
+ * @since 6.2
+ */
+package org.bonitasoft.engine.exception;
 
 /**
- * @author Celine Souchet
+ * 
+ * Happens when a service is missing from the configuration
+ * 
+ * @author Baptiste Mesta
+ * 
  */
+public class MissingServiceException extends RuntimeException {
 
-@RunWith(Suite.class)
-@SuiteClasses({
-        ProfileServiceImplForProfileTest.class, ProfileServiceImplForProfileEntryTest.class
-// , ProfileServiceImplForProfileMemberTest.class
-})
-public class ProfileServiceImplTests {
+    public MissingServiceException(final String string) {
+        super(string);
+    }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
 }

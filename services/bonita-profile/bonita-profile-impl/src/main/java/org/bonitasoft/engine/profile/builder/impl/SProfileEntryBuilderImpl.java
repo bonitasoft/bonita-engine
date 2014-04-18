@@ -67,6 +67,12 @@ public class SProfileEntryBuilderImpl implements SProfileEntryBuilder {
     }
 
     @Override
+    public SProfileEntryBuilder setCustom(final Boolean custom) {
+        profileEntry.setCustom(custom);
+        return this;
+    }
+
+    @Override
     public SProfileEntry done() {
         return profileEntry;
     }

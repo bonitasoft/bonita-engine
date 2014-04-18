@@ -326,7 +326,7 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
+         final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
         return read(scanner);
     }
 
@@ -341,6 +341,13 @@ public class IOUtil {
         } finally {
             zipInputstream.close();
         }
+    }
+
+    private static boolean mkdirs(final File file) {
+        if (!file.exists()) {
+            return file.mkdirs();
+        }
+        return true;
     }
 
     private static void extractZipEntry(final ZipInputStream zipInputstream, final ZipEntry zipEntry, final File outputFolder) throws FileNotFoundException,
@@ -393,25 +400,6 @@ public class IOUtil {
         } finally {
             out.close();
         }
-    }
-
-    private static boolean mkdirs(final File file) {
-        if (!file.exists()) {
-            return file.mkdirs();
-        }
-        return true;
-    }
-
-    public static File createTempDirectory(final String fileName) throws IOException {
-        final File temp = File.createTempFile(fileName, String.valueOf(System.currentTimeMillis()));
-        temp.setReadable(true);
-        temp.setWritable(true);
-
-        if (!(temp.delete())) {
-            throw new IOException("Could not delete temporary file : " + temp.getAbsolutePath());
-        }
-        mkdirs(temp);
-        return temp;
     }
 
 }

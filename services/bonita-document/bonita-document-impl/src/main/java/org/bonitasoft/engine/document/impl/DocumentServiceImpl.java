@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,8 @@ public class DocumentServiceImpl implements DocumentService {
         final String documentId = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
         final SDocumentContent sdocumentContent = createDocumentContent(documentId, documentContent);
         final InsertRecord insertRecord = new InsertRecord(sdocumentContent);
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("SDocumentContent").setObject(sdocumentContent)
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("SDocumentContent")
+                .setObject(sdocumentContent)
                 .done();
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -87,7 +88,8 @@ public class DocumentServiceImpl implements DocumentService {
             // sdocumentContent = getDocumentContent(sDocument.getStorageId());
             sdocumentContent = getDocumentContent(documentId);
             final DeleteRecord deleteRecord = new DeleteRecord(sdocumentContent);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentContent").setObject(sdocumentContent)
+            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentContent")
+                    .setObject(sdocumentContent)
                     .done();
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
@@ -110,11 +112,11 @@ public class DocumentServiceImpl implements DocumentService {
                     inputParameters, SDocumentContent.class);
             final SDocumentContent docContent = persistenceService.selectOne(selectDescriptor);
             if (docContent == null) {
-                throw new SDocumentContentNotFoundException("Cannot get the DocumentContent with documentID:" + documentId);
+                throw new SDocumentContentNotFoundException(documentId);
             }
             return docContent;
         } catch (final SBonitaReadException e) {
-            throw new SDocumentContentNotFoundException("Cannot get the DocumentContent with documentID:" + documentId, e);
+            throw new SDocumentContentNotFoundException(documentId, e);
         }
     }
 

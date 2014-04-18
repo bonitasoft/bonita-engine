@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -31,7 +30,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -109,19 +107,19 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
         loginWith(userName, "bpm");
-        final String delivery1 = "ActorMenu";
-        final String delivery2 = "ActorElias";
-        final String delivery3 = "ActorBap";
+        final String ACTOR_NAME1 = "ActorMenu";
+        final String ACTOR_NAME2 = "ActorElias";
+        final String ACTOR_NAME3 = "ActorBap";
 
         final List<Long> pIds = new ArrayList<Long>();
         final int num = 5;
         for (int i = 0; i < num; i++) {
             ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", String.valueOf(i));
             if (i % 2 == 0) {
-                processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(delivery1, delivery1, delivery2, delivery3),
+                processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                         Arrays.asList(true, false, false, false));
             } else {
-                processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(delivery1, delivery1, delivery2, delivery3),
+                processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                         Arrays.asList(false, false, false, false));
             }
 
@@ -129,9 +127,9 @@ public class ActorPermissionCommandTest extends CommonAPITest {
             final DesignProcessDefinition processDef = processDefinitionBuilder.done();
             final ProcessDefinition processDefinition = getProcessAPI().deploy(
                     new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef).done());
-            addMappingOfActorsForUser(delivery1, manu.getId(), processDefinition);
-            addMappingOfActorsForUser(delivery2, manu.getId(), processDefinition);
-            addMappingOfActorsForUser(delivery3, manu.getId(), processDefinition);
+            getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, manu.getId());
+            getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, manu.getId());
+            getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, manu.getId());
             final long processDefinitionId = processDefinition.getId();
             getProcessAPI().enableProcess(processDefinitionId);
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -160,22 +158,22 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
         loginWith(userName, "bpm");
-        final String delivery1 = "ActorMenu";
-        final String delivery2 = "ActorElias";
-        final String delivery3 = "ActorBap";
+        final String ACTOR_NAME1 = "ActorMenu";
+        final String ACTOR_NAME2 = "ActorElias";
+        final String ACTOR_NAME3 = "ActorBap";
 
         DesignProcessDefinition processDef = null;
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0");
-        processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(delivery1, delivery1, delivery2, delivery3),
+        processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                 Arrays.asList(true, false, false, false));
         // one process has only one actorInitiator.
         processDef = processDefinitionBuilder.done();
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef).done());
-        addMappingOfActorsForUser(delivery1, manu.getId(), processDefinition);
-        addMappingOfActorsForUser(delivery2, manu.getId(), processDefinition);
-        addMappingOfActorsForUser(delivery3, manu.getId(), processDefinition);
+        getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, manu.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, manu.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, manu.getId());
         final long processDefinitionId = processDefinition.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -209,18 +207,17 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         final List<Long> processDefinitionIds = new ArrayList<Long>(2);
         final List<Long> processInstanceIds = new ArrayList<Long>(2);
         for (int i = 0; i < 2; i++) {
-            final String delivery = "Delivery men";
             final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                     "SearchOpenProcessInstancesInvolvingUser", "14." + i);
             if (i == 1) {
-                designProcessDefinition.setActorInitiator(delivery).addDescription("Delivery all day and night long");
+                designProcessDefinition.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION);
             }
-            designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+            designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
             designProcessDefinition.addAutomaticTask("step1");
-            designProcessDefinition.addUserTask("step2", delivery);
+            designProcessDefinition.addUserTask("step2", ACTOR_NAME);
             designProcessDefinition.addTransition("step1", "step2");
             // assign pending task to jack
-            final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, manu);
+            final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, manu);
             final long processDefinitionId = processDefinition.getId();
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
@@ -248,20 +245,17 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     public void testIsAllowedToSeeOverviewFormForArchivedProcessInstancesInvolvingUser() throws Exception {
         final User user = createUser("jack", "bpm");
         // create process
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
                 "14.3");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addAutomaticTask("step1");
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 500, 10000, false, 1, user).waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
-        final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
+        final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
@@ -280,30 +274,27 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     public void testIsAllowedToSeeOverviewFormForProcessInstancesInvolvingUser() throws Exception {
         final User user = createUser("jack", "bpm");
         // create process
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
                 "14.3");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addAutomaticTask("step1");
-        designProcessDefinition.addUserTask("step2", delivery);
-        designProcessDefinition.addUserTask("step3", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
+        designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         logout();
         loginWith("jack", "bpm");
 
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 500, 10000, false, 1, user).waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
-        final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
+        final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
         assignAndExecuteStep(pendingTask, user.getId());
-        waitForUserTask("step3", processInstance.getId());
+        waitForUserTask("step3", processInstance);
 
         // after execute
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));

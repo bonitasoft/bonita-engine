@@ -39,12 +39,12 @@ public class SearchSupervisors extends AbstractSupervisorSearchEntity {
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return supervisorService.getNumberOfProcessDefSupervisors(searchOptions);
+        return supervisorService.getNumberOfProcessSupervisors(searchOptions);
     }
 
     @Override
     public List<SProcessSupervisor> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return supervisorService.searchProcessDefSupervisors(searchOptions);
+        return supervisorService.searchProcessSupervisors(searchOptions);
     }
 
 }

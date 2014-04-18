@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -29,15 +28,11 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -131,70 +126,6 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(user);
-    }
-
-    @Test
-    public void searchOpenProcessInstancesSupervisedBy() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
-
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        // create user
-        final User user1 = createUser("user1", "bpm");
-        // before supervisor
-        SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
-        SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(user1.getId(), searchOptions.done());
-        assertNotNull(result);
-        assertEquals(0, result.getCount());
-        assertNotNull(result.getResult());
-        assertEquals(0, result.getResult().size());
-        // after supervisor
-        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
-
-        // prepare search options
-        searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
-        // search and check result
-        result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(user1.getId(), searchOptions.done());
-        assertNotNull(result);
-        assertEquals(1, result.getCount());
-        final List<ProcessInstance> processInstanceList = result.getResult();
-        assertNotNull(processInstanceList);
-        assertEquals(1, processInstanceList.size());
-        assertEquals(instance.getId(), processInstanceList.get(0).getId());
-
-        // add supervisor by role and group
-        final User supervisor = createUser("supervisor", "bpm");
-        final Map<String, Object> map = createSupervisorByRoleAndGroup(processDefinition.getId(), supervisor.getId());
-        final ProcessSupervisor supervisorByRole = (ProcessSupervisor) map.get("supervisorByRole");
-        final ProcessSupervisor supervisorByGroup = (ProcessSupervisor) map.get("supervisorByGroup");
-        final Role role = (Role) map.get("roleId");
-        final Group group = (Group) map.get("groupId");
-        final UserMembership membership = (UserMembership) map.get("membership");
-        assertEquals(supervisorByRole.getRoleId(), role.getId());
-        assertEquals(supervisorByGroup.getGroupId(), group.getId());
-        assertEquals(membership.getUserId(), supervisor.getId());
-        assertEquals(membership.getRoleId(), role.getId());
-        assertEquals(membership.getGroupId(), group.getId());
-        // prepare search options
-        searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
-        // search and check result
-        result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(supervisor.getId(), searchOptions.done());
-        assertNotNull(result);
-        assertEquals(1, result.getCount());
-        final List<ProcessInstance> processInstanceList2 = result.getResult();
-        assertNotNull(processInstanceList2);
-        assertEquals(1, processInstanceList2.size());
-        assertEquals(instance.getId(), processInstanceList2.get(0).getId());
-
-        // clean-up
-        deleteSupervisor(supervisor1.getSupervisorId());
-        deleteRoleGroupSupervisor(map, supervisor.getId());
-        deleteUser(supervisor);
-        deleteUser(user1);
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
@@ -1138,70 +1069,6 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         // Clean
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-    }
-
-    @Test
-    public void searchArchivedProcessInstancesSupervisedBy() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        // add supervisor
-        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
-
-        waitForStep("userTask1", processInstance);
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        for (final ActivityInstance activityInstance : activityInstances) {
-            final long activityInstanceId = activityInstance.getId();
-            skipTask(activityInstanceId);
-        }
-
-        assertTrue("Expected process instance with id " + processInstance.getId() + " should be ARCHIVED", new WaitUntil(400, 3000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                final SearchOptions searchOpts = new SearchOptionsBuilder(0, 1).filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID,
-                        processInstance.getId()).done();
-                return getProcessAPI().searchArchivedProcessInstances(searchOpts).getCount() == 1;
-            }
-        }.waitUntil());
-
-        // test supervisor
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        final SearchResult<ArchivedProcessInstance> sapi = getProcessAPI().searchArchivedProcessInstancesSupervisedBy(user.getId(), builder.done());
-        assertEquals(1, sapi.getCount());
-        final List<ArchivedProcessInstance> archivedProcessInstanceList = sapi.getResult();
-        assertEquals(processInstance.getId(), archivedProcessInstanceList.get(0).getSourceObjectId());
-
-        // add supervisor by role and group
-        final User supervisor = createUser("supervisor", "bpm");
-        final Map<String, Object> map = createSupervisorByRoleAndGroup(processDefinition.getId(), supervisor.getId());
-        final ProcessSupervisor supervisorByRole = (ProcessSupervisor) map.get("supervisorByRole");
-        final ProcessSupervisor supervisorByGroup = (ProcessSupervisor) map.get("supervisorByGroup");
-        final Role role = (Role) map.get("roleId");
-        final Group group = (Group) map.get("groupId");
-        final UserMembership membership = (UserMembership) map.get("membership");
-        assertEquals(supervisorByRole.getRoleId(), role.getId());
-        assertEquals(supervisorByGroup.getGroupId(), group.getId());
-        assertEquals(membership.getUserId(), supervisor.getId());
-        assertEquals(membership.getRoleId(), role.getId());
-        assertEquals(membership.getGroupId(), group.getId());
-
-        final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
-        final SearchResult<ArchivedProcessInstance> sapi1 = getProcessAPI().searchArchivedProcessInstancesSupervisedBy(supervisor.getId(), builder1.done());
-        assertEquals(1, sapi1.getCount());
-        final List<ArchivedProcessInstance> archivedProcessInstanceList1 = sapi.getResult();
-        assertEquals(processInstance.getId(), archivedProcessInstanceList1.get(0).getSourceObjectId());
-
-        deleteSupervisor(supervisor1.getSupervisorId());
-        deleteRoleGroupSupervisor(map, supervisor.getId());
-        deleteUser(supervisor);
-        deleteUser(user);
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Process instance", "terminal state" }, story = "Search archived process instances retrieve only instances in terminal state", jira = "ENGINE-1084")

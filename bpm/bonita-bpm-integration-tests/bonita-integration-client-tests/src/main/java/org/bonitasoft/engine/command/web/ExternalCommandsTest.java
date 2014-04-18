@@ -10,7 +10,6 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-        SupervisorCommandTest.class,
         ActorCommandTest.class,
         ProfileImportCommandTest.class,
         ActorPermissionCommandTest.class,
