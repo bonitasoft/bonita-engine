@@ -103,7 +103,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final SProcessDefinition sDefinition = getProcessDefinition(tenantAccessor, processDefinitionId);
         SProcessInstance startedInstance = null;
         try {
-            final List<SOperation> sOperations = toSOperation(operations);
+            final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
             startedInstance = processExecutor.start(starterId, session.getUserId(), sOperations, context, connectorsWithInput, new FlowNodeSelector(
                     sDefinition, new StartFlowNodeFilter()));
         } catch (final SProcessInstanceCreationException e) {
