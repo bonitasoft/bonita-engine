@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm;
+package com.bonitasoft.engine.bdm.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.client.ClientBDMCodeGenerator;
+import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
+import com.bonitasoft.engine.bdm.BusinessObject;
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.CompilableCode;
+import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.FieldType;
+import com.bonitasoft.engine.bdm.Query;
+import com.bonitasoft.engine.bdm.QueryParameter;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
@@ -310,7 +317,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
-        String daoContent = readGeneratedDAOFile();
+        final String daoContent = readGeneratedDAOFile();
         // String signature = getQueryMethodSignature(query, query.getReturnType(), EMPLOYEE_QUALIFIED_NAME, false);
         assertThat(daoContent).contains("public Employee findByName(String name)");
     }
@@ -328,7 +335,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         ageField.setType(FieldType.INTEGER);
         employeeBO.getFields().add(ageField);
 
-        final Query query = new Query("getEmployeesByNameAndAge", "From Employee e WHERE e.name = :myName AND e.age = :miEdad", List.class.getName());
+        final Query query = new Query("getEmployeesByNameAndAge", "SELECT e FROM Employee e WHERE e.name = :name AND e.age = :miEdad", List.class.getName());
         query.addQueryParameter("myName", String.class.getName());
         query.addQueryParameter("miEdad", Integer.class.getName());
         employeeBO.getQueries().add(query);
@@ -336,16 +343,15 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
-        String daoContent = readGeneratedDAOFile();
-        // String signature = getQueryMethodSignature(query, query.getReturnType(), EMPLOYEE_QUALIFIED_NAME, true);
-        // "public List<Employee> getEmployeesByNameAndAge(String myName, Integer miEdad, final int startIndex, final int maxResults)":
-        assertThat(daoContent).contains("public List<Employee> getEmployeesByNameAndAge(String myName, Integer miEdad, int startIndex, int maxResults)");
+        final String daoContent = readGeneratedDAOFile();
+
+        assertThat(daoContent).contains("public List<Employee> findByMyNameAndMiEdad(String myName, Integer miEdad, int startIndex, int maxResults)");
     }
 
     protected String getQueryMethodSignature(final Query query, final String queryReturnType, final String businessObjectName, final boolean returnsList) {
         String signature = "public " + getSimpleClassName(queryReturnType) + "<" + getSimpleClassName(businessObjectName) + "> " + query.getName() + "(";
         boolean first = true;
-        for (QueryParameter param : query.getQueryParameters()) {
+        for (final QueryParameter param : query.getQueryParameters()) {
             signature = appendCommaIfNotFirstParam(signature, first);
             signature += getSimpleClassName(param.getClassName()) + " " + param.getName();
             first = false;
@@ -391,7 +397,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     private String readGeneratedDAOFile() throws IOException {
-        File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replace(".", File.separator) + "DAO.java");
+        final File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replace(".", File.separator) + "DAO.java");
         return FileUtils.readFileToString(daoInterface);
     }
 

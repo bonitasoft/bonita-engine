@@ -98,14 +98,23 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
-        employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
+        // employee.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
 
         final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
                 "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
 
+        final BusinessObject person = new BusinessObject();
+        person.setQualifiedName("org.bonitasoft.pojo.Person");
+        person.addField(firstName);
+        person.addField(lastName);
+        person.addField(phoneNumbers);
+        person.setDescription("Describe a simple person");
+        person.addUniqueConstraint("uk_fl", "firstName", "lastName");
+
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
+        model.addBusinessObject(person);
         return model;
     }
 
@@ -139,10 +148,10 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Test
     public void deploying_bdm_after_process_should_put_process_in_resolved_state() throws Exception {
-        String aQualifiedName = "org.bonitasoft.test.Bo";
-        byte[] bom = buildSimpleBom(aQualifiedName);
+        final String aQualifiedName = "org.bonitasoft.test.Bo";
+        final byte[] bom = buildSimpleBom(aQualifiedName);
 
-        ProcessDefinition processDefinition = deploySimpleProcessWithBusinessData(aQualifiedName);
+        final ProcessDefinition processDefinition = deploySimpleProcessWithBusinessData(aQualifiedName);
 
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
@@ -168,23 +177,23 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final String bizDataName = "myBizData";
         processDefinitionBuilder.addBusinessData(bizDataName, aQualifiedName, null);
 
-        ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, matti.getId());
         return processDefinition;
     }
 
     private byte[] buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
-        Field field = new Field();
+        final Field field = new Field();
         field.setName("aField");
         field.setType(FieldType.STRING);
         bo.addField(field);
-        BusinessObjectModel model = new BusinessObjectModel();
+        final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
-        BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        byte[] zip = converter.zip(model);
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        final byte[] zip = converter.zip(model);
         return zip;
     }
 
@@ -465,7 +474,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
             final BusinessObjectDAO daoImpl = businessObjectDAOFactory.createDAO(apiSession, daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME + "DAOImpl");
 
-            final Method daoMethod = daoImpl.getClass().getMethod(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, String.class, int.class, int.class);
+            final Method daoMethod = daoImpl.getClass().getMethod("findByLastName", String.class, int.class, int.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
             List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol", 0, 10);
