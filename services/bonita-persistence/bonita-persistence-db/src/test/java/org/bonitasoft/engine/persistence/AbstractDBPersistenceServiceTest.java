@@ -127,13 +127,106 @@ public class AbstractDBPersistenceServiceTest {
         }
     }
 
+    class DummyPersistentObject implements PersistentObject {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public long getId() {
+            return 0;
+        }
+
+        @Override
+        public String getDiscriminator() {
+            return null;
+        }
+
+        @Override
+        public void setId(final long id) {
+
+        }
+
+        @Override
+        public void setTenantId(final long id) {
+
+        }
+
+    }
+
+    class DummyPersistentObject2 implements PersistentObject {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public long getId() {
+            return 0;
+        }
+
+        @Override
+        public String getDiscriminator() {
+            return null;
+        }
+
+        @Override
+        public void setId(final long id) {
+
+        }
+
+        @Override
+        public void setTenantId(final long id) {
+
+        }
+
+    }
+
 
     @Test
-    public void should_word_search_is_disable_when_entity_class_is_null() throws Exception {
+    public void should_word_search_returns_false_when_entity_class_is_null() throws Exception {
         boolean enableWordSearch = true;
         Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
         Class<? extends PersistentObject> entityClass = null;
         final boolean expectedResult = false;
+
+        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+    }
+
+    @Test
+    public void should_word_search_returns_true_when_feature_is_enabled_and_exclusion_is_empty() throws Exception {
+        boolean enableWordSearch = true;
+        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
+        Class<? extends PersistentObject> entityClass = DummyPersistentObject.class;
+        final boolean expectedResult = true;
+
+        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+    }
+
+    @Test
+    public void should_word_search_returns_false_when_feature_is_disabled_and_exclusion_is_empty() throws Exception {
+        boolean enableWordSearch = false;
+        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
+        Class<? extends PersistentObject> entityClass = DummyPersistentObject.class;
+        final boolean expectedResult = false;
+
+        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+    }
+
+    @Test
+    public void should_word_search_returns_false_when_feature_is_enabled_and_entity_class_is_excluded() throws Exception {
+        boolean enableWordSearch = true;
+        Set<String> wordSearchExclusionMappings = Collections.singleton(DummyPersistentObject.class.getName());
+        Class<? extends PersistentObject> entityClass = DummyPersistentObject.class;
+        final boolean expectedResult = false;
+
+        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+    }
+
+
+    @Test
+    public void should_word_search_returns_true_when_feature_is_enabled_and_entity_class_is_not_excluded() throws Exception {
+        boolean enableWordSearch = true;
+        Set<String> wordSearchExclusionMappings = Collections.singleton(DummyPersistentObject2.class.getName());
+        Class<? extends PersistentObject> entityClass = DummyPersistentObject.class;
+        final boolean expectedResult = true;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
