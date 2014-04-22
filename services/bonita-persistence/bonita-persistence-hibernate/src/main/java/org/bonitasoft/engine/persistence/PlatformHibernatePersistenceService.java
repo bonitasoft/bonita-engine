@@ -32,8 +32,8 @@ import org.hibernate.SessionFactory;
  */
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
-    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
-        super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings);
+    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+        super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings, logger);
     }
 
     public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,

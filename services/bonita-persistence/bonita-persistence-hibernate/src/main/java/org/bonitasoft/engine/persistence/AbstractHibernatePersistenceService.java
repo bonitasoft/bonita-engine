@@ -84,14 +84,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     int stat_display_count;
 
-    TechnicalLoggerService logger;
-
     List<String> classesToPurge;
 
     // ----
 
-    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
-        super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings);
+    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+        super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
         this.statistics = sessionFactory.getStatistics();
 
@@ -100,8 +98,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         this.classMapping = classMapping;
         this.interfaceToClassMapping = Collections.emptyMap();
         this.mappingExclusions = Collections.emptyList();
-
-        // TODO Auto-generated constructor stub
     }
 
     // Setter for session
@@ -113,7 +109,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
-                wordSearchExclusionMappings);
+                wordSearchExclusionMappings, logger);
         Configuration configuration;
         try {
             configuration = hbmConfigurationProvider.getConfiguration();
@@ -159,7 +155,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         mappingExclusions = hbmConfigurationProvider.getMappingExclusions();
 
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
-        this.logger = logger;
     }
 
     /**

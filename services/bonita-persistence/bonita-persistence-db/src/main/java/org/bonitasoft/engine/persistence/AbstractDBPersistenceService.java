@@ -28,6 +28,8 @@ import java.util.TreeSet;
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.TenantPersistenceService;
@@ -73,8 +75,10 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     private final boolean enableWordSearch;
 
+    protected final TechnicalLoggerService logger;
+
     public AbstractDBPersistenceService(final String name, final String statementDelimiter, final String likeEscapeCharacter,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = null;
         this.datasource = null;
@@ -91,11 +95,12 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
                 this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
             }
         }
+        this.logger = logger;
     }
 
     public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
             final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
@@ -103,7 +108,15 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
         this.enableWordSearch = enableWordSearch;
+        this.logger = logger;
+
+        if (enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "The word based search feature is experimental, using it in production may impact performances.");
+        }
         if (wordSearchExclusionMappings != null) {
+            if (!enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "You defined an exclusion mapping for the word based search feature, but it is not enabled.");
+            }
             for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
                 final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
                 if (!PersistentObject.class.isAssignableFrom(clazz)) {

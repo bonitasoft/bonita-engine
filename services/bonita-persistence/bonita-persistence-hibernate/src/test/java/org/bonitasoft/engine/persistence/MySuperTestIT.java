@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.persistence;
 
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.hamcrest.CoreMatchers;
 import org.hibernate.Session;
@@ -75,7 +77,7 @@ public class MySuperTestIT {
         //
         final List<Class<? extends PersistentObject>> classMapping = Arrays.<Class<? extends PersistentObject>>asList(Book.class);
         final Map<String, String> classAliasMappings = Collections.singletonMap(Book.class.getName(), "book");
-        PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, classMapping, classAliasMappings, enableWordSearch, Collections.<String>emptySet());
+        PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, classMapping, classAliasMappings, enableWordSearch, Collections.<String>emptySet(), mock(TechnicalLoggerService.class));
 
         Session session;
         session = persistenceService.getSession(true);
