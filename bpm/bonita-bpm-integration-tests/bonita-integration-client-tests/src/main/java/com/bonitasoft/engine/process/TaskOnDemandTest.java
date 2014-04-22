@@ -164,11 +164,11 @@ public class TaskOnDemandTest extends CommonAPISPTest {
                 TaskPriority.NORMAL);
         final ManualTaskInstance m2 = getProcessAPI().addManualUserTask(taskCreator);
 
-        assertEquals("newTask", m1.getDisplayName());
+        assertEquals("newTask1", m1.getDisplayName());
         assertEquals("add new manual user task", m1.getDisplayDescription());
         assertEquals("add new manual user task", m1.getDescription());
         m1 = (ManualTaskInstance) getProcessAPI().getActivityInstance(m1.getId());
-        assertEquals("newTask", m1.getDisplayName());
+        assertEquals("newTask1", m1.getDisplayName());
         assertEquals("add new manual user task", m1.getDisplayDescription());
         assertEquals("add new manual user task", m1.getDescription());
         assertEquals(dueDate, m2.getExpectedEndDate());
