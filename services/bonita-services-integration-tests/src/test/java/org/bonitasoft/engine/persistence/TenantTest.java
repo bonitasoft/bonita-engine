@@ -891,33 +891,9 @@ public class TenantTest extends CommonServiceTest {
         fields.add("firstName");
         fields.add("lastName");
         allFields.put(Human.class, fields);
-        QueryOptions queryOptions =new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstname", OrderByType.ASC)),
+        QueryOptions queryOptions =new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstName", OrderByType.ASC)),
                 new ArrayList<FilterOption>(0), new SearchFields(Arrays.asList(searchTerm), allFields));
         return queryOptions;
-    }
-
-    @Test
-    public void search_Humans_With_Fields_Containing_Word_Starting_With_Prefix() throws Exception {
-        getTransactionService().begin();
-        persistenceService.enableWordSearch(true);
-        final Human human = PersistenceTestUtil.buildHuman("humanFN", "humanLN", 24);
-        persistenceService.insert(human);
-        final Parent parent = PersistenceTestUtil.buildParent("parentFN of child1FN", "parentLN", 36);
-        persistenceService.insert(parent);
-        final Child child = buildChild("child1FN", "child1LN", 5, parent);
-        persistenceService.insert(child);
-
-        QueryOptions queryOptions = buildQueryOptionsOrderByFirstnameASC("child");
-
-        final List<Human> allHumans = persistenceService.selectList(new SelectListDescriptor<Human>("getAllHumans", null, Human.class, queryOptions));
-
-        persistenceService.delete(child);
-        persistenceService.delete(parent);
-        persistenceService.delete(human);
-
-        getTransactionService().complete();
-
-        assertEquals("Parent and Child should be found with this search query.",2, allHumans.size());
     }
 
 }
