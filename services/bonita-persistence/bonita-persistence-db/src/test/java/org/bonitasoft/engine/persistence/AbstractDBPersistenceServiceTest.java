@@ -130,15 +130,23 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_is_disable_when_entity_class_is_null() throws Exception {
+        boolean enableWordSearch = true;
+        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
+        Class<? extends PersistentObject> entityClass = null;
+        final boolean expectedResult = false;
+
+        executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
+    }
+
+
+    private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
+            throws ClassNotFoundException {
         DBConfigurationsProvider dbConfigurationsProvider = mock(DBConfigurationsProvider.class);
         SequenceManager sequenceManager = mock(SequenceManager.class);
         DataSource datasource = mock(DataSource.class);
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", dbConfigurationsProvider, ";", "#", sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings, logger);
 
-        assertThat(persistenceService.isWordSearchEnabled(null), is(false));
-
+        assertThat(persistenceService.isWordSearchEnabled(entityClass), is(expectedResult));
     }
 }
