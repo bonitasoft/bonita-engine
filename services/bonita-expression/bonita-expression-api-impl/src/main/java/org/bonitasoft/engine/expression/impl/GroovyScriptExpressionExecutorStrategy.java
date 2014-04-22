@@ -44,10 +44,11 @@ public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpre
         final String expressionName = expression.getName();
         try {
             final GroovyShell shell = new GroovyShell(scriptClassLoader);
-            final Script script = shell.parse(expressionContent);// can put the name here
+            // can put the name here
+            final Script script = shell.parse(expressionContent);
             final Binding binding = new Binding(context);
             script.setBinding(binding);
-            return script.evaluate(expressionContent);// .evaluate(expressionContent);run()
+            return script.evaluate(expressionContent);
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
