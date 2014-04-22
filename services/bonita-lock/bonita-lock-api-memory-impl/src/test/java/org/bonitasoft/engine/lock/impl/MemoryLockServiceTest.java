@@ -202,7 +202,7 @@ public class MemoryLockServiceTest {
     }
 
     @Test
-    public void getDetailsOnLockShouldReturnLockingTheadOwnerName() throws Exception {
+    public void getDetailsOnLockShouldReturnLockingTheadOwnerName() {
         // given:
         MemoryLockService spiedLockService = spy(memoryLockService);
         long objectToLockId = 151L;

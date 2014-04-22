@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -663,36 +664,32 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     public void getNumberOfUsersCanExecutePendingHumanTaskDeploymentInfo() throws Exception {
         logoutThenloginAs("pedro", "secreto");
 
-        final String otherUserName = "other";
-        final User otherUser = createUser(otherUserName, "user");
+        final User otherUser = createUser("other", "user");
 
         // create process definition with integer data;
         final String dataName = "var1";
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addIntegerData(dataName, new ExpressionBuilder().createConstantIntegerExpression(1)).addUserTask("step1", ACTOR_NAME)
                 .addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
-        // final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, pedro);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro, otherUser));
 
         // create Operation keyed map
         final Operation integerOperation = buildIntegerOperation(dataName, 2);
-        final List<Operation> operations = new ArrayList<Operation>();
-        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        contexts.put("page", "1");
-        operations.add(integerOperation);
-        final long processDefinitionId = processDefinition.getId();
-        final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinitionId, operations, contexts);
 
-        List<HumanTaskInstance> humanTaskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "step1", 0, 10);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(),
+                Collections.singletonList(integerOperation), Collections.<String, Serializable> singletonMap("page", "1"));
+        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
-
-        SearchResult<User> results = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(humanTaskInstances.get(0).getId(), builder.done());
+        final SearchResult<User> results = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1.getId(), builder.done());
         assertThat(results.getCount()).isSameAs(2L);
         assertThat(results.getResult()).isNotEmpty();
         assertThat(results.getResult().get(0).getId()).isEqualTo(pedro.getId());
         assertThat(results.getResult().get(1).getId()).isEqualTo(otherUser.getId());
+
+        // Clean up
         disableAndDeleteProcess(processDefinition);
         deleteUser(otherUser);
     }
