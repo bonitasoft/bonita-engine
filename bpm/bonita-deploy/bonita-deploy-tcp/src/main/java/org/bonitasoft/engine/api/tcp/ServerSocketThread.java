@@ -48,7 +48,7 @@ public class ServerSocketThread extends Thread {
         final Object[] parametersValues = methodCall.getParametersValues();
         try {
             return this.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } catch (ServerWrappedException e) {
+        } catch (final ServerWrappedException e) {
             throw StackTraceTransformer.mergeStackTraces(e);
         }
     }
@@ -66,7 +66,7 @@ public class ServerSocketThread extends Thread {
                     oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(callResult);
                     oos.flush();
-                } catch (Exception t) {
+                } catch (final Exception t) {
                     t.printStackTrace();
                 } finally {
                     if (ois != null) {
