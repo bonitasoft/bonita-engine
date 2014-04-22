@@ -33,7 +33,7 @@ public class BonitaException extends Exception implements BonitaContextException
 
     private static final long serialVersionUID = -5413586694735909486L;
 
-    private final Map<Context, Serializable> context;
+    private final Map<Context, Serializable> context = new TreeMap<Context, Serializable>();
 
     private long tenantId = -1;
 
@@ -54,7 +54,6 @@ public class BonitaException extends Exception implements BonitaContextException
      */
     public BonitaException(final String message, final Throwable cause) {
         super(message, cause);
-        context = new TreeMap<Context, Serializable>();
     }
 
     /**
@@ -65,7 +64,6 @@ public class BonitaException extends Exception implements BonitaContextException
      */
     public BonitaException(final String message) {
         super(message);
-        context = new TreeMap<Context, Serializable>();
     }
 
     /**
@@ -77,7 +75,6 @@ public class BonitaException extends Exception implements BonitaContextException
      */
     public BonitaException(final Throwable cause) {
         super(cause);
-        context = new TreeMap<Context, Serializable>();
     }
 
     /**
