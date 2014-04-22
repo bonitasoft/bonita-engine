@@ -64,6 +64,7 @@ import org.hibernate.stat.Statistics;
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Laurent Vaills
  */
 public abstract class AbstractHibernatePersistenceService extends AbstractDBPersistenceService {
 
@@ -87,7 +88,26 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     List<String> classesToPurge;
 
-    @SuppressWarnings("unchecked")
+    // ----
+
+    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
+        super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings);
+        this.sessionFactory = sessionFactory;
+        this.statistics = sessionFactory.getStatistics();
+
+        this.classAliasMappings = classAliasMappings;
+        this.cacheQueries = Collections.emptyMap();
+        this.classMapping = classMapping;
+        this.interfaceToClassMapping = Collections.emptyMap();
+        this.mappingExclusions = Collections.emptyList();
+
+        // TODO Auto-generated constructor stub
+    }
+
+    // Setter for session
+
+    // ----
+
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
             final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
@@ -446,8 +466,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter, final boolean enableWordSearch) {
         final StringBuilder builder = new StringBuilder(query);
         final Set<String> specificFilters = new HashSet<String>(filters.size());
-        FilterOption previousFilter = null;
         if (!filters.isEmpty()) {
+            FilterOption previousFilter = null;
             if (!query.contains("WHERE")) {
                 builder.append(" WHERE (");
             } else {
@@ -473,57 +493,89 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             builder.append(")");
         }
         if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
-            final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
-            final Set<String> fields = new HashSet<String>();
-            for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
-                final String alias = getClassAliasMappings().get(entry.getKey().getName());
-                for (final String field : entry.getValue()) {
-                    final StringBuilder aliasBuilder = new StringBuilder(alias);
-                    aliasBuilder.append('.').append(field);
-                    fields.add(aliasBuilder.toString());
-                }
-            }
-            fields.removeAll(specificFilters);
-
-            final List<String> terms = multipleFilter.getTerms();
-            if (!fields.isEmpty()) {
-                if (!builder.toString().contains("WHERE")) {
-                    builder.append(" WHERE (");
-                } else {
-                    builder.append(" AND (");
-                }
-
-                final Iterator<String> fieldIterator = fields.iterator();
-                while (fieldIterator.hasNext()) {
-                    final String currentField = fieldIterator.next();
-
-                    final Iterator<String> termIterator = terms.iterator();
-                    while (termIterator.hasNext()) {
-                        final String currentTerm = termIterator.next();
-
-                        final String likeEscapedClause = buildLikeEscapeClause(currentTerm);
-
-                        // Search if a sentence starts with the term
-                        builder.append(currentField).append(likeEscapedClause);
-
-                        if (enableWordSearch) {
-                            // Search also if a word starts with the term
-                            builder.append(" OR ").append(currentField).append("% " + likeEscapedClause);
-                        }
-
-                        if (termIterator.hasNext()) {
-                            builder.append(" OR ");
-                        }
-                    }
-                    if (fieldIterator.hasNext()) {
-                        builder.append(" OR ");
-                    }
-                }
-
-                builder.append(")");
-            }
+            handleMultipleFilters(builder, multipleFilter, specificFilters, enableWordSearch);
         }
         return builder.toString();
+    }
+
+    /**
+     * @param builder
+     * @param multipleFilter
+     * @param specificFilters
+     * @param enableWordSearch
+     */
+    protected void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters, final boolean enableWordSearch) {
+        final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
+        final Set<String> fields = new HashSet<String>();
+        for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
+            final String alias = getClassAliasMappings().get(entry.getKey().getName());
+            for (final String field : entry.getValue()) {
+                final StringBuilder aliasBuilder = new StringBuilder(alias);
+                aliasBuilder.append('.').append(field);
+                fields.add(aliasBuilder.toString());
+            }
+        }
+        fields.removeAll(specificFilters);
+
+        if (!fields.isEmpty()) {
+            final List<String> terms = multipleFilter.getTerms();
+            applyFiltersOnQuery(builder, fields, terms, enableWordSearch);
+        }
+    }
+
+    protected void applyFiltersOnQuery(final StringBuilder queryBuilder, final Set<String> fields, final List<String> terms, final boolean enableWordSearch) {
+        if (!queryBuilder.toString().contains("WHERE")) {
+            queryBuilder.append(" WHERE ");
+        } else {
+            queryBuilder.append(" AND ");
+        }
+        queryBuilder.append("(");
+
+        final Iterator<String> fieldIterator = fields.iterator();
+        while (fieldIterator.hasNext()) {
+            buildLikeClauseForOneFieldMultipleTerms(queryBuilder, fieldIterator.next(), terms, enableWordSearch);
+            if (fieldIterator.hasNext()) {
+                queryBuilder.append(" OR ");
+            }
+        }
+
+        queryBuilder.append(")");
+    }
+
+    /**
+     * @param queryBuilder
+     * @param currentField
+     * @param terms
+     * @param enableWordSearch
+     */
+    protected void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField, final List<String> terms, final boolean enableWordSearch) {
+        final Iterator<String> termIterator = terms.iterator();
+        while (termIterator.hasNext()) {
+            final String currentTerm = termIterator.next();
+
+            buildLikeClauseForOneFieldOneTerm(queryBuilder, currentField, currentTerm, enableWordSearch);
+
+            if (termIterator.hasNext()) {
+                queryBuilder.append(" OR ");
+            }
+        }
+    }
+
+    /**
+     * @param queryBuilder
+     * @param currentField
+     * @param currentTerm
+     * @param enableWordSearch
+     */
+    protected void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm, final boolean enableWordSearch) {
+        // Search if a sentence starts with the term
+        queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
+
+        if (enableWordSearch) {
+            // Search also if a word starts with the term
+            // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
+            queryBuilder.append(" OR ").append(currentField).append(buildLikeEscapeClause(currentTerm, "% ", "%"));
+        }
     }
 
     private <T> String getQueryWithOrderByClause(final String query, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
@@ -677,12 +729,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                final boolean enableWordSearch = this.isWordSearchEnable(selectDescriptor.getEntityType());
+                final boolean enableWordSearch = this.isWordSearchEnabled(selectDescriptor.getEntityType());
                 builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
             }
+
             if (selectDescriptor.hasOrderByParameters()) {
                 builtQuery = getQueryWithOrderByClause(builtQuery, selectDescriptor);
             }
+
             if (!builtQuery.equals(query.getQueryString())) {
                 query = session.createQuery(builtQuery);
             }

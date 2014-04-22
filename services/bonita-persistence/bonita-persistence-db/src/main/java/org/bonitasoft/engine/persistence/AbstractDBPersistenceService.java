@@ -73,6 +73,26 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     private final boolean enableWordSearch;
 
+    public AbstractDBPersistenceService(final String name, final String statementDelimiter, final String likeEscapeCharacter,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
+        this.name = name;
+        this.sequenceManager = null;
+        this.datasource = null;
+        this.statementDelimiter = statementDelimiter;
+        this.likeEscapeCharacter = likeEscapeCharacter;
+        this.enableWordSearch = enableWordSearch;
+        if (wordSearchExclusionMappings != null) {
+            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
+                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
+                if (!PersistentObject.class.isAssignableFrom(clazz)) {
+                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz + " because it does not implements "
+                            + PersistentObject.class);
+                }
+                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
+            }
+        }
+    }
+
     public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
             final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
@@ -100,7 +120,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         return name;
     }
 
-    public boolean isWordSearchEnable(final Class<? extends PersistentObject> entityClass) {
+    protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
         if (!enableWordSearch) {
             return false;
         }
@@ -323,8 +343,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     /**
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
-    protected String buildLikeEscapeClause(final String term) {
-        return " LIKE '" + escapeTerm(term)+ "%' ESCAPE '"+ likeEscapeCharacter + "'";
+    protected String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
+        return " LIKE '" + (prefixPattern != null ?prefixPattern :"") + escapeTerm(term) + (suffixPattern != null ?suffixPattern :"") + "' ESCAPE '"+ getLikeEscapeCharacter() + "'";
     }
 
     /**
@@ -338,9 +358,13 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         // 4) escape _ character (sql query wildcard) by adding escape character
         return term
                 .replaceAll("'", "''")
-                .replaceAll(likeEscapeCharacter, likeEscapeCharacter + likeEscapeCharacter)
-                .replaceAll("%", likeEscapeCharacter + "%")
-                .replaceAll("_", likeEscapeCharacter + "_");
+                .replaceAll(getLikeEscapeCharacter(), getLikeEscapeCharacter() + getLikeEscapeCharacter())
+                .replaceAll("%", getLikeEscapeCharacter() + "%")
+                .replaceAll("_", getLikeEscapeCharacter() + "_");
+    }
+
+    protected String getLikeEscapeCharacter() {
+        return likeEscapeCharacter;
     }
 
 }

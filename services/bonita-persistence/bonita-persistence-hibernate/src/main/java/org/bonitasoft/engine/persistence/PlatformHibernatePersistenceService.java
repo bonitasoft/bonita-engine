@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -21,6 +22,7 @@ import javax.sql.DataSource;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
+import org.hibernate.SessionFactory;
 
 /**
  * @author Baptiste Mesta
@@ -29,6 +31,10 @@ import org.bonitasoft.engine.services.SPersistenceException;
  * @author Celine Souchet
  */
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
+
+    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws ClassNotFoundException {
+        super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings);
+    }
 
     public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
@@ -49,7 +55,7 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
     }
 
     @Override
-    public void deleteByTenant(Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) {
+    public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) {
         // FIXME : Method for tenant. TODO: Refactor code for PlatformHibernatePersistenceService don't implements TenantPersistenceService
     }
 
