@@ -36,6 +36,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.bonitasoft.engine.tracking.TimeTracker;
+import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 
 /**
  * Execute connectors directly
@@ -60,6 +62,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     private final long keepAliveTimeSeconds;
 
     private final TechnicalLoggerService loggerService;
+
+    private final TimeTracker timeTracker;
 
     /**
      * The handling of threads relies on the JVM
@@ -86,7 +90,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      *            will wait for new tasks before terminating. (in seconds)
      */
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
-            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService) {
+            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService, final TimeTracker timeTracker) {
 
         this.queueCapacity = queueCapacity;
         this.corePoolSize = corePoolSize;
@@ -95,14 +99,16 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         this.keepAliveTimeSeconds = keepAliveTimeSeconds;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
+        this.timeTracker = timeTracker;
     }
 
     @Override
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
+        final long startTime = System.currentTimeMillis();
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is node started. Start it first");
         }
-        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
+        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, this.timeTracker);
         final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
             return getValue(submit);
@@ -116,6 +122,17 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             submit.cancel(true);
             disconnectSilently(sConnector);
             throw new SConnectorException("The connector timed out " + sConnector);
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("Connector: ");
+                desc.append(sConnector);
+                desc.append(" - ");
+                desc.append("inputParameters: ");
+                desc.append(inputParameters);
+                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, desc.toString(), (endTime - startTime));
+            }
         }
     }
 
@@ -153,13 +170,17 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector) {
+        private final TimeTracker timeTracker;
+
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final TimeTracker timeTracker) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
+            this.timeTracker = timeTracker;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
+            final long startTime = System.currentTimeMillis();
             sConnector.setInputParameters(inputParameters);
             try {
                 sConnector.validate();
@@ -173,6 +194,16 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                     sessionService.deleteSession(sessionId);
                 } catch (final SessionIdNotSetException e) {
                     // nothing, no session has been created
+                }
+                if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE)) {
+                    final long endTime = System.currentTimeMillis();
+                    final StringBuilder desc = new StringBuilder();
+                    desc.append("Connector: ");
+                    desc.append(sConnector);
+                    desc.append(" - ");
+                    desc.append("inputParameters: ");
+                    desc.append(inputParameters);
+                    this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE, desc.toString(), (endTime - startTime));
                 }
             }
         }

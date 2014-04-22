@@ -1,0 +1,16 @@
+package org.bonitasoft.engine.tracking;
+
+public class TimeTrackerRecords {
+
+    public static final String EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT = "EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT";
+
+    public static final String EXECUTE_CONNECTOR_CALLABLE = "EXECUTE_CONNECTOR_CALLABLE";
+
+    public static final String EXECUTE_CONNECTOR_OUTPUT_OPERATIONS = "EXECUTE_CONNECTOR_OUTPUT_OPERATIONS";
+
+    public static final String EXECUTE_CONNECTOR_INPUT_EXPRESSIONS = "EXECUTE_CONNECTOR_INPUT_EXPRESSIONS";
+
+    public static final String EXECUTE_CONNECTOR_DISCONNECT = "EXECUTE_CONNECTOR_DISCONNECT";
+
+    public static final String EXECUTE_CONNECTOR_WORK = "EXECUTE_CONNECTOR_WORK";
+}

@@ -10,6 +10,7 @@
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="dependencyService" ref="dependencyService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
 	</bean>
 	
 	<bean id="connectorInstanceService" class="org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImpl">

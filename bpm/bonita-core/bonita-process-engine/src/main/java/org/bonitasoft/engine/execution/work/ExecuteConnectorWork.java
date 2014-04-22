@@ -31,6 +31,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithF
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.tracking.TimeTracker;
+import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
@@ -104,11 +106,13 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     @Override
     public void work(final Map<String, Object> context) throws Exception {
+        final long startTime = System.currentTimeMillis();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final TimeTracker timeTracker = tenantAccessor.getTimeTracker();
         final ClassLoader processClassloader = getClassLoader(context);
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -123,6 +127,19 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             // evaluate output and trigger the execution of the flow node
             userTransactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, context));
         } finally {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("processDefinitionId: ");
+                desc.append(processDefinitionId);
+                desc.append(" - ");
+                desc.append("connectorDefinitionName: ");
+                desc.append(connectorDefinitionName);
+                desc.append(" - ");
+                desc.append("connectorInstanceId: ");
+                desc.append(connectorInstanceId);
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK, desc.toString(), (endTime - startTime));
+            }
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
@@ -178,7 +195,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         @Override
         public Void call() throws Exception {
             sConnectorDefinition = getSConnectorDefinition(processDefinitionService);
-            inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), inputParametersContext, null);
+            inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getConnectorId(), sConnectorDefinition.getInputs(),
+                    inputParametersContext, null);
             connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
             return null;
         }

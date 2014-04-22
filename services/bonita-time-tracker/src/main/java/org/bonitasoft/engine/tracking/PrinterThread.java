@@ -7,6 +7,7 @@ public class PrinterThread extends Thread {
     private final int flushIntervalInMiliSeconds;
 
     public PrinterThread(final int flushIntervalInSeconds, final RecordKeeper recordKeeper) {
+        super("TimeTracker-PrinterThread");
         this.flushIntervalInMiliSeconds = flushIntervalInSeconds * 1000;
         this.recordKeeper = recordKeeper;
     }
