@@ -499,7 +499,7 @@ public class ProcessExecutionTest extends CommonAPITest {
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
-                        || comment.getContent().contains(" acting as delegate of user with id <" + step1Archived.getExecutedBy() + "> has done the task.");
+                        || comment.getContent().contains(" acting as delegate of user with id <" + step1Archived.getExecutedBy() + "> has executed the task.");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
