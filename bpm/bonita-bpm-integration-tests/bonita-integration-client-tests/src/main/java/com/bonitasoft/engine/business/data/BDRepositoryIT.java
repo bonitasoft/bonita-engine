@@ -551,7 +551,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
             final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
             return (String) evaluatedExpressions.get(expressionEmployee);
         } catch (final ExpressionEvaluationException eee) {
-            eee.printStackTrace();
+            System.err.println(eee.getMessage());
             return null;
         }
     }
