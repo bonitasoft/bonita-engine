@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,14 +13,29 @@
  **/
 package org.bonitasoft.engine.commons;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public class StringUtil {
 
     public static String firstCharToUpperCase(final String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1, s.length());
+        if (s == null) {
+            throw new IllegalArgumentException("The string is null");
+        }
+        if (s.isEmpty()) {
+            return "";
+        }
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
     public static String firstCharToLowerCase(final String s) {
-        return s.substring(0, 1).toLowerCase() + s.substring(1, s.length());
+        if (s == null) {
+            throw new IllegalArgumentException("The string is null");
+        }
+        if (s.isEmpty()) {
+            return "";
+        }
+        return Character.toLowerCase(s.charAt(0)) + s.substring(1);
     }
 
 }
