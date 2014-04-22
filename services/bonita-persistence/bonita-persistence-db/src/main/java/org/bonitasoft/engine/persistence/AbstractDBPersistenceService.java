@@ -134,7 +134,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     }
 
     protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
-        if (!enableWordSearch) {
+        if (!enableWordSearch || entityClass == null) {
             return false;
         }
         for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
