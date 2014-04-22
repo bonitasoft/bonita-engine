@@ -41,7 +41,6 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -258,35 +257,42 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Ignore
     @Test
     public void createHumanTaskAndExecutingItWithOtherUser() throws Exception {
+        final User userWhoCreateTheManualTask = createUser("userWhoCreateTheManualTask", PASSWORD);
+
+        logout();
+        loginWith("userWhoCreateTheManualTask", PASSWORD);
+
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final String userTaskName = "userTask";
         processBuilder.addActor(ACTOR_NAME).addDescription("test process with archived sub tasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final HumanTaskInstance parentTask = waitForUserTask(userTaskName, processInstance);
-
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, userWhoCreateTheManualTask);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(userTaskName, processInstance, userWhoCreateTheManualTask);
 
         // Add sub task
         ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", john.getId(), "add new manual user task",
                 new Date(System.currentTimeMillis()), TaskPriority.NORMAL);
         final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
-        checkNbPendingTaskOf(2, john);
+
+        logout();
+        loginWith(USERNAME, PASSWORD);
 
         // archive sub task:
         // archive first children tasks:
         getProcessAPI().executeFlowNode(manualUserTask.getId());
-        checkNbPendingTaskOf(1, john);
+
+        executeFlowNodeUntilEnd(parentTask.getId());
+        waitForProcessToFinish(processInstance);
+
         final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(manualUserTask.getId());
         assertEquals(john.getId(), archivedActivityInstance.getExecutedBy());
-        assertEquals(-1, archivedActivityInstance.getExecutedBySubstitute());
+        assertEquals(john.getId(), archivedActivityInstance.getExecutedBySubstitute());
 
         // Clean up
         disableAndDeleteProcess(processDefinition);
+        deleteUser(userWhoCreateTheManualTask);
     }
 
     // @Test

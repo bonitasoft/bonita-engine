@@ -365,7 +365,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             addActivityInstanceTokenCount(activityInstanceService, activityInstance);
 
             return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
-        } catch (final Exception e) {
+        } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e.getMessage());
         }
