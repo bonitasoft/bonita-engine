@@ -225,15 +225,17 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
-    public void aRemovedEntityShouldNotBeRetrievableAnyLonger() {
+    public void aRemovedEntityShouldNotBeRetrievableAnyLonger() throws SBusinessDataNotFoundException {
         Employee employee = null;
         try {
             employee = addEmployeeToRepository(anEmployee().build());
 
             businessDataRepository.remove(employee);
-            businessDataRepository.findById(Employee.class, employee.getPersistenceId());
         } catch (final Exception e) {
             fail("Should not fail here");
+        }
+        if (employee != null) {
+            businessDataRepository.findById(Employee.class, employee.getPersistenceId());
         }
     }
 
