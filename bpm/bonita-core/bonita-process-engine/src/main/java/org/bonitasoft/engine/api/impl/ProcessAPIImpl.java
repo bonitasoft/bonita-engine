@@ -884,16 +884,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(0, flownodeInstanceId, true);
+        try {
+            executeFlowNode(0, flownodeInstanceId, true);
+        } catch (final SBonitaException e) {
+            throw new FlowNodeExecutionException(e);
+        }
     }
 
     @CustomTransactions
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(userId, flownodeInstanceId, true);
+        try {
+            executeFlowNode(userId, flownodeInstanceId, true);
+        } catch (final SBonitaException e) {
+            throw new FlowNodeExecutionException(e);
+        }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws FlowNodeExecutionException {
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -931,7 +939,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                             final StringBuilder stb = new StringBuilder();
                             stb.append("The user <" + session.getUserName() + "> ");
                             stb.append("acting as delegate of user with id <" + executerUserId + "> ");
-                            stb.append("has done the task.");
+                            stb.append("has executed the task.");
                             commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
                         } catch (final SCommentAddException e) {
                             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
@@ -941,19 +949,16 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
         };
 
+        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
+        executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
+        final BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
+                tenantAccessor.getTenantId());
         try {
-            final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
-            executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
-            final BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
-                    tenantAccessor.getTenantId());
-            try {
-                executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
-            } finally {
-                lockService.unlock(lock, tenantAccessor.getTenantId());
-            }
-        } catch (final SBonitaException e) {
-            throw new FlowNodeExecutionException(e);
+            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
+        } finally {
+            lockService.unlock(lock, tenantAccessor.getTenantId());
         }
+
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,
