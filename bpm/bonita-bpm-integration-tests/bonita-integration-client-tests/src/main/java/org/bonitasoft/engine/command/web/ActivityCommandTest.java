@@ -186,8 +186,7 @@ public class ActivityCommandTest extends CommonAPITest {
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
-                        || comment.getContent().contains(
-                                " acting as delegate of user with id <" + archivedActivityInstance.getExecutedBy() + "> has done the task.");
+                        || comment.getContent().contains("The user " + USERNAME + " acting as delegate of the user john has done the task \"step1\".");
             }
             assertTrue(haveCommentForDelegate);
         } finally {

@@ -27,7 +27,6 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
@@ -45,6 +44,8 @@ import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -127,7 +128,7 @@ public class ProcessStarter {
             throw e;
         }
 
-        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterSubstituteUserId, starterUserId, startedSProcessInstance);
+        logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId, startedSProcessInstance);
         return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
     }
 
@@ -165,7 +166,6 @@ public class ProcessStarter {
             final SProcessInstance sProcessInstance) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
 
         final StringBuilder stb = new StringBuilder();
         stb.append("The user <");
@@ -174,7 +174,7 @@ public class ProcessStarter {
             stb.append("> acting as delegate of user with id <");
             stb.append(starterId);
         }
-        stb.append("> has started instance <");
+        stb.append("> has started the process instance <");
         stb.append(sProcessInstance.getId());
         stb.append("> of process <");
         stb.append(sProcessDefinition.getName());
@@ -188,11 +188,26 @@ public class ProcessStarter {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
         }
 
+        addSystemCommentOnProcessInstanceWhenStartingProcessFor(sProcessInstance, starterId, starterSubstituteId);
+    }
+
+    protected void addSystemCommentOnProcessInstanceWhenStartingProcessFor(final SProcessInstance sProcessInstance, final long starterId,
+            final long starterSubstituteId) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final SCommentService commentService = tenantAccessor.getCommentService();
+
         if (starterId != starterSubstituteId) {
+            final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
+                final SUser starter = identityService.getUser(starterId);
+                final StringBuilder stb = new StringBuilder();
+                stb.append("The user " + SessionInfos.getUserNameFromSession() + " ");
+                stb.append("acting as delegate of the user " + starter.getUserName() + " ");
+                stb.append("has started the case.");
                 commentService.addSystemComment(sProcessInstance.getId(), stb.toString());
-            } catch (final SCommentAddException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            } catch (final SBonitaException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
             }
         }
     }
