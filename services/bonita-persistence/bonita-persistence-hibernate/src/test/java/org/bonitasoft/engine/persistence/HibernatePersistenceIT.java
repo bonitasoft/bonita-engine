@@ -22,7 +22,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.junit.Test;
 
-public class MySuperTestIT {
+public class HibernatePersistenceIT {
 
     protected QueryOptions buildQueryOptions(final String... searchTerms) {
         Map<Class<? extends PersistentObject>, Set<String>> allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
