@@ -3,11 +3,9 @@ package org.bonitasoft.engine.core.process.instance.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
 import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
-import static org.bonitasoft.engine.test.persistence.builder.MessageInstanceBuilder.aMessageInstance;
 import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
-import static org.bonitasoft.engine.test.persistence.builder.WaitingMessageEventBuilder.aWaitingEvent;
 
 import java.util.List;
 
@@ -15,7 +13,6 @@ import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.test.persistence.repository.BPMEventRepository;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,10 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProcessInstanceQueriesTest {
 
-    private static final int SOME_NUMBER_OF_MESSAGE_INSTANCES = 5;
-
-    private static final int MORE_THAN_DEFAULT_PAGE_SIZE = 42;
-
     private static final long aGroupId = 654L;
 
     private static final long anotherGroupId = 9875L;
@@ -42,9 +35,6 @@ public class ProcessInstanceQueriesTest {
 
     @Inject
     private ProcessInstanceRepository repository;
-
-    @Inject
-    private BPMEventRepository bPMEventRepository;
 
     @Test
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_through_user_filters() {
@@ -136,100 +126,6 @@ public class ProcessInstanceQueriesTest {
         List<Long> userIds = repository.getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
 
         assertThat(userIds).containsExactly(john.getId(), marie.getId(), paul.getId(), walter.getId());
-    }
-
-    @Test
-    public void getInProgressMessageInstancesShouldOnlyConsiderHandledMessages() {
-        // given:
-        for (int i = 0; i < SOME_NUMBER_OF_MESSAGE_INSTANCES; i++) {
-            bPMEventRepository.add(aMessageInstance().handled(true).build());
-        }
-        // Add instances that should be ignored by getInProgressMessageInstances():
-        bPMEventRepository.add(aMessageInstance().handled(false).build());
-        bPMEventRepository.add(aMessageInstance().handled(false).build());
-
-        // when:
-        List<Long> inProgressMessageInstances = bPMEventRepository.getInProgressMessageInstances();
-
-        // then:
-        assertThat(inProgressMessageInstances).hasSize(SOME_NUMBER_OF_MESSAGE_INSTANCES);
-    }
-
-    @Test
-    public void resetMessageInstancesShouldResetAllHandledFlagToFalse() {
-        // given:
-        for (int i = 0; i < MORE_THAN_DEFAULT_PAGE_SIZE; i++) {
-            bPMEventRepository.add(aMessageInstance().handled(true).build());
-        }
-
-        // when:
-        bPMEventRepository.resetProgressMessageInstances();
-
-        // then:
-        assertThat(bPMEventRepository.getInProgressMessageInstances()).hasSize(0);
-    }
-
-    @Test
-    public void getInProgressWaitingEventsShouldOnlyConsiderInProgressElements() {
-        // given:
-        for (int i = 0; i < SOME_NUMBER_OF_MESSAGE_INSTANCES; i++) {
-            bPMEventRepository.add(aWaitingEvent().inProgress(true).build());
-        }
-        // Add instances that should be ignored by getInProgressWaitingEvents():
-        bPMEventRepository.add(aWaitingEvent().inProgress(false).build());
-        bPMEventRepository.add(aWaitingEvent().inProgress(false).build());
-
-        // when:
-        List<Long> inProgressWaitingEvents = bPMEventRepository.getInProgressWaitingEvents();
-
-        // then:
-        assertThat(inProgressWaitingEvents).hasSize(SOME_NUMBER_OF_MESSAGE_INSTANCES);
-    }
-
-    @Test
-    public void resetWaitingEventsShouldResetAllInProgressFlagToFalse() {
-        // given:
-        for (int i = 0; i < MORE_THAN_DEFAULT_PAGE_SIZE; i++) {
-            bPMEventRepository.add(aWaitingEvent().inProgress(true).build());
-        }
-
-        // when:
-        bPMEventRepository.resetInProgressWaitingEvents();
-
-        // then:
-        assertThat(bPMEventRepository.getInProgressWaitingEvents()).hasSize(0);
-    }
-
-    @Test
-    public void resetWaitingEventsShouldReturnNumberOfRowsUpdated() {
-        // given:
-        for (int i = 0; i < MORE_THAN_DEFAULT_PAGE_SIZE; i++) {
-            bPMEventRepository.add(aWaitingEvent().inProgress(true).build());
-        }
-        bPMEventRepository.add(aWaitingEvent().inProgress(false).build());
-        bPMEventRepository.add(aWaitingEvent().inProgress(false).build());
-
-        // when:
-        int resetInProgressWaitingEvents = bPMEventRepository.resetInProgressWaitingEvents();
-
-        // then:
-        assertThat(resetInProgressWaitingEvents).as("wrong result").isEqualTo(MORE_THAN_DEFAULT_PAGE_SIZE);
-    }
-
-    @Test
-    public void resetMessageInstancesShouldReturnNumberOfRowsUpdated() {
-        // given:
-        for (int i = 0; i < MORE_THAN_DEFAULT_PAGE_SIZE; i++) {
-            bPMEventRepository.add(aMessageInstance().handled(true).build());
-        }
-        bPMEventRepository.add(aMessageInstance().handled(false).build());
-        bPMEventRepository.add(aMessageInstance().handled(false).build());
-
-        // when:
-        int resetMessageInstances = bPMEventRepository.resetProgressMessageInstances();
-
-        // then:
-        assertThat(resetMessageInstances).as("wrong result").isEqualTo(MORE_THAN_DEFAULT_PAGE_SIZE);
     }
 
 }
