@@ -22,6 +22,7 @@ import javax.persistence.Temporal;
 import javax.persistence.Version;
 
 import org.apache.commons.io.FileUtils;
+import org.assertj.core.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,11 +46,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     private File destDir;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        destDir = new File(System.getProperty("java.io.tmpdir"), "generationDir");
-        destDir.mkdirs();
+        destDir = Files.newTemporaryFolder();
     }
 
     @After
