@@ -150,7 +150,7 @@ public class TestsInitializer {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             Class<?> initializerClass = contextClassLoader.loadClass(getInitializerListenerClassName());
             initializerClass.getMethod("unload").invoke(null);
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             System.out.println("Unable to execute the unload handler, maybe test are not local: " + e.getMessage());
             // not in local, do nothing
         }

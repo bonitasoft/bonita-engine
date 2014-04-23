@@ -146,19 +146,17 @@ public class ExpressionServiceImpl implements ExpressionService {
      *             if the condition is not fulfilled, does nothing otherwise
      */
     private void checkReturnType(final SExpression expression, final Object result) throws SExpressionEvaluationException {
-        if (mustCheckExpressionReturnType() && result != null) {
-            if (!result.getClass().getName().equals(expression.getReturnType())) {
-                try {
-                    final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
-                    final Class<?> evaluatedReturnedType = result.getClass();
-                    if (!(declaredReturnedType.isAssignableFrom(evaluatedReturnedType))) {
-                        throw new SExpressionEvaluationException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
-                                + evaluatedReturnedType + " for expression " + expression.getName(), expression.getName());
-                    }
-                } catch (final ClassNotFoundException e) {
-                    throw new SExpressionEvaluationException(
-                            "Declared return type unknown : " + expression.getReturnType() + " for expression " + expression.getName(), e, expression.getName());
+        if (mustCheckExpressionReturnType() && result != null && !result.getClass().getName().equals(expression.getReturnType())) {
+            try {
+                final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
+                final Class<?> evaluatedReturnedType = result.getClass();
+                if (!(declaredReturnedType.isAssignableFrom(evaluatedReturnedType))) {
+                    throw new SExpressionEvaluationException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
+                            + evaluatedReturnedType + " for expression " + expression.getName(), expression.getName());
                 }
+            } catch (final ClassNotFoundException e) {
+                throw new SExpressionEvaluationException(
+                        "Declared return type unknown : " + expression.getReturnType() + " for expression " + expression.getName(), e, expression.getName());
             }
         }
     }

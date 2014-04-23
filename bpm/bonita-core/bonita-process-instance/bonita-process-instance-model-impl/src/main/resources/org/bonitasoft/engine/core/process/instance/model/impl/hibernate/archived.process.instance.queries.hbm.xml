@@ -271,9 +271,10 @@
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-		OR (usertask.rootContainerId = ap.sourceObjectId
-			AND usertask.stable = TRUE
-			AND usertask.assigneeId = :userId) )
+			OR (usertask.rootContainerId = ap.sourceObjectId
+				AND usertask.stable = TRUE
+				AND usertask.assigneeId = :userId) 
+		)
   	</query>
   
   	<query name="searchSAProcessInstancewithSUserTaskInstance">
@@ -286,9 +287,10 @@
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-		OR (usertask.rootContainerId = ap.sourceObjectId
-			AND usertask.stable = TRUE
-			AND usertask.assigneeId = :userId) )
+			OR (usertask.rootContainerId = ap.sourceObjectId
+				AND usertask.stable = TRUE
+				AND usertask.assigneeId = :userId) 
+		)
 	</query>
 
 	<query name="searchSAHumanTaskInstancewithSAActivityInstance">
@@ -582,7 +584,7 @@
 				(
 					 EXISTS (SELECT at.id 
 						FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-						WHERE (at.logicalGroup2 = ap.sourceObjectId AND at.executedBy = :userId)
+						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 					)
 					OR ap.startedBy = :userId
 				)
@@ -597,7 +599,7 @@
 				(
 					 EXISTS (SELECT at.id 
 						FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-						WHERE (at.logicalGroup2 = ap.sourceObjectId AND at.executedBy = :userId)
+						WHERE (at.logicalGroup2 = ap.sourceObjectId AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 					)
 					OR ap.startedBy = :userId
 				)

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
-import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -31,6 +30,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
  * @author Julien Reboul
+ * @author Celine Souchet
  */
 public class AuthenticationServiceImpl implements GenericAuthenticationService {
 
@@ -47,27 +47,27 @@ public class AuthenticationServiceImpl implements GenericAuthenticationService {
      * @see org.bonitasoft.engine.authentication.GenericAuthenticationService#checkUserCredentials(java.util.Map)
      */
     @Override
-    public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
+    public String checkUserCredentials(Map<String, Serializable> credentials) {
+        final String methodName = "checkUserCredentials";
         try {
-            String password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
-            String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
+            final String password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
+            final String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
             }
             final SUser user = identityService.getUserByUserName(userName);
             if (identityService.chechCredentials(user, password)) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials Success"));
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
                 }
                 return userName;
-            } else {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials Failed"));
-                }
+            }
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
             }
         } catch (final SUserNotFoundException sunfe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "checkUserCredentials", sunfe));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, sunfe));
             }
         }
         return null;

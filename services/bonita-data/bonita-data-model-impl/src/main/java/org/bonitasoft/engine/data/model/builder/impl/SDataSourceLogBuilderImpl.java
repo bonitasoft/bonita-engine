@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class SDataSourceLogBuilderImpl extends CRUDELogBuilder implements SDataSourceLogBuilder {
 
@@ -39,10 +40,8 @@ public class SDataSourceLogBuilderImpl extends CRUDELogBuilder implements SDataS
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
-            if (log.getNumericIndex(SDataSourceLogIndexesMapper.DATA_SOURCE_INDEX) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "DataSource Id");
-            }
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SDataSourceLogIndexesMapper.DATA_SOURCE_INDEX) == 0L) {
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "DataSource Id");
         }
     }
 

@@ -55,7 +55,7 @@ public class TestUtil {
                 try {// FIXME will only delete jobs of the current tenant
                     txService.begin();
                     scheduler.deleteJobs();
-                } catch (final Throwable t) {
+                } catch (final Exception t) {
                     txService.setRollbackOnly();
                     t.printStackTrace();
                 } finally {
