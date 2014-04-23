@@ -42,7 +42,7 @@
         <constructor-arg ref="sessionFactory" />
    </bean>
     
-   <bean id="messageAndEventRepository" class="org.bonitasoft.engine.test.persistence.repository.MessageAndEventRepository">
+   <bean id="messageAndEventRepository" class="org.bonitasoft.engine.test.persistence.repository.BPMEventRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
 

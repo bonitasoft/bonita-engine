@@ -23,9 +23,9 @@ import org.hibernate.SessionFactory;
 /**
  * @author Emmanuel Duchastenier
  */
-public class MessageAndEventRepository extends TestRepository {
+public class BPMEventRepository extends TestRepository {
 
-    public MessageAndEventRepository(final SessionFactory sessionFactory) {
+    public BPMEventRepository(final SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 
