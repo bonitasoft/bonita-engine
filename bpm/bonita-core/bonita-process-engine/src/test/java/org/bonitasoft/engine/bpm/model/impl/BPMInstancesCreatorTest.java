@@ -11,8 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.model.impl;
+package org.bonitasoft.engine.bpm.model.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -25,13 +26,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.operation.model.SOperatorType;
+import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
+import org.bonitasoft.engine.core.operation.model.impl.SOperationImpl;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
@@ -90,6 +96,30 @@ public class BPMInstancesCreatorTest {
                 eq(1));
         ignoreStubs(transactionExecutor);
         ignoreStubs(connectorInstanceService);
+    }
+
+    @Test
+    public void should_getOperationToSetData_return_the_operation_for_the_data() throws Exception {
+        // given
+        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, null, null,
+                null, null, null);
+        SLeftOperandImpl leftOp1 = new SLeftOperandImpl();
+        leftOp1.setName(new String("Plop1"));
+        leftOp1.setType(new String(SLeftOperand.TYPE_DATA));
+        SOperationImpl op1 = new SOperationImpl();
+        op1.setLeftOperand(leftOp1);
+        op1.setType(SOperatorType.ASSIGNMENT);
+        SLeftOperandImpl leftOp2 = new SLeftOperandImpl();
+        leftOp2.setName(new String("Plop2"));
+        leftOp2.setType(new String(SLeftOperand.TYPE_DATA));
+        SOperationImpl op2 = new SOperationImpl();
+        op2.setType(SOperatorType.ASSIGNMENT);
+        op2.setLeftOperand(leftOp2);
+        // when
+        SOperation operationToSetData = bpmInstancesCreator.getOperationToSetData("Plop2", Arrays.<SOperation> asList(op1, op2));
+
+        // then
+        assertThat(operationToSetData).isEqualTo(op2);
     }
 
     private List<SConnectorDefinition> getConnectorList() {

@@ -641,13 +641,13 @@ public class BPMInstancesCreator {
         return !processContainer.getDataDefinitions().isEmpty() || !processDefinition.getProcessContainer().getDataDefinitions().isEmpty();
     }
 
-    private SOperation getOperationToSetData(final String dataName, final List<SOperation> operations) {
+    SOperation getOperationToSetData(final String dataName, final List<SOperation> operations) {
         SOperation dataOperation = null;
         final Iterator<SOperation> iterator = operations.iterator();
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final SOperation operation = iterator.next();
-            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && SLeftOperand.TYPE_DATA == operation.getLeftOperand().getType()
+            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && SLeftOperand.TYPE_DATA.equals(operation.getLeftOperand().getType())
                     && dataName.equals(operation.getLeftOperand().getName())) {
                 found = true;
                 dataOperation = operation;
