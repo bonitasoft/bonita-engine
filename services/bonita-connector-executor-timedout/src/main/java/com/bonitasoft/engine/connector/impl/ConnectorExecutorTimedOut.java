@@ -18,6 +18,7 @@ import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.tracking.TimeTracker;
 
 /**
  * Execute connectors in parallel thread with a timeout
@@ -28,8 +29,9 @@ public class ConnectorExecutorTimedOut extends ConnectorExecutorImpl {
 
     public ConnectorExecutorTimedOut(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
             final long keepAliveTimeSeconds,
-            final SessionAccessor sessionAccessor, final SessionService sessionService, final int timeout) {
-        super(queueCapacity, corePoolSize, loggerService, maximumPoolSize, keepAliveTimeSeconds, sessionAccessor, sessionService);
+            final SessionAccessor sessionAccessor, final SessionService sessionService, final int timeout,
+            final TimeTracker timeTracker) {
+        super(queueCapacity, corePoolSize, loggerService, maximumPoolSize, keepAliveTimeSeconds, sessionAccessor, sessionService, timeTracker);
         this.timeout = timeout;
     }
 
