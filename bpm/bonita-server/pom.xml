@@ -250,11 +250,6 @@
     </dependency>
     <dependency>
       <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-      <artifactId>bonita-process-document-mapping-model-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
       <artifactId>bonita-process-document-mapping-api-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -917,7 +912,6 @@
                   <!-- Document Mapping -->
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model</include>
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model-impl</include>
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
                   <!-- Event -->
