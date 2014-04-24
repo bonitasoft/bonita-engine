@@ -424,11 +424,6 @@
 			<artifactId>bonita-process-comment-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
-			<artifactId>bonita-process-comment-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Process Definition -->
 		<dependency>
@@ -811,7 +806,6 @@
 									<!-- Process Comment -->
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>
-									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
 									<!-- Process Definition -->
