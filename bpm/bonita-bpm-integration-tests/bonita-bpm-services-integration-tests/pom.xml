@@ -634,12 +634,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-			<artifactId>bonita-supervisor-mapping-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Technical log -->
 		<dependency>
