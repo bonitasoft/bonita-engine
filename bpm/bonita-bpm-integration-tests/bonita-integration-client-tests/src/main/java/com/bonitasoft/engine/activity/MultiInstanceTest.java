@@ -81,11 +81,11 @@ public class MultiInstanceTest extends CommonAPISPTest {
         for (int i = 0; i < numberOfTask; i++) {
             final HumanTaskInstance pendingTask = pendingTasks.get(i);
             getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
-            ManualTaskCreator taskCreator = buildManualTaskCreator(pendingTask.getId(), "manual1" + i, "manual1" + i, john.getId(), "manual task",
+            ManualTaskCreator taskCreator = buildManualTaskCreator(pendingTask.getId(), "manual1" + i, john.getId(), "manual task",
                     new Date(), null);
             getProcessAPI().addManualUserTask(taskCreator);
 
-            taskCreator = buildManualTaskCreator(pendingTask.getId(), "manual2" + i, "manual2" + i, john.getId(), "manual task", new Date(),
+            taskCreator = buildManualTaskCreator(pendingTask.getId(), "manual2" + i, john.getId(), "manual task", new Date(),
                     TaskPriority.NORMAL);
             getProcessAPI().addManualUserTask(taskCreator);
         }
