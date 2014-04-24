@@ -44,6 +44,7 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     private long getNbFlowNodeInstances(final QueryOptions countOptions) throws Exception {
         return userTransactionService.executeInTransaction(new Callable<Long>() {
+
             @Override
             public Long call() throws Exception {
                 return activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
@@ -60,31 +61,24 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         final OrderByOption oderByOption = new OrderByOption(SFlowNodeInstance.class, startEventInstanceBuilder.getNameKey(), OrderByType.ASC);
         final List<FilterOption> filterOptions = Collections.emptyList();
         final QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(oderByOption), filterOptions, null);
-        final QueryOptions countOptions = new QueryOptions(0, 10);
 
         // search: no result expected
         List<SFlowNodeInstance> flowNodeInstances = searchFlowNodeInstances(queryOptions);
-        long nbFlowNodeInstances = getNbFlowNodeInstances(countOptions);
-        assertTrue(flowNodeInstances.isEmpty());
-        assertEquals(0, nbFlowNodeInstances);
+        assertTrue("There should not be any flownode instance instead of " + flowNodeInstances.size(), flowNodeInstances.isEmpty());
 
         // create flow nodes
         createFlowNodeInstances(procInst1, procInst2);
 
         // search: created flow nodes must be retrieved
         flowNodeInstances = searchFlowNodeInstances(queryOptions);
-        nbFlowNodeInstances = getNbFlowNodeInstances(countOptions);
         assertEquals(10, flowNodeInstances.size());
-        assertEquals(10, nbFlowNodeInstances);
 
         // delete process instances
         deleteSProcessInstance(procInst1);
         deleteSProcessInstance(procInst2);
 
         flowNodeInstances = searchFlowNodeInstances(queryOptions);
-        nbFlowNodeInstances = getNbFlowNodeInstances(countOptions);
         assertEquals(0, flowNodeInstances.size());
-        assertEquals(0, nbFlowNodeInstances);
     }
 
     @Test
@@ -118,14 +112,11 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     }
 
-    private void createFlowNodeInstances(final SProcessInstance procInst1,
-            final SProcessInstance procInst2) throws SBonitaException {
+    private void createFlowNodeInstances(final SProcessInstance procInst1, final SProcessInstance procInst2) throws SBonitaException {
         // add flow nodes to procInst 1
         createSStartEventInstance("startEvent", 1, procInst1.getId(), 5, procInst1.getId());
-        createSIntermediateCatchEventInstance("intermediateCatchEvent", 2, procInst1.getId(),
-                5, procInst1.getId());
-        createSIntermediateThrowEventInstance("intermediateThrowEvent", 3, procInst1.getId(),
-                5, procInst1.getId());
+        createSIntermediateCatchEventInstance("intermediateCatchEvent", 2, procInst1.getId(), 5, procInst1.getId());
+        createSIntermediateThrowEventInstance("intermediateThrowEvent", 3, procInst1.getId(), 5, procInst1.getId());
         createSEndEventInstance("endEvent", 4, procInst1.getId(), 5, procInst1.getId());
 
         final SGatewayInstance gatewayInstance = BuilderFactory.get(SGatewayInstanceBuilderFactory.class)
