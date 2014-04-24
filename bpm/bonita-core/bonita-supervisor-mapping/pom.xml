@@ -17,6 +17,5 @@
 	<modules>
 		<module>bonita-supervisor-mapping-api</module>
 		<module>bonita-supervisor-mapping-impl</module>
-		<module>bonita-supervisor-mapping-impl-hibernate</module>
 	</modules>
 </project>

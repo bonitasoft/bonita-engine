@@ -296,10 +296,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void setExecutedByDelegate(final SFlowNodeInstance flowNodeInstance, final long executerDelegateId) throws SFlowNodeModificationException {
+    public void setExecutedBySubstitute(final SFlowNodeInstance flowNodeInstance, final long executerSubstituteId) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getExecutedByDelegate(), executerDelegateId);
-        updateFlowNode(flowNodeInstance, EXECUTED_BY_DELEGATE_MODIFIED, descriptor);
+        descriptor.addField(activityInstanceKeyProvider.getExecutedBySubstitute(), executerSubstituteId);
+        updateFlowNode(flowNodeInstance, EXECUTED_BY_SUBSTITUTE_MODIFIED, descriptor);
     }
 
     @Override

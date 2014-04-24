@@ -1290,7 +1290,7 @@
 		WHERE (EXISTS 
 				(SELECT at.id 
 					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-					WHERE (at.logicalGroup2 = p.id AND at.executedBy = :userId)
+					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 				)
 				OR p.startedBy = :userId
 		)
@@ -1302,7 +1302,7 @@
 		WHERE (EXISTS 
 				(SELECT at.id 
 					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-					WHERE (at.logicalGroup2 = p.id AND at.executedBy = :userId)
+					WHERE (at.logicalGroup2 = p.id AND (at.executedBy = :userId OR at.executedBySubstitute = :userId))
 				)
 				OR p.startedBy = :userId
 		)
@@ -1315,12 +1315,10 @@
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-				WHERE at.executedBy = u.id
+				WHERE (at.executedBy = u.id OR at.executedBySubstitute = u.id)
 					AND u.managerUserId = :managerUserId
 				)
-			OR (p.startedBy = u.id
-				AND u.managerUserId = :managerUserId
-				)
+			OR (p.startedBy = u.id AND u.managerUserId = :managerUserId)
 			)
 	</query>
 
@@ -1331,12 +1329,10 @@
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-				WHERE at.executedBy = u.id
+				WHERE (at.executedBy = u.id OR at.executedBySubstitute = u.id)
 					AND u.managerUserId = :managerUserId
 				)
-			OR (p.startedBy = u.id
-				AND u.managerUserId = :managerUserId
-				)
+			OR (p.startedBy = u.id AND u.managerUserId = :managerUserId)
 			)
 	</query>
 
@@ -1415,5 +1411,85 @@
         GROUP BY user.id
         ORDER BY MIN(user.userName)
     </query>
+    
+    
+
+	<query name="getNumberOfSUserWhoCanStartPendingTask">
+		SELECT count(DISTINCT user)
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+        WHERE
+          (
+	          user.id IN (
+	              SELECT mapping.userId
+	              FROM  org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+	              WHERE mapping.activityId = :humanTaskInstanceId
+	          )
+	          OR user.id IN (
+	              SELECT actormember.userId
+	              FROM    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+	                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+	                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+	              WHERE 
+	                  mapping.activityId = :humanTaskInstanceId
+	                  AND mapping.actorId = actor.id 
+	                  AND actor.id = actormember.actorId
+	         )
+	         OR user.id IN (
+	              SELECT user_membership.userId
+	              FROM    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
+	                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+	                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+	                      org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+	              WHERE
+	                  mapping.activityId = :humanTaskInstanceId
+	                  AND mapping.actorId = actor.id
+	                  AND actor.id = actormember.actorId
+	                  AND (
+	                    (actormember.roleId = -1 AND actormember.groupId = user_membership.groupId)
+	                    OR (actormember.groupId = -1 AND actormember.roleId = user_membership.roleId)
+	                    OR (actormember.roleId = user_membership.roleId AND actormember.groupId = user_membership.groupId) 
+	                  )                  
+	          )
+	       )
+	</query>
+
+	<query name="searchSUserWhoCanStartPendingTask">
+		SELECT DISTINCT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+        WHERE
+           (
+	          user.id IN (
+	              SELECT mapping.userId
+	              FROM  org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+	              WHERE mapping.activityId = :humanTaskInstanceId
+	          )
+	          OR user.id IN (
+	              SELECT actormember.userId
+	              FROM    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+	                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+	                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+	              WHERE 
+	                  mapping.activityId = :humanTaskInstanceId
+	                  AND mapping.actorId = actor.id 
+	                  AND actor.id = actormember.actorId
+	         )
+	         OR user.id IN (
+	              SELECT user_membership.userId
+	              FROM    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
+	                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+	                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+	                      org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+	              WHERE
+	                  mapping.activityId = :humanTaskInstanceId
+	                  AND mapping.actorId = actor.id
+	                  AND actor.id = actormember.actorId
+	                  AND (
+	                    (actormember.roleId = -1 AND actormember.groupId = user_membership.groupId)
+	                    OR (actormember.groupId = -1 AND actormember.roleId = user_membership.roleId)
+	                    OR (actormember.roleId = user_membership.roleId AND actormember.groupId = user_membership.groupId) 
+	                  )                  
+	          )
+	       )
+	</query>
 	
 </hibernate-mapping>

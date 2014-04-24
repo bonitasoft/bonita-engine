@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -32,15 +32,23 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     Date getStartDate();
 
     /**
-     * @return id of the user who originally started the process
+     * @return The identifier of the user who started the process
      * @since 6.0.1
      */
     long getStartedBy();
 
     /**
-     * @return id of the user (delegate) who started the process for the original starter
-     * @since 6.0.1
+     * @return The identifier of the substitute user (as Process manager or Administrator) who started the process.
+     * @since 6.3.0
      */
+    long getStartedBySubstitute();
+
+    /**
+     * @return The identifier of the substitute user (as Process manager or Administrator) who started the process.
+     * @since 6.0.1
+     * @deprecated since 6.3.0, use {@link ArchivedProcessInstance#getStartedBySubstitute()}
+     */
+    @Deprecated
     long getStartedByDelegate();
 
     Date getEndDate();

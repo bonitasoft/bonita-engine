@@ -39,7 +39,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
 
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
-        if (expression.getContent().trim().equals("")) {
+        if ("".equals(expression.getContent().trim())) {
             throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression : " + expression, expression.getName());
         }
     }
@@ -76,7 +76,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
                         + expressionContent, expression.getName());
             }
         } catch (final NumberFormatException e) {
-            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent,
+            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent, e,
                     expression.getName());
         }
         return result;
@@ -111,7 +111,8 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
 
             final String month = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$3");
             if (month != null && !month.isEmpty() && Integer.valueOf(month) < 13) {
-                calendar.set(Calendar.MONTH, Integer.valueOf(month) - 1); // MONTH value from 0 to 11
+                // MONTH value from 0 to 11
+                calendar.set(Calendar.MONTH, Integer.valueOf(month) - 1);
             }
 
             final String day = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$6");
@@ -139,11 +140,11 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
                 calendar.set(Calendar.MILLISECOND, Integer.valueOf(fractional));
             }
 
-            final String TZsign = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$17");
-            final String TZhour = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$18");
-            final String TZminutes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$19");
-            final TimeZone tz = TimeZone.getTimeZone("GMT" + TZsign + TZhour + TZminutes);
-            if (!TZsign.isEmpty() && !TZhour.isEmpty() && !TZminutes.isEmpty() && tz != null) {
+            final String tzSign = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$17");
+            final String tzHour = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$18");
+            final String tzMinutes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$19");
+            final TimeZone tz = TimeZone.getTimeZone("GMT" + tzSign + tzHour + tzMinutes);
+            if (!tzSign.isEmpty() && !tzHour.isEmpty() && !tzMinutes.isEmpty() && tz != null) {
                 calendar.setTimeZone(tz);
             }
 
