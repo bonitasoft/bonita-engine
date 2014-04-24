@@ -26,7 +26,7 @@ public class HashCodeBuilderTest extends CompilableCode {
     private File destDir;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         codeGenerator = new CodeGenerator();
         hashCodeBuilder = new HashCodeBuilder();
         destDir = new File(System.getProperty("java.io.tmpdir"), "generationDir");
@@ -34,7 +34,7 @@ public class HashCodeBuilderTest extends CompilableCode {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         destDir.delete();
     }
 

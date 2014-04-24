@@ -64,7 +64,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         loginWith("login1", "password");
         getProcessAPI().assignUserTask(taskId, user.getId());
 
-        final ManualTaskCreator taskCreator = buildManualTaskCreator(taskId, "subtask", "MySubTask", user.getId(), "desk", new Date(), TaskPriority.NORMAL);
+        final ManualTaskCreator taskCreator = buildManualTaskCreator(taskId, "subtask", user.getId(), "desk", new Date(), TaskPriority.NORMAL);
         final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
         try {
             getProcessAPI().releaseUserTask(manualUserTask.getId());

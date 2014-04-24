@@ -525,7 +525,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         barResource = buildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
         businessArchiveBuilder.addClasspathResource(barResource);
-       
+
         return deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, matti);
     }
 
