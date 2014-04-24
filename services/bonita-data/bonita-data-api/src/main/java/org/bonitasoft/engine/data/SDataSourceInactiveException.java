@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,6 +19,7 @@ import org.bonitasoft.engine.data.model.SDataSourceState;
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SDataSourceInactiveException extends SBonitaException {
 
@@ -26,7 +27,7 @@ public class SDataSourceInactiveException extends SBonitaException {
 
     private SDataSourceState currentState;
 
-    public SDataSourceInactiveException(final String message, final SDataSourceState currentState) {
+    public SDataSourceInactiveException(final String message) {
         super(message);
     }
 

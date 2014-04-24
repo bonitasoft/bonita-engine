@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
@@ -62,9 +65,10 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ProcessSupervisedTest extends CommonAPITest {
@@ -104,8 +108,11 @@ public class ProcessSupervisedTest extends CommonAPITest {
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");
 
+        logout();
+        loginWith("matti", PASSWORD);
+
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("step1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
         definition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
         processDefinitions = new ArrayList<ProcessDefinition>();
@@ -136,9 +143,9 @@ public class ProcessSupervisedTest extends CommonAPITest {
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
-        waitForUserTaskAndAssigneIt("userTask1", processInstances.get(0), john);
-        waitForUserTaskAndAssigneIt("userTask1", processInstances.get(1), john);
-        waitForUserTask("userTask1", processInstances.get(2));
+        waitForUserTaskAndAssigneIt("step1", processInstances.get(0), john);
+        waitForUserTaskAndAssigneIt("step1", processInstances.get(1), john);
+        waitForUserTask("step1", processInstances.get(2));
     }
 
     @After
@@ -153,23 +160,25 @@ public class ProcessSupervisedTest extends CommonAPITest {
         logout();
     }
 
-    @Ignore
     @Test
     public void searchAssignedTasksSupervisedBy() throws Exception {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
         builder.filter("state", "ready");
-        builder.filter("name", "userTask1");
+        builder.filter("name", "step1");
         builder.filter("priority", TaskPriority.NORMAL);
 
         final SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchAssignedTasksSupervisedBy(matti.getId(), builder.done());
         assertEquals(2, searchResult.getResult().size());
-        final UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
-        assertEquals("userTask1", taskInstance.getName());
+        UserTaskInstance taskInstance = (UserTaskInstance) searchResult.getResult().get(0);
+        assertEquals("step1", taskInstance.getName());
+        assertEquals(john.getId(), taskInstance.getAssigneeId());
+
+        taskInstance = (UserTaskInstance) searchResult.getResult().get(1);
+        assertEquals("step1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
     }
 
-    @Ignore
     @Test
     public void superviseMyArchivedTask() throws Exception {
         final List<HumanTaskInstance> instanceList = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
@@ -196,12 +205,11 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals(1, searchResult.getCount());
         assertEquals(1, searchResult.getResult().size());
         final ArchivedUserTaskInstance taskInstance = (ArchivedUserTaskInstance) searchResult.getResult().get(0);
-        assertEquals("userTask1", taskInstance.getName());
+        assertEquals("step1", taskInstance.getName());
         assertEquals(john.getId(), taskInstance.getAssigneeId());
         assertEquals(ActivityStates.COMPLETED_STATE, taskInstance.getState());
     }
 
-    @Ignore
     @Test
     public void searchProcessDefinitionsSupervisedBy() throws Exception {
         // create processDefintions
@@ -211,7 +219,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
             final String actorName = "actorManu" + i;
             final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process" + i, "1." + i);
             processBuilder.addActor(actorName).addDescription("actor description" + i);
-            final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", actorName).getProcess();
+            final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", actorName).getProcess();
             final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, john);
             processDefinitions.add(processDefinition1);
             proDefIds.add(processDefinition1.getId());
@@ -272,7 +280,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         getProcessAPI().deleteCategory(category2.getId());
     }
 
-    @Ignore
     @Test
     @SuppressWarnings("unchecked")
     public void searchCommentsSupervisedBy() throws Exception {
@@ -314,7 +321,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals(5, searchResult2.getCount());
     }
 
-    @Ignore
     @Test
     public void searchDocumentsSupervisedBy() throws Exception {
         final ProcessInstance processInstance = processInstances.get(2);
@@ -327,7 +333,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals(processInstance.getId(), documentSearch.getResult().get(0).getProcessInstanceId());
     }
 
-    @Ignore
     @Test
     public void searchArchivedDocumentsSupervisedBy() throws Exception {
         final ProcessInstance processInstance = processInstances.get(2);
@@ -361,7 +366,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals(getProcessAPI().getActivities(processInstances.get(2).getId(), 0, 10).get(0).getId(), humanTaskInstanceList.get(2).getId());
     }
 
-    @Ignore
     @Test
     public void searchUncategorizedProcessDefinitionsSupervisedBy() throws Exception {
         // create process1
@@ -413,7 +417,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
         deleteCategories(categories);
     }
 
-    @Ignore
     @Test
     public void searchOpenProcessInstancesSupervisedBy() throws Exception {
         final ProcessInstance instance = processInstances.get(2);
@@ -429,7 +432,41 @@ public class ProcessSupervisedTest extends CommonAPITest {
         assertEquals(instance.getId(), processInstanceList.get(2).getId());
     }
 
-    @Ignore
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, jira = "BS-8387", keywords = { "Process instance", "Started for", "Search",
+            "Involving user", "Open", "Archived" })
+    @Test
+    public void searchProcessInstancesInvolvingUserWithSupervisorStartedProcess() throws Exception {
+        final long processDefinitionId = processDefinitions.get(0).getId();
+        // assign pending task to jack
+        final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinitionId);
+        processInstances.add(processInstance);
+        final HumanTaskInstance pendingTask = waitForUserTask("step1", processInstance);
+
+        logout();
+        loginWith("john", PASSWORD);
+
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinitionId, 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
+        assertNotNull(result);
+        assertEquals(1, result.getCount());
+        assertEquals(john.getId(), result.getResult().get(0).getStartedBy());
+        assertEquals(matti.getId(), result.getResult().get(0).getStartedBySubstitute());
+
+        getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
+        getProcessAPI().executeFlowNode(matti.getId(), pendingTask.getId());
+
+        waitForProcessToFinishAndBeArchived(processInstance);
+        result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
+        assertNotNull(result);
+        assertEquals(0, result.getCount());
+
+        final SearchResult<ArchivedProcessInstance> result2 = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
+        assertNotNull(result2);
+        assertEquals(1, result2.getCount());
+        assertEquals(john.getId(), result2.getResult().get(0).getStartedBy());
+        assertEquals(matti.getId(), result2.getResult().get(0).getStartedBySubstitute());
+    }
+
     @Test
     public void searchArchivedProcessInstancesSupervisedBy() throws Exception {
         final ProcessInstance processInstance = processInstances.get(2);

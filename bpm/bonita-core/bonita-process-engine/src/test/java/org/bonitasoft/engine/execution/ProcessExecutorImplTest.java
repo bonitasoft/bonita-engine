@@ -146,7 +146,7 @@ public class ProcessExecutorImplTest {
     @Test
     public void startProcessWithOperationsAndContext() throws Exception {
         final long starterId = 1L;
-        final long starterDelegateId = 9L;
+        final long starterSubstituteId = 9L;
         final List<SOperation> operations = new ArrayList<SOperation>(1);
         operations.add(mock(SOperation.class));
         final Map<String, Object> context = new HashMap<String, Object>(1);
@@ -156,12 +156,12 @@ public class ProcessExecutorImplTest {
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
-        when(mockedProcessExecutorImpl.start(starterId, starterDelegateId, null, operations, context, null, -1, selector)).thenReturn(
+        when(mockedProcessExecutorImpl.start(starterId, starterSubstituteId, null, operations, context, null, -1, selector)).thenReturn(
                 sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterDelegateId, operations, context, null, selector);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterDelegateId, operations, context, null, selector);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context, null, selector);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations, context, null, selector);
 
         assertNotNull(result);
         assertEquals(sProcessInstance, result);
@@ -170,7 +170,7 @@ public class ProcessExecutorImplTest {
     @Test
     public void startProcessWithOperationsAndContextAndExpressionContextAndConnectors() throws Exception {
         final long starterId = 1L;
-        final long starterDelegateId = 9L;
+        final long starterSubstituteId = 9L;
         final List<SOperation> operations = new ArrayList<SOperation>(1);
         operations.add(mock(SOperation.class));
         final Map<String, Object> context = new HashMap<String, Object>(1);
@@ -190,18 +190,18 @@ public class ProcessExecutorImplTest {
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null, subProcessDefinitionId);
         when(mockedProcessExecutorImpl.startElements(sProcessInstance, selector)).thenReturn(sProcessInstance);
-        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterDelegateId, subProcessDefinitionId)).thenReturn(
+        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, subProcessDefinitionId)).thenReturn(
                 sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterDelegateId, expressionContext, operations, context,
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, expressionContext, operations, context,
                 connectors, callerId, selector);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterDelegateId, expressionContext, operations,
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, expressionContext, operations,
                 context, connectors, callerId, selector);
 
         // and check methods are called:
         verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessInstance.class), any(FlowNodeSelector.class));
-        verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterDelegateId, subProcessDefinitionId);
+        verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, subProcessDefinitionId);
 
         assertNotNull(result);
         assertEquals(sProcessInstance, result);

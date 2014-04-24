@@ -41,7 +41,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -87,8 +86,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, user1);
         final ProcessInstance pi1 = getProcessAPI().startProcess(user1.getId(), processDefinition1.getId());
         assertEquals(user1.getId(), pi1.getStartedBy());
-
-        waitForStep("step1", pi1, TestStates.getReadyState());
+        assertEquals(-1, pi1.getStartedBySubstitute());
+        waitForUserTask("step1", pi1);
 
         // create process2
         final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", PROCESS_VERSION,
@@ -96,8 +95,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, ACTOR_NAME, user1);
         final ProcessInstance pi2 = getProcessAPI().startProcess(user1.getId(), processDefinition2.getId());
         assertEquals(user1.getId(), pi2.getStartedBy());
-
-        waitForStep("step1", pi2, TestStates.getReadyState());
+        assertEquals(-1, pi2.getStartedBySubstitute());
+        waitForUserTask("step1", pi2);
 
         final SearchOptions searchOptions = new SearchOptionsImpl(0, 5);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId1, searchOptions);

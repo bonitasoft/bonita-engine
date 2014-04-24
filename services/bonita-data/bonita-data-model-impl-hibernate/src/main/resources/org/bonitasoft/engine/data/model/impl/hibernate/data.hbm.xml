@@ -35,7 +35,7 @@
 		</composite-id>
 		<property name="dataSourceId" type="long" column="datasourceid" />
 		<property name="name" type="java.lang.String" column="name" />
-		<property name="value_" type="java.lang.String" column="value_" />
+		<property name="value" type="java.lang.String" column="value_" />
 		<filter name="tenantFilter" />
 	</class>
 

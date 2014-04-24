@@ -326,7 +326,7 @@ public class ModelConvertor {
         flowNode.setDisplayDescription(sflowNode.getDisplayDescription());
         flowNode.setDescription(sflowNode.getDescription());
         flowNode.setExecutedBy(sflowNode.getExecutedBy());
-        flowNode.setExecutedByDelegate(sflowNode.getExecutedByDelegate());
+        flowNode.setExecutedBySubstitute(sflowNode.getExecutedBySubstitute());
         flowNode.setStateCategory(StateCategory.valueOf(sflowNode.getStateCategory().name()));
     }
 
@@ -552,7 +552,7 @@ public class ModelConvertor {
             clientProcessInstanceBuilder.setStartDate(sInstance.getStartDate());
         }
         clientProcessInstanceBuilder.setStartedBy(sInstance.getStartedBy());
-        clientProcessInstanceBuilder.setStartedByDelegate(sInstance.getStartedByDelegate());
+        clientProcessInstanceBuilder.setStartedBySubstitute(sInstance.getStartedBySubstitute());
         if (sInstance.getEndDate() > 0) {
             clientProcessInstanceBuilder.setEndDate(sInstance.getEndDate());
         }
@@ -674,7 +674,7 @@ public class ModelConvertor {
             aFlowNode.setArchiveDate(new Date(saFlowNode.getArchiveDate()));
         }
         aFlowNode.setExecutedBy(saFlowNode.getExecutedBy());
-        aFlowNode.setExecutedByDelegate(saFlowNode.getExecutedByDelegate());
+        aFlowNode.setExecutedBySubstitute(saFlowNode.getExecutedBySubstitute());
         aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlowNodeDefinitionId());
         aFlowNode.setTerminal(saFlowNode.isTerminal());
     }
@@ -827,6 +827,7 @@ public class ModelConvertor {
             archivedInstance.setStartDate(new Date(sInstance.getStartDate()));
         }
         archivedInstance.setStartedBy(sInstance.getStartedBy());
+        archivedInstance.setStartedBySubstitute(sInstance.getStartedBySubstitute());
         if (sInstance.getEndDate() > 0) {
             archivedInstance.setEndDate(new Date(sInstance.getEndDate()));
         }
@@ -1406,7 +1407,7 @@ public class ModelConvertor {
         }
         return contactInfoBuilder.done();
     }
-    
+
     public static SRole constructSRole(final RoleCreator creator) {
         final long now = System.currentTimeMillis();
         final SRoleBuilder roleBuilder = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance();
@@ -1632,7 +1633,7 @@ public class ModelConvertor {
         return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
                 .setType(operatorType).setLeftOperand(sLeftOperand).done();
     }
-    
+
     public static List<SOperation> constructSOperations(List<Operation> operations) {
         ArrayList<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
         for (Operation operation : operations) {
@@ -1640,7 +1641,7 @@ public class ModelConvertor {
         }
         return sOperations;
     }
-    
+
     private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName())
                 .setExternal(variableToSet.isExternal()).done();

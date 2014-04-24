@@ -19,6 +19,5 @@
 		<module>bonita-process-definition-model-impl</module>
 		<module>bonita-process-definition-api</module>
 		<module>bonita-process-definition-impl</module>
-		<module>bonita-process-definition-model-impl-hibernate</module>
 	</modules>
 </project>
