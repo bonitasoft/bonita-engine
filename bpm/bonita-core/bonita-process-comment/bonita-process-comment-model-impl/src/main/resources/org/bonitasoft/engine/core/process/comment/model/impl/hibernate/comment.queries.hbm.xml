@@ -174,93 +174,62 @@
 	<query name="getNumberOfSCommentManagedBy">
 		SELECT count(DISTINCT comment.id)
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
-		WHERE comment.userId = u.id
-		AND (comment.userId IN (
-			SELECT user.id
-			FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-			WHERE user.managerUserId = :managerUserId
-		)
-		OR comment.processInstanceId IN (
-			SELECT usertask.logicalGroup2
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
-			WHERE usertask.assigneeId IN (
-				SELECT user.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-				WHERE user.managerUserId = :managerUserId
+			org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
+		WHERE u.managerUserId = :managerUserId
+		AND (comment.userId = u.id
+			OR comment.processInstanceId IN (
+				SELECT usertask.logicalGroup2
+				FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
+				WHERE usertask.assigneeId = u.id
+			)
+			OR comment.processInstanceId IN (
+				SELECT at.logicalGroup2
+				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
+				WHERE at.assigneeId = u.id
+			)
+			OR comment.processInstanceId IN (
+				SELECT p.id
+				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				WHERE p.startedBy = u.id
+			)
+			OR comment.processInstanceId IN (
+				SELECT pi.sourceObjectId
+				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
+					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				WHERE pi.startedBy = u.id
 			)
 		)
-		OR comment.processInstanceId IN (
-			SELECT at.logicalGroup2
-			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-			WHERE at.assigneeId IN (
-				SELECT user.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-				WHERE user.managerUserId = :managerUserId
-			)
-		)
-		OR comment.processInstanceId IN (
-			SELECT p.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-				 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-			WHERE p.startedBy IN (
-				SELECT user.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-				WHERE user.managerUserId = :managerUserId
-			)
-		)
-		OR comment.processInstanceId IN (
-			SELECT pi.sourceObjectId
-			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
-				 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-			WHERE pi.startedBy IN (
-				SELECT user.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-				WHERE user.managerUserId = :managerUserId
-			)
-		))
 	</query>
 
 	<query name="searchSCommentManagedBy">
 		SELECT comment
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
-		WHERE comment.userId = u.id
-		AND (comment.userId IN (
-				SELECT user.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-				WHERE user.managerUserId = :managerUserId
-				)
+			org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
+		WHERE u.managerUserId = :managerUserId
+		AND (comment.userId = u.id
 			OR comment.processInstanceId IN (
 				SELECT usertask.logicalGroup2
 				FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS usertask
-				WHERE usertask.assigneeId IN (
-						SELECT user.id FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user WHERE user.managerUserId = :managerUserId
-						)
-				)
+				WHERE usertask.assigneeId = u.id
+			)
 			OR comment.processInstanceId IN (
 				SELECT at.logicalGroup2
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
-				WHERE at.assigneeId IN ( 
-						SELECT user.id FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user WHERE user.managerUserId = :managerUserId
-					)
-				)
+				WHERE at.assigneeId = u.id
+			)
 			OR comment.processInstanceId IN (
 				SELECT p.id
 				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-				org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-				WHERE p.startedBy IN ( 
-						SELECT user.id FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user WHERE user.managerUserId = :managerUserId
-						)
-				)
+					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				WHERE p.startedBy = u.id
+			)
 			OR comment.processInstanceId IN (
 				SELECT pi.sourceObjectId
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
-				org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-				WHERE pi.startedBy IN ( 
-						SELECT user.id FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user WHERE user.managerUserId = :managerUserId 
-						)
-				)
+					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				WHERE pi.startedBy = u.id
+			)
 		)
 	</query>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -27,6 +27,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * objects.
  * 
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class ListExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
@@ -53,7 +54,7 @@ public class ListExpressionExecutorStrategy implements ExpressionExecutorStrateg
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions) {
-        final ArrayList<Object> list = new ArrayList<Object>(expressions.size());
+        final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions));
         }

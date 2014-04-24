@@ -44,7 +44,7 @@ public interface SProcessInstanceBuilderFactory {
 
     String getStartedByKey();
 
-    String getStartedByDelegateKey();
+    String getStartedBySubstituteKey();
 
     String getEndDateKey();
 

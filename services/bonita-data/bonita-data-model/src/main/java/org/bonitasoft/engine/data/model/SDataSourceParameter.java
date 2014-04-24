@@ -21,6 +21,6 @@ public interface SDataSourceParameter extends PersistentObject {
 
     String getName();
 
-    String getValue_();
+    String getValue();
 
 }

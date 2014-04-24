@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -27,27 +27,29 @@ public class SDataSourceParameterImpl implements SDataSourceParameter {
 
     private String name;
 
-    private String value_;
+    private String value;
 
     public SDataSourceParameterImpl() {
         super();
     }
 
-    public SDataSourceParameterImpl(final long dataSourceId, final String name, final String value_) {
+    public SDataSourceParameterImpl(final long dataSourceId, final String name, final String value) {
         super();
         this.dataSourceId = dataSourceId;
         this.name = name;
-        this.value_ = value_;
+        this.value = value;
     }
 
     public long getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }
@@ -73,8 +75,8 @@ public class SDataSourceParameterImpl implements SDataSourceParameter {
     }
 
     @Override
-    public String getValue_() {
-        return value_;
+    public String getValue() {
+        return value;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class SDataSourceParameterImpl implements SDataSourceParameter {
         result = prime * result + (int) (id ^ (id >>> 32));
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + (int) (tenantId ^ (tenantId >>> 32));
-        result = prime * result + ((value_ == null) ? 0 : value_.hashCode());
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
     }
 
@@ -117,11 +119,11 @@ public class SDataSourceParameterImpl implements SDataSourceParameter {
         if (tenantId != other.tenantId) {
             return false;
         }
-        if (value_ == null) {
-            if (other.value_ != null) {
+        if (value == null) {
+            if (other.value != null) {
                 return false;
             }
-        } else if (!value_.equals(other.value_)) {
+        } else if (!value.equals(other.value)) {
             return false;
         }
         return true;

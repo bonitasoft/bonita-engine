@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,7 +35,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
 
     private long startedBy;
 
-    private long startedByDelegate;
+    private long startedBySubstitute;
 
     private Date endDate;
 
@@ -87,12 +87,23 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
     }
 
     @Override
-    public long getStartedByDelegate() {
-        return startedByDelegate;
+    public long getStartedBySubstitute() {
+        return startedBySubstitute;
     }
 
+    public void setStartedBySubstitute(long startedBySubstitute) {
+        this.startedBySubstitute = startedBySubstitute;
+    }
+
+    @Deprecated
+    @Override
+    public long getStartedByDelegate() {
+        return getStartedBySubstitute();
+    }
+
+    @Deprecated
     public void setStartedByDelegate(long startedByDelegate) {
-        this.startedByDelegate = startedByDelegate;
+        setStartedBySubstitute(startedByDelegate);
     }
 
     @Override
@@ -189,7 +200,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         result = prime * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
         result = prime * result + (startDate == null ? 0 : startDate.hashCode());
         result = prime * result + (int) (startedBy ^ startedBy >>> 32);
-        result = prime * result + (int) (startedByDelegate ^ startedByDelegate >>> 32);
+        result = prime * result + (int) (startedBySubstitute ^ startedBySubstitute >>> 32);
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + stateId;
         return result;
@@ -250,7 +261,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         if (startedBy != other.startedBy) {
             return false;
         }
-        if (startedByDelegate != other.startedByDelegate) {
+        if (startedBySubstitute != other.startedBySubstitute) {
             return false;
         }
         if (state == null) {

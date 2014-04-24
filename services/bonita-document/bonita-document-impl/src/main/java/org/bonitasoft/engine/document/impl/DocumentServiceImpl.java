@@ -75,7 +75,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
         try {
             ClassReflector.invokeSetter(sDocument, "setId", String.class, documentId);
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             throw new SDocumentStorageException(e);
         }
         return sDocument;
@@ -85,7 +85,6 @@ public class DocumentServiceImpl implements DocumentService {
     public void deleteDocumentContent(final String documentId) throws SDocumentDeletionException, SDocumentContentNotFoundException {
         SDocumentContent sdocumentContent = null;
         try {
-            // sdocumentContent = getDocumentContent(sDocument.getStorageId());
             sdocumentContent = getDocumentContent(documentId);
             final DeleteRecord deleteRecord = new DeleteRecord(sdocumentContent);
             final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentContent")
