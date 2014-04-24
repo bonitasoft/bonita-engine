@@ -240,7 +240,6 @@ import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
@@ -907,7 +906,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final LockService lockService = tenantAccessor.getLockService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
         final TransactionContent transactionContent = new TransactionContent() {
 
             @Override
@@ -934,17 +932,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                     }
 
-                    if (executerUserId != executerSubstituteUserId) {
-                        try {
-                            final StringBuilder stb = new StringBuilder();
-                            stb.append("The user <" + session.getUserName() + "> ");
-                            stb.append("acting as delegate of user with id <" + executerUserId + "> ");
-                            stb.append("has executed the task.");
-                            commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
-                        } catch (final SCommentAddException e) {
-                            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-                        }
-                    }
+                    addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteUserId);
                 }
             }
         };
@@ -959,6 +947,29 @@ public class ProcessAPIImpl implements ProcessAPI {
             lockService.unlock(lock, tenantAccessor.getTenantId());
         }
 
+    }
+
+    protected void addSystemCommentOnProcessInstanceWhenExecutingTaskFor(final SFlowNodeInstance flowNodeInstance, final long executerUserId,
+            final long executerSubstituteUserId) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final SCommentService commentService = tenantAccessor.getCommentService();
+
+        final SSession session = SessionInfos.getSession();
+
+        if (executerUserId != executerSubstituteUserId) {
+            final IdentityService identityService = tenantAccessor.getIdentityService();
+            try {
+                final SUser executerUser = identityService.getUser(executerUserId);
+                final StringBuilder stb = new StringBuilder();
+                stb.append("The user " + session.getUserName() + " ");
+                stb.append("acting as delegate of the user " + executerUser.getUserName() + " ");
+                stb.append("has done the task \"" + flowNodeInstance.getDisplayName() + "\".");
+                commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
+            } catch (final SBonitaException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
+            }
+        }
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,

@@ -218,11 +218,6 @@
 			<artifactId>bonita-process-document-mapping-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-			<artifactId>bonita-process-document-mapping-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Event -->
 		<dependency>
@@ -429,11 +424,6 @@
 			<artifactId>bonita-process-comment-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
-			<artifactId>bonita-process-comment-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Process Definition -->
 		<dependency>
@@ -444,11 +434,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -534,11 +519,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
 			<artifactId>bonita-supervisor-mapping-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-			<artifactId>bonita-supervisor-mapping-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -733,7 +713,6 @@
 									<!-- Document Mapping -->
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model-impl</include>
-									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
 									<!-- Event -->
@@ -817,13 +796,11 @@
 									<!-- Process Comment -->
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>
-									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
 									<!-- Process Definition -->
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
-									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
 									<!-- Process Document -->
@@ -863,7 +840,6 @@
 									<!-- Supervisor Mapping -->
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
-									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl-hibernate</include>
 									<!-- Synchro-repository -->
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-service</include>
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>

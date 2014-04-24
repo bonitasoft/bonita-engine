@@ -30,6 +30,8 @@ import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -48,6 +50,7 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -586,7 +589,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Cover(jira = "BS-8397", classes = { DataInstance.class, ProcessInstance.class }, concept = BPMNConcept.DATA, keywords = { "initilize process data behalf" })
     @Test
-    public void startProcessUsingInitialVariableValuesOnBehalfUserId() throws Exception {
+    public void startProcessUsingInitialVariableValuesFor() throws Exception {
         final User jack = createUserAndLogin(USERNAME, USERNAME);
 
         final String otherUserName = "other";
@@ -599,26 +602,41 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         processBuilder.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Map<String, Serializable> variables = new HashMap<String, Serializable>();
-        variables.put("bigD", new BigDecimal("3.141592653589793"));
-        final ProcessInstance instance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(), variables);
-        final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(instance.getId());
+        try {
+            final Map<String, Serializable> variables = new HashMap<String, Serializable>();
+            variables.put("bigD", new BigDecimal("3.141592653589793"));
+            final ProcessInstance instance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(), variables);
+            final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(instance.getId());
 
-        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("bigD", instance.getId());
-        assertEquals(new BigDecimal("3.141592653589793"), dataInstance.getValue());
-        dataInstance = getProcessAPI().getProcessDataInstance("D", instance.getId());
-        assertEquals(Double.valueOf(3.14), dataInstance.getValue());
+            DataInstance dataInstance = getProcessAPI().getProcessDataInstance("bigD", instance.getId());
+            assertEquals(new BigDecimal("3.141592653589793"), dataInstance.getValue());
+            dataInstance = getProcessAPI().getProcessDataInstance("D", instance.getId());
+            assertEquals(Double.valueOf(3.14), dataInstance.getValue());
 
-        assertEquals(otherUser.getId(), processInstance2.getStartedBy());
-        assertEquals(jack.getId(), processInstance2.getStartedBySubstitute());
+            assertEquals(otherUser.getId(), processInstance2.getStartedBy());
+            assertEquals(jack.getId(), processInstance2.getStartedBySubstitute());
 
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
-        deleteUser(otherUser.getId());
+            // Check system comment
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance2.getId())
+                    .done();
+            final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
+            boolean haveCommentForDelegate = false;
+            for (final Comment comment : comments) {
+                haveCommentForDelegate = haveCommentForDelegate
+                        || comment.getContent()
+                                .contains("The user " + USERNAME + " acting as delegate of the user " + otherUserName + " has started the case.");
+            }
+            assertTrue(haveCommentForDelegate);
+        } finally {
+            // Clean up
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(jack.getId());
+            deleteUser(otherUser.getId());
+        }
     }
 
     @Test
-    public void startProcessInstanceOnBehalfUserId() throws Exception {
+    public void startProcessInstanceFor() throws Exception {
         logoutThenloginAs("pedro", "secreto");
 
         final String otherUserName = "other";
@@ -631,20 +649,34 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, pedro);
 
-        // create Operation keyed map
-        final Operation integerOperation = buildIntegerOperation(dataName, 2);
-        final List<Operation> operations = new ArrayList<Operation>();
-        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        contexts.put("page", "1");
-        operations.add(integerOperation);
-        final long processDefinitionId = processDefinition.getId();
-        final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinitionId, operations, contexts);
-        final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(processInstance.getId());
-        assertEquals(otherUser.getId(), processInstance2.getStartedBy());
-        assertEquals(pedro.getId(), processInstance2.getStartedBySubstitute());
+        try {
+            // create Operation keyed map
+            final Operation integerOperation = buildIntegerOperation(dataName, 2);
+            final List<Operation> operations = new ArrayList<Operation>();
+            final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
+            contexts.put("page", "1");
+            operations.add(integerOperation);
+            final long processDefinitionId = processDefinition.getId();
+            final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinitionId, operations, contexts);
+            final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(processInstance.getId());
+            assertEquals(otherUser.getId(), processInstance2.getStartedBy());
+            assertEquals(pedro.getId(), processInstance2.getStartedBySubstitute());
 
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(otherUser);
+            // Check system comment
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
+                    done();
+            final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
+            boolean haveCommentForDelegate = false;
+            for (final Comment comment : comments) {
+                haveCommentForDelegate = haveCommentForDelegate
+                        || comment.getContent().contains("The user pedro acting as delegate of the user " + otherUserName + " has started the case.");
+            }
+            assertTrue(haveCommentForDelegate);
+        } finally {
+            // Clean up
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(otherUser);
+        }
     }
 
     private List<ProcessInstance> startNbProcess(final List<ProcessDefinition> processDefinitions) throws Exception {

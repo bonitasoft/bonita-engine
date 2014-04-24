@@ -28,7 +28,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
@@ -37,6 +36,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -44,6 +45,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
@@ -148,7 +150,6 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
         final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
 
         final long executerSubstituteId = sessionInfos.getUserId();
@@ -160,15 +161,28 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             logger.log(getClass(), TechnicalLogSeverity.INFO, message);
         }
 
-        if (executerUserId != executerSubstituteId) {
+        addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteId);
+    }
+
+    protected void addSystemCommentOnProcessInstanceWhenExecutingTaskFor(final SFlowNodeInstance flowNodeInstance, final long executerUserId,
+            final long executerSubstituteUserId) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final SCommentService commentService = tenantAccessor.getCommentService();
+
+        final SSession session = SessionInfos.getSession();
+
+        if (executerUserId != executerSubstituteUserId) {
+            final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
+                final SUser executerUser = identityService.getUser(executerUserId);
                 final StringBuilder stb = new StringBuilder();
-                stb.append("The user <" + sessionInfos.getUsername() + "> ");
-                stb.append("acting as delegate of user with id <" + executerUserId + "> ");
-                stb.append("has done the task.");
+                stb.append("The user " + session.getUserName() + " ");
+                stb.append("acting as delegate of the user " + executerUser.getUserName() + " ");
+                stb.append("has done the task \"" + flowNodeInstance.getDisplayName() + "\".");
                 commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
-            } catch (final SCommentAddException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            } catch (final SBonitaException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
             }
         }
     }

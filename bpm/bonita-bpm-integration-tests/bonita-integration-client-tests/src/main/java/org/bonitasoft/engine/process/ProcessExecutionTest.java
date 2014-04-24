@@ -131,7 +131,8 @@ public class ProcessExecutionTest extends CommonAPITest {
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
-                haveCommentForDelegate = haveCommentForDelegate || comment.getContent().contains(" acting as delegate of user with id");
+                haveCommentForDelegate = haveCommentForDelegate
+                        || comment.getContent().contains("The user install acting as delegate of the user john has started the case.");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
@@ -499,7 +500,7 @@ public class ProcessExecutionTest extends CommonAPITest {
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
-                        || comment.getContent().contains(" acting as delegate of user with id <" + step1Archived.getExecutedBy() + "> has executed the task.");
+                        || comment.getContent().contains("The user " + johnName + " acting as delegate of the user jack has done the task \"step1\".");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
