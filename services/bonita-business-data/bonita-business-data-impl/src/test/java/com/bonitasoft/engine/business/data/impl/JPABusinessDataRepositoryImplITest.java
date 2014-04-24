@@ -9,7 +9,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,7 +18,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
@@ -72,7 +70,7 @@ public class JPABusinessDataRepositoryImplITest {
     private EntityManager entityManager;
 
     @BeforeClass
-    public static void initializeBitronix() throws NamingException, SQLException {
+    public static void initializeBitronix() {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
         TransactionManagerServices.getConfiguration().setJournal(null);
     }
@@ -120,7 +118,7 @@ public class JPABusinessDataRepositoryImplITest {
         }
     }
 
-    private Employee addEmployeeToRepository(final Employee employee) throws SBusinessDataNotFoundException {
+    private Employee addEmployeeToRepository(final Employee employee) {
         return entityManager.merge(employee);
     }
 
@@ -198,7 +196,7 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test
-    public void entityClassNames_is_an_empty_set_if_bdr_is_not_started() throws Exception {
+    public void entityClassNames_is_an_empty_set_if_bdr_is_not_started() {
         businessDataRepository.stop();
 
         final Set<String> classNames = businessDataRepository.getEntityClassNames();
@@ -220,14 +218,14 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test
-    public void getEntityClassNames_should_return_the_classes_managed_by_the_bdr() throws Exception {
+    public void getEntityClassNames_should_return_the_classes_managed_by_the_bdr() {
         final Set<String> classNames = businessDataRepository.getEntityClassNames();
 
         assertThat(classNames).containsExactly(Employee.class.getName(), Person.class.getName());
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
-    public void aRemovedEntityShouldNotBeRetrievableAnyLonger() throws Exception {
+    public void aRemovedEntityShouldNotBeRetrievableAnyLonger() throws SBusinessDataNotFoundException {
         Employee employee = null;
         try {
             employee = addEmployeeToRepository(anEmployee().build());
@@ -236,28 +234,30 @@ public class JPABusinessDataRepositoryImplITest {
         } catch (final Exception e) {
             fail("Should not fail here");
         }
-        businessDataRepository.findById(Employee.class, employee.getPersistenceId());
+        if (employee != null) {
+            businessDataRepository.findById(Employee.class, employee.getPersistenceId());
+        }
     }
 
     @Test
-    public void remove_should_not_throw_an_exception_with_a_null_entity() throws Exception {
+    public void remove_should_not_throw_an_exception_with_a_null_entity() {
         businessDataRepository.remove(null);
     }
 
     @Test
-    public void remove_should_not_throw_an_exception_with_an_unknown_entity_without_an_id() throws Exception {
+    public void remove_should_not_throw_an_exception_with_an_unknown_entity_without_an_id() {
         businessDataRepository.remove(anEmployee().build());
     }
 
     @Test
-    public void remove_should_not_throw_an_exception_with_an_unknown_entity() throws Exception {
+    public void remove_should_not_throw_an_exception_with_an_unknown_entity() {
         final Employee newEmployee = addEmployeeToRepository(anEmployee().build());
         businessDataRepository.remove(newEmployee);
         businessDataRepository.remove(newEmployee);
     }
 
     @Test
-    public void findList_should_return_employee_list() throws Exception {
+    public void findList_should_return_employee_list() {
         final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").build());
         final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
         final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
@@ -269,7 +269,7 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test
-    public void findListShouldReturnEmptyListIfNoResults() throws Exception {
+    public void findListShouldReturnEmptyListIfNoResults() {
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) "Jaakko");
         final List<Employee> employees = businessDataRepository.findList(Employee.class,
                 "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters, 0, 10);
@@ -277,7 +277,7 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void findListShouldThrowAnExceptionIfAtLeastOneQueryParameterIsNotSet() throws Exception {
+    public void findListShouldThrowAnExceptionIfAtLeastOneQueryParameterIsNotSet() {
         businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null, 0, 10);
     }
 
