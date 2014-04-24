@@ -37,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -899,5 +900,25 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass,
             QueryOptions queryOptions)
             throws SBonitaSearchException;
+
+    /**
+     * Get total number of users according to specific query options, and who can start the task filtered with the search option
+     * of the given process definition
+     * 
+     * @param searchOptions
+     *            The QueryOptions object containing some query conditions
+     * @return
+     */
+    long getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, QueryOptions searchOptions) throws SBonitaSearchException;
+
+    /**
+     * Get total number of users according to specific query options, and who can start the task filtered with the search option
+     * of the given process definition
+     * 
+     * @param searchOptions
+     *            The QueryOptions object containing some query conditions
+     * @return
+     */
+    List<SUser> searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, QueryOptions searchOptions) throws SBonitaSearchException;
 
 }

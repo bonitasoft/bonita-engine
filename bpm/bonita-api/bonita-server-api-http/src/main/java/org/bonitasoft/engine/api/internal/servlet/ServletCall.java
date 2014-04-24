@@ -103,7 +103,7 @@ public abstract class ServletCall {
                         parameters.put(fieldName, read);
                     }
                     stream.close();
-                } catch (final Throwable t) {
+                } catch (final Exception t) {
                     throw new IOException(t);
                 }
             }

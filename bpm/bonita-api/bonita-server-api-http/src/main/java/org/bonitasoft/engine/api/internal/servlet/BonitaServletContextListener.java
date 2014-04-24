@@ -49,7 +49,7 @@ public class BonitaServletContextListener implements ServletContextListener {
             }
             platformSessionService.deleteSession(createSession.getId());
             sessionAccessor.deleteSessionId();
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

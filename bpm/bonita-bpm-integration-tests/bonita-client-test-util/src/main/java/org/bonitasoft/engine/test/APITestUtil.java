@@ -141,27 +141,15 @@ import org.slf4j.LoggerFactory;
  */
 public class APITestUtil {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(APITestUtil.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(APITestUtil.class);
 
-    protected static final String SUPERVISOR_ID_KEY = "supervisorId";
+    public static final String SUPERVISOR_ID_KEY = "supervisorId";
 
-    protected static final String ROLE_ID_KEY = "roleId";
+    public static final String ROLE_ID_KEY = "roleId";
 
-    protected static final String GROUP_ID_KEY = "groupId";
+    public static final String GROUP_ID_KEY = "groupId";
 
-    protected static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
-
-    private APISession session;
-
-    private ProcessAPI processAPI;
-
-    private IdentityAPI identityAPI;
-
-    private CommandAPI commandAPI;
-
-    private ProfileAPI profileAPI;
-
-    private ThemeAPI themeAPI;
+    public static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
 
     public static final String DEFAULT_TENANT = "default";
 
@@ -177,9 +165,25 @@ public class APITestUtil {
 
     public static final String USERNAME = "william.jobs";
 
+    public static final String GROUP_NAME = "R&D";
+
+    public static final String ROLE_NAME = "Developper";
+
     public static final int DEFAULT_REPEAT_EACH = 500;
 
     public static final int DEFAULT_TIMEOUT;
+
+    private APISession session;
+
+    private ProcessAPI processAPI;
+
+    private IdentityAPI identityAPI;
+
+    private CommandAPI commandAPI;
+
+    private ProfileAPI profileAPI;
+
+    private ThemeAPI themeAPI;
 
     static {
         String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
@@ -201,7 +205,7 @@ public class APITestUtil {
         }
     }
 
-    protected void loginWith(final String userName, final String password) throws BonitaException {
+    public void loginWith(final String userName, final String password) throws BonitaException {
         setSession(loginTenant(userName, password));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
@@ -210,7 +214,7 @@ public class APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
-    protected void login() throws BonitaException {
+    public void login() throws BonitaException {
         setSession(loginDefaultTenant());
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
@@ -219,7 +223,7 @@ public class APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
-    protected void logout() throws BonitaException {
+    public void logout() throws BonitaException {
         logoutTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
@@ -258,7 +262,7 @@ public class APITestUtil {
     /**
      * First actor means "first one in Alphanumerical order !"
      */
-    protected void addUserToFirstActorOfProcess(final long userId, final ProcessDefinition processDefinition) throws BonitaException {
+    public void addUserToFirstActorOfProcess(final long userId, final ProcessDefinition processDefinition) throws BonitaException {
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         final ActorInstance actor = actors.get(0);
         getProcessAPI().addUserToActor(actor.getId(), userId);
@@ -282,36 +286,36 @@ public class APITestUtil {
         return null;
     }
 
-    protected User createUser(final String userName, final String password) throws BonitaException {
+    public User createUser(final String userName, final String password) throws BonitaException {
         return getIdentityAPI().createUser(userName, password);
     }
 
-    protected User createUser(final String userName, final String password, final String firstName, final String lastName) throws BonitaException {
+    public User createUser(final String userName, final String password, final String firstName, final String lastName) throws BonitaException {
         return getIdentityAPI().createUser(userName, password, firstName, lastName);
     }
 
-    protected User createUser(final UserCreator creator) throws BonitaException {
+    public User createUser(final UserCreator creator) throws BonitaException {
         return getIdentityAPI().createUser(creator);
     }
 
-    protected User createUser(final String userName, final long managerId) throws BonitaException {
+    public User createUser(final String userName, final long managerId) throws BonitaException {
         return createUser(userName, "bpm", managerId);
     }
 
-    protected User createUser(final String userName, final String password, final long managerId) throws BonitaException {
+    public User createUser(final String userName, final String password, final long managerId) throws BonitaException {
         final UserCreator creator = new UserCreator(userName, password);
         creator.setManagerUserId(managerId);
         return getIdentityAPI().createUser(creator);
     }
 
-    protected User createUserAndLogin(final String userName, final String password) throws BonitaException {
+    public User createUserAndLogin(final String userName, final String password) throws BonitaException {
         final User user = getIdentityAPI().createUser(userName, password);
         logout();
         loginWith(userName, password);
         return user;
     }
 
-    protected void deleteUsers(final User... users) throws BonitaException {
+    public void deleteUsers(final User... users) throws BonitaException {
         deleteUsers(Arrays.asList(users));
     }
 
@@ -323,7 +327,7 @@ public class APITestUtil {
         }
     }
 
-    protected void deleteGroups(final Group... groups) throws BonitaException {
+    public void deleteGroups(final Group... groups) throws BonitaException {
         deleteGroups(Arrays.asList(groups));
     }
 
@@ -335,7 +339,7 @@ public class APITestUtil {
         }
     }
 
-    protected void deleteRoles(final Role... roles) throws BonitaException {
+    public void deleteRoles(final Role... roles) throws BonitaException {
         deleteRoles(Arrays.asList(roles));
     }
 
@@ -347,11 +351,11 @@ public class APITestUtil {
         }
     }
 
-    protected void deleteUserMembership(final long id) throws BonitaException {
+    public void deleteUserMembership(final long id) throws BonitaException {
         getIdentityAPI().deleteUserMembership(id);
     }
 
-    protected void deleteUserMemberships(final UserMembership... userMemberships) throws BonitaException {
+    public void deleteUserMemberships(final UserMembership... userMemberships) throws BonitaException {
         deleteUserMemberships(Arrays.asList(userMemberships));
     }
 
@@ -363,7 +367,7 @@ public class APITestUtil {
         }
     }
 
-    protected UserMembership createUserMembership(final String userName, final String roleName, final String groupName) throws BonitaException {
+    public UserMembership createUserMembership(final String userName, final String roleName, final String groupName) throws BonitaException {
         return getIdentityAPI().addUserMembership(getIdentityAPI().getUserByUserName(userName).getId(), getIdentityAPI().getGroupByPath(groupName).getId(),
                 getIdentityAPI().getRoleByName(roleName).getId());
     }
@@ -393,20 +397,20 @@ public class APITestUtil {
         getIdentityAPI().deleteGroup(((Group) map.get(GROUP_ID_KEY)).getId());
     }
 
-    protected void deleteUserAndProcess(final String johnName, final ProcessDefinition definition) throws BonitaException {
+    public void deleteUserAndProcess(final String johnName, final ProcessDefinition definition) throws BonitaException {
         deleteUser(johnName);
         deleteProcess(definition);
     }
 
-    protected void deleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
+    public void deleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
         deleteProcess(processDefinition.getId());
     }
 
-    protected void deleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
+    public void deleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
         deleteProcess(Arrays.asList(processDefinitions));
     }
 
-    protected void deleteProcess(final List<ProcessDefinition> processDefinitions) throws BonitaException {
+    public void deleteProcess(final List<ProcessDefinition> processDefinitions) throws BonitaException {
         if (processDefinitions != null) {
             for (final ProcessDefinition processDefinition : processDefinitions) {
                 deleteProcess(processDefinition);
@@ -414,20 +418,20 @@ public class APITestUtil {
         }
     }
 
-    protected void deleteProcess(final long processDefinitionId) throws BonitaException {
+    public void deleteProcess(final long processDefinitionId) throws BonitaException {
         deleteProcessInstanceAndArchived(processDefinitionId);
         getProcessAPI().deleteProcessDefinition(processDefinitionId);
     }
 
-    protected void deleteUser(final String userName) throws BonitaException {
+    public void deleteUser(final String userName) throws BonitaException {
         getIdentityAPI().deleteUser(userName);
     }
 
-    protected void deleteUser(final User user) throws BonitaException {
+    public void deleteUser(final User user) throws BonitaException {
         deleteUser(user.getId());
     }
 
-    protected void deleteUser(final long userId) throws BonitaException {
+    public void deleteUser(final long userId) throws BonitaException {
         getIdentityAPI().deleteUser(userId);
     }
 
@@ -437,11 +441,11 @@ public class APITestUtil {
         }
     }
 
-    protected ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition) throws BonitaException {
+    public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition) throws BonitaException {
         return getProcessAPI().deployAndEnableProcess(designProcessDefinition);
     }
 
-    protected ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive) throws BonitaException {
+    public ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive) throws BonitaException {
         return getProcessAPI().deployAndEnableProcess(businessArchive);
     }
 
@@ -450,7 +454,7 @@ public class APITestUtil {
         return deployAndEnableWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final List<User> users)
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final List<User> users)
             throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableWithActor(businessArchive, actorName, users);
@@ -467,7 +471,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
+    public ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final User user, final Map<String, String> parameters) throws BonitaException {
         return deployAndEnableWithActorAndParameters(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user), parameters);
     }
@@ -509,7 +513,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group group)
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group group)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -518,7 +522,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group... groups)
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group... groups)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -529,7 +533,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role)
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -538,7 +542,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role... roles)
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role... roles)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -549,7 +553,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role,
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role,
             final Group group) throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -558,7 +562,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
+    public void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
         if (processDefinition != null) {
             final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
             if (deploymentInfo.getActivationState().equals(ActivationState.ENABLED)) {
@@ -569,7 +573,7 @@ public class APITestUtil {
         }
     }
 
-    protected void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
+    public void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
         // Delete all process instances
         long nbDeletedProcessInstances;
         getProcessAPI().disableProcess(processDefinitionId);
@@ -586,11 +590,11 @@ public class APITestUtil {
         getProcessAPI().deleteProcessDefinition(processDefinitionId);
     }
 
-    protected void disableAndDeleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
+    public void disableAndDeleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
         disableAndDeleteProcess(Arrays.asList(processDefinitions));
     }
 
-    protected void disableAndDeleteProcess(final List<ProcessDefinition> processDefinitions) throws BonitaException {
+    public void disableAndDeleteProcess(final List<ProcessDefinition> processDefinitions) throws BonitaException {
         if (processDefinitions != null) {
             for (final ProcessDefinition processDefinition : processDefinitions) {
                 disableAndDeleteProcess(processDefinition);
@@ -598,7 +602,7 @@ public class APITestUtil {
         }
     }
 
-    protected void disableAndDeleteProcessById(final List<Long> processDefinitionIds) throws BonitaException {
+    public void disableAndDeleteProcessById(final List<Long> processDefinitionIds) throws BonitaException {
         if (processDefinitionIds != null) {
             for (final Long id : processDefinitionIds) {
                 disableAndDeleteProcess(id);
@@ -606,18 +610,18 @@ public class APITestUtil {
         }
     }
 
-    protected void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
+    public void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
         while (getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 10) != 0) {
         }
         while (getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 10) != 0) {
         }
     }
 
-    protected void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
+    public void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
         deleteProcessInstanceAndArchived(Arrays.asList(processDefinitions));
     }
 
-    protected void deleteProcessInstanceAndArchived(final List<ProcessDefinition> processDefinitions) throws BonitaException {
+    public void deleteProcessInstanceAndArchived(final List<ProcessDefinition> processDefinitions) throws BonitaException {
         if (processDefinitions != null) {
             for (final ProcessDefinition processDefinition : processDefinitions) {
                 deleteProcessInstanceAndArchived(processDefinition.getId());
@@ -638,36 +642,34 @@ public class APITestUtil {
         return false;
     }
 
-    protected Group createGroup(final String groupName) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String groupName) throws AlreadyExistsException, CreationException {
         return createGroup(groupName, null);
     }
 
-    protected Group createGroup(final String groupName, final String parentGroupPath) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String groupName, final String parentGroupPath) throws AlreadyExistsException, CreationException {
         return getIdentityAPI().createGroup(groupName, parentGroupPath);
     }
 
-    protected Group createGroup(final String name, final String displayName, final String description) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String name, final String displayName, final String description) throws AlreadyExistsException, CreationException {
         final GroupCreator groupCreator = new GroupCreator(name);
         groupCreator.setDisplayName(displayName).setDescription(description);
         return getIdentityAPI().createGroup(groupCreator);
     }
 
-    protected Role createRole(final String roleName) throws BonitaException {
+    public Role createRole(final String roleName) throws BonitaException {
         return getIdentityAPI().createRole(roleName);
     }
 
-    protected Operation buildAssignOperation(final String dataInstanceName, final String expressionContent, final ExpressionType expressionType,
+    public Operation buildAssignOperation(final String dataInstanceName, final String expressionContent, final ExpressionType expressionType,
             final String returnType) throws InvalidExpressionException {
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
         final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(expressionContent)
-                .setExpressionType(expressionType.name()).setReturnType(returnType).done();
-        final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+                .setExpressionType(expressionType).setReturnType(returnType).done();
+        return new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
-        return operation;
     }
 
-    protected void assignAndExecuteStep(final ActivityInstance activityInstance, final long userId) throws BonitaException {
+    public void assignAndExecuteStep(final ActivityInstance activityInstance, final long userId) throws BonitaException {
         assignAndExecuteStep(activityInstance.getId(), userId);
     }
 
@@ -676,7 +678,7 @@ public class APITestUtil {
         executeFlowNodeUntilEnd(activityInstanceId);
     }
 
-    protected void executeFlowNodeUntilEnd(final long flowNodeId) throws FlowNodeExecutionException {
+    public void executeFlowNodeUntilEnd(final long flowNodeId) throws FlowNodeExecutionException {
         getProcessAPI().executeFlowNode(flowNodeId);
     }
 
@@ -733,30 +735,30 @@ public class APITestUtil {
         }
     }
 
-    protected void deleteSupervisor(final long id) throws BonitaException {
+    public void deleteSupervisor(final long id) throws BonitaException {
         getProcessAPI().deleteSupervisor(id);
     }
 
     @Deprecated
-    protected List<HumanTaskInstance> waitForPendingTasks(final long userId, final int nbPendingTasks) throws Exception {
+    public List<HumanTaskInstance> waitForPendingTasks(final long userId, final int nbPendingTasks) throws Exception {
         final WaitForPendingTasks waitUntil = new WaitForPendingTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbPendingTasks, userId, getProcessAPI());
         assertTrue("no pending user task instances are found", waitUntil.waitUntil());
         return waitUntil.getResults();
     }
 
     @Deprecated
-    protected List<HumanTaskInstance> waitForPendingTasks(final User user, final int nbPendingTasks) throws Exception {
+    public List<HumanTaskInstance> waitForPendingTasks(final User user, final int nbPendingTasks) throws Exception {
         return waitForPendingTasks(user.getId(), nbPendingTasks);
     }
 
-    protected StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
+    public StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance task = waitForUserTask(taskName, processInstance.getId());
         return new StartProcessUntilStep(processInstance, task);
     }
 
     @Deprecated
-    protected ArchivedActivityInstance waitForArchivedActivity(final long activityId, final String stateName) throws Exception {
+    public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final String stateName) throws Exception {
         final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, stateName,
                 getProcessAPI());
         waitForArchivedActivity.waitUntil();
@@ -812,7 +814,7 @@ public class APITestUtil {
     }
 
     @Deprecated
-    protected boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
+    public boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
         return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
@@ -1037,7 +1039,7 @@ public class APITestUtil {
         platformLoginAPI.logout(session);
     }
 
-    protected PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return PlatformAPIAccessor.getPlatformAPI(session);
     }
 
@@ -1129,7 +1131,7 @@ public class APITestUtil {
         return loginAPI.login(userName, password);
     }
 
-    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getLoginAPI();
     }
 
@@ -1391,7 +1393,7 @@ public class APITestUtil {
         }
     }
 
-    protected void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws InvalidSessionException, SearchException {
+    public void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws InvalidSessionException, SearchException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, parentProcessInstance.getId());
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, flowNodeName);
@@ -1663,47 +1665,47 @@ public class APITestUtil {
         return processAPI;
     }
 
-    protected void setProcessAPI(final ProcessAPI processAPI) {
+    public void setProcessAPI(final ProcessAPI processAPI) {
         this.processAPI = processAPI;
     }
 
-    protected IdentityAPI getIdentityAPI() {
+    public IdentityAPI getIdentityAPI() {
         return identityAPI;
     }
 
-    protected void setIdentityAPI(final IdentityAPI identityAPI) {
+    public void setIdentityAPI(final IdentityAPI identityAPI) {
         this.identityAPI = identityAPI;
     }
 
-    protected CommandAPI getCommandAPI() {
+    public CommandAPI getCommandAPI() {
         return commandAPI;
     }
 
-    protected void setCommandAPI(final CommandAPI commandAPI) {
+    public void setCommandAPI(final CommandAPI commandAPI) {
         this.commandAPI = commandAPI;
     }
 
-    protected ProfileAPI getProfileAPI() {
+    public ProfileAPI getProfileAPI() {
         return profileAPI;
     }
 
-    protected void setProfileAPI(final ProfileAPI profileAPI) {
+    public void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
     }
 
-    protected ThemeAPI getThemeAPI() {
+    public ThemeAPI getThemeAPI() {
         return themeAPI;
     }
 
-    protected void setThemeAPI(final ThemeAPI themeAPI) {
+    public void setThemeAPI(final ThemeAPI themeAPI) {
         this.themeAPI = themeAPI;
     }
 
-    protected void setSession(final APISession session) {
+    public void setSession(final APISession session) {
         this.session = session;
     }
 
-    protected byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
+    public byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
             final String implementationVersion, final String implementationClassname) {
         final StringBuilder stb = new StringBuilder();
         stb.append("<connectorImplementation>");
