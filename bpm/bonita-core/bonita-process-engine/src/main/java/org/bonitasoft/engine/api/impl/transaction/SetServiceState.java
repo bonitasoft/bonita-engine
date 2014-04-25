@@ -54,6 +54,9 @@ public class SetServiceState implements Callable<Void>, Serializable {
             final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
             final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
 
+            // refresh the tenant classloader:
+            tenantServiceAccessor.getDependencyService().refreshClassLoader(ScopeType.TENANT, tenantId);
+
             // Set the right classloader:
             final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
             final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);

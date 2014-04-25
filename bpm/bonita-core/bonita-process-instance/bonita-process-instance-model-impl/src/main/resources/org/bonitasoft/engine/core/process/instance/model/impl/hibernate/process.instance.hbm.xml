@@ -181,6 +181,7 @@
 		</property>
 		<property name="state" column="state" />
 		<property name="executionOrder" column="executionOrder" />
+		<filter name="tenantFilter" />
 	</class>
 	
 	<class name="SConnectorInstanceWithFailureInfoImpl" table="connector_instance" polymorphism="explicit" >
@@ -204,6 +205,7 @@
 		<property name="executionOrder" column="executionOrder" />
 		<property name="exceptionMessage" column="exceptionMessage" />
 		<property name="stackTrace" column="stackTrace" type="text"/>
+		<filter name="tenantFilter" />
 	</class>
 
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" abstract="true" extends="SFlowNodeInstanceImpl" />

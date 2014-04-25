@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +35,8 @@ import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -118,7 +121,7 @@ public class PlatformServiceImplTest {
     @Test
     public final void getNumberOfTenantsWithOptions() throws SBonitaException {
         final long numberOfTenants = 155L;
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         when(persistenceService.getNumberOfEntities(STenant.class, options, null)).thenReturn(numberOfTenants);
 
         assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants(options));
@@ -126,7 +129,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = SBonitaSearchException.class)
     public final void getNumberOfTenantsWithOptionsThrowException() throws SBonitaException {
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         when(persistenceService.getNumberOfEntities(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.getNumberOfTenants(options);
@@ -206,7 +209,7 @@ public class PlatformServiceImplTest {
     public final void getTenantsByIds() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
         sTenants.add(buildTenant(15, "name"));
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         final List<Long> ids = Collections.singletonList(15L);
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
         when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, options))).thenReturn(sTenants);
@@ -214,11 +217,16 @@ public class PlatformServiceImplTest {
         assertEquals(sTenants, platformServiceImpl.getTenants(ids, options));
     }
 
+    private QueryOptions getQueryOptions() {
+        return new QueryOptions(0, 10, Arrays.asList(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getIdKey(),
+                OrderByType.DESC)));
+    }
+
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantsByIdsNotExists() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
         sTenants.add(buildTenant(15, "name"));
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         final List<Long> ids = Arrays.asList(15l, 32l);
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
         when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, options))).thenReturn(sTenants);
@@ -228,7 +236,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantException.class)
     public final void getTenantsByIdsThrowException() throws SBonitaException {
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         final List<Long> ids = Collections.singletonList(15L);
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
         when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, options))).thenThrow(
@@ -241,7 +249,7 @@ public class PlatformServiceImplTest {
     public final void getTenantsWithOptions() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
         sTenants.add(buildTenant(48, "name"));
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, options))).thenReturn(sTenants);
 
         assertEquals(sTenants, platformServiceImpl.getTenants(options));
@@ -249,11 +257,31 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantException.class)
     public final void getTenantsWithOptionsThrowException() throws SBonitaException {
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, options))).thenThrow(
                 new SBonitaReadException(""));
 
         platformServiceImpl.getTenants(options);
+    }
+
+    @Test
+    public final void isPlatformCreated_already_in_cache() throws SBonitaException {
+        final SPlatform sPlatform = buildPlatform();
+        when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
+
+        assertTrue(platformServiceImpl.isPlatformCreated());
+    }
+
+    @Test
+    public final void isPlatformCreated_not_in_cache() throws SBonitaException {
+        final SelectOneDescriptor<SPlatform> selectOneDescriptor = new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class);
+
+        // given
+        when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
+
+        // when then
+        assertFalse(platformServiceImpl.isPlatformCreated());
+        verify(persistenceService, times(1)).selectOne(selectOneDescriptor);
     }
 
     @Test
@@ -265,16 +293,11 @@ public class PlatformServiceImplTest {
     }
 
     @Test
-    public final void isPlatformNotCreated() throws SBonitaException {
-        when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
-
-        assertFalse(platformServiceImpl.isPlatformCreated());
-    }
-
-    @Test
-    public final void isPlatformNotCreatedThrowException() throws SBonitaException {
+    public final void isPlatformCreated_false_when_cache_exception() throws SBonitaException {
+        // given
         when(platformCacheService.get(anyString(), anyString())).thenThrow(new SCacheException(""));
 
+        // whne then
         assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
@@ -304,7 +327,7 @@ public class PlatformServiceImplTest {
     public final void searchTenants() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
         sTenants.add(buildTenant(87, "tenant"));
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         when(persistenceService.searchEntity(STenant.class, options, null)).thenReturn(sTenants);
 
         assertEquals(sTenants, platformServiceImpl.searchTenants(options));
@@ -312,7 +335,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = SBonitaSearchException.class)
     public final void searchTenantsThrowException() throws SBonitaException {
-        final QueryOptions options = new QueryOptions(0, 10);
+        final QueryOptions options = getQueryOptions();
         when(persistenceService.searchEntity(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.searchTenants(options);
