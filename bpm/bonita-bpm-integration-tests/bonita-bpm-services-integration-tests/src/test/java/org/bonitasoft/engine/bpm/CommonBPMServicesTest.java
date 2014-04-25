@@ -25,7 +25,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
-import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
@@ -125,6 +124,8 @@ public class CommonBPMServicesTest {
 
     private static final ActivityInstanceService activityInstanceService;
 
+    private static boolean platformCreated = false;
+
     private APISession sSession;
 
     public static BPMServicesBuilder getServicesBuilder() {
@@ -192,18 +193,22 @@ public class CommonBPMServicesTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        // Call directly the API because we want the files to be copied:
-        final PlatformAPIImpl platformAPI = new PlatformAPIImpl();
-        sessionAccessor.setSessionInfo(1l, -1);
-        platformAPI.createAndInitializePlatform();
-        platformAPI.startNode();
+        // if (!platformCreated) {
+        // // Call directly the API because we want the files to be copied:
+        // final PlatformAPIImpl platformAPI = new PlatformAPIImpl();
+        // sessionAccessor.setSessionInfo(1l, -1);
+        // platformAPI.createAndInitializePlatform();
+        // platformAPI.startNode();
+        // }
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        TestUtil.closeTransactionIfOpen(transactionService);
-        stopScheduler();
-        TestUtil.deleteDefaultTenantAndPlatForm(transactionService, platformService, sessionAccessor, bpmServicesBuilder.getSessionService());
+        // if (!platformCreated) {
+        // TestUtil.closeTransactionIfOpen(transactionService);
+        // stopScheduler();
+        // TestUtil.deleteDefaultTenantAndPlatForm(transactionService, platformService, sessionAccessor, bpmServicesBuilder.getSessionService());
+        // }
     }
 
     protected Group createGroup(final String groupName) throws AlreadyExistsException, CreationException {

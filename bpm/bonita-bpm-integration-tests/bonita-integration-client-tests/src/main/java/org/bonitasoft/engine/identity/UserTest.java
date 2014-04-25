@@ -332,11 +332,12 @@ public class UserTest extends CommonAPITest {
 
     @Cover(classes = { User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-1055", keywords = { "contact info", "user" })
     @Test
-    public void deleteUserContactInfo() throws BonitaException {
+    public void testUserContactInfos() throws BonitaException {
         final UserCreator creator = new UserCreator("john", "bpm");
         creator.setFirstName("John").setLastName("Doe");
         final ContactDataCreator persoCreator = new ContactDataCreator();
-        persoCreator.setEmail("john.doe@anywhere.com");
+        // BS-7711
+        persoCreator.setEmail("anemailwithmorethanfifteencharacter@extremellylongdomainname.com");
         final ContactDataCreator proCreator = new ContactDataCreator();
         proCreator.setEmail("john.doe@bonitasoft.com");
         creator.setPersonalContactData(persoCreator);
@@ -344,7 +345,7 @@ public class UserTest extends CommonAPITest {
         final User john = getIdentityAPI().createUser(creator);
 
         final ContactData persoData = getIdentityAPI().getUserContactData(john.getId(), true);
-        assertEquals("john.doe@anywhere.com", persoData.getEmail());
+        assertEquals("anemailwithmorethanfifteencharacter@extremellylongdomainname.com", persoData.getEmail());
         final ContactData prooData = getIdentityAPI().getUserContactData(john.getId(), false);
         assertEquals("john.doe@bonitasoft.com", prooData.getEmail());
 

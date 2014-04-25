@@ -75,6 +75,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -383,7 +384,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 int i = 0;
                 final List<STenant> tenantIds = new ArrayList<STenant>();
                 do {
-                    tenants = platformService.getTenants(new QueryOptions(i, maxResults));
+                    tenants = platformService.getTenants(new QueryOptions(i, maxResults, STenant.class, "id", OrderByType.ASC));
                     i += maxResults;
                     for (final STenant sTenant : tenants) {
                         tenantIds.add(sTenant);

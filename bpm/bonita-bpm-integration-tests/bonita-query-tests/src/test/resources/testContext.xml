@@ -29,7 +29,7 @@
        <property name="hibernateProperties">
            <props>
                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-               <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+               <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
                <prop key="hibernate.show_sql">false</prop>
            </props>
        </property>
@@ -42,7 +42,11 @@
    <bean id="processInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
-   
+    
+   <bean id="bpmEventRepository" class="org.bonitasoft.engine.test.persistence.repository.BPMEventRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+  
       <bean id="supervisorRepository" class="org.bonitasoft.engine.test.persistence.repository.SupervisorRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
