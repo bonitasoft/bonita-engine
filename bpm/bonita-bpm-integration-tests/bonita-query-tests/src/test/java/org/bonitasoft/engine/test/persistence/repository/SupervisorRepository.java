@@ -11,30 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.exception;
+package org.bonitasoft.engine.test.persistence.repository;
 
-/**
- * Exception wrapper providing context on the exception.
- * 
- * @author Aurelien Pupier
- *
- */
-public interface BonitaContextException {
+import java.util.List;
 
-	public abstract long getTenantId();
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
 
-	public abstract void setTenantId(long tenantId);
+public class SupervisorRepository extends TestRepository {
 
-	public abstract String getHostname();
+    public SupervisorRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
+    }
 
-	public abstract void setHostname(String hostname);
-
-	public abstract String getUserName();
-
-	public abstract void setUserName(String userName);
-	
-	public abstract long getThreadId();
-	
-	public abstract void setThreadId(long threadId);
+    @SuppressWarnings("unchecked")
+    public List<Long> searchSProcessSupervisorWithSUserSGroupSRole() {
+        Query namedQuery = getNamedQuery("searchSProcessSupervisorwithSUserSGroupSRole");
+        return namedQuery.list();
+    }
 
 }
