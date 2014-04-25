@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.data.DataSourceConfiguration;
 import org.bonitasoft.engine.data.SDataSourceInitializationException;
@@ -120,7 +120,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
 
             for (final Map.Entry<String, Object> field : descriptor.getFields().entrySet()) {
                 try {
-                    final String setterName = "set" + StringUtil.firstCharToUpperCase(field.getKey());
+                    final String setterName = "set" + WordUtils.capitalize(field.getKey());
                     ClassReflector.invokeMethodByName(dataInstance, setterName, field.getValue());
                 } catch (final Exception e) {
                     throw new SUpdateDataInstanceException("Problem while updating entity: " + dataInstance + " with id: " + dataInstance.getId()

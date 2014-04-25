@@ -34,9 +34,9 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -58,7 +58,7 @@ import org.hibernate.stat.Statistics;
 
 /**
  * Hibernate implementation of the persistence service
- * 
+ *
  * @author Charles Souillard
  * @author Nicolas Chabanoles
  * @author Yanyan Liu
@@ -360,7 +360,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         Long id = null;
         try {
             id = entity.getId();
-            final String setterName = "set" + StringUtil.firstCharToUpperCase(fieldName);
+            final String setterName = "set" + WordUtils.capitalize(fieldName);
             ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
         } catch (final Exception e) {
             throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
@@ -592,7 +592,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
-        StringBuilder stb = new StringBuilder(completeField);
+        final StringBuilder stb = new StringBuilder(completeField);
         stb.append(" in (");
         stb.append(getInValues(filterOption));
         stb.append(")");
@@ -600,11 +600,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     private String getInValues(final FilterOption filterOption) {
-        StringBuilder stb = new StringBuilder();
-        for (Object element : filterOption.getIn()) {
+        final StringBuilder stb = new StringBuilder();
+        for (final Object element : filterOption.getIn()) {
             stb.append(element + ",");
         }
-        String inValues = stb.toString();
+        final String inValues = stb.toString();
         return inValues.substring(0, inValues.length() - 1);
     }
 
