@@ -25,7 +25,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.bonitasoft.engine.commons.StringUtil;
+import org.apache.commons.lang3.text.WordUtils;
 
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -145,7 +145,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
         final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
-        final JVar param = copyConstructor.param(entityClass, StringUtil.firstCharToLowerCase(entityClass.name()));
+        final JVar param = copyConstructor.param(entityClass, WordUtils.capitalize(entityClass.name()));
         final JBlock copyBody = copyConstructor.body();
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));

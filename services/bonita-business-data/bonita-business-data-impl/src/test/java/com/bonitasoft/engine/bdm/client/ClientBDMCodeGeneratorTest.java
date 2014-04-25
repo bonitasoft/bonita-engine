@@ -335,9 +335,9 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         ageField.setType(FieldType.INTEGER);
         employeeBO.getFields().add(ageField);
 
-        final Query query = new Query("getEmployeesByNameAndAge", "SELECT e FROM Employee e WHERE e.name = :name AND e.age = :miEdad", List.class.getName());
-        query.addQueryParameter("myName", String.class.getName());
+        final Query query = new Query("getEmployeesByNameAndAge", "SELECT e FROM Employee e WHERE e.name = :myName AND e.age = :miEdad", List.class.getName());
         query.addQueryParameter("miEdad", Integer.class.getName());
+        query.addQueryParameter("myName", String.class.getName());
         employeeBO.getQueries().add(query);
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
@@ -345,7 +345,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
         final String daoContent = readGeneratedDAOFile();
 
-        assertThat(daoContent).contains("public List<Employee> findByMyNameAndMiEdad(String myName, Integer miEdad, int startIndex, int maxResults)");
+        assertThat(daoContent).contains("public List<Employee> findByMiEdadAndMyName(Integer miEdad, String myName, int startIndex, int maxResults)");
     }
 
     protected String getQueryMethodSignature(final Query query, final String queryReturnType, final String businessObjectName, final boolean returnsList) {

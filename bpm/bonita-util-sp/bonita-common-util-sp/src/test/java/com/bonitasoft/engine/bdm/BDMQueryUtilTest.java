@@ -19,7 +19,7 @@ public class BDMQueryUtilTest {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryNameForUniqueConstraint = BDMQueryUtil.createQueryNameForUniqueConstraint("org.bonita.Employee", uniqueConstraint);
-        assertThat(queryNameForUniqueConstraint).isEqualTo("getEmployeeByName");
+        assertThat(queryNameForUniqueConstraint).isEqualTo("Employee.findByName");
 
     }
 
@@ -28,7 +28,7 @@ public class BDMQueryUtilTest {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryContentForUniqueConstraint = BDMQueryUtil.createQueryContentForUniqueConstraint("org.bonita.Employee", uniqueConstraint);
-        assertThat(queryContentForUniqueConstraint).isNotEmpty().isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
+        assertThat(queryContentForUniqueConstraint).isNotEmpty().isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name= :name\n");
     }
 
     @Test
@@ -43,7 +43,7 @@ public class BDMQueryUtilTest {
         bo.addUniqueConstraint("someName", "people");
 
         // when:
-        List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
+        final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
         assertThat(getQueryNames(queries)).doesNotContain("getAllArrivalByPeople");
@@ -59,7 +59,7 @@ public class BDMQueryUtilTest {
         bo.addUniqueConstraint("someConstraintName", "unikAttr");
 
         // when:
-        List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
+        final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
         assertThat(queries).hasSize(3);
@@ -89,14 +89,14 @@ public class BDMQueryUtilTest {
 
         final Query query = BDMQueryUtil.createQueryForUniqueConstraint(bo, uniqueConstraint);
         assertThat(query).isNotNull();
-        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
-        assertThat(query.getName()).isEqualTo("getEmployeeByName");
+        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name= :name\n");
+        assertThat(query.getName()).isEqualTo("Employee.findByName");
         assertThat(query.getReturnType()).isEqualTo(bo.getQualifiedName());
         assertThat(query.getQueryParameters()).hasSize(1);
     }
 
     @Test
-    public void should_createQueryFoField_return_query_with_parameters() throws Exception {
+    public void should_createQueryForField_return_query_with_parameters() throws Exception {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final Field field = new Field();
@@ -106,8 +106,8 @@ public class BDMQueryUtilTest {
 
         final Query query = BDMQueryUtil.createQueryForField(bo, field);
         assertThat(query).isNotNull();
-        assertThat(query.getContent()).contains("SELECT e\nFROM Employee e\nWHERE e.name=:name");
-        assertThat(query.getName()).isEqualTo("getAllEmployeeByName");
+        assertThat(query.getContent()).contains("SELECT e\nFROM Employee e\nWHERE e.name= :name\nORDER BY e.persistenceId");
+        assertThat(query.getName()).isEqualTo("Employee.findByName");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).hasSize(1);
     }
@@ -125,7 +125,7 @@ public class BDMQueryUtilTest {
         assertThat(query).isNotNull();
         assertThat(query.getContent()).contains("SELECT e\nFROM Employee e");
         assertThat(query.getContent()).doesNotContain("WHERE");
-        assertThat(query.getName()).isEqualTo("getAllEmployee");
+        assertThat(query.getName()).isEqualTo("Employee.find");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).isEmpty();
     }
@@ -133,7 +133,7 @@ public class BDMQueryUtilTest {
     @Test
     public void createSelectAllQueryShouldGenerateOrderByPersistenceId() throws Exception {
         // when:
-        String queryContent = BDMQueryUtil.createSelectAllQueryContent("MyBizObject");
+        final String queryContent = BDMQueryUtil.createSelectAllQueryContent("MyBizObject");
         // then:
         assertThat(queryContent).contains("ORDER BY m.persistenceId");
     }
@@ -141,8 +141,9 @@ public class BDMQueryUtilTest {
     @Test
     public void createDefaultQueryForFieldShouldGenerateOrderByPersistenceId() throws Exception {
         // when:
-        String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new Field());
+        final String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new Field());
         // then:
         assertThat(queryContent).contains("ORDER BY n.persistenceId");
     }
+
 }

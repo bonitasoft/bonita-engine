@@ -11,12 +11,11 @@ package com.bonitasoft.engine.bdm.client;
 import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule.FORBIDDEN_PARAMETER_NAMES;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.bonitasoft.engine.commons.StringUtil;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
@@ -76,7 +75,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-            ClassNotFoundException {
+    ClassNotFoundException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -182,22 +181,11 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private String buildMethodName(final Query query) {
-        final StringBuilder nameBuilder = new StringBuilder("find");
-        final List<QueryParameter> queryParameters = query.getQueryParameters();
-        if (!queryParameters.isEmpty()) {
-            nameBuilder.append("By");
-            String paramName;
-            final int numberOfParams = queryParameters.size() - 1;
-            for (int i = 0; i < numberOfParams; i++) {
-                final QueryParameter queryParameter = queryParameters.get(i);
-                paramName = StringUtil.firstCharToUpperCase(queryParameter.getName());
-                nameBuilder.append(paramName).append("And");
-            }
-            final QueryParameter queryParameter = queryParameters.get(numberOfParams);
-            paramName = StringUtil.firstCharToUpperCase(queryParameter.getName());
-            nameBuilder.append(paramName);
+        final List<String> fieldNames = new ArrayList<String>();
+        for (final QueryParameter param : query.getQueryParameters()) {
+            fieldNames.add(param.getName());
         }
-        return nameBuilder.toString();
+        return BDMQueryUtil.getDefaultName(fieldNames);
     }
 
     private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {
@@ -220,15 +208,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         if (returnType instanceof JClass && collectionType.isAssignableFrom((JClass) returnType)) {
             returnType = ((JClass) returnType).narrow(entity);
         }
-        final JMethod method = addMethodSignature(targetClass, name, returnType);
-        addThrows(method, "org.bonitasoft.engine.command.CommandNotFoundException");
-        addThrows(method, "org.bonitasoft.engine.command.CommandExecutionException");
-        addThrows(method, "org.bonitasoft.engine.command.CommandParameterizationException");
-        addThrows(method, "org.bonitasoft.engine.exception.BonitaHomeNotSetException");
-        addThrows(method, "org.bonitasoft.engine.exception.UnknownAPITypeException");
-        addThrows(method, "org.bonitasoft.engine.exception.ServerAPIException");
-
-        return method;
+        return addMethodSignature(targetClass, name, returnType);
     }
 
     private String toDaoInterfaceClassname(final BusinessObject bo) {
