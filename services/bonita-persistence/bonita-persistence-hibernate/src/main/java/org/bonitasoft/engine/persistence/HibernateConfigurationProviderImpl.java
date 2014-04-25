@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,10 +44,10 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     public HibernateConfigurationProviderImpl(final Properties properties,
             final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider, final Map<String, String> interfaceToClassMapping,
             final List<String> mappingExclusions) throws SPersistenceException {
-        this.properties = buildProperties(properties);
+        this.properties = properties;
         this.hibernateResourcesConfigurationProvider = hibernateResourcesConfigurationProvider;
 
-        configuration = buildConfiguration(this.properties, hibernateResourcesConfigurationProvider);
+        configuration = buildConfiguration(properties, hibernateResourcesConfigurationProvider);
         final Iterator<PersistentClass> it = configuration.getClassMappings();
 
         final StringBuilder sb = new StringBuilder();
@@ -77,15 +76,6 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
             this.interfaceToClassMapping.put(interfaceClassName, mappedClass);
         }
         this.mappingExclusions = mappingExclusions;
-    }
-
-    private Properties buildProperties(final Properties properties) {
-        final String property = properties.getProperty("org.bonitasoft.ehCachePath");
-        if (property != null && !property.isEmpty()) {
-            properties.remove(property);
-            properties.setProperty("net.sf.ehcache.configurationResourceName", new File(property));
-        }
-        return properties;
     }
 
     private Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
