@@ -23,6 +23,8 @@ CREATE TABLE arch_process_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
+CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId,sourceObjectId, rootProcessInstanceId, callerId);
+
 CREATE TABLE arch_flownode_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -72,6 +74,9 @@ CREATE TABLE arch_flownode_instance (
   interrupting BOOLEAN,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance (tenantId, kind, logicalGroup2, executedBy);
+CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
+CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId,rootContainerId, parentContainerId);
 
 CREATE TABLE arch_transition_instance (
   tenantid BIGINT NOT NULL,
@@ -95,8 +100,6 @@ CREATE TABLE arch_transition_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
-
-
 CREATE TABLE arch_connector_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -111,3 +114,6 @@ CREATE TABLE arch_connector_instance (
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
+CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId,containerId, containerType);
+

@@ -255,7 +255,7 @@
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl-hibernate</artifactId>
+			<artifactId>bonita-identity-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -707,7 +707,6 @@
 									<!-- Identity -->
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl</include>
-									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-api</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
 									<!-- Lock -->

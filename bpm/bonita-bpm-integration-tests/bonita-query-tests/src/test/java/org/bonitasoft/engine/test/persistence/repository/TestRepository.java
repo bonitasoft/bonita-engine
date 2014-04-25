@@ -5,6 +5,10 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -29,7 +33,7 @@ public class TestRepository {
 
     private final SessionFactory sessionFactory;
 
-    public TestRepository(SessionFactory sessionFactory) {
+    public TestRepository(final SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
@@ -37,14 +41,14 @@ public class TestRepository {
         return sessionFactory.getCurrentSession();
     }
 
-    protected Query getNamedQuery(String queryName) {
+    protected Query getNamedQuery(final String queryName) {
         return getSession().getNamedQuery(queryName);
     }
 
     /**
      * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
      */
-    public SUser add(SUserImpl user) {
+    public SUser add(final SUserImpl user) {
         getSession().save(user);
         return (SUser) getSession().get(user.getClass(), new PersistentObjectId(user.getId(), user.getTenantId()));
     }
@@ -54,30 +58,40 @@ public class TestRepository {
         return (SRole) getSession().get(role.getClass(), new PersistentObjectId(role.getId(), role.getTenantId()));
     }
 
-    public SGroup add(SGroupImpl sGroup) {
+    public SGroup add(final SGroupImpl sGroup) {
         getSession().save(sGroup);
         return (SGroup) getSession().get(sGroup.getClass(), new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
     }
 
-    public SPendingActivityMapping add(SPendingActivityMappingImpl pendingActivityMapping) {
+    public SPendingActivityMapping add(final SPendingActivityMappingImpl pendingActivityMapping) {
         getSession().save(pendingActivityMapping);
         return (SPendingActivityMapping) getSession().get(pendingActivityMapping.getClass(),
                 new PersistentObjectId(pendingActivityMapping.getId(), pendingActivityMapping.getTenantId()));
     }
 
-    public SActorMember add(SActorMemberImpl actorMember) {
+    public SActorMember add(final SActorMemberImpl actorMember) {
         getSession().save(actorMember);
         return (SActorMember) getSession().get(actorMember.getClass(), new PersistentObjectId(actorMember.getId(), actorMember.getTenantId()));
     }
 
-    public SActor add(SActorImpl actor) {
+    public SActor add(final SActorImpl actor) {
         getSession().save(actor);
         return (SActor) getSession().get(actor.getClass(), new PersistentObjectId(actor.getId(), actor.getTenantId()));
     }
 
-    public SUserMembership add(SUserMembershipImpl membership) {
+    public SUserMembership add(final SUserMembershipImpl membership) {
         getSession().save(membership);
         return (SUserMembership) getSession().get(membership.getClass(), new PersistentObjectId(membership.getId(), membership.getTenantId()));
+    }
+
+    public SMessageInstance add(final SMessageInstanceImpl message) {
+        getSession().save(message);
+        return (SMessageInstance) getSession().get(message.getClass(), new PersistentObjectId(message.getId(), message.getTenantId()));
+    }
+
+    public SWaitingMessageEvent add(final SWaitingMessageEventImpl waitingEvent) {
+        getSession().save(waitingEvent);
+        return (SWaitingMessageEvent) getSession().get(waitingEvent.getClass(), new PersistentObjectId(waitingEvent.getId(), waitingEvent.getTenantId()));
     }
 
     public SProcessSupervisor add(final SProcessSupervisorImpl sProcessSupervisor) {

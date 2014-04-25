@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,7 +60,6 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -71,6 +69,8 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.SPersistenceException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -80,11 +80,15 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  */
 public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl implements EventInstanceService {
 
+    private static final String QUERY_RESET_PROGRESS_MESSAGE_INSTANCES = "resetProgressMessageInstances";
+
+    public static final String QUERY_RESET_IN_PROGRESS_WAITING_EVENTS = "resetInProgressWaitingEvents";
+
     private final EventService eventService;
 
-    public SEventInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
+    public SEventInstanceServiceImpl(final Recorder recorder, final PersistenceService persistenceService, final EventService eventService,
             final TechnicalLoggerService logger) {
-        super(recorder, persistenceRead, eventService, logger);
+        super(recorder, persistenceService, eventService, logger);
         this.eventService = eventService;
     }
 
@@ -221,8 +225,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     @Override
     public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException {
         final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
-                .getFlowNodeNameKey(),
-                OrderByType.ASC);
+                .getFlowNodeNameKey(), OrderByType.ASC);
         final FilterOption filterOption = new FilterOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
                 .getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
         final List<FilterOption> filters = Collections.singletonList(filterOption);
@@ -246,7 +249,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public List<SBoundaryEventInstance> getActivityBoundaryEventInstances(final long activityInstanceId) throws SEventInstanceReadException {
         final SelectListDescriptor<SBoundaryEventInstance> selectDescriptor = SelectDescriptorBuilder.getActivityBoundaryEvents(activityInstanceId);
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventInstanceReadException(e);
         }
@@ -262,7 +265,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
         }
         SWaitingErrorEvent waitingError = null;
         try {
-            final List<SWaitingErrorEvent> selectList = getPersistenceRead().selectList(selectDescriptor);
+            final List<SWaitingErrorEvent> selectList = getPersistenceService().selectList(selectDescriptor);
             if ((selectList != null) && !selectList.isEmpty()) {
                 if (selectList.size() == 1) {
                     waitingError = selectList.get(0);
@@ -288,7 +291,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public SEventInstance getEventInstance(final long eventInstanceId) throws SEventInstanceNotFoundException, SEventInstanceReadException {
         SEventInstance selectOne;
         try {
-            selectOne = getPersistenceRead().selectById(SelectDescriptorBuilder.getElementById(SEventInstance.class, "SEventInstance", eventInstanceId));
+            selectOne = getPersistenceService().selectById(SelectDescriptorBuilder.getElementById(SEventInstance.class, "SEventInstance", eventInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SEventInstanceReadException(e);
         }
@@ -304,7 +307,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
         final SelectListDescriptor<SEventInstance> selectDescriptor = SelectDescriptorBuilder.getEventsFromRootContainer(rootContainerId, fromIndex,
                 maxResults, fieldName, orderByType);
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventInstanceReadException(e);
         }
@@ -315,7 +318,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
             SEventTriggerInstanceReadException {
         SEventTriggerInstance selectOne;
         try {
-            selectOne = getPersistenceRead().selectById(
+            selectOne = getPersistenceService().selectById(
                     SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class, "EventTriggerInstance", eventTriggerInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
@@ -330,7 +333,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId) throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId);
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -342,34 +345,27 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
         final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, fromIndex, maxResults,
                 fieldName, orderByType);
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
     }
 
     @Override
-    public List<SMessageInstance> getInProgressMessageInstances() throws SMessageInstanceReadException {
+    public int resetProgressMessageInstances() throws SMessageModificationException {
         try {
-            final QueryOptions queryOptions = new QueryOptions(Arrays.asList(new OrderByOption(SMessageInstance.class, "id", OrderByType.ASC)));
-            return getPersistenceRead()
-                    .selectList(
-                            new SelectListDescriptor<SMessageInstance>("getInProgressMessageInstances", Collections.<String, Object> emptyMap(),
-                                    SMessageInstance.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new SMessageInstanceReadException(e);
+            return getPersistenceService().update(QUERY_RESET_PROGRESS_MESSAGE_INSTANCES);
+        } catch (SPersistenceException e) {
+            throw new SMessageModificationException(e);
         }
     }
 
     @Override
-    public List<SWaitingMessageEvent> getInProgressWaitingMessageEvents() throws SWaitingEventReadException {
+    public int resetInProgressWaitingEvents() throws SWaitingEventModificationException {
         try {
-            final QueryOptions queryOptions = new QueryOptions(Arrays.asList(new OrderByOption(SWaitingMessageEvent.class, "id", OrderByType.ASC)));
-            return getPersistenceRead().selectList(
-                    new SelectListDescriptor<SWaitingMessageEvent>("getInProgressWaitingEvents", Collections.<String, Object> emptyMap(),
-                            SWaitingMessageEvent.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new SWaitingEventReadException(e);
+            return getPersistenceService().update(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
+        } catch (SPersistenceException e) {
+            throw new SWaitingEventModificationException(e);
         }
     }
 
@@ -377,7 +373,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public List<SMessageEventCouple> getMessageEventCouples() throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples();
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -387,7 +383,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public SMessageInstance getMessageInstance(final long messageInstanceId) throws SMessageInstanceNotFoundException, SMessageInstanceReadException {
         SMessageInstance selectOne;
         try {
-            selectOne = getPersistenceRead().selectById(SelectDescriptorBuilder.getElementById(SMessageInstance.class, "MessageInstance", messageInstanceId));
+            selectOne = getPersistenceService()
+                    .selectById(SelectDescriptorBuilder.getElementById(SMessageInstance.class, "MessageInstance", messageInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SMessageInstanceReadException(e);
         }
@@ -401,7 +398,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> entityClass, final QueryOptions countOptions)
             throws SBonitaSearchException {
         try {
-            return getPersistenceRead().getNumberOfEntities(entityClass, countOptions, null);
+            return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -410,7 +407,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     @Override
     public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> entityClass, final QueryOptions countOptions) throws SBonitaSearchException {
         try {
-            return getPersistenceRead().getNumberOfEntities(entityClass, countOptions, null);
+            return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -420,7 +417,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public List<SWaitingEvent> getStartWaitingEvents(final long processDefinitionId) throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder.getStartWaitingEvents(processDefinitionId);
         try {
-            return getPersistenceRead().selectList(descriptor);
+            return getPersistenceService().selectList(descriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -432,7 +429,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
         final SelectListDescriptor<SMessageInstance> selectDescriptor = SelectDescriptorBuilder.getMessageInstancesByNameAndTarget(messageName, targetProcess,
                 targetFlowNode);
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -442,7 +439,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public SWaitingEvent getWaitingEvent(final Long waitingEvent) throws SWaitingEventNotFoundException, SWaitingEventReadException {
         SWaitingEvent selectOne;
         try {
-            selectOne = getPersistenceRead().selectById(SelectDescriptorBuilder.getElementById(SWaitingEvent.class, "WaitingEvent", waitingEvent));
+            selectOne = getPersistenceService().selectById(SelectDescriptorBuilder.getElementById(SWaitingEvent.class, "WaitingEvent", waitingEvent));
         } catch (final SBonitaReadException e) {
             throw new SWaitingEventReadException(e);
         }
@@ -456,7 +453,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public SWaitingMessageEvent getWaitingMessage(final long waitingMessageId) throws SWaitingEventNotFoundException, SWaitingEventReadException {
         SWaitingMessageEvent selectOne;
         try {
-            selectOne = getPersistenceRead().selectById(
+            selectOne = getPersistenceService().selectById(
                     SelectDescriptorBuilder.getElementById(SWaitingMessageEvent.class, "WaitingMessageEvent", waitingMessageId));
         } catch (final SBonitaReadException e) {
             throw new SWaitingEventReadException(e);
@@ -472,7 +469,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
             throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SWaitingMessageEvent> selectDescriptor = SelectDescriptorBuilder.getCaughtMessages(messageName, processName, flowNodeName);
         try {
-            return getPersistenceRead().selectList(selectDescriptor);
+            return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -482,7 +479,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public List<SWaitingSignalEvent> getWaitingSignalEvents(final String signalName) throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SWaitingSignalEvent> descriptor = SelectDescriptorBuilder.getListeningSignals(signalName);
         try {
-            return getPersistenceRead().selectList(descriptor);
+            return getPersistenceService().selectList(descriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -492,7 +489,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     public <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(final Class<T> entityClass, final QueryOptions searchOptions)
             throws SBonitaSearchException {
         try {
-            return getPersistenceRead().searchEntity(entityClass, searchOptions, null);
+            return getPersistenceService().searchEntity(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -501,7 +498,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     @Override
     public <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> entityClass, final QueryOptions searchOptions) throws SBonitaSearchException {
         try {
-            return getPersistenceRead().searchEntity(entityClass, searchOptions, null);
+            return getPersistenceService().searchEntity(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }

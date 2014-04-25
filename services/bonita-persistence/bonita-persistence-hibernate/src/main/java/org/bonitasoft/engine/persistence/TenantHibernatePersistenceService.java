@@ -177,8 +177,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
-            final Query query = session.createQuery(getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName)
-                    + " WHERE tenantId= :tenantId", filters, null));
+            final Query query = session.createQuery(getQueryString(entityClassName, filters));
             query.setLong(TENANT_ID, getTenantId());
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -186,6 +185,15 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             }
         } catch (final STenantIdNotSetException e) {
             throw new SPersistenceException(e);
+        }
+    }
+    
+    private String getQueryString(final String entityClassName, final List<FilterOption> filters) {
+        if (filters == null || filters.isEmpty()) {
+            return "DELETE FROM " + entityClassName + " WHERE tenantId= :tenantId";
+        } else {
+            return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId", filters,
+                    null);
         }
     }
 }

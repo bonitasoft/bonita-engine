@@ -60,12 +60,6 @@ public class SelectDescriptorBuilder {
         return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
     }
 
-    /*
-     * public static <T extends PersistentObject> SelectOneDescriptor<T> getOneElementByQuery(final Class<T> clazz, final long id) {
-     * return new SelectOneDescriptor<T>("get" + clazz.getSimpleName() + "ById", Collections.<String, Object> singletonMap("id", id), clazz);
-     * }
-     */
-
     public static SelectOneDescriptor<SHiddenTaskInstance> getSHiddenTask(final long userId, final long activityInstanceId) {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("userId", userId);
@@ -75,25 +69,26 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<SHiddenTaskInstance> getSHiddenTasksForActivity(final long activityInstanceId) {
         final Map<String, Object> parameters = Collections.singletonMap("activityInstanceId", (Object) activityInstanceId);
-        return new SelectListDescriptor<SHiddenTaskInstance>("getSHiddenTasksForActivity", parameters, SHiddenTaskInstance.class);
+        final QueryOptions queryOptions = new QueryOptions(SHiddenTaskInstance.class, "id", OrderByType.ASC);
+        return new SelectListDescriptor<SHiddenTaskInstance>("getSHiddenTasksForActivity", parameters, SHiddenTaskInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SFlowNodeInstance.class, "name", OrderByType.ASC);
         return new SelectListDescriptor<SFlowNodeInstance>("getFlowNodesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<SAFlowNodeInstance> getArchivedFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex,
             final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAFlowNodeInstance.class, "name", OrderByType.ASC);
         return new SelectListDescriptor<SAFlowNodeInstance>("getArchivedFlowNodesFromProcessInstance", parameters, SAFlowNodeInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<SFlowNodeInstance> getActivitiesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SFlowNodeInstance.class, "name", OrderByType.ASC);
         return new SelectListDescriptor<SFlowNodeInstance>("getActivitiesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
     }
 
@@ -373,7 +368,7 @@ public class SelectDescriptorBuilder {
         final Map<String, Object> singletonMap = new HashMap<String, Object>(2);
         singletonMap.put("processInstanceId", processInstanceId);
         singletonMap.put("refId", refId);
-        return new SelectListDescriptor<SToken>("getToken", singletonMap, SToken.class, new QueryOptions(0, 1));
+        return new SelectListDescriptor<SToken>("getToken", singletonMap, SToken.class, new QueryOptions(0, 1, SToken.class, "id", OrderByType.ASC));
     }
 
     public static SelectOneDescriptor<Long> getNumberOfToken(final long processInstanceId, final long refId) {
