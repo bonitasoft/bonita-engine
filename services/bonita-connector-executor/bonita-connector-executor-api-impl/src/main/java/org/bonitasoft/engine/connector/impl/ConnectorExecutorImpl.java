@@ -19,6 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -44,7 +45,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  */
 public class ConnectorExecutorImpl implements ConnectorExecutor {
 
-    private ThreadPoolExecutor threadPoolExecutor;
+    private ExecutorService executorService;
 
     private final SessionAccessor sessionAccessor;
 
@@ -98,28 +99,38 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     @Override
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
-        if (threadPoolExecutor == null) {
+        if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is node started. Start it first");
         }
         final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
-        final Future<Map<String, Object>> submit = threadPoolExecutor.submit(callable);
+        final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
             return getValue(submit);
         } catch (final InterruptedException e) {
-            disconnect(sConnector);
+            disconnectSilently(sConnector);
             throw new SConnectorException(e);
         } catch (final ExecutionException e) {
-            disconnect(sConnector);
+            disconnectSilently(sConnector);
             throw new SConnectorException(e);
         } catch (final TimeoutException e) {
             submit.cancel(true);
-            disconnect(sConnector);
+            disconnectSilently(sConnector);
             throw new SConnectorException("The connector timed out " + sConnector);
         }
     }
 
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
+    }
+
+    void disconnectSilently(final SConnector sConnector) {
+        try {
+            sConnector.disconnect();
+        } catch (final Throwable t) {
+            if (this.loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occured while disconnecting the connector: " + sConnector, t);
+            }
+        }
     }
 
     @Override
@@ -136,7 +147,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     /**
      * @author Baptiste Mesta
      */
-    private final class ExecuteConnectorCallable implements Callable<Map<String, Object>> {
+    final class ExecuteConnectorCallable implements Callable<Map<String, Object>> {
 
         private final Map<String, Object> inputParameters;
 
@@ -194,20 +205,25 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
         final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
-        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
+        useExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler));
+    }
+
+    void useExecutor(final ExecutorService executorService) {
+        this.executorService = executorService;
     }
 
     @Override
     public void stop() {
-        if (threadPoolExecutor != null) {
-            threadPoolExecutor.shutdown();
+        if (executorService != null) {
+            executorService.shutdown();
             try {
-                if (!threadPoolExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+                if (!executorService.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
                     loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout (5s) trying to stop the connector executor thread pool.");
                 }
             } catch (final InterruptedException e) {
                 loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool.", e);
             }
+            executorService = null;
         }
     }
 

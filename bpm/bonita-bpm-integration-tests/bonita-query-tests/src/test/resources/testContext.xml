@@ -18,6 +18,7 @@
                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
                
                <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
+               <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
                <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
                
@@ -42,7 +43,11 @@
         <constructor-arg ref="sessionFactory" />
    </bean>
     
-   <bean id="messageAndEventRepository" class="org.bonitasoft.engine.test.persistence.repository.BPMEventRepository">
+   <bean id="bpmEventRepository" class="org.bonitasoft.engine.test.persistence.repository.BPMEventRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+  
+      <bean id="supervisorRepository" class="org.bonitasoft.engine.test.persistence.repository.SupervisorRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
 

@@ -10,11 +10,17 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
+import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
+import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
+import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -47,6 +53,16 @@ public class TestRepository {
         return (SUser) getSession().get(user.getClass(), new PersistentObjectId(user.getId(), user.getTenantId()));
     }
 
+    public SRole add(final SRoleImpl role) {
+        getSession().save(role);
+        return (SRole) getSession().get(role.getClass(), new PersistentObjectId(role.getId(), role.getTenantId()));
+    }
+
+    public SGroup add(final SGroupImpl sGroup) {
+        getSession().save(sGroup);
+        return (SGroup) getSession().get(sGroup.getClass(), new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
+    }
+
     public SPendingActivityMapping add(final SPendingActivityMappingImpl pendingActivityMapping) {
         getSession().save(pendingActivityMapping);
         return (SPendingActivityMapping) getSession().get(pendingActivityMapping.getClass(),
@@ -76,5 +92,11 @@ public class TestRepository {
     public SWaitingMessageEvent add(final SWaitingMessageEventImpl waitingEvent) {
         getSession().save(waitingEvent);
         return (SWaitingMessageEvent) getSession().get(waitingEvent.getClass(), new PersistentObjectId(waitingEvent.getId(), waitingEvent.getTenantId()));
+    }
+
+    public SProcessSupervisor add(final SProcessSupervisorImpl sProcessSupervisor) {
+        getSession().save(sProcessSupervisor);
+        return (SProcessSupervisor) getSession().get(sProcessSupervisor.getClass(),
+                new PersistentObjectId(sProcessSupervisor.getId(), sProcessSupervisor.getTenantId()));
     }
 }
