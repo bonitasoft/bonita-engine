@@ -41,7 +41,7 @@
 				<prop key="hibernate.validator.autoregister_listeners">false</prop>
 				<prop key="hibernate.validator.apply_to_ddl">false</prop>
 				<prop key="javax.persistence.validation.mode">NONE</prop>
-				<prop key="net.sf.ehcache.configurationResourceName">file://${bonita.home}/server/platform/conf/ehcache.xml</prop>
+				<prop key="org.bonitasoft.ehCachePath">${bonita.home}/server/platform/conf/ehcache.xml</prop>
 			</props>
 		</constructor-arg>
 		<constructor-arg name="interfaceToClassMapping">
