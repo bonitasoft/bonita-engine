@@ -101,11 +101,7 @@ public class BusinessObject {
     }
 
     public Query addQuery(final String name, final String queryContent, final String returnType) {
-        if (qualifiedName == null) {
-            throw new IllegalArgumentException("qualifiedName is null, unable to add a query");
-        }
-        final String businessObjectName = BDMQueryUtil.getSimpleBusinessObjectName(qualifiedName);
-        final Query query = new Query(businessObjectName + "." + name, queryContent, returnType);
+        final Query query = new Query(name, queryContent, returnType);
         queries.add(query);
         return query;
     }

@@ -37,24 +37,14 @@ public class BDMQueryUtil {
 
     public static final String START_INDEX_PARAM_NAME = "startIndex";
 
-    public static String createQueryNameForUniqueConstraint(final String businessObjectName, final UniqueConstraint uniqueConstraint) {
+    public static String createQueryNameForUniqueConstraint(final UniqueConstraint uniqueConstraint) {
         if (uniqueConstraint == null) {
             throw new IllegalArgumentException("uniqueConstraint cannot be null");
         }
-        return getQueryName(businessObjectName, uniqueConstraint.getFieldNames());
+        return getQueryName(uniqueConstraint.getFieldNames());
     }
 
-    private static String getQueryName(final String businessObjectName, final List<String> fieldNames) {
-        if (businessObjectName == null) {
-            throw new IllegalArgumentException("businessObjectName cannot be null");
-        }
-        final String boClassName = getSimpleBusinessObjectName(businessObjectName);
-        final StringBuilder nameBuilder = new StringBuilder(boClassName);
-        nameBuilder.append('.').append(getDefaultName(fieldNames));
-        return nameBuilder.toString();
-    }
-
-    public static String getDefaultName(final List<String> fieldNames) {
+    public static String getQueryName(final List<String> fieldNames) {
         final StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append("find");
         if (!fieldNames.isEmpty()) {
@@ -82,7 +72,7 @@ public class BDMQueryUtil {
     }
 
     public static Query createQueryForUniqueConstraint(final BusinessObject businessObject, final UniqueConstraint uniqueConstraint) {
-        final String name = createQueryNameForUniqueConstraint(businessObject.getQualifiedName(), uniqueConstraint);
+        final String name = createQueryNameForUniqueConstraint(uniqueConstraint);
         final String content = createQueryContentForUniqueConstraint(businessObject.getQualifiedName(), uniqueConstraint);
         final Query q = new Query(name, content, businessObject.getQualifiedName());
         for (final String fieldName : uniqueConstraint.getFieldNames()) {
@@ -99,18 +89,18 @@ public class BDMQueryUtil {
         if (field.isCollection() != null && field.isCollection()) {
             throw new IllegalArgumentException("Collection field are not supported");
         }
-        final String name = createQueryNameForField(businessObject.getQualifiedName(), field);
+        final String name = createQueryNameForField(field);
         final String content = createQueryContentForField(businessObject.getQualifiedName(), field);
         final Query q = new Query(name, content, List.class.getName());
         q.addQueryParameter(field.getName(), field.getType().getClazz().getName());
         return q;
     }
 
-    public static String createQueryNameForField(final String businessObjectName, final Field field) {
+    public static String createQueryNameForField(final Field field) {
         if (field == null) {
             throw new IllegalArgumentException("field cannot be null");
         }
-        return getQueryName(businessObjectName, Arrays.asList(field.getName()));
+        return getQueryName(Arrays.asList(field.getName()));
     }
 
     public static Field getField(final String fieldName, final BusinessObject businessObject) {
@@ -163,7 +153,7 @@ public class BDMQueryUtil {
         }
         for (final Field f : businessObject.getFields()) {
             if (f.isCollection() == null || !f.isCollection()) {
-                final String potentialConflictingQueryName = createQueryNameForField(businessObject.getQualifiedName(), f);
+                final String potentialConflictingQueryName = createQueryNameForField(f);
                 if (!queryNames.contains(potentialConflictingQueryName)) {
                     final Query query = createQueryForField(businessObject, f);
                     queries.add(query);
@@ -177,12 +167,12 @@ public class BDMQueryUtil {
     public static Set<String> getAllProvidedQueriesNameForBusinessObject(final BusinessObject businessObject) {
         final Set<String> queryNames = new HashSet<String>();
         for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
-            queryNames.add(createQueryNameForUniqueConstraint(businessObject.getQualifiedName(), uc));
+            queryNames.add(createQueryNameForUniqueConstraint(uc));
         }
         for (final Field f : businessObject.getFields()) {
-            queryNames.add(createQueryNameForField(businessObject.getQualifiedName(), f));
+            queryNames.add(createQueryNameForField(f));
         }
-        queryNames.add(createSelectAllQueryName(businessObject));
+        queryNames.add(createSelectAllQueryName());
         return queryNames;
     }
 
@@ -190,7 +180,7 @@ public class BDMQueryUtil {
         if (businessObject == null) {
             throw new IllegalArgumentException("businessObject cannot be null");
         }
-        final String queryName = createSelectAllQueryName(businessObject);
+        final String queryName = createSelectAllQueryName();
         final String content = createSelectAllQueryContent(businessObject.getQualifiedName());
         return new Query(queryName, content, List.class.getName());
     }
@@ -207,8 +197,8 @@ public class BDMQueryUtil {
         return sb.toString();
     }
 
-    public static String createSelectAllQueryName(final BusinessObject businessObject) {
-        return getQueryName(businessObject.getQualifiedName(), Collections.<String> emptyList());
+    public static String createSelectAllQueryName() {
+        return getQueryName(Collections.<String> emptyList());
     }
 
     private static String buildSelectFrom(final String simpleName, final char var) {

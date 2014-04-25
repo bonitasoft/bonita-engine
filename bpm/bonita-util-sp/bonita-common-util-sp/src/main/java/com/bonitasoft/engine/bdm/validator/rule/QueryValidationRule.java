@@ -34,9 +34,7 @@ public class QueryValidationRule implements ValidationRule {
             status.addError("A query must have name");
             return status;
         }
-        final int index = name.indexOf('.') + 1;
-        final String queryName = name.substring(index);
-        if (!SourceVersion.isIdentifier(queryName)) {
+        if (!SourceVersion.isIdentifier(name)) {
             status.addError(name + " is not a valid Java identifier.");
         }
         if (name.length() > MAX_QUERY_NAME_LENGTH) {

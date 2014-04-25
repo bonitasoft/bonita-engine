@@ -126,7 +126,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray, final String name, final String content) {
         final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
-        nameQueryAnnotation.param("name", name);
+        nameQueryAnnotation.param("name", entityClass.name() + "." + name);
         nameQueryAnnotation.param("query", content);
     }
 

@@ -75,7 +75,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-    ClassNotFoundException {
+            ClassNotFoundException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -85,13 +85,13 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Add method for provided queries
         for (final Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(method, q.getName(), entity.fullName());
+            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
         }
 
         // Add method for queries
         for (final Query q : bo.getQueries()) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(method, q.getName(), entity.fullName());
+            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
         }
 
     }
@@ -105,7 +105,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         body.assign(JExpr.refthis("session"), JExpr.ref("session"));
     }
 
-    private void addQueryMethodBody(final JMethod method, final String queryName, final String returnType) {
+    private void addQueryMethodBody(final String entityName, final JMethod method, final String queryName, final String returnType) {
         final JBlock body = method.body();
 
         final JTryBlock tryBlock = body._try();
@@ -123,7 +123,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         JClass hashMapClass = getModel().ref(HashMap.class);
         hashMapClass = hashMapClass.narrow(String.class, Serializable.class);
         final JVar commandParametersRef = tryBody.decl(mapClass, "commandParameters", JExpr._new(hashMapClass));
-        tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("queryName")).arg(JExpr.lit(queryName));
+        tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("queryName")).arg(JExpr.lit(entityName + "." + queryName));
         tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("returnType")).arg(JExpr.lit(returnType));
 
         // Set if should returns a List or a single value
@@ -185,7 +185,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         for (final QueryParameter param : query.getQueryParameters()) {
             fieldNames.add(param.getName());
         }
-        return BDMQueryUtil.getDefaultName(fieldNames);
+        return BDMQueryUtil.getQueryName(fieldNames);
     }
 
     private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {

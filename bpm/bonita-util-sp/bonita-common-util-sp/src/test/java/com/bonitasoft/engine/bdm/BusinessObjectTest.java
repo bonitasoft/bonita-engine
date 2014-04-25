@@ -40,16 +40,8 @@ public class BusinessObjectTest {
     @Test
     public void should_addQuery() throws Exception {
         final BusinessObject businessObject = new BusinessObject();
-        businessObject.setQualifiedName("User");
         final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
         assertThat(businessObject.getQueries()).containsExactly(query);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addAQueryWithoutABOQualifiedNameThrowsAnException() throws Exception {
-        final BusinessObject businessObject = new BusinessObject();
-
-        businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
     }
 
 }

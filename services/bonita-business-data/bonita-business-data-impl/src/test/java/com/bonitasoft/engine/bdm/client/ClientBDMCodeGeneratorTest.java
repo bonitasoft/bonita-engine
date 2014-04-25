@@ -310,16 +310,12 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
 
-        final Query query = new Query("findByName", "From Employee e WHERE e.name = :name", EMPLOYEE_QUALIFIED_NAME);
-        query.addQueryParameter("name", String.class.getName());
-        employeeBO.getQueries().add(query);
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
         final String daoContent = readGeneratedDAOFile();
-        // String signature = getQueryMethodSignature(query, query.getReturnType(), EMPLOYEE_QUALIFIED_NAME, false);
-        assertThat(daoContent).contains("public Employee findByName(String name)");
+        assertThat(daoContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
     }
 
     @Test
