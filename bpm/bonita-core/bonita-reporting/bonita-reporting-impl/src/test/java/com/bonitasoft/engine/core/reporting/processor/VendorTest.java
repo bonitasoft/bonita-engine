@@ -12,6 +12,7 @@ import static com.bonitasoft.engine.core.reporting.processor.Vendor.ORACLE;
 import static com.bonitasoft.engine.core.reporting.processor.Vendor.OTHER;
 import static com.bonitasoft.engine.core.reporting.processor.Vendor.SQLSERVER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +48,14 @@ public class VendorTest {
         when(metadata.getDatabaseProductName()).thenReturn("MySql");
 
         Vendor vendor = Vendor.fromDatabaseMetadata(metadata);
+
+        assertThat(vendor).isEqualTo(OTHER);
+
+    }
+
+    @Test
+    public void should_return_other_for_any_other_cases() throws Exception {
+        Vendor vendor = Vendor.fromDatabaseMetadata(null);
 
         assertThat(vendor).isEqualTo(OTHER);
 

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 /**
  * Databases Vendor
- *  
+ * 
  * @author Colin PUY
  */
 public enum Vendor {
@@ -26,12 +26,14 @@ public enum Vendor {
      * Get database vendor from databases metadatas
      */
     public static Vendor fromDatabaseMetadata(DatabaseMetaData metadata) throws SQLException {
-        String productName = metadata.getDatabaseProductName();
-        if (containsIgnoreCase(productName, "Oracle")) {
-            return ORACLE;
-        }
-        if (containsIgnoreCase(productName, "Microsoft SQL Server")) {
-            return SQLSERVER;
+        if (metadata != null) {
+            String productName = metadata.getDatabaseProductName();
+            if (containsIgnoreCase(productName, "Oracle")) {
+                return ORACLE;
+            }
+            if (containsIgnoreCase(productName, "Microsoft SQL Server")) {
+                return SQLSERVER;
+            }
         }
         return OTHER;
     }

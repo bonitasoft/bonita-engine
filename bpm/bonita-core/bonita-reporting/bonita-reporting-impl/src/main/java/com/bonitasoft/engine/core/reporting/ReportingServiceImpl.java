@@ -72,10 +72,13 @@ public class ReportingServiceImpl implements ReportingService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public ReportingServiceImpl(final DataSource dataSource, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+    private QueryPreProcessor queryPreProcessor;
+
+    public ReportingServiceImpl(final DataSource dataSource, final ReadPersistenceService persistenceService, final QueryPreProcessor queryPreProcessor,
+            final Recorder recorder, final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
         this.dataSource = dataSource;
         this.persistenceService = persistenceService;
+        this.queryPreProcessor = queryPreProcessor;
         this.eventService = eventService;
         this.recorder = recorder;
         this.logger = logger;
@@ -89,8 +92,8 @@ public class ReportingServiceImpl implements ReportingService {
             throw new SQLException("The statement is not a SELECT query");
         }
         final Connection connection = dataSource.getConnection();
-        String query = new QueryPreProcessor().preProcessFor(Vendor.fromDatabaseMetadata(connection.getMetaData()), selectQuery);
-        
+        String query = queryPreProcessor.preProcessFor(Vendor.fromDatabaseMetadata(connection.getMetaData()), selectQuery);
+
         try {
             final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
@@ -105,7 +108,7 @@ public class ReportingServiceImpl implements ReportingService {
             connection.close();
         }
     }
-    
+
     private String executeQuery(final String selectQuery, final Statement statement) throws SQLException {
         final ResultSet resultSet = statement.executeQuery(selectQuery);
         try {
