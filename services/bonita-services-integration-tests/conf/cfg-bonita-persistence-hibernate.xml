@@ -18,7 +18,7 @@
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
-        <constructor-arg name="likeEscapeCharacter" value="#" />
+                <constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
     <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
@@ -36,7 +36,7 @@
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.use_query_cache">true</prop>
 				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
-				<prop key="org.bonitasoft.ehCachePath">ehcache.xml</prop>
+				<prop key="net.sf.ehcache.configurationResourceName">ehcache.xml</prop>
 				<prop key="hibernate.show_sql">${hibernate.journal.show_sql}</prop>
 				<prop key="hibernate.format_sql">${hibernate.journal.format_sql}</prop>
 				<prop key="hibernate.use_sql_comments">${hibernate.journal.use_sql_comments}</prop>
