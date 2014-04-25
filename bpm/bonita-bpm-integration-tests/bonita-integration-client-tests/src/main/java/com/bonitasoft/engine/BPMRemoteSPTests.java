@@ -27,6 +27,7 @@ import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
+import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
 import com.bonitasoft.engine.supervisor.SupervisedTests;
 
@@ -47,6 +48,7 @@ import com.bonitasoft.engine.supervisor.SupervisedTests;
         MonitoringAPITest.class,
         SearchEntitiesTests.class,
         ReportingAPIIT.class,
+        ReportingSQLValidityIT.class,
         PlatformMonitoringAPITest.class,
         TenantTest.class,
         OperationTest.class,

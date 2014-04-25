@@ -61,7 +61,7 @@ import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
-    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "getEmployeeByLastName";
+    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "getAllEmployeeByLastName";
 
     private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "getEmployeeByPhoneNumber";
 
@@ -551,7 +551,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
             final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
             return (String) evaluatedExpressions.get(expressionEmployee);
         } catch (final ExpressionEvaluationException eee) {
-            eee.printStackTrace();
+            System.err.println(eee.getMessage());
             return null;
         }
     }
