@@ -4,6 +4,7 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<bean id="businessDataRepository" class="com.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
+		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
 		<constructor-arg name="configuration">
 			<map>

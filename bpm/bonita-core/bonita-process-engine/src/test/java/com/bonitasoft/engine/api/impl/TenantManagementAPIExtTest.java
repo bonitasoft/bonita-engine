@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
@@ -126,13 +127,14 @@ public class TenantManagementAPIExtTest {
         when(tenantConfiguration.getLifecycleServices()).thenReturn(Arrays.asList(workService, businessDataRepository));
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(tenantLogger);
         when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
+        when(tenantServiceAccessor.getDependencyService()).thenReturn(mock(DependencyService.class));
 
         when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
 
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
-        
+
         doNothing().when(tenantManagementAPI).resolveDependenciesForAllProcesses();
     }
 
@@ -183,12 +185,12 @@ public class TenantManagementAPIExtTest {
         // given a tenant moved to available mode
         tenantManagementAPI.resume();
     }
-    
+
     @Test
     public void resume_tenant_should_resolve_dependecies_for_deployed_processes() throws Exception {
-        
+
         tenantManagementAPI.resume();
-        
+
         verify(tenantManagementAPI).resolveDependenciesForAllProcesses();
     }
 

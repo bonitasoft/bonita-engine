@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
+import static ch.lambdaj.Lambda.extract;
+import static ch.lambdaj.Lambda.on;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
@@ -27,6 +29,51 @@ public class BDMQueryUtilTest {
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryContentForUniqueConstraint = BDMQueryUtil.createQueryContentForUniqueConstraint("org.bonita.Employee", uniqueConstraint);
         assertThat(queryContentForUniqueConstraint).isNotEmpty().isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
+    }
+
+    @Test
+    public void createProvidedQueriesForBOShouldNotGenerateGetAllForUniqueConstraint() throws Exception {
+        // given:
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("com.corp.Arrival");
+        final Field field = new Field();
+        field.setName("people");
+        field.setType(FieldType.INTEGER);
+        bo.addField(field);
+        bo.addUniqueConstraint("someName", "people");
+
+        // when:
+        List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
+
+        // then:
+        assertThat(getQueryNames(queries)).doesNotContain("getAllArrivalByPeople");
+    }
+
+    @Test
+    public void createProvidedQueriesForBOWithOneUniqueAndOneNonUniqueFieldShouldGenerate3Queries() throws Exception {
+        // given:
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("com.corp.Arrival");
+        bo.addField(aStringField("unikAttr"));
+        bo.addField(aStringField("unconstrainedAttr"));
+        bo.addUniqueConstraint("someConstraintName", "unikAttr");
+
+        // when:
+        List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
+
+        // then:
+        assertThat(queries).hasSize(3);
+    }
+
+    protected Field aStringField(final String name) {
+        final Field field = new Field();
+        field.setName(name);
+        field.setType(FieldType.STRING);
+        return field;
+    }
+
+    private List<String> getQueryNames(final List<Query> queries) {
+        return extract(queries, on(Query.class).getName());
     }
 
     @Test
@@ -59,8 +106,8 @@ public class BDMQueryUtilTest {
 
         final Query query = BDMQueryUtil.createQueryForField(bo, field);
         assertThat(query).isNotNull();
-        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name=:name");
-        assertThat(query.getName()).isEqualTo("getEmployeeByName");
+        assertThat(query.getContent()).contains("SELECT e\nFROM Employee e\nWHERE e.name=:name");
+        assertThat(query.getName()).isEqualTo("getAllEmployeeByName");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).hasSize(1);
     }
@@ -76,9 +123,26 @@ public class BDMQueryUtilTest {
 
         final Query query = BDMQueryUtil.createSelectAllQueryForBusinessObject(bo);
         assertThat(query).isNotNull();
-        assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e");
+        assertThat(query.getContent()).contains("SELECT e\nFROM Employee e");
+        assertThat(query.getContent()).doesNotContain("WHERE");
         assertThat(query.getName()).isEqualTo("getAllEmployee");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).isEmpty();
+    }
+
+    @Test
+    public void createSelectAllQueryShouldGenerateOrderByPersistenceId() throws Exception {
+        // when:
+        String queryContent = BDMQueryUtil.createSelectAllQueryContent("MyBizObject");
+        // then:
+        assertThat(queryContent).contains("ORDER BY m.persistenceId");
+    }
+
+    @Test
+    public void createDefaultQueryForFieldShouldGenerateOrderByPersistenceId() throws Exception {
+        // when:
+        String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new Field());
+        // then:
+        assertThat(queryContent).contains("ORDER BY n.persistenceId");
     }
 }
