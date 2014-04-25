@@ -14,7 +14,6 @@ import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.reporting.TaskListIT;
 import com.bonitasoft.engine.theme.ThemeTest;
 
 @RunWith(BonitaSuiteRunner.class)
@@ -29,8 +28,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         TenantPauseLocalTestSP.class,
         TenantMaintenanceLocalTestSP.class,
         PageAPILocalIT.class,
-        TenantLocalTestSpITest.class, 
-        TaskListIT.class
+        TenantLocalTestSpITest.class 
 })
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
