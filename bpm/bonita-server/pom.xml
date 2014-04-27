@@ -118,23 +118,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Data -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Data Definition -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.definition</groupId>
@@ -156,13 +139,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
 			<artifactId>bonita-data-instance-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<!-- Data Source -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-data-source-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -554,7 +530,7 @@
 		<!-- Transient Data -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient-data-source</artifactId>
+			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -677,12 +653,6 @@
 									<!-- Connector -->
 									<include>org.bonitasoft.engine.core.connector:bonita-connector-service-api</include>
 									<include>org.bonitasoft.engine.core.connector:bonita-connector-service-api-impl</include>
-									<!-- Data -->
-									<include>org.bonitasoft.engine.data:bonita-data-model</include>
-									<include>org.bonitasoft.engine.data:bonita-data-model-impl</include>
-									<include>org.bonitasoft.engine.data:bonita-data-model-impl-hibernate</include>
-									<include>org.bonitasoft.engine.data:bonita-data-api</include>
-									<include>org.bonitasoft.engine.data:bonita-data-impl</include>
 									<!-- Data Definition -->
 									<include>org.bonitasoft.engine.data.definition:bonita-data-definition-model</include>
 									<include>org.bonitasoft.engine.data.definition:bonita-data-definition-model-impl</include>
@@ -692,9 +662,6 @@
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api-impl</include>
-									<!-- Data Source -->
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-data-source</include>
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-data-source-impl</include>
 									<!-- Delete -->
 									<include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-delete-impl</include>
@@ -848,7 +815,7 @@
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
 									<!-- Transient Data -->
-									<include>org.bonitasoft.engine.core.data:bonita-data-instance-transient-data-source</include>
+									<include>org.bonitasoft.engine.core.data:bonita-data-instance-transient</include>
 									<!-- Technical Logs -->
 									<include>org.bonitasoft.engine.log:bonita-log-technical-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>

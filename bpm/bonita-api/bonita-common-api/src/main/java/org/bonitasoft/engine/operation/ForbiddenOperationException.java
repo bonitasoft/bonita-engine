@@ -17,7 +17,9 @@ import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Baptiste Mesta
+ * @deprecated not used anymore
  */
+@Deprecated
 public class ForbiddenOperationException extends BonitaException {
 
     private static final long serialVersionUID = -317301483399066500L;

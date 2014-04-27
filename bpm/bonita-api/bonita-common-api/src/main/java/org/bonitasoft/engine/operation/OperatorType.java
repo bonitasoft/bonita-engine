@@ -26,15 +26,10 @@ public enum OperatorType {
 
     XPATH_UPDATE_QUERY,
 
+    @Deprecated
     DOCUMENT_CREATE_UPDATE,
 
+    @Deprecated
     STRING_INDEX,
 
-    CREATE_BUSINESS_DATA,
-
-    // update a Business Data attribute by calling setter method on it:
-    BUSINESS_DATA_JAVA_SETTER,
-
-    // Attach an existing Business Data to the current process:
-    ATTACH_EXISTING_BUSINESS_DATA;
 }

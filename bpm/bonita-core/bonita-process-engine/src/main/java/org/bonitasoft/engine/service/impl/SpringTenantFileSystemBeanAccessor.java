@@ -16,6 +16,9 @@ package org.bonitasoft.engine.service.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -55,8 +58,13 @@ public class SpringTenantFileSystemBeanAccessor {
                     return pathname.isFile() && pathname.getName().endsWith(".xml");
                 }
             };
-
-            final File[] listFiles = serviceFolder.listFiles(filter);
+            /*
+             * sort this to have always the same order
+             */
+            File[] listFiles = serviceFolder.listFiles(filter);
+            List<File> listFilesCollection = Arrays.asList(listFiles);
+            Collections.sort(listFilesCollection);
+            listFiles = listFilesCollection.toArray(new File[listFilesCollection.size()]);
             if (listFiles.length == 0) {
                 throw new RuntimeException("No file found");
             }
@@ -124,14 +132,14 @@ public class SpringTenantFileSystemBeanAccessor {
         return localContext;
     }
 
-    protected Properties findBonitaServerTenantProperties(long tenantId) {
+    protected Properties findBonitaServerTenantProperties(final long tenantId) {
         final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
         try {
             return homeServer.getTenantProperties(tenantId);
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException("Bonita home not set !!");
         } catch (IOException e) {
-            throw new RuntimeException("Tenant Properties not found !!");
+            throw new RuntimeException("Unable to read tenant properties file", e);
         }
     }
 

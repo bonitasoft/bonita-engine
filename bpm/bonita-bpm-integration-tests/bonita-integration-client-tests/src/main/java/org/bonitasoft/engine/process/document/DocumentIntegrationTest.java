@@ -702,9 +702,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final Expression groovyThatCreateDocumentContent = new ExpressionBuilder().createGroovyScriptExpression("script",
                 "return new org.bonitasoft.engine.bpm.document.DocumentValue(\"updated Content\".getBytes(), \"plain/text\", \"updatedContent.txt\");",
                 DocumentValue.class.getName());
-        designProcessDefinition.addAutomaticTask("step2").addOperation(
-                new OperationBuilder().createNewInstance().setRightOperand(groovyThatCreateDocumentContent).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
-                        .setLeftOperand("textFile", false).done());
+        designProcessDefinition.addAutomaticTask("step2").addOperation(new OperationBuilder().createSetDocument("textFile", groovyThatCreateDocumentContent));
         designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
@@ -752,9 +750,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doc'");
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final Expression groovyThatReturnNull = new ExpressionBuilder().createGroovyScriptExpression("script", "return null;", DocumentValue.class.getName());
-        designProcessDefinition.addAutomaticTask("step2").addOperation(
-                new OperationBuilder().createNewInstance().setRightOperand(groovyThatReturnNull).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
-                        .setLeftOperand("textFile", false).done());
+        designProcessDefinition.addAutomaticTask("step2").addOperation(new OperationBuilder().createSetDocument("textFile", groovyThatReturnNull));
         designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
@@ -797,8 +793,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doc'");
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step2").addOperation(
-                new OperationBuilder().createNewInstance().setRightOperand(getDocumentValueExpressionWithUrl("http://www.example.com/new_url.txt"))
-                        .setType(OperatorType.DOCUMENT_CREATE_UPDATE).setLeftOperand("textFile", false).done());
+                new OperationBuilder().createSetDocument("textFile", getDocumentValueExpressionWithUrl("http://www.example.com/new_url.txt")));
         designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
@@ -956,8 +951,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doctor");
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step2").addOperation(
-                new OperationBuilder().createNewInstance().setRightOperand(getDocumentValueExpressionWithUrl(url)).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
-                        .setLeftOperand(documentName, false).done());
+                new OperationBuilder().createSetDocument(documentName, getDocumentValueExpressionWithUrl(url)));
         designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
@@ -970,13 +964,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("procWithStringIndexes", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doc'");
         UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        userTaskBuilder.addOperation(new OperationBuilder().createNewInstance()
-                .setRightOperand(getDocumentValueExpressionWithUrl("http://www.example.com/new_url.txt")).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
-                .setLeftOperand("textFile2", false).done());
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDocument("textFile2",
+                getDocumentValueExpressionWithUrl("http://www.example.com/new_url.txt")));
         userTaskBuilder = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        userTaskBuilder.addOperation(new OperationBuilder().createNewInstance()
-                .setRightOperand(getDocumentValueExpressionWithUrl("http://www.example.com/new_url.txt")).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
-                .setLeftOperand("textFile4", false).done());
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDocument("textFile4",
+                getDocumentValueExpressionWithUrl("http://www.example.com/new_url.txt")));
         designProcessDefinition.addDocumentDefinition("textFile2").addContentFileName("myFile3.pdf").addDescription("a cool text document")
                 .addMimeType("application/atom+xml").addUrl("http://www.example.com/original_url5.txt");
         designProcessDefinition.addDocumentDefinition("textFile1").addContentFileName("myFile1.pdf").addDescription("a cool text document")
@@ -1166,13 +1158,9 @@ public class DocumentIntegrationTest extends CommonAPITest {
         builder.addShortTextData("url", null);
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addOperation(
-                new LeftOperandBuilder().createNewInstance("caseDocument").done(),
-                OperatorType.DOCUMENT_CREATE_UPDATE,
-                "=",
-                null,
-                expressionBuilder.createGroovyScriptExpression("addDocVersion",
+                new OperationBuilder().createSetDocument("caseDocument", expressionBuilder.createGroovyScriptExpression("addDocVersion",
                         "import org.bonitasoft.engine.bpm.document.DocumentValue;return new DocumentValue(url);", DocumentValue.class.getName(),
-                        expressionBuilder.createDataExpression("url", String.class.getName())));
+                        expressionBuilder.createDataExpression("url", String.class.getName()))));
         builder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
         final ProcessDefinition docDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessDefinition miDefinition = deployAndEnableProcess(miBuilder.done());

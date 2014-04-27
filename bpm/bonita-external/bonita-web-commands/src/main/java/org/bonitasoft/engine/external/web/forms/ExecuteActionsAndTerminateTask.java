@@ -29,6 +29,7 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -42,7 +43,6 @@ import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.model.SSession;
@@ -111,7 +111,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final List<Operation> operations = getParameter(parameters, OPERATIONS_LIST_KEY, message);
         if (operations == null) {
             return Collections.emptyList();
-        }
+    }
         return operations;
     }
 
@@ -127,7 +127,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
     protected void updateActivityInstanceVariables(final List<Operation> operations, final Map<String, Serializable> operationsContext,
             final long activityInstanceId, final Long processDefinitionID) throws SOperationExecutionException {
         SExpressionContext sExpressionContext = buildExpressionContext(operationsContext, activityInstanceId, processDefinitionID);
-        List<SOperation> sOperations = ModelConvertor.constructSOperations(operations);
+        List<SOperation> sOperations = ServerModelConvertor.convertOperations(operations);
         getOperationService().execute(sOperations, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
     }
 
