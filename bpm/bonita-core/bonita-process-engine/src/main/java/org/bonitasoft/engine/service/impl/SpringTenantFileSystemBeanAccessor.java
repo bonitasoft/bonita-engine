@@ -139,7 +139,7 @@ public class SpringTenantFileSystemBeanAccessor {
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException("Bonita home not set !!");
         } catch (IOException e) {
-            throw new RuntimeException("Tenant Properties not found !!");
+            throw new RuntimeException("Unable to read tenant properties file", e);
         }
     }
 
