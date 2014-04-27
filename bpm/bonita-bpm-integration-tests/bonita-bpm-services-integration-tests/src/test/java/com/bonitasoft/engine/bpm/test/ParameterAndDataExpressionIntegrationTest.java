@@ -24,7 +24,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -88,10 +87,6 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
 
     protected static TransactionService getTransactionService() {
         return getServicesBuilder().getTransactionService();
-    }
-
-    protected static DataService getDataService() {
-        return getServicesBuilder().getDataService();
     }
 
     protected String getParameterClassName() {
