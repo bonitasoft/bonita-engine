@@ -1,8 +1,4 @@
-CSV n'est qu'une implem de flush subscriber
 objet clock pour le FlushThread
-commenter les timetrackerrecords
-
-séparer les tests relatifs à CSVFEL
 
 séparer les tests liés au flushThread
 
