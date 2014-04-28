@@ -90,7 +90,13 @@ public class TimeTrackerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testUnexistingOutputFilePath() throws Exception {
+    public void should_fail_if_enabled_and_output_folder_unknown() throws Exception {
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        new TimeTracker(logger, true, null, 10, 2, "unknownFolder", ";");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void should_not_fail_if_not_enabled_and_output_folder_unknown() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         new TimeTracker(logger, false, null, 10, 2, "unknownFolder", ";");
     }
@@ -104,14 +110,14 @@ public class TimeTrackerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testForbiddenStop() throws Exception {
+    public void should_throw_an_exception_on_stopPrinterThread_if_not_started() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "unknownFolder", ";");
         tracker.stopPrinterThread();
     }
 
     @Test(expected = RuntimeException.class)
-    public void testForbiddenStart() throws Exception {
+    public void should_throw_an_exception_on_startPrinterThread_if_already_started_at_build_time() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TimeTracker tracker = new TimeTracker(logger, true, null, 10, 2, "unknownFolder", ";");
         try {
@@ -202,7 +208,7 @@ public class TimeTrackerTest {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TimeTracker tracker = new TimeTracker(logger, true, listeners, 10, flushIntervalInSeconds, System.getProperty("java.io.tmpdir"), ";", "rec");
         final long startTime = System.currentTimeMillis();
-        final long maxWait = flushIntervalInSeconds * 1000 * 2;
+        final long maxWait = flushIntervalInSeconds * 1000 * 1;
         tracker.track(rec1);
         tracker.track(rec2);
         synchronized (monitor) {
