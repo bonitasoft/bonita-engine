@@ -1,51 +1,44 @@
-package org.bonitasoft.engine.tracking;
+package org.bonitasoft.engine.tracking.csv;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.FlushEvent;
+import org.bonitasoft.engine.tracking.FlushEventListener;
+import org.bonitasoft.engine.tracking.Record;
 
-public class RecordKeeper {
+public class CSVFlushEventListener implements FlushEventListener {
 
     private final String csvSeparator;
 
     private final String outputFolder;
 
-    private final Queue<Record> records;
-
-    private final List<FlushEventListener> flushSubscribers;
-
     private final TechnicalLoggerService logger;
 
-    public RecordKeeper(final TechnicalLoggerService logger, final int maxSize, final String csvSeparator, final String outputFolder,
-            final List<FlushEventListener> flushSubscribers) {
-        this.logger = logger;
+    public CSVFlushEventListener(final String outputFolder, final String csvSeparator, final TechnicalLoggerService logger) {
+        super();
         this.csvSeparator = csvSeparator;
         this.outputFolder = outputFolder;
-        this.flushSubscribers = flushSubscribers;
-        this.records = new CircularFifoQueue<Record>(maxSize);
+        this.logger = logger;
+
+        final File outputFolderFile = new File(outputFolder);
+        if (!outputFolderFile.exists()) {
+            throw new RuntimeException("Output folder does not exist: " + outputFolder);
+        }
+        if (!outputFolderFile.isDirectory()) {
+            throw new RuntimeException("Output folder is not a directory: " + outputFolder);
+        }
     }
 
-    public void record(final Record record) {
-        // TODO needs a synchro?
-        records.add(record);
-    }
-
-    public List<Record> cloneRecords() {
-        return Arrays.asList(this.records.toArray(new Record[] {}));
-    }
-
-    public FlushEvent flush() throws IOException {
-        final List<Record> records = cloneRecords();
+    @Override
+    public CSVFlushResult flush(final FlushEvent flushEvent) throws Exception {
+        final List<Record> records = flushEvent.getRecords();
         final List<List<String>> csvContent = new ArrayList<List<String>>();
         csvContent.add(getHeaderRow());
         for (final Record record : records) {
@@ -60,19 +53,7 @@ public class RecordKeeper {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Generating csv file to: " + outputFile);
         }
         CSVUtil.writeCSV(outputFile, csvContent, csvSeparator);
-
-        final FlushEvent flushEvent = new FlushEvent(records, outputFile);
-
-        if (this.flushSubscribers != null) {
-            for (final FlushEventListener subscriber : this.flushSubscribers) {
-                try {
-                    subscriber.flush(flushEvent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return flushEvent;
+        return new CSVFlushResult(flushEvent, outputFile);
     }
 
     private List<String> getRow(final Record record) {
@@ -117,4 +98,5 @@ public class RecordKeeper {
         header.add("description");
         return header;
     }
+
 }

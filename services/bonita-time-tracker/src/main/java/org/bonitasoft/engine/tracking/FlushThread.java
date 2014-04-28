@@ -1,15 +1,15 @@
 package org.bonitasoft.engine.tracking;
 
-public class PrinterThread extends Thread {
+public class FlushThread extends Thread {
 
-    private final RecordKeeper recordKeeper;
+    private final TimeTracker timeTracker;
 
     private final int flushIntervalInMiliSeconds;
 
-    public PrinterThread(final int flushIntervalInSeconds, final RecordKeeper recordKeeper) {
-        super("TimeTracker-PrinterThread");
+    public FlushThread(final int flushIntervalInSeconds, final TimeTracker timeTracker) {
+        super("TimeTracker-FlushThread");
         this.flushIntervalInMiliSeconds = flushIntervalInSeconds * 1000;
-        this.recordKeeper = recordKeeper;
+        this.timeTracker = timeTracker;
     }
 
     @Override
@@ -17,7 +17,7 @@ public class PrinterThread extends Thread {
         try {
             while (true) {
                 Thread.sleep(flushIntervalInMiliSeconds);
-                this.recordKeeper.flush();
+                this.timeTracker.flush();
             }
         } catch (Exception e) {
             // TODO use logger

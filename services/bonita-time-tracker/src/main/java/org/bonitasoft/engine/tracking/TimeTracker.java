@@ -1,13 +1,15 @@
 package org.bonitasoft.engine.tracking;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -15,35 +17,24 @@ public class TimeTracker {
 
     private final Set<String> activatedRecords;
 
-    private final PrinterThread printerThread;
+    private final FlushThread flushThread;
 
-    private final RecordKeeper recordKeeper;
-
-    private final File outputFolderFile;
-
-    private final List<FlushEventListener> flushSubscribers;
+    private final List<? extends FlushEventListener> flushEventListeners;
 
     private final TechnicalLoggerService logger;
 
+    private final Queue<Record> records;
+
     public TimeTracker(
             final TechnicalLoggerService logger,
-            final boolean startPrinterThread,
-            final List<FlushEventListener> flushSubscribers,
+            final boolean startFlushThread,
+            final List<? extends FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInSeconds,
-            final String outputFolder,
-            final String csvSeparator,
             final String... activatedRecords) {
         super();
         this.logger = logger;
-        this.flushSubscribers = flushSubscribers;
-        outputFolderFile = new File(outputFolder);
-        if (!outputFolderFile.exists()) {
-            throw new RuntimeException("Output folder does not exist: " + outputFolder);
-        }
-        if (!outputFolderFile.isDirectory()) {
-            throw new RuntimeException("Output folder is not a directory: " + outputFolder);
-        }
+        this.flushEventListeners = flushEventListeners;
         if (activatedRecords == null || activatedRecords.length == 0) {
             this.activatedRecords = Collections.emptySet();
         } else {
@@ -54,30 +45,14 @@ public class TimeTracker {
                     "Time tracker is activated for some records. This may not be used in production as performances may be strongly impacted: "
                             + activatedRecords);
         }
-        this.recordKeeper = new RecordKeeper(logger, maxSize, csvSeparator, outputFolder, this.flushSubscribers);
-        this.printerThread = new PrinterThread(flushIntervalInSeconds, recordKeeper);
-        if (startPrinterThread) {
-            startPrinterThread();
+        this.flushThread = new FlushThread(flushIntervalInSeconds, this);
+
+        this.records = new CircularFifoQueue<Record>(maxSize);
+
+        if (startFlushThread) {
+            startFlushThread();
         }
-        Runtime.getRuntime().addShutdownHook(new PrinterThreadShutdownHook(this.printerThread));
-    }
-
-    private static class PrinterThreadShutdownHook extends Thread {
-
-        private final PrinterThread printerThread;
-
-        public PrinterThreadShutdownHook(final PrinterThread printerThread) {
-            super();
-            this.printerThread = printerThread;
-        }
-
-        @Override
-        public void run() {
-            if (this.printerThread.isAlive()) {
-                this.printerThread.interrupt();
-            }
-
-        }
+        Runtime.getRuntime().addShutdownHook(new FlushThreadShutdownHook(this.flushThread));
     }
 
     public boolean isTrackable(final String recordName) {
@@ -95,49 +70,67 @@ public class TimeTracker {
             if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Tracking record: " + record);
             }
-            this.recordKeeper.record(record);
+            // TODO needs a synchro?
+            records.add(record);
         }
     }
 
-    public void startPrinterThread() {
+    public void startFlushThread() {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker PrinterThread...");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker FlushThread...");
         }
-        if (this.printerThread.isAlive()) {
-            throw new RuntimeException("PrinterThread is already running");
+        if (this.flushThread.isAlive()) {
+            throw new RuntimeException("FlushThread is already running");
         }
-        this.printerThread.start();
+        this.flushThread.start();
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker PrinterThread started.");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker FlushThread started.");
         }
     }
 
-    public void stopPrinterThread() {
+    public void stopFlushThread() {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker PrinterThread...");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker FlushThread...");
         }
-        if (!this.printerThread.isAlive()) {
-            throw new RuntimeException("PrinterThread is not running");
+        if (!this.flushThread.isAlive()) {
+            throw new RuntimeException("FlushThread is not running");
         }
-        this.printerThread.interrupt();
+        this.flushThread.interrupt();
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker PrinterThread stopped.");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker FlushThread stopped.");
         }
     }
 
-    public FlushEvent flush() throws IOException {
+    public List<FlushResult> flush() throws IOException {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Flushing...");
         }
-        final FlushEvent flushEvent = this.recordKeeper.flush();
+        final List<Record> records = getRecords();
+
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Flushing...");
+        }
+
+        final FlushEvent flushEvent = new FlushEvent(records);
+
+        final List<FlushResult> flushResults = new ArrayList<FlushResult>();
+        if (this.flushEventListeners != null) {
+            for (final FlushEventListener listener : this.flushEventListeners) {
+                try {
+                    flushResults.add(listener.flush(flushEvent));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
         }
-        return flushEvent;
+        return flushResults;
     }
 
     public List<Record> getRecords() throws IOException {
-        return this.recordKeeper.cloneRecords();
+        return Arrays.asList(this.records.toArray(new Record[] {}));
     }
 
 }

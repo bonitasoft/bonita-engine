@@ -5,10 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +13,7 @@ import java.util.Map;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 
-public class TimeTrackerTest {
+public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void testIsTrackable() throws Exception {
@@ -90,104 +87,25 @@ public class TimeTrackerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void should_fail_if_enabled_and_output_folder_unknown() throws Exception {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        new TimeTracker(logger, true, null, 10, 2, "unknownFolder", ";");
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void should_not_fail_if_not_enabled_and_output_folder_unknown() throws Exception {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        new TimeTracker(logger, false, null, 10, 2, "unknownFolder", ";");
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testOutputFilePathNotAFolder() throws Exception {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final File file = new File(System.getProperty("java.io.tmpdir"), "test.txt");
-        file.createNewFile();
-        new TimeTracker(logger, false, null, 10, 2, file.getAbsolutePath(), ";");
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void should_throw_an_exception_on_stopPrinterThread_if_not_started() throws Exception {
+    public void should_throw_an_exception_on_stopFlushThread_if_not_started() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "unknownFolder", ";");
-        tracker.stopPrinterThread();
+        tracker.stopFlushThread();
     }
 
     @Test(expected = RuntimeException.class)
-    public void should_throw_an_exception_on_startPrinterThread_if_already_started_at_build_time() throws Exception {
+    public void should_throw_an_exception_on_startFlushThread_if_already_started_at_build_time() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TimeTracker tracker = new TimeTracker(logger, true, null, 10, 2, "unknownFolder", ";");
         try {
-            tracker.startPrinterThread();
+            tracker.startFlushThread();
         } finally {
-            tracker.stopPrinterThread();
+            tracker.stopFlushThread();
         }
     }
 
     @Test
-    public void testFlush() throws Exception {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
-        final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, System.getProperty("java.io.tmpdir"), ";", "rec");
-
-        tracker.track(rec1);
-        tracker.track(rec2);
-
-        final File csvFile = tracker.flush().getOutputFile();
-        final List<List<String>> csvValues = CSVUtil.readCSV(true, csvFile, ";");
-        assertEquals(2, csvValues.size());
-        checkCSVRecord(rec1, csvValues.get(0));
-        checkCSVRecord(rec2, csvValues.get(1));
-
-        final List<Record> records = tracker.flush().getRecords();
-        assertEquals(2, records.size());
-        checkRecord(rec1, records.get(0));
-        checkRecord(rec2, records.get(1));
-    }
-
-    private void checkRecord(final Record expected, final Record actual) {
-        assertEquals(expected.getTimestamp(), actual.getTimestamp());
-        assertEquals(expected.getName(), actual.getName());
-        assertEquals(expected.getDescription(), actual.getDescription());
-        assertEquals(expected.getDuration(), actual.getDuration());
-    }
-
-    private void checkCSVRecord(final Record record, final List<String> csvValues) {
-        // timestamp, year, month, day, hour, minute, second, milisecond, duration, name, description]
-        assertEquals(11, csvValues.size());
-
-        final long timestamp = record.getTimestamp();
-        final GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(timestamp);
-        final int year = cal.get(Calendar.YEAR);
-        final int month = cal.get(Calendar.MONTH) + 1;
-        final int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-        final int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
-        final int minute = cal.get(Calendar.MINUTE);
-        final int second = cal.get(Calendar.SECOND);
-        final int milisecond = cal.get(Calendar.MILLISECOND);
-
-        assertEquals(timestamp, Long.valueOf(csvValues.get(0)).longValue());
-        assertEquals(year, Integer.valueOf(csvValues.get(1)).intValue());
-        assertEquals(month, Integer.valueOf(csvValues.get(2)).intValue());
-        assertEquals(dayOfMonth, Integer.valueOf(csvValues.get(3)).intValue());
-        assertEquals(hourOfDay, Integer.valueOf(csvValues.get(4)).intValue());
-        assertEquals(minute, Integer.valueOf(csvValues.get(5)).intValue());
-        assertEquals(second, Integer.valueOf(csvValues.get(6)).intValue());
-        assertEquals(milisecond, Integer.valueOf(csvValues.get(7)).intValue());
-
-        assertEquals(record.getDuration(), Long.valueOf(csvValues.get(8)).longValue());
-        assertEquals(record.getName(), csvValues.get(9));
-        assertEquals(record.getDescription(), csvValues.get(10));
-
-    }
-
-    @Test
-    public void testPrinterThread() throws Exception {
+    public void testFlushThread() throws Exception {
         final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
         final Object monitor = new Object();
@@ -195,13 +113,13 @@ public class TimeTrackerTest {
         listeners.add(new FlushEventListener() {
 
             @Override
-            public void flush(FlushEvent flushEvent) throws Exception {
-                final File csvFile = flushEvent.getOutputFile();
-                final List<List<String>> records = CSVUtil.readCSV(true, csvFile, ";");
+            public FlushResult flush(final FlushEvent flushEvent) throws Exception {
+                final List<Record> records = flushEvent.getRecords();
                 assertEquals(2, records.size());
                 synchronized (monitor) {
                     monitor.notify();
                 }
+                return new FlushResult(flushEvent);
             }
         });
         final int flushIntervalInSeconds = 1;
@@ -216,7 +134,7 @@ public class TimeTrackerTest {
         }
         final long endTime = System.currentTimeMillis();
         assertTrue((endTime - startTime) < maxWait);
-        tracker.stopPrinterThread();
+        tracker.stopFlushThread();
     }
 
     @Test
