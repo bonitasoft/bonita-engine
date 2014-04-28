@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,7 @@ import org.bonitasoft.engine.command.TenantCommand;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public abstract class CommandWithParameters extends TenantCommand {
 
@@ -29,7 +30,7 @@ public abstract class CommandWithParameters extends TenantCommand {
             throws SCommandParameterizationException {
         try {
             return (T) parameters.get(parameterName);
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             throw new SCommandParameterizationException(message);
         }
     }

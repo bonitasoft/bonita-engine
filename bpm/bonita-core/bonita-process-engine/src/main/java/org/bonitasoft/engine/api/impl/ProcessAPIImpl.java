@@ -329,6 +329,7 @@ import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
@@ -1629,8 +1630,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
 
         try {
-            final SAFlowNodeInstance archivedFlowNodeInstance = activityInstanceService.getArchivedFlowNodeInstance(archivedFlowNodeInstanceId,
-                    persistenceService);
+            final SAFlowNodeInstance archivedFlowNodeInstance = activityInstanceService.getArchivedFlowNodeInstance(archivedFlowNodeInstanceId);
             return ModelConvertor.toArchivedFlowNodeInstance(archivedFlowNodeInstance, flowNodeStateManager);
         } catch (final SFlowNodeNotFoundException e) {
             throw new ArchivedFlowNodeInstanceNotFoundException(archivedFlowNodeInstanceId);
@@ -3443,6 +3443,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setProcessDefinitionId(processDefinitionId);
+            expcontext.setContainerState(ContainerState.ACTIVE);
             final SProcessDefinition processDef = processDefinitionService.getProcessDefinition(processDefinitionId);
             if (processDef != null) {
                 expcontext.setProcessDefinition(processDef);

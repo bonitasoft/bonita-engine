@@ -958,4 +958,19 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         return persistenceRead.selectList(selectListDescriptor);
     }
 
+    @Override
+    public SAProcessInstance getLastArchivedProcessInstance(long processInstanceId) throws SBonitaSearchException {
+        final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
+        final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
+        final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();
+        orderByOptions.add(new OrderByOption(SAProcessInstance.class, processInstanceBuilderFact.getArchiveDateKey(), OrderByType.DESC));
+        orderByOptions.add(new OrderByOption(SAProcessInstance.class, processInstanceBuilderFact.getEndDateKey(), OrderByType.DESC));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, Collections.singletonList(filterOption), null);
+        final List<SAProcessInstance> processInstances = searchArchivedProcessInstances(queryOptions);
+        if (!processInstances.isEmpty()) {
+            return processInstances.get(0);
+        }
+        return null;
+    }
+
 }

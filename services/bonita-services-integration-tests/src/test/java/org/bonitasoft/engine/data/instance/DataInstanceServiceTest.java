@@ -29,6 +29,7 @@ import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -93,7 +94,7 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
     private void evaluateDefaultValueOf(final SDataDefinition dataDefinition, final SDataInstanceBuilder dataInstanceBuilder) throws SBonitaException {
         final SExpression expression = dataDefinition.getDefaultValueExpression();
         if (expression != null) {
-            dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression, EMPTY_RESOLVED_EXPRESSIONS));
+            dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
         }
     }
 

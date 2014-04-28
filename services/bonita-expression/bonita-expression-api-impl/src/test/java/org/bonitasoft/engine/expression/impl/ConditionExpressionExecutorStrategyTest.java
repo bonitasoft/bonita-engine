@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -98,89 +99,90 @@ public class ConditionExpressionExecutorStrategyTest {
     @Test
     public void evaluateConditionExpressionGraterThan() throws Exception {
         final SExpression expr1 = buildExpression(">", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, true, resolvedDependencies);
+        evaluateAndCheckResult(expr1, true, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr2 = buildExpression(">", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, false, resolvedDependencies);
+        evaluateAndCheckResult(expr2, false, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr3 = buildExpression(">", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, false, resolvedDependencies);
+        evaluateAndCheckResult(expr3, false, resolvedDependencies, ContainerState.ACTIVE);
     }
 
-    protected void evaluateAndCheckResult(final SExpression expression, final Object expectedValue, final Map<Integer, Object> resolvedExpression)
+    protected void evaluateAndCheckResult(final SExpression expression, final Object expectedValue, final Map<Integer, Object> resolvedExpression,
+            final ContainerState containerState)
             throws Exception {
-        final Object expressionResult = evaluate(expression, resolvedExpression);
+        final Object expressionResult = evaluate(expression, resolvedExpression, containerState);
         assertEquals(expectedValue, expressionResult);
     }
 
-    protected Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException {
-        final Object result = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions);
-        return result;
+    protected Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+            throws SExpressionEvaluationException {
+        return strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, containerState);
     }
 
-    protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException {
-        final List<Object> result = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions);
-        return result;
+    protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+            throws SExpressionEvaluationException {
+        return strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, containerState);
     }
 
     @Test
     public void evaluateConditionExpressionGraterThanOrEquals() throws Exception {
         final SExpression expr1 = buildExpression(">=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, true, resolvedDependencies);
+        evaluateAndCheckResult(expr1, true, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr2 = buildExpression(">=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, false, resolvedDependencies);
+        evaluateAndCheckResult(expr2, false, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr3 = buildExpression(">=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, true, resolvedDependencies);
+        evaluateAndCheckResult(expr3, true, resolvedDependencies, ContainerState.ACTIVE);
     }
 
     @Test
     public void evaluateConditionExpressionLowerThan() throws Exception {
         final SExpression expr1 = buildExpression("<", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, false, resolvedDependencies);
+        evaluateAndCheckResult(expr1, false, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr2 = buildExpression("<", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, true, resolvedDependencies);
+        evaluateAndCheckResult(expr2, true, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr3 = buildExpression("<", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, false, resolvedDependencies);
+        evaluateAndCheckResult(expr3, false, resolvedDependencies, ContainerState.ACTIVE);
     }
 
     @Test
     public void evaluateConditionExpressionLowerThanOrEquals() throws Exception {
         final SExpression expr1 = buildExpression("<=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, false, resolvedDependencies);
+        evaluateAndCheckResult(expr1, false, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr2 = buildExpression("<=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, true, resolvedDependencies);
+        evaluateAndCheckResult(expr2, true, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr3 = buildExpression("<=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, true, resolvedDependencies);
+        evaluateAndCheckResult(expr3, true, resolvedDependencies, ContainerState.ACTIVE);
     }
 
     @Test
     public void evaluateConditionExpressionEquals() throws Exception {
         final SExpression expr1 = buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, false, resolvedDependencies);
+        evaluateAndCheckResult(expr1, false, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr2 = buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, false, resolvedDependencies);
+        evaluateAndCheckResult(expr2, false, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr3 = buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, true, resolvedDependencies);
+        evaluateAndCheckResult(expr3, true, resolvedDependencies, ContainerState.ACTIVE);
     }
 
     @Test
     public void evaluateConditionExpressionDifferent() throws Exception {
         final SExpression expr1 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, true, resolvedDependencies);
+        evaluateAndCheckResult(expr1, true, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr2 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, true, resolvedDependencies);
+        evaluateAndCheckResult(expr2, true, resolvedDependencies, ContainerState.ACTIVE);
 
         final SExpression expr3 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, false, resolvedDependencies);
+        evaluateAndCheckResult(expr3, false, resolvedDependencies, ContainerState.ACTIVE);
     }
 
     @Test
@@ -189,12 +191,14 @@ public class ConditionExpressionExecutorStrategyTest {
         final SExpression booleanDependTrueExpr = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
         final SExpression boleanOperatorExpr1 = buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
                 Collections.singletonList(booleanDependTrueExpr));
-        evaluateAndCheckResult(boleanOperatorExpr1, false, Collections.<Integer, Object> singletonMap(booleanDependTrueExpr.getDiscriminant(), true));
+        evaluateAndCheckResult(boleanOperatorExpr1, false, Collections.<Integer, Object> singletonMap(booleanDependTrueExpr.getDiscriminant(), true),
+                ContainerState.ACTIVE);
 
         final SExpression booleanDependFalseExpr = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
         final SExpression boleanOperatorExpr2 = buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
                 Collections.singletonList(booleanDependFalseExpr));
-        evaluateAndCheckResult(boleanOperatorExpr2, true, Collections.<Integer, Object> singletonMap(booleanDependFalseExpr.getDiscriminant(), false));
+        evaluateAndCheckResult(boleanOperatorExpr2, true, Collections.<Integer, Object> singletonMap(booleanDependFalseExpr.getDiscriminant(), false),
+                ContainerState.ACTIVE);
     }
 
     @Test
@@ -207,7 +211,7 @@ public class ConditionExpressionExecutorStrategyTest {
         expressions.add(expr2);
         expressions.add(expr3);
 
-        final List<Object> resolvedExpressions = evaluate(expressions, resolvedDependencies);
+        final List<Object> resolvedExpressions = evaluate(expressions, resolvedDependencies, ContainerState.ACTIVE);
         assertEquals(3, resolvedExpressions.size());
         assertTrue((Boolean) resolvedExpressions.get(0));
         assertTrue((Boolean) resolvedExpressions.get(1));
@@ -344,7 +348,7 @@ public class ConditionExpressionExecutorStrategyTest {
         evaluatedDependencies.put(exp1.hashCode(), exp1Value);
         evaluatedDependencies.put(exp2.hashCode(), exp2Value);
         evaluateAndCheckResult(buildExpression(operator, SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(exp1, exp2)), result,
-                evaluatedDependencies);
+                evaluatedDependencies, ContainerState.ACTIVE);
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -357,7 +361,7 @@ public class ConditionExpressionExecutorStrategyTest {
         evaluatedDependencies.put(exp2.hashCode(), 1l);
         evaluatedDependencies.put(exp3.hashCode(), 1l);
         evaluateAndCheckResult(buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(exp1, exp2, exp3)), true,
-                evaluatedDependencies);
+                evaluatedDependencies, ContainerState.ACTIVE);
     }
 
     @Test
@@ -373,7 +377,7 @@ public class ConditionExpressionExecutorStrategyTest {
         final Map<Integer, Object> evaluatedDependencies = new HashMap<Integer, Object>(1);
         evaluatedDependencies.put(trueBoolean.hashCode(), Boolean.FALSE);
         evaluateAndCheckResult(buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(trueBoolean)), true,
-                evaluatedDependencies);
+                evaluatedDependencies, ContainerState.ACTIVE);
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -382,6 +386,6 @@ public class ConditionExpressionExecutorStrategyTest {
         final Map<Integer, Object> evaluatedDependencies = new HashMap<Integer, Object>(1);
         evaluatedDependencies.put(stringExpression.hashCode(), "false");
         evaluateAndCheckResult(buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(stringExpression)), true,
-                evaluatedDependencies);
+                evaluatedDependencies, ContainerState.ACTIVE);
     }
 }

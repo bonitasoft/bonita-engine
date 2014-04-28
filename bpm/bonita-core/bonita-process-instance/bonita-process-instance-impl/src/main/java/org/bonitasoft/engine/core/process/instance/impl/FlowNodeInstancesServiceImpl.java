@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
@@ -45,6 +47,9 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -80,15 +85,22 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private final PersistenceService persistenceService;
 
+    private final ArchiveService archiveService;
+
     private final TechnicalLoggerService logger;
 
     public FlowNodeInstancesServiceImpl(final Recorder recorder, final PersistenceService persistenceService, final EventService eventService,
-            final TechnicalLoggerService logger) {
+            final TechnicalLoggerService logger, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.logger = logger;
         activityInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         this.eventService = eventService;
+        this.archiveService = archiveService;
+    }
+
+    public ArchiveService getArchiveService() {
+        return archiveService;
     }
 
     protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
@@ -258,8 +270,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public SAFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId, final ReadPersistenceService persistenceService)
-            throws SFlowNodeReadException, SFlowNodeNotFoundException {
+    public SAFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId) throws SFlowNodeReadException, SFlowNodeNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         SAFlowNodeInstance selectOne;
         try {
             selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SAFlowNodeInstance.class, "SArchivedFlowNodeInstance",
@@ -271,6 +283,22 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             throw new SFlowNodeNotFoundException(archivedFlowNodeInstanceId);
         }
         return selectOne;
+    }
+
+    @Override
+    public <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
+            throws SBonitaSearchException {
+        final SAManualTaskInstanceBuilderFactory builderFactory = BuilderFactory.get(SAManualTaskInstanceBuilderFactory.class);
+        final FilterOption filterOption = new FilterOption(entityClass, builderFactory.getSourceObjectIdKey(), sourceObjectFlowNodeInstanceId);
+        final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();
+        orderByOptions.add(new OrderByOption(entityClass, builderFactory.getArchivedDateKey(), OrderByType.DESC));
+        orderByOptions.add(new OrderByOption(entityClass, builderFactory.getLastUpdateKey(), OrderByType.DESC));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, Collections.singletonList(filterOption), null);
+        final List<T> saFlowNodeInstances = searchArchivedFlowNodeInstances(entityClass, queryOptions);
+        if (!saFlowNodeInstances.isEmpty()) {
+            return saFlowNodeInstances.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -383,11 +411,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<SAFlowNodeInstance> searchArchivedFlowNodeInstances(final Class<? extends SAFlowNodeInstance> entityClass, final QueryOptions searchOptions)
+    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(final Class<T> entityClass, final QueryOptions searchOptions)
             throws SBonitaSearchException {
         try {
-            return (List<SAFlowNodeInstance>) getPersistenceService().searchEntity(entityClass, searchOptions, null);
+            return getPersistenceService().searchEntity(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }

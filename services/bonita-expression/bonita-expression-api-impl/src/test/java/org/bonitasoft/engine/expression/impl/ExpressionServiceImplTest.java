@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -61,7 +62,7 @@ public class ExpressionServiceImplTest {
     public void evaluateInvalidExpressionFailsAtValidationStep() throws Exception {
         final SExpression expression = mock(SExpression.class);
         expressionService = new ExpressionServiceImpl(expressionExecutorStrategyProvider, logger, true);
-        expressionService.evaluate(expression, new HashMap<Integer, Object>(0));
+        expressionService.evaluate(expression, new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
         verify(expressionExecutorStrategy, times(1)).validate(any(SExpression.class));
     }
 }

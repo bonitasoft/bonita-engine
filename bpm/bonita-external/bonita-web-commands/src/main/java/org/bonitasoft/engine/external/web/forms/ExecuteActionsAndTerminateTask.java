@@ -68,7 +68,6 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final long sActivityInstanceID = getActivityInstanceId(parameters);
 
         try {
-            final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
             final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
             final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
             final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
@@ -111,7 +110,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final List<Operation> operations = getParameter(parameters, OPERATIONS_LIST_KEY, message);
         if (operations == null) {
             return Collections.emptyList();
-    }
+        }
         return operations;
     }
 
@@ -169,7 +168,6 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SCommentService commentService = tenantAccessor.getCommentService();
-
         final SSession session = SessionInfos.getSession();
 
         if (executerUserId != executerSubstituteUserId) {

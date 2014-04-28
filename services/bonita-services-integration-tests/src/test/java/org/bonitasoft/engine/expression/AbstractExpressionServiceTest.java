@@ -75,7 +75,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException,
             STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
-        final Object result = getExpressionService().evaluate(expression, resolvedExpressions);
+        final Object result = getExpressionService().evaluate(expression, resolvedExpressions, ContainerState.ACTIVE);
         getTransactionService().complete();
         return result;
     }
@@ -85,7 +85,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
             SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException, STransactionCommitException,
             STransactionRollbackException {
         getTransactionService().begin();
-        final List<Object> result = getExpressionService().evaluate(expressionKind, expressions, dependencyValues, resolvedExpressions);
+        final List<Object> result = getExpressionService().evaluate(expressionKind, expressions, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
         getTransactionService().complete();
         return result;
     }

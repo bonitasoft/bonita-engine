@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -87,8 +88,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     private final EventService eventService;
 
     public SEventInstanceServiceImpl(final Recorder recorder, final PersistenceService persistenceService, final EventService eventService,
-            final TechnicalLoggerService logger) {
-        super(recorder, persistenceService, eventService, logger);
+            final TechnicalLoggerService logger, final ArchiveService archiveService) {
+        super(recorder, persistenceService, eventService, logger, archiveService);
         this.eventService = eventService;
     }
 

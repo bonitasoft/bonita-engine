@@ -53,6 +53,7 @@
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
 </beans>

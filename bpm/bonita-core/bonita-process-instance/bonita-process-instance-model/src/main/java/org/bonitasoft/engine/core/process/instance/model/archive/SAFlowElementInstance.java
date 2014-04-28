@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.model.archive;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface SAFlowElementInstance extends SANamedElement {
 
@@ -26,5 +27,31 @@ public interface SAFlowElementInstance extends SANamedElement {
     long getLogicalGroup(int index);
 
     boolean isTerminal();
+
+    /**
+     * @return
+     *         the id of the process definition of this element
+     */
+    long getProcessDefinitionId();
+
+    /**
+     * the root process instance is the top level process containing this element
+     * 
+     * @return
+     *         the id of the root process instance of this element
+     */
+    long getRootProcessInstanceId();
+
+    /**
+     * @return
+     *         the id of the activity instance containing this element or 0 if this element is not contained in an activity
+     */
+    long getParentActivityInstanceId();
+
+    /**
+     * @return
+     *         the id of the process instance containing this element
+     */
+    long getParentProcessInstanceId();
 
 }

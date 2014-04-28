@@ -92,7 +92,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(humanTaskInstance.getType()).thenReturn(flowNodeType);
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);
-        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap());
+        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap(),
+                ContainerState.ACTIVE);
         assertEquals(taskAssigneeId, evaluatedTaskAssigneeId);
     }
 
@@ -105,7 +106,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(expression.getContent()).thenReturn(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName());
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);
-        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap());
+        final long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap(),
+                ContainerState.ACTIVE);
         assertEquals(-1L, evaluatedTaskAssigneeId);
 
     }
@@ -119,7 +121,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(expression.getContent()).thenReturn(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName());
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);
-        final int evaluatedTaskAssigneeId = (Integer) strategy.evaluate(expression, dependencyValues, Collections.<Integer, Object> emptyMap());
+        final int evaluatedTaskAssigneeId = (Integer) strategy.evaluate(expression, dependencyValues, Collections.<Integer, Object> emptyMap(),
+                ContainerState.ACTIVE);
         assertEquals(-1L, evaluatedTaskAssigneeId);
 
     }
@@ -138,7 +141,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);
         final EngineExecutionContext engineExecutionContext = (EngineExecutionContext) strategy.evaluate(expression, defaultDependencyValues,
-                Collections.<Integer, Object> emptyMap());
+                Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         assertEquals(taskAssigneeId, engineExecutionContext.getTaskAssigneeId());
 
     }
@@ -156,7 +159,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         dependencies.put(ExpressionConstants.ENGINE_EXECUTION_CONTEXT.getEngineConstantName(), engineExecutionContext);
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);
-        final Long evaluatedTaskAssigneeId = (Long) strategy.evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap());
+        final Long evaluatedTaskAssigneeId = (Long) strategy
+                .evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         assertEquals(taskAssigneeId, evaluatedTaskAssigneeId);
 
         verify(activityInstanceService, never()).getActivityInstance(anyLong());
@@ -176,7 +180,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         dependencies.put(ExpressionConstants.ENGINE_EXECUTION_CONTEXT.getEngineConstantName(), engineExecutionContext);
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(null, null, null, null);
-        final Long evaluatedProcessInstanceId = (Long) strategy.evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap());
+        final Long evaluatedProcessInstanceId = (Long) strategy.evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap(),
+                ContainerState.ACTIVE);
         assertEquals(processInstanceId, evaluatedProcessInstanceId.longValue());
 
     }
@@ -191,7 +196,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
         final Map<String, Object> dependencies = new HashMap<String, Object>(0);
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(null, null, null, null);
-        final Serializable noValue = strategy.evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap());
+        final Serializable noValue = strategy.evaluate(expression, dependencies, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         assertFalse(("" + processInstanceId).equals(String.valueOf(noValue)));
 
     }
@@ -203,7 +208,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(expression.getContent()).thenReturn("unexisting_constant_value");
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(null, null, null, null);
-        strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap());
+        strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
     }
 
     @Test(expected = SInvalidExpressionException.class)

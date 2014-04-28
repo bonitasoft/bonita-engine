@@ -21,6 +21,7 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -45,6 +46,8 @@ public class SExpressionContext implements Serializable {
     private Long containerId;
 
     private String containerType;
+
+    private ContainerState containerState;
 
     private long time;
 
@@ -124,20 +127,28 @@ public class SExpressionContext implements Serializable {
         this.time = time;
     }
 
+    public Long getContainerId() {
+        return containerId;
+    }
+
     public void setContainerId(final Long containerId) {
         this.containerId = containerId;
+    }
+
+    public String getContainerType() {
+        return containerType;
     }
 
     public void setContainerType(final String containerType) {
         this.containerType = containerType;
     }
 
-    public Long getContainerId() {
-        return containerId;
+    public ContainerState getContainerState() {
+        return containerState;
     }
 
-    public String getContainerType() {
-        return containerType;
+    public void setContainerState(final ContainerState containerState) {
+        this.containerState = containerState;
     }
 
     public Map<String, Object> getInputValues() {

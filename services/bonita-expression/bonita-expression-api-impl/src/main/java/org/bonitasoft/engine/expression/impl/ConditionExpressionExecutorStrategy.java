@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -76,8 +77,8 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<SExpression> dependencies = expression.getDependencies();
         final String content = expression.getContent();
         Object result;
@@ -202,11 +203,12 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
             throws SExpressionEvaluationException {
         final List<Object> evaluatedExpressions = new ArrayList<Object>(expressions.size());
         for (final SExpression sExpression : expressions) {
-            evaluatedExpressions.add(evaluate(sExpression, context, resolvedExpressions));
+            evaluatedExpressions.add(evaluate(sExpression, context, resolvedExpressions, containerState));
         }
         return evaluatedExpressions;
     }
