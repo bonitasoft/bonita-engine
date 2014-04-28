@@ -104,6 +104,7 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -716,6 +717,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
             expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(saprocessInstance.getArchiveDate().getTime());
 
@@ -778,6 +780,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
             expcontext.setContainerType("ACTIVITY_INSTANCE");
+            expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
             final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
@@ -834,6 +837,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
             expcontext.setContainerType("ACTIVITY_INSTANCE");
+            expcontext.setContainerState(ContainerState.ARCHIVED);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(aactivityInstance.getArchiveDate() + 500);
             final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
@@ -888,6 +892,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
             expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setContainerState(ContainerState.ARCHIVED);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(saprocessInstance.getArchiveDate().getTime() + 500);
             final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
@@ -945,6 +950,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
             expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
             final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);

@@ -111,8 +111,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Before
     public void setUp() throws Exception {
-        clientFolder = new File(System.getProperty("java.io.tmpdir"), "client");
-        clientFolder.mkdirs();
+        clientFolder = com.bonitasoft.engine.io.IOUtils.createTempDirectory("bdr_it_client");
         login();
         matti = createUser("matti", "bpm");
 

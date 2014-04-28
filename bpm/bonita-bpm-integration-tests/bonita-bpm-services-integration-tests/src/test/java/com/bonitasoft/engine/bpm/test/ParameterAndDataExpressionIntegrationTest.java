@@ -25,6 +25,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -111,7 +112,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     private Object createAndEvaluateParameterExpression(final String nameParameter, final Long deployId, final String key) throws Exception {
         final SExpression strExpr = newExpression(nameParameter, SExpression.TYPE_PARAMETER, String.class.getName(), null, null);
         final Map<String, Object> dependencies = CollectionUtil.buildSimpleMap(key, deployId);
-        return getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);
+        return getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE);
     }
 
     private ProcessDefinition createProcessAndInsertParameterAndDeployIt(final String processName, final String version, final String parameterName,
@@ -180,7 +181,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         dependencies.put(intDataName, intDataValue);
         // check
         assertEquals("welcome " + parameterValue + " to " + strDataValue + ",Please call " + intDataValue,
-                getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS));
+                getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
     }
 
 }

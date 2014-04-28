@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -52,7 +53,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         final Long result = Long.valueOf(45);
         when(businessDataRepository.findByNamedQuery("countEmployees", Long.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
 
-        final Long count = (Long) strategy.evaluate(expression, buildContext(), null);
+        final Long count = (Long) strategy.evaluate(expression, buildContext(), null, ContainerState.ACTIVE);
 
         assertThat(count).isEqualTo(result);
     }
@@ -63,7 +64,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         final Double result = Double.valueOf(2.5);
         when(businessDataRepository.findByNamedQuery("avgEmployees", Double.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
 
-        final Double avg = (Double) strategy.evaluate(expression, buildContext(), null);
+        final Double avg = (Double) strategy.evaluate(expression, buildContext(), null, ContainerState.ACTIVE);
 
         assertThat(avg).isEqualTo(result);
     }
@@ -74,7 +75,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         final Integer result = Integer.valueOf(25);
         when(businessDataRepository.findByNamedQuery("maxEmployees", Integer.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
 
-        final Integer max = (Integer) strategy.evaluate(expression, buildContext(), null);
+        final Integer max = (Integer) strategy.evaluate(expression, buildContext(), null, ContainerState.ACTIVE);
 
         assertThat(max).isEqualTo(result);
     }
@@ -85,7 +86,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         final Float result = Float.valueOf(1.5F);
         when(businessDataRepository.findByNamedQuery("minEmployees", Float.class, Collections.<String, Serializable> emptyMap())).thenReturn(result);
 
-        final Float min = (Float) strategy.evaluate(expression, buildContext(), null);
+        final Float min = (Float) strategy.evaluate(expression, buildContext(), null, ContainerState.ACTIVE);
 
         assertThat(min).isEqualTo(result);
     }
@@ -100,7 +101,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(2);
         resolvedExpressions.put(dependencyStartIndex.getDiscriminant(), 0);
         resolvedExpressions.put(dependencyMaxResults.getDiscriminant(), 10);
-        strategy.evaluate(expression, buildContext(), resolvedExpressions);
+        strategy.evaluate(expression, buildContext(), resolvedExpressions, ContainerState.ACTIVE);
 
         verify(businessDataRepository).findListByNamedQuery("getEmployees", Entity.class, Collections.<String, Serializable> emptyMap(), 0, 10);
     }
@@ -118,7 +119,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         resolvedExpressions.put(dependencyFirstNameExpression.getDiscriminant(), "John");
         resolvedExpressions.put(dependencyLastNameExpression.getDiscriminant(), "Doe");
 
-        strategy.evaluate(expression, buildContext(), resolvedExpressions);
+        strategy.evaluate(expression, buildContext(), resolvedExpressions, ContainerState.ACTIVE);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("firstName", "John");
@@ -132,7 +133,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         when(businessDataRepository.findByNamedQuery("getEmployees", Entity.class, Collections.<String, Serializable> emptyMap())).thenThrow(
                 new NonUniqueResultException(new IllegalArgumentException("several")));
 
-        strategy.evaluate(expression, buildContext(), null);
+        strategy.evaluate(expression, buildContext(), null, ContainerState.ACTIVE);
     }
 
 }

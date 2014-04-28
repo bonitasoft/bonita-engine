@@ -45,6 +45,7 @@ import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.FieldType;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.business.data.ClassloaderRefresher;
+import com.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Romain Bioteau
@@ -102,8 +103,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     }
 
     @BeforeClass
-    public static void initTestClass() {
-        clientFolder = new File(System.getProperty("java.io.tmpdir"), "client");
+    public static void initTestClass() throws IOException {
+        clientFolder = IOUtils.createTempDirectory("ExecuteBDMQueryCommandIT_client");
         clientFolder.mkdirs();
     }
 
