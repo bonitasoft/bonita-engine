@@ -176,11 +176,11 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         // guess it
         if (ExpressionConstants.ENGINE_EXECUTION_CONTEXT.equals(expressionConstant)) {
             return createContext(context, containerState);
-        } else if (context.containsKey(SExpressionContext.containerTypeKey) && context.containsKey(SExpressionContext.containerIdKey)) {
-            final String containerType = (String) context.get(SExpressionContext.containerTypeKey);
-            final long containerId = (Long) context.get(SExpressionContext.containerIdKey);
+        } else if (context.containsKey(SExpressionContext.CONTAINER_TYPE_KEY) && context.containsKey(SExpressionContext.CONTAINER_ID_KEY)) {
+            final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
+            final long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
             if (ExpressionConstants.PROCESS_DEFINITION_ID.equals(expressionConstant)) {
-                return (Serializable) context.get(SExpressionContext.processDefinitionIdKey);
+                return (Serializable) context.get(SExpressionContext.PROCESS_DEFINITION_ID_KEY);
             } else if (DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)) {
                 return evaluateUsingActivityInstanceContainer(expressionConstant, context, containerId);
             } else {
@@ -259,9 +259,9 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
             SProcessInstanceReadException, SActivityInstanceNotFoundException, SFlowNodeReadException,
             SBonitaSearchException {
         final EngineExecutionContext ctx = new EngineExecutionContext();
-        if (context.containsKey(SExpressionContext.containerTypeKey) && context.containsKey(SExpressionContext.containerIdKey)) {
-            final String containerType = (String) context.get(SExpressionContext.containerTypeKey);
-            final long containerId = (Long) context.get(SExpressionContext.containerIdKey);
+        if (context.containsKey(SExpressionContext.CONTAINER_TYPE_KEY) && context.containsKey(SExpressionContext.CONTAINER_ID_KEY)) {
+            final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
+            final long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
             if (ContainerState.ARCHIVED.equals(containerState)) {
                 if (DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)) {
                     updateContextFromArchivedActivityInstance(ctx, containerId);
@@ -276,8 +276,8 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                 }
             }
         }
-        if (context.containsKey(SExpressionContext.processDefinitionIdKey)) {
-            ctx.setProcessDefinitionId((Long) context.get(SExpressionContext.processDefinitionIdKey));
+        if (context.containsKey(SExpressionContext.PROCESS_DEFINITION_ID_KEY)) {
+            ctx.setProcessDefinitionId((Long) context.get(SExpressionContext.PROCESS_DEFINITION_ID_KEY));
         }
         return ctx;
     }

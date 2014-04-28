@@ -33,15 +33,15 @@ public class SExpressionContext implements Serializable {
 
     private static final long serialVersionUID = 6417383664862870145L;
 
-    public static final String containerIdKey = "containerId";
+    public static final String CONTAINER_ID_KEY = "containerId";
 
-    public static final String containerTypeKey = "containerType";
+    public static final String CONTAINER_TYPE_KEY = "containerType";
 
-    public static final String timeKey = "time";
+    public static final String TIME_KEY = "time";
 
-    public static final String processDefinitionIdKey = "processDefinitionId";
+    public static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
 
-    public static final String processDefinitionKey = "processDefinition";
+    public static final String PROCESS_DEFINITION_KEY = "processDefinition";
 
     private Long containerId;
 
@@ -174,17 +174,15 @@ public class SExpressionContext implements Serializable {
     public SExpression getDefaultValueFor(final String name) {
         if (evaluateInDefinition) {
             return dataMap.get(name);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public String isDefaultValueOf(final SExpression exp) {
         if (evaluateInDefinition) {
             return invertedDataMap.get(exp);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public void setInputValues(final Map<String, Object> inputValues) {

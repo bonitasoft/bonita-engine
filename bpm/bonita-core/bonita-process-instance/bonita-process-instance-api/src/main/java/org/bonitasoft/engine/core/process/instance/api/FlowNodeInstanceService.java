@@ -232,9 +232,6 @@ public interface FlowNodeInstanceService {
      * @return The list of paginated results, according to the QueryOptions search criteria
      * @since 6.0
      */
-    // List<SAFlowNodeInstance> searchArchivedFlowNodeInstances(Class<? extends SAFlowNodeInstance> entityClass, QueryOptions queryOptions)
-    // throws SBonitaSearchException;
-
     public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(Class<T> entityClass, QueryOptions queryOptions)
             throws SBonitaSearchException;
 
@@ -289,8 +286,6 @@ public interface FlowNodeInstanceService {
      */
     public <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
             throws SBonitaSearchException;
-
-    // SAFlowNodeInstance getLastArchivedFlowNodeInstance(long sourceObjectFlowNodeInstanceId) throws SBonitaSearchException;
 
     /**
      * @param flowNodeInstance

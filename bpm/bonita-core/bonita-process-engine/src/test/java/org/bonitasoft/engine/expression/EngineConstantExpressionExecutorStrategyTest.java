@@ -64,8 +64,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
         MockitoAnnotations.initMocks(this);
 
         defaultDependencyValues = new HashMap<String, Object>(2);
-        defaultDependencyValues.put(SExpressionContext.containerIdKey, containerId);
-        defaultDependencyValues.put(SExpressionContext.containerTypeKey, DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        defaultDependencyValues.put(SExpressionContext.CONTAINER_ID_KEY, containerId);
+        defaultDependencyValues.put(SExpressionContext.CONTAINER_TYPE_KEY, DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
     public void taskAssigneeProcessInstance() throws Exception {
         final SExpression expression = mock(SExpression.class);
         final Map<String, Object> dependencyValues = new HashMap<String, Object>(defaultDependencyValues);
-        dependencyValues.put(SExpressionContext.containerTypeKey, DataInstanceContainer.PROCESS_INSTANCE.name());
+        dependencyValues.put(SExpressionContext.CONTAINER_TYPE_KEY, DataInstanceContainer.PROCESS_INSTANCE.name());
 
         when(expression.getContent()).thenReturn(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName());
 

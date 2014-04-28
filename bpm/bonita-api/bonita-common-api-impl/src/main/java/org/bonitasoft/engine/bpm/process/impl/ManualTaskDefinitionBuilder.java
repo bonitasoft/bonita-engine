@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,20 +17,20 @@ import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImp
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.ManualTaskDefinitionImpl;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Feng Hui
+ * @author Celine Souchet
  */
 public class ManualTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     public ManualTaskDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final String name, final String actorName) {
-        super(container, processDefinitionBuilder, getManualTask(name, actorName, container));
+        super(container, processDefinitionBuilder, getManualTask(name, actorName));
     }
 
-    private static ManualTaskDefinitionImpl getManualTask(final String name, final String actorName, final FlowElementContainerDefinitionImpl container) {
+    private static ManualTaskDefinitionImpl getManualTask(final String name, final String actorName) {
         return new ManualTaskDefinitionImpl(name, actorName);
     }
 

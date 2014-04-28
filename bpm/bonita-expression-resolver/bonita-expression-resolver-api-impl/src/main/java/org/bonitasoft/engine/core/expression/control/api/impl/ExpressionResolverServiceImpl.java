@@ -76,15 +76,17 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         return evaluateExpressionsFlatten(Collections.singletonList(expression), evaluationContext).get(0);
     }
 
-    private List<Object> evaluateExpressionsFlatten(final List<SExpression> expressions, SExpressionContext evaluationContext)
+    private List<Object> evaluateExpressionsFlatten(final List<SExpression> expressions, final SExpressionContext evaluationContext)
             throws SInvalidExpressionException, SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final HashMap<String, Object> dependencyValues = new HashMap<String, Object>();
+            final Map<String, Object> dependencyValues = new HashMap<String, Object>();
+            SExpressionContext newEvaluationContext;
             if (evaluationContext == null) {
-                evaluationContext = EMPTY_CONTEXT;
+                newEvaluationContext = EMPTY_CONTEXT;
             } else {
-                fillContext(evaluationContext, dependencyValues);
+                newEvaluationContext = evaluationContext;
+                fillContext(newEvaluationContext, dependencyValues);
             }
             final Long processDefinitionId = evaluationContext.getProcessDefinitionId();
             if (processDefinitionId != null) {
@@ -95,12 +97,12 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             // We incrementaly build the Map of already resolved expressions:
             final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
             // Let's evaluate all expressions with no dependencies first:
-            resolvedExpressions.putAll(evaluateAllExpressionsWithNoDependencies(dependencyValues, dataReplacement, expressions, evaluationContext));
+            resolvedExpressions.putAll(evaluateAllExpressionsWithNoDependencies(dependencyValues, dataReplacement, expressions, newEvaluationContext));
 
             for (final SExpression sExpression : expressions) {
                 // Then evaluate recursively all remaining expressions:
                 resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(sExpression, dependencyValues, dataReplacement, resolvedExpressions,
-                        evaluationContext.getContainerState()));
+                        newEvaluationContext.getContainerState()));
             }
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression sExpression : expressions) {
@@ -130,14 +132,14 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         return exception;
     }
 
-    private Map<Integer, Object> evaluateAllExpressionsWithNoDependencies(final HashMap<String, Object> dependencyValues,
+    private Map<Integer, Object> evaluateAllExpressionsWithNoDependencies(final Map<String, Object> dependencyValues,
             final Map<SExpression, SExpression> dataReplacement, final List<SExpression> expressions, final SExpressionContext evaluationContext)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
         final Map<ExpressionKind, List<SExpression>> expressionMapByKind = flattenDependencies(expressions);
         final List<SExpression> variableExpressions = expressionMapByKind.get(new ExpressionKind(ExpressionType.TYPE_VARIABLE.name()));
 
-        if (evaluationContext.isEvaluateInDefinition() && variableExpressions != null && variableExpressions.size() > 0) {
+        if (evaluationContext.isEvaluateInDefinition() && variableExpressions != null && !variableExpressions.isEmpty()) {
             final SExpression expressionNotProvided = variablesAreAllProvided(variableExpressions, evaluationContext);
             if (expressionNotProvided != null) {
                 // We forbid the evaluation of expressions of type VARIABLE at process definition level:
@@ -245,16 +247,16 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             evaluationContext.setEvaluateInDefinition(true);
         }
         if (evaluationContext.getContainerId() != null) {
-            dependencyValues.put(SExpressionContext.containerIdKey, evaluationContext.getContainerId());
+            dependencyValues.put(SExpressionContext.CONTAINER_ID_KEY, evaluationContext.getContainerId());
         }
         if (evaluationContext.getContainerType() != null) {
-            dependencyValues.put(SExpressionContext.containerTypeKey, evaluationContext.getContainerType());
+            dependencyValues.put(SExpressionContext.CONTAINER_TYPE_KEY, evaluationContext.getContainerType());
         }
         if (evaluationContext.getProcessDefinitionId() != null) {
-            dependencyValues.put(SExpressionContext.processDefinitionIdKey, evaluationContext.getProcessDefinitionId());
+            dependencyValues.put(SExpressionContext.PROCESS_DEFINITION_ID_KEY, evaluationContext.getProcessDefinitionId());
         }
         if (evaluationContext.getTime() != 0) {
-            dependencyValues.put(SExpressionContext.timeKey, evaluationContext.getTime());
+            dependencyValues.put(SExpressionContext.TIME_KEY, evaluationContext.getTime());
         }
         if (evaluationContext.getInputValues() != null) {
             dependencyValues.putAll(evaluationContext.getInputValues());
