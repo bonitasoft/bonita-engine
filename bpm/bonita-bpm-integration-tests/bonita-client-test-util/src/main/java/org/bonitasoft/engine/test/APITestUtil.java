@@ -73,7 +73,9 @@ import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptor;
+import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -1415,8 +1417,10 @@ public class APITestUtil {
         return builder;
     }
 
-    public Operation buildStringOperation(final String dataInstanceName, final String newConstantValue) throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
+    public Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
+            throws InvalidExpressionException {
+        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
+                .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done();
         final Expression expression = new ExpressionBuilder().createConstantStringExpression(newConstantValue);
         final Operation operation;
         operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
@@ -1437,6 +1441,7 @@ public class APITestUtil {
         getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
 
+
     public void skipTasks(final ProcessInstance processInstance) throws UpdateException {
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         for (final ActivityInstance activityInstance : activityInstances) {
@@ -1445,20 +1450,23 @@ public class APITestUtil {
         }
     }
 
-    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName)
+    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
+            final boolean isTransient)
             throws InvalidExpressionException, UpdateException {
-        final Operation stringOperation = buildStringOperation(dataName, updatedValue);
+        final Operation stringOperation = buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
         getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
     }
 
-    public Operation buildOperation(final String dataName, final OperatorType operatorType, final String operator, final Expression rightOperand) {
+    public Operation buildOperation(final String dataName, final boolean isTransient, final OperatorType operatorType, final String operator,
+            final Expression rightOperand) {
         final OperationBuilder operationBuilder = new OperationBuilder().createNewInstance();
         operationBuilder.setOperator(operator);
         operationBuilder.setRightOperand(rightOperand);
         operationBuilder.setType(operatorType);
-        operationBuilder.setLeftOperand(new LeftOperandBuilder().createDataLeftOperand(dataName));
+        operationBuilder.setLeftOperand(new LeftOperandBuilder().createNewInstance(dataName)
+                .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done());
         return operationBuilder.done();
     }
 
@@ -1785,5 +1793,15 @@ public class APITestUtil {
     public byte[] generateContent(final Document doc) {
         return doc.getName().getBytes();
     }
+    /**
+     * tell the engine to run BPMEventHandlingjob now
+     * 
+     * @throws CommandParameterizationException
+     * @throws CommandExecutionException
+     * @throws CommandNotFoundException
+     */
+    protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
+        commandAPI.execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
+        }
 
 }

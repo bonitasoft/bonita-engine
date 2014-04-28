@@ -155,26 +155,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Data -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Data Instance -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
@@ -191,12 +171,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.definition</groupId>
 			<artifactId>bonita-data-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-data-source-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -365,7 +339,7 @@
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl-hibernate</artifactId>
+			<artifactId>bonita-identity-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -612,7 +586,7 @@
 		<!-- Transient Data -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient-data-source</artifactId>
+			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -849,6 +823,20 @@
 							</target>
 						</configuration>
 					</execution>
+					<execution>
+						<id>complete test conf setup</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target name="copy-bpm-test-conf">
+								<copy todir="${project.build.directory}/conf" overwrite="true">
+									<fileset dir="${basedir}/src/test/resources/conf" />
+								</copy>
+							</target>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -871,26 +859,6 @@
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>complete test conf setup</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target name="copy-bpm-test-conf">
-								<copy todir="${project.build.directory}/conf" overwrite="true">
-									<fileset dir="${basedir}/src/test/resources/conf" />
-								</copy>
-							</target>
 						</configuration>
 					</execution>
 				</executions>

@@ -298,6 +298,9 @@ public class IOUtil {
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Input stream is null");
+        }
         final Scanner scanner = new Scanner(inputStream, fEncoding);
         return read(scanner);
     }
@@ -326,7 +329,7 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-         final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
+        final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
         return read(scanner);
     }
 

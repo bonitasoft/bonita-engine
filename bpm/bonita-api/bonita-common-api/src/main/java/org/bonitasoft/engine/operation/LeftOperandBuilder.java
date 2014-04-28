@@ -59,11 +59,47 @@ public class LeftOperandBuilder {
     }
 
     /**
+     * Set the type of the left operand
+     * It can be {@link LeftOperand#TYPE_DATA} {@link LeftOperand#TYPE_BUSINESS_DATA} {@link LeftOperand#TYPE_DOCUMENT} {@link LeftOperand#TYPE_EXTERNAL_DATA}
+     * {@link LeftOperand#TYPE_SEARCH_INDEX} {@link LeftOperand#TYPE_TRANSIENT_DATA}
+     * 
+     * or an other type of org.bonitasoft.engine.core.operation.LeftOperandHandler registered in the configuration
+     * 
+     * 
+     * @param type
+     * @return
+     */
+    public LeftOperandBuilder setType(final String type) {
+        leftOperand.setType(type);
+        return this;
+    }
+
+    /**
+     * @deprecated use setType(String)
+     * 
+     * @param type
+     * @return
+     */
+    @Deprecated
+    public LeftOperandBuilder setType(final LeftOperandType type) {
+        leftOperand.setType(type.name());
+        return this;
+    }
+
+    /**
+     * @deprecated use setType(LeftOperand.EXTERNAL_DATA) instead
+     * 
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
+    @Deprecated
     public LeftOperandBuilder setExternal(final boolean external) {
-        leftOperand.setExternal(external);
+        if (leftOperand.getType() != null && !LeftOperand.TYPE_DATA.equals(leftOperand.getType())
+                && !LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
+            throw new IllegalStateException(
+                    "Can't set left operand to external when the type is not input or data this method is deprecated, it's not usefull to use it anymore");
+        }
+        leftOperand.setType(external ? LeftOperand.TYPE_EXTERNAL_DATA : LeftOperand.TYPE_DATA);
         return this;
     }
 
@@ -72,11 +108,22 @@ public class LeftOperandBuilder {
     }
 
     public LeftOperand createSearchIndexLeftOperand(final int index) {
-        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).done();
+        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperand.TYPE_SEARCH_INDEX).done();
     }
 
+    /**
+     * @deprecated use {@link #createDataLeftOperand(String)}
+     * @param dataName
+     * @param external
+     * @return
+     */
+    @Deprecated
     public LeftOperand createDataLeftOperand(final String dataName, final boolean external) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setExternal(external).done();
+        if (external) {
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_EXTERNAL_DATA).done();
+        } else {
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
+        }
     }
 
     /**
@@ -87,7 +134,18 @@ public class LeftOperandBuilder {
      * @return the newly created <code>LeftOperand</code> object
      */
     public LeftOperand createDataLeftOperand(final String dataName) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setExternal(false).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_DATA).done();
+    }
+
+    /**
+     * creates a <code>LeftOperand</code> object to set a data, with a default value of external to false (data will be updated in Bonita system)
+     * 
+     * @param dataName
+     *            the name of the data to set
+     * @return the newly created <code>LeftOperand</code> object
+     */
+    public LeftOperand createBusinessDataLeftOperand(final String dataName) {
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperand.TYPE_BUSINESS_DATA).done();
     }
 
 }

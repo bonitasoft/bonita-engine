@@ -49,15 +49,15 @@ public interface OperationService {
      * 
      * @param operations
      *            the operations to execute
-     * @param dataContainerId
-     *            the id of the data container (used for left operand)
-     * @param dataContainerType
-     *            the type of the data container (used for left operand)
+     * @param leftOperandContainerId
+     *            the id of the container (used for left operand)
+     * @param leftOperandContainerType
+     *            the type of the container (used for left operand)
      * @param expressionContext
      *            the context in which execute the operation
      * @throws SOperationExecutionException
      */
-    void execute(List<SOperation> operations, long dataContainerId, String dataContainerType, SExpressionContext expressionContext)
+    void execute(List<SOperation> operations, long leftOperandContainerId, final String leftOperandContainerType, SExpressionContext expressionContext)
             throws SOperationExecutionException;
 
     /**

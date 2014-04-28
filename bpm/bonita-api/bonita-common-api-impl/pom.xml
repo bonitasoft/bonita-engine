@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>bonita-common-api-impl</artifactId>
-	<name>Bonita Commons Impl</name>
+	<name>Bonita Common APIs Impl</name>
 
 	<dependencies>
 		<dependency>

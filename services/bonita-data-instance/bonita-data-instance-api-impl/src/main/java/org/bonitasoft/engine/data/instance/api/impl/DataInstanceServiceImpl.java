@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.data.instance.api.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,17 +24,17 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
@@ -42,10 +43,10 @@ import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceB
 import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceVisibilityMappingBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceVisibilityMappingBuilderFactory;
-import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -54,6 +55,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -61,6 +63,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 
 /**
  * General mechanism for lookup is to look in specific flow node to search a data instance. When refering to "local" data instance, it means the lookup is
@@ -71,18 +74,11 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
  * @author Feng Hui
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
+ * @author Baptiste Mesta: include data instance data source directly here
  */
 public class DataInstanceServiceImpl implements DataInstanceService {
 
-    public static final String DEFAULT_DATA_SOURCE = "bonita_data_source";
-
-    public static final String DATA_SOURCE_VERSION = "6.0";
-
-    public static final String TRANSIENT_DATA_SOURCE = "bonita_transient_data_source";
-
-    public static final String TRANSIENT_DATA_SOURCE_VERSION = "6.0";
-
-    private final DataService dataSourceService;
+    private static final String DATA_INSTANCE = "DATA_INSTANCE";
 
     protected final Recorder recorder;
 
@@ -92,64 +88,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     protected final TechnicalLoggerService logger;
 
-    public DataInstanceServiceImpl(final DataService dataSourceService, final Recorder recorder, final ReadPersistenceService persistenceService,
+    public DataInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final ArchiveService archiveService, final TechnicalLoggerService logger) {
-        this.dataSourceService = dataSourceService;
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.archiveService = archiveService;
         this.logger = logger;
-    }
-
-    // FIXME this should be done BEFORE insertChildContainer... should we add a check mappings and add it here too
-    @Override
-    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataInstance");
-        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
-        dataInstanceDataSource.createDataInstance(dataInstance);
-        archiveDataInstance(dataInstance);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "createDataInstance");
-    }
-
-    private DataInstanceDataSource getDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
-        try {
-            final SDataSource dataSource = dataSourceService.getDataSource(dataSourceName, dataSourceVersion);
-            final DataInstanceDataSource dataInstanceDataSource = dataSourceService.getDataSourceImplementation(DataInstanceDataSource.class,
-                    dataSource.getId());
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
-            return dataInstanceDataSource;
-        } catch (final SBonitaException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource", e);
-            throw new SDataInstanceException("Unable to get data instance data source", e);
-        }
-    }
-
-    private DataInstanceDataSource getDataInstanceDataSource(final boolean isTransient) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
-        final DataInstanceDataSource dataInstanceDataSource;
-        if (isTransient) {
-            dataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-        } else {
-            dataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-        }
-        logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
-        return dataInstanceDataSource;
-    }
-
-    @Override
-    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "updateDataInstance");
-        NullCheckingUtil.checkArgsNotNull(dataInstance, descriptor);
-        if (dataInstance.isTransientData()) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Updating a transient data instance is not a good practice.");
-            }
-        }
-        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
-        dataInstanceDataSource.updateDataInstance(dataInstance, descriptor);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "updateDataInstance");
-        archiveDataInstance(dataInstance);
     }
 
     private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceException {
@@ -189,52 +133,15 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "deleteDataInstance");
-        NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
-        dataInstanceDataSource.deleteDataInstance(dataInstance);
-        logAfterMethod(TechnicalLogSeverity.TRACE, "deleteDataInstance");
-    }
-
-    @Override
-    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
-        // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
-        try {
-            return getDataInstanceById(dataInstanceId);
-        } finally {
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
-        }
-    }
-
-    @Override
     public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
-        // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
-
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
         try {
             final long dataInstanceId = getDataInstanceDataVisibilityMapping(dataName, containerId, containerType);
-            return getDataInstanceById(dataInstanceId);
+            return getDataInstance(dataInstanceId);
         } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstance", e);
             throw new SDataInstanceReadException("No data found with name " + dataName + "  neither on container " + containerId + " with type "
                     + containerType
                     + " nor in its parents", e);
-        } finally {
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
-        }
-    }
-
-    private SDataInstance getDataInstanceById(final long dataInstanceId) throws SDataInstanceException {
-        final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-        try {
-            return transientDataInstanceDataSource.getDataInstance(dataInstanceId);
-        } catch (final SDataInstanceException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstance", e);
-            final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-            return defaultDataInstanceDataSource.getDataInstance(dataInstanceId);
         }
     }
 
@@ -297,7 +204,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     @Override
     public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
             throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
         NullCheckingUtil.checkArgsNotNull(containerType);
         try {
             final List<SDataInstanceVisibilityMapping> mappings = getDataInstanceVisibilityMappings(containerId, containerType, fromIndex, numberOfResults);
@@ -305,10 +211,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             for (final SDataInstanceVisibilityMapping mapping : mappings) {
                 dataInstances.add(getDataInstance(mapping.getDataInstanceId()));
             }
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
             return dataInstances;
         } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
             throw new SDataInstanceReadException("Unable to read data mappings of the container with type " + containerType + " and id " + containerId, e);
         }
     }
@@ -324,42 +228,42 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public SDataInstance getLocalDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance");
-        NullCheckingUtil.checkArgsNotNull(dataName);
-        NullCheckingUtil.checkArgsNotNull(containerType);
+    public SDataInstance getLocalDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
+        NullCheckingUtil.checkArgsNotNull(dataName, containerType);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getNameKey(), dataName);
+        paraMap.put(fact.getContainerIdKey(), containerId);
+        paraMap.put(fact.getContainerTypeKey(), containerType);
 
-        // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
-        final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
         try {
-            return transientDataInstanceDataSource.getDataInstance(dataName, containerId, containerType);
-        } catch (final SDataInstanceException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance", e);
-            final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-            return defaultDataInstanceDataSource.getDataInstance(dataName, containerId, containerType);
-        } finally {
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance");
+            final SDataInstance dataInstance = persistenceService.selectOne(new SelectOneDescriptor<SDataInstance>("getDataInstancesByNameAndContainer",
+                    paraMap,
+                    SDataInstance.class, SDataInstance.class)); // conditions :and not or
+            if (dataInstance == null) {
+                throw new SDataInstanceReadException("No data instance found");
+            }
+            return dataInstance;
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists: " + e.getMessage(), e);
         }
     }
 
     @Override
     public List<SDataInstance> getLocalDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances");
+            throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(containerType);
-        final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-        final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getContainerIdKey(), containerId);
+        final OrderByOption orderByOption = new OrderByOption(SDataInstance.class, fact.getIdKey(), OrderByType.ASC);
+        paraMap.put(fact.getContainerTypeKey(), containerType);
+
         try {
-            final List<SDataInstance> transientDataInstances = transientDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex,
-                    numberOfResults);
-            final List<SDataInstance> dataInstances = defaultDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
-            dataInstances.addAll(transientDataInstances);
-            return dataInstances;
-        } catch (final SDataInstanceException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances", e);
-            throw e;
-        } finally {
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances");
+            return persistenceService.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,
+                    SDataInstance.class, new QueryOptions(fromIndex, numberOfResults, Arrays.asList(orderByOption))));
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists for the data container of type " + containerType
+                    + " with id "
+                    + containerId + " for reason: " + e.getMessage(), e);
         }
     }
 
@@ -642,24 +546,10 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
         try {
             final List<Long> dataInstanceIds = getDataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
-            final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-            List<SDataInstance> result = null;
-            try {
-                result = transientDataInstanceDataSource.getDataInstances(dataInstanceIds);
-            } catch (final SDataInstanceException e) {
-                logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
-            }
-            if (result == null || result.size() < dataNames.size()) {
-                final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-                final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
-                if (result != null) {
-                    finalResult.addAll(result);
-                }
-                finalResult.addAll(defaultDataInstanceDataSource.getDataInstances(dataInstanceIds));
-                result = finalResult;
-            }
+            final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
+            finalResult.addAll(getDataInstances(dataInstanceIds));
             logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
-            return result;
+            return finalResult;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
             throw new SDataInstanceReadException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
@@ -713,7 +603,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
-        final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DataInstanceDataSource.DATA_INSTANCE).setObject(dataInstance)
+        final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_INSTANCE).setObject(dataInstance)
                 .done();
         final SDeleteEvent deleteEvent = (SDeleteEvent) event;
         try {
@@ -765,6 +655,93 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     private void logOnExceptionMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName, final Exception e) {
         if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
             logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
+        }
+    }
+
+    // ==================================================
+    // was the data instance data source code
+
+    private SInsertEvent getInsertEvent(final Object obj) {
+        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_INSTANCE).setObject(obj).done();
+    }
+
+    private SUpdateEvent getUpdateEvent(final Object obj) {
+        return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DATA_INSTANCE).setObject(obj).done();
+    }
+
+    private SDeleteEvent getDeleteEvent(final Object obj) {
+        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_INSTANCE).setObject(obj).done();
+    }
+
+    @Override
+    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+        try {
+            final InsertRecord insertRecord = new InsertRecord(dataInstance);
+            final SInsertEvent insertEvent = getInsertEvent(dataInstance);
+            recorder.recordInsert(insertRecord, insertEvent);
+        } catch (final SRecorderException e) {
+            throw new SCreateDataInstanceException("Impossible to create data instance.", e);
+        }
+        archiveDataInstance(dataInstance);
+    }
+
+    @Override
+    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
+        NullCheckingUtil.checkArgsNotNull(dataInstance);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, descriptor);
+        final SUpdateEvent updateEvent = getUpdateEvent(dataInstance);
+        try {
+            recorder.recordUpdate(updateRecord, updateEvent);
+        } catch (final SRecorderException e) {
+            throw new SUpdateDataInstanceException("Impossible to update data instance '" + dataInstance.getName() + "': " + e.getMessage(), e);
+        }
+        archiveDataInstance(dataInstance);
+    }
+
+    @Override
+    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+        NullCheckingUtil.checkArgsNotNull(dataInstance);
+        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
+        final SDeleteEvent deleteEvent = getDeleteEvent(dataInstance);
+        try {
+            recorder.recordDelete(deleteRecord, deleteEvent);
+        } catch (final SRecorderException e) {
+            throw new SDeleteDataInstanceException("Impossible to delete data instance", e);
+        }
+    }
+
+    @Override
+    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
+        NullCheckingUtil.checkArgsNotNull(dataInstanceId);
+        try {
+            final SelectByIdDescriptor<SDataInstance> selectDescriptor = new SelectByIdDescriptor<SDataInstance>("getDataInstanceById", SDataInstance.class,
+                    dataInstanceId);
+            final SDataInstance dataInstance = persistenceService.selectById(selectDescriptor);
+            if (dataInstance == null) {
+                throw new SDataInstanceNotFoundException("Cannot get the data instance with id " + dataInstanceId);
+            }
+            return dataInstance;
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException("Cannot get the data instance with id " + dataInstanceId, e);
+        }
+    }
+
+    private List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceException {
+        NullCheckingUtil.checkArgsNotNull(dataInstanceIds);
+        if (dataInstanceIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        try {
+            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", dataInstanceIds);
+            final SelectListDescriptor<SDataInstance> selectDescriptor = new SelectListDescriptor<SDataInstance>("getDataInstanceByIds", parameters,
+                    SDataInstance.class, new QueryOptions(0, dataInstanceIds.size()));
+            final List<SDataInstance> dataInstances = persistenceService.selectList(selectDescriptor);
+            if (dataInstances == null) {
+                throw new SDataInstanceNotFoundException("Cannot get the data instance with id " + dataInstanceIds);
+            }
+            return dataInstances;
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException("Cannot get the data instance with id " + dataInstanceIds, e);
         }
     }
 

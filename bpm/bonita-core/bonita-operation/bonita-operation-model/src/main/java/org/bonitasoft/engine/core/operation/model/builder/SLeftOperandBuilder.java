@@ -17,12 +17,13 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 
 /**
  * @author Zhang Bole
+ * @author Baptiste Mesta
  */
 public interface SLeftOperandBuilder {
 
     SLeftOperandBuilder setName(final String dataName);
 
-    SLeftOperandBuilder setExternal(final boolean external);
+    SLeftOperandBuilder setType(final String type);
 
     SLeftOperand done();
 

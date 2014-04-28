@@ -24,16 +24,10 @@ import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 public class SLeftOperandBuilderImpl implements SLeftOperandBuilder {
 
     private final SLeftOperandImpl leftOperand;
-    
+
     public SLeftOperandBuilderImpl(final SLeftOperandImpl leftOperand) {
         super();
         this.leftOperand = leftOperand;
-    }
-
-    @Override
-    public SLeftOperandBuilder setExternal(final boolean external) {
-        leftOperand.setExternal(external);
-        return this;
     }
 
     @Override
@@ -45,6 +39,12 @@ public class SLeftOperandBuilderImpl implements SLeftOperandBuilder {
     @Override
     public SLeftOperand done() {
         return leftOperand;
+    }
+
+    @Override
+    public SLeftOperandBuilder setType(final String type) {
+        leftOperand.setType(type);
+        return this;
     }
 
 }

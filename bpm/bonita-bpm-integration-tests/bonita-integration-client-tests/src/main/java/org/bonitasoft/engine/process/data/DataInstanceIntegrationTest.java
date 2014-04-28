@@ -431,25 +431,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
 
         // Update data instance
-        updateActivityInstanceVariablesWithOperations(updatedValue, activityInstanceId, "dataName");
-        assertEquals(updatedValue, getProcessAPI().getActivityDataInstance("dataName", activityInstanceId).getValue());
-
-        // Clean
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    @Cover(classes = { ProcessAPI.class, ActivityInstance.class, DataInstance.class }, concept = BPMNConcept.DATA, keywords = { "Data", "Transient", "Update" }, jira = "ENGINE-1260")
-    @Test
-    public void updateActivityInstanceOperationsWithStringDataTransient() throws Exception {
-        final String updatedValue = "afterUpdate";
-
-        final DesignProcessDefinition designProcessDefinition = createProcessWithActorAndHumanTaskAndNullStringDataTransient();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
-
-        // Update data instance
-        updateActivityInstanceVariablesWithOperations(updatedValue, activityInstanceId, "dataName");
+        updateActivityInstanceVariablesWithOperations(updatedValue, activityInstanceId, "dataName", false);
         assertEquals(updatedValue, getProcessAPI().getActivityDataInstance("dataName", activityInstanceId).getValue());
 
         // Clean
@@ -981,7 +963,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
-        final Expression transientVariableExpression = new ExpressionBuilder().createDataExpression("transientVariable", String.class.getName());
+        final Expression transientVariableExpression = new ExpressionBuilder().createTransientDataExpression("transientVariable", String.class.getName());
         expressions.put(persistedVariableExpression, (Map<String, Serializable>) null);
         expressions.put(transientVariableExpression, (Map<String, Serializable>) null);
 

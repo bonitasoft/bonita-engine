@@ -52,6 +52,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_VARIABLE = "TYPE_VARIABLE";
 
+    String TYPE_TRANSIENT_VARIABLE = "TYPE_TRANSIENT_VARIABLE";
+
     String TYPE_PATTERN = "TYPE_PATTERN";
 
     String TYPE_JAVA_METHOD_CALL = "TYPE_JAVA_METHOD_CALL";
@@ -77,6 +79,8 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_INPUT = new ExpressionKind(TYPE_INPUT);
 
     ExpressionKind KIND_VARIABLE = new ExpressionKind(TYPE_VARIABLE);
+
+    ExpressionKind KIND_TRANSIENT_VARIABLE = new ExpressionKind(TYPE_TRANSIENT_VARIABLE);
 
     ExpressionKind KIND_PATTERN = new ExpressionKind(TYPE_PATTERN);
 

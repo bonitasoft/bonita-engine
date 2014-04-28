@@ -22,7 +22,6 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
@@ -120,7 +119,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private void createListDataInstance(final String dataInstanceName, final long containerId, final String containerType,
-            final String defaultValueExpressionConstant, final Serializable defaultValue) throws SBonitaException, SDataInstanceReadException {
+            final String defaultValueExpressionConstant, final Serializable defaultValue) throws SBonitaException {
         final String description = null;
         final SDataInstance dataInstance = buildDataInstance(dataInstanceName, ArrayList.class.getName(), description, defaultValueExpressionConstant,
                 containerId, containerType, false, SExpression.TYPE_READ_ONLY_SCRIPT, SExpression.GROOVY, defaultValue);
@@ -163,7 +162,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private void createStringDataInstance(final String instanceName, final long containerId, final String containerType,
-            final String defaultValueExpressionContent, final Serializable currentDataInstanceValue) throws SBonitaException, SDataInstanceReadException {
+            final String defaultValueExpressionContent, final Serializable currentDataInstanceValue) throws SBonitaException {
         final SDataInstance dataInstance = buildDataInstance(instanceName, String.class.getName(), "testUpdate", defaultValueExpressionContent, containerId,
                 containerType, false, SExpression.TYPE_CONSTANT, null, currentDataInstanceValue);
         insertDataInstance(dataInstance);

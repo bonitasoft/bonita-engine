@@ -156,6 +156,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -1626,26 +1627,31 @@ public class ModelConvertor {
         }
     }
 
-    public static SOperation constructSOperation(final Operation operation) {
-        final SExpression rightOperand = constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
+    public static SOperation convertOperation(final Operation operation) {
+        if (operation == null) {
+            return null;
+        }
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
+                .setType(SOperatorType.valueOf(operation.getType().name()))
+                .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                        .setName(operation.getLeftOperand().getName())
+                        .setType(operation.getLeftOperand().getType())
+                        .done())
+                .done();
     }
 
-    public static List<SOperation> constructSOperations(List<Operation> operations) {
-        ArrayList<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
-        for (Operation operation : operations) {
-            sOperations.add(ModelConvertor.constructSOperation(operation));
+    public static List<SOperation> convertOperations(final List<Operation> operations) {
+        if (operations == null) {
+            return Collections.emptyList();
+        }
+        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
+        for (final Operation operation : operations) {
+            sOperations.add(convertOperation(operation));
         }
         return sOperations;
     }
 
-    private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName())
-                .setExternal(variableToSet.isExternal()).done();
-    }
 
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
             final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors) {
@@ -1694,11 +1700,11 @@ public class ModelConvertor {
         operationImpl.setRightOperand(toExpression(operation.getRightOperand()));
         operationImpl.setOperator(operation.getOperator());
         operationImpl.setType(toOperatorType(operation.getType()));
-        final LeftOperandImpl variableToSet = new LeftOperandImpl();
-        final SLeftOperand variableToSet2 = operation.getLeftOperand();
-        variableToSet.setName(variableToSet2.getName());
-        variableToSet.setExternal(variableToSet2.isExternal());
-        operationImpl.setLeftOperand(variableToSet);
+        final LeftOperandImpl leftOperand = new LeftOperandImpl();
+        final SLeftOperand sLeftOperand = operation.getLeftOperand();
+        leftOperand.setName(sLeftOperand.getName());
+        leftOperand.setType(sLeftOperand.getType());
+        operationImpl.setLeftOperand(leftOperand);
         return operationImpl;
     }
 
@@ -1959,28 +1965,6 @@ public class ModelConvertor {
         return themeImpl;
     }
 
-    public static List<SOperation> toSOperation(final List<Operation> operations) {
-        if (operations == null) {
-            return null;
-        }
-        if (operations.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
-        for (final Operation operation : operations) {
-            final SOperation sOperation = toSOperation(operation);
-            sOperations.add(sOperation);
-        }
-        return sOperations;
-    }
-
-    public static SOperation toSOperation(final Operation operation) {
-        final SExpression rightOperand = ModelConvertor.constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
-    }
 
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();

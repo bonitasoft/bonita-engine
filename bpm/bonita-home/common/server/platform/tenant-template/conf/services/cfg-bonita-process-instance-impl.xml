@@ -3,7 +3,7 @@
 
     <bean id="activityInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl">
         <constructor-arg name="recorder" ref="recorderSync" />
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -51,7 +51,7 @@
     <bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="eventService" ref="eventService" />
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
