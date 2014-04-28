@@ -43,11 +43,6 @@
 						<entry key="hibernate.validator.autoregister_listeners" value="false" />
 						<entry key="hibernate.validator.apply_to_ddl" value="false" />
 						<entry key="javax.persistence.validation.mode" value="NONE" />
-						<entry key="net.sf.ehcache.configurationResourceName">
-							<bean class="org.bonitasoft.engine.service.impl.URLInBonitaHomeFactory">
-								<property name="path" value="/server/platform/conf/ehcache.xml" />
-							</bean>
-						</entry>
 					</map>
 				</property>
 			</bean>
