@@ -34,6 +34,8 @@ CREATE TABLE token (
   PRIMARY KEY (tenantid, id)
 );
 
+CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
+
 CREATE TABLE flownode_instance (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
