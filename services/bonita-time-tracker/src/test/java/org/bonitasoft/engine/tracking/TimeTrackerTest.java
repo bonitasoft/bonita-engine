@@ -13,24 +13,44 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
+    private TimeTracker tracker;
+
+    @After
+    public void after() {
+        if (tracker != null) {
+            assertFalse(tracker.isStarted());
+        }
+    }
+
+    @Test
+    public void should_isTrackable_returns_false_if_not_started() throws Exception {
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        tracker = new TimeTracker(logger, false, null, 10, 2, "rec");
+        assertFalse(tracker.isTrackable("rec"));
+    }
+
     @Test
     public void testIsTrackable() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
+        tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
+        tracker.start();
         assertTrue(tracker.isTrackable("rec1"));
         assertTrue(tracker.isTrackable("rec2"));
         assertFalse(tracker.isTrackable("rec3"));
+        tracker.stop();
     }
 
     @Test
     public void testTrackRecords() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
+        tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
+        tracker.start();
         tracker.track("rec1", "rec11Desc", 100);
         tracker.track("rec1", "rec12Desc", 200);
         tracker.track("rec2", "rec2Desc", 300);
@@ -57,12 +77,14 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         assertEquals("rec2", rec2.getName());
         assertEquals("rec2Desc", rec2.getDescription());
         assertEquals(300L, rec2.getDuration());
+        tracker.stop();
     }
 
     @Test
     public void testTimestamp() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "rec1");
+        tracker = new TimeTracker(logger, false, null, 10, 2, "rec1");
+        tracker.start();
         tracker.track("rec1", "desc2", 100);
         Thread.sleep(2);
         tracker.track("rec1", "desc2", 200);
@@ -73,6 +95,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         final List<Record> rec1s = records.get("rec1");
 
         assertTrue(rec1s.get(0).getTimestamp() < rec1s.get(1).getTimestamp());
+        tracker.stop();
     }
 
     private Map<String, List<Record>> mapRecords(final List<Record> records) {
@@ -89,22 +112,46 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         return result;
     }
 
-    @Test(expected = RuntimeException.class)
-    public void should_throw_an_exception_on_stopFlushThread_if_not_started() throws Exception {
+    @Test
+    public void should_build_do_not_start_flush_thread() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2);
-        tracker.stopFlushThread();
+        tracker = new TimeTracker(logger, false, null, 10, 2);
+        assertFalse(tracker.isFlushThreadAlive());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void should_throw_an_exception_on_startFlushThread_if_already_started_at_build_time() throws Exception {
+    @Test
+    public void should_start_start_flush_thread_if_startFlushThread_is_true() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, true, null, 10, 2);
-        try {
-            tracker.startFlushThread();
-        } finally {
-            tracker.stopFlushThread();
-        }
+        tracker = new TimeTracker(logger, true, null, 10, 2);
+        tracker.start();
+        assertTrue(tracker.isFlushThreadAlive());
+        tracker.stop();
+    }
+
+    @Test
+    public void should_start_do_not_start_flush_thread_if_startFlushThread_is_false() throws Exception {
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        tracker = new TimeTracker(logger, false, null, 10, 2);
+        tracker.start();
+        assertFalse(tracker.isFlushThreadAlive());
+        tracker.stop();
+    }
+
+    @Test
+    public void should_stop_stop_flush_thread_if_running() throws Exception {
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        tracker = new TimeTracker(logger, false, null, 10, 2);
+        tracker.start();
+        tracker.stop();
+        assertFalse(tracker.isFlushThreadAlive());
+    }
+
+    @Test
+    public void should_stop_stop_silently_if_flush_thread_is_running() throws Exception {
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        tracker = new TimeTracker(logger, false, null, 10, 2);
+        tracker.start();
+        tracker.stop();
     }
 
     @Test
@@ -123,7 +170,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener2);
         listeners.add(listener3);
 
-        final TimeTracker tracker = new TimeTracker(logger, clock, false, listeners, 10, 1, "rec");
+        tracker = new TimeTracker(logger, clock, false, listeners, 10, 1, "rec");
 
         tracker.track("rec", "desc", 10);
 
@@ -146,7 +193,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener1);
         listeners.add(listener2);
 
-        final TimeTracker tracker = new TimeTracker(logger, clock, false, listeners, 10, 1, "rec");
+        tracker = new TimeTracker(logger, clock, false, listeners, 10, 1, "rec");
 
         tracker.track("rec", "desc", 10);
 
@@ -160,8 +207,8 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void testRollingRecords() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 2, 2, "rec");
-
+        tracker = new TimeTracker(logger, false, null, 2, 2, "rec");
+        tracker.start();
         tracker.track("rec", "rec1", 100);
         assertEquals(1, tracker.getRecords().size());
         tracker.track("rec", "rec2", 100);
@@ -170,5 +217,6 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         assertEquals(2, tracker.getRecords().size());
         assertEquals("rec2", tracker.getRecords().get(0).getDescription());
         assertEquals("rec3", tracker.getRecords().get(1).getDescription());
+        tracker.stop();
     }
 }

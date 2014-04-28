@@ -10,10 +10,12 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
-public class TimeTracker {
+public class TimeTracker implements TenantLifecycleService {
 
     private final Set<String> activatedRecords;
 
@@ -24,6 +26,10 @@ public class TimeTracker {
     private final TechnicalLoggerService logger;
 
     private final Queue<Record> records;
+
+    private boolean started;
+
+    private final boolean startFlushThread;
 
     public TimeTracker(
             final TechnicalLoggerService logger,
@@ -44,6 +50,8 @@ public class TimeTracker {
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
         super();
+        this.startFlushThread = startFlushThread;
+        started = false;
         this.logger = logger;
         this.flushEventListeners = flushEventListeners;
         if (activatedRecords == null || activatedRecords.length == 0) {
@@ -59,15 +67,10 @@ public class TimeTracker {
         this.flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
 
         this.records = new CircularFifoQueue<Record>(maxSize);
-
-        if (startFlushThread) {
-            startFlushThread();
-        }
-        Runtime.getRuntime().addShutdownHook(new FlushThreadShutdownHook(this.flushThread));
     }
 
     public boolean isTrackable(final String recordName) {
-        return this.activatedRecords.contains(recordName);
+        return started && this.activatedRecords.contains(recordName);
     }
 
     public void track(final String recordName, final String recordDescription, final long duration) {
@@ -85,32 +88,6 @@ public class TimeTracker {
             }
             // TODO needs a synchro?
             records.add(record);
-        }
-    }
-
-    public void startFlushThread() {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker FlushThread...");
-        }
-        if (this.flushThread.isAlive()) {
-            throw new RuntimeException("FlushThread is already running");
-        }
-        this.flushThread.start();
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker FlushThread started.");
-        }
-    }
-
-    public void stopFlushThread() {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker FlushThread...");
-        }
-        if (!this.flushThread.isAlive()) {
-            throw new RuntimeException("FlushThread is not running");
-        }
-        this.flushThread.interrupt();
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker FlushThread stopped.");
         }
     }
 
@@ -148,4 +125,49 @@ public class TimeTracker {
         return Arrays.asList(this.records.toArray(new Record[] {}));
     }
 
+    @Override
+    public void start() throws SBonitaException {
+        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker...");
+        }
+        if (this.startFlushThread && !this.flushThread.isAlive()) {
+            this.flushThread.start();
+        }
+        this.started = true;
+        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker started.");
+        }
+    }
+
+    @Override
+    public void stop() throws SBonitaException {
+        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
+        }
+        if (this.flushThread.isAlive()) {
+            this.flushThread.interrupt();
+        }
+        this.started = false;
+        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker stopped.");
+        }
+    }
+
+    @Override
+    public void pause() throws SBonitaException {
+        // nothing to do as this service is not for production, we don't want to spend time on this
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do as this service is not for production, we don't want to spend time on this
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public boolean isFlushThreadAlive() {
+        return this.flushThread.isAlive();
+    }
 }

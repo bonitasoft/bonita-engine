@@ -47,7 +47,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
         final TimeTracker tracker = new TimeTracker(logger, false, flushEventListeners, 10, 2, "rec");
-
+        tracker.start();
         tracker.track(rec1);
         tracker.track(rec2);
 
@@ -65,6 +65,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         assertEquals(2, records.size());
         checkRecord(rec1, records.get(0));
         checkRecord(rec2, records.get(1));
+        tracker.stop();
     }
 
     private void checkCSVRecord(final Record record, final List<String> csvValues) {
