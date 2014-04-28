@@ -50,8 +50,8 @@ import com.bonitasoft.engine.supervisor.SupervisedTests;
         ReportingSQLValidityIT.class,
         PlatformMonitoringAPITest.class,
         TenantTest.class,
-        BDRepositoryIT.class,
-        ExecuteBDMQueryCommandIT.class
+        BDRepositoryIT.class
+        //ExecuteBDMQueryCommandIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {
