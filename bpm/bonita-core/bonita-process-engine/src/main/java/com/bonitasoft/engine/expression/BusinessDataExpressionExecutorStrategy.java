@@ -56,14 +56,14 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        String bizDataName = expression.getContent();
+        final String bizDataName = expression.getContent();
         if (context.containsKey(bizDataName)) {
             return context.get(bizDataName);
         }
         long processInstanceId = -1;
         try {
-            processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
-                    (String) context.get(SExpressionContext.containerTypeKey));
+            processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.CONTAINER_ID_KEY),
+                    (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY));
             SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
             Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             return businessDataRepository.findById(bizClass, refBusinessDataInstance.getDataId());

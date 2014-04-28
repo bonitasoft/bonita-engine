@@ -101,8 +101,8 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
     private HashMap<String, Object> buildBusinessDataExpressionContext(final long containerId, final DataInstanceContainer containerType) {
         final HashMap<String, Object> context = new HashMap<String, Object>();
-        context.put(SExpressionContext.containerIdKey, containerId);
-        context.put(SExpressionContext.containerTypeKey, containerType.name());
+        context.put(SExpressionContext.CONTAINER_ID_KEY, containerId);
+        context.put(SExpressionContext.CONTAINER_TYPE_KEY, containerType.name());
         return context;
     }
 
