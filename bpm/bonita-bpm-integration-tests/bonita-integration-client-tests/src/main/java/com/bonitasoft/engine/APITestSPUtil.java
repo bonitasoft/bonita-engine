@@ -233,8 +233,8 @@ public class APITestSPUtil extends APITestUtil {
         getCommandAPI().execute("deleteSupervisor", deleteParameters);
     }
 
-    protected ManualTaskCreator buildManualTaskCreator(final long parentTaskId, final String taskName, final long assignTo,
-            final String description, final Date dueDate, final TaskPriority priority) {
+    protected ManualTaskCreator buildManualTaskCreator(final long parentTaskId, final String taskName, final long assignTo, final String description,
+            final Date dueDate, final TaskPriority priority) {
         final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTaskId, taskName);
         taskCreator.setDisplayName(taskName);
         taskCreator.setAssignTo(assignTo);

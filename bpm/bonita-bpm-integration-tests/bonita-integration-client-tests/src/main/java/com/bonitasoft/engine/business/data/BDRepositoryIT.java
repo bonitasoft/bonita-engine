@@ -111,8 +111,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Before
     public void setUp() throws Exception {
-        clientFolder = new File(System.getProperty("java.io.tmpdir"), "client");
-        clientFolder.mkdirs();
+        clientFolder = com.bonitasoft.engine.io.IOUtils.createTempDirectory("bdr_it_client");
         login();
         matti = createUser("matti", "bpm");
 
@@ -155,14 +154,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
         deleteProcess(processDefinition);
     }
 
-    private void installBusinessDataModel(byte[] bdm) throws Exception {
+    private void installBusinessDataModel(final byte[] bdm) throws Exception {
         getTenantManagementAPI().pause();
         getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
         getTenantManagementAPI().installBusinessDataModel(bdm);
         getTenantManagementAPI().resume();
     }
 
-    private ProcessDefinition deploySimpleProcessWithBusinessData(String aQualifiedName) throws Exception {
+    private ProcessDefinition deploySimpleProcessWithBusinessData(final String aQualifiedName) throws Exception {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         final String bizDataName = "myBizData";
@@ -174,7 +173,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         return processDefinition;
     }
 
-    private byte[] buildSimpleBom(String boQualifiedName) throws IOException, JAXBException, SAXException {
+    private byte[] buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
         BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
         Field field = new Field();
