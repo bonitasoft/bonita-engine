@@ -26,6 +26,7 @@ import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -46,9 +47,9 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        return evaluate(Arrays.asList(expression), dependencyValues, resolvedExpressions).get(0);
+    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+        return evaluate(Arrays.asList(expression), dependencyValues, resolvedExpressions, containerState).get(0);
     }
 
     @Override
@@ -57,8 +58,9 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
+            final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         long containerId;
         String containerType;
         final int maxExpressionSize = expressions.size();

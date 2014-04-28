@@ -436,7 +436,7 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_GET_PLATFORM));
             }
             return platform;
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                         LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_GET_PLATFORM, "Unable to check if a platform already exists : " + e.getMessage()));
@@ -456,7 +456,7 @@ public class PlatformServiceImpl implements PlatformService {
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with id: " + id);
             }
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             throw new STenantNotFoundException("Unable to get the tenant : " + e.getMessage(), e);
         }
         if (trace) {

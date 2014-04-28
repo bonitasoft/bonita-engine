@@ -250,7 +250,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                     quartzSchedulerField.setAccessible(true);
                     quartzScheduler = (QuartzScheduler) quartzSchedulerField.get(scheduler);
                 }
-            } catch (final Throwable t) {
+            } catch (final Exception t) {
                 // this is an optimization, we do not want it to make the system failing
                 t.printStackTrace();
             }
@@ -410,6 +410,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
+    @Override
     public void pauseJobs(final long tenantId) throws SSchedulerException {
         GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
         try {
@@ -428,5 +429,5 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
         }
     }
-    
+
 }

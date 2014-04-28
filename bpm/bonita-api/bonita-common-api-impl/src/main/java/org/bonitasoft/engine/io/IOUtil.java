@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -45,7 +45,7 @@ public class IOUtil {
 
     private static final int BUFFER_SIZE = 100000;
 
-    public static final String fEncoding = "UTF-8";
+    public static final String FILE_ENCODING = "UTF-8";
 
     public static byte[] generateJar(final Class<?>... classes) throws IOException {
         return generateJar(getResources(classes));
@@ -88,7 +88,7 @@ public class IOUtil {
     }
 
     public static byte[] generateJar(final Map<String, byte[]> resources) throws IOException {
-        if (resources == null || resources.size() == 0) {
+        if (resources == null || resources.isEmpty()) {
             final String message = "No resources available";
             throw new IOException(message);
         }
@@ -301,7 +301,7 @@ public class IOUtil {
         if (inputStream == null) {
             throw new IllegalArgumentException("Input stream is null");
         }
-        final Scanner scanner = new Scanner(inputStream, fEncoding);
+        final Scanner scanner = new Scanner(inputStream, FILE_ENCODING);
         return read(scanner);
     }
 
@@ -329,7 +329,7 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        final Scanner scanner = new Scanner(new FileInputStream(file), fEncoding);
+        final Scanner scanner = new Scanner(new FileInputStream(file), FILE_ENCODING);
         return read(scanner);
     }
 
@@ -397,7 +397,7 @@ public class IOUtil {
     }
 
     public static void writeContentToFile(final String content, final File outputFile) throws IOException {
-        final Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), fEncoding);
+        final Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), FILE_ENCODING);
         try {
             out.write(content);
         } finally {

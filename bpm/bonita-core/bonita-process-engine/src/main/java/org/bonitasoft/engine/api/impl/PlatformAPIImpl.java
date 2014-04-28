@@ -637,7 +637,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             return;
         }
         try {
-            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.fEncoding);
+            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.FILE_ENCODING);
         } finally {
             inputStream.close();
         }

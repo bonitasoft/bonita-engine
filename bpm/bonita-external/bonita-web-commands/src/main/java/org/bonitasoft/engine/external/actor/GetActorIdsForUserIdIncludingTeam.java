@@ -103,8 +103,6 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
             // Let's fill in the final result:
             map.put(processDefinition, actorIdsForProcessDef);
         }
-        // next page of results:
-        // fromIndex += numberOfResult;
 
         return map;
     }

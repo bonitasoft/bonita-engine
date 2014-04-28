@@ -61,6 +61,8 @@ import com.thoughtworks.xstream.mapper.CannotResolveClassException;
  */
 public class HTTPServerAPI implements ServerAPI {
 
+    private static final long serialVersionUID = -3375874140999200702L;
+
     private static final String UTF_8 = "UTF-8";
 
     private static final String CLASS_NAME_PARAMETERS = "classNameParameters";
@@ -76,8 +78,6 @@ public class HTTPServerAPI implements ServerAPI {
     private static final char SLASH = '/';
 
     private static final String SERVER_API = "/serverAPI/";
-
-    private static final long serialVersionUID = 1L;
 
     static final String SERVER_URL = "server.url";
 
@@ -103,15 +103,15 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static DefaultHttpClient httpclient;
 
-    private static final XStream xstream;
+    private static final XStream XSTREAM;
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
-    private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
+    private static final ResponseHandler<String> RESPONSE_HANDLER = new BonitaResponseHandler();
 
     static {
-        xstream = new XStream();
-        xstream.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
+        XSTREAM = new XStream();
+        XSTREAM.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
     }
 
     public HTTPServerAPI(final Map<String, String> parameters) {
@@ -132,8 +132,8 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         String response = null;
         try {
-            response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
-            return checkInvokeMethodReturn(response, xstream);
+            response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, XSTREAM);
+            return checkInvokeMethodReturn(response, XSTREAM);
         } catch (final UndeclaredThrowableException e) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.log(Level.FINE, e.getMessage(), e);
@@ -148,7 +148,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
         Object invokeMethodReturn = null;
-        if (response != null && !response.isEmpty() && !response.equals("null")) {
+        if (response != null && !response.isEmpty() && !"null".equals(response)) {
             invokeMethodReturn = fromXML(response, xstream);
             if (invokeMethodReturn instanceof Throwable) {
                 throw (Throwable) invokeMethodReturn;
@@ -162,7 +162,7 @@ public class HTTPServerAPI implements ServerAPI {
             ClientProtocolException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
         try {
-            return httpclient.execute(httpost, responseHandler);
+            return httpclient.execute(httpost, RESPONSE_HANDLER);
         } catch (final ClientProtocolException e) {
             if (LOGGER.isLoggable(Level.SEVERE)) {
                 LOGGER.log(Level.SEVERE, e.getMessage() + System.getProperty("line.separator") + "httpost = <" + httpost + ">");

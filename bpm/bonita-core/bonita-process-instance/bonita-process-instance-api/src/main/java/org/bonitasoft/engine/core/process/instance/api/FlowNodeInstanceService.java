@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
@@ -233,7 +232,7 @@ public interface FlowNodeInstanceService {
      * @return The list of paginated results, according to the QueryOptions search criteria
      * @since 6.0
      */
-    List<SAFlowNodeInstance> searchArchivedFlowNodeInstances(Class<? extends SAFlowNodeInstance> entityClass, QueryOptions queryOptions)
+    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(Class<T> entityClass, QueryOptions queryOptions)
             throws SBonitaSearchException;
 
     /**
@@ -276,8 +275,17 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeNotFoundException
      * @since 6.0
      */
-    SAFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId, ReadPersistenceService persistenceService) throws SFlowNodeReadException,
-            SFlowNodeNotFoundException;
+    SAFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId) throws SFlowNodeReadException, SFlowNodeNotFoundException;
+
+    /**
+     * 
+     * @param sourceObjectFlowNodeInstanceId
+     *            The source identifier of the flow node instance
+     * @return The last archived flow node
+     * @since 6.3
+     */
+    public <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
+            throws SBonitaSearchException;
 
     /**
      * @param flowNodeInstance

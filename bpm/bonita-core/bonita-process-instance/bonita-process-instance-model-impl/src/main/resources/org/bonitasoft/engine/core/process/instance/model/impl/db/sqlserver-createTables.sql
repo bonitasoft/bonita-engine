@@ -90,7 +90,6 @@ CREATE TABLE flownode_instance (
   PRIMARY KEY (tenantid, id)
 )
 GO
-
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
 GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
@@ -111,6 +110,8 @@ CREATE TABLE connector_instance (
   stackTrace NVARCHAR(MAX),
   PRIMARY KEY (tenantid, id)
 )
+GO
+CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent)
 GO
 
 CREATE TABLE event_trigger_instance (

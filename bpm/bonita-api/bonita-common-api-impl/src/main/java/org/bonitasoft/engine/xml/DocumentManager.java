@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -38,6 +38,10 @@ import org.xml.sax.SAXException;
  */
 public class DocumentManager {
 
+    private DocumentManager() {
+        // For Sonar
+    }
+
     public static Document generateDocument(final String s) throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final InputStream is = new ByteArrayInputStream(s.getBytes());
@@ -52,7 +56,6 @@ public class DocumentManager {
         final Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         final StringWriter writer = new StringWriter();
         try {
             final StreamResult result = new StreamResult(writer);

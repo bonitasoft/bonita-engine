@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,6 +26,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 /**
  * @author Zhao Na
  * @author Baptiste Mesta
+ * @author Celine Souchet
  * @since 6.0
  */
 public interface ExpressionService {
@@ -41,7 +42,7 @@ public interface ExpressionService {
      * @throws SExpressionDependencyMissingException
      * @throws SInvalidExpressionException
      */
-    Object evaluate(SExpression expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionTypeUnknownException,
+    Object evaluate(SExpression expression, Map<Integer, Object> resolvedExpressions, ContainerState containerState) throws SExpressionTypeUnknownException,
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException;
 
     /**
@@ -57,7 +58,7 @@ public interface ExpressionService {
      * @throws SExpressionDependencyMissingException
      * @throws SInvalidExpressionException
      */
-    Object evaluate(SExpression expression, Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+    Object evaluate(SExpression expression, Map<String, Object> dependencyValues, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException;
 
     /**
@@ -76,7 +77,7 @@ public interface ExpressionService {
      * @throws SInvalidExpressionException
      */
     List<Object> evaluate(ExpressionKind expressionKind, List<SExpression> expressions, Map<String, Object> dependencyValues,
-            final Map<Integer, Object> resolvedExpressions) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            Map<Integer, Object> resolvedExpressions, ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException;
 
     /**

@@ -10,41 +10,15 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
- * @since 6.2
- */
-package org.bonitasoft.engine.service.impl;
+ **/
 
-import java.io.File;
-
-import org.springframework.beans.factory.config.AbstractFactoryBean;
+package org.bonitasoft.engine.expression;
 
 /**
- * @author Baptiste Mesta
+ * 
+ * @author Celine Souchet
  * 
  */
-public class URLInBonitaHomeFactory extends AbstractFactoryBean<String> {
-
-    private String path;
-
-    @Override
-    public Class<?> getObjectType() {
-        return String.class;
-    }
-
-    @Override
-    protected String createInstance() throws Exception {
-        File file = new File(System.getProperty("bonita.home"), path);
-        if (file.exists()) {
-            return file.toURI().toURL().toString();
-        }
-        throw new IllegalStateException("The file " + path + " does not exists in bonita home");
-
-    }
-
-    public void setPath(final String path) {
-        this.path = path;
-
-    }
-
+public enum ContainerState {
+    ARCHIVED, ACTIVE;
 }
