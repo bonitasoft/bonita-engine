@@ -49,12 +49,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-cached-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Parameter -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.parameter</groupId>
@@ -201,26 +195,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Data -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Data Instance -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
@@ -237,12 +211,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.definition</groupId>
 			<artifactId>bonita-data-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-data-source-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -403,7 +371,7 @@
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl-hibernate</artifactId>
+			<artifactId>bonita-identity-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -674,7 +642,7 @@
 		<!-- Transient Data -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient-data-source</artifactId>
+			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

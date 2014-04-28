@@ -247,8 +247,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createNewInstance("myEmployee").done(),
-                OperatorType.CREATE_BUSINESS_DATA, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
+                OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
         final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, businessUser);

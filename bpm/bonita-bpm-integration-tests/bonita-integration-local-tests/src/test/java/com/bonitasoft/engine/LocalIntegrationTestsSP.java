@@ -28,7 +28,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         TenantPauseLocalTestSP.class,
         TenantMaintenanceLocalTestSP.class,
         PageAPILocalIT.class,
-        TenantLocalTestSpITest.class
+        TenantLocalTestSpITest.class 
 })
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {

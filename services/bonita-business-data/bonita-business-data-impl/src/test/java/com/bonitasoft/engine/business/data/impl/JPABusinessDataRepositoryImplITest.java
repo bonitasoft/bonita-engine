@@ -3,9 +3,11 @@ package com.bonitasoft.engine.business.data.impl;
 import static com.bonitasoft.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
@@ -18,12 +20,12 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
-import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -49,6 +51,8 @@ public class JPABusinessDataRepositoryImplITest {
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
+    private TransactionService transactionService;
+
     @Autowired
     @Qualifier("businessDataDataSource")
     private DataSource datasource;
@@ -66,8 +70,6 @@ public class JPABusinessDataRepositoryImplITest {
     private JdbcTemplate jdbcTemplate;
 
     private UserTransaction ut;
-
-    private EntityManager entityManager;
 
     @BeforeClass
     public static void initializeBitronix() {
@@ -87,10 +89,11 @@ public class JPABusinessDataRepositoryImplITest {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
+        transactionService = mock(TransactionService.class);
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, null, null));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(businessDataModelRepositoryImpl, configuration));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, configuration));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
@@ -101,7 +104,6 @@ public class JPABusinessDataRepositoryImplITest {
 
         businessDataModelRepositoryImpl.update(classNames);
         businessDataRepository.start();
-        entityManager = businessDataRepository.getEntityManager();
     }
 
     @After
@@ -119,7 +121,7 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     private Employee addEmployeeToRepository(final Employee employee) {
-        return entityManager.merge(employee);
+        return businessDataRepository.merge(employee);
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
@@ -285,17 +287,24 @@ public class JPABusinessDataRepositoryImplITest {
     public void findBasedOnAMultipleAttributeShouldReturnTheEntity() throws Exception {
         final Person person = new Person();
         person.setNickNames(Arrays.asList("John", "James", "Jack"));
-        final Person expected = entityManager.merge(person);
+        final Person expected = businessDataRepository.merge(person);
 
         final Person actual = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
         assertThat(actual).isEqualTo(expected);
 
         actual.removeFrom("James");
 
-        entityManager.merge(actual);
+        businessDataRepository.merge(actual);
 
         final Person actual2 = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
         assertThat(actual2).isNull();
+    }
+
+    @Test
+    public void getEntityManagerAddATransactionSynchroInOrderToCleanTheThreadLocalWhenTheTxIsOver() throws Exception {
+        businessDataRepository.getEntityManager();
+
+        verify(transactionService).registerBonitaSynchronization(any(RemoveEntityManagerSynchronization.class));
     }
 
 }

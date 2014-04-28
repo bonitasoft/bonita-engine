@@ -22,10 +22,12 @@ import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.page.PageAPIIT;
+import com.bonitasoft.engine.operation.OperationTest;
 import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
+import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
 import com.bonitasoft.engine.supervisor.SupervisedTests;
 
@@ -46,8 +48,10 @@ import com.bonitasoft.engine.supervisor.SupervisedTests;
         MonitoringAPITest.class,
         SearchEntitiesTests.class,
         ReportingAPIIT.class,
+        ReportingSQLValidityIT.class,
         PlatformMonitoringAPITest.class,
         TenantTest.class,
+        OperationTest.class,
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
