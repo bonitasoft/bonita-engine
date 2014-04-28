@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
@@ -105,39 +108,53 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_flush_thread_flush_every_flushIntervalSeconds() throws Exception {
-        final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
-        final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
-        final Object monitor = new Object();
-        final List<FlushEventListener> listeners = new ArrayList<FlushEventListener>();
-        listeners.add(new FlushEventListener() {
-
-            @Override
-            public FlushResult flush(final FlushEvent flushEvent) throws Exception {
-                final List<Record> records = flushEvent.getRecords();
-                assertEquals(2, records.size());
-                synchronized (monitor) {
-                    monitor.notify();
-                }
-                return new FlushResult(flushEvent);
-            }
-        });
-        final int flushIntervalInSeconds = 1;
+    public void should_flush_ignore_flush_listeners_exceptions() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final Clock clock = mock(Clock.class);
-        final TimeTracker tracker = new TimeTracker(logger, clock, true, listeners, 10, flushIntervalInSeconds,
-                "rec");
 
-        final long startTime = System.currentTimeMillis();
-        final long maxWait = flushIntervalInSeconds * 1000 * 1;
-        tracker.track(rec1);
-        tracker.track(rec2);
-        synchronized (monitor) {
-            monitor.wait(maxWait);
-        }
-        final long endTime = System.currentTimeMillis();
-        assertTrue((endTime - startTime) < maxWait);
-        tracker.stopFlushThread();
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        final FlushEventListener listener2 = mock(FlushEventListener.class);
+        final FlushEventListener listener3 = mock(FlushEventListener.class);
+
+        Mockito.when(listener2.flush(Mockito.any(FlushEvent.class))).thenThrow(new Exception());
+
+        final List<FlushEventListener> listeners = new ArrayList<FlushEventListener>();
+        listeners.add(listener1);
+        listeners.add(listener2);
+        listeners.add(listener3);
+
+        final TimeTracker tracker = new TimeTracker(logger, clock, false, listeners, 10, 1, "rec");
+
+        tracker.track("rec", "desc", 10);
+
+        tracker.flush();
+
+        verify(listener1, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener2, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener3, times(1)).flush(Mockito.any(FlushEvent.class));
+    }
+
+    @Test
+    public void should_flush_call_all_flush_listeners() throws Exception {
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        final Clock clock = mock(Clock.class);
+
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        final FlushEventListener listener2 = mock(FlushEventListener.class);
+
+        final List<FlushEventListener> listeners = new ArrayList<FlushEventListener>();
+        listeners.add(listener1);
+        listeners.add(listener2);
+
+        final TimeTracker tracker = new TimeTracker(logger, clock, false, listeners, 10, 1, "rec");
+
+        tracker.track("rec", "desc", 10);
+
+        tracker.flush();
+
+        verify(listener1, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener2, times(1)).flush(Mockito.any(FlushEvent.class));
+
     }
 
     @Test

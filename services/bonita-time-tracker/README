@@ -1,12 +1,4 @@
-objet clock pour le FlushThread
-
-séparer les tests liés au flushThread
-
-séparer les tests liés à la clock
-
 rechercher toutes les occurences de printerThread et remplacer par flushThread
-
-test flush subscribers
 
 remplacer subscriber par listener
 

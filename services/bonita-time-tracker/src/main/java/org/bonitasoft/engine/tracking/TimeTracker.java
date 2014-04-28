@@ -130,7 +130,9 @@ public class TimeTracker {
                 try {
                     flushResults.add(listener.flush(flushEvent));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                        logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
+                    }
                 }
             }
         }
