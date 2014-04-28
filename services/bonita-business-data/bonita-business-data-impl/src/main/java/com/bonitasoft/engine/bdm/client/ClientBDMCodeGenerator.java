@@ -24,12 +24,15 @@ import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JTryBlock;
@@ -39,6 +42,7 @@ import com.sun.codemodel.JVar;
 /**
  * @author Romain Bioteau
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
  */
 public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
@@ -144,7 +148,22 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         addQueryParameters(method, tryBody, mapClass, hashMapClass, commandParametersRef);
 
         // Execute command
-        tryBody._return(JExpr.cast(method.type(), commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef)));
+        final JInvocation executeQuery = commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef);
+        final JClass serial = getModel().ref(byte[].class);
+        final JClass omClass = getModel().ref(ObjectMapper.class);
+        final JInvocation omObject = JExpr._new(omClass);
+
+        final JExpression invocation;
+        final JClass ref = getModel().ref(returnType);
+        final JExpression entityClassExpression = JExpr.dotclass(ref);
+        if (isCollection) {
+            final JClass list = getModel().ref(List.class);
+            invocation = omObject.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
+        } else {
+            invocation = entityClassExpression;
+        }
+        final JInvocation deserialize = omObject.invoke("readValue").arg(JExpr.cast(serial, executeQuery)).arg(invocation);
+        tryBody._return(JExpr.cast(method.type(), deserialize));
 
         final JClass exceptionClass = getModel().ref(Exception.class);
         final JCatchBlock catchBlock = tryBlock._catch(exceptionClass);
@@ -198,7 +217,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private JMethod createQueryMethod(final JDefinedClass entity, final JDefinedClass targetClass, final String name, final String returnTypeName)
             throws ClassNotFoundException {
-        JType returnType = null;
+        JType returnType;
         if (returnTypeName.equals(entity.fullName())) {
             returnType = entity;
         } else {
