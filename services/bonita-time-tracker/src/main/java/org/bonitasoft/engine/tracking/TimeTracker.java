@@ -71,9 +71,11 @@ public class TimeTracker {
     }
 
     public void track(final String recordName, final String recordDescription, final long duration) {
-        final long timestamp = System.currentTimeMillis();
-        final Record record = new Record(timestamp, recordName, recordDescription, duration);
-        track(record);
+        if (isTrackable(recordName)) {
+            final long timestamp = System.currentTimeMillis();
+            final Record record = new Record(timestamp, recordName, recordDescription, duration);
+            track(record);
+        }
     }
 
     public void track(final Record record) {
