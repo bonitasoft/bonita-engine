@@ -20,13 +20,13 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
 
     public void should_work_if_output_folder_is_a_folder() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        new CSVFlushEventListener(System.getProperty("java.io.tmpdir"), ";", logger);
+        new CSVFlushEventListener(logger, System.getProperty("java.io.tmpdir"), ";");
     }
 
     @Test(expected = RuntimeException.class)
     public void should_fail_if_output_folder_unknown() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        new CSVFlushEventListener("unknownFolder", ";", logger);
+        new CSVFlushEventListener(logger, "unknownFolder", ";");
     }
 
     @Test(expected = RuntimeException.class)
@@ -35,14 +35,13 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         final File file = new File(System.getProperty("java.io.tmpdir"), "test.txt");
         file.createNewFile();
 
-        new CSVFlushEventListener(file.getAbsolutePath(), ";", logger);
+        new CSVFlushEventListener(logger, file.getAbsolutePath(), ";");
     }
 
     @Test
     public void testFlushedCsv() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(System.getProperty("java.io.tmpdir"), ";",
-                logger);
+        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(logger, System.getProperty("java.io.tmpdir"), ";");
         final List<CSVFlushEventListener> flushEventListeners = Collections.singletonList(csvFlushEventListener);
         final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);

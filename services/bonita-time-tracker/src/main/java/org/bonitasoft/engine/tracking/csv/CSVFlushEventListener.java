@@ -21,11 +21,11 @@ public class CSVFlushEventListener implements FlushEventListener {
 
     private final TechnicalLoggerService logger;
 
-    public CSVFlushEventListener(final String outputFolder, final String csvSeparator, final TechnicalLoggerService logger) {
+    public CSVFlushEventListener(final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
         super();
-        this.csvSeparator = csvSeparator;
-        this.outputFolder = outputFolder;
         this.logger = logger;
+        this.outputFolder = outputFolder;
+        this.csvSeparator = csvSeparator;
 
         final File outputFolderFile = new File(outputFolder);
         if (!outputFolderFile.exists()) {
