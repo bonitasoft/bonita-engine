@@ -2,6 +2,4 @@ rechercher toutes les occurences de printerThread et remplacer par flushThread
 
 remplacer subscriber par listener
 
-csv headers test
-
 ajouter stop du service au stop node
