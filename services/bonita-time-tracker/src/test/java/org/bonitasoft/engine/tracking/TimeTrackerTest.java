@@ -18,7 +18,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void testIsTrackable() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, System.getProperty("java.io.tmpdir"), ";", "rec1", "rec2");
+        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
         assertTrue(tracker.isTrackable("rec1"));
         assertTrue(tracker.isTrackable("rec2"));
         assertFalse(tracker.isTrackable("rec3"));
@@ -27,7 +27,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void testTrackRecords() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, System.getProperty("java.io.tmpdir"), ";", "rec1", "rec2");
+        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
         tracker.track("rec1", "rec11Desc", 100);
         tracker.track("rec1", "rec12Desc", 200);
         tracker.track("rec2", "rec2Desc", 300);
@@ -59,7 +59,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void testTimestamp() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, System.getProperty("java.io.tmpdir"), ";", "rec1");
+        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "rec1");
         tracker.track("rec1", "desc2", 100);
         Thread.sleep(2);
         tracker.track("rec1", "desc2", 200);
@@ -89,14 +89,14 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test(expected = RuntimeException.class)
     public void should_throw_an_exception_on_stopFlushThread_if_not_started() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2, "unknownFolder", ";");
+        final TimeTracker tracker = new TimeTracker(logger, false, null, 10, 2);
         tracker.stopFlushThread();
     }
 
     @Test(expected = RuntimeException.class)
     public void should_throw_an_exception_on_startFlushThread_if_already_started_at_build_time() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, true, null, 10, 2, "unknownFolder", ";");
+        final TimeTracker tracker = new TimeTracker(logger, true, null, 10, 2);
         try {
             tracker.startFlushThread();
         } finally {
@@ -105,7 +105,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void testFlushThread() throws Exception {
+    public void should_flush_thread_flush_every_flushIntervalSeconds() throws Exception {
         final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
         final Object monitor = new Object();
@@ -124,7 +124,10 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         });
         final int flushIntervalInSeconds = 1;
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, true, listeners, 10, flushIntervalInSeconds, System.getProperty("java.io.tmpdir"), ";", "rec");
+        final Clock clock = mock(Clock.class);
+        final TimeTracker tracker = new TimeTracker(logger, clock, true, listeners, 10, flushIntervalInSeconds,
+                "rec");
+
         final long startTime = System.currentTimeMillis();
         final long maxWait = flushIntervalInSeconds * 1000 * 1;
         tracker.track(rec1);
@@ -140,7 +143,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void testRollingRecords() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final TimeTracker tracker = new TimeTracker(logger, false, null, 2, 2, System.getProperty("java.io.tmpdir"), ";", "rec");
+        final TimeTracker tracker = new TimeTracker(logger, false, null, 2, 2, "rec");
 
         tracker.track("rec", "rec1", 100);
         assertEquals(1, tracker.getRecords().size());

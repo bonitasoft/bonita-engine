@@ -11,3 +11,5 @@ test flush subscribers
 remplacer subscriber par listener
 
 csv headers test
+
+ajouter stop du service au stop node

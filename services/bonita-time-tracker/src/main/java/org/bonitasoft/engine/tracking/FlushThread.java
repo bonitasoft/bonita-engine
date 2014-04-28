@@ -1,27 +1,41 @@
 package org.bonitasoft.engine.tracking;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+
 public class FlushThread extends Thread {
 
     private final TimeTracker timeTracker;
 
-    private final int flushIntervalInMiliSeconds;
+    private final long flushIntervalInMilliSeconds;
 
-    public FlushThread(final int flushIntervalInSeconds, final TimeTracker timeTracker) {
+    private final Clock clock;
+
+    private final TechnicalLoggerService logger;
+
+    public FlushThread(final Clock clock, final long flushIntervalInMilliSeconds, final TimeTracker timeTracker, final TechnicalLoggerService logger) {
         super("TimeTracker-FlushThread");
-        this.flushIntervalInMiliSeconds = flushIntervalInSeconds * 1000;
+        this.clock = clock;
+        this.logger = logger;
+        this.flushIntervalInMilliSeconds = flushIntervalInMilliSeconds;
         this.timeTracker = timeTracker;
     }
 
     @Override
     public void run() {
-        try {
-            while (true) {
-                Thread.sleep(flushIntervalInMiliSeconds);
-                this.timeTracker.flush();
+        while (true) {
+            try {
+                clock.sleep(flushIntervalInMilliSeconds);
+            } catch (InterruptedException e) {
+                break;
             }
-        } catch (Exception e) {
-            // TODO use logger
-            e.printStackTrace();
+            try {
+                this.timeTracker.flush();
+            } catch (Exception e) {
+                if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                    this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
+                }
+            }
         }
     }
 

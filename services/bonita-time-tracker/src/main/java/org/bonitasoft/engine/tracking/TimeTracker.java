@@ -32,6 +32,17 @@ public class TimeTracker {
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
+        this(logger, new ThreadSleepClockImpl(), startFlushThread, flushEventListeners, maxSize, flushIntervalInSeconds * 1000, activatedRecords);
+    }
+
+    public TimeTracker(
+            final TechnicalLoggerService logger,
+            final Clock clock,
+            final boolean startFlushThread,
+            final List<? extends FlushEventListener> flushEventListeners,
+            final int maxSize,
+            final int flushIntervalInSeconds,
+            final String... activatedRecords) {
         super();
         this.logger = logger;
         this.flushEventListeners = flushEventListeners;
@@ -45,7 +56,7 @@ public class TimeTracker {
                     "Time tracker is activated for some records. This may not be used in production as performances may be strongly impacted: "
                             + activatedRecords);
         }
-        this.flushThread = new FlushThread(flushIntervalInSeconds, this);
+        this.flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
 
         this.records = new CircularFifoQueue<Record>(maxSize);
 
