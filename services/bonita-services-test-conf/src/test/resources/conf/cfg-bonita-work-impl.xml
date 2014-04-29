@@ -9,12 +9,10 @@
 		</constructor-arg>
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="bonitaExecutorServiceFactory"
-			ref="bonitaExecutorServiceFactory" />
+		<constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
 	</bean>
 
-	<bean id="bonitaExecutorServiceFactory"
-		class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
+	<bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="tenantId" value="111"  />
 		<constructor-arg name="corePoolSize" value="25" />

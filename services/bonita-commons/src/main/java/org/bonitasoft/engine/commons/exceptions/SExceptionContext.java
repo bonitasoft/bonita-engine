@@ -101,10 +101,6 @@ public enum SExceptionContext {
      */
     ROLE_ID,
     /**
-     * Corresponding to the identifier of the tenant
-     */
-    TENANT_ID,
-    /**
      * Corresponding to the identifier of the document
      */
     DOCUMENT_ID;

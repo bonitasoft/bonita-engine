@@ -162,7 +162,7 @@ public class ServicesBuilder implements ServicesResolver {
     }
 
     public TechnicalLoggerService buildTechnicalLoggerService() {
-        return getAccessor().getInstanceOf(TechnicalLoggerService.class);
+        return getAccessor().getInstanceOf("technicalLoggerService", TechnicalLoggerService.class);
     }
 
     public CommandService buildCommandService() {

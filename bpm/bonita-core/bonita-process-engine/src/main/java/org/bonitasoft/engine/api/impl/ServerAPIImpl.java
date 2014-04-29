@@ -56,7 +56,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
@@ -131,10 +130,10 @@ public class ServerAPIImpl implements ServerAPI {
                 throw sapire.getCause();
             }
         } catch (final BonitaRuntimeException bre) {
-            fillGlobalContextForException(sessionAccessor, session, bre);
+            fillGlobalContextForException(session, bre);
             throw createServerWrappedException(bre);
         } catch (final BonitaException be) {
-            fillGlobalContextForException(sessionAccessor, session, be);
+            fillGlobalContextForException(session, be);
             throw createServerWrappedException(be);
         } catch (final UndeclaredThrowableException ute) {
             technicalDebugLog(ute);
@@ -142,7 +141,7 @@ public class ServerAPIImpl implements ServerAPI {
         } catch (final Throwable cause) {
             technicalDebugLog(cause);
             final BonitaRuntimeException throwableToWrap = new BonitaRuntimeException(cause);
-            fillGlobalContextForException(sessionAccessor, session, throwableToWrap);
+            fillGlobalContextForException(session, throwableToWrap);
             throw createServerWrappedException(throwableToWrap);
         } finally {
             cleanSessionIfNeeded(sessionAccessor);
@@ -156,8 +155,7 @@ public class ServerAPIImpl implements ServerAPI {
         return new ServerWrappedException(throwableToWrap);
     }
 
-    private void fillGlobalContextForException(final SessionAccessor sessionAccessor, final Session session, final BonitaContextException be) {
-        fillTenantIdContextForException(sessionAccessor, be);
+    private void fillGlobalContextForException(final Session session, final BonitaContextException be) {
         fillUserNameContextForException(session, be);
     }
 
@@ -167,18 +165,6 @@ public class ServerAPIImpl implements ServerAPI {
             if (userName != null) {
                 be.setUserName(userName);
             }
-        }
-    }
-
-    private void fillTenantIdContextForException(final SessionAccessor sessionAccessor, final BonitaContextException be) {
-        if (sessionAccessor != null) {
-            long tenantId = -1;
-            try {
-                tenantId = sessionAccessor.getTenantId();
-            } catch (STenantIdNotSetException e) {
-                technicalDebugLog(e);
-            }
-            be.setTenantId(tenantId);
         }
     }
 

@@ -281,7 +281,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
         if (technicalLoggerService == null) {
-            technicalLoggerService = beanAccessor.getService(TechnicalLoggerService.class);
+            technicalLoggerService = beanAccessor.getService("technicalLoggerService", TechnicalLoggerService.class);
         }
         return technicalLoggerService;
     }

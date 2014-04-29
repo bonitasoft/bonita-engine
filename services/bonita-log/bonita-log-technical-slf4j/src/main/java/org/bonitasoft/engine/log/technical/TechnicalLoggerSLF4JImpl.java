@@ -42,13 +42,21 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
     private String hostname = null;
 
+    private final long tenantId;
+
     public TechnicalLoggerSLF4JImpl() {
+        this(-1);
+    }
+
+    public TechnicalLoggerSLF4JImpl(final long tenantId) {
         super();
 
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
         }
+
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -174,7 +182,7 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
     }
 
     private String getContextMessage() {
-        return getThreadIdMessage() + getHostNameMessage();
+        return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage();
         // return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage();
     }
 
@@ -187,26 +195,13 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
         return hostname != null && !hostname.isEmpty() ? "HOSTNAME=" + hostname + " | " : "";
     }
 
+    private String getTenantIdMessage() {
+        return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
+    }
+
     // private String getUserNameMessage() {
     // return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
     // }
     //
-    // private String getTenantIdMessage() {
-    // return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
-    // }
-
-    // private void getTenantId() {
-    // SessionInfos a;
-    //
-    // SessionAccessor sessionAccessor;
-    // if (sessionAccessor != null) {
-    // long tenantId = -1;
-    // try {
-    // tenantId = sessionAccessor.getTenantId();
-    // } catch (STenantIdNotSetException e) {
-    // }
-    // return tenantId;
-    // }
-    // }
 
 }

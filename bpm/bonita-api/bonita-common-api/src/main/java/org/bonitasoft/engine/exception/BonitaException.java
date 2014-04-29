@@ -35,8 +35,6 @@ public class BonitaException extends Exception implements BonitaContextException
 
     private final Map<ExceptionContext, Serializable> context = new TreeMap<ExceptionContext, Serializable>();
 
-    private long tenantId = -1;
-
     private String userName = "";
 
     /**
@@ -71,22 +69,6 @@ public class BonitaException extends Exception implements BonitaContextException
      */
     public BonitaException(final Throwable cause) {
         super(cause);
-    }
-
-    /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#getTenantId()
-     */
-    @Override
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#setTenantId(long)
-     */
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
     }
 
     /**
@@ -305,7 +287,7 @@ public class BonitaException extends Exception implements BonitaContextException
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getTenantIdMessage() + getUserNameMessage());
+        stringBuilder.append(getUserNameMessage());
         appendContextMessage(stringBuilder);
         stringBuilder.append(super.getMessage());
         return stringBuilder.toString();
@@ -321,10 +303,6 @@ public class BonitaException extends Exception implements BonitaContextException
 
     private String getUserNameMessage() {
         return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
-    }
-
-    private String getTenantIdMessage() {
-        return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
     }
 
 }

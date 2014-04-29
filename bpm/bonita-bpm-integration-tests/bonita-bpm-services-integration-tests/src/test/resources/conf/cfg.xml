@@ -16,25 +16,25 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="platformService" ref="platformService" />
 	</bean>
 
 	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+		<constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
 		<constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
@@ -59,7 +59,7 @@
     <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
 		<constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
 		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
     <bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />

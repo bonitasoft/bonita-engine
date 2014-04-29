@@ -248,7 +248,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
-        return getInstanceOf(TechnicalLoggerService.class);
+        return getInstanceOf("technicalLoggerService", TechnicalLoggerService.class);
     }
 
     @Override

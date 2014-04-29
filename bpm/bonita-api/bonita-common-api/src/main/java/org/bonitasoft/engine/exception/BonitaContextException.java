@@ -22,10 +22,6 @@ package org.bonitasoft.engine.exception;
  */
 public interface BonitaContextException {
 
-    public abstract long getTenantId();
-
-    public abstract void setTenantId(long tenantId);
-
     public abstract String getUserName();
 
     public abstract void setUserName(String userName);

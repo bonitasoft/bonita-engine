@@ -3,7 +3,7 @@
 
 	<bean id="platformCommandService" class="org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl">
 		<constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 	
 </beans>

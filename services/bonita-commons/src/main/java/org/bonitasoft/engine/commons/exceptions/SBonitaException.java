@@ -302,15 +302,6 @@ public abstract class SBonitaException extends Exception {
         context.put(SExceptionContext.ROLE_ID, roleId);
     }
 
-    /**
-     * @param tenantId
-     *            The tenant id to set
-     * @since 6.3
-     */
-    public void setTenantID(final long tenantId) {
-        context.put(SExceptionContext.TENANT_ID, tenantId);
-    }
-
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();

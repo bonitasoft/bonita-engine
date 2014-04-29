@@ -22,8 +22,6 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
 
     private static final long serialVersionUID = -5413586694735909486L;
 
-    private long tenantId = -1;
-
     private String userName = "";
 
     public BonitaRuntimeException(final String message) {
@@ -36,22 +34,6 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
 
     public BonitaRuntimeException(final Throwable cause) {
         super(cause);
-    }
-
-    /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#getTenantId()
-     */
-    @Override
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#setTenantId(long)
-     */
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
     }
 
     /**
@@ -72,15 +54,11 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
 
     @Override
     public String getMessage() {
-        return getTenantIdMessage() + getUserNameMessage() + super.getMessage();
+        return getUserNameMessage() + super.getMessage();
     }
 
     private String getUserNameMessage() {
         return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
-    }
-
-    private String getTenantIdMessage() {
-        return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
     }
 
 }

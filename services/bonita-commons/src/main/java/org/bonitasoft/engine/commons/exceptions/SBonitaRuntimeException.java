@@ -213,15 +213,6 @@ public class SBonitaRuntimeException extends RuntimeException {
         context.put(SExceptionContext.USER_ID, userId);
     }
 
-    /**
-     * @param tenantId
-     *            The tenant id to set
-     * @since 6.3
-     */
-    public void setTenantID(final long tenantId) {
-        context.put(SExceptionContext.TENANT_ID, tenantId);
-    }
-
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
