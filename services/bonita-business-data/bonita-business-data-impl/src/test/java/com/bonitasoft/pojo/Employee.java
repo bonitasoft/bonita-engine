@@ -3,6 +3,7 @@ package com.bonitasoft.pojo;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Version;
 
 @Entity
 public class Employee implements com.bonitasoft.engine.bdm.Entity {
@@ -12,6 +13,9 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity {
     @Id
     @GeneratedValue
     private Long persistenceId;
+
+    @Version
+    private Long persistenceVersion;
 
     private String firstName;
 
@@ -32,6 +36,13 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity {
         this.lastName = lastName;
     }
 
+    public Employee(final Employee employee) {
+        persistenceId = employee.getPersistenceId();
+        persistenceVersion = employee.getPersistenceVersion();
+        firstName = employee.getFirstName();
+        lastName = employee.getLastName();
+    }
+
     @Override
     public Long getPersistenceId() {
         return persistenceId;
@@ -39,8 +50,7 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity {
 
     @Override
     public Long getPersistenceVersion() {
-        // TODO Auto-generated method stub
-        return null;
+        return persistenceVersion;
     }
 
     public String getFirstName() {

@@ -6,9 +6,18 @@
 	<bean id="dataSourceDependency" class="java.lang.Object" depends-on="h2Server" scope="singleton"/>
 
 	<!-- Start the H2 server -->
-	<bean id="h2Server" class="org.h2.tools.Server" factory-method="createTcpServer"
-		init-method="start" destroy-method="stop" scope="singleton" >
-		<constructor-arg value="-tcp,-tcpAllowOthers,-tcpPort,${h2.port:1234}" />
+	<bean id="h2Server" class="org.h2.tools.Server" factory-method="createTcpServer" init-method="start" destroy-method="stop" scope="singleton">
+		<constructor-arg value="-tcp,-tcpAllowOthers,-tcpPort,${db.server.port}" />
+	</bean>
+
+	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="user">${db.user}</prop>
+				<prop key="password">${db.password}</prop>
+				<prop key="URL">${db.url}</prop>
+			</props>
+		</property>
 	</bean>
 
 </beans>

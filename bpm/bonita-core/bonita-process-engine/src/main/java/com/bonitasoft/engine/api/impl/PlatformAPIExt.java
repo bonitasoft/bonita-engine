@@ -43,6 +43,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -78,6 +79,7 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
+import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
@@ -283,9 +285,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         sessionAccessor.deleteSessionId();
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        // Create default data source
-                        createDefaultDataSource(tenantServiceAccessor);
-
                         // Create default commands
                         createDefaultCommands(tenantServiceAccessor);
 
@@ -294,6 +293,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
+
+                        // Create customPage examples
+                        createCustomPageExamples(tenantServiceAccessor);
 
                         // Create default themes
                         getDelegate().createDefaultThemes(tenantServiceAccessor);
@@ -304,11 +306,21 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
                 }
+
             };
             return transactionService.executeInTransaction(initializeTenant);
         } catch (final Exception e) {
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
         }
+    }
+
+    private void createCustomPageExamples(final TenantServiceAccessor tenantServiceAccessor) throws CreationException {
+        try {
+            tenantServiceAccessor.getPageService().start();
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
+        }
+
     }
 
     public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
@@ -355,7 +367,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
             final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
@@ -366,7 +378,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(transactionContent);
 
             // stop tenant services and clear the spring context:
-            TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenantId, new StopServiceStrategy()));
 
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
@@ -743,4 +755,24 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return platformAccessor;
     }
 
+    // @Override
+    protected void startServices(final TechnicalLoggerService logger, final long tenantId,
+            final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor)
+            throws SBonitaException {
+        // super.startServices(logger, tenantId, tenantServiceAccessor);
+        tenantServiceAccessor.getTransactionExecutor().execute(new TransactionContent() {
+
+            @Override
+            public void execute() throws SBonitaException {
+                PageService pageService;
+                try {
+                    pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
+                } catch (final MissingServiceException e) {
+                    // if not in the configuration just ignore it
+                    return;
+                }
+                pageService.start();
+            }
+        });
+    }
 }

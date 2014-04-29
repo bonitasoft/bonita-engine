@@ -10,7 +10,7 @@ package com.bonitasoft.engine.bdm;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -25,14 +25,22 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
@@ -49,21 +57,20 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         this.bom = bom;
     }
 
-    protected void buildASTFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
+    public void buildASTFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
         for (final BusinessObject bo : bom.getBusinessObjects()) {
-            JDefinedClass entity = addEntity(bo);
+            final JDefinedClass entity = addEntity(bo);
             addDAO(bo, entity);
         }
     }
 
     protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
 
-    protected JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
+    public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
         final String qualifiedName = bo.getQualifiedName();
         validateClassNotExistsInRuntime(qualifiedName);
 
         JDefinedClass entityClass = addClass(qualifiedName);
-        entityClass = addInterface(entityClass, Serializable.class.getName());
         entityClass = addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
         entityClass.javadoc().add(bo.getDescription());
 
@@ -74,15 +81,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         tableAnnotation.param("name", entityClass.name().toUpperCase());
         final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
 
-        final List<Query> queries = bo.getQueries();
-
-        JAnnotationUse namedQueriesAnnotation = null;
-        JAnnotationArrayMember valueArray = null;
-        if (!queries.isEmpty() || !uniqueConstraints.isEmpty()) {
-            namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
-            valueArray = namedQueriesAnnotation.paramArray("value");
-        }
-
         if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
@@ -92,16 +90,19 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
                 for (final String fieldName : uniqueConstraint.getFieldNames()) {
                     columnNamesParamArray.param(fieldName.toUpperCase());
                 }
-
-                // Generate a query for Unique Constraint
-                addNamedQuery(entityClass,
-                        valueArray,
-                        BDMQueryUtil.createQueryNameForUniqueConstraint(entityClass.name(), uniqueConstraint),
-                        BDMQueryUtil.createQueryContentForUniqueConstraint(entityClass.name(), uniqueConstraint));
             }
         }
 
-        for (final Query query : queries) {
+        final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
+        final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
+
+        // Add provided queries
+        for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
+        }
+
+        // Add custom queries
+        for (final Query query : bo.getQueries()) {
             addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
         }
 
@@ -109,9 +110,13 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         addPersistenceVersionFieldAndAccessors(entityClass);
 
         for (final Field field : bo.getFields()) {
-            final JFieldVar basicField = addBasicField(entityClass, field);
-            addAccessors(entityClass, basicField);
+            final JFieldVar fieldVar = addField(entityClass, field);
+            addAccessors(entityClass, fieldVar);
+            addModifiers(entityClass, field);
         }
+
+        addDefaultConstructor(entityClass);
+        addCopyConstructor(entityClass, bo);
 
         addEqualsMethod(entityClass);
         addHashCodeMethod(entityClass);
@@ -119,9 +124,9 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return entityClass;
     }
 
-    private void addNamedQuery(JDefinedClass entityClass, JAnnotationArrayMember valueArray, final String name, final String content) {
+    private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray, final String name, final String content) {
         final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
-        nameQueryAnnotation.param("name", name);
+        nameQueryAnnotation.param("name", entityClass.name() + "." + name);
         nameQueryAnnotation.param("query", content);
     }
 
@@ -138,21 +143,45 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         }
     }
 
-    protected void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
+        final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
+        final JVar param = copyConstructor.param(entityClass, WordUtils.capitalize(entityClass.name()));
+        final JBlock copyBody = copyConstructor.body();
+        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
+        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
+        for (final Field field : bo.getFields()) {
+            if (field.isCollection() != null && field.isCollection()) {
+                final JClass fieldClass = getModel().ref(field.getType().getClazz());
+                final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
+                copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz)
+                        .arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
+            } else {
+                copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
+            }
+        }
+    }
+
+    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
         final JFieldVar idFieldVar = addField(entityClass, Field.PERSISTENCE_ID, toJavaType(FieldType.LONG));
         addAnnotation(idFieldVar, Id.class);
         addAnnotation(idFieldVar, GeneratedValue.class);
         addAccessors(entityClass, idFieldVar);
     }
 
-    protected void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    public void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
         final JFieldVar versionField = addField(entityClass, Field.PERSISTENCE_VERSION, toJavaType(FieldType.LONG));
         addAnnotation(versionField, Version.class);
         addAccessors(entityClass, versionField);
     }
 
-    protected JFieldVar addBasicField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
-        final JFieldVar fieldVar = addField(entityClass, field.getName(), toJavaType(field.getType()));
+    public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
+        final Boolean collection = field.isCollection();
+        JFieldVar fieldVar;
+        if (collection != null && collection) {
+            fieldVar = addListField(entityClass, field);
+        } else {
+            fieldVar = addField(entityClass, field.getName(), toJavaType(field.getType()));
+        }
         final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
         columnAnnotation.param("name", field.getName().toUpperCase());
         final Boolean nullable = field.isNullable();
@@ -168,12 +197,20 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return fieldVar;
     }
 
-    protected void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
+    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
         addSetter(entityClass, fieldVar);
         addGetter(entityClass, fieldVar);
     }
 
-    protected JType toJavaType(final FieldType type) {
+    protected void addModifiers(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
+        final Boolean collection = field.isCollection();
+        if (collection != null && collection) {
+            addAddMethod(entityClass, field);
+            addRemoveMethod(entityClass, field);
+        }
+    }
+
+    public JType toJavaType(final FieldType type) {
         return getModel().ref(type.getClazz());
     }
 

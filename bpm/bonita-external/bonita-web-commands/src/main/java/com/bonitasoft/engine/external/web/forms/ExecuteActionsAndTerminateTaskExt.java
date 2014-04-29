@@ -32,7 +32,6 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -54,7 +53,6 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         final String message = "Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.";
         final List<ConnectorDefinitionWithInputValues> connectorsList = getParameter(parameters, CONNECTORS_LIST_KEY, message);
 
-        final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
         final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         try {
@@ -73,7 +71,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            executeActivity(flowNodeInstance, logger);
+            long executedByUserId = getExecuteByUserId(parameters);
+            executeActivity(flowNodeInstance, executedByUserId);
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTaskExt(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
@@ -104,7 +103,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             final List<Operation> outputs = connectorDefinition.getOutputs();
             final ArrayList<SOperation> operations = new ArrayList<SOperation>(outputs.size());
             for (final Operation operation : outputs) {
-                operations.add(ModelConvertor.constructSOperation(operation));
+                operations.add(ModelConvertor.convertOperation(operation));
             }
             expcontext.setInputValues(result.getResult());
             connectorService.executeOutputOperation(operations, expcontext, result);

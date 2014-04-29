@@ -43,7 +43,6 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void failed(final Throwable cause, final Description d) {
             LOGGER.error("Failed test: " + d.getClassName() + "." + d.getMethodName());

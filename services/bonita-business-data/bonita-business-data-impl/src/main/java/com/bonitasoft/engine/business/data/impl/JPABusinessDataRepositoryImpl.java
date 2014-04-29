@@ -9,6 +9,8 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +28,8 @@ import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -45,11 +49,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private EntityManagerFactory entityManagerFactory;
 
-    private EntityManager entityManager;
+    private final ThreadLocal<EntityManager> managers = new ThreadLocal<EntityManager>();
 
     private final BusinessDataModelRepository businessDataModelRepository;
 
-    public JPABusinessDataRepositoryImpl(final BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration) {
+    private final TransactionService transactionService;
+
+    public JPABusinessDataRepositoryImpl(final TransactionService transactionService, final BusinessDataModelRepository businessDataModelRepository,
+            final Map<String, Object> configuration) {
+        this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
         this.configuration = new HashMap<String, Object>(configuration);
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
@@ -99,12 +107,18 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new IllegalStateException("The BDR is not started");
         }
 
-        if (entityManager == null || !entityManager.isOpen()) {
-            entityManager = entityManagerFactory.createEntityManager();
-        } else {
-            entityManager.joinTransaction();
+        EntityManager manager = managers.get();
+        if (manager == null || !manager.isOpen()) {
+            manager = entityManagerFactory.createEntityManager();
+            try {
+                transactionService.registerBonitaSynchronization(new RemoveEntityManagerSynchronization(managers));
+            } catch (final STransactionNotFoundException stnfe) {
+                throw new IllegalStateException(stnfe);
+            }
+            managers.set(manager);
         }
-        return entityManager;
+        manager.joinTransaction();
+        return manager;
     }
 
     @Override
@@ -118,7 +132,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new SBusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
         }
         em.detach(entity);
-        return entity;
+        return copy(entity);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T extends Entity> T copy(final T entity) {
+        try {
+            final Constructor<? extends Entity> constructor = entity.getClass().getConstructor(entity.getClass());
+            return (T) constructor.newInstance(entity);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
@@ -134,8 +158,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         final EntityManager em = getEntityManager();
         try {
             final T entity = query.getSingleResult();
-            detachEntity(em, resultClass, entity);
-            return entity;
+            return detachEntity(em, resultClass, entity);
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
         } catch (final NoResultException e) {
@@ -151,9 +174,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters) {
+    public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters,
+            final int startIndex, final int maxResults) {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
-        return findList(resultClass, typedQuery, parameters);
+        return findList(resultClass, typedQuery, parameters, startIndex, maxResults);
     }
 
     @Override
@@ -165,17 +189,19 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters) {
+    public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass,
+            final Map<String, Serializable> parameters, final int startIndex, final int maxResults) {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
-        return findList(resultClass, query, parameters);
+        return findList(resultClass, query, parameters, startIndex, maxResults);
     }
 
     private <T extends Serializable> TypedQuery<T> createTypedQuery(final String jpqlQuery, final Class<T> resultClass) {
         return getEntityManager().createQuery(jpqlQuery, resultClass);
     }
 
-    protected <T extends Serializable> List<T> findList(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters) {
+    protected <T extends Serializable> List<T> findList(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters,
+            final int startIndex, final int maxResults) {
         if (query == null) {
             throw new IllegalArgumentException("query is null");
         }
@@ -184,17 +210,25 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
                 query.setParameter(parameter.getKey(), parameter.getValue());
             }
         }
+        query.setFirstResult(startIndex);
+        query.setMaxResults(maxResults);
         final EntityManager em = getEntityManager();
         final List<T> resultList = query.getResultList();
+        final List<T> copyList = new ArrayList<T>();
         for (final T entity : resultList) {
-            detachEntity(em, resultClass, entity);
+            copyList.add(detachEntity(em, resultClass, entity));
         }
-        return resultList;
+        return copyList;
     }
 
-    private <T> void detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
-        if (!ClassUtils.isPrimitiveOrWrapper(resultClass)) {
+    @SuppressWarnings("unchecked")
+    private <T> T detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
+        if (ClassUtils.isPrimitiveOrWrapper(resultClass)) {
+            return entity;
+        } else {
             em.detach(entity);
+            final Entity e = (Entity) entity;
+            return (T) copy(e);
         }
     }
 

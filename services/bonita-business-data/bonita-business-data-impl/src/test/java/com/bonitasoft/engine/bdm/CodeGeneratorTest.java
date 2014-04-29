@@ -3,6 +3,7 @@ package com.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -203,12 +205,21 @@ public class CodeGeneratorTest {
         codeGenerator.addGetter(definedClass, skillField);
         codeGenerator.addSetter(definedClass, skillField);
 
-        final File destDir = new File(System.getProperty("java.io.tmpdir"), "generatedPojo");
+        File destDir = createTempDirectory("generatedPojo");
+        try {
+            codeGenerator.generate(destDir);
+            final File rootFolder = new File(destDir, "org" + File.separatorChar + "bonitasoft");
+            assertThat(rootFolder.listFiles()).isNotEmpty().contains(new File(rootFolder, "Entity.java"));
+        } finally {
+            FileUtils.deleteQuietly(destDir);
+        }
+    }
+
+    protected File createTempDirectory(final String tmpDirName) throws IOException {
+        File destDir = File.createTempFile(tmpDirName, null);
+        destDir.delete();
         destDir.mkdirs();
-        // destDir.deleteOnExit();
-        codeGenerator.generate(destDir);
-        final File rootFolder = new File(destDir, "org" + File.separatorChar + "bonitasoft");
-        assertThat(rootFolder.listFiles()).isNotEmpty().contains(new File(rootFolder, "Entity.java"));
+        return destDir;
     }
 
     @Test

@@ -9,12 +9,6 @@
 package com.bonitasoft.engine.bdm.client;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
@@ -36,8 +30,12 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
     }
 
     @Override
-    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
-            ParserConfigurationException, SAXException {
+    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) {
+        // DO NOTHING
+    }
+
+    @Override
+    protected void addBOMFile(final File directory, final BusinessObjectModel bom) {
         // DO NOTHING
     }
 

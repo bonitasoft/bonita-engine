@@ -25,15 +25,15 @@ public class QueryParameter {
     @XmlAttribute(required = true)
     private String className;
 
-    public QueryParameter(){
-        
+    public QueryParameter() {
+
     }
-    
-    public QueryParameter(String name,String className){
-    	this.name = name;
-    	this.className = className;
+
+    public QueryParameter(final String name, final String className) {
+        this.name = name;
+        this.className = className;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -42,13 +42,13 @@ public class QueryParameter {
         this.name = name;
     }
 
-	public String getClassName() {
-		return className;
-	}
+    public String getClassName() {
+        return className;
+    }
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    public void setClassName(final String className) {
+        this.className = className;
+    }
 
     @Override
     public int hashCode() {
@@ -60,7 +60,7 @@ public class QueryParameter {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -81,6 +81,9 @@ public class QueryParameter {
         return true;
     }
 
-	
+    @Override
+    public String toString() {
+        return "QueryParameter: " + name + " (" + className + ")";
+    }
 
 }

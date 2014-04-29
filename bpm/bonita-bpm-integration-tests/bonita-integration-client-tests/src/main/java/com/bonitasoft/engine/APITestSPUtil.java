@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
@@ -76,18 +77,20 @@ public class APITestSPUtil extends APITestUtil {
 
     private TenantManagementAPI tenantManagementAPI;
 
+    private PageAPI pageAPI;
+
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
     }
 
     @Override
-    protected PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return PlatformAPIAccessor.getPlatformAPI(session);
     }
 
     @Override
-    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getLoginAPI();
     }
 
@@ -112,7 +115,7 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    protected ThemeAPI getThemeAPI() {
+    public ThemeAPI getThemeAPI() {
         return themeAPI;
     }
 
@@ -157,13 +160,13 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    protected void loginWith(final String userName, final String password) throws BonitaException {
+    public void loginWith(final String userName, final String password) throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant(userName, password));
         setAPIs();
     }
 
     @Override
-    protected void login() throws BonitaException {
+    public void login() throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant());
         setAPIs();
     }
@@ -180,14 +183,23 @@ public class APITestSPUtil extends APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
+    protected void setPageAPI(final PageAPI pageAPI) {
+        this.pageAPI = pageAPI;
+    }
+
+    public PageAPI getPageAPI() {
+        return pageAPI;
+    }
+
     @Override
-    protected void logout() throws BonitaException {
+    public void logout() throws BonitaException {
         SPBPMTestUtil.logoutTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
@@ -221,10 +233,10 @@ public class APITestSPUtil extends APITestUtil {
         getCommandAPI().execute("deleteSupervisor", deleteParameters);
     }
 
-    protected ManualTaskCreator buildManualTaskCreator(final long parentTaskId, final String taskName, final String displayName, final long assignTo,
-            final String description, final Date dueDate, final TaskPriority priority) {
+    protected ManualTaskCreator buildManualTaskCreator(final long parentTaskId, final String taskName, final long assignTo, final String description,
+            final Date dueDate, final TaskPriority priority) {
         final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTaskId, taskName);
-        taskCreator.setDisplayName(displayName);
+        taskCreator.setDisplayName(taskName);
         taskCreator.setAssignTo(assignTo);
         taskCreator.setDescription(description);
         taskCreator.setDueDate(dueDate);
@@ -290,7 +302,7 @@ public class APITestSPUtil extends APITestUtil {
      * @throws BonitaException
      */
     public Collection<? extends String> checkNoDataMappings() throws BonitaException {
-        Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
+        final Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
         if (count == 0) {
             return Collections.emptyList();
         }

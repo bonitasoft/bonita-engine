@@ -14,6 +14,7 @@
 				<ref bean="groovyScriptExpressionExecutorStrategy" />
 				<ref bean="inputExpressionExecutorStrategy" />
 				<ref bean="dataExpressionExecutorStrategy" />
+				<ref bean="transientDataExpressionExecutorStrategy" />
 				<ref bean="patternExpressionExecutorStrategy" />
 				<ref bean="documentReferenceExpressionExecutorStrategy" />
 				<ref bean="engineConstantExpressionExecutorStrategy" />
@@ -23,6 +24,7 @@
 				<ref bean="parameterExpressionExecutorStrategy" />
 				<ref bean="xPathReadExpressionExecutorStrategy" />
 				<ref bean="businessDataExpressionExecutorStrategy" />
+				<ref bean="queryBusinessDataExpressionExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
@@ -31,6 +33,10 @@
 		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+	</bean>
+
+	<bean id="queryBusinessDataExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.QueryBusinessDataExpressionExecutorStrategy" >
+		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
 	</bean>
 
 	<bean id="constantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />

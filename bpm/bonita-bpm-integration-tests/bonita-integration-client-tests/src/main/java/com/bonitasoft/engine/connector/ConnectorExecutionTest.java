@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
+import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.connectors.TestExternalConnector;
@@ -85,7 +86,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         loginWith(JOHN, "bpm");
     }
 
-    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String delivery, final long userId,
+    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final User user,
             final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -99,10 +100,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     protected void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
@@ -119,16 +117,14 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector3.impl", "TestConnector3.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorLongToExecute.impl", "TestConnectorLongToExecute.impl");
+        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorEngineExecutionContext.impl", "TestConnectorEngineExecutionContext.impl");
         return resources;
     }
 
     protected ProcessDefinition deployProcessWithExternalTestConnectorAndActor(final ProcessDefinitionBuilderExt processDefBuilder, final String delivery,
             final User user) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = addExternalTestConnector(processDefBuilder);
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), delivery, user);
     }
 
     private BusinessArchiveBuilder addExternalTestConnector(final ProcessDefinitionBuilderExt processDefBuilder) throws InvalidProcessDefinitionException,
@@ -152,6 +148,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         addResource(resources, TestConnector.class, "TestConnector.jar");
         addResource(resources, TestConnector.class, "TestConnector3.jar");
         addResource(resources, TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
+        addResource(resources, TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
         return resources;
     }
 
@@ -194,10 +191,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {

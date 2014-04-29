@@ -63,8 +63,7 @@ public class LicenseChecker {
     public void checkLicenceAndFeature(final String feature) throws IllegalStateException {
         checkLicence();
         if (!Manager.getInstance().isFeatureActive(feature)) {
-            final String message = exceptions.get(feature);
-            throw new IllegalStateException(message);
+            throw new IllegalStateException(exceptions.get(feature));
         }
     }
 
