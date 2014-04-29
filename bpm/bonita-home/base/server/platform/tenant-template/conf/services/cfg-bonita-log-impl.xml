@@ -7,7 +7,7 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="platformService" ref="platformService" />
 	</bean>
 

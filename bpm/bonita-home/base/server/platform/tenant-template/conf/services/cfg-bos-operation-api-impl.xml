@@ -5,7 +5,7 @@
 		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
 		<constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor"/>
@@ -32,7 +32,7 @@
 		<constructor-arg name="flownodeInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>

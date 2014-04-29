@@ -5,7 +5,7 @@
  		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
  		<constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
  		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
- 		<constructor-arg name="logger" ref="technicalLoggerService" />
+ 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
  	</bean>
 
 	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor" />

@@ -3,7 +3,7 @@
 
 	<bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
 	
-	<bean id="technicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" >
+	<bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" >
 		<constructor-arg name="tenantId" value="111" />
 	</bean>
 

@@ -73,7 +73,6 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -106,8 +105,6 @@ public class CommonBPMServicesTest {
 
     protected static TransactionService transactionService;
 
-    private static PlatformService platformService;
-
     private static SessionAccessor sessionAccessor;
 
     private static LoginService loginService;
@@ -123,8 +120,6 @@ public class CommonBPMServicesTest {
     private final static ActorMappingService actorMappingService;
 
     private static final ActivityInstanceService activityInstanceService;
-
-    private static boolean platformCreated = false;
 
     private APISession sSession;
 
@@ -147,20 +142,26 @@ public class CommonBPMServicesTest {
                 clean();
             } catch (final Exception be) {
                 LOGGER.error("unable to clean db", be);
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
 
         @Override
         public void succeeded(final Description d) {
-            List<String> clean;
             try {
-                clean = clean();
-            } catch (final Exception e) {
-                throw new BonitaRuntimeException(e);
-            }
-            LOGGER.info("Succeeded test: " + this.getClass().getName() + "." + d.getMethodName());
-            if (!clean.isEmpty()) {
-                throw new BonitaRuntimeException(clean.toString());
+                List<String> clean;
+                try {
+                    clean = clean();
+                } catch (final Exception e) {
+                    throw new BonitaRuntimeException(e);
+                }
+                LOGGER.info("Succeeded test: " + this.getClass().getName() + "." + d.getMethodName());
+                if (!clean.isEmpty()) {
+                    throw new BonitaRuntimeException(clean.toString());
+                }
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
     };
@@ -172,7 +173,7 @@ public class CommonBPMServicesTest {
     static {
         bpmServicesBuilder = new BPMServicesBuilder();
         transactionService = bpmServicesBuilder.getTransactionService();
-        platformService = bpmServicesBuilder.getPlatformService();
+        bpmServicesBuilder.getPlatformService();
         sessionAccessor = bpmServicesBuilder.getSessionAccessor();
         loginService = bpmServicesBuilder.getLoginService();
         identityService = bpmServicesBuilder.getIdentityService();
