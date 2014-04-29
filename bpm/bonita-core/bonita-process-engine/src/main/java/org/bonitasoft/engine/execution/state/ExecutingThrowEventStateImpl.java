@@ -51,4 +51,9 @@ public class ExecutingThrowEventStateImpl extends ExecutingFlowNodeStateImpl {
         stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
         stateBehaviors.handleThrowEvent(processDefinition, flowNodeInstance);
     }
+
+    @Override
+    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+        stateBehaviors.updateDisplayDescriptionAfterCompletion(processDefinition, flowNodeInstance);
+    }
 }
