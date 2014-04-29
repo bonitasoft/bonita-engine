@@ -170,7 +170,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     @Test
     public void should_execute_returns_employee_list() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "BonitaEmployee.pfind");
+        parameters.put(QUERY_NAME, "BonitaEmployee.find");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
@@ -184,7 +184,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     @Test
     public void getListFromQueryShouldLimitToMaxResults() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "BonitaEmployee.pfind");
+        parameters.put(QUERY_NAME, "BonitaEmployee.find");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
@@ -216,7 +216,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     @Test(expected = CommandExecutionException.class)
     public void should_execute_throw_a_CommandExecutionException_if_result_is_not_single() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "BonitaEmployee.pfindByLastName");
+        parameters.put(QUERY_NAME, "BonitaEmployee.findByLastName");
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         queryParameters.put("lastName", "Bioteau");
