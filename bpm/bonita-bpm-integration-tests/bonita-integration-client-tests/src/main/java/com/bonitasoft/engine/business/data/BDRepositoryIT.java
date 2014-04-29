@@ -61,7 +61,7 @@ import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
-    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
+    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "pfindByLastName";
 
     private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
 
@@ -479,7 +479,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
             final BusinessObjectDAO daoImpl = businessObjectDAOFactory.createDAO(apiSession, daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME + "DAOImpl");
 
-            Method daoMethod = daoImpl.getClass().getMethod("findByLastName", String.class, int.class, int.class);
+            Method daoMethod = daoImpl.getClass().getMethod(GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, String.class, int.class, int.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
             List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol", 0, 10);
@@ -488,7 +488,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
             result = (List<?>) daoMethod.invoke(daoImpl, "Hanin", 0, 10);
             assertThat(result).isEmpty();
 
-            daoMethod = daoImpl.getClass().getMethod("findByFirstNameAndLastName", String.class, String.class);
+            daoMethod = daoImpl.getClass().getMethod("pfindByFirstNameAndLastName", String.class, String.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
             assertThat(daoMethod.invoke(daoImpl, "Marcel", "Pagnol")).isNotNull();

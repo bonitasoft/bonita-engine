@@ -37,6 +37,8 @@ public class BDMQueryUtil {
 
     public static final String START_INDEX_PARAM_NAME = "startIndex";
 
+    private static final String PREFIX = "p";
+
     public static String createQueryNameForUniqueConstraint(final UniqueConstraint uniqueConstraint) {
         if (uniqueConstraint == null) {
             throw new IllegalArgumentException("uniqueConstraint cannot be null");
@@ -46,7 +48,7 @@ public class BDMQueryUtil {
 
     public static String getQueryName(final List<String> fieldNames) {
         final StringBuilder nameBuilder = new StringBuilder();
-        nameBuilder.append("find");
+        nameBuilder.append(PREFIX).append("find");
         if (!fieldNames.isEmpty()) {
             nameBuilder.append("By");
             String paramName;

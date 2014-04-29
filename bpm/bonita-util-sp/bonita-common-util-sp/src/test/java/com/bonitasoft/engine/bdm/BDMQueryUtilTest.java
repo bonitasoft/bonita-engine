@@ -19,7 +19,7 @@ public class BDMQueryUtilTest {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryNameForUniqueConstraint = BDMQueryUtil.createQueryNameForUniqueConstraint(uniqueConstraint);
-        assertThat(queryNameForUniqueConstraint).isEqualTo("findByName");
+        assertThat(queryNameForUniqueConstraint).isEqualTo("pfindByName");
 
     }
 
@@ -90,7 +90,7 @@ public class BDMQueryUtilTest {
         final Query query = BDMQueryUtil.createQueryForUniqueConstraint(bo, uniqueConstraint);
         assertThat(query).isNotNull();
         assertThat(query.getContent()).isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name= :name\n");
-        assertThat(query.getName()).isEqualTo("findByName");
+        assertThat(query.getName()).isEqualTo("pfindByName");
         assertThat(query.getReturnType()).isEqualTo(bo.getQualifiedName());
         assertThat(query.getQueryParameters()).hasSize(1);
     }
@@ -107,7 +107,7 @@ public class BDMQueryUtilTest {
         final Query query = BDMQueryUtil.createQueryForField(bo, field);
         assertThat(query).isNotNull();
         assertThat(query.getContent()).contains("SELECT e\nFROM Employee e\nWHERE e.name= :name\nORDER BY e.persistenceId");
-        assertThat(query.getName()).isEqualTo("findByName");
+        assertThat(query.getName()).isEqualTo("pfindByName");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).hasSize(1);
     }
@@ -125,7 +125,7 @@ public class BDMQueryUtilTest {
         assertThat(query).isNotNull();
         assertThat(query.getContent()).contains("SELECT e\nFROM Employee e");
         assertThat(query.getContent()).doesNotContain("WHERE");
-        assertThat(query.getName()).isEqualTo("find");
+        assertThat(query.getName()).isEqualTo("pfind");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).isEmpty();
     }

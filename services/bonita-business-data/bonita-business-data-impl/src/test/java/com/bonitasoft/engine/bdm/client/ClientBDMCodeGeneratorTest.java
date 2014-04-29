@@ -315,7 +315,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
         final String daoContent = readGeneratedDAOFile();
-        assertThat(daoContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
+        assertThat(daoContent).contains("public List<Employee> pfindByName(String name, int startIndex, int maxResults)");
     }
 
     @Test
