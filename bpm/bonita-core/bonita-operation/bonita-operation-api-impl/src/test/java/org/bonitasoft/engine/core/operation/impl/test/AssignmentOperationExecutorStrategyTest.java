@@ -62,8 +62,8 @@ public class AssignmentOperationExecutorStrategyTest {
     @Test
     public void testGetValue() throws Exception {
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
-        when(leftOperand.isExternal()).thenReturn(false);
-        final Object returnedValue = assignmentOperationExecutorStrategy.getValue(operation, value, 1, "type", expressionContext);
+        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
         assertEquals("value", returnedValue);
     }
 
@@ -71,8 +71,8 @@ public class AssignmentOperationExecutorStrategyTest {
     public void testGetValueOnExternalData() throws Exception {
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
-        when(leftOperand.isExternal()).thenReturn(true);
-        final Object returnedValue = assignmentOperationExecutorStrategy.getValue(operation, value, 1, "type", expressionContext);
+        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
         assertEquals("value", returnedValue);
     }
 
@@ -80,8 +80,8 @@ public class AssignmentOperationExecutorStrategyTest {
     public void testGetValueWithWrongType() throws Exception {
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
-        when(leftOperand.isExternal()).thenReturn(false);
-        assignmentOperationExecutorStrategy.getValue(operation, value, 1, "type", expressionContext);
+        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
+        assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
     }
 
 }

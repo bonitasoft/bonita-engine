@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Date;
 import java.util.List;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -51,7 +52,7 @@ public class ConstantExpressionExecutorStrategyTest {
     public final void evaluateDate() throws SExpressionEvaluationException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
 
-        final Date result = (Date) strategy.evaluate(sExpression, null, null);
+        final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
     }
 
@@ -61,7 +62,7 @@ public class ConstantExpressionExecutorStrategyTest {
     public final void evaluateDateWithoutTimeZone() throws SExpressionEvaluationException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
 
-        final Date result = (Date) strategy.evaluate(sExpression, null, null);
+        final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
     }
 
@@ -71,7 +72,7 @@ public class ConstantExpressionExecutorStrategyTest {
     public final void evaluateDateWithoutMilliseconds() throws SExpressionEvaluationException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
 
-        final Date result = (Date) strategy.evaluate(sExpression, null, null);
+        final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
     }
 

@@ -40,8 +40,8 @@ public interface ExpressionResolverService {
      * @throws SExpressionDependencyMissingException
      * @throws SInvalidExpressionException
      */
-    Object evaluate(final SExpression expression) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
-            SExpressionDependencyMissingException, SInvalidExpressionException;
+    Object evaluate(final SExpression expression) throws SExpressionTypeUnknownException,
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException;
 
     /**
      * Evaluate the specific expression with the given expressionContext.
@@ -56,8 +56,8 @@ public interface ExpressionResolverService {
      * @throws SExpressionDependencyMissingException
      * @throws SInvalidExpressionException
      */
-    Object evaluate(final SExpression expression, final SExpressionContext contextDependency) throws SExpressionTypeUnknownException,
-            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException;
+    Object evaluate(final SExpression expression, final SExpressionContext contextDependency)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException;
 
     /**
      * Evaluate the specific expressions with the given expressionContext.

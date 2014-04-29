@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-20123 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -57,6 +57,7 @@ import org.w3c.dom.Document;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class IOUtil {
 
@@ -64,7 +65,11 @@ public class IOUtil {
 
     private static final int BUFFER_SIZE = 100000;
 
-    public static final String fEncoding = "UTF-8";
+    public static final String FILE_ENCODING = "UTF-8";
+
+    private IOUtil() {
+        // For Sonar
+    }
 
     public static File createDirectory(final String path) {
         final File file = new File(path);
@@ -282,7 +287,7 @@ public class IOUtil {
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
-        final Scanner scanner = new Scanner(inputStream, fEncoding);
+        final Scanner scanner = new Scanner(inputStream, FILE_ENCODING);
         final StringBuilder text = new StringBuilder();
         try {
             boolean isFirst = true;

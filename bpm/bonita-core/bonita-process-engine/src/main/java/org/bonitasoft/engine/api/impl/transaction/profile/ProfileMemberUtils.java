@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
  * @author Julien Mege
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ProfileMemberUtils {
 
@@ -77,8 +79,12 @@ public class ProfileMemberUtils {
 
     public static final String ROLE_AND_GROUP_SUFFIX = "ForRoleAndGroup";
 
-    public static HashMap<String, Serializable> memberAsProfileMembersMap(final SProfileMember profileMember) {
-        final HashMap<String, Serializable> profileMemeber = new HashMap<String, Serializable>();
+    private ProfileMemberUtils() {
+        // For Sonar
+    }
+
+    public static Map<String, Serializable> memberAsProfileMembersMap(final SProfileMember profileMember) {
+        final Map<String, Serializable> profileMemeber = new HashMap<String, Serializable>();
         profileMemeber.put(PROFILE_ID, profileMember.getProfileId());
         profileMemeber.put(USER_ID, profileMember.getUserId());
         profileMemeber.put(GROUP_ID, profileMember.getGroupId());
@@ -90,8 +96,8 @@ public class ProfileMemberUtils {
         return profileMemeber;
     }
 
-    public static List<HashMap<String, Serializable>> membersAsProfileMembersMapList(final List<SProfileMember> serverObjects) {
-        final ArrayList<HashMap<String, Serializable>> profileMemberMaps = new ArrayList<HashMap<String, Serializable>>();
+    public static List<Map<String, Serializable>> membersAsProfileMembersMapList(final List<SProfileMember> serverObjects) {
+        final List<Map<String, Serializable>> profileMemberMaps = new ArrayList<Map<String, Serializable>>();
         for (final SProfileMember profileMember : serverObjects) {
             profileMemberMaps.add(memberAsProfileMembersMap(profileMember));
         }

@@ -144,7 +144,7 @@ public class TenantSequenceManagerImpl {
 
                         connection.commit();
                         return;
-                    } catch (final Throwable t) {
+                    } catch (final Exception t) {
                         attempt++;
                         try {
                             connection.rollback();
@@ -241,7 +241,7 @@ public class TenantSequenceManagerImpl {
         }
     }
 
-    private static void manageException(final long sleepTime, final Throwable t) {
+    private static void manageException(final long sleepTime, final Exception t) {
         t.printStackTrace();
         System.err.println("Optimistic locking failed: " + t);
         System.err.println("Waiting " + sleepTime + " millis");

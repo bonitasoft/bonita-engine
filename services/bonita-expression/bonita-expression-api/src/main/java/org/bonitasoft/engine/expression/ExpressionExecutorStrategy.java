@@ -31,6 +31,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Zhao Na
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface ExpressionExecutorStrategy {
 
@@ -51,6 +52,8 @@ public interface ExpressionExecutorStrategy {
     String TYPE_READ_ONLY_SCRIPT = "TYPE_READ_ONLY_SCRIPT";
 
     String TYPE_VARIABLE = "TYPE_VARIABLE";
+
+    String TYPE_TRANSIENT_VARIABLE = "TYPE_TRANSIENT_VARIABLE";
 
     String TYPE_PATTERN = "TYPE_PATTERN";
 
@@ -77,6 +80,8 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_INPUT = new ExpressionKind(TYPE_INPUT);
 
     ExpressionKind KIND_VARIABLE = new ExpressionKind(TYPE_VARIABLE);
+
+    ExpressionKind KIND_TRANSIENT_VARIABLE = new ExpressionKind(TYPE_TRANSIENT_VARIABLE);
 
     ExpressionKind KIND_PATTERN = new ExpressionKind(TYPE_PATTERN);
 
@@ -113,8 +118,8 @@ public interface ExpressionExecutorStrategy {
      * @throws SExpressionEvaluationException
      * @throws SExpressionDependencyMissingException
      */
-    Object evaluate(SExpression expression, Map<String, Object> context, Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException,
-            SExpressionDependencyMissingException;
+    Object evaluate(SExpression expression, Map<String, Object> context, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**
      * Validate the expression, an exception is thrown it is invalid
@@ -129,7 +134,7 @@ public interface ExpressionExecutorStrategy {
 
     ExpressionKind getExpressionKind();
 
-    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> context, Map<Integer, Object> resolvedExpressions)
+    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> context, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**

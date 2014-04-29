@@ -507,4 +507,13 @@ public interface ProcessInstanceService {
      */
     void deleteArchivedProcessInstancesOfProcessInstance(long processInstanceId) throws SBonitaException;
 
+    /**
+     * 
+     * @param sourceObjectProcessInstanceId
+     *            The source identifier of the process instance
+     * @return The last archived process instance
+     * @since 6.3
+     */
+    SAProcessInstance getLastArchivedProcessInstance(long sourceObjectProcessInstanceId) throws SBonitaSearchException;
+
 }

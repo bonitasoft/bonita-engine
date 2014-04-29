@@ -36,6 +36,8 @@ public enum ExpressionType {
 
     TYPE_VARIABLE,
 
+    TYPE_TRANSIENT_VARIABLE,
+
     TYPE_PATTERN,
 
     TYPE_PARAMETER,

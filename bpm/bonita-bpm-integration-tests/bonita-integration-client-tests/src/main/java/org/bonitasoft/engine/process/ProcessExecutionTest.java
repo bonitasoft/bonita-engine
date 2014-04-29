@@ -645,35 +645,6 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
             "activity instance" })
     @Test
-    public void getArchivedTransientActivityDataInstance() throws Exception {
-        final String dataName = "title";
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
-        builder.addActor("actor");
-        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1")).isTransient();
-
-        final User matti = createUser("matti", "bpm");
-
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
-        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
-        assignAndExecuteStep(userTask, matti.getId());
-        waitForProcessToFinish(processInstance.getId());
-
-        try {
-            getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
-            fail("a transient data of an activity is not archived");
-        } catch (final ArchivedDataNotFoundException adnfe) {
-
-        } finally {
-            disableAndDeleteProcess(processDefinition);
-            deleteUser(matti);
-        }
-    }
-
-    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
-    @Test
     public void getUnknownArchivedActivityDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
         builder.addActor("actor");

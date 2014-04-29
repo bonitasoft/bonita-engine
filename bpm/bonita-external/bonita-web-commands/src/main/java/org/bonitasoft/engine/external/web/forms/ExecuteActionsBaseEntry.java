@@ -14,20 +14,12 @@
  */
 package org.bonitasoft.engine.external.web.forms;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -42,14 +34,8 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
-import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -104,48 +90,6 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-    }
-
-    protected SOperation toSOperation(final Operation operation) throws SInvalidExpressionException {
-        final SExpression rightOperand = toSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
-        final SOperation sOperation = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
-                .setRightOperand(rightOperand).setType(operatorType).setLeftOperand(sLeftOperand).done();
-        return sOperation;
-    }
-
-    protected SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
-    }
-
-    protected SExpression toSExpression(final Expression exp) throws SInvalidExpressionException {
-        final List<SExpression> dependencies = new ArrayList<SExpression>(exp.getDependencies().size());
-        if (!exp.getDependencies().isEmpty()) {
-            for (final Expression dependency : exp.getDependencies()) {
-                dependencies.add(toSExpression(dependency));
-            }
-        }
-        final SExpression sExpression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(exp.getName())
-                .setContent(exp.getContent())
-                .setExpressionType(exp.getExpressionType()).setInterpreter(exp.getInterpreter()).setReturnType(exp.getReturnType())
-                .setDependencies(dependencies).done();
-        return sExpression;
-    }
-
-    protected List<SOperation> toSOperation(final List<Operation> operations) throws SInvalidExpressionException {
-        if (operations == null) {
-            return null;
-        }
-        if (operations.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
-        for (final Operation operation : operations) {
-            final SOperation sOperation = toSOperation(operation);
-            sOperations.add(sOperation);
-        }
-        return sOperations;
     }
 
     protected SActivityInstance getSActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId) throws SActivityReadException,

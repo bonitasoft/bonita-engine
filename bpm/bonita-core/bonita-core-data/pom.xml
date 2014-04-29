@@ -13,6 +13,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bonita-data-instance-transient-data-source</module>
+		<module>bonita-data-instance-transient</module>
 	</modules>
 </project>

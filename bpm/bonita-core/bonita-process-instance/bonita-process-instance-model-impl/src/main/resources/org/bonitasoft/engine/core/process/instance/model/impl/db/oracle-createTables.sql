@@ -87,7 +87,6 @@ CREATE TABLE flownode_instance (
   token_ref_id NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantid, id)
 );
-
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
 
@@ -106,6 +105,7 @@ CREATE TABLE connector_instance (
   stackTrace CLOB,
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent);
 
 CREATE TABLE event_trigger_instance (
 	tenantid NUMBER(19, 0) NOT NULL,

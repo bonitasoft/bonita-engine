@@ -22,15 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource;
-import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
-import org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
-import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -44,20 +36,11 @@ import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
-
-    private static SDataSource dataSource;
-
-    private static SDataSource transientDataSource;
-
-    private static DataService dataSourceService;
-
-    private static SDataSourceBuilderFactory dataSourceBuilderFactory;
 
     protected static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
@@ -67,41 +50,9 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
 
     protected abstract CacheService getCacheService();
 
-    static {
-        dataSourceService = getServicesBuilder().buildDataService();
-        dataSourceBuilderFactory = BuilderFactory.get(SDataSourceBuilderFactory.class);
-    }
-
-    @BeforeClass
-    public static void setUpPersistence() throws Exception {
-        dataSource = createDataInstanceDataSource(DataInstanceServiceImpl.DEFAULT_DATA_SOURCE, DataInstanceServiceImpl.DATA_SOURCE_VERSION,
-                DataInstanceDataSourceImpl.class);
-        transientDataSource = createDataInstanceDataSource(DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE,
-                DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE_VERSION, TransientDataInstanceDataSource.class);
-    }
-
-    private static SDataSource createDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion,
-            final Class<? extends DataInstanceDataSource> clazz) throws Exception {
-        getTransactionService().begin();
-        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName()).done();
-        dataSourceService.createDataSource(dataSource);
-        getTransactionService().complete();
-        return dataSource;
-    }
-
     @AfterClass
     public static void tearDownPersistence() throws Exception {
         TestUtil.closeTransactionIfOpen(getTransactionService());
-        removeDataInstanceDataSource(dataSource);
-        removeDataInstanceDataSource(transientDataSource);
-    }
-
-    private static void removeDataInstanceDataSource(final SDataSource dataSource) throws Exception {
-        getTransactionService().begin();
-        if (dataSource != null) {
-            dataSourceService.removeDataSource(dataSource.getId());
-        }
-        getTransactionService().complete();
     }
 
     protected SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
@@ -124,7 +75,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException,
             STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
-        final Object result = getExpressionService().evaluate(expression, resolvedExpressions);
+        final Object result = getExpressionService().evaluate(expression, resolvedExpressions, ContainerState.ACTIVE);
         getTransactionService().complete();
         return result;
     }
@@ -134,7 +85,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
             SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException, STransactionCommitException,
             STransactionRollbackException {
         getTransactionService().begin();
-        final List<Object> result = getExpressionService().evaluate(expressionKind, expressions, dependencyValues, resolvedExpressions);
+        final List<Object> result = getExpressionService().evaluate(expressionKind, expressions, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
         getTransactionService().complete();
         return result;
     }

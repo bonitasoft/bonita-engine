@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,6 +19,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementIn
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class SAFlowElementInstanceImpl extends SANamedElementImpl implements SAFlowElementInstance {
 
@@ -50,6 +51,26 @@ public abstract class SAFlowElementInstanceImpl extends SANamedElementImpl imple
         logicalGroup2 = flowElementInstance.getLogicalGroup(1);
         logicalGroup3 = flowElementInstance.getLogicalGroup(2);
         logicalGroup4 = flowElementInstance.getLogicalGroup(3);
+    }
+
+    @Override
+    public long getProcessDefinitionId() {
+        return logicalGroup1;
+    }
+
+    @Override
+    public long getRootProcessInstanceId() {
+        return logicalGroup2;
+    }
+
+    @Override
+    public long getParentActivityInstanceId() {
+        return logicalGroup3;
+    }
+
+    @Override
+    public long getParentProcessInstanceId() {
+        return logicalGroup4;
     }
 
     @Override

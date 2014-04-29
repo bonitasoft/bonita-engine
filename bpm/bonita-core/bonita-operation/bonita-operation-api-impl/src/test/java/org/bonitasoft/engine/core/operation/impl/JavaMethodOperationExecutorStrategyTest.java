@@ -13,44 +13,83 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
-import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JavaMethodOperationExecutorStrategyTest {
 
     @Test(expected = SOperationExecutionException.class)
     public void dontThrowNPEIfObjectDoesNotExist() throws Exception {
-        final DataInstanceService dataInstanceService = mock(DataInstanceService.class);
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy(dataInstanceService);
+        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
         final SOperation operation = mock(SOperation.class);
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
         final SExpression rightOperand = mock(SExpression.class);
 
         when(operation.getLeftOperand()).thenReturn(leftOperand);
         when(leftOperand.getName()).thenReturn("unknownData");
-        when(leftOperand.isExternal()).thenReturn(true);
+        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
         when(operation.getRightOperand()).thenReturn(rightOperand);
         when(operation.getOperator()).thenReturn("=");
         when(rightOperand.getReturnType()).thenReturn(Object.class.getName());
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         expressionContext.setInputValues(Collections.<String, Object> emptyMap());
-        strategy.getValue(operation, "Update", 123L, DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
+        strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext);
+    }
+
+    @Test
+    public void computeValue() throws Exception {
+        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
+        final SOperation operation = mock(SOperation.class);
+        final SLeftOperand leftOperand = mock(SLeftOperand.class);
+        final SExpression rightOperand = mock(SExpression.class);
+
+        when(operation.getLeftOperand()).thenReturn(leftOperand);
+        when(leftOperand.getName()).thenReturn("myData");
+        when(operation.getRightOperand()).thenReturn(rightOperand);
+        when(operation.getOperator()).thenReturn("setThing:int");
+        when(rightOperand.getReturnType()).thenReturn(Integer.class.getName());
+
+        final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("myData", new MyClass());
+        expressionContext.setInputValues(map);
+        MyClass updated = (MyClass) strategy.computeNewValueForLeftOperand(operation, 12, expressionContext);
+
+        assertEquals(12, updated.getThing());
+    }
+
+    public class MyClass {
+
+        private int thing = 0;
+
+        public void setThing(final int thing) {
+            this.thing = thing;
+        }
+
+        public int getThing() {
+            return thing;
+        }
+
     }
 
 }

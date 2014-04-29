@@ -25,14 +25,15 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.activity.CreateActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
-import org.bonitasoft.engine.api.impl.transaction.data.CreateSDataInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -146,13 +147,15 @@ public class BPMInstancesCreator {
 
     private final DataInstanceService dataInstanceService;
 
+    private final TransientDataService transientDataService;
+
     private final TechnicalLoggerService logger;
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger) {
+            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -162,6 +165,7 @@ public class BPMInstancesCreator {
         this.expressionResolverService = expressionResolverService;
         this.dataInstanceService = dataInstanceService;
         this.logger = logger;
+        this.transientDataService = transientDataService;
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
@@ -580,9 +584,8 @@ public class BPMInstancesCreator {
             }
         }
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
-            final CreateSDataInstances transaction = new CreateSDataInstances(sDataInstances, dataInstanceService, processInstance, activityInstanceService,
-                    processDefinition);
-            transaction.execute();
+            // we create here only normal data, not transient because there is no transient on process
+            createDataForProcess(processInstance, processDefinition, sDataInstances);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             final StringBuilder stb = new StringBuilder();
@@ -607,18 +610,45 @@ public class BPMInstancesCreator {
         }
     }
 
+    private void createDataForProcess(final SProcessInstance processInstance, final SProcessDefinition processDefinition,
+            final List<SDataInstance> sDataInstances)
+            throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
+        if (!sDataInstances.isEmpty()) {
+            for (final SDataInstance sDataInstance : sDataInstances) {
+                dataInstanceService.createDataInstance(sDataInstance);
+            }
+        }
+
+        final boolean parentHasData = !processDefinition.getProcessContainer().getDataDefinitions().isEmpty();
+        if (!sDataInstances.isEmpty() || parentHasData) {
+            if (processInstance.getCallerId() > 0) {
+                final SFlowNodeInstance caller = activityInstanceService.getFlowNodeInstance(processInstance.getCallerId());
+                if (SFlowNodeType.SUB_PROCESS.equals(caller.getType())) {
+                    final SSubProcessActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SSubProcessActivityInstanceBuilderFactory.class);
+                    dataInstanceService.addChildContainer(caller.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()),
+                            DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                } else {
+                    dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                }
+            } else {
+                dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+            }
+        }
+    }
+
     private boolean hasLocalOrInheritedData(final SProcessDefinition processDefinition, final SFlowElementContainerDefinition processContainer) {
         // processContainer is different of processDefinition.getProcessContainer() if it's a sub-process
         return !processContainer.getDataDefinitions().isEmpty() || !processDefinition.getProcessContainer().getDataDefinitions().isEmpty();
     }
 
-    private SOperation getOperationToSetData(final String dataName, final List<SOperation> operations) {
+    SOperation getOperationToSetData(final String dataName, final List<SOperation> operations) {
         SOperation dataOperation = null;
         final Iterator<SOperation> iterator = operations.iterator();
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final SOperation operation = iterator.next();
-            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && dataName.equals(operation.getLeftOperand().getName())) {
+            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && SLeftOperand.TYPE_DATA.equals(operation.getLeftOperand().getType())
+                    && dataName.equals(operation.getLeftOperand().getName())) {
                 found = true;
                 dataOperation = operation;
             }
@@ -628,8 +658,9 @@ public class BPMInstancesCreator {
 
     private void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
             final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final String loopDataInputRef, final int index,
-            final String dataInputRef, final long parentContainerId) throws SDataInstanceException, SExpressionException {
+            final DataInstanceService dataInstanceService, final TransientDataService transientDataService, final String loopDataInputRef, final int index,
+            final String dataInputRef, final long parentContainerId)
+            throws SDataInstanceException, SExpressionException {
         for (final SDataDefinition dataDefinition : dataDefinitions) {
             Serializable dataValue = null;
             if (dataDefinition.getName().equals(dataInputRef)) {
@@ -663,22 +694,25 @@ public class BPMInstancesCreator {
             } catch (final SDataInstanceNotWellFormedException e) {
                 throw new SDataInstanceReadException(e);
             }
-            dataInstanceService.createDataInstance(dataInstance);
+            if (dataInstance.isTransientData()) {
+                transientDataService.createDataInstance(dataInstance);
+            } else {
+                dataInstanceService.createDataInstance(dataInstance);
+            }
         }
 
     }
 
     public void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
-            final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService) throws SDataInstanceException,
+            final SExpressionContext expressionContext) throws SDataInstanceException,
             SExpressionException {
         createDataInstances(dataDefinitions, containerId, containerType, expressionContext, expressionResolverService, dataInstanceService,
-                null, -1, null, -1);
+                transientDataService, null, -1, null, -1);
     }
 
-    private SDataInstance buildDataInstance(final SDataDefinition correlation, final long dataContainerId, final DataInstanceContainer dataContainerType,
+    private SDataInstance buildDataInstance(final SDataDefinition dataDefinition, final long dataContainerId, final DataInstanceContainer dataContainerType,
             final Serializable dataValue) throws SDataInstanceNotWellFormedException {
-        return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(correlation).setContainerId(dataContainerId)
+        return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition).setContainerId(dataContainerId)
                 .setContainerType(dataContainerType.name()).setValue(dataValue).done();
 
     }
@@ -702,11 +736,10 @@ public class BPMInstancesCreator {
                         && ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataInputItemRef() != null) {
                     final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
                     createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
-                            expressionResolverService, dataInstanceService, miLoop.getLoopDataInputRef(),
+                            expressionResolverService, dataInstanceService, transientDataService, miLoop.getLoopDataInputRef(),
                             flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(), flowNodeInstance.getParentContainerId());
                 } else {
-                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
-                            expressionResolverService, dataInstanceService);
+                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);
                 }
                 if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                     final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);

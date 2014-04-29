@@ -21,6 +21,7 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -32,19 +33,21 @@ public class SExpressionContext implements Serializable {
 
     private static final long serialVersionUID = 6417383664862870145L;
 
-    public static final String containerIdKey = "containerId";
+    public static final String CONTAINER_ID_KEY = "containerId";
 
-    public static final String containerTypeKey = "containerType";
+    public static final String CONTAINER_TYPE_KEY = "containerType";
 
-    public static final String timeKey = "time";
+    public static final String TIME_KEY = "time";
 
-    public static final String processDefinitionIdKey = "processDefinitionId";
+    public static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
 
-    public static final String processDefinitionKey = "processDefinition";
+    public static final String PROCESS_DEFINITION_KEY = "processDefinition";
 
     private Long containerId;
 
     private String containerType;
+
+    private ContainerState containerState;
 
     private long time;
 
@@ -92,6 +95,16 @@ public class SExpressionContext implements Serializable {
         this.time = time;
     }
 
+    public SExpressionContext(final long containerId, final String containerType, final Map<String, Object> inputValues) {
+        this.containerId = containerId;
+        this.containerType = containerType;
+        if (inputValues == null) {
+            this.inputValues = new HashMap<String, Object>();
+        } else {
+            this.inputValues = new HashMap<String, Object>(inputValues);
+        }
+    }
+
     public Long getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -114,20 +127,28 @@ public class SExpressionContext implements Serializable {
         this.time = time;
     }
 
+    public Long getContainerId() {
+        return containerId;
+    }
+
     public void setContainerId(final Long containerId) {
         this.containerId = containerId;
+    }
+
+    public String getContainerType() {
+        return containerType;
     }
 
     public void setContainerType(final String containerType) {
         this.containerType = containerType;
     }
 
-    public Long getContainerId() {
-        return containerId;
+    public ContainerState getContainerState() {
+        return containerState;
     }
 
-    public String getContainerType() {
-        return containerType;
+    public void setContainerState(final ContainerState containerState) {
+        this.containerState = containerState;
     }
 
     public Map<String, Object> getInputValues() {
@@ -153,17 +174,15 @@ public class SExpressionContext implements Serializable {
     public SExpression getDefaultValueFor(final String name) {
         if (evaluateInDefinition) {
             return dataMap.get(name);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public String isDefaultValueOf(final SExpression exp) {
         if (evaluateInDefinition) {
             return invertedDataMap.get(exp);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public void setInputValues(final Map<String, Object> inputValues) {
@@ -180,6 +199,13 @@ public class SExpressionContext implements Serializable {
 
     public boolean isEvaluateInDefinition() {
         return evaluateInDefinition;
+    }
+
+    @Override
+    public String toString() {
+        return "context [containerId=" + containerId + ", containerType=" + containerType + ", processDefinitionId="
+                + processDefinitionId
+                + (processDefinition != null ? ", processDefinition=" + processDefinition.getName() + " -- " + processDefinition.getVersion() : "") + "]";
     }
 
 }

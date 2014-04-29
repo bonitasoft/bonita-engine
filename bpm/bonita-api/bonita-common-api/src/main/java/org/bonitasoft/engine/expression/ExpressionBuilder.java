@@ -154,6 +154,10 @@ public class ExpressionBuilder {
                 .setDependencies(Arrays.asList(dependencies)).done();
     }
 
+    public Expression createTransientDataExpression(final String dataName, final String dataType) throws InvalidExpressionException {
+        return createNewInstance(dataName).setContent(dataName).setExpressionType(ExpressionType.TYPE_TRANSIENT_VARIABLE.name()).setReturnType(dataType).done();
+    }
+
     public Expression createDocumentReferenceExpression(final String documentName) throws InvalidExpressionException {
         return createNewInstance(documentName).setContent(documentName).setExpressionType(ExpressionType.TYPE_DOCUMENT).setReturnType(Document.class.getName())
                 .done();

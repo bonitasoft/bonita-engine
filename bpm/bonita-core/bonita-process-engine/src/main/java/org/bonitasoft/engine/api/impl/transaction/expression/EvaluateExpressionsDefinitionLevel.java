@@ -69,7 +69,7 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
                     if (inputValues == null) {
                         inputValues = new HashMap<String, Serializable>();
                     }
-                    inputValues.put(SExpressionContext.processDefinitionKey, processDefinition);
+                    inputValues.put(SExpressionContext.PROCESS_DEFINITION_KEY, processDefinition);
                     context.setProcessDefinitionId(processDefinitionId);
                     context.setSerializableInputValues(inputValues);
                     final SExpression sexp = ServerModelConvertor.convertExpression(exp);
