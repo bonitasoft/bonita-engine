@@ -107,6 +107,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
 
+        employee.addQuery("countEmployee", "SELECT COUNT(e) FROM Employee e", Long.class.getName());
+
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName("org.bonitasoft.pojo.Person");
         person.addField(firstName);

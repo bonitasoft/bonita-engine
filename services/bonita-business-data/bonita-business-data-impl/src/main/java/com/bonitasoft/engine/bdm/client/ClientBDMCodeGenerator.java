@@ -78,7 +78,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-            ClassNotFoundException {
+    ClassNotFoundException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -158,8 +158,10 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         if (isCollection) {
             final JClass list = getModel().ref(List.class);
             invocation = omObject.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
-        } else {
+        } else if (method.type().binaryName().equals(returnType)) {
             invocation = entityClassExpression;
+        } else {
+            invocation = JExpr.dotclass(getModel().ref(method.type().binaryName()));
         }
         final JInvocation deserialize = omObject.invoke("readValue").arg(JExpr.cast(serial, executeQuery)).arg(invocation);
         tryBody._return(JExpr.cast(method.type(), deserialize));
