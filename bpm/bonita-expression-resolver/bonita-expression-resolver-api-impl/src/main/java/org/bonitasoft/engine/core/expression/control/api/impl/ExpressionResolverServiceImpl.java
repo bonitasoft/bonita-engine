@@ -79,16 +79,14 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     private List<Object> evaluateExpressionsFlatten(final List<SExpression> expressions, final SExpressionContext evaluationContext)
             throws SInvalidExpressionException, SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        SExpressionContext newEvaluationContext = EMPTY_CONTEXT;
         try {
             final Map<String, Object> dependencyValues = new HashMap<String, Object>();
-            SExpressionContext newEvaluationContext;
-            if (evaluationContext == null) {
-                newEvaluationContext = EMPTY_CONTEXT;
-            } else {
+            if (evaluationContext != null) {
                 newEvaluationContext = evaluationContext;
                 fillContext(newEvaluationContext, dependencyValues);
             }
-            final Long processDefinitionId = evaluationContext.getProcessDefinitionId();
+            final Long processDefinitionId = newEvaluationContext.getProcessDefinitionId();
             if (processDefinitionId != null) {
                 Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId));
             }
@@ -115,9 +113,9 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             }
             return results;
         } catch (final SProcessDefinitionNotFoundException e) {
-            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(evaluationContext, e);
+            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(newEvaluationContext, e);
         } catch (final SProcessDefinitionReadException e) {
-            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(evaluationContext, e);
+            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(newEvaluationContext, e);
         } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException(e, null);
         } finally {
