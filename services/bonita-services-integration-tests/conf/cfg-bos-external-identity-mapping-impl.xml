@@ -5,7 +5,7 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
 

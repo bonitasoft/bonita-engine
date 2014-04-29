@@ -10,7 +10,7 @@
 <!-- 				</bean> -->
 			</list>
 		</constructor-arg>
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>
