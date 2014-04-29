@@ -11,7 +11,6 @@ package com.bonitasoft.engine.bdm.client;
 import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule.FORBIDDEN_PARAMETER_NAMES;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -190,21 +189,13 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) throws ClassNotFoundException {
-        final String methodName = buildMethodName(query);
+        final String methodName = query.getName();
         final JMethod queryMethod = createQueryMethod(entity, targetClass, methodName, query.getReturnType());
         for (final QueryParameter param : query.getQueryParameters()) {
             queryMethod.param(getModel().ref(param.getClassName()), param.getName());
         }
         addOptionalPaginationParameters(queryMethod, query.getReturnType());
         return queryMethod;
-    }
-
-    private String buildMethodName(final Query query) {
-        final List<String> fieldNames = new ArrayList<String>();
-        for (final QueryParameter param : query.getQueryParameters()) {
-            fieldNames.add(param.getName());
-        }
-        return BDMQueryUtil.getQueryName(fieldNames);
     }
 
     private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {

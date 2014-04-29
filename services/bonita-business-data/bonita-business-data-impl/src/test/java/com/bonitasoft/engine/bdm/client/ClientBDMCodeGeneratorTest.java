@@ -341,7 +341,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
         final String daoContent = readGeneratedDAOFile();
 
-        assertThat(daoContent).contains("public List<Employee> findByMiEdadAndMyName(Integer miEdad, String myName, int startIndex, int maxResults)");
+        assertThat(daoContent).contains("public List<Employee> getEmployeesByNameAndAge(Integer miEdad, String myName, int startIndex, int maxResults)");
     }
 
     protected String getQueryMethodSignature(final Query query, final String queryReturnType, final String businessObjectName, final boolean returnsList) {

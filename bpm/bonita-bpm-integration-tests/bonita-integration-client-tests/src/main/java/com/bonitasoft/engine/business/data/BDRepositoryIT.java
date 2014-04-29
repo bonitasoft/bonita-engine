@@ -102,6 +102,11 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
 
+        final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery("findByFirstNameAndLastNameNewOrder",
+                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", List.class.getName());
+        findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
+        findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
+
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName("org.bonitasoft.pojo.Person");
         person.addField(firstName);
