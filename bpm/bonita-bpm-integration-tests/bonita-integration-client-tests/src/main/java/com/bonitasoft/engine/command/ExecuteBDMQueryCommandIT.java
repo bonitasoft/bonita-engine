@@ -38,6 +38,7 @@ import com.bonitasoft.engine.bdm.FieldType;
 import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.business.data.ClassloaderRefresher;
+import com.bonitasoft.engine.io.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -96,8 +97,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     }
 
     @BeforeClass
-    public static void initTestClass() {
-        clientFolder = new File(System.getProperty("java.io.tmpdir"), "client");
+    public static void initTestClass() throws IOException {
+        clientFolder = IOUtils.createTempDirectory("ExecuteBDMQueryCommandIT_client");
         clientFolder.mkdirs();
     }
 
@@ -240,8 +241,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createNewInstance("myEmployee").done(),
-                OperatorType.CREATE_BUSINESS_DATA, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
+                OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
         final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, businessUser);

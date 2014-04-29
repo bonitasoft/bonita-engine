@@ -109,14 +109,14 @@ public class OperationTest extends CommonAPITest {
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
         addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
                 new ExpressionBuilder().createConstantStringExpression("newValue1")));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(2), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue2"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(3), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue3"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(4), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue4"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(5), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue5"));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(2,
+                new ExpressionBuilder().createConstantStringExpression("newValue2")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(3,
+                new ExpressionBuilder().createConstantStringExpression("newValue3")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(4,
+                new ExpressionBuilder().createConstantStringExpression("newValue4")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(5,
+                new ExpressionBuilder().createConstantStringExpression("newValue5")));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createConstantStringExpression("value1"));
@@ -157,8 +157,8 @@ public class OperationTest extends CommonAPITest {
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
         addAutomaticTask.addOperation(new LeftOperandBuilder().createDataLeftOperand("baseData"), OperatorType.ASSIGNMENT, null, null,
                 new ExpressionBuilder().createConstantStringExpression("changedData"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(1), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
+                new ExpressionBuilder().createDataExpression("baseData", String.class.getName())));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
@@ -183,7 +183,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step1", actorName);
         designProcessDefinition.addUserTask("step3", actorName);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(1), OperatorType.STRING_INDEX, null, null, null);
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1, null));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.done();
