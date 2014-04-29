@@ -57,9 +57,8 @@ public abstract class ResourceInSpecificFolderContribution implements BusinessAr
                 fin = null;
             }
             return listFiles.length > 0;
-        } else {
-            return false;
         }
+        return false;
     }
 
     protected abstract String getFolderName();

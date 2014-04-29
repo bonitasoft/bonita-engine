@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 

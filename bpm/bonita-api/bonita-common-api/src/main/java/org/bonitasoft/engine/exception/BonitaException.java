@@ -33,15 +33,11 @@ public class BonitaException extends Exception implements BonitaContextException
 
     private static final long serialVersionUID = -5413586694735909486L;
 
-    private final Map<Context, Serializable> context = new TreeMap<Context, Serializable>();
+    private final Map<ExceptionContext, Serializable> context = new TreeMap<ExceptionContext, Serializable>();
 
     private long tenantId = -1;
 
-    private String hostname = "";
-
     private String userName = "";
-
-    private long threadId = -1;
 
     /**
      * Constructs a new exception with the specified detail message and cause.
@@ -94,22 +90,6 @@ public class BonitaException extends Exception implements BonitaContextException
     }
 
     /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#getHostname()
-     */
-    @Override
-    public String getHostname() {
-        return hostname;
-    }
-
-    /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#setHostname(java.lang.String)
-     */
-    @Override
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
-    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getUserName()
      */
     @Override
@@ -125,21 +105,11 @@ public class BonitaException extends Exception implements BonitaContextException
         this.userName = userName;
     }
 
-    @Override
-    public long getThreadId() {
-        return threadId;
-    }
-
-    @Override
-    public void setThreadId(long threadId) {
-        this.threadId = threadId;
-    }
-
     /**
      * @return The context of the exception
      * @since 6.3
      */
-    public Map<Context, Serializable> getContext() {
+    public Map<ExceptionContext, Serializable> getContext() {
         return context;
     }
 
@@ -149,7 +119,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setProcessDefinitionIdOnContext(final Long id) {
-        context.put(Context.PROCESS_DEFINITION_ID, id);
+        context.put(ExceptionContext.PROCESS_DEFINITION_ID, id);
     }
 
     /**
@@ -158,7 +128,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setProcessDefinitionNameOnContext(final String name) {
-        context.put(Context.PROCESS_NAME, name);
+        context.put(ExceptionContext.PROCESS_NAME, name);
     }
 
     /**
@@ -167,7 +137,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setProcessDefinitionVersionOnContext(final String version) {
-        context.put(Context.PROCESS_VERSION, version);
+        context.put(ExceptionContext.PROCESS_VERSION, version);
     }
 
     /**
@@ -176,7 +146,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setProcessInstanceIdOnContext(final Long id) {
-        context.put(Context.PROCESS_INSTANCE_ID, id);
+        context.put(ExceptionContext.PROCESS_INSTANCE_ID, id);
     }
 
     /**
@@ -185,7 +155,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setRootProcessInstanceIdOnContext(final Long id) {
-        context.put(Context.ROOT_PROCESS_INSTANCE_ID, id);
+        context.put(ExceptionContext.ROOT_PROCESS_INSTANCE_ID, id);
     }
 
     /**
@@ -194,7 +164,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setConnectorDefinitionIdOnContext(final String id) {
-        context.put(Context.CONNECTOR_DEFINITION_ID, id);
+        context.put(ExceptionContext.CONNECTOR_DEFINITION_ID, id);
     }
 
     /**
@@ -203,7 +173,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setConnectorDefinitionImplementationClassNameOnContext(final String name) {
-        context.put(Context.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
+        context.put(ExceptionContext.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
     }
 
     /**
@@ -212,7 +182,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setConnectorDefinitionVersionOnContext(final String version) {
-        context.put(Context.CONNECTOR_DEFINITION_VERSION, version);
+        context.put(ExceptionContext.CONNECTOR_DEFINITION_VERSION, version);
     }
 
     /**
@@ -221,7 +191,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setConnectorActivationEventOnContext(final String activationEvent) {
-        context.put(Context.CONNECTOR_ACTIVATION_EVENT, activationEvent);
+        context.put(ExceptionContext.CONNECTOR_ACTIVATION_EVENT, activationEvent);
     }
 
     /**
@@ -230,7 +200,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setConnectorInstanceIdOnContext(final long id) {
-        context.put(Context.CONNECTOR_INSTANCE_ID, id);
+        context.put(ExceptionContext.CONNECTOR_INSTANCE_ID, id);
     }
 
     /**
@@ -239,7 +209,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setFlowNodeDefinitionIdOnContext(final long id) {
-        context.put(Context.FLOW_NODE_DEFINITION_ID, id);
+        context.put(ExceptionContext.FLOW_NODE_DEFINITION_ID, id);
     }
 
     /**
@@ -248,7 +218,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setFlowNodeInstanceIdOnContext(final long id) {
-        context.put(Context.FLOW_NODE_INSTANCE_ID, id);
+        context.put(ExceptionContext.FLOW_NODE_INSTANCE_ID, id);
     }
 
     /**
@@ -257,7 +227,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setFlowNodeNameOnContext(final String name) {
-        context.put(Context.FLOW_NODE_NAME, name);
+        context.put(ExceptionContext.FLOW_NODE_NAME, name);
     }
 
     /**
@@ -266,7 +236,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setMessageInstanceNameOnContext(final String name) {
-        context.put(Context.MESSAGE_INSTANCE_NAME, name);
+        context.put(ExceptionContext.MESSAGE_INSTANCE_NAME, name);
     }
 
     /**
@@ -275,7 +245,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setMessageInstanceTargetProcessOnContext(final String name) {
-        context.put(Context.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, name);
+        context.put(ExceptionContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, name);
     }
 
     /**
@@ -284,7 +254,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setMessageInstanceTargetFlowNodeOnContext(final String name) {
-        context.put(Context.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, name);
+        context.put(ExceptionContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, name);
     }
 
     /**
@@ -293,7 +263,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setWaitingMessageEventTypeOnContext(final String eventType) {
-        context.put(Context.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
+        context.put(ExceptionContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
     }
 
     /**
@@ -302,7 +272,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setDocumentIdOnContext(final long id) {
-        context.put(Context.DOCUMENT_ID, id);
+        context.put(ExceptionContext.DOCUMENT_ID, id);
     }
 
     /**
@@ -311,7 +281,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setUserIdOnContext(final Long userId) {
-        context.put(Context.USER_ID, userId);
+        context.put(ExceptionContext.USER_ID, userId);
     }
 
     /**
@@ -320,7 +290,7 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setGroupIdOnContext(final Long groupId) {
-        context.put(Context.GROUP_ID, groupId);
+        context.put(ExceptionContext.GROUP_ID, groupId);
     }
 
     /**
@@ -329,13 +299,13 @@ public class BonitaException extends Exception implements BonitaContextException
      * @since 6.3
      */
     public void setRoleIdOnContext(final Long roleId) {
-        context.put(Context.ROLE_ID, roleId);
+        context.put(ExceptionContext.ROLE_ID, roleId);
     }
 
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage());
+        stringBuilder.append(getTenantIdMessage() + getUserNameMessage());
         appendContextMessage(stringBuilder);
         stringBuilder.append(super.getMessage());
         return stringBuilder.toString();
@@ -343,18 +313,10 @@ public class BonitaException extends Exception implements BonitaContextException
 
     private void appendContextMessage(final StringBuilder stringBuilder) {
         if (!context.isEmpty()) {
-            for (final Entry<Context, Serializable> entry : context.entrySet()) {
+            for (final Entry<ExceptionContext, Serializable> entry : context.entrySet()) {
                 stringBuilder.append(entry.getKey() + "=" + entry.getValue() + " | ");
             }
         }
-    }
-
-    private String getThreadIdMessage() {
-        return threadId != -1 ? "THREAD_ID=" + threadId + " | " : "";
-    }
-
-    private String getHostNameMessage() {
-        return hostname != null && !hostname.isEmpty() ? "HOSTNAME=" + hostname + " | " : "";
     }
 
     private String getUserNameMessage() {

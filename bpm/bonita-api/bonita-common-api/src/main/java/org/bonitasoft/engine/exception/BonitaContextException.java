@@ -17,24 +17,17 @@ package org.bonitasoft.engine.exception;
  * Exception wrapper providing context on the exception.
  * 
  * @author Aurelien Pupier
- *
+ * @author Celine Souchet
+ * 
  */
 public interface BonitaContextException {
 
-	public abstract long getTenantId();
+    public abstract long getTenantId();
 
-	public abstract void setTenantId(long tenantId);
+    public abstract void setTenantId(long tenantId);
 
-	public abstract String getHostname();
+    public abstract String getUserName();
 
-	public abstract void setHostname(String hostname);
-
-	public abstract String getUserName();
-
-	public abstract void setUserName(String userName);
-	
-	public abstract long getThreadId();
-	
-	public abstract void setThreadId(long threadId);
+    public abstract void setUserName(String userName);
 
 }

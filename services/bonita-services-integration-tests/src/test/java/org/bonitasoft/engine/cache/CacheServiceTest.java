@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -51,7 +50,7 @@ public class CacheServiceTest {
     }
 
     @After
-    public void tearDown() throws SBonitaException, TimeoutException {
+    public void tearDown() throws SBonitaException {
         LOGGER.info("Tested: {}", name.getMethodName());
         cacheService.stop();
         cacheService = null;

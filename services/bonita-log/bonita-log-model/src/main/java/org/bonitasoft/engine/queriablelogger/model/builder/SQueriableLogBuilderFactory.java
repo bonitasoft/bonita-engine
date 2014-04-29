@@ -21,10 +21,12 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
  */
 public interface SQueriableLogBuilderFactory extends SLogBuilderFactory {
 
+    @Override
     SQueriableLogBuilder createNewInstance();
-    
+
+    @Override
     SQueriableLogBuilder fromInstance(SQueriableLog log);
-    
+
     String getActionTypeKey();
 
     String getNumericIndexKey(int pos);

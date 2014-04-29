@@ -15,9 +15,6 @@
  */
 package org.bonitasoft.engine.core.operation;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -47,7 +44,7 @@ public interface LeftOperandHandler {
      */
     // TODO batch method
     void update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
-    
+
     /**
      * 
      * @param sLeftOperand

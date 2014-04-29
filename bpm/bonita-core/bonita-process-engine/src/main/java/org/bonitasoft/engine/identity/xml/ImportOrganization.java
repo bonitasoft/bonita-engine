@@ -73,11 +73,12 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     private final ImportOrganizationStrategy strategy;
 
-    private TenantServiceAccessor serviceAccessor;
+    private final TenantServiceAccessor serviceAccessor;
 
-    private SCustomUserInfoValueAPI userInfoValueAPI;
+    private final SCustomUserInfoValueAPI userInfoValueAPI;
 
-    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy, SCustomUserInfoValueAPI userInfoValueAPI)
+    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy,
+            SCustomUserInfoValueAPI userInfoValueAPI)
             throws OrganizationImportException {
         this.serviceAccessor = serviceAccessor;
         this.userInfoValueAPI = userInfoValueAPI;
@@ -116,9 +117,10 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             final List<RoleCreator> roles = organization.getRoleCreators();
             final List<GroupCreator> groups = organization.getGroupCreators();
             final List<UserMembership> memberships = organization.getMemberships();
-            
-            //custom user info definitions
-            Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization.getCustomUserInfoDefinitionCreators());
+
+            // custom user info definitions
+            Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization
+                    .getCustomUserInfoDefinitionCreators());
 
             // Users
             final Map<String, SUser> userNameToSUsers = importUsers(users, customUserInfoDefinitions);
@@ -139,7 +141,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators) throws SIdentityException, ImportDuplicateInOrganizationException {
+    private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators)
+            throws SIdentityException, ImportDuplicateInOrganizationException {
         CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
         return importer.importCustomUserInfoDefinitions(customUserInfoDefinitionCreators);
     }
@@ -172,14 +175,12 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         final String username = newMembership.getUsername();
         if (username == null || username.isEmpty()) {
             return -1L;
-        } else {
-            final SUser sUser = userNameToSUsers.get(username);
-            if (sUser != null) {
-                return sUser.getId();
-            } else {
-                return null;
-            }
         }
+        final SUser sUser = userNameToSUsers.get(username);
+        if (sUser != null) {
+            return sUser.getId();
+        }
+        return null;
 
     }
 
@@ -193,28 +194,24 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         final String roleName = newMembership.getRoleName();
         if (roleName == null || roleName.isEmpty()) {
             return -1L;
-        } else {
-            final Long roleId = roleNameToIdMap.get(roleName);
-            if (roleId != null) {
-                return roleId;
-            } else {
-                return null;
-            }
         }
+        final Long roleId = roleNameToIdMap.get(roleName);
+        if (roleId != null) {
+            return roleId;
+        }
+        return null;
     }
 
     private Long getAssignedBy(final Map<String, SUser> userNameToSUsers, final UserMembership newMembership) {
         final String assignedByName = newMembership.getAssignedByName();
         if (assignedByName == null || assignedByName.isEmpty()) {
             return -1L;
-        } else {
-            final SUser sUserAssigned = userNameToSUsers.get(assignedByName);
-            if (sUserAssigned != null) {
-                return sUserAssigned.getId();
-            } else {
-                return -1L;
-            }
         }
+        final SUser sUserAssigned = userNameToSUsers.get(assignedByName);
+        if (sUserAssigned != null) {
+            return sUserAssigned.getId();
+        }
+        return -1L;
     }
 
     private Map<String, Long> importGroups(final List<GroupCreator> groupCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
@@ -239,9 +236,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         final String parentPath = (String) fields.get(GroupField.PARENT_PATH);
         if (parentPath == null) {
             return "/" + name;
-        } else {
-            return parentPath + "/" + name;
         }
+        return parentPath + "/" + name;
     }
 
     private Map<String, Long> importRoles(final List<RoleCreator> roleCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
@@ -278,7 +274,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, SUser> importUsers(final List<ExportedUser> users, Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions) throws SBonitaException {
+    private Map<String, SUser> importUsers(final List<ExportedUser> users, Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions)
+            throws SBonitaException {
         CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI, customUserInfoDefinitions);
         UserImporter userImporter = new UserImporter(serviceAccessor, strategy, SessionInfos.getUserIdFromSession(), userInfoValueImporter);
         return userImporter.importUsers(users);
@@ -296,9 +293,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         final Date assignedDate = newMembership.getAssignedDate();
         if (assignedDate != null) {
             return assignedDate.getTime();
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     private SGroup addGroup(final GroupCreator creator) throws SGroupCreationException {

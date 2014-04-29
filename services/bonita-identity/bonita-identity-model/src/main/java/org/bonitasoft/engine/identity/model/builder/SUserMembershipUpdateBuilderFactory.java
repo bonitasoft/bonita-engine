@@ -19,6 +19,7 @@ package org.bonitasoft.engine.identity.model.builder;
  */
 public interface SUserMembershipUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
 
+    @Override
     SUserMembershipUpdateBuilder createNewInstance();
-    
+
 }

@@ -38,7 +38,7 @@ public class SGroupImpl extends SNamedElementImpl implements SGroup {
 
     public SGroupImpl() {
         super();
-    };
+    }
 
     @Override
     public String getDiscriminator() {
@@ -103,9 +103,8 @@ public class SGroupImpl extends SNamedElementImpl implements SGroup {
     public String getPath() {
         if (parentPath == null) {
             return "/" + getName();
-        } else {
-            return parentPath + "/" + getName();
         }
+        return parentPath + "/" + getName();
     }
 
     @Override

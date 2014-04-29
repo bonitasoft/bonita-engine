@@ -20,7 +20,9 @@ import java.io.Serializable;
  */
 public class CustomUserInfoValueUpdater implements Serializable {
 
-    private String value;
+    private static final long serialVersionUID = -2699448153857398426L;
+
+    private final String value;
 
     public CustomUserInfoValueUpdater(String value) {
         this.value = value;

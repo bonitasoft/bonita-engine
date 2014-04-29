@@ -99,7 +99,7 @@ public class BPMInstancesCreatorTest {
     }
 
     @Test
-    public void should_getOperationToSetData_return_the_operation_for_the_data() throws Exception {
+    public void should_getOperationToSetData_return_the_operation_for_the_data() {
         // given
         final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, null, null,
                 null, null, null);

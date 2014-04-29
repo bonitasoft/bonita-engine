@@ -24,11 +24,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
 
     private long tenantId = -1;
 
-    private String hostname = "";
-
     private String userName = "";
-
-    private long threadId = -1;
 
     public BonitaRuntimeException(final String message) {
         super(message);
@@ -59,22 +55,6 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
     }
 
     /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#getHostname()
-     */
-    @Override
-    public String getHostname() {
-        return hostname;
-    }
-
-    /**
-     * @see org.bonitasoft.engine.exception.BonitaContextException#setHostname(java.lang.String)
-     */
-    @Override
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
-    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getUserName()
      */
     @Override
@@ -91,26 +71,8 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
     }
 
     @Override
-    public long getThreadId() {
-        return threadId;
-    }
-
-    @Override
-    public void setThreadId(long threadId) {
-        this.threadId = threadId;
-    }
-
-    @Override
     public String getMessage() {
-        return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage() + super.getMessage();
-    }
-
-    private String getThreadIdMessage() {
-        return threadId != -1 ? "THREAD_ID=" + threadId + " | " : "";
-    }
-
-    private String getHostNameMessage() {
-        return hostname != null && !hostname.isEmpty() ? "HOSTNAME=" + hostname + " | " : "";
+        return getTenantIdMessage() + getUserNameMessage() + super.getMessage();
     }
 
     private String getUserNameMessage() {

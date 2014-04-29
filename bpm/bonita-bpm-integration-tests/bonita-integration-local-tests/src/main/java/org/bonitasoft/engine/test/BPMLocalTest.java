@@ -130,7 +130,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
                 final OrderByOption orderByOption = new OrderByOption(SATransitionInstance.class, "id", OrderByType.ASC);
                 final QueryOptions searchOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption));
                 return transitionInstanceService.searchArchivedTransitionInstances(searchOptions);
-            };
+            }
         });
         assertEquals(3, searchArchivedTransitions.size());
         assertTrue(searchArchivedTransitions.get(2).getId() > searchArchivedTransitions.get(0).getId());

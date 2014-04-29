@@ -3519,7 +3519,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 public Void call() throws Exception {
                     processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
                     return null;
-                };
+                }
             });
         } catch (final SBonitaException e) {
             throw e;

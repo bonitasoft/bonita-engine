@@ -23,6 +23,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SCustomUserInfoDefinitionUpdateBuilderFactoryImpl implements SCustomUserInfoDefinitionUpdateBuilderFactory {
 
+    @Override
     public SCustomUserInfoDefinitionUpdateBuilder createNewInstance() {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SCustomUserInfoDefinitionUpdateBuilderImpl(descriptor);

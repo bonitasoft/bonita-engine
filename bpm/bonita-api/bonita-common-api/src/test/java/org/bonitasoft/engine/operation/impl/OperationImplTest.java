@@ -11,7 +11,7 @@ import org.junit.Test;
 public class OperationImplTest {
 
     @Test
-    public void setOperatorInputTypeShouldConcatenateWithExistingOperator() throws Exception {
+    public void setOperatorInputTypeShouldConcatenateWithExistingOperator() {
         // given:
         OperationImpl operation = new OperationImpl();
         operation.setOperator("Some#@");
@@ -24,7 +24,7 @@ public class OperationImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void setOperatorInputTypeShouldThrowExceptionIfOperatorNotAlreadySet() throws Exception {
+    public void setOperatorInputTypeShouldThrowExceptionIfOperatorNotAlreadySet() {
         // given:
         OperationImpl operation = new OperationImpl();
 
@@ -36,7 +36,7 @@ public class OperationImplTest {
     }
 
     @Test
-    public void setOperatorInputTypeShouldLeaveUnchangedIfNull() throws Exception {
+    public void setOperatorInputTypeShouldLeaveUnchangedIfNull() {
         // given:
         OperationImpl operation = new OperationImpl();
         operation.setOperator("notNullOperator");

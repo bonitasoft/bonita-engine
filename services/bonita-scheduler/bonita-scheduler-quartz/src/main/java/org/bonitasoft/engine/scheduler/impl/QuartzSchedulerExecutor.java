@@ -185,6 +185,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 case ONE:
                     cronScheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
                     break;
+                default:
+                    throw new IllegalStateException();
             }
             triggerBuilder = base.withSchedule(cronScheduleBuilder).endAt(cronTrigger.getEndDate());
         } else if (trigger instanceof RepeatTrigger) {
@@ -202,6 +204,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 case ONE:
                     scheduleBuilder.withMisfireHandlingInstructionNowWithRemainingCount();
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         } else {
             triggerBuilder = base.startAt(trigger.getStartDate());

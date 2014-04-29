@@ -25,6 +25,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SUserUpdateBuilderFactoryImpl implements SUserUpdateBuilderFactory {
 
+    @Override
     public SUserUpdateBuilder createNewInstance() {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SUserUpdateBuilderImpl(descriptor);

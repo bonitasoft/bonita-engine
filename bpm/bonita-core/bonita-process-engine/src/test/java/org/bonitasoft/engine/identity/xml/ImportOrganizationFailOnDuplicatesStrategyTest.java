@@ -8,27 +8,25 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.junit.Test;
 
-
-
 public class ImportOrganizationFailOnDuplicatesStrategyTest {
-    
+
     @Test
-    public void foundExistingCustomUserInfoDefinition_throws_ImportDuplicateInOrganizationException() throws Exception {
-        //given
+    public void foundExistingCustomUserInfoDefinition_throws_ImportDuplicateInOrganizationException() {
+        // given
         String name = "duplicate";
         SCustomUserInfoDefinition existingUserInfoDefinition = mock(SCustomUserInfoDefinition.class);
         CustomUserInfoDefinitionCreator newUserInfoDefinition = new CustomUserInfoDefinitionCreator(name);
         ImportOrganizationFailOnDuplicatesStrategy strategy = new ImportOrganizationFailOnDuplicatesStrategy();
-        
+
         try {
-            //when
+            // when
             strategy.foundExistingCustomUserInfoDefinition(existingUserInfoDefinition, newUserInfoDefinition);
             fail("exception expected");
         } catch (ImportDuplicateInOrganizationException e) {
-            //then
+            // then
             assertThat(e.getMessage()).isEqualTo("There's already a custom user info definition with the name : '" + name + "'");
         }
-        
+
     }
 
 }

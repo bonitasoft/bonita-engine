@@ -23,7 +23,6 @@ import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -63,7 +62,7 @@ public interface CustomUserInfoAPI {
 
     /**
      * Count the number of existing definitions.
-     *
+     * 
      * @return the number of existing definitions.
      * @since 6.3
      */
@@ -73,7 +72,7 @@ public interface CustomUserInfoAPI {
      * Delete the {@link CustomUserInfoDefinition} related to the given id. All {@link CustomUserInfoValue} related to this {@link CustomUserInfoDefinition}
      * will be deleted as well.
      * 
-     *
+     * 
      * @param id
      *            the identifier of the {@link org.bonitasoft.engine.identity.CustomUserInfoDefinition}
      * @return
@@ -102,7 +101,7 @@ public interface CustomUserInfoAPI {
 
     /**
      * Searches custom user info values according to the criteria containing in the options.
-     *
+     * 
      * @param options
      *            The search criteria
      * @return The search result
@@ -112,9 +111,11 @@ public interface CustomUserInfoAPI {
 
     /**
      * Set value of a custom user info described by definitionId/userId.
-     *
-     * @param definitionId the {@link CustomUserInfoDefinition} identifier
-     * @param userId the {@link User} identifier
+     * 
+     * @param definitionId
+     *            the {@link CustomUserInfoDefinition} identifier
+     * @param userId
+     *            the {@link User} identifier
      * @param value
      *            the new custom user info value
      * @return custom user info value

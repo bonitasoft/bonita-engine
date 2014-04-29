@@ -19,6 +19,7 @@ public abstract class SPersistentObjectImpl implements ArchivedPersistentObject 
         return tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
@@ -28,6 +29,7 @@ public abstract class SPersistentObjectImpl implements ArchivedPersistentObject 
         return id;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }

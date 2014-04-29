@@ -18,8 +18,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -80,10 +78,6 @@ public class ServerAPIImpl implements ServerAPI {
     private final boolean cleanSession;
 
     private TechnicalLoggerService technicalLogger;
-
-    private String hostname = null;
-
-    private boolean hostnameResolutionAlreadyTried = false;
 
     private enum SessionType {
         PLATFORM, API;
@@ -165,26 +159,6 @@ public class ServerAPIImpl implements ServerAPI {
     private void fillGlobalContextForException(final SessionAccessor sessionAccessor, final Session session, final BonitaContextException be) {
         fillTenantIdContextForException(sessionAccessor, be);
         fillUserNameContextForException(session, be);
-        fillHostnameContextForException(be);
-        fillThreadIdContextForException(be);
-    }
-
-    private void fillThreadIdContextForException(final BonitaContextException be) {
-        be.setThreadId(Thread.currentThread().getId());
-    }
-
-    private void fillHostnameContextForException(final BonitaContextException be) {
-        if (hostname == null && !hostnameResolutionAlreadyTried) {
-            hostnameResolutionAlreadyTried = true;
-            try {
-                hostname = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                technicalDebugLog(e);
-            }
-        }
-        if (hostname != null) {
-            be.setHostname(hostname);
-        }
     }
 
     private void fillUserNameContextForException(final Session session, final BonitaContextException be) {

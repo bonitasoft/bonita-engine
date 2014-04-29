@@ -13,26 +13,19 @@
  **/
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * @author Aurelien Pupier
+ * @author Celine Souchet
  * 
  */
 public class GlobalContextWork extends TxInHandleFailureWrappingWork {
 
     private static final long serialVersionUID = -6043722230605068850L;
-
-    private static String hostname = null;
-
-    private static boolean hostnameResolutionAlreadyTried;
 
     public GlobalContextWork(BonitaWork work) {
         super(work);
@@ -40,34 +33,7 @@ public class GlobalContextWork extends TxInHandleFailureWrappingWork {
 
     @Override
     protected void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) {
-        sBonitaException.setThreadId(retrieveThreadId());
         sBonitaException.setTenantID(getTenantId());
-        fillHostnameContextForException(sBonitaException, context);
-    }
-
-    long retrieveThreadId() {
-        return Thread.currentThread().getId();
-    }
-
-    private void fillHostnameContextForException(SBonitaException be, final Map<String, Object> context) {
-        if (hostname == null && !hostnameResolutionAlreadyTried) {
-            hostnameResolutionAlreadyTried = true;
-            try {
-                hostname = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                technicalDebugLog(e, context);
-            }
-        }
-        if (hostname != null) {
-            be.setHostname(hostname);
-        }
-    }
-
-    private void technicalDebugLog(final Throwable throwableToLog, final Map<String, Object> context) {
-        TechnicalLoggerService technicalLogger = getTenantAccessor(context).getTechnicalLoggerService();
-        if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
-        }
     }
 
 }

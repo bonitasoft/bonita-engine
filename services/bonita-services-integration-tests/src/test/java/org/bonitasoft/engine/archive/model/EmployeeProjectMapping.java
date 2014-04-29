@@ -2,7 +2,7 @@ package org.bonitasoft.engine.archive.model;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-public class EmployeeProjectMapping extends SPersistentObjectImpl implements PersistentObject {
+public class EmployeeProjectMapping extends SPersistentObjectImpl {
 
     private static final long serialVersionUID = 1L;
 

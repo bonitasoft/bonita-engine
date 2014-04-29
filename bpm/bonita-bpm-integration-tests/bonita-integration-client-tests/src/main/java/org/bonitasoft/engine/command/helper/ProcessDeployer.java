@@ -2,8 +2,8 @@ package org.bonitasoft.engine.command.helper;
 
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * Created by Vincent Elcrin
@@ -16,7 +16,7 @@ public abstract class ProcessDeployer {
 
     public ProcessDefinition deploy(SimpleProcessDesigner design) throws BonitaException {
         return processDefinition = deploy(design.done());
-    };
+    }
 
     public abstract ProcessDefinition deploy(DesignProcessDefinition design) throws BonitaException;
 

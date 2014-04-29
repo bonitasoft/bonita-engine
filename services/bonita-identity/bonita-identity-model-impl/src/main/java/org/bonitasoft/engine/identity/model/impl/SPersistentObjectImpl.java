@@ -35,6 +35,7 @@ public abstract class SPersistentObjectImpl implements PersistentObject {
         return this.tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
@@ -44,6 +45,7 @@ public abstract class SPersistentObjectImpl implements PersistentObject {
         return this.id;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }

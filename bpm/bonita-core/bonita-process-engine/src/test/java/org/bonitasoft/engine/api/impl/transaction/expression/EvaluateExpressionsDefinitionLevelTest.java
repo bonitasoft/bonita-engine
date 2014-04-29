@@ -6,7 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.bonitasoft.engine.commons.exceptions.SContext;
+import org.bonitasoft.engine.commons.exceptions.SExceptionContext;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -43,7 +43,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
             // then:
-            assertThat(e.getContext().get(SContext.PROCESS_DEFINITION_ID)).isEqualTo(processDefId);
+            assertThat(e.getContext().get(SExceptionContext.PROCESS_DEFINITION_ID)).isEqualTo(processDefId);
         }
     }
 
@@ -63,7 +63,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
             // then:
-            assertThat(e.getContext().get(SContext.PROCESS_NAME)).isEqualTo(processName);
+            assertThat(e.getContext().get(SExceptionContext.PROCESS_NAME)).isEqualTo(processName);
         }
     }
 
@@ -83,7 +83,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
             // then:
-            assertThat(e.getContext().get(SContext.PROCESS_VERSION)).isEqualTo(processVersion);
+            assertThat(e.getContext().get(SExceptionContext.PROCESS_VERSION)).isEqualTo(processVersion);
         }
     }
 }
