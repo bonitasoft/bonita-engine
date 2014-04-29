@@ -4,7 +4,7 @@
 	<bean id="connectorExecutor" class="com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut">
 		<constructor-arg name="queueCapacity" value="25" />
 		<constructor-arg name="corePoolSize" value="25" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
 		<!-- timeout in seconds, default = 5 minutes -->
 		<constructor-arg name="timeout" value="300" />
 		<constructor-arg name="maximumPoolSize" value="25" />

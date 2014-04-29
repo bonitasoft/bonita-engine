@@ -6,7 +6,7 @@
 		<constructor-arg name="workSynchronizationFactory">
 			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory" />
 		</constructor-arg>
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
 	</bean>

@@ -13,7 +13,7 @@
 		<property name="flownodeInstanceService" ref="activityInstanceService" />
 		<property name="processDefinitionService" ref="processDefinitionManager" />
 		<property name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 </beans>

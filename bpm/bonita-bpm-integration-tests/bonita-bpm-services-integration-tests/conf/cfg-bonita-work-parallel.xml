@@ -7,7 +7,7 @@
 		<constructor-arg name="workSynchronizationFactory">
 			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory"></bean>
 		</constructor-arg>
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="bonitaExecutorServiceFactory"
 			ref="bonitaExecutorServiceFactory" />
@@ -15,7 +15,7 @@
 
 	<bean id="bonitaExecutorServiceFactory"
 		class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="tenantId" value="1" />
 		<constructor-arg name="corePoolSize" value="25" />
 		<constructor-arg name="maximumPoolSize" value="25" />

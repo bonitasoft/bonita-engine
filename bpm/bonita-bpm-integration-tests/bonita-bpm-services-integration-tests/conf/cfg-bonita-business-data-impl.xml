@@ -32,7 +32,7 @@
 	</bean>
 
 	<bean id="schemaManager" class="com.bonitasoft.engine.business.data.impl.SchemaManager">
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="configuration">
 			<map>
 				<entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
