@@ -18,7 +18,6 @@ import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.synchro.AbstractSynchroService;
-import org.bonitasoft.engine.synchro.SynchroService;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
@@ -29,7 +28,7 @@ import com.hazelcast.core.ISemaphore;
  * @author Emmanuel Duchastenier
  * @author Baptiste Mesta
  */
-public class ClusteredSynchroService extends AbstractSynchroService implements SynchroService {
+public class ClusteredSynchroService extends AbstractSynchroService {
 
     private final static String CLUSTERED_SYNCHRO_SERVICE_WAITERS = "CLUSTERED_SYNCHRO_SERVICE_WAITERS";
 
@@ -105,10 +104,9 @@ public class ClusteredSynchroService extends AbstractSynchroService implements S
                 getWaitersMap().remove(event);
             }
             return getEventKeyAndIdMap().get(semaphoreKey);
-        } else {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Event arrived. Returning ID " + id);
-            return id;
         }
+        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Event arrived. Returning ID " + id);
+        return id;
     }
 
 }

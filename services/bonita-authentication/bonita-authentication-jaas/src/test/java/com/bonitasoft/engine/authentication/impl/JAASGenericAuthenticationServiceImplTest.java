@@ -1,8 +1,11 @@
 package com.bonitasoft.engine.authentication.impl;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.security.Principal;
@@ -19,7 +22,6 @@ import javax.security.auth.login.LoginException;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,7 +47,7 @@ public class JAASGenericAuthenticationServiceImplTest {
     ReadSessionAccessor sessionAccessor;
 
     @Before
-    public void setup() throws STenantIdNotSetException {
+    public void setup() {
         jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(logger, sessionAccessor);
     }
 

@@ -279,7 +279,7 @@ public class PageAPIExtTest {
         doReturn(sPage).when(pageService).getPageByName("name");
 
         // when
-        pageAPIExt.checkPageAlreadyExists("name", tenantServiceAccessor);
+        pageAPIExt.checkPageAlreadyExists("name");
 
         // then
         // AlreadyExistsException

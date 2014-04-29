@@ -18,7 +18,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.authentication.AuthenticationException;

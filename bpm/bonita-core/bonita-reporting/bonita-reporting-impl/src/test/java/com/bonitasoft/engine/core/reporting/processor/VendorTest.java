@@ -12,7 +12,6 @@ import static com.bonitasoft.engine.core.reporting.processor.Vendor.ORACLE;
 import static com.bonitasoft.engine.core.reporting.processor.Vendor.OTHER;
 import static com.bonitasoft.engine.core.reporting.processor.Vendor.SQLSERVER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +30,7 @@ public class VendorTest {
 
         assertThat(vendor).isEqualTo(ORACLE);
     }
-    
+
     @Test
     public void should_return_sqlserver_for_a_sql_server_database() throws Exception {
         DatabaseMetaData metadata = mock(DatabaseMetaData.class);

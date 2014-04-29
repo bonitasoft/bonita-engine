@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SContext;
+import org.bonitasoft.engine.commons.exceptions.SExceptionContext;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -147,7 +147,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
             businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
             fail("should throw Exception");
         } catch (SBonitaException e) {
-            assertThat(((SBonitaException) e.getCause()).getContext().get(SContext.PROCESS_INSTANCE_ID)).isEqualTo(proccessInstanceId);
+            assertThat(((SBonitaException) e.getCause()).getContext().get(SExceptionContext.PROCESS_INSTANCE_ID)).isEqualTo(proccessInstanceId);
         }
     }
 

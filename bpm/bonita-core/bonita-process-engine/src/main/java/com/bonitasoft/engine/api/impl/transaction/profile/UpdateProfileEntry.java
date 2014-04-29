@@ -94,6 +94,8 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
                 case PAGE:
                     updateBuilder.setPage((String) field.getValue());
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         }
         return updateBuilder.done();
