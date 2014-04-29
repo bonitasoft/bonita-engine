@@ -1,17 +1,11 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.command;
 
 import java.io.Serializable;
@@ -23,9 +17,13 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class ExecuteBDMQueryCommand extends TenantCommand {
 
@@ -44,28 +42,38 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        BusinessDataRepository businessDataRepository = getBusinessDataRepository(serviceAccessor);
-        String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
+        final BusinessDataRepository businessDataRepository = getBusinessDataRepository(serviceAccessor);
+        final String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
-        String returnType = getStringMandadoryParameter(parameters, RETURN_TYPE);
+        final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
+        final String returnType = getStringMandadoryParameter(parameters, RETURN_TYPE);
         Class<? extends Serializable> resultClass = null;
         try {
             resultClass = loadClass(returnType);
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             throw new SCommandParameterizationException(e);
         }
-        Boolean returnsList = (Boolean) parameters.get(RETURNS_LIST);
+        final Boolean returnsList = (Boolean) parameters.get(RETURNS_LIST);
         if (returnsList != null && returnsList) {
-            Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
-            Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
-            return (Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters, startIndex, maxResults);
+            final Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
+            final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
+            return serializeResult((Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters, startIndex, maxResults));
         } else {
             try {
-                return businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
-            } catch (NonUniqueResultException e) {
+                return serializeResult(businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters));
+            } catch (final NonUniqueResultException e) {
                 throw new SCommandExecutionException(e);
             }
+        }
+    }
+
+    private byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        try {
+            return mapper.writeValueAsBytes(result);
+        } catch (final JsonProcessingException jpe) {
+            throw new SCommandExecutionException(jpe);
         }
     }
 

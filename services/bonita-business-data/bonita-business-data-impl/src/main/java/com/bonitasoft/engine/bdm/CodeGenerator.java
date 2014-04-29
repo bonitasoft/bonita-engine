@@ -24,7 +24,7 @@ import javax.lang.model.SourceVersion;
 import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 
-import org.bonitasoft.engine.commons.StringUtil;
+import org.apache.commons.lang3.text.WordUtils;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
@@ -171,7 +171,7 @@ public class CodeGenerator {
         final JClass fieldClass = getModel().ref(field.getType().getClazz());
 
         final StringBuilder builder = new StringBuilder(parameterName);
-        builder.append(StringUtil.firstCharToUpperCase(field.getName()));
+        builder.append(WordUtils.capitalize(field.getName()));
 
         final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
         final JVar adderParam = method.param(fieldClass, parameterName);
@@ -199,7 +199,7 @@ public class CodeGenerator {
         } else {
             builder.append("get");
         }
-        builder.append(StringUtil.firstCharToUpperCase(field.name()));
+        builder.append(WordUtils.capitalize(field.name()));
         return builder.toString();
     }
 
@@ -210,12 +210,12 @@ public class CodeGenerator {
         } else {
             builder.append("get");
         }
-        builder.append(StringUtil.firstCharToUpperCase(field.getName()));
+        builder.append(WordUtils.capitalize(field.getName()));
         return builder.toString();
     }
 
     public String getSetterName(final JFieldVar field) {
-        return "set" + StringUtil.firstCharToUpperCase(field.name());
+        return "set" + WordUtils.capitalize(field.name());
     }
 
     public JCodeModel getModel() {
@@ -253,11 +253,6 @@ public class CodeGenerator {
             }
         }
         return elementTypes;
-    }
-
-    public void addThrows(final JMethod method, final String exceptionClassname) {
-        final JClass ref = getModel().ref(exceptionClassname);
-        method._throws(ref);
     }
 
 }

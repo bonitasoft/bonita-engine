@@ -11,8 +11,11 @@ package com.bonitasoft.engine.core.reporting;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -40,31 +43,40 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.core.reporting.processor.QueryPreProcessor;
+import com.bonitasoft.engine.core.reporting.processor.Vendor;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ReportingServiceImplTest {
 
     private static String lineSeparator = "\n";
+
     private ReportingServiceImpl reportingService;
-    private DataSource dataSource;
+
+    @Mock
+    private Connection connection;
+
+    @Mock
     private ReadPersistenceService persistence;
-    private TechnicalLoggerService logger;
+
+    @Mock
     private Recorder recorder;
-    private QueriableLoggerService loggerService;
-    
+
+    @Mock
+    private QueryPreProcessor preProcessor;
+
     @Before
-    public void setUp() {
-        loggerService = mock(QueriableLoggerService.class);
-        recorder = mock(Recorder.class);
-        dataSource = mock(DataSource.class);
-        persistence = mock(ReadPersistenceService.class);
-        logger = mock(TechnicalLoggerService.class);
-        final EventService eventService = mock(EventService.class);
-        QueryPreProcessor preProcessor = mock(QueryPreProcessor.class);
-        reportingService = new ReportingServiceImpl(dataSource, persistence, preProcessor, recorder, eventService, logger, loggerService);
+    public void setUp() throws Exception {
+        DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getConnection()).thenReturn(connection);
+        reportingService = new ReportingServiceImpl(dataSource, persistence, preProcessor, recorder, mock(EventService.class), mock(TechnicalLoggerService.class), mock(QueriableLoggerService.class));
     }
-    
+
     private SReport aReport(final long reportId) {
         final SReport expected = new SReportImpl("report1", 123456, 45, true);
         expected.setId(reportId);
@@ -84,8 +96,6 @@ public class ReportingServiceImplTest {
     @Test
     public void executeASelectQuery() throws SQLException {
         final String sql = "SELECT id, name  FROM activities;";
-        final Connection connection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(connection);
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         final ResultSet resultSet = mock(ResultSet.class);
@@ -100,7 +110,7 @@ public class ReportingServiceImplTest {
         when(resultSet.getObject(2)).thenReturn("step1", "step2");
 
         final String actual = reportingService.selectList(sql);
-        
+
         final String expected = "ID,NAME" + lineSeparator + "1,step1" + lineSeparator + "424,step2" + lineSeparator;
         assertEquals(expected, actual);
     }
@@ -108,8 +118,6 @@ public class ReportingServiceImplTest {
     @Test
     public void should_selectList_escaping_comma_quotes() throws Exception {
         final String sql = "SELECT id, name  FROM activities;";
-        final Connection connection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(connection);
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         final ResultSet resultSet = mock(ResultSet.class);
@@ -126,7 +134,7 @@ public class ReportingServiceImplTest {
         when(resultSet.getObject(3)).thenReturn(1, 2);
 
         final String actual = reportingService.selectList(sql);
-        
+
         final String expected = "ID,NAME,COUNTER" + lineSeparator + "1,\"\"\"dsd\"\" , s tep1\",1" + lineSeparator + "424,\"s\"\"t\"\"ep2\",2" + lineSeparator;
         assertEquals(expected, actual);
     }
@@ -134,12 +142,10 @@ public class ReportingServiceImplTest {
     @Test(expected = SQLException.class)
     public void connectionCloses() throws SQLException {
         final String sql = "SELECT COUNT(*) FROM activities;";
-        final Connection connection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(connection);
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         doThrow(new SQLException()).when(connection).close();
-        
+
         reportingService.selectList(sql);
     }
 
@@ -148,9 +154,9 @@ public class ReportingServiceImplTest {
         final long expectedReportNumber = 50;
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SReport.class, options, null)).thenReturn(expectedReportNumber);
-        
+
         final long numberOfReports = reportingService.getNumberOfReports(options);
-        
+
         assertEquals(expectedReportNumber, numberOfReports);
     }
 
@@ -158,7 +164,7 @@ public class ReportingServiceImplTest {
     public void getNumberOfReportsThrowsException() throws SBonitaException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
-        
+
         reportingService.getNumberOfReports(options);
     }
 
@@ -171,7 +177,7 @@ public class ReportingServiceImplTest {
         when(persistence.searchEntity(SReport.class, options, null)).thenReturn(expected);
 
         final List<SReport> reports = reportingService.searchReports(options);
-        
+
         assertEquals(expected, reports);
     }
 
@@ -179,7 +185,7 @@ public class ReportingServiceImplTest {
     public void searchReportsThrowsException() throws SBonitaException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.searchEntity(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
-        
+
         reportingService.searchReports(options);
     }
 
@@ -190,7 +196,7 @@ public class ReportingServiceImplTest {
         when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
 
         final SReport report = reportingService.getReport(reportId);
-        
+
         assertEquals(expected, report);
     }
 
@@ -220,4 +226,15 @@ public class ReportingServiceImplTest {
         reportingService.deleteReport(reportId);
     }
 
+    @Test
+    public void should_preprocess_query_before_execute_it() throws Exception {
+        ReportingServiceImpl reportingServicespy = spy(reportingService);
+        doReturn("something we don't care").when(reportingServicespy).executeQuery(anyString(), any(Statement.class));
+
+        reportingServicespy.selectList("SELECT something FROM somewhere");
+
+        InOrder inOrder = inOrder(preProcessor, reportingServicespy);
+        inOrder.verify(preProcessor).preProcessFor(Vendor.OTHER, "SELECT something FROM somewhere");
+        inOrder.verify(reportingServicespy).executeQuery(anyString(), any(Statement.class));
+    }
 }

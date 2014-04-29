@@ -109,7 +109,8 @@ public class ReportingServiceImpl implements ReportingService {
         }
     }
 
-    private String executeQuery(final String selectQuery, final Statement statement) throws SQLException {
+    /** protected for mocking */
+    protected String executeQuery(final String selectQuery, final Statement statement) throws SQLException {
         final ResultSet resultSet = statement.executeQuery(selectQuery);
         try {
             return parseResultSet(resultSet);
