@@ -138,12 +138,12 @@ public abstract class SDataInstanceImpl implements SDataInstance {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + (int) (containerId ^ (containerId >>> 32));
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + ((className == null) ? 0 : className.hashCode());
-        result = prime * result + ((containerType == null) ? 0 : containerType.hashCode());
+        result = prime * result + (int) (id ^ id >>> 32);
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (int) (containerId ^ containerId >>> 32);
+        result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (className == null ? 0 : className.hashCode());
+        result = prime * result + (containerType == null ? 0 : containerType.hashCode());
         result = prime * result + (transientData ? 1231 : 1237);
         return result;
     }
@@ -206,7 +206,6 @@ public abstract class SDataInstanceImpl implements SDataInstance {
      * @throws SDataInstanceNotWellFormedException
      *             thrown if the data is not well formed
      */
-    @SuppressWarnings("unused")
     public void validate() throws SDataInstanceNotWellFormedException {
     }
 

@@ -6,7 +6,7 @@ CREATE TABLE arch_process_instance (
   description NVARCHAR(255),
   startDate NUMERIC(19, 0) NOT NULL,
   startedBy NUMERIC(19, 0) NULL,
-  startedByDelegate NUMERIC(19, 0) NOT NULL,
+  startedBySubstitute NUMERIC(19, 0) NOT NULL,
   endDate NUMERIC(19, 0) NOT NULL,
   archiveDate NUMERIC(19, 0) NOT NULL,
   stateId INT NOT NULL,
@@ -22,6 +22,9 @@ CREATE TABLE arch_process_instance (
   stringIndex5 NVARCHAR(50),
   PRIMARY KEY (tenantid, id)
 )
+GO
+
+CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId,sourceObjectId, rootProcessInstanceId, callerId)
 GO
 
 CREATE TABLE arch_flownode_instance (
@@ -66,13 +69,19 @@ CREATE TABLE arch_flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy NUMERIC(19, 0),
-  executedByDelegate NUMERIC(19, 0),
+  executedBySubstitute NUMERIC(19, 0),
   activityInstanceId NUMERIC(19, 0),
   aborting BIT NOT NULL,
   triggeredByEvent BIT,
   interrupting BIT,
   PRIMARY KEY (tenantid, id)
 )
+GO
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance (tenantId,kind, logicalGroup2, executedBy)
+GO
+CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind)
+GO
+CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId,rootContainerId, parentContainerId)
 GO
 
 CREATE TABLE arch_transition_instance (
@@ -114,4 +123,7 @@ CREATE TABLE arch_connector_instance (
   archiveDate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
+GO
+
+CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId,containerId, containerType)
 GO

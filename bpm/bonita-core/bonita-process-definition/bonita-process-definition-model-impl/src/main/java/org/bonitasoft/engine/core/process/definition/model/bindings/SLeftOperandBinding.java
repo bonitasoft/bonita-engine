@@ -24,7 +24,9 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class SLeftOperandBinding extends ElementBinding {
 
-    private String dataName;
+    private String name;
+
+    private String type;
 
     @Override
     public String getElementTag() {
@@ -33,22 +35,21 @@ public class SLeftOperandBinding extends ElementBinding {
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
-        dataName = attributes.get(XMLSProcessDefinition.LEFT_OPERAND_NAME);
+        name = attributes.get(XMLSProcessDefinition.LEFT_OPERAND_NAME);
+        type = attributes.get(XMLSProcessDefinition.LEFT_OPERAND_TYPE);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }
 
     @Override
     public Object getObject() {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataName).done();
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(name).setType(type).done();
     }
 
 }

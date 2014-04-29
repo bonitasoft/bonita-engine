@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -58,16 +59,20 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
@@ -304,7 +309,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters.
-     * Passing {@link Long#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
+     * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
      * Instead, to delete all Process instances of a specific process definition, should you should use a loop and delete instances in bulk.
      * 
      * @param processDefinitionId
@@ -322,7 +327,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete archived process instances of process definition given as input parameter respecting the pagination parameters.
-     * Passing {@link Long#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
+     * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
      * Instead, to delete all archived process instances of a specific process definition, you should use a loop and delete archived instances in bulk.
      * 
      * @param processDefinitionId
@@ -331,7 +336,8 @@ public interface ProcessRuntimeAPI {
      *            The index
      * @param maxResults
      *            The max number of elements to retrieve per page
-     * @return The number of elements that have been deleted
+     * @return The number of elements that have been deleted in any state. For example, process instance can be archived is several states: Cancelled,
+     *         Aborted, Completed, Failed
      * @throws DeletionException
      *             If a process instance can't be deleted because of a parent that is still active
      * @since 6.1
@@ -444,6 +450,30 @@ public interface ProcessRuntimeAPI {
      */
     ProcessInstance startProcess(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
             throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+
+    /**
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
+     * given initialVariables.
+     * 
+     * @param userId
+     *            The identifier of the user.
+     * @param processDefinitionId
+     *            The identifier of the process definition for which an instance will be started.
+     * @param initialVariables
+     *            The couples of initial variable/value
+     * @return An instance of the process.
+     * @throws InvalidSessionException
+     *             If the session is invalid, e.g. the session has expired.
+     * @throws ProcessDefinitionNotFoundException
+     *             If no matching process definition is found.
+     * @throws ProcessActivationException
+     *             If an exception occurs during activation.
+     * @throws ProcessExecutionException
+     *             If a problem occurs when starting the process.
+     * @since 6.0
+     */
+    ProcessInstance startProcess(final long userId, final long processDefinitionId, final Map<String, Serializable> initialVariables)
+            throws  ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
      * Execute an activity that is in an unstable state.
@@ -2133,5 +2163,22 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     List<User> getPossibleUsersOfPendingHumanTask(long humanTaskInstanceId, int startIndex, int maxResults);
+
+    /**
+     * Lists the possible users (candidates) that can execute the specified human task instance.
+     * Users are ordered by user name.
+     * 
+     * @param humanTaskInstanceId
+     *            The identifier of the human task instance
+     * @param searchOptions
+     *            the search options
+     * @return The list of users.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws RetrieveException
+     *             If an exception occurs while retrieving the users
+     * @since 6.3
+     */
+    SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, SearchOptions searchOptions);
 
 }

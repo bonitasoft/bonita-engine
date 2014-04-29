@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SUnhideableTaskException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -398,7 +400,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityReadException
      *             if a Read exception occurs
      */
-    long getNumberOfArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search UserTask instances assigned for a specific supervisor
@@ -424,7 +426,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityReadException
      *             if a Read exception occurs
      */
-    List<SAHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SAHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Gets the archive instance of the activity according to its identifier at a given state.
@@ -867,5 +869,56 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     int getNumberOfActivityInstances(long processInstanceId) throws SActivityReadException;
 
     List<Long> getPossibleUserIdsOfPendingTasks(long humanTaskInstanceId, int startIndex, int maxResults) throws SActivityReadException;
+
+    /**
+     * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
+     * 
+     * @param supervisorId
+     *            The identifier of the supervisor
+     * @param entityClass
+     *            The type of the archived flow node to search for
+     * @param queryOptions
+     *            The search options to filter the results
+     * @return The number found, 0 if no matching search criteria
+     * @since 6.3
+     */
+    long getNumberOfArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass, QueryOptions queryOptions)
+            throws SBonitaSearchException;
+
+    /**
+     * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
+     * 
+     * @param supervisorId
+     *            The identifier of the supervisor
+     * @param entityClass
+     *            The type of the archived flow node to search for
+     * @param queryOptions
+     *            The search options to filter the results
+     * @return The list of paginated results, according to the QueryOptions search criteria
+     * @since 6.3
+     */
+    List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass,
+            QueryOptions queryOptions)
+            throws SBonitaSearchException;
+
+    /**
+     * Get total number of users according to specific query options, and who can start the task filtered with the search option
+     * of the given process definition
+     * 
+     * @param searchOptions
+     *            The QueryOptions object containing some query conditions
+     * @return
+     */
+    long getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, QueryOptions searchOptions) throws SBonitaSearchException;
+
+    /**
+     * Get total number of users according to specific query options, and who can start the task filtered with the search option
+     * of the given process definition
+     * 
+     * @param searchOptions
+     *            The QueryOptions object containing some query conditions
+     * @return
+     */
+    List<SUser> searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, QueryOptions searchOptions) throws SBonitaSearchException;
 
 }

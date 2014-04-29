@@ -27,6 +27,7 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.LoginService;
@@ -40,7 +41,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -67,6 +67,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
@@ -150,7 +151,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     DataInstanceService getDataInstanceService();
 
-    DataService getDataService();
+    TransientDataService getTransientDataService();
 
     ParserFactory getParserFactgory();
 
@@ -211,5 +212,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     <T> T lookup(String serviceName);
 
     void destroy();
+
+    TimeTracker getTimeTracker();
 
 }

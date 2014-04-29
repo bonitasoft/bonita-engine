@@ -26,7 +26,6 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersByManager;
-import org.bonitasoft.engine.api.impl.transaction.process.GetAllProcessDefinitionsIds;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
@@ -88,14 +87,8 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
         // Then finally add managerId to the list:
         userIds.add(managerId);
 
-        // int fromIndex = 0;
-        // int numberOfResult = 100;
-        final Map<Long, Set<Long>> map = new HashMap<Long, Set<Long>>();
-        // GetAllProcessDefinitionsIds getAllPD = new GetAllProcessDefinitionsIds(fromIndex, numberOfResult);
-        // while ((processDefinitionIds = processDefinitionService.getProcessDefinitionIds(fromIndex, numberOfResult)).size() > 0) {
-        final GetAllProcessDefinitionsIds getAllPD = new GetAllProcessDefinitionsIds(processDefinitionService);
-        getAllPD.execute();
-        final List<Long> processDefinitionIds = getAllPD.getResult();
+        final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE);
+        final Map<Long, Set<Long>> map = new HashMap<Long, Set<Long>>(processDefinitionIds.size());
 
         // For each process definition:
         for (final Long processDefinition : processDefinitionIds) {
@@ -110,8 +103,6 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
             // Let's fill in the final result:
             map.put(processDefinition, actorIdsForProcessDef);
         }
-        // next page of results:
-        // fromIndex += numberOfResult;
 
         return map;
     }

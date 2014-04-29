@@ -23,7 +23,6 @@ public class TransactionServiceForTest implements UserTransactionService {
     public TransactionServiceForTest() {
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
     }
@@ -33,9 +32,8 @@ public class TransactionServiceForTest implements UserTransactionService {
         return callable.call();
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public void registerBeforeCommitCallable(Callable<Void> callable) {
+    public void registerBeforeCommitCallable(final Callable<Void> callable) {
     }
 
 }

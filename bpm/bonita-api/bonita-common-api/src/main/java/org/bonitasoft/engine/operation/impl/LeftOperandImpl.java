@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.operation.impl;
 
 import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandType;
 
 /**
  * @author Zhang Bole
@@ -27,7 +26,12 @@ public class LeftOperandImpl implements LeftOperand {
 
     private String name;
 
-    private boolean external;
+    private String type;
+
+    public LeftOperandImpl() {
+        // default when not set
+        type = LeftOperand.TYPE_DATA;
+    }
 
     public void setName(final String name) {
         this.name = name;
@@ -57,11 +61,16 @@ public class LeftOperandImpl implements LeftOperand {
 
     @Override
     public boolean isExternal() {
-        return external;
+        return LeftOperand.TYPE_EXTERNAL_DATA.equals(type);
     }
 
-    public void setExternal(final boolean external) {
-        this.external = external;
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
     }
 
     @Override
@@ -69,7 +78,7 @@ public class LeftOperandImpl implements LeftOperand {
         final int prime = 31;
         int result = 1;
         result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (external ? 1231 : 1237);
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
@@ -84,7 +93,7 @@ public class LeftOperandImpl implements LeftOperand {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final LeftOperandImpl other = (LeftOperandImpl) obj;
+        LeftOperandImpl other = (LeftOperandImpl) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -92,7 +101,11 @@ public class LeftOperandImpl implements LeftOperand {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (external != other.external) {
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
             return false;
         }
         return true;
@@ -101,10 +114,10 @@ public class LeftOperandImpl implements LeftOperand {
     /**
      * @deprecated As of 6.0 use {@link Operation#getType()} instead
      */
-    @Override
     @Deprecated
-    public LeftOperandType getType() {
-        return null;
+    @Override
+    public String toString() {
+        return "LeftOperandImpl [name=" + name + ", type=" + type + "]";
     }
 
 }

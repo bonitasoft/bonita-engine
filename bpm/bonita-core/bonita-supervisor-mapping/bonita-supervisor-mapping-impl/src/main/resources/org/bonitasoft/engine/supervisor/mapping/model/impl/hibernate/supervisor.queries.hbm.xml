@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getNumberOfSProcessSupervisor">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+	</query>
+	
+	<query name="searchSProcessSupervisor">
+		SELECT DISTINCT processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+	</query>
+
+	<query name="getNumberOfSProcessSupervisorwithSUser">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		WHERE processsupervisor.userId = user.id
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSUser">
+		SELECT DISTINCT processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		WHERE processsupervisor.userId = user.id
+	</query>
+	
+	<query name="getNumberOfSProcessSupervisorwithSGroup">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			 org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE processsupervisor.groupId = group_.id
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSGroup">
+		SELECT DISTINCT processsupervisor.id
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			 org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE processsupervisor.groupId = group_.id
+	</query>
+	
+	
+	<query name="getNumberOfSProcessSupervisorwithSRole">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			 org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE processsupervisor.roleId = role.id
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSRole">
+		SELECT DISTINCT processsupervisor.id
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			 org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE processsupervisor.roleId = role.id
+	</query>
+		
+	<query name="getNumberOfSProcessSupervisorwithSGroupSRole">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE processsupervisor.roleId = role.id
+		AND processsupervisor.groupId = group_.id
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSGroupSRole">
+		SELECT DISTINCT processsupervisor.id
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE processsupervisor.roleId = role.id
+		AND processsupervisor.groupId = group_.id
+	</query>
+	
+	<query name="getNumberOfSProcessSupervisorwithSUserSRole">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE (processsupervisor.userId &lt;= 0 AND  processsupervisor.roleId = role.id)
+		OR (processsupervisor.userId = user.id AND processsupervisor.roleId &lt;= 0)
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSUserSRole">
+		SELECT DISTINCT processsupervisor.id
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE (processsupervisor.userId &lt;= 0 AND  processsupervisor.roleId = role.id)
+		OR (processsupervisor.userId = user.id AND processsupervisor.roleId &lt;= 0)
+	</query>
+	
+	<query name="getNumberOfSProcessSupervisorwithSUserSGroup">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE (processsupervisor.userId = user.id AND processsupervisor.groupId &lt;= 0)
+		OR (processsupervisor.userId &lt;= 0 AND processsupervisor.groupId = group_.id)
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSUserSGroup">
+		SELECT DISTINCT processsupervisor.id
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE (processsupervisor.userId = user.id AND processsupervisor.groupId &lt;= 0)
+		OR (processsupervisor.userId &lt;= 0 AND processsupervisor.groupId = group_.id)
+	</query>
+	
+	<query name="getNumberOfSProcessSupervisorwithSUserSGroupSRole">
+		SELECT COUNT(DISTINCT processsupervisor.id)
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE ((user.id = processsupervisor.userId AND processsupervisor.roleId &lt;= 0 AND processsupervisor.groupId &lt;= 0)
+		OR (processsupervisor.userId &lt;= 0 AND 
+			((processsupervisor.roleId = role.id AND processsupervisor.groupId = group_.id)
+			OR (processsupervisor.roleId = role.id AND processsupervisor.groupId &lt;= 0)
+			OR (processsupervisor.roleId &lt;= 0 AND processsupervisor.groupId = group_.id))))
+	</query>
+	
+	<query name="searchSProcessSupervisorwithSUserSGroupSRole">
+		SELECT DISTINCT processsupervisor.id
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE ((user.id = processsupervisor.userId AND processsupervisor.roleId &lt;= 0 AND processsupervisor.groupId &lt;= 0)
+		OR (processsupervisor.userId &lt;= 0 AND 
+			((processsupervisor.roleId = role.id AND processsupervisor.groupId = group_.id)
+			OR (processsupervisor.roleId = role.id AND processsupervisor.groupId &lt;= 0)
+			OR (processsupervisor.roleId &lt;= 0 AND processsupervisor.groupId = group_.id))))
+	</query>
+	
+	<query name="getSupervisorById">
+		SELECT processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE processsupervisor.id = :id
+	</query>
+
+	<query name="getSupervisor">
+		SELECT processsupervisor
+		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE processsupervisor.processDefId = :processDefId
+		AND (
+			processsupervisor.userId = :userId
+			OR processsupervisor.id IN (
+				SELECT processsupervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
+		 			org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+	 			WHERE  user_membership.userId = :userId
+				AND (
+					(processsupervisor.groupId = user_membership.groupId AND processsupervisor.roleId &lt;= 0)
+					OR (processsupervisor.roleId = user_membership.roleId AND processsupervisor.groupId &lt;= 0)
+					OR (processsupervisor.roleId = user_membership.roleId AND processsupervisor.groupId = user_membership.groupId)
+				)
+			)
+		)
+	</query>
+
+</hibernate-mapping>

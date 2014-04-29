@@ -64,13 +64,11 @@ public class ExecutingActivityStateImpl extends FlowNodeStateWithConnectors {
         return "executing";
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;
@@ -81,24 +79,20 @@ public class ExecutingActivityStateImpl extends FlowNodeStateWithConnectors {
         return SStateCategory.NORMAL;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
     }

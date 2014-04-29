@@ -28,14 +28,13 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class ProfileBinding extends ElementBinding {
 
-    private ExportedProfileBuilder profileBuilder = null;
+    protected ExportedProfileBuilder profileBuilder = null;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         profileBuilder = new ExportedProfileBuilder(attributes.get("name"), Boolean.valueOf(attributes.get("isDefault")));
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {

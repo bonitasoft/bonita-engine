@@ -80,7 +80,7 @@ public class XMLProcessDefinition {
 
     public static final String CORRELATION_KEY = "key";
 
-    public static final String NAMESPACE = "http://www.bonitasoft.org/ns/process/client/6.0";
+    public static final String NAMESPACE = "http://www.bonitasoft.org/ns/process/client/6.3";
 
     public static final String PROCESS_NODE = "processDefinition";
 
@@ -285,6 +285,8 @@ public class XMLProcessDefinition {
     public static final String OPERATION_OPERATOR = "operator";
 
     public static final String LEFT_OPERAND_NAME = "name";
+
+    public static final String LEFT_OPERAND_TYPE = "type";
 
     public static final String CONNECTOR_INPUTS_NODE = "inputs";
 
@@ -847,6 +849,7 @@ public class XMLProcessDefinition {
 
     private void fillLeftOperandNode(final XMLNode rightOperandNode, final LeftOperand leftOperand) {
         rightOperandNode.addAttribute(LEFT_OPERAND_NAME, leftOperand.getName());
+        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, leftOperand.getType());
     }
 
     private void fillUserFilterNode(final XMLNode userFilterNode, final UserFilterDefinition userFilter) {

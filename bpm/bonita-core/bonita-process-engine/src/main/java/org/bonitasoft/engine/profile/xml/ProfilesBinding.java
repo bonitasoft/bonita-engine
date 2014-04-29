@@ -28,20 +28,18 @@ public class ProfilesBinding extends ElementBinding {
 
     private List<ExportedProfile> profiles;
 
-    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         profiles = new ArrayList<ExportedProfile>(10);
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
     public void setChildObject(final String name, final Object value) {
-        if ("profile".equals(name)) {
+        if (value != null && "profile".equals(name)) {
             profiles.add((ExportedProfile) value);
         }
     }

@@ -206,10 +206,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                         designErrors.add("An event sub process must have one and only one start events, but " + subProcessContainer.getStartEvents().size()
                                 + " were found : " + activity);
                     }
-                    if (!subProcessContainer.getStartEvents().isEmpty()) {
-                        if (subProcessContainer.getStartEvents().get(0).getEventTriggers().isEmpty()) {
-                            designErrors.add("The event sub process have no start event with a not NONE trigger : " + activity);
-                        }
+                    if (!subProcessContainer.getStartEvents().isEmpty() && subProcessContainer.getStartEvents().get(0).getEventTriggers().isEmpty()) {
+                        designErrors.add("The event sub process have no start event with a not NONE trigger : " + activity);
                     }
                     if (activity.getIncomingTransitions().size() > 0) {
                         designErrors.add("An event sub process cannot have incoming transitions : " + activity);

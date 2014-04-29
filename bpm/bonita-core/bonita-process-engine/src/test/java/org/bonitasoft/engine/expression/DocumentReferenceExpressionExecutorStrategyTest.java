@@ -88,12 +88,13 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluate_should_throw_an_exception_when_container_id_is_null() throws Exception {
-        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> emptyMap(), null);
+        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> emptyMap(), null, ContainerState.ACTIVE);
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluate_should_throw_an_exception_when_container_type_is_null() throws Exception {
-        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID), null);
+        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID), null,
+                ContainerState.ACTIVE);
     }
 
     @Test
@@ -102,7 +103,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document));
     }
@@ -113,7 +114,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(parentDocument));
     }
@@ -125,7 +126,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains((Document) null);
     }
@@ -137,7 +138,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains((Document) null);
     }
@@ -149,7 +150,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         dependencies.put("containerType", "PROCESS_INSTANCE");
         dependencies.put("time", A_LONG_TIME_AGO);
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument));
     }

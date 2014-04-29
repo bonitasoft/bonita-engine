@@ -26,6 +26,10 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -44,8 +48,7 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
     public EvaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressions, final long processDefinitionId,
-            final ExpressionResolverService expressionResolverService,
-            final ProcessDefinitionService processDefinitionService) {
+            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
         expressionsAndTheirPartialContext = expressions;
         this.processDefinitionId = processDefinitionId;
         expressionResolver = expressionResolverService;
@@ -66,17 +69,38 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
                     if (inputValues == null) {
                         inputValues = new HashMap<String, Serializable>();
                     }
-                    inputValues.put(SExpressionContext.processDefinitionKey, processDefinition);
+                    inputValues.put(SExpressionContext.PROCESS_DEFINITION_KEY, processDefinition);
                     context.setProcessDefinitionId(processDefinitionId);
                     context.setSerializableInputValues(inputValues);
                     final SExpression sexp = ServerModelConvertor.convertExpression(exp);
-                    // maybe the context's not enough to delivery those parameters like ap<String, Serializable>.
-                    final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);// evaluate(sexp, context);
+                    final Serializable res = evaluateExpression(context, sexp, processDefinition);
                     results.put(buildName(exp), res);
                 }
             }
         }
 
+    }
+
+    protected Serializable evaluateExpression(final SExpressionContext context, final SExpression sexp, final SProcessDefinition processDefinition)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        try {
+            return (Serializable) expressionResolver.evaluate(sexp, context);
+        } catch (SExpressionTypeUnknownException e) {
+            throw enrichExceptionContext(e, processDefinition);
+        } catch (SExpressionEvaluationException e) {
+            throw enrichExceptionContext(e, processDefinition);
+        } catch (SExpressionDependencyMissingException e) {
+            throw enrichExceptionContext(e, processDefinition);
+        } catch (SInvalidExpressionException e) {
+            throw enrichExceptionContext(e, processDefinition);
+        }
+    }
+
+    private <T extends SBonitaException> T enrichExceptionContext(final T e, final SProcessDefinition processDefinition) {
+        e.setProcessDefinitionIdOnContext(processDefinition.getId());
+        e.setProcessDefinitionNameOnContext(processDefinition.getName());
+        e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+        return e;
     }
 
     @Override

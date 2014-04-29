@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -37,10 +37,9 @@ public interface SupervisorMappingService {
      * @param supervisor
      *            a SSupervisor object
      * @return the new created supervisor
-     * @throws SSupervisorAlreadyExistsException
      * @throws SSupervisorCreationException
      */
-    SProcessSupervisor createSupervisor(SProcessSupervisor supervisor) throws SSupervisorAlreadyExistsException, SSupervisorCreationException;
+    SProcessSupervisor createProcessSupervisor(SProcessSupervisor supervisor) throws SSupervisorCreationException;
 
     /**
      * get supervisor without display name by its id
@@ -50,7 +49,7 @@ public interface SupervisorMappingService {
      * @return the supervisor with id equals the parameter
      * @throws SSupervisorNotFoundException
      */
-    SProcessSupervisor getSupervisor(long supervisorId) throws SSupervisorNotFoundException;
+    SProcessSupervisor getProcessSupervisor(long supervisorId) throws SSupervisorNotFoundException;
 
     /**
      * Delete the id specified supervisor
@@ -60,7 +59,7 @@ public interface SupervisorMappingService {
      * @throws SSupervisorNotFoundException
      * @throws SSupervisorDeletionException
      */
-    void deleteSupervisor(long supervisorId) throws SSupervisorNotFoundException, SSupervisorDeletionException;
+    void deleteProcessSupervisor(long supervisorId) throws SSupervisorNotFoundException, SSupervisorDeletionException;
 
     /**
      * Delete the specific supervisor
@@ -69,7 +68,7 @@ public interface SupervisorMappingService {
      *            the supervisor will be deleted
      * @throws SSupervisorDeletionException
      */
-    void deleteSupervisor(SProcessSupervisor supervisor) throws SSupervisorDeletionException;
+    void deleteProcessSupervisor(SProcessSupervisor supervisor) throws SSupervisorDeletionException;
 
     /**
      * Delete all supervisors for the connected tenant
@@ -77,7 +76,7 @@ public interface SupervisorMappingService {
      * @throws SSupervisorDeletionException
      * @since 6.1
      */
-    void deleteAllSupervisors() throws SSupervisorDeletionException;
+    void deleteAllProcessSupervisors() throws SSupervisorDeletionException;
 
     /**
      * Verify if the id specified user is the supervisor of id specified process definition
@@ -99,7 +98,7 @@ public interface SupervisorMappingService {
      * @return a list of SSupervisor objects
      * @throws SBonitaSearchException
      */
-    List<SProcessSupervisor> searchProcessDefSupervisors(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SProcessSupervisor> searchProcessSupervisors(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of supervisors suit to the specific criteria
@@ -109,6 +108,6 @@ public interface SupervisorMappingService {
      * @return a list of SSupervisor objects
      * @throws SBonitaSearchException
      */
-    long getNumberOfProcessDefSupervisors(QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfProcessSupervisors(QueryOptions searchOptions) throws SBonitaSearchException;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Yanyan Liu
+ * @author Celine Souchet
  */
 public class SSupervisorNotFoundException extends SBonitaException {
 
@@ -32,6 +33,14 @@ public class SSupervisorNotFoundException extends SBonitaException {
 
     public SSupervisorNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
+    }
+
+    public SSupervisorNotFoundException(final Long userId, final Long roleId, final Long groupId, final Long processDefinitionId) {
+        super("No supervisor was found !!");
+        setUserIdOnContext(userId);
+        setRoleIdOnContext(roleId);
+        setGroupIdOnContext(groupId);
+        setProcessDefinitionIdOnContext(processDefinitionId);
     }
 
 }

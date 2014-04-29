@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,6 +31,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Zhao Na
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface ExpressionExecutorStrategy {
 
@@ -52,6 +53,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_VARIABLE = "TYPE_VARIABLE";
 
+    String TYPE_TRANSIENT_VARIABLE = "TYPE_TRANSIENT_VARIABLE";
+
     String TYPE_PATTERN = "TYPE_PATTERN";
 
     String TYPE_JAVA_METHOD_CALL = "TYPE_JAVA_METHOD_CALL";
@@ -68,6 +71,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_BUSINESS_DATA = "TYPE_BUSINESS_DATA";
 
+    String TYPE_QUERY_BUSINESS_DATA = "TYPE_QUERY_BUSINESS_DATA";
+
     ExpressionKind KIND_CONSTANT = new ExpressionKind(TYPE_CONSTANT);
 
     ExpressionKind KIND_READ_ONLY_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_SCRIPT, INTERPRETER_GROOVY);
@@ -75,6 +80,8 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_INPUT = new ExpressionKind(TYPE_INPUT);
 
     ExpressionKind KIND_VARIABLE = new ExpressionKind(TYPE_VARIABLE);
+
+    ExpressionKind KIND_TRANSIENT_VARIABLE = new ExpressionKind(TYPE_TRANSIENT_VARIABLE);
 
     ExpressionKind KIND_PATTERN = new ExpressionKind(TYPE_PATTERN);
 
@@ -92,6 +99,8 @@ public interface ExpressionExecutorStrategy {
 
     ExpressionKind KIND_BUSINESS_DATA = new ExpressionKind(TYPE_BUSINESS_DATA);
 
+    ExpressionKind KIND_QUERY_BUSINESS_DATA = new ExpressionKind(TYPE_QUERY_BUSINESS_DATA);
+
     /**
      * This list must contain only types with no dependencies
      */
@@ -101,7 +110,7 @@ public interface ExpressionExecutorStrategy {
     /**
      * @param expression
      *            the expression to evaluate
-     * @param dependencyValues
+     * @param context
      *            map containing the result of the evaluation of dependencies
      *            and also informations about the context of evaluation given by {@link #CONTAINER_ID_KEY} and {@link #CONTAINER_TYPE_KEY}
      * @return
@@ -109,7 +118,7 @@ public interface ExpressionExecutorStrategy {
      * @throws SExpressionEvaluationException
      * @throws SExpressionDependencyMissingException
      */
-    Object evaluate(SExpression expression, Map<String, Object> dependencyValues, Map<Integer, Object> resolvedExpressions)
+    Object evaluate(SExpression expression, Map<String, Object> context, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**
@@ -125,7 +134,7 @@ public interface ExpressionExecutorStrategy {
 
     ExpressionKind getExpressionKind();
 
-    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> dependencyValues, Map<Integer, Object> resolvedExpressions)
+    List<Object> evaluate(List<SExpression> expressions, Map<String, Object> context, Map<Integer, Object> resolvedExpressions, ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException;
 
     /**

@@ -123,7 +123,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         waitForProcessToFinish(calledProcessInstance);
         try {
             waitForArchivedActivity(calledStep2.getId(), TestStates.getAbortedState());
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                     ActivityInstanceCriterion.DEFAULT);
             System.out.println("After completion of the called process");

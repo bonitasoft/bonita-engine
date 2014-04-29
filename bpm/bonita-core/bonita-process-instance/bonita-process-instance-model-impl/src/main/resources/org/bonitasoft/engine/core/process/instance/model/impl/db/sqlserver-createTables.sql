@@ -6,7 +6,7 @@ CREATE TABLE process_instance (
   description NVARCHAR(255),
   startDate NUMERIC(19, 0) NOT NULL,
   startedBy NUMERIC(19, 0) NOT NULL,
-  startedByDelegate NUMERIC(19, 0) NOT NULL,
+  startedBySubstitute NUMERIC(19, 0) NOT NULL,
   endDate NUMERIC(19, 0) NOT NULL,
   stateId INT NOT NULL,
   stateCategory NVARCHAR(50) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy NUMERIC(19, 0),
-  executedByDelegate NUMERIC(19, 0),
+  executedBySubstitute NUMERIC(19, 0),
   activityInstanceId NUMERIC(19, 0),
   state_executing BIT DEFAULT 0,
   abortedByBoundary NUMERIC(19, 0),
@@ -90,7 +90,6 @@ CREATE TABLE flownode_instance (
   PRIMARY KEY (tenantid, id)
 )
 GO
-
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
 GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
@@ -111,6 +110,8 @@ CREATE TABLE connector_instance (
   stackTrace NVARCHAR(MAX),
   PRIMARY KEY (tenantid, id)
 )
+GO
+CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent)
 GO
 
 CREATE TABLE event_trigger_instance (
@@ -157,6 +158,8 @@ CREATE TABLE waiting_event (
   	PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active)
+GO
 
 CREATE TABLE message_instance (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -176,6 +179,8 @@ CREATE TABLE message_instance (
   	PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3)
+GO
 
 CREATE TABLE pending_mapping (
 	tenantid NUMERIC(19, 0) NOT NULL,
@@ -185,6 +190,8 @@ CREATE TABLE pending_mapping (
   	userId NUMERIC(19, 0),
   	PRIMARY KEY (tenantid, id)
 )
+GO
+CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId)
 GO
 
 CREATE TABLE hidden_activity (

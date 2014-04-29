@@ -23,7 +23,6 @@ import org.bonitasoft.engine.work.BonitaWork;
 /**
  * @author Aurelien Pupier
  * @author Celine Souchet
- * 
  */
 public class MessageInstanceContextWork extends TxInHandleFailureWrappingWork {
 
@@ -33,14 +32,12 @@ public class MessageInstanceContextWork extends TxInHandleFailureWrappingWork {
 
     private final SWaitingMessageEvent waitingMessageEvent;
 
-    public MessageInstanceContextWork(final BonitaWork work, final SMessageInstance messageInstance,
-            final SWaitingMessageEvent waitingMessageEvent) {
+    public MessageInstanceContextWork(final BonitaWork work, final SMessageInstance messageInstance, final SWaitingMessageEvent waitingMessageEvent) {
         super(work);
         this.messageInstance = messageInstance;
         this.waitingMessageEvent = waitingMessageEvent;
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) {
         sBonitaException.setMessageInstanceNameOnContext(messageInstance.getMessageName());

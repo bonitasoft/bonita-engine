@@ -39,22 +39,22 @@ public class DocumentQueryBuilder implements Serializable {
     }
 
     public DocumentQueryBuilder leftParenthesis() {
-        query.add("(");// QueryFormatter.L_PARENTHESIS);
+        query.add("(");
         return this;
     }
 
     public DocumentQueryBuilder rightParenthesis() {
-        query.add(")");// QueryFormatter.R_PARENTHESIS);
+        query.add(")");
         return this;
     }
 
     public DocumentQueryBuilder or() {
-        query.add("OR");// QueryFormatter.OR);
+        query.add("OR");
         return this;
     }
 
     public DocumentQueryBuilder and() {
-        query.add("AND");// QueryFormatter.AND);
+        query.add("AND");
         return this;
     }
 

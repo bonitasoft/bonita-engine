@@ -387,7 +387,6 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = getDependenciesResources();
@@ -419,9 +418,8 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         return resources;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) {
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final List<SDependency> dependencies) {
         throw new UnsupportedOperationException("Only one artifact at platform level. No need to update in batch all dependencies.");
     }
 

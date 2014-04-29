@@ -24,6 +24,7 @@ CREATE TABLE profileentry (
   index_ NUMERIC(19, 0),
   type NVARCHAR(50),
   page NVARCHAR(50),
+  custom BIT DEFAULT 0,
   PRIMARY KEY (tenantId, id)
 )
 GO

@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.process;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -710,11 +711,11 @@ public class ProcessManagementTest extends CommonAPITest {
 
         DataInstance dataInstance = getProcessAPI().getActivityDataInstance(dataName1, activityInstanceId);
         final String newConstantValue1 = "afterUpdate";
-        final Operation stringOperation = buildStringOperation(dataInstance.getName(), newConstantValue1);
+        final Operation stringOperation = buildStringOperation(dataInstance.getName(), newConstantValue1, false);
 
         final String newConstantValue2 = "GOLDORAK";
         dataInstance = getProcessAPI().getActivityDataInstance(dataName2, activityInstanceId);
-        final Operation stringOperation2 = buildStringOperation(dataInstance.getName(), newConstantValue2);
+        final Operation stringOperation2 = buildStringOperation(dataInstance.getName(), newConstantValue2, false);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
         operations.add(stringOperation2);
@@ -734,25 +735,49 @@ public class ProcessManagementTest extends CommonAPITest {
     public void updateActivityInstanceVariables() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
 
-        final DesignProcessDefinition processDef = createProcessWithActorAndHumanTaskAndStringData();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForStep("step1", processInstance);
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        UserTaskDefinitionBuilder addUserTask = processDefinitionBuilder
+                .addActor(ACTOR_NAME)
+                .addDescription("Delivery all day and night long")
+                .addUserTask("step1", ACTOR_NAME);
+        processDefinitionBuilder.addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("aprocess"));
+        processDefinitionBuilder.addShortTextData("b", new ExpressionBuilder().createConstantStringExpression("bprocess"));
+        processDefinitionBuilder.addShortTextData("c", new ExpressionBuilder().createConstantStringExpression("cprocess"));
+        processDefinitionBuilder.addShortTextData("d", new ExpressionBuilder().createConstantStringExpression("dprocess"));
+        processDefinitionBuilder.addShortTextData("e", new ExpressionBuilder().createConstantStringExpression("eprocess"));
+        addUserTask.addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("aacti"));
+        addUserTask.addShortTextData("b", new ExpressionBuilder().createConstantStringExpression("bacti")).isTransient();
+        addUserTask.addShortTextData("f", new ExpressionBuilder().createConstantStringExpression("facti"));
+        addUserTask.addShortTextData("g", new ExpressionBuilder().createConstantStringExpression("gacti")).isTransient();
 
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        final long activityInstanceId = activityInstances.get(0).getId();
-        final List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(activityInstanceId, 0, 10);
-        DataInstance dataInstance = dataInstances.get(0);
-        final String newConstantValue = "afterUpdate";
-        final Operation stringOperation = buildStringOperation(dataInstance.getName(), newConstantValue);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+
+        List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
+        assertThat(dataInstances).hasSize(6);
+        ArrayList<String> names = new ArrayList<String>(6);
+        ArrayList<String> values = new ArrayList<String>(6);
+        for (DataInstance dataInstance2 : dataInstances) {
+            names.add(dataInstance2.getName());
+            values.add((String) dataInstance2.getValue());
+        }
+        assertThat(names).contains("a", "b", "c", "d", "e", "f");
+        assertThat(values).contains("aacti", "bprocess", "cprocess", "dprocess", "eprocess", "facti");
         final List<Operation> operations = new ArrayList<Operation>();
-        operations.add(stringOperation);
-        getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
+        for (DataInstance dataInstance2 : dataInstances) {
+            final Operation stringOperation = buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up", false);
+            operations.add(stringOperation);
+        }
+        getProcessAPI().updateActivityInstanceVariables(operations, step1.getId(), null);
 
-        dataInstance = getProcessAPI().getActivityDataInstance("dataName", activityInstanceId);
-        assertEquals("afterUpdate", dataInstance.getValue());
+        dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
+        assertThat(dataInstances).hasSize(6);
+        values = new ArrayList<String>(6);
+        for (DataInstance dataInstance2 : dataInstances) {
+            values.add((String) dataInstance2.getValue());
+        }
+        assertThat(values).contains("aacti+up", "bprocess+up", "cprocess+up", "dprocess+up", "eprocess+up", "facti+up");
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
@@ -813,19 +838,17 @@ public class ProcessManagementTest extends CommonAPITest {
         final User user = createUser(USERNAME, PASSWORD);
         final long userId = user.getId();
 
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("stepX", "stepXX"),
-                Arrays.asList(true, true));
+        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+                Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
-        final long activityInstanceId = activityInstances.get(0).getId();
-        Thread.sleep(100);
-        boolean boo = getProcessAPI().canExecuteTask(activityInstanceId, userId);
-        assertFalse(boo);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        assertFalse("The user " + USERNAME + " shouldn't be able to execute the task step1.", getProcessAPI().canExecuteTask(activityInstanceId, userId));
 
-        getProcessAPI().assignUserTask(activityInstanceId, user.getId());
-        boo = getProcessAPI().canExecuteTask(activityInstanceId, userId);
-        assertTrue(boo);
+        getProcessAPI().assignUserTask(activityInstanceId, userId);
+        Thread.sleep(100);
+        assertTrue("The user " + USERNAME + " should be able to execute the task step1.", getProcessAPI().canExecuteTask(activityInstanceId, userId));
+
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
@@ -1165,20 +1188,20 @@ public class ProcessManagementTest extends CommonAPITest {
         final User jack = createUser(username1, PASSWORD);
         final User john = createUser(username2, PASSWORD);
         final User lucy = createUser(username3, PASSWORD);
-        final String coders = "Coding men";
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(coders).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", coders).addUserTask("userTask2", coders)
-                .addUserTask("userTask3", coders);
+        processBuilder.addActor(ACTOR_NAME).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", ACTOR_NAME)
+                .addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, coders, jack);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
                 new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
         // add lucy to actor
-        addMappingOfActorsForUser(coders, lucy.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
         final List<ActivityInstance> activities = getProcessAPI().getActivities(startedProcess.getId(), 0, 10);
         getProcessAPI().assignUserTask(activities.get(0).getId(), jack.getId());
@@ -1210,20 +1233,20 @@ public class ProcessManagementTest extends CommonAPITest {
         final User jack = createUser(username1, PASSWORD);
         final User john = createUser(username2, PASSWORD);
         final User lucy = createUser(username3, PASSWORD);
-        final String coders = "Coding men";
         // default expectedDuration is null for HumanTaskDefinition, so the expectedEndDate is 0 by default, no need to set it in particular.
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(coders).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", coders).addUserTask("userTask2", coders)
-                .addUserTask("userTask3", coders);
+        processBuilder.addActor(ACTOR_NAME).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", ACTOR_NAME)
+                .addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, coders, jack);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
                 new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
         // add lucy to actor
-        addMappingOfActorsForUser(coders, lucy.getId(), definition);
+        getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
         final List<ActivityInstance> activities = getProcessAPI().getActivities(startedProcess.getId(), 0, 10);
         getProcessAPI().assignUserTask(activities.get(0).getId(), jack.getId());
@@ -1494,7 +1517,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Operation stringOperation = buildStringOperation("aData", "15");
+        final Operation stringOperation = buildStringOperation("aData", "15", false);
         final Map<String, Serializable> context = new HashMap<String, Serializable>();
         context.put("page", "1");
 
@@ -1519,7 +1542,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Operation stringOperation = buildStringOperation("aData", "15");
+        final Operation stringOperation = buildStringOperation("aData", "15", false);
         final Map<String, Serializable> context = new HashMap<String, Serializable>();
         context.put("page", "1");
 
@@ -1544,7 +1567,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
-        final Operation stringOperation = buildStringOperation("aData", "15");
+        final Operation stringOperation = buildStringOperation("aData", "15", false);
         final ArrayList<Operation> operations = new ArrayList<Operation>(1);
         operations.add(stringOperation);
         final Map<String, Serializable> context = new HashMap<String, Serializable>();

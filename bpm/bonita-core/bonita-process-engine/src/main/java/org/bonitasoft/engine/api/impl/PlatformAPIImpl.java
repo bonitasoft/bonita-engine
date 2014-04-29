@@ -33,7 +33,6 @@ import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformTableContent;
@@ -58,12 +57,6 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.SDataException;
-import org.bonitasoft.engine.data.SDataSourceAlreadyExistException;
-import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -76,6 +69,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -84,7 +78,6 @@ import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.STenantActivationException;
 import org.bonitasoft.engine.platform.STenantCreationException;
-import org.bonitasoft.engine.platform.STenantDeactivationException;
 import org.bonitasoft.engine.platform.STenantDeletionException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.StartNodeException;
@@ -385,7 +378,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 int i = 0;
                 final List<STenant> tenantIds = new ArrayList<STenant>();
                 do {
-                    tenants = platformService.getTenants(new QueryOptions(i, maxResults));
+                    tenants = platformService.getTenants(new QueryOptions(i, maxResults, STenant.class, "id", OrderByType.ASC));
                     i += maxResults;
                     for (final STenant sTenant : tenants) {
                         tenantIds.add(sTenant);
@@ -577,9 +570,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
-            // Create default data source
-            createDefaultDataSource(tenantServiceAccessor);
-
             // Create default commands
             createDefaultCommands(tenantServiceAccessor);
 
@@ -647,7 +637,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             return;
         }
         try {
-            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.fEncoding);
+            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.FILE_ENCODING);
         } finally {
             inputStream.close();
         }
@@ -684,20 +674,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation()).setSystem(true).done();
             commandService.create(sCommand);
         }
-    }
-
-    protected void createDefaultDataSource(final TenantServiceAccessor tenantServiceAccessor) throws SDataSourceAlreadyExistException, SDataException {
-        final DataService dataService = tenantServiceAccessor.getDataService();
-        final SDataSource bonitaDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
-                .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
-                .done();
-        dataService.createDataSource(bonitaDataSource);
-
-        final SDataSource transientDataSource = BuilderFactory
-                .get(SDataSourceBuilderFactory.class)
-                .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
-                        "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
-        dataService.createDataSource(transientDataSource);
     }
 
     private String getUserName(final long tenantId) throws IOException, BonitaHomeNotSetException {
@@ -814,38 +790,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
         } else {
             e.printStackTrace();
-        }
-    }
-
-    private void deactiveTenant(final long tenantId) throws STenantDeactivationException {
-        // TODO : Reduce number of transactions
-        PlatformServiceAccessor platformAccessor = null;
-        SessionAccessor sessionAccessor = null;
-        long platformSessionId = -1;
-        try {
-            platformAccessor = getPlatformAccessor();
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
-            // final WorkService workService = platformAccessor.getWorkService();
-            final long sessionId = createSession(tenantId, sessionService);
-
-            platformSessionId = sessionAccessor.getSessionId();
-            sessionAccessor.deleteSessionId();
-
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
-            transactionContent.execute();
-            sessionService.deleteSession(sessionId);
-            sessionService.deleteSessionsOfTenant(tenantId);
-        } catch (final STenantDeactivationException stde) {
-            log(platformAccessor, stde);
-            throw stde;
-        } catch (final Exception e) {
-            log(platformAccessor, e);
-            throw new STenantDeactivationException("Tenant deactivation failed.", e);
-        } finally {
-            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 

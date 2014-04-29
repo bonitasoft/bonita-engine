@@ -1,16 +1,17 @@
 package org.bonitasoft.engine.command.web;
 
+import org.bonitasoft.engine.BonitaSuiteRunner;
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.external.profile.command.ProfileImportCommandTest;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * @author Emmanuel Duchastenier
  */
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        SupervisorCommandTest.class,
         ActorCommandTest.class,
         ProfileImportCommandTest.class,
         ActorPermissionCommandTest.class,
@@ -20,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ActivityCommandTest.class,
         EntityMemberCommandsTest.class
 })
+@Initializer(TestsInitializer.class)
 public class ExternalCommandsTest {
 
 }

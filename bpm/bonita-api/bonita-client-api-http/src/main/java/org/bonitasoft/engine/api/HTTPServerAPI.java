@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,8 @@ import com.thoughtworks.xstream.mapper.CannotResolveClassException;
  */
 public class HTTPServerAPI implements ServerAPI {
 
+    private static final long serialVersionUID = -3375874140999200702L;
+
     private static final String UTF_8 = "UTF-8";
 
     private static final String CLASS_NAME_PARAMETERS = "classNameParameters";
@@ -76,9 +79,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final String SERVER_API = "/serverAPI/";
 
-    private static final long serialVersionUID = 1L;
-
-    private static final String SERVER_URL = "server.url";
+    static final String SERVER_URL = "server.url";
 
     private static final String BASIC_AUTHENTICATION_ACTIVE = "basicAuthentication.active";
 
@@ -86,7 +87,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final String BASIC_AUTHENTICATION_PASSWORD = "basicAuthentication.password";
 
-    private static final String APPLICATION_NAME = "application.name";
+    static final String APPLICATION_NAME = "application.name";
 
     private static final Logger LOGGER = Logger.getLogger(HTTPServerAPI.class.getName());
 
@@ -102,13 +103,15 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static DefaultHttpClient httpclient;
 
-    private static final XStream xstream;
+    private static final XStream XSTREAM;
 
-    private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
+    private static final ResponseHandler<String> RESPONSE_HANDLER = new BonitaResponseHandler();
 
     static {
-        xstream = new XStream();
-        xstream.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
+        XSTREAM = new XStream();
+        XSTREAM.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
     }
 
     public HTTPServerAPI(final Map<String, String> parameters) {
@@ -129,8 +132,8 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         String response = null;
         try {
-            response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
-            return checkInvokeMethodReturn(response, xstream);
+            response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, XSTREAM);
+            return checkInvokeMethodReturn(response, XSTREAM);
         } catch (final UndeclaredThrowableException e) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.log(Level.FINE, e.getMessage(), e);
@@ -145,7 +148,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
         Object invokeMethodReturn = null;
-        if (response != null && !response.isEmpty() && !response.equals("null")) {
+        if (response != null && !response.isEmpty() && !"null".equals(response)) {
             invokeMethodReturn = fromXML(response, xstream);
             if (invokeMethodReturn instanceof Throwable) {
                 throw (Throwable) invokeMethodReturn;
@@ -159,7 +162,7 @@ public class HTTPServerAPI implements ServerAPI {
             ClientProtocolException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
         try {
-            return httpclient.execute(httpost, responseHandler);
+            return httpclient.execute(httpost, RESPONSE_HANDLER);
         } catch (final ClientProtocolException e) {
             if (LOGGER.isLoggable(Level.SEVERE)) {
                 LOGGER.log(Level.SEVERE, e.getMessage() + System.getProperty("line.separator") + "httpost = <" + httpost + ">");
@@ -168,7 +171,7 @@ public class HTTPServerAPI implements ServerAPI {
         }
     }
 
-    private HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    private final HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException {
         final HttpEntity httpEntity = buildEntity(options, classNameParameters, parametersValues, xstream);
         final StringBuilder sBuilder = new StringBuilder(serverUrl);
@@ -188,7 +191,7 @@ public class HTTPServerAPI implements ServerAPI {
         return httpost;
     }
 
-    private HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters, final Object[] parametersValues,
+    final HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters, final Object[] parametersValues,
             final XStream xstream) throws UnsupportedEncodingException, IOException {
         final HttpEntity httpEntity;
         /*
@@ -196,9 +199,9 @@ public class HTTPServerAPI implements ServerAPI {
          */
         if (classNameParameters.contains(BusinessArchive.class.getName()) || classNameParameters.contains(byte[].class.getName())) {
             final List<Object> bytearrayParameters = new ArrayList<Object>();
-            final MultipartEntity entity = new MultipartEntity();
-            entity.addPart(OPTIONS, new StringBody(toXML(options, xstream)));
-            entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(toXML(classNameParameters, xstream)));
+            final MultipartEntity entity = new MultipartEntity(null, null, UTF8);
+            entity.addPart(OPTIONS, new StringBody(toXML(options, xstream), UTF8));
+            entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(toXML(classNameParameters, xstream), UTF8));
             for (int i = 0; i < parametersValues.length; i++) {
                 final Object parameterValue = parametersValues[i];
                 if (parameterValue instanceof BusinessArchive || parameterValue instanceof byte[]) {
@@ -206,7 +209,7 @@ public class HTTPServerAPI implements ServerAPI {
                     bytearrayParameters.add(parameterValue);
                 }
             }
-            entity.addPart(PARAMETERS_VALUES, new StringBody(toXML(parametersValues, xstream)));
+            entity.addPart(PARAMETERS_VALUES, new StringBody(toXML(parametersValues, xstream), UTF8));
             int i = 0;
             for (final Object object : bytearrayParameters) {
                 entity.addPart(BINARY_PARAMETER + i, new ByteArrayBody(serialize(object), BINARY_PARAMETER + i));

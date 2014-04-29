@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
@@ -61,14 +62,23 @@ public class ServerModelConvertor {
     }
 
     public static SOperation convertOperation(final Operation operation) {
+        if (operation == null) {
+            return null;
+        }
         return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
-                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName()).done())
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                        .setName(operation.getLeftOperand().getName())
+                        .setType(operation.getLeftOperand().getType())
+                        .done())
                 .done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
+        if (operations == null) {
+            return Collections.emptyList();
+        }
         final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
         for (final Operation operation : operations) {
             sOperations.add(convertOperation(operation));
@@ -76,10 +86,6 @@ public class ServerModelConvertor {
         return sOperations;
     }
 
-    /**
-     * @param dataDefinition
-     * @return
-     */
     public static SDataDefinition convertDataDefinition(final DataDefinition dataDefinition) {
         if (dataDefinition instanceof XMLDataDefinition) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
@@ -92,7 +98,7 @@ public class ServerModelConvertor {
             return builder.done();
         } else {
             final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-            SDataDefinitionBuilder builder = null;
+            SDataDefinitionBuilder builder = null; 
             if (dataDefinition instanceof TextDataDefinition) {
                 final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
                 builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
@@ -107,7 +113,7 @@ public class ServerModelConvertor {
     }
 
     public static SBusinessDataDefinition convertBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
-        SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
+        final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
         builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());
         return builder.done();
@@ -115,7 +121,7 @@ public class ServerModelConvertor {
 
     protected static SBusinessDataDefinitionBuilder getSBusinessDataDefinitionBuilder(final BusinessDataDefinition businessDataDefinition) {
         final SBusinessDataDefinitionBuilderFactory fact = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
-        SBusinessDataDefinitionBuilder builder = fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
+        final SBusinessDataDefinitionBuilder builder = fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
         return builder;
     }
 }

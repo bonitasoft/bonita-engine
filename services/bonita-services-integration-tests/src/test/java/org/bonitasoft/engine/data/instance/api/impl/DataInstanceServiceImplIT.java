@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.data.instance.api.impl;
 
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -29,6 +28,7 @@ import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Emmanuel Duchastenier
@@ -43,7 +43,7 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
         TenantHibernatePersistenceService persistenceService = getServicesBuilder().buildTenantPersistenceService();
         TechnicalLoggerService technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
         ArchiveService archiveService = getServicesBuilder().buildArchiveService();
-        dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, recorder, persistenceService, archiveService, technicalLoggerService);
+        dataInstanceServiceImpl = new DataInstanceServiceImpl(recorder, persistenceService, archiveService, technicalLoggerService);
         CacheService cacheService = getServicesBuilder().buildCacheService();
         try {
             cacheService.start();
@@ -67,7 +67,7 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
         SDataInstanceVisibilityMapping mapping = BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class)
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
         mapping.setTenantId(1);
-        DataInstanceServiceImpl spy = spy(dataInstanceServiceImpl);
+        DataInstanceServiceImpl spy = Mockito.spy(dataInstanceServiceImpl);
         doReturn(mapping).when(spy).createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
 
         // when:

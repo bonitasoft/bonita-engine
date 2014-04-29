@@ -6,7 +6,7 @@ CREATE TABLE arch_process_instance (
   description VARCHAR(255),
   startDate BIGINT NOT NULL,
   startedBy BIGINT NOT NULL,
-  startedByDelegate BIGINT NOT NULL,
+  startedBySubstitute BIGINT NOT NULL,
   endDate BIGINT NOT NULL,
   archiveDate BIGINT NOT NULL,
   stateId INT NOT NULL,
@@ -65,13 +65,16 @@ CREATE TABLE arch_flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy BIGINT,
-  executedByDelegate BIGINT,
+  executedBySubstitute BIGINT,
   activityInstanceId BIGINT,
   aborting BOOLEAN NOT NULL,
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance (kind, logicalGroup2, executedBy);
+CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
+
 
 CREATE TABLE arch_transition_instance (
   tenantid BIGINT NOT NULL,

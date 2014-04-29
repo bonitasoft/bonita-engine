@@ -34,12 +34,14 @@ public class SearchProfileEntryDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> profileAllFields;
 
     public SearchProfileEntryDescriptor() {
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(5);
+        searchEntityKeys = new HashMap<String, FieldDescriptor>(7);
         searchEntityKeys.put(ProfileEntrySearchDescriptor.ID, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.ID));
         searchEntityKeys.put(ProfileEntrySearchDescriptor.NAME, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.NAME));
         searchEntityKeys.put(ProfileEntrySearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID));
         searchEntityKeys.put(ProfileEntrySearchDescriptor.PARENT_ID, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID));
         searchEntityKeys.put(ProfileEntrySearchDescriptor.INDEX, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.PAGE, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE));
+        searchEntityKeys.put(ProfileEntrySearchDescriptor.CUSTOM, new FieldDescriptor(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM));
 
         profileAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(3);

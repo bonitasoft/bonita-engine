@@ -34,9 +34,9 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -88,7 +88,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     // ----
 
-    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
+            final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+            final TechnicalLoggerService logger) throws ClassNotFoundException {
         super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
         this.statistics = sessionFactory.getStatistics();
@@ -270,6 +272,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
+    public int update(final String updateQueryName) throws SPersistenceException {
+        final Query query = getSession(true).getNamedQuery(updateQueryName);
+        try {
+            return query.executeUpdate();
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    @Override
     public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession(true).getNamedQuery("deleteAll" + mappedClass.getSimpleName());
@@ -367,7 +379,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         Long id = null;
         try {
             id = entity.getId();
-            final String setterName = "set" + StringUtil.firstCharToUpperCase(fieldName);
+            final String setterName = "set" + WordUtils.capitalize(fieldName);
             ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
         } catch (final Exception e) {
             throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
@@ -499,7 +511,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @param specificFilters
      * @param enableWordSearch
      */
-    protected void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters, final boolean enableWordSearch) {
+    protected void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters,
+            final boolean enableWordSearch) {
         final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
         final Set<String> fields = new HashSet<String>();
         for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
@@ -543,7 +556,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @param terms
      * @param enableWordSearch
      */
-    protected void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField, final List<String> terms, final boolean enableWordSearch) {
+    protected void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField, final List<String> terms,
+            final boolean enableWordSearch) {
         final Iterator<String> termIterator = terms.iterator();
         while (termIterator.hasNext()) {
             final String currentTerm = termIterator.next();
@@ -562,7 +576,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @param currentTerm
      * @param enableWordSearch
      */
-    protected void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm, final boolean enableWordSearch) {
+    protected void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm,
+            final boolean enableWordSearch) {
         // Search if a sentence starts with the term
         queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
 
@@ -593,62 +608,62 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
         }
         switch (type) {
-        case EQUALS:
-            if (fieldValue == null) {
-                clause.append(completeField).append(" IS NULL");
-            } else {
-                clause.append(completeField).append(" = ").append(fieldValue);
-            }
-            break;
-        case GREATER:
-            clause.append(completeField).append(" > ").append(fieldValue);
-            break;
-        case GREATER_OR_EQUALS:
-            clause.append(completeField).append(" >= ").append(fieldValue);
-            break;
-        case LESS:
-            clause.append(completeField).append(" < ").append(fieldValue);
-            break;
-        case LESS_OR_EQUALS:
-            clause.append(completeField).append(" <= ").append(fieldValue);
-            break;
-        case DIFFERENT:
-            clause.append(completeField).append(" != ").append(fieldValue);
-            break;
-        case IN:
-            clause.append(getInClause(completeField, filterOption));
-            break;
-        case BETWEEN:
-            final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
-            final Object to = filterOption.getTo() instanceof String ? "'" + filterOption.getTo() + "'" : filterOption.getTo();
-            clause.append("(").append(from).append(" <= ").append(completeField);
-            clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
-            break;
-        case LIKE:
-            // TODO:write LIKE
-            clause.append(completeField).append(" LIKE '%").append(filterOption.getValue()).append("%'");
-            break;
-        case L_PARENTHESIS:
-            clause.append(" (");
-            break;
-        case R_PARENTHESIS:
-            clause.append(" )");
-            break;
-        case AND:
-            clause.append(" AND ");
-            break;
-        case OR:
-            clause.append(" OR ");
-            break;
-        default:
-            // TODO:do we want default behaviour?
-            break;
+            case EQUALS:
+                if (fieldValue == null) {
+                    clause.append(completeField).append(" IS NULL");
+                } else {
+                    clause.append(completeField).append(" = ").append(fieldValue);
+                }
+                break;
+            case GREATER:
+                clause.append(completeField).append(" > ").append(fieldValue);
+                break;
+            case GREATER_OR_EQUALS:
+                clause.append(completeField).append(" >= ").append(fieldValue);
+                break;
+            case LESS:
+                clause.append(completeField).append(" < ").append(fieldValue);
+                break;
+            case LESS_OR_EQUALS:
+                clause.append(completeField).append(" <= ").append(fieldValue);
+                break;
+            case DIFFERENT:
+                clause.append(completeField).append(" != ").append(fieldValue);
+                break;
+            case IN:
+                clause.append(getInClause(completeField, filterOption));
+                break;
+            case BETWEEN:
+                final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
+                final Object to = filterOption.getTo() instanceof String ? "'" + filterOption.getTo() + "'" : filterOption.getTo();
+                clause.append("(").append(from).append(" <= ").append(completeField);
+                clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
+                break;
+            case LIKE:
+                // TODO:write LIKE
+                clause.append(completeField).append(" LIKE '%").append(filterOption.getValue()).append("%'");
+                break;
+            case L_PARENTHESIS:
+                clause.append(" (");
+                break;
+            case R_PARENTHESIS:
+                clause.append(" )");
+                break;
+            case AND:
+                clause.append(" AND ");
+                break;
+            case OR:
+                clause.append(" OR ");
+                break;
+            default:
+                // TODO:do we want default behaviour?
+                break;
         }
         return completeField;
     }
 
     private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
-        StringBuilder stb = new StringBuilder(completeField);
+        final StringBuilder stb = new StringBuilder(completeField);
         stb.append(" in (");
         stb.append(getInValues(filterOption));
         stb.append(")");
@@ -656,11 +671,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     private String getInValues(final FilterOption filterOption) {
-        StringBuilder stb = new StringBuilder();
-        for (Object element : filterOption.getIn()) {
+        final StringBuilder stb = new StringBuilder();
+        for (final Object element : filterOption.getIn()) {
             stb.append(element + ",");
         }
-        String inValues = stb.toString();
+        final String inValues = stb.toString();
         return inValues.substring(0, inValues.length() - 1);
     }
 

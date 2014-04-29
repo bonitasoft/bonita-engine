@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -30,14 +31,13 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
-    @SuppressWarnings("unused")
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
-        if (dependencyValues != null && !dependencyValues.isEmpty()) {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
+        if (context != null && !context.isEmpty()) {
             final String key = expression.getContent();
-            if (dependencyValues.containsKey(key)) {
-                return dependencyValues.get(key);
+            if (context.containsKey(key)) {
+                return context.get(key);
             }
         }
         throw new SExpressionEvaluationException("No value found for mandatory expression '" + expression.getContent() + "' of type Input Expression",
@@ -50,11 +50,11 @@ public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionEx
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }

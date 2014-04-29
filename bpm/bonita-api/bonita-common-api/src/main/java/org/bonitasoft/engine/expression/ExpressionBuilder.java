@@ -99,14 +99,12 @@ public class ExpressionBuilder {
      * @since 6.0
      */
     public Expression createConstantStringExpression(final String value) throws InvalidExpressionException {
-        createNewInstance(value).setContent(value).setExpressionType(ExpressionType.TYPE_CONSTANT).setReturnType(String.class.getName());
-        return done();
+        return createConstantExpression(value, value, String.class);
     }
 
     public Expression createConstantBooleanExpression(final boolean value) throws InvalidExpressionException {
-        createNewInstance(Boolean.toString(value)).setContent(value ? "true" : "false").setExpressionType(ExpressionType.TYPE_CONSTANT)
-                .setReturnType(Boolean.class.getName());
-        return done();
+        final String valueOf = String.valueOf(value);
+        return createConstantExpression(valueOf, valueOf, Boolean.class);
     }
 
     /**
@@ -119,19 +117,25 @@ public class ExpressionBuilder {
      * @since 6.0
      */
     public Expression createConstantDateExpression(final String value) throws InvalidExpressionException {
-        createNewInstance(value).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT).setReturnType(Date.class.getName());
-        return done();
+        return createConstantExpression(value, value, Date.class);
     }
 
     public Expression createConstantLongExpression(final long value) throws InvalidExpressionException {
-        createNewInstance(Long.toString(value)).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT)
-                .setReturnType(Long.class.getName());
-        return done();
+        final String valueOf = String.valueOf(value);
+        return createConstantExpression(valueOf, valueOf, Long.class);
     }
 
     public Expression createConstantIntegerExpression(final int value) throws InvalidExpressionException {
-        createNewInstance(Integer.toString(value)).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT)
-                .setReturnType(Integer.class.getName());
+        final String valueOf = String.valueOf(value);
+        return createConstantExpression(valueOf, valueOf, Integer.class);
+    }
+
+    public Expression createConstantStringExpression(final String expressionName, final String value) throws InvalidExpressionException {
+        return createConstantExpression(expressionName, value, String.class);
+    }
+
+    private Expression createConstantExpression(final String expressionName, final String value, final Class<?> returnType) throws InvalidExpressionException {
+        createNewInstance(expressionName).setContent(value).setExpressionType(ExpressionType.TYPE_CONSTANT).setReturnType(returnType.getName());
         return done();
     }
 
@@ -142,6 +146,16 @@ public class ExpressionBuilder {
     public Expression createBusinessDataExpression(final String businessDataName, final String returnType) throws InvalidExpressionException {
         return createNewInstance(businessDataName).setContent(businessDataName).setExpressionType(ExpressionType.TYPE_BUSINESS_DATA).setReturnType(returnType)
                 .done();
+    }
+
+    public Expression createQueryBusinessDataExpression(final String expressionName, final String queryName, final String returnType,
+            final Expression... dependencies) throws InvalidExpressionException {
+        return createNewInstance(expressionName).setContent(queryName).setExpressionType(ExpressionType.TYPE_QUERY_BUSINESS_DATA).setReturnType(returnType)
+                .setDependencies(Arrays.asList(dependencies)).done();
+    }
+
+    public Expression createTransientDataExpression(final String dataName, final String dataType) throws InvalidExpressionException {
+        return createNewInstance(dataName).setContent(dataName).setExpressionType(ExpressionType.TYPE_TRANSIENT_VARIABLE.name()).setReturnType(dataType).done();
     }
 
     public Expression createDocumentReferenceExpression(final String documentName) throws InvalidExpressionException {
@@ -461,10 +475,6 @@ public class ExpressionBuilder {
         return expBuilder.done();
     }
 
-    /**
-     * @param returnType
-     * @param expBuilder
-     */
     protected void getXPathReturnType(final XPathReturnType returnType, final ExpressionBuilder expBuilder) {
         switch (returnType) {
             case BOOLEAN:

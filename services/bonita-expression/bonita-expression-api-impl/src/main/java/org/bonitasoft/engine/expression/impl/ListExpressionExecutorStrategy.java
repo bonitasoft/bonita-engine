@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -27,10 +28,10 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * objects.
  * 
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class ListExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
-    @SuppressWarnings("unused")
     @Override
     public void validate(final SExpression expression) {
         // nothing to validate, as Business logic resides in dependencies:
@@ -41,9 +42,9 @@ public class ListExpressionExecutorStrategy implements ExpressionExecutorStrateg
         return KIND_LIST;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions) {
+    public Serializable evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) {
         final List<Object> result = new ArrayList<Object>(expression.getDependencies().size());
         for (final SExpression exp : expression.getDependencies()) {
             result.add(resolvedExpressions.get(exp.getDiscriminant()));
@@ -54,10 +55,11 @@ public class ListExpressionExecutorStrategy implements ExpressionExecutorStrateg
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions) {
-        final ArrayList<Object> list = new ArrayList<Object>(expressions.size());
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) {
+        final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, dependencyValues, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }

@@ -34,4 +34,10 @@ public interface SProfileEntry extends PersistentObject {
 
     String getPage();
 
+    /**
+     * 
+     * @return true if the page is a custom page
+     */
+    boolean isCustom();
+
 }

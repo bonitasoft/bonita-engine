@@ -70,26 +70,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Data -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Data Instance -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
@@ -110,14 +90,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-data-source-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient-data-source</artifactId>
+			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -227,7 +201,7 @@
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl-hibernate</artifactId>
+			<artifactId>bonita-identity-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -368,12 +342,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.profile</groupId>
 			<artifactId>bonita-profile-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.profile</groupId>
-			<artifactId>bonita-profile-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

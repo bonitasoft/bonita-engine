@@ -19,7 +19,7 @@
 		<property name="description" column="description" />
 		<property name="startDate" column="startDate" />
 		<property name="startedBy" column="startedBy" />
-		<property name="startedByDelegate" column="startedByDelegate" />
+		<property name="startedBySubstitute" column="startedBySubstitute" />
 		<property name="endDate" column="endDate" />
 		<property name="stateId" column="stateId" />
 		<property name="stateCategory" column="stateCategory">
@@ -95,7 +95,7 @@
 		<property name="description" column="description" />
 		<property name="loopCounter" column="loop_counter" />
 		<property name="executedBy" column="executedBy" />
-		<property name="executedByDelegate" column="executedByDelegate" />
+		<property name="executedBySubstitute" column="executedBySubstitute" />
 		<property name="deleted" column="deleted" />
 		<property name="stateExecuting" column="state_executing" />
 		<filter name="tenantFilter" />
@@ -181,6 +181,7 @@
 		</property>
 		<property name="state" column="state" />
 		<property name="executionOrder" column="executionOrder" />
+		<filter name="tenantFilter" />
 	</class>
 	
 	<class name="SConnectorInstanceWithFailureInfoImpl" table="connector_instance" polymorphism="explicit" >
@@ -204,6 +205,7 @@
 		<property name="executionOrder" column="executionOrder" />
 		<property name="exceptionMessage" column="exceptionMessage" />
 		<property name="stackTrace" column="stackTrace" type="text"/>
+		<filter name="tenantFilter" />
 	</class>
 
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" abstract="true" extends="SFlowNodeInstanceImpl" />

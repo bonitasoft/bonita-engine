@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -35,7 +34,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
@@ -43,7 +41,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -89,8 +86,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, user1);
         final ProcessInstance pi1 = getProcessAPI().startProcess(user1.getId(), processDefinition1.getId());
         assertEquals(user1.getId(), pi1.getStartedBy());
-
-        waitForStep("step1", pi1, TestStates.getReadyState());
+        assertEquals(-1, pi1.getStartedBySubstitute());
+        waitForUserTask("step1", pi1);
 
         // create process2
         final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", PROCESS_VERSION,
@@ -98,8 +95,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, ACTOR_NAME, user1);
         final ProcessInstance pi2 = getProcessAPI().startProcess(user1.getId(), processDefinition2.getId());
         assertEquals(user1.getId(), pi2.getStartedBy());
-
-        waitForStep("step1", pi2, TestStates.getReadyState());
+        assertEquals(-1, pi2.getStartedBySubstitute());
+        waitForUserTask("step1", pi2);
 
         final SearchOptions searchOptions = new SearchOptionsImpl(0, 5);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId1, searchOptions);
@@ -545,94 +542,6 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
     }
 
     @Test
-    public void searchUncategorizedProcessDefinitionsSupervisedBy() throws Exception {
-        // create user
-        final String username = "Bole";
-        final String password = "bpm";
-        final User bole = createUser(username, password);
-        loginWith(username, password);
-
-        // create process1
-        final String processName1 = "processDefinition1";
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName1, "1.1",
-                Arrays.asList("step1_1", "step1_2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, bole);
-
-        // create process2
-        final String processName2 = "processDefinition2";
-        final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName2, "1.2",
-                Arrays.asList("step2_1", "step2_2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, ACTOR_NAME, bole);
-
-        // create process3
-        final String processName3 = "processDefinition3";
-        final DesignProcessDefinition designProcessDefinition3 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName3, "1.2",
-                Arrays.asList("step2_1", "step2_2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, ACTOR_NAME, bole);
-
-        // create supervisor
-        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), bole.getId());
-        final ProcessSupervisor supervisor2 = getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), bole.getId());
-
-        // add categories to processDefinition1
-        final ArrayList<Long> categoryIds = new ArrayList<Long>();
-        final Category c1 = getProcessAPI().createCategory("category1", "categoryDescription1");
-        final Category c2 = getProcessAPI().createCategory("category2", "categoryDescription2");
-        final Category c3 = getProcessAPI().createCategory("category3", "categoryDescription3");
-        categoryIds.add(c1.getId());
-        categoryIds.add(c2.getId());
-        categoryIds.add(c3.getId());
-        getProcessAPI().addCategoriesToProcess(processDefinition1.getId(), categoryIds);
-        categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinition1.getId(), 0, 10, CategoryCriterion.NAME_ASC);
-        assertTrue(!categories.isEmpty());
-
-        // Get all process definitions:
-        SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 5);
-        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
-        SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
-        assertEquals(3, searchRes0.getCount());
-
-        // Get all process definitions with no category associated, supervised by user:
-        optsBuilder = new SearchOptionsBuilder(0, 5);
-        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
-        searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfosSupervisedBy(bole.getId(), optsBuilder.done());
-        assertEquals(1, searchRes0.getCount());
-        assertEquals(processDefinition2.getId(), searchRes0.getResult().get(0).getProcessId());
-        assertEquals("processDefinition2", searchRes0.getResult().get(0).getName());
-
-        // add supervisor by role and group
-        final User supervisor = createUser("supervisor", "bpm");
-        final Map<String, Object> map = createSupervisorByRoleAndGroup(processDefinition2.getId(), supervisor.getId());
-        final ProcessSupervisor supervisorByRole = (ProcessSupervisor) map.get("supervisorByRole");
-        final ProcessSupervisor supervisorByGroup = (ProcessSupervisor) map.get("supervisorByGroup");
-        final Role role = (Role) map.get("roleId");
-        final Group group = (Group) map.get("groupId");
-        final UserMembership membership = (UserMembership) map.get("membership");
-        assertEquals(supervisorByRole.getRoleId(), role.getId());
-        assertEquals(supervisorByGroup.getGroupId(), group.getId());
-        assertEquals(membership.getUserId(), supervisor.getId());
-        assertEquals(membership.getRoleId(), role.getId());
-        assertEquals(membership.getGroupId(), group.getId());
-
-        optsBuilder = new SearchOptionsBuilder(0, 5);
-        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
-        searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfosSupervisedBy(supervisor.getId(), optsBuilder.done());
-        assertEquals(1, searchRes0.getCount());
-        assertEquals(processDefinition2.getId(), searchRes0.getResult().get(0).getProcessId());
-        assertEquals("processDefinition2", searchRes0.getResult().get(0).getName());
-
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
-        disableAndDeleteProcess(processDefinition3);
-        deleteSupervisor(supervisor1.getSupervisorId());
-        deleteSupervisor(supervisor2.getSupervisorId());
-        deleteRoleGroupSupervisor(map, supervisor.getId());
-        deleteUser(supervisor);
-        deleteCategories(categories);
-        deleteUser(bole);
-    }
-
-    @Test
     public void searchUncategorizedProcessDefinitionsUserCanStartFromGroup() throws Exception {
         beforeSearchUncategorizedProcessDefinitionsUserCanStart(true);
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
@@ -790,7 +699,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition4 = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition4).done());
-        addMappingOfActorsForUser(actor2, users.get(1).getId(), processDefinition4);
+        getProcessAPI().addUserToActor(actor2, processDefinition4, users.get(1).getId());
         processDefinitions.add(processDefinition4);
 
         // process without actor initiator

@@ -18,7 +18,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
-import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 
@@ -51,7 +50,7 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
     }
 
     @Override
-    public void setSessionContext(final SessionContext ctx) throws EJBException {
+    public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
     }
 

@@ -54,16 +54,19 @@ public class SetServiceState implements Callable<Void>, Serializable {
             final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
             final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
 
+            // refresh the tenant classloader:
+            tenantServiceAccessor.getDependencyService().refreshClassLoader(ScopeType.TENANT, tenantId);
+
             // Set the right classloader:
             final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
-            ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
+            final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
             Thread.currentThread().setContextClassLoader(serverClassLoader);
 
             final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             for (final TenantLifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, serviceStrategy.getStateName() + "ing tenant-level service "
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, serviceStrategy.getStateName() + " tenant-level service "
                             + tenantService.getClass().getName() + " on tenant with ID " + tenantId);
                 }
                 try {
