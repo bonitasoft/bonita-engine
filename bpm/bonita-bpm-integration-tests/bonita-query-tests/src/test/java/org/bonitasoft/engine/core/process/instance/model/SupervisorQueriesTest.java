@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.*;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
 import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
+import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.repository.SupervisorRepository;
@@ -53,7 +54,9 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_user() {
-        repository.add(aUser().withId(userId).build());
+        SUserImpl user = aUser().withId(userId).build();
+        user.setTenantId(tenantId);
+        repository.add(user);
         final SRoleImpl sRole = new SRoleImpl();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
@@ -65,14 +68,16 @@ public class SupervisorQueriesTest {
         final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, userId, -1, -1));
         repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_group() {
-        repository.add(aUser().withId(userId).build());
+        SUserImpl user = aUser().withId(userId).build();
+        user.setTenantId(tenantId);
+        repository.add(user);
         final SRoleImpl sRole = new SRoleImpl();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
@@ -84,14 +89,16 @@ public class SupervisorQueriesTest {
         final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, groupId, 0));
         repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_role() {
-        repository.add(aUser().withId(userId).build());
+        SUserImpl user = aUser().withId(userId).build();
+        user.setTenantId(tenantId);
+        repository.add(user);
         final SRoleImpl sRole = new SRoleImpl();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
@@ -103,14 +110,16 @@ public class SupervisorQueriesTest {
         final SProcessSupervisor expectedSProcessSupervisor = repository.add(new SProcessSupervisorImpl(supervisorId, tenantId, processDefId, 0, 0, roleId));
         repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_group_and_role() {
-        repository.add(aUser().withId(userId).build());
+        SUserImpl user = aUser().withId(userId).build();
+        user.setTenantId(tenantId);
+        repository.add(user);
         final SRoleImpl sRole = new SRoleImpl();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
@@ -123,7 +132,7 @@ public class SupervisorQueriesTest {
                 roleId));
         repository.add(new SProcessSupervisorImpl(2, tenantId, processDefId, userId, groupId, roleId));
 
-        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole();
+        final List<Long> sProcessSupervisors = repository.searchSProcessSupervisorWithSUserSGroupSRole(tenantId);
 
         assertThat(sProcessSupervisors).containsOnly(expectedSProcessSupervisor.getId());
     }

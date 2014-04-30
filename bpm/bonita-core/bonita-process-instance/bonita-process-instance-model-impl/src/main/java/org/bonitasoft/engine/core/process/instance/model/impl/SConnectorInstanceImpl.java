@@ -119,4 +119,9 @@ public class SConnectorInstanceImpl extends SNamedElementImpl implements SConnec
         this.executionOrder = executionOrder;
     }
 
+    @Override
+    public String toString() {
+        return "SConnectorInstanceImpl#" + getId();
+    }
+
 }

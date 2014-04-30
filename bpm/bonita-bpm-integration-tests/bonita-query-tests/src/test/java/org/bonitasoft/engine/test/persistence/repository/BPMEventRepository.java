@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
-import static org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl.QUERY_RESET_IN_PROGRESS_WAITING_EVENTS;
+import static org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl.*;
 
 import java.util.List;
 
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
@@ -31,22 +32,26 @@ public class BPMEventRepository extends TestRepository {
 
     @SuppressWarnings("unchecked")
     public List<Long> getInProgressMessageInstances() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getInProgressMessageInstances");
         return namedQuery.list();
     }
 
     public int resetProgressMessageInstances() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("resetProgressMessageInstances");
         return namedQuery.executeUpdate();
     }
 
     @SuppressWarnings("unchecked")
     public List<Long> getInProgressWaitingEvents() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery("getInProgressWaitingEvents");
         return namedQuery.list();
     }
 
     public int resetInProgressWaitingEvents() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         Query namedQuery = getNamedQuery(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
         return namedQuery.executeUpdate();
     }

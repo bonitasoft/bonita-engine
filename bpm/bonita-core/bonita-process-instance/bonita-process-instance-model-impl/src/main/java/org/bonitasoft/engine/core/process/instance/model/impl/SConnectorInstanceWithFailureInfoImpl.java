@@ -44,4 +44,9 @@ public class SConnectorInstanceWithFailureInfoImpl extends SConnectorInstanceImp
         this.stackTrace = stackTrace;
     }
 
+    @Override
+    public String toString() {
+        return "SConnectorInstanceImplWithFailureInfoImpl#" + getId();
+    }
+
 }
