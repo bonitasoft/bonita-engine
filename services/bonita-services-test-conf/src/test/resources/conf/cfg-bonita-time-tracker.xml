@@ -7,7 +7,7 @@
         <constructor-arg name="startFlushThread" value="false" />
         <constructor-arg name="flushEventListeners">
             <list>
-<!--                 <bean id="csvFlushEventListener" ref="csvFlushEventListener" /> -->
+<!--                 <ref bean="csvFlushEventListener" /> -->
             </list>
         </constructor-arg>
         <constructor-arg name="maxSize" value="1000000" />
