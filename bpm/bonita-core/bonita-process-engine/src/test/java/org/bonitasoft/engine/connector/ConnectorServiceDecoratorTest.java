@@ -81,9 +81,10 @@ public class ConnectorServiceDecoratorTest {
         final Map<String, Object> toBeReturned = new HashMap<String, Object>(parameters);
         toBeReturned.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
         toBeReturned.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
-        doReturn(toBeReturned).when(connectorService).evaluateInputParameters(newParameters, sExpressionContext, inputValues);
+        doReturn(toBeReturned).when(connectorService).evaluateInputParameters("connectorId", newParameters, sExpressionContext, inputValues);
 
-        final Map<String, Object> evaluateInputParameters = connectorServiceDecorator.evaluateInputParameters(parameters, sExpressionContext, inputValues);
+        final Map<String, Object> evaluateInputParameters = connectorServiceDecorator.evaluateInputParameters("connectorId", parameters, sExpressionContext,
+                inputValues);
         assertEquals(toBeReturned, evaluateInputParameters);
     }
 

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +52,8 @@ public class ConnectorExecutorImplTest {
     @Before
     public void before() {
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
-        connectorExecutorImpl = new ConnectorExecutorImpl(0, 0, loggerService, 0, 0, sessionAccessor, sessionService);
+        final TimeTracker timeTracker = mock(TimeTracker.class);
+        connectorExecutorImpl = new ConnectorExecutorImpl(0, 0, loggerService, 0, 0, sessionAccessor, sessionService, timeTracker);
         connectorExecutorImpl.useExecutor(executorService);
     }
 

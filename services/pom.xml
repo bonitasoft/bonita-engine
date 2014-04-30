@@ -52,6 +52,7 @@
 		<module>bonita-builder</module>
 		<module>bonita-theme</module>
 		<module>bonita-page</module>
+		<module>bonita-time-tracker</module>
 	</modules>
 	
 	<profiles>

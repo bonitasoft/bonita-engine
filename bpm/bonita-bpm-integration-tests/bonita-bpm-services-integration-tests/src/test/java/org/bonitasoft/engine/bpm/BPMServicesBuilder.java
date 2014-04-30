@@ -102,6 +102,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
 import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
@@ -130,6 +131,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         // For this class only used by the tests, we do not matter of the parameter tenantId
         super();
         accessor = ServicesAccessor.getInstance();
+    }
+
+    @Override
+    public TimeTracker getTimeTracker() {
+        return getInstanceOf(TimeTracker.class);
     }
 
     @Override

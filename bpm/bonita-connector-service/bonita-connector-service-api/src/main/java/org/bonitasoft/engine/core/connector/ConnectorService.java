@@ -151,6 +151,7 @@ public interface ConnectorService {
             throws SConnectorException;
 
     /**
+     * @param @param parameters
      * @param parameters
      * @param sExpressionContext
      * @param inputValues
@@ -160,7 +161,7 @@ public interface ConnectorService {
      * @throws SExpressionDependencyMissingException
      * @throws SInvalidExpressionException
      */
-    Map<String, Object> evaluateInputParameters(Map<String, SExpression> parameters, SExpressionContext sExpressionContext,
+    Map<String, Object> evaluateInputParameters(String connectorId, Map<String, SExpression> parameters, SExpressionContext sExpressionContext,
             Map<String, Map<String, Serializable>> inputValues) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException;
 

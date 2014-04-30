@@ -87,7 +87,8 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public Map<String, Object> evaluateInputParameters(final Map<String, SExpression> parameters, final SExpressionContext sExpressionContext,
+    public Map<String, Object> evaluateInputParameters(final String connectorId, final Map<String, SExpression> parameters,
+            final SExpressionContext sExpressionContext,
             final Map<String, Map<String, Serializable>> inputValues) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         SExpression apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
@@ -95,7 +96,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
         final Map<String, SExpression> newParameters = new HashMap<String, SExpression>(parameters);
         newParameters.put("connectorApiAccessor", apiAccessorExpression);
         newParameters.put("engineExecutionContext", engineExecutionContext);
-        return connectorService.evaluateInputParameters(newParameters, sExpressionContext, inputValues);
+        return connectorService.evaluateInputParameters(connectorId, newParameters, sExpressionContext, inputValues);
     }
 
     @Override

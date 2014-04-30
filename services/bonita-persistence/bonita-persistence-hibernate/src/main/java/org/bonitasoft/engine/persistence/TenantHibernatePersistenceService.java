@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -50,8 +51,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
             final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource) throws SPersistenceException {
-        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource);
+            final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
+            ClassNotFoundException {
+        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
+                enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
     }
 
@@ -177,7 +180,9 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
-            final Query query = session.createQuery(getQueryString(entityClassName, filters));
+            final boolean enableWordSearch = isWordSearchEnabled(entityClass);
+
+            final Query query = session.createQuery(getQueryString(entityClassName, filters, enableWordSearch));
             query.setLong(TENANT_ID, getTenantId());
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -188,11 +193,13 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         }
     }
 
-    private String getQueryString(final String entityClassName, final List<FilterOption> filters) {
+    private String getQueryString(final String entityClassName, final List<FilterOption> filters, final boolean enableWordSearch) {
         if (filters == null || filters.isEmpty()) {
             return "DELETE FROM " + entityClassName + " WHERE tenantId= :tenantId";
+        } else {
+            return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId",
+                    filters, null, enableWordSearch);
         }
-        return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId",
-                filters, null);
     }
+
 }

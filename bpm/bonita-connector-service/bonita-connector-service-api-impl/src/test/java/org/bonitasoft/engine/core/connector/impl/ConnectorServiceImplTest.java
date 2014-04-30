@@ -44,6 +44,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.junit.Before;
@@ -74,14 +75,14 @@ public class ConnectorServiceImplTest {
     @Before
     public void setup() {
         parser = mock(Parser.class);
-        
+
         final ParserFactory parserFactory = mock(ParserFactory.class);
         when(parserFactory.createParser(anyList())).thenReturn(parser);
 
         final DependencyService dependencyService = mock(DependencyService.class);
 
         connectorService = new ConnectorServiceImpl(mock(CacheService.class), mock(ConnectorExecutor.class), parserFactory, mock(ReadSessionAccessor.class),
-                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null);
+                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null, mock(TimeTracker.class));
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)

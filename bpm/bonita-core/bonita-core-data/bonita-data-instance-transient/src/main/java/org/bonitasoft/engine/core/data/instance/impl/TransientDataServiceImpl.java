@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
@@ -33,9 +33,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class TransientDataServiceImpl implements TransientDataService {
 
@@ -43,17 +41,14 @@ public class TransientDataServiceImpl implements TransientDataService {
 
     private final CacheService cacheService;
 
-    /**
-     * 
-     */
     public TransientDataServiceImpl(final CacheService cacheService) {
         this.cacheService = cacheService;
     }
 
     @Override
     public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType) throws SDataInstanceException {
-        ArrayList<SDataInstance> data = new ArrayList<SDataInstance>(dataNames.size());
-        for (String dataName : dataNames) {
+        final ArrayList<SDataInstance> data = new ArrayList<SDataInstance>(dataNames.size());
+        for (final String dataName : dataNames) {
             data.add(getDataInstance(dataName, containerId, containerType));
         }
         return data;
@@ -109,7 +104,7 @@ public class TransientDataServiceImpl implements TransientDataService {
 
             for (final Map.Entry<String, Object> field : descriptor.getFields().entrySet()) {
                 try {
-                    final String setterName = "set" + StringUtil.firstCharToUpperCase(field.getKey());
+                    final String setterName = "set" + WordUtils.capitalize(field.getKey());
                     ClassReflector.invokeMethodByName(dataInstance, setterName, field.getValue());
                 } catch (final Exception e) {
                     throw new SUpdateDataInstanceException("Problem while updating entity: " + dataInstance + " with id: " + dataInstance.getId()

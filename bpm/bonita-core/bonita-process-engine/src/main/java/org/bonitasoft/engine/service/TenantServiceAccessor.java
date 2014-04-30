@@ -67,6 +67,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
@@ -211,5 +212,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     <T> T lookup(String serviceName);
 
     void destroy();
+
+    TimeTracker getTimeTracker();
 
 }
