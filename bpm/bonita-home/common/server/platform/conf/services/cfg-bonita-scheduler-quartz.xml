@@ -22,7 +22,7 @@
 	</bean>
 
 	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
@@ -52,7 +52,7 @@
 	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
 		<constructor-arg name="jobService" ref="jobService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />

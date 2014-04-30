@@ -26,28 +26,28 @@ public class SBonitaRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 7268935639620676043L;
 
-    private final Map<SContext, Serializable> context;
+    private final Map<SExceptionContext, Serializable> context;
 
     public SBonitaRuntimeException(final Throwable cause) {
         super(cause);
-        context = new TreeMap<SContext, Serializable>();
+        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     public SBonitaRuntimeException(final String message, final Throwable cause) {
         super(message, cause);
-        context = new TreeMap<SContext, Serializable>();
+        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     public SBonitaRuntimeException(final String message) {
         super(message);
-        context = new TreeMap<SContext, Serializable>();
+        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     /**
      * @return The context of the exception
      * @since 6.3
      */
-    public Map<SContext, Serializable> getContext() {
+    public Map<SExceptionContext, Serializable> getContext() {
         return context;
     }
 
@@ -57,7 +57,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setProcessDefinitionIdOnContext(final Long id) {
-        context.put(SContext.PROCESS_DEFINITION_ID, id);
+        context.put(SExceptionContext.PROCESS_DEFINITION_ID, id);
     }
 
     /**
@@ -66,7 +66,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setProcessDefinitionNameOnContext(final String name) {
-        context.put(SContext.PROCESS_NAME, name);
+        context.put(SExceptionContext.PROCESS_NAME, name);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setProcessDefinitionVersionOnContext(final String version) {
-        context.put(SContext.PROCESS_VERSION, version);
+        context.put(SExceptionContext.PROCESS_VERSION, version);
     }
 
     /**
@@ -84,7 +84,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setProcessInstanceIdOnContext(final Long id) {
-        context.put(SContext.PROCESS_INSTANCE_ID, id);
+        context.put(SExceptionContext.PROCESS_INSTANCE_ID, id);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setRootProcessInstanceIdOnContext(final Long id) {
-        context.put(SContext.ROOT_PROCESS_INSTANCE_ID, id);
+        context.put(SExceptionContext.ROOT_PROCESS_INSTANCE_ID, id);
     }
 
     /**
@@ -102,7 +102,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setConnectorDefinitionIdOnContext(final String id) {
-        context.put(SContext.CONNECTOR_DEFINITION_ID, id);
+        context.put(SExceptionContext.CONNECTOR_DEFINITION_ID, id);
     }
 
     /**
@@ -111,7 +111,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setConnectorDefinitionImplementationClassNameOnContext(final String name) {
-        context.put(SContext.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
+        context.put(SExceptionContext.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
     }
 
     /**
@@ -120,7 +120,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setConnectorDefinitionVersionOnContext(final String version) {
-        context.put(SContext.CONNECTOR_DEFINITION_VERSION, version);
+        context.put(SExceptionContext.CONNECTOR_DEFINITION_VERSION, version);
     }
 
     /**
@@ -129,7 +129,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setConnectorActivationEventOnContext(final String activationEvent) {
-        context.put(SContext.CONNECTOR_ACTIVATION_EVENT, activationEvent);
+        context.put(SExceptionContext.CONNECTOR_ACTIVATION_EVENT, activationEvent);
     }
 
     /**
@@ -138,7 +138,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setConnectorInstanceIdOnContext(final long id) {
-        context.put(SContext.CONNECTOR_INSTANCE_ID, id);
+        context.put(SExceptionContext.CONNECTOR_INSTANCE_ID, id);
     }
 
     /**
@@ -147,7 +147,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setFlowNodeDefinitionIdOnContext(final long id) {
-        context.put(SContext.FLOW_NODE_DEFINITION_ID, id);
+        context.put(SExceptionContext.FLOW_NODE_DEFINITION_ID, id);
     }
 
     /**
@@ -156,7 +156,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setFlowNodeInstanceIdOnContext(final long id) {
-        context.put(SContext.FLOW_NODE_INSTANCE_ID, id);
+        context.put(SExceptionContext.FLOW_NODE_INSTANCE_ID, id);
     }
 
     /**
@@ -165,7 +165,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setFlowNodeNameOnContext(final String name) {
-        context.put(SContext.FLOW_NODE_NAME, name);
+        context.put(SExceptionContext.FLOW_NODE_NAME, name);
     }
 
     /**
@@ -174,7 +174,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setMessageInstanceNameOnContext(final String name) {
-        context.put(SContext.MESSAGE_INSTANCE_NAME, name);
+        context.put(SExceptionContext.MESSAGE_INSTANCE_NAME, name);
     }
 
     /**
@@ -183,7 +183,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setMessageInstanceTargetProcessOnContext(final String name) {
-        context.put(SContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, name);
+        context.put(SExceptionContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, name);
     }
 
     /**
@@ -192,7 +192,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setMessageInstanceTargetFlowNodeOnContext(final String name) {
-        context.put(SContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, name);
+        context.put(SExceptionContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, name);
     }
 
     /**
@@ -201,7 +201,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setWaitingMessageEventTypeOnContext(final String eventType) {
-        context.put(SContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
+        context.put(SExceptionContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
     }
 
     /**
@@ -210,34 +210,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setUserIdOnContext(final long userId) {
-        context.put(SContext.USER_ID, userId);
-    }
-
-    /**
-     * @param threadId
-     *            The thread id to set
-     * @since 6.3
-     */
-    public void setThreadId(final long threadId) {
-        context.put(SContext.THREAD_ID, threadId);
-    }
-
-    /**
-     * @param hostname
-     *            The hostname to set
-     * @since 6.3
-     */
-    public void setHostname(final String hostname) {
-        context.put(SContext.HOSTNAME, hostname);
-    }
-
-    /**
-     * @param tenantId
-     *            The tenant id to set
-     * @since 6.3
-     */
-    public void setTenantID(final long tenantId) {
-        context.put(SContext.TENANT_ID, tenantId);
+        context.put(SExceptionContext.USER_ID, userId);
     }
 
     @Override
@@ -260,7 +233,7 @@ public class SBonitaRuntimeException extends RuntimeException {
 
     private void appendContextMessage(final StringBuilder stringBuilder) {
         if (!context.isEmpty()) {
-            for (final Entry<SContext, Serializable> entry : context.entrySet()) {
+            for (final Entry<SExceptionContext, Serializable> entry : context.entrySet()) {
                 stringBuilder.append(entry.getKey() + "=" + entry.getValue() + " | ");
             }
         }

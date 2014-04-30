@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SContext;
+import org.bonitasoft.engine.commons.exceptions.SExceptionContext;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -30,7 +30,7 @@ public class ReturnTypeCheckerTest {
             fail("Should have raised an exception");
         } catch (SExpressionEvaluationException e) {
             // then:
-            assertThat(e.getContext().get(SContext.FLOW_NODE_INSTANCE_ID)).isEqualTo(activityInstanceId);
+            assertThat(e.getContext().get(SExceptionContext.FLOW_NODE_INSTANCE_ID)).isEqualTo(activityInstanceId);
         }
     }
 
@@ -50,7 +50,7 @@ public class ReturnTypeCheckerTest {
             fail("Should have raised an exception");
         } catch (SExpressionEvaluationException e) {
             // then:
-            assertThat(e.getContext().get(SContext.PROCESS_INSTANCE_ID)).isEqualTo(processInstanceId);
+            assertThat(e.getContext().get(SExceptionContext.PROCESS_INSTANCE_ID)).isEqualTo(processInstanceId);
         }
     }
 }

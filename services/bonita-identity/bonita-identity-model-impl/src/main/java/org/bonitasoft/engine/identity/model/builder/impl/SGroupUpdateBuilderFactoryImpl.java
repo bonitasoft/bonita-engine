@@ -23,6 +23,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SGroupUpdateBuilderFactoryImpl implements SGroupUpdateBuilderFactory {
 
+    @Override
     public SGroupUpdateBuilder createNewInstance() {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SGroupUpdateBuilderImpl(descriptor);

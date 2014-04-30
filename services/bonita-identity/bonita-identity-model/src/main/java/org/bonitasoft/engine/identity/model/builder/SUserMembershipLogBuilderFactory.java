@@ -23,8 +23,9 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
  */
 public interface SUserMembershipLogBuilderFactory extends HasCRUDEActionFactory, SPersistenceLogBuilderFactory {
 
+    @Override
     SUserMembershipLogBuilder createNewInstance();
-    
+
     String getRoleNameKey();
 
     String getGroupPathKey();

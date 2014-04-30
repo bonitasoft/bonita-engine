@@ -1625,8 +1625,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
 
         try {
@@ -2403,17 +2401,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SPendingActivityMapping mapping = sPendingActivityMappingBuilderFactory.createNewInstanceForUser(humanTaskInstanceId, userId)
                 .done();
         activityInstanceService.addPendingActivityMappings(mapping);
-    }
-
-    private List<SPendingActivityMapping> getSPendingMappings(final long humanTaskInstanceId, final ActivityInstanceService activityInstanceService,
-            final Long userId) throws SActivityReadException {
-        final List<OrderByOption> options = Collections.singletonList(new OrderByOption(SPendingActivityMapping.class,
-                SPendingActivityMappingBuilderFactory.USER_ID, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilderFactory.USER_ID, userId));
-        filters.add(new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilderFactory.ACTIVITY_ID, humanTaskInstanceId));
-        final QueryOptions queryOptions = new QueryOptions(0, 1, options, filters, null);
-        return activityInstanceService.getPendingMappings(humanTaskInstanceId, queryOptions);
     }
 
     @Override
@@ -3532,7 +3519,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 public Void call() throws Exception {
                     processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
                     return null;
-                };
+                }
             });
         } catch (final SBonitaException e) {
             throw e;
@@ -5777,7 +5764,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, SearchOptions searchOptions) {
+    public SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();

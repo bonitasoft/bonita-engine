@@ -12,14 +12,14 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.commons.exceptions;
+package org.bonitasoft.engine.exception;
 
 /**
  * To define the context of an exception in the message.
  * 
  * @author Celine Souchet
  */
-public enum SContext {
+public enum ExceptionContext {
     /**
      * Corresponding to the identifier of the process definition
      */
@@ -100,18 +100,6 @@ public enum SContext {
      * Corresponding to the identifier of the role
      */
     ROLE_ID,
-    /**
-     * Corresponding to the identifier of the thread
-     */
-    THREAD_ID,
-    /**
-     * Corresponding to the hostname
-     */
-    HOSTNAME,
-    /**
-     * Corresponding to the identifier of the tenant
-     */
-    TENANT_ID,
     /**
      * Corresponding to the identifier of the document
      */

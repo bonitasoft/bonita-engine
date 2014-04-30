@@ -19,6 +19,7 @@ package org.bonitasoft.engine.identity.model.builder;
  */
 public interface SCustomUserInfoDefinitionUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
 
+    @Override
     SCustomUserInfoDefinitionUpdateBuilder createNewInstance();
-    
+
 }

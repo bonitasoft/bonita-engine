@@ -5,7 +5,7 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy">

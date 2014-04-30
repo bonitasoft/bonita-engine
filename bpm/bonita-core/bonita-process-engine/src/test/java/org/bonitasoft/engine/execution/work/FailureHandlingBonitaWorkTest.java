@@ -202,7 +202,7 @@ public class FailureHandlingBonitaWorkTest {
 
     @Test
     public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();;
+        final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
         when(wrappedWork.getDescription()).thenReturn("");

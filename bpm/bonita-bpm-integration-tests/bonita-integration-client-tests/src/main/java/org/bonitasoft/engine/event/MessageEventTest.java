@@ -319,7 +319,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
+        forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -339,7 +339,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
+        forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -359,6 +359,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -382,6 +383,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -398,6 +400,8 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         disableAndDeleteProcess(receiveMessageProcess);
@@ -442,7 +446,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-
+        forceMatchingOfEvents();
         assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId()));
         waitForEventInWaitingState(receiveMessageProcessInstance2, CATCH_EVENT_NAME);
 
@@ -484,6 +488,7 @@ public class MessageEventTest extends CommonAPITest {
         // instantiate a process containing whom the targetProcess is of the ProcessDefinition receiveMessageProcess
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        forceMatchingOfEvents();
 
         final HumanTaskInstance waitForUserTask = waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
@@ -530,6 +535,7 @@ public class MessageEventTest extends CommonAPITest {
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        forceMatchingOfEvents();
 
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
         // waitForStep(100, 5000, "userTask1", receiveMessageProcessInstance1);
@@ -568,8 +574,9 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-        // 7 sec because it's an assert false
-        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, 7000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
+        forceMatchingOfEvents();
+        // 1 sec because it's an assert false and we forced matching of event
+        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, 500, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
 
         // instantiate a process having both two correlation keys matching, the process must go further
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(
@@ -577,6 +584,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance2));
+        forceMatchingOfEvents();
         waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -648,6 +656,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -679,7 +688,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
+        forceMatchingOfEvents();
         checkNbPendingTaskOf(2, user);
 
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
@@ -712,6 +721,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        forceMatchingOfEvents();
 
         // at the first test some time the cron job time some time before executing
         final HumanTaskInstance userTask = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
@@ -754,7 +764,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
+        forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
@@ -782,6 +792,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        forceMatchingOfEvents();
         waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -851,6 +862,7 @@ public class MessageEventTest extends CommonAPITest {
         final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance);
         waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, CATCH_EVENT_NAME);
         assignAndExecuteStep(step2.getId(), user.getId());
+        forceMatchingOfEvents();
         waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendAndReceiveMessageProcess);
@@ -877,6 +889,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess1);
@@ -897,7 +910,8 @@ public class MessageEventTest extends CommonAPITest {
 
         final long processInstanceId = processInstance.getId();
         getProcessAPI().deleteProcessInstance(processInstanceId);
-        assertThat(new WaitForEvent(50, 5000, CATCH_EVENT_NAME, processInstanceId, getProcessAPI()).waitUntil(), is(false));
+        forceMatchingOfEvents();
+        assertThat(new WaitForEvent(50, 1000, CATCH_EVENT_NAME, processInstanceId, getProcessAPI()).waitUntil(), is(false));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -909,7 +923,7 @@ public class MessageEventTest extends CommonAPITest {
 
         // send message
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null);
-
+        forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(receiveMessageProcess);
@@ -942,7 +956,7 @@ public class MessageEventTest extends CommonAPITest {
 
         // send message
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null);
-
+        forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(receiveMessageProcess);
@@ -963,7 +977,7 @@ public class MessageEventTest extends CommonAPITest {
         checkUserHasNoPendingTasks();
 
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.singletonMap(lastNameDisplay, lastNameValue));
-
+        forceMatchingOfEvents();
         // at the first test some time the cron job time some time before executing
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 11 * 1000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -984,9 +998,11 @@ public class MessageEventTest extends CommonAPITest {
     public void sendMessageTwiceTriggersTwoStartMessageEvents() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
+        forceMatchingOfEvents();
         ActivityInstance taskFirstProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
+        forceMatchingOfEvents();
         ActivityInstance taskSecondProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
         assertNotEquals(taskFirstProcInst.getId(), taskSecondProcInst.getId());
         assertNotEquals(taskFirstProcInst.getParentProcessInstanceId(), taskSecondProcInst.getParentProcessInstanceId());
@@ -1030,10 +1046,12 @@ public class MessageEventTest extends CommonAPITest {
 
         // send a message having only one correlation key matching, the process must not go further
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations1);
-        assertFalse(new WaitForStep(50, 10000, "userTask1", receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
+        forceMatchingOfEvents();
+        assertFalse(new WaitForStep(50, 1000, "userTask1", receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
 
         // send a message having both two correlations keys matching, the process must go further
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations2);
+        forceMatchingOfEvents();
         waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(receiveMessageProcess);
@@ -1060,7 +1078,7 @@ public class MessageEventTest extends CommonAPITest {
         final Expression lastNameDisplay = new ExpressionBuilder().createConstantStringExpression("lName");
         final Expression lastNameValue = new ExpressionBuilder().createConstantStringExpression("Doe");
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.singletonMap(lastNameDisplay, lastNameValue));
-
+        forceMatchingOfEvents();
         waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());

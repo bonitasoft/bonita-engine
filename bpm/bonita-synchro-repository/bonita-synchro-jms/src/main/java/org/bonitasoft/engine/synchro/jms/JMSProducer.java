@@ -80,12 +80,11 @@ public class JMSProducer {
         final MapMessage message = session.createMapMessage();
 
         for (final Map.Entry<String, Serializable> property : properties.entrySet()) {
-            message.setObjectProperty(property.getKey(), property.getValue());;
+            message.setObjectProperty(property.getKey(), property.getValue());
         }
         message.setString("body-id", bodyId);
         message.setJMSExpiration(System.currentTimeMillis() + timeout);
 
         producer.send(message);
-        // System.err.println("Message sent= " + message);
     }
 }

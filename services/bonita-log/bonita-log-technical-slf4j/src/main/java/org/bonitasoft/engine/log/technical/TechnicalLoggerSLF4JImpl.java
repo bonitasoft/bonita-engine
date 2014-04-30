@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.log.technical;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
@@ -37,8 +40,23 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
     private final Map<Class<?>, Logger> classLoggers = new HashMap<Class<?>, Logger>();
 
+    private String hostname = null;
+
+    private final long tenantId;
+
     public TechnicalLoggerSLF4JImpl() {
+        this(-1);
+    }
+
+    public TechnicalLoggerSLF4JImpl(final long tenantId) {
         super();
+
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+        }
+
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -49,50 +67,52 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
     @Override
     public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
         final Logger logger = getLogger(callerClass);
+        final String loggedMessage = getContextMessage() + message;
         switch (severity) {
             case TRACE:
-                logger.trace(message);
+                logger.trace(loggedMessage);
                 break;
             case DEBUG:
-                logger.debug(message);
+                logger.debug(loggedMessage);
                 break;
             case INFO:
-                logger.info(message);
+                logger.info(loggedMessage);
                 break;
             case WARNING:
-                logger.warn(message);
+                logger.warn(loggedMessage);
                 break;
             case ERROR:
-                logger.error(message);
+                logger.error(loggedMessage);
                 break;
             default:
                 logger.error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
-                logger.error(message);
+                logger.error(loggedMessage);
                 break;
         }
     }
 
     @Override
     public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
+        final String loggedMessage = getContextMessage() + message;
         switch (severity) {
             case TRACE:
-                getLogger(callerClass).trace(message, t);
+                getLogger(callerClass).trace(loggedMessage, t);
                 break;
             case DEBUG:
-                getLogger(callerClass).debug(message, t);
+                getLogger(callerClass).debug(loggedMessage, t);
                 break;
             case INFO:
-                getLogger(callerClass).info(message, t);
+                getLogger(callerClass).info(loggedMessage, t);
                 break;
             case WARNING:
-                getLogger(callerClass).warn(message, t);
+                getLogger(callerClass).warn(loggedMessage, t);
                 break;
             case ERROR:
-                getLogger(callerClass).error(message, t);
+                getLogger(callerClass).error(loggedMessage, t);
                 break;
             default:
                 getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
-                getLogger(callerClass).error(message);
+                getLogger(callerClass).error(loggedMessage);
                 break;
         }
     }
@@ -160,5 +180,28 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
         }
         return logger;
     }
+
+    private String getContextMessage() {
+        return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage();
+        // return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage();
+    }
+
+    private String getThreadIdMessage() {
+        final long threadId = Thread.currentThread().getId();
+        return "THREAD_ID=" + threadId + " | ";
+    }
+
+    private String getHostNameMessage() {
+        return hostname != null && !hostname.isEmpty() ? "HOSTNAME=" + hostname + " | " : "";
+    }
+
+    private String getTenantIdMessage() {
+        return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
+    }
+
+    // private String getUserNameMessage() {
+    // return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
+    // }
+    //
 
 }

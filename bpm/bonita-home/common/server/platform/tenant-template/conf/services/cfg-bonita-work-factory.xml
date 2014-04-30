@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="tenantId" value="${tenantId}" />
 		<constructor-arg name="corePoolSize" value="25" />
 		<constructor-arg name="maximumPoolSize" value="25" />

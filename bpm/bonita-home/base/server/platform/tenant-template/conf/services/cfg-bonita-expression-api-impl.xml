@@ -3,7 +3,7 @@
 
 	<bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
 		<constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="checkExpressionReturnType" value="true" />
 	</bean>
 
@@ -31,7 +31,7 @@
 	<bean id="groovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy" >
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="inputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />

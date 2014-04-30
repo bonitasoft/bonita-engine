@@ -19,6 +19,7 @@ package org.bonitasoft.engine.identity.model.builder;
  */
 public interface SGroupUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
 
+    @Override
     SGroupUpdateBuilder createNewInstance();
-    
+
 }

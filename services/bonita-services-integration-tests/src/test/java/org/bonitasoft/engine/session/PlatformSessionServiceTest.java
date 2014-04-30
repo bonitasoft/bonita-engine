@@ -58,7 +58,7 @@ public class PlatformSessionServiceTest {
         @Override
         public void failed(final Throwable e, final Description d) {
             LOGGER.info("Failed test: " + this.getClass().getName() + "." + d.getMethodName());
-        };
+        }
 
         @Override
         public void succeeded(final Description d) {

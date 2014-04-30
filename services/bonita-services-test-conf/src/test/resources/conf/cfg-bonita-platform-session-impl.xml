@@ -3,7 +3,7 @@
 
 	<bean id="platformSessionService" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionServiceImpl">
 		<constructor-arg name="platformSessionProvider" ref="platformSessionProvider" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>

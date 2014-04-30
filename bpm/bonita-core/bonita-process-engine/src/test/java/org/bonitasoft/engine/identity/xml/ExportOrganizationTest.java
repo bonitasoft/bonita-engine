@@ -33,11 +33,11 @@ public class ExportOrganizationTest {
 
     class QueryOptionsMatcher extends ArgumentMatcher<QueryOptions> {
 
-        private int fromIndex;
+        private final int fromIndex;
 
-        private int masResults;
+        private final int masResults;
 
-        private long userId;
+        private final long userId;
 
         public QueryOptionsMatcher(long userId, int fromIndex, int masResults) {
             this.userId = userId;
@@ -96,7 +96,7 @@ public class ExportOrganizationTest {
     private ExportOrganization exportOrganization;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         exportOrganization = new ExportOrganization(xmlWriter, identityService, MAX_RESULTS);
         given(userInfoVal1.getDefinitionId()).willReturn(USER_INFO_DEF1_ID);
         given(userInfoVal1.getValue()).willReturn(SKILLS_VALUE);
@@ -128,18 +128,18 @@ public class ExportOrganizationTest {
         // then
         assertThat(allCustomUserInfoValues).isEqualTo(Arrays.asList(userInfoVal1, userInfoVal2, userInfoVal3));
     }
-    
+
     @Test
     public void addCustomUserInfoValues_should_call_addCustomUserInfoValue_on_builder_for_all_elements() throws Exception {
-        //given
+        // given
         given(identityService.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(USER_ID, 0, MAX_RESULTS)))).willReturn(
                 Arrays.asList(userInfoVal1));
         ExportedUserBuilder clientUserbuilder = mock(ExportedUserBuilder.class);
-        
-        //when
+
+        // when
         exportOrganization.addCustomUserInfoValues(USER_ID, clientUserbuilder, Collections.singletonMap(USER_INFO_DEF1_ID, SKILSS_NAME));
 
-        //then
+        // then
         verify(clientUserbuilder, times(1)).addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
         verify(clientUserbuilder, times(1)).addCustomUserInfoValue(new ExportedCustomUserInfoValue(SKILSS_NAME, SKILLS_VALUE));
     }

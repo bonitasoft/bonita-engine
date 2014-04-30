@@ -54,7 +54,7 @@ public class CustomUserInfoDefinitionAPITest {
     private CustomUserInfoDefinitionAPI api;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         api = new CustomUserInfoDefinitionAPI(service);
     }
 
@@ -67,20 +67,20 @@ public class CustomUserInfoDefinitionAPITest {
 
         assertThat(definition.getId()).isEqualTo(1L);
     }
-    
+
     @Test
     public void create_should_throws_AlreadyExistException_when_service_throws_SCustomUserInfoDefinitionAlreadyExistsException() throws Exception {
-        //given
+        // given
         String name = "skill";
         SCustomUserInfoDefinitionAlreadyExistsException serverException = new SCustomUserInfoDefinitionAlreadyExistsException(name);
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class))).willThrow(serverException);
-        
+
         try {
-        //when
+            // when
             api.create(factory, new CustomUserInfoDefinitionCreator(name));
             fail("Expected AlreadyExistsException");
         } catch (AlreadyExistsException e) {
-            //then
+            // then
             assertThat(e.getMessage()).isEqualTo("A custom user info definition already exists with name '" + name + "'");
         }
     }
@@ -92,30 +92,30 @@ public class CustomUserInfoDefinitionAPITest {
     }
 
     @Test
-    public void create_should_throws_CreationException_if_name_is_empty() throws Exception {
-        //given
+    public void create_should_throws_CreationException_if_name_is_empty() {
+        // given
         String name = "";
-        
+
         try {
-            //when
+            // when
             api.create(factory, new CustomUserInfoDefinitionCreator(name));
             fail("Expected CreationException");
         } catch (CreationException e) {
-            //then
+            // then
             assertThat(e.getMessage()).isEqualTo("The definition name cannot be null or empty.");
         }
     }
 
     @Test
-    public void create_should_throws_CreationException_if_name_is_longer_then_75() throws Exception {
-        //given
+    public void create_should_throws_CreationException_if_name_is_longer_then_75() {
+        // given
         String name = "123456789:123456789:123456789:123456789:123456789:123456789:123456789:123456";
         try {
-            //when
+            // when
             api.create(factory, new CustomUserInfoDefinitionCreator(name));
             fail("Expected CreationException");
         } catch (CreationException e) {
-            //then
+            // then
             assertThat(e.getMessage()).isEqualTo("The definition name cannot be longer then 75 characters.");
         }
     }
@@ -139,10 +139,10 @@ public class CustomUserInfoDefinitionAPITest {
     public void list_call_service_to_retrieve_items_and_return_empty_list_when_service_returns_empty_list() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
                 Collections.<SCustomUserInfoDefinition> emptyList());
-        
+
         List<CustomUserInfoDefinition> definitions = api.list(0, 3);
-        
-        assertThat(definitions).isEmpty();;
+
+        assertThat(definitions).isEmpty();
     }
 
     @Test

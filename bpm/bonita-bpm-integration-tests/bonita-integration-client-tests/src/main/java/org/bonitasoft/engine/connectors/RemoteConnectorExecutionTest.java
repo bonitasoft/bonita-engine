@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -82,7 +80,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Ignore;
@@ -155,7 +152,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
-        
+
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, designProcessDefinition, false);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
@@ -1085,54 +1082,13 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(calledProcess);
     }
 
-    @Test
-    @Cover(classes = {}, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode", "connector" }, story = "elements must be restarted when connectors were not completed when the node was shut down")
-    public void restartElementsWithConnector() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTransition", "1.0");
-        builder.addActor(ACTOR_NAME);
-        builder.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("default"));
-        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
-        taskDefinitionBuilder
-                .addConnector("myConnector1", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
-                .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        taskDefinitionBuilder.addConnector("wait1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(1000));
-        taskDefinitionBuilder.addConnector("wait2", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(500));
-        taskDefinitionBuilder
-                .addConnector("myConnector2", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
-                .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addUserTask("step2", ACTOR_NAME);
-        builder.addTransition("step1", "step2");
-        // start check value1,stop, check still value1, start, check value 2, check step2 is active
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUser, builder, false);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, johnUser);
-        waitForDataValue(processInstance, "data", "value1");
-        logout();
-        final PlatformSession loginPlatform = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.stopNode();
-        platformAPI.startNode();
-        logoutPlatform(loginPlatform);
-        login();
-        // connector restarted
-        waitForDataValue(processInstance, "data", "value2");
-
-        disableAndDeleteProcess(processDefinition.getId());
-    }
-   
     @Cover(classes = ConnectorInstance.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Search" }, story = "Search connector instances", jira = "")
     @Test
     public void searchConnectorInstances() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("searchConnector", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
         designProcessDefinition.addConnector("onEnterConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME,
-                new ExpressionBuilder().createConstantStringExpression("test"));;
+                new ExpressionBuilder().createConstantStringExpression("test"));
         designProcessDefinition.addConnector("onFinishConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH).addInput(CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createConstantStringExpression("test"));
 

@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="timeTracker" class="org.bonitasoft.engine.tracking.TimeTracker">
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="startFlushThread" value="false" />
         <constructor-arg name="flushEventListeners">
             <list>
@@ -27,7 +27,7 @@
 
     <bean id="csvFlushEventListener"
         class="org.bonitasoft.engine.tracking.csv.CSVFlushEventListener">
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="outputFolder" value="/tmp" />
         <constructor-arg name="csvSeparator" value=";" />
     </bean>

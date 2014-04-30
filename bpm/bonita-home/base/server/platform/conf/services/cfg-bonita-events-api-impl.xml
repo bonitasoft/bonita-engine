@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="eventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>

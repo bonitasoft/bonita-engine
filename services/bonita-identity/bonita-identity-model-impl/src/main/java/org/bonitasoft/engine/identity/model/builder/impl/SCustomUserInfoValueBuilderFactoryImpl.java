@@ -38,6 +38,7 @@ public class SCustomUserInfoValueBuilderFactoryImpl implements SCustomUserInfoVa
         return new SCustomUserInfoValueBuilderImpl(entity);
     }
 
+    @Override
     public String getIdKey() {
         return ID;
     }

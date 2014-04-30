@@ -55,15 +55,14 @@ public abstract class WaitUntil {
     protected boolean checkCondition() throws Exception {
         if (throwExceptions) {
             return check();
-        } else {
-            try {
-                return check();
-            } catch (final Exception e) {
-                // do nothing
-            }
-            return false;
         }
-    };
+        try {
+            return check();
+        } catch (final Exception e) {
+            // do nothing
+        }
+        return false;
+    }
 
     /**
      * Condition to check for.

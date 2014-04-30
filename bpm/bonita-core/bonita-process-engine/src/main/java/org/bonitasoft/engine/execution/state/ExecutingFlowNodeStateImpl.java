@@ -26,8 +26,11 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  */
 public class ExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
 
+    private StateBehaviors stateBehaviors;
+
     public ExecutingFlowNodeStateImpl(final StateBehaviors stateBehaviors) {
         super(stateBehaviors, false, true);
+        this.stateBehaviors = stateBehaviors;
     }
 
     /**
@@ -99,7 +102,8 @@ public class ExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
     }
 
     @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+        stateBehaviors.updateDisplayDescriptionAfterCompletion(processDefinition, flowNodeInstance);
     }
 
 }

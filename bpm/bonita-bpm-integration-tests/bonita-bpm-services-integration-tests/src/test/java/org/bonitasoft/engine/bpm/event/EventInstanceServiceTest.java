@@ -109,12 +109,14 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex,
             final int maxResult) throws Exception {
-        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC);
+        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(),
+                OrderByType.ASC);
     }
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex, final int maxResult, final String fieldName,
             final OrderByType orderByType) throws Exception {
         return userTransactionService.executeInTransaction(new Callable<List<SEventInstance>>() {
+
             @Override
             public List<SEventInstance> call() throws Exception {
                 return eventInstanceService.getEventInstances(processInstanceId, fromIndex, maxResult, fieldName, orderByType);
@@ -124,6 +126,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private SEventInstance getEventInstance(final long eventId) throws Exception {
         return userTransactionService.executeInTransaction(new Callable<SEventInstance>() {
+
             @Override
             public SEventInstance call() throws Exception {
                 return eventInstanceService.getEventInstance(eventId);
@@ -133,6 +136,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private List<SBoundaryEventInstance> getActiviyBoundaryEventInstances(final long activityId) throws Exception {
         return userTransactionService.executeInTransaction(new Callable<List<SBoundaryEventInstance>>() {
+
             @Override
             public List<SBoundaryEventInstance> call() throws Exception {
                 return eventInstanceService.getActivityBoundaryEventInstances(activityId);
@@ -154,34 +158,41 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         assertEquals(expectedTriggerInstance.getEventInstanceId(), retrievedEventTriggerInstance.getEventInstanceId());
     }
 
-    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue) throws Exception {
-        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class).createNewTimerEventTriggerInstance(eventInstanceId, timerType,
-                timerValue).done();
+    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue)
+            throws Exception {
+        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
+                .createNewTimerEventTriggerInstance(eventInstanceId, timerType,
+                        timerValue).done();
         createEventTriggerInstance(triggerInstance);
         return triggerInstance;
     }
 
-    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName, final String targetProcess, final String targetFlowNode) throws Exception {
-        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, messageName, targetProcess,
-                targetFlowNode).done();
+    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName,
+            final String targetProcess, final String targetFlowNode) throws Exception {
+        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
+                .createNewInstance(eventInstanceId, messageName, targetProcess,
+                        targetFlowNode).done();
         createEventTriggerInstance(messageTrigger);
         return messageTrigger;
     }
 
     private SThrowSignalEventTriggerInstance createThrowSignalEventTriggerInstance(final long eventInstanceId, final String signalName) throws Exception {
-        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, signalName).done();
+        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
+                .createNewInstance(eventInstanceId, signalName).done();
         createEventTriggerInstance(signalTrigger);
         return signalTrigger;
     }
 
     private SThrowErrorEventTriggerInstance createThrowErrorEventTriggerInstance(final long eventInstanceId, final String errorCode) throws Exception {
-        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, errorCode).done();
+        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class)
+                .createNewInstance(eventInstanceId, errorCode).done();
         createEventTriggerInstance(errorTriggerInstance);
         return errorTriggerInstance;
     }
 
     private void createEventTriggerInstance(final SEventTriggerInstance triggerInstance) throws Exception {
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 eventInstanceService.createEventTriggerInstance(triggerInstance);
@@ -192,6 +203,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private void createWaitingEvent(final SWaitingEvent waitingEvent) throws Exception {
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 eventInstanceService.createWaitingEvent(waitingEvent);
@@ -203,8 +215,11 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     private SEventInstance createBoundaryEventInstance(final String eventName,
             final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId,
             final long activityInstanceId, final boolean isInterrupting) throws SBonitaException {
-        final SEventInstance eventInstance = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class).createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
-                rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId).done();
+        final SEventInstance eventInstance = BuilderFactory
+                .get(SBoundaryEventInstanceBuilderFactory.class)
+                .createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
+                        rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId)
+                .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -426,16 +441,18 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults) throws Exception {
         return userTransactionService.executeInTransaction(new Callable<List<SEventTriggerInstance>>() {
+
             @Override
             public List<SEventTriggerInstance> call() throws Exception {
                 return eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
                         BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
-            };
+            }
         });
     }
 
     private <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> clazz, final QueryOptions searchOptions) throws Exception {
         return transactionService.executeInTransaction(new Callable<List<T>>() {
+
             @Override
             public List<T> call() throws Exception {
                 return eventInstanceService.searchWaitingEvents(clazz, searchOptions);
@@ -445,6 +462,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> clazz, final QueryOptions countOptions) throws Exception {
         return transactionService.executeInTransaction(new Callable<Long>() {
+
             @Override
             public Long call() throws Exception {
                 return eventInstanceService.getNumberOfWaitingEvents(clazz, countOptions);
@@ -454,6 +472,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private <T extends SEventTriggerInstance> List<T> searchEventTrigger(final Class<T> clazz, final QueryOptions searchOptions) throws Exception {
         return transactionService.executeInTransaction(new Callable<List<T>>() {
+
             @Override
             public List<T> call() throws Exception {
                 return eventInstanceService.searchEventTriggerInstances(clazz, searchOptions);
@@ -463,6 +482,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> clazz, final QueryOptions countOptions) throws Exception {
         return transactionService.executeInTransaction(new Callable<Long>() {
+
             @Override
             public Long call() throws Exception {
                 return eventInstanceService.getNumberOfEventTriggerInstances(clazz, countOptions);
@@ -485,6 +505,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private SEventTriggerInstance getEventTrigger(final long triggerEventInstanceId) throws Exception {
         return transactionService.executeInTransaction(new Callable<SEventTriggerInstance>() {
+
             @Override
             public SEventTriggerInstance call() throws Exception {
                 return eventInstanceService.getEventTriggerInstance(triggerEventInstanceId);
@@ -495,6 +516,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     private List<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final int fromIndex, final int maxResults, final String fieldName,
             final OrderByType orderByType) throws Exception {
         return transactionService.executeInTransaction(new Callable<List<SEventTriggerInstance>>() {
+
             @Override
             public List<SEventTriggerInstance> call() throws Exception {
                 return eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,

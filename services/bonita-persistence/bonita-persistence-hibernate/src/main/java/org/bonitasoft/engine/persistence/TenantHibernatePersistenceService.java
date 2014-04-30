@@ -53,8 +53,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
             final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
             ClassNotFoundException {
-        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter,
-                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
+        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
+                enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
     }
 
@@ -180,7 +180,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
-            final boolean enableWordSearch = this.isWordSearchEnabled(entityClass);
+            final boolean enableWordSearch = isWordSearchEnabled(entityClass);
 
             final Query query = session.createQuery(getQueryString(entityClassName, filters, enableWordSearch));
             query.setLong(TENANT_ID, getTenantId());
@@ -198,8 +198,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             return "DELETE FROM " + entityClassName + " WHERE tenantId= :tenantId";
         } else {
             return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId",
-                    filters,
-                    null, enableWordSearch);
+                    filters, null, enableWordSearch);
         }
     }
+
 }

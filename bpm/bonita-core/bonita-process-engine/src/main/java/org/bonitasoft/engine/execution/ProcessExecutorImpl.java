@@ -422,7 +422,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private List<SFlowNodeInstance> initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector) {
         try {
-            final List<SFlowNodeDefinition> flownNodeDefinitions = selector.getFilteredElements();;
+            final List<SFlowNodeDefinition> flownNodeDefinitions = selector.getFilteredElements();
             long rootProcessInstanceId = sProcessInstance.getRootProcessInstanceId();
             if (rootProcessInstanceId <= 0) {
                 rootProcessInstanceId = sProcessInstance.getId();

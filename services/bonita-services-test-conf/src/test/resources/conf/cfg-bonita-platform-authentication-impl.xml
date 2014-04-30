@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="platformAuthenticationService" class="org.bonitasoft.engine.platform.authentication.impl.PlatformAuthenticationServiceImpl" >
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 </beans>

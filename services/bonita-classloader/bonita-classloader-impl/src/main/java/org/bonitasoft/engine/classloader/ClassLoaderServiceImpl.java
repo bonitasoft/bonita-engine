@@ -49,11 +49,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final String temporaryFolder;
 
-    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());;
+    private final VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
-    private Object mutex = new ClassLoaderServiceMutex();
+    private final Object mutex = new ClassLoaderServiceMutex();
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
@@ -73,9 +73,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private static final class ClassLoaderServiceMutex {
-        
+
     }
-    
+
     private String getKey(final String type, final long id) {
         final StringBuffer stb = new StringBuffer();
         stb.append(type);
@@ -110,13 +110,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
         final String key = getKey(type, id);
-        //here we have to manage the case of the "first" get to avoid creating 2 classloaders
-        //we decided to do it in a "double" check manner
-        //as it happens almost "never" (concurrency maybe on 2 or more threads but only on time...
-        //we use the same mutex for all pair type/id
+        // here we have to manage the case of the "first" get to avoid creating 2 classloaders
+        // we decided to do it in a "double" check manner
+        // as it happens almost "never" (concurrency maybe on 2 or more threads but only on time...
+        // we use the same mutex for all pair type/id
         if (!this.localClassLoaders.containsKey(key)) {
             synchronized (mutex) {
-                //here we have to check again the classloader is still not null as it can be not null if the thread executing now is the "second" one
+                // here we have to check again the classloader is still not null as it can be not null if the thread executing now is the "second" one
                 if (!this.localClassLoaders.containsKey(key)) {
                     final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(getGlobalClassLoader(),
                             this.parentClassLoaderResolver, this, type, id));

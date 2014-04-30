@@ -13,13 +13,12 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
-import org.bonitasoft.engine.archive.ArchivingStrategy;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class DefaultArchivingStrategy extends AbstractArchivingStrategy implements ArchivingStrategy {
+public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
 
     public DefaultArchivingStrategy() {
         super();
@@ -39,7 +38,7 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy implemen
         archives.put("org.bonitasoft.engine.core.process.instance.model.SConnectorInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping", true);
-        //is the archived version because there is no not archived version
+        // is the archived version because there is no not archived version
         archives.put("org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance", true);
     }
 

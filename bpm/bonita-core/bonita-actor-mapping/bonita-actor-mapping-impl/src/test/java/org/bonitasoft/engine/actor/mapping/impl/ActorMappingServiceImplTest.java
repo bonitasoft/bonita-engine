@@ -496,7 +496,7 @@ public class ActorMappingServiceImplTest {
 
     @Test(expected = SActorNotFoundException.class)
     public final void updateActorNotExists() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException {
-        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();;
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
         doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
 
         actorMappingServiceImpl.updateActor(4, sActorUpdateBuilder.done());

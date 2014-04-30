@@ -42,7 +42,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(WorkFactory.class)
@@ -119,7 +118,7 @@ public class RestartFlowNodesHandlerTest {
     }
 
     @Test
-    public final void do_noting_if_no_flownode() throws Exception {
+    public final void do_nothing_if_no_flownode() throws Exception {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
 
