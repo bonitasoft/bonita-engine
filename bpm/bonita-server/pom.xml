@@ -656,6 +656,13 @@
       <artifactId>bonita-synchro-jms</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <!-- Time Tracker -->
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-time-tracker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     <!-- Transaction -->
     <dependency>
@@ -784,6 +791,8 @@
                                     <!-- Builder Factory -->
                                     <include>org.bonitasoft.engine:bonita-builder</include>
                                     <include>com.bonitasoft.engine:bonita-builder-sp</include>
+                                    <!-- Time Tracker -->
+                                    <include>org.bonitasoft.engine:bonita-time-tracker</include>
                   <!-- Actor Mapping -->
                   <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
                   <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
