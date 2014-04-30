@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
@@ -99,6 +100,9 @@ public class TenantManagementAPIExtTest {
     @Mock
     private ClassLoaderService classLoaderService;
 
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+
     private long tenantId;
 
     private STenantImpl sTenant;
@@ -124,6 +128,7 @@ public class TenantManagementAPIExtTest {
         when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
         when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(tenantConfiguration);
+        when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         when(tenantConfiguration.getLifecycleServices()).thenReturn(Arrays.asList(workService, businessDataRepository));
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(tenantLogger);
         when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
