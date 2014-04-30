@@ -1,22 +1,16 @@
-/**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
 /**
  * Tests the validity of Query parameters
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 import java.util.Arrays;
@@ -43,9 +37,9 @@ public class QueryParameterValidationRule implements ValidationRule {
             throw new IllegalArgumentException(QueryParameterValidationRule.class.getName() + " doesn't handle validation for "
                     + modelElement.getClass().getName());
         }
-        QueryParameter parameter = (QueryParameter) modelElement;
-        ValidationStatus status = new ValidationStatus();
-        String name = parameter.getName();
+        final QueryParameter parameter = (QueryParameter) modelElement;
+        final ValidationStatus status = new ValidationStatus();
+        final String name = parameter.getName();
         if (name == null || name.isEmpty()) {
             status.addError("A parameter must have name");
             return status;
