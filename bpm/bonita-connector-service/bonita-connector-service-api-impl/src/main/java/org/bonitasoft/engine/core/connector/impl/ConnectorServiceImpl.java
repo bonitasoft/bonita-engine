@@ -360,8 +360,8 @@ public class ConnectorServiceImpl implements ConnectorService {
                 final StringBuilder desc = new StringBuilder();
                 desc.append("Connector ID: ");
                 desc.append(connectorId);
-                desc.append(" - ");
-                desc.append(inputValues);
+                desc.append(" - input parameters: ");
+                desc.append(inputParameters);
                 this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS, desc.toString(), (endTime - startTime));
             }
         }
