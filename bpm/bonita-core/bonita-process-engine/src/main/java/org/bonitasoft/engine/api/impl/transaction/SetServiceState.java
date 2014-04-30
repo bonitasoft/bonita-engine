@@ -88,18 +88,17 @@ public class SetServiceState implements Callable<Void>, Serializable {
     }
 
     protected void refreshClassloaderOfProcessDefinitions(final TenantServiceAccessor tenantServiceAccessor) throws SBonitaException {
-        final int maxResults = 100;
         final DependencyService dependencyService = tenantServiceAccessor.getDependencyService();
-        dependencyService.refreshClassLoader(ScopeType.TENANT, tenantId);
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
-        int j = 0;
+        final int maxResults = 100;
+        int startIndex = 0;
         do {
-            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(j, maxResults);
-            j += maxResults;
+            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(startIndex, maxResults);
             for (final Long id : processDefinitionIds) {
                 dependencyService.refreshClassLoader(ScopeType.PROCESS, id);
             }
+            startIndex += maxResults;
         } while (processDefinitionIds.size() == maxResults);
     }
 
