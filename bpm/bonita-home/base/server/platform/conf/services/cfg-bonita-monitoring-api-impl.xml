@@ -8,7 +8,7 @@
 		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="schedulerService" ref="scheduler" />
-		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
+		<constructor-arg name="technicalLog" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>

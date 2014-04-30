@@ -100,7 +100,7 @@ public class PageAPIExt implements PageAPI {
         final long userId = getUserIdFromSessionInfos();
         final SPage sPage = constructPage(pageCreator, userId);
 
-        checkPageAlreadyExists((String) pageCreator.getFields().get(PageCreator.PageField.NAME), getTenantAccessor());
+        checkPageAlreadyExists((String) pageCreator.getFields().get(PageCreator.PageField.NAME));
         try {
             final SPage addPage = pageService.addPage(sPage, content);
             return convertToPage(addPage);
@@ -156,7 +156,7 @@ public class PageAPIExt implements PageAPI {
         }
     }
 
-    protected void checkPageAlreadyExists(final String name, final TenantServiceAccessor tenantAccessor) throws AlreadyExistsException {
+    protected void checkPageAlreadyExists(final String name) throws AlreadyExistsException {
         final PageService pageService = getTenantAccessor().getPageService();
         // Check if the problem is primary key duplication:
         try {

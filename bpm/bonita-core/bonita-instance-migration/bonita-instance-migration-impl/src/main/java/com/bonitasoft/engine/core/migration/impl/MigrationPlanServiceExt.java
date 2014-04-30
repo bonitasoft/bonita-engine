@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.core.migration.MigrationPlanService;
 import org.bonitasoft.engine.core.migration.exceptions.SInvalidMigrationPlanException;
 import org.bonitasoft.engine.core.migration.exceptions.SMigrationPlanNotFoundException;
 import org.bonitasoft.engine.core.migration.exceptions.SPrepareForMigrationFailedException;
@@ -40,7 +39,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuil
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class MigrationPlanServiceExt extends MigrationPlanServiceImpl implements MigrationPlanService {
+public class MigrationPlanServiceExt extends MigrationPlanServiceImpl {
 
     private final BreakpointService breakpointService;
 

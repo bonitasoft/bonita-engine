@@ -78,6 +78,8 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
                 case ICON_PATH:
                     updateBuilder.setIconPath((String) field.getValue());
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         }
         updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(lastUpdatorId);

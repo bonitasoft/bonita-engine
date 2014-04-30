@@ -16,7 +16,6 @@ import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.services.SPersistenceException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class TaskListIT extends CommonAPISPTest {
         persistenceservice = accessor.getBeanAccessor().getService(TenantHibernatePersistenceService.class);
         reportingService = accessor.getReportingService();
     }
-    
+
     @After
     public void cleanUp() throws Exception {
         BitronixTransactionManager transactionManager = TransactionManagerServices.getTransactionManager();
@@ -60,13 +59,13 @@ public class TaskListIT extends CommonAPISPTest {
         SUserTaskInstanceImpl deletedTask = createDeletedUserTask(1L, "shouldNotBeRetrieved", processInstance, user);
         SUserTaskInstanceImpl expectedTask = createUserTask(2L, "shouldBeRetrieved", processInstance, user);
         insert(processDef, processInstance, user, deletedTask, expectedTask);
-        
+
         String csv = executeQuery(getTaskListQuery());
-    
+
         assertThat(csv).contains(expectedTask.getDisplayName());
         assertThat(csv).doesNotContain(deletedTask.getDisplayName());
     }
-    
+
     private String executeQuery(String query) throws Exception {
         BitronixTransactionManager transactionManager = TransactionManagerServices.getTransactionManager();
         transactionManager.begin();
@@ -74,7 +73,7 @@ public class TaskListIT extends CommonAPISPTest {
         transactionManager.commit();
         return csv;
     }
-    
+
     private void insert(PersistentObject... persistentObject) throws Exception {
         BitronixTransactionManager transactionManager = TransactionManagerServices.getTransactionManager();
         transactionManager.begin();
@@ -83,7 +82,7 @@ public class TaskListIT extends CommonAPISPTest {
         }
         transactionManager.commit();
     }
-    
+
     private String getTaskListQuery() throws IOException {
         String query = IOUtils.toString(TaskListIT.class.getResourceAsStream("TaskList.sql"));
         query = query.replace("$P{BONITA_TENANT_ID}", "1");
@@ -93,7 +92,7 @@ public class TaskListIT extends CommonAPISPTest {
         query = query.replace("$P!{_p_apps_id}", "");
         return query;
     }
-    
+
     private SUserTaskInstanceImpl createUserTask(long id, String displayName, SProcessInstanceImpl instance, SUserImpl user) {
         SUserTaskInstanceImpl tsk = new SUserTaskInstanceImpl("userTak", 1L, instance.getId(), 1L, 0, null, 0L, 0L);
         tsk.setId(id);
@@ -106,7 +105,7 @@ public class TaskListIT extends CommonAPISPTest {
         tsk.setDeleted(false);
         return tsk;
     }
-    
+
     private SUserTaskInstanceImpl createDeletedUserTask(long id, String displayName, SProcessInstanceImpl instance, SUserImpl user) {
         SUserTaskInstanceImpl tsk = createUserTask(id, displayName, instance, user);
         tsk.setDeleted(true);
@@ -123,7 +122,7 @@ public class TaskListIT extends CommonAPISPTest {
         return user;
     }
 
-    private SProcessInstanceImpl createInstance(SProcessDefinitionDeployInfoImpl aps) throws SPersistenceException {
+    private SProcessInstanceImpl createInstance(SProcessDefinitionDeployInfoImpl aps) {
         SProcessInstanceImpl cs = new SProcessInstanceImpl("instance", aps.getProcessId());
         cs.setId(1L);
         cs.setTenantId(1L);

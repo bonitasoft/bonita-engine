@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Date;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
@@ -24,14 +22,11 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.platform.PlatformLoginException;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -45,7 +40,6 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
@@ -56,8 +50,6 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
 public class TenantRemoteTestSpITest extends CommonAPISPTest {
-
-    private static final int EXPECTED_PAGE_SEARCH_RESULT_COUNT = 1;
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";
 
@@ -301,21 +293,6 @@ public class TenantRemoteTestSpITest extends CommonAPISPTest {
         logNumberOfProcess(tenantParameter);
         deactivateAndDeleteTenant(tenantParameter);
 
-    }
-
-    private void checkThatPageServiceExamplesAreDeployedOnTenant(final long tenantId) throws BonitaException, SearchException {
-        // given
-        login(tenantId);
-
-        // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, EXPECTED_PAGE_SEARCH_RESULT_COUNT).done());
-
-        // then
-        assertThat(searchPages.getResult()).as("should have:" + EXPECTED_PAGE_SEARCH_RESULT_COUNT + " provided pages on tenantId:" + tenantId).hasSize(
-                EXPECTED_PAGE_SEARCH_RESULT_COUNT);
-
-        // clean up
-        logout();
     }
 
     private void waitForMaintenanceTime() throws InterruptedException {

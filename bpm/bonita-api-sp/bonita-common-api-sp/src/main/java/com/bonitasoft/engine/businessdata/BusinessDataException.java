@@ -22,6 +22,8 @@ import org.bonitasoft.engine.exception.BonitaException;
  */
 public class BusinessDataException extends BonitaException {
 
+    private static final long serialVersionUID = -7068505030248451684L;
+
     public BusinessDataException(final Throwable cause) {
         super(cause);
     }

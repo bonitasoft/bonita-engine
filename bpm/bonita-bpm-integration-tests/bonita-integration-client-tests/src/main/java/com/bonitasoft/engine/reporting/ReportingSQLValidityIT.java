@@ -1,7 +1,6 @@
 package com.bonitasoft.engine.reporting;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,7 +23,7 @@ import com.bonitasoft.engine.CommonAPISPTest;
 public class ReportingSQLValidityIT extends CommonAPISPTest {
 
     @Parameters(name = "{0}")
-    public static Collection<Object[]> params() throws URISyntaxException, IOException {
+    public static Collection<Object[]> params() {
         ArrayList<Object[]> params = new ArrayList<Object[]>();
         params.add(new Object[] { "AppName_test.sql" });
         params.add(new Object[] { "CaseAvgTime_test.sql" });
@@ -33,8 +32,8 @@ public class ReportingSQLValidityIT extends CommonAPISPTest {
         params.add(new Object[] { "TaskList_test.sql" });
         return params;
     }
-    
-    private String sql;
+
+    private final String sql;
 
     public ReportingSQLValidityIT(String filename) throws IOException {
         String sql = IOUtils.toString(ReportingSQLValidityIT.class.getResourceAsStream(filename));
