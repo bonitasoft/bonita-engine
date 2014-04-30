@@ -25,11 +25,11 @@
         </constructor-arg>
     </bean>
 
-    <bean id="csvFlushEventListener"
-        class="org.bonitasoft.engine.tracking.csv.CSVFlushEventListener">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="outputFolder" value="/tmp" />
-        <constructor-arg name="csvSeparator" value=";" />
-    </bean>
+<!--     <bean id="csvFlushEventListener" -->
+<!--         class="org.bonitasoft.engine.tracking.csv.CSVFlushEventListener"> -->
+<!--         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" /> -->
+<!--         <constructor-arg name="outputFolder" value="/tmp" /> -->
+<!--         <constructor-arg name="csvSeparator" value=";" /> -->
+<!--     </bean> -->
     
 </beans>
