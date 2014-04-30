@@ -13,7 +13,7 @@
         <constructor-arg name="enableWordSearch" value="false" />
         <constructor-arg name="wordSearchExclusionMappings">
             <set>
-                <!-- value>org.bonitasoft.engine.identity.model.impl.SUserImpl</value -->
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
             </set>
         </constructor-arg>
 	</bean>
@@ -31,7 +31,7 @@
         <constructor-arg name="enableWordSearch" value="false" />
         <constructor-arg name="wordSearchExclusionMappings">
             <set>
-                <!-- value>org.bonitasoft.engine.identity.model.impl.SUserImpl</value -->
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
             </set>
         </constructor-arg>
 	</bean>
