@@ -520,6 +520,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+    	<!-- Time Tracker -->
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-time-tracker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<!-- Transaction -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.transaction</groupId>
@@ -617,6 +623,8 @@
 								<includes>
                                     <!-- Builder Factory -->
                                     <include>org.bonitasoft.engine:bonita-builder</include>
+                                    <!-- Time Tracker -->
+                                    <include>org.bonitasoft.engine:bonita-time-tracker</include>
 									<!-- Actor Mapping -->
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
