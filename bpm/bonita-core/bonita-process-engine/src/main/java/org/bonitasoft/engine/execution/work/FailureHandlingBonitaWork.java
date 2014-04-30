@@ -101,7 +101,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     private void logException(final TechnicalLoggerService loggerService, final Throwable e) {
         if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : " + e);
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : ", e);
         } else {
             String message = e.getMessage();
             if (message == null || message.isEmpty()) {
