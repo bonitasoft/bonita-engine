@@ -19,19 +19,22 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.junit.Test;
 
-
 public class AbstractDBPersistenceServiceTest {
 
     /**
      * Dummy implementation for testing purpose : we are not interested in the data manipulation behaviour.
+     * 
      * @author Laurent Vaills
-     *
+     * 
      */
     class DummyDBPersistenceService extends AbstractDBPersistenceService {
 
-        public DummyDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter, final SequenceManager sequenceManager,
-                final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
-            super(name, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings, logger);
+        public DummyDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
+                final String likeEscapeCharacter, final SequenceManager sequenceManager,
+                final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
+                throws ClassNotFoundException {
+            super(name, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
+                    wordSearchExclusionMappings, logger);
         }
 
         @Override
@@ -110,8 +113,15 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements, final boolean useDataSourceConnection) throws SPersistenceException, IOException {
+        protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
+                final boolean useDataSourceConnection) throws SPersistenceException, IOException {
 
+        }
+
+        @Override
+        public int update(String updateQueryName) throws SPersistenceException {
+            // TODO Auto-generated method stub
+            return 0;
         }
     }
 
@@ -179,11 +189,10 @@ public class AbstractDBPersistenceServiceTest {
 
     }
 
-
     @Test
     public void should_word_search_returns_false_when_entity_class_is_null() throws Exception {
         boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
+        Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
         Class<? extends PersistentObject> entityClass = null;
         final boolean expectedResult = false;
 
@@ -193,7 +202,7 @@ public class AbstractDBPersistenceServiceTest {
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_exclusion_is_empty() throws Exception {
         boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
+        Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
         Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
@@ -203,7 +212,7 @@ public class AbstractDBPersistenceServiceTest {
     @Test
     public void should_word_search_returns_false_when_feature_is_disabled_and_exclusion_is_empty() throws Exception {
         boolean enableWordSearch = false;
-        Set<String> wordSearchExclusionMappings = Collections.<String>emptySet();
+        Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
         Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = false;
 
@@ -220,7 +229,6 @@ public class AbstractDBPersistenceServiceTest {
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
-
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_entity_class_is_not_excluded() throws Exception {
         boolean enableWordSearch = true;
@@ -230,7 +238,6 @@ public class AbstractDBPersistenceServiceTest {
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
-
 
     @Test
     public void should_word_search_returns_false_when_feature_is_enabled_and_parent_entity_class_is_excluded() throws Exception {
@@ -242,7 +249,6 @@ public class AbstractDBPersistenceServiceTest {
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
-
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_child_entity_class_is_excluded() throws Exception {
         boolean enableWordSearch = true;
@@ -252,7 +258,6 @@ public class AbstractDBPersistenceServiceTest {
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
-
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_brother_entity_class_is_excluded() throws Exception {
@@ -264,14 +269,15 @@ public class AbstractDBPersistenceServiceTest {
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
     }
 
-
-    private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
+    private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+            final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
             throws ClassNotFoundException {
         DBConfigurationsProvider dbConfigurationsProvider = mock(DBConfigurationsProvider.class);
         SequenceManager sequenceManager = mock(SequenceManager.class);
         DataSource datasource = mock(DataSource.class);
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", dbConfigurationsProvider, ";", "#", sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings, logger);
+        AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", dbConfigurationsProvider, ";", "#", sequenceManager,
+                datasource, enableWordSearch, wordSearchExclusionMappings, logger);
 
         assertThat(persistenceService.isWordSearchEnabled(entityClass), is(expectedResult));
     }
