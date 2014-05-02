@@ -31,6 +31,7 @@
                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
                <prop key="hibernate.show_sql">false</prop>
+               <prop key="hibernate.format_sql">false</prop>
            </props>
        </property>
    </bean>
@@ -48,6 +49,10 @@
    </bean>
   
       <bean id="supervisorRepository" class="org.bonitasoft.engine.test.persistence.repository.SupervisorRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+  
+      <bean id="connectorInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ConnectorInstanceRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
 

@@ -4,11 +4,13 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -61,6 +63,12 @@ public class TestRepository {
     public SGroup add(final SGroupImpl sGroup) {
         getSession().save(sGroup);
         return (SGroup) getSession().get(sGroup.getClass(), new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
+    }
+
+    public SConnectorInstance add(final SConnectorInstanceImpl sConnectorInstance) {
+        getSession().save(sConnectorInstance);
+        return (SConnectorInstance) getSession().get(sConnectorInstance.getClass(),
+                new PersistentObjectId(sConnectorInstance.getId(), sConnectorInstance.getTenantId()));
     }
 
     public SPendingActivityMapping add(final SPendingActivityMappingImpl pendingActivityMapping) {
