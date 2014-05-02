@@ -112,11 +112,13 @@ public class JPABusinessDataRepositoryImplITest {
         businessDataRepository.stop();
 
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
-        try {
-            jdbcTemplate.update("drop table Employee");
-            jdbcTemplate.update("drop table Person");
-        } catch (final Exception e) {
-            // ignore drop of non-existing table
+        for (String tableName : Arrays.asList("Person_nickNames", "Employee", "PERSON")) {
+            try {
+                jdbcTemplate.update("drop table " + tableName);
+            } catch (final Exception e) {
+                System.out.println(e.getMessage());
+                // ignore drop of non-existing table
+            }
         }
     }
 
