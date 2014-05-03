@@ -111,9 +111,10 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         this.logger = logger;
 
         if (enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "The word based search feature is experimental, using it in production may impact performances.");
+            logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "The word based search feature is experimental, using it in production may impact performances.");
         }
-        if (wordSearchExclusionMappings != null) {
+        if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
             if (!enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "You defined an exclusion mapping for the word based search feature, but it is not enabled.");
             }
@@ -357,7 +358,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
     protected String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
-        return " LIKE '" + (prefixPattern != null ?prefixPattern :"") + escapeTerm(term) + (suffixPattern != null ?suffixPattern :"") + "' ESCAPE '"+ getLikeEscapeCharacter() + "'";
+        return " LIKE '" + (prefixPattern != null ? prefixPattern : "") + escapeTerm(term) + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
+                + getLikeEscapeCharacter() + "'";
     }
 
     /**
