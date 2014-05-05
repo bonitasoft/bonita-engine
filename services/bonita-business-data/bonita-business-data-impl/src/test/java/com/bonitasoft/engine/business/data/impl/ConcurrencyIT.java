@@ -112,7 +112,7 @@ public class ConcurrencyIT {
     }
 
     @Test
-    public void testName() throws Exception {
+    public void addConcurrentlyEmployeesShouldCreateAllTheEmployees() throws Exception {
         final ExecutorService threadPoolExecutor = new ThreadPoolExecutor(5, 10, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         final int expected = 10;
         for (int i = 0; i < expected; i++) {
