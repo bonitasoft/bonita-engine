@@ -29,6 +29,7 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -51,8 +52,8 @@ public class OperationServiceImpl implements OperationService {
     private final OperationExecutorStrategyProvider operationExecutorStrategyProvider;
 
     public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
-            final LeftOperandHandlerProvider leftOperandHandlerProvider,
-            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger) {
+            final LeftOperandHandlerProvider leftOperandHandlerProvider, final ExpressionResolverService expressionResolverService,
+            final TechnicalLoggerService logger) {
         super();
         this.operationExecutorStrategyProvider = operationExecutorStrategyProvider;
         this.expressionResolverService = expressionResolverService;
@@ -99,8 +100,7 @@ public class OperationServiceImpl implements OperationService {
         }
     }
 
-    void executeOperators(final List<SOperation> operations,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    void executeOperators(final List<SOperation> operations, final SExpressionContext expressionContext) throws SOperationExecutionException {
         for (final SOperation operation : operations) {
             final Object rightOperandValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
             final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
@@ -118,25 +118,30 @@ public class OperationServiceImpl implements OperationService {
         return leftOperandHandler;
     }
 
-    void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long dataContainerId,
-            final String dataContainerType, final SExpressionContext expressionContext)
-            throws SOperationExecutionException {
+    void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final long dataContainerId, final String dataContainerType,
+            final SExpressionContext expressionContext) throws SOperationExecutionException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
 
         for (final SOperation operation : operations) {
-            // this operation will set a data, we retrieve it and put it in context
-            SLeftOperand leftOperand = operation.getLeftOperand();
-            Object retrieve;
-            try {
-                retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
-                        new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
-            } catch (SBonitaReadException e) {
-                throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
+            // for assignements, initial retrieval is not necessary:
+            if (operation.getType() != SOperatorType.ASSIGNMENT) {
+                // this operation will set a data, we retrieve it and put it in context
+                SLeftOperand leftOperand = operation.getLeftOperand();
+                Object retrieve;
+                try {
+                    retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
+                            new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
+                } catch (SBonitaReadException e) {
+                    throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
+                }
+                putRetrievedValueInContextifNotNullAndNotAlreadyIn(inputValues, leftOperand, retrieve);
             }
-            if (retrieve != null /* some left operand don't retrieve it, e.g. document, it's heavy */&& !inputValues.containsKey(leftOperand.getName())) {
-                inputValues.put(leftOperand.getName(), retrieve);
-            }
+        }
+    }
 
+    protected void putRetrievedValueInContextifNotNullAndNotAlreadyIn(final Map<String, Object> context, SLeftOperand leftOperand, Object retrieve) {
+        if (retrieve != null /* some left operand don't retrieve it, e.g. document, it's heavy */&& !context.containsKey(leftOperand.getName())) {
+            context.put(leftOperand.getName(), retrieve);
         }
     }
 
@@ -152,8 +157,8 @@ public class OperationServiceImpl implements OperationService {
         }
     }
 
-    private void logOperation(final TechnicalLogSeverity severity, final SOperation operation,
-            final Object operationValue, final SExpressionContext expressionContext) {
+    private void logOperation(final TechnicalLogSeverity severity, final SOperation operation, final Object operationValue,
+            final SExpressionContext expressionContext) {
         if (logger.isLoggable(this.getClass(), severity)) {
             String message = buildLogMessage(operation, operationValue, expressionContext);
             logger.log(this.getClass(), severity, message);
