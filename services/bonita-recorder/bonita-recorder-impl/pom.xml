@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-recorder</artifactId>
 		<groupId>org.bonitasoft.engine.recorder</groupId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.0</version>
 	</parent>
 
 	<artifactId>bonita-recorder-impl</artifactId>

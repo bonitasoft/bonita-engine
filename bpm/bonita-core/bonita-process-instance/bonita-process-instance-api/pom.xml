@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-process-instance</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.0</version>
 	</parent>
 
 	<artifactId>bonita-process-instance-api</artifactId>

@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-bpm-integration-tests</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.0</version>
 	</parent>
 
 	<artifactId>bonita-bpm-services-integration-tests</artifactId>
