@@ -57,7 +57,7 @@ CREATE TABLE user_contactinfo (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   userId NUMBER(19, 0) NOT NULL,
-  email VARCHAR2(50),
+  email VARCHAR2(255),
   phone VARCHAR2(50),
   mobile VARCHAR2(50),
   fax VARCHAR2(50),

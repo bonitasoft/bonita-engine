@@ -23,6 +23,7 @@ public final class SelectListDescriptor<T> extends AbstractSelectWithParametersD
 
     private final QueryOptions queryOptions;
 
+    @Deprecated
     public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType) {
         super(queryName, inputParameters, entityType, (Class<T>) entityType);
         this.queryOptions = QueryOptions.defaultQueryOptions();
@@ -38,6 +39,7 @@ public final class SelectListDescriptor<T> extends AbstractSelectWithParametersD
         }
     }
 
+    @Deprecated
     public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
             final Class<T> returnType) {
         super(queryName, inputParameters, entityType, returnType);

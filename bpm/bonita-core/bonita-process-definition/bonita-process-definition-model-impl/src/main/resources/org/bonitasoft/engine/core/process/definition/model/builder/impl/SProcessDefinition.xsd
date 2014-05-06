@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/server/6.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/server/6.0"
+<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/server/6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/server/6.3"
 	elementFormDefault="qualified">
 
 	<xs:element name="processDefinition" type="definition:SProcessDefinition" />
@@ -688,6 +688,7 @@
 
 	<xs:complexType name="SLeftOperand">
 		<xs:attribute name="name" />
+		<xs:attribute name="type" />
 	</xs:complexType>
 
 	<xs:complexType name="SNamedElement">

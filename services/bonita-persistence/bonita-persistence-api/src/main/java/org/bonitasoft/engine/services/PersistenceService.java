@@ -20,6 +20,7 @@ import java.util.Map;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SRetryableException;
 
 /**
  * @author Charles Souillard
@@ -156,6 +157,17 @@ public interface PersistenceService extends ReadPersistenceService {
      * @since 6.0
      */
     void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException;
+
+    /**
+     * Executes a query update.
+     * 
+     * @param updateQueryName
+     *            the name of the declared query that represent the update.
+     * @return the number of updated rows, as returned by the underlining persistence implementation.
+     * @throws SPersistenceException
+     *             if a persistence problem occurs when executing the update query.
+     */
+    int update(final String updateQueryName) throws SPersistenceException;
 
     /**
      * Delete all elements of a specific table for a specific tenant

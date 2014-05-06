@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.ValidationException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -228,12 +230,32 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         } catch (final XMLParseException e) {
             throw new InvalidBusinessArchiveFormatException(e);
         } catch (final ValidationException e) {
+            checkVersion(file);
             throw new InvalidBusinessArchiveFormatException(e);
         }
         if (objectFromXML instanceof DesignProcessDefinition) {
             return (DesignProcessDefinition) objectFromXML;
         } else {
             throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
+        }
+    }
+
+    private void checkVersion(final File file) throws IOException, InvalidBusinessArchiveFormatException {
+        String content = IOUtil.read(file);
+        checkVersion(content);
+    }
+
+    void checkVersion(final String content) throws InvalidBusinessArchiveFormatException {
+        Pattern pattern = Pattern.compile("http://www\\.bonitasoft\\.org/ns/process/client/6.([0-9])");
+        Matcher matcher = pattern.matcher(content);
+        boolean find = matcher.find();
+        if (!find) {
+            throw new InvalidBusinessArchiveFormatException("There is no bonitasoft process namespace declaration");
+        }
+        String group = matcher.group();
+        if (!group.equals("3")) {
+            throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, 6." + group
+                    + " namespace is not compatible with your current version. Use the studio to update it.");
         }
     }
 

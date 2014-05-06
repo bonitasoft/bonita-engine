@@ -140,7 +140,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
+            final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
         FlowNodeState state = null;
 
         // retrieve the activity and execute its state
@@ -159,8 +159,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     if (executerId != null && executerId > 0 && sFlowNodeInstance.getExecutedBy() != executerId) {
                         activityInstanceService.setExecutedBy(sFlowNodeInstance, executerId);
                     }
-                    if (executerDelegateId != null && executerDelegateId > 0 && sFlowNodeInstance.getExecutedByDelegate() != executerDelegateId) {
-                        activityInstanceService.setExecutedByDelegate(sFlowNodeInstance, executerDelegateId);
+                    if (executerSubstituteId != null && executerSubstituteId > 0 && sFlowNodeInstance.getExecutedBySubstitute() != executerSubstituteId) {
+                        activityInstanceService.setExecutedBySubstitute(sFlowNodeInstance, executerSubstituteId);
                     }
                     if (operations != null) {
                         for (final SOperation operation : operations) {
@@ -299,8 +299,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
-        return stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerDelegateId);
+            final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
+        return stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerSubstituteId);
     }
 
     @Override

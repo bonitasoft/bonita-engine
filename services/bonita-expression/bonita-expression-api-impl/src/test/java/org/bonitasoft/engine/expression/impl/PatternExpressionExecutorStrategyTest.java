@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.SExpressionType;
@@ -50,7 +51,7 @@ public class PatternExpressionExecutorStrategyTest {
                 getIntegerExpressions(dependencyNames, dependencyContent));
         final Map<Integer, Object> resolvedExpressions = getResolvedExpressionMap(expression);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(1);
-        assertEquals(result, strategy.evaluate(expression, dependencyValues, resolvedExpressions));
+        assertEquals(result, strategy.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE));
     }
 
     @Test
@@ -61,7 +62,7 @@ public class PatternExpressionExecutorStrategyTest {
                 null, getIntegerExpressions(Arrays.asList("bla", "bli"), Arrays.asList(12, 13)));
         final Map<Integer, Object> resolvedExpressions = getResolvedExpressionMap(expression1, expression2);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(1);
-        final List<Object> evaluate = strategy.evaluate(Arrays.asList(expression1, expression2), dependencyValues, resolvedExpressions);
+        final List<Object> evaluate = strategy.evaluate(Arrays.asList(expression1, expression2), dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
         assertArrayEquals(new Object[] { "12 12 test", "12 13 test" }, evaluate.toArray());
     }
 
@@ -71,7 +72,7 @@ public class PatternExpressionExecutorStrategyTest {
                 null, getIntegerExpressions(Arrays.asList("bla"), Arrays.asList(12)));
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(1);
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(1);
-        strategy.evaluate(Arrays.asList(expression1), dependencyValues, resolvedExpressions);
+        strategy.evaluate(Arrays.asList(expression1), dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
     }
 
     /**

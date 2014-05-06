@@ -24,12 +24,12 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -79,7 +79,7 @@ public class GetUpdatedVariableValuesForProcessInstance extends UpdateVariableVa
     protected void executeOperation(final Operation operation, final Map<String, Serializable> operationsInputValues,
             final Map<String, Serializable> currentVariableValues, final long processInstanceId) throws SBonitaException {
         if (currentVariableValues != null) {
-            final SOperation sOperation = ModelConvertor.constructSOperation(operation);
+            final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
             final Map<String, Serializable> inputValues = operationsInputValues;
             inputValues.putAll(currentVariableValues);
             final SExpressionContext sec = new SExpressionContext();

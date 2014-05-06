@@ -496,7 +496,7 @@ public class ActorMappingServiceImplTest {
 
     @Test(expected = SActorNotFoundException.class)
     public final void updateActorNotExists() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException {
-        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();;
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
         doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
 
         actorMappingServiceImpl.updateActor(4, sActorUpdateBuilder.done());
@@ -535,7 +535,7 @@ public class ActorMappingServiceImplTest {
         doReturn(4L).when(sActorMember).getId();
         sActorMembers.add(sActorMember);
 
-        doReturn(sActors).when(persistenceService).selectList(SelectDescriptorBuilder.getActorsOfScope(scopeId));
+        doReturn(sActors).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doReturn(sActorMembers).doReturn(new ArrayList<SActorMember>()).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
@@ -556,7 +556,7 @@ public class ActorMappingServiceImplTest {
 
         final List<SActorMember> sActorMembers = new ArrayList<SActorMember>();
 
-        doReturn(sActors).when(persistenceService).selectList(SelectDescriptorBuilder.getActorsOfScope(scopeId));
+        doReturn(sActors).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doReturn(sActorMembers).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
@@ -570,7 +570,7 @@ public class ActorMappingServiceImplTest {
         final int scopeId = 9;
         final List<SActor> sActors = new ArrayList<SActor>(3);
 
-        doReturn(sActors).when(persistenceService).selectList(SelectDescriptorBuilder.getActorsOfScope(scopeId));
+        doReturn(sActors).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
@@ -596,55 +596,6 @@ public class ActorMappingServiceImplTest {
         doThrow(new SRecorderException("plop")).when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
 
         actorMappingServiceImpl.deleteAllActorMembers();
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addUserToActor(long, long)}.
-     */
-    @Test
-    public final void addUserToActor() {
-        // TODO : "Not yet implemented"
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addGroupToActor(long, long)}.
-     */
-    @Test
-    public final void addGroupToActor() {
-        // TODO : "Not yet implemented"
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addRoleToActor(long, long)}.
-     */
-    @Test
-    public final void addRoleToActor() {
-        // TODO : "Not yet implemented"
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addRoleAndGroupToActor(long, long, long)}.
-     */
-    @Test
-    public final void addRoleAndGroupToActor() {
-        // TODO : "Not yet implemented"
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#removeActorMember(long)}.
-     */
-    @Test
-    public final void removeActorMemberLong() {
-        // TODO : "Not yet implemented"
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#removeActorMember(org.bonitasoft.engine.actor.mapping.model.SActorMember)}.
-     */
-    @Test
-    public final void removeActorMemberSActorMember() {
-        // TODO : "Not yet implemented"
     }
 
 }

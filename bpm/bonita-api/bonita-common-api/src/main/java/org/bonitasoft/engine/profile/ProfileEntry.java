@@ -59,4 +59,9 @@ public interface ProfileEntry extends NamedElement, BaseElement {
      */
     String getPage();
 
+    /**
+     * @return true if this entry reference a custom page
+     */
+    boolean isCustom();
+
 }

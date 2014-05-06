@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.process;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -69,11 +70,20 @@ public class GatewayExecutionTest extends CommonAPITest {
     @Test
     public void archiveGatewayInstance() throws Exception {
         createTrueAndFalseExpression();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My_Process", PROCESS_VERSION)
-                .addActor(ACTOR_NAME).addDescription("description").addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
-                .addUserTask("step4", ACTOR_NAME).addGateway("gatewayOne", GatewayType.INCLUSIVE).addTransition("step1", "gatewayOne")
-                .addTransition("gatewayOne", "step2", falseExpression).addTransition("gatewayOne", "step3", falseExpression)
-                .addDefaultTransition("gatewayOne", "step4").getProcess();
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My_Process", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME).addDescription("description");
+        builder.addAutomaticTask("step1");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addUserTask("step3", ACTOR_NAME);
+        builder.addUserTask("step4", ACTOR_NAME);
+        builder.addGateway("gatewayOne", GatewayType.INCLUSIVE)
+                .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("description after completion"))
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("display name"));
+        builder.addTransition("step1", "gatewayOne");
+        builder.addTransition("gatewayOne", "step2", falseExpression);
+        builder.addTransition("gatewayOne", "step3", falseExpression)
+                .addDefaultTransition("gatewayOne", "step4");
+        final DesignProcessDefinition designProcessDefinition = builder.getProcess();
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -93,18 +103,23 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertEquals(0, searchResult0.getCount());
 
         // search archive gateway instances:
-        final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
+        SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, "gate");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
-        final SearchResult<ArchivedFlowNodeInstance> searchResult1 = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done());
+        SearchResult<ArchivedFlowNodeInstance> searchResult1 = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done());
         // we expect all normal gateway states to be archived:
         assertEquals(getProcessAPI().getSupportedStates(FlowNodeType.GATEWAY).size(), searchResult1.getCount());
 
-        // search archive transition instance
-        // final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
-        // FIXME: searchArchivedFlowElementInstances not implemented:
-        // final SearchResult<ArchivedFlowElementInstance> searchResult2 = getProcessAPI().searchArchivedFlowElementInstances(builder2.done());
-        // assertEquals(4, searchResult2.getCount());
+        // check display name/description
+        builder1 = new SearchOptionsBuilder(0, 10);
+        builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, "gate");
+        builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
+        builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "gatewayOne");
+        builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
+        ArchivedFlowNodeInstance gatewayOne = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done()).getResult().get(0);
+        // we expect all normal gateway states to be archived:
+        assertThat(gatewayOne.getDisplayName()).isEqualTo("display name");
+        assertThat(gatewayOne.getDisplayDescription()).isEqualTo("description after completion");
 
         // clean
         disableAndDeleteProcess(processDefinition);

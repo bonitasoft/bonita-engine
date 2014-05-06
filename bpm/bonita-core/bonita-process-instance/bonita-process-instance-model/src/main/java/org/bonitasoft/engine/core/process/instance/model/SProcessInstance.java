@@ -42,7 +42,7 @@ public interface SProcessInstance extends SFlowElementsContainer {
      * @return id of the user (delegate) who started the process for the original starter
      * @since 6.0.1
      */
-    long getStartedByDelegate();
+    long getStartedBySubstitute();
 
     long getEndDate();
 

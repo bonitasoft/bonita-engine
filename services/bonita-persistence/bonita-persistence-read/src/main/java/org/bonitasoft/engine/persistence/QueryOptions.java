@@ -54,6 +54,16 @@ public class QueryOptions implements Serializable {
         multipleFilter = queryOptions.getMultipleFilter();
     }
 
+    @Deprecated
+    public QueryOptions(final int fromIndex, final int numberOfResults) {
+        super();
+        this.fromIndex = fromIndex;
+        this.numberOfResults = numberOfResults;
+        orderByOptions = Collections.emptyList();
+        filters = Collections.emptyList();
+        multipleFilter = null;
+    }
+
     public QueryOptions(final int fromIndex, final int numberOfResults, final List<OrderByOption> orderByOptions) {
         super();
         this.fromIndex = fromIndex;
@@ -73,8 +83,13 @@ public class QueryOptions implements Serializable {
         this.multipleFilter = multipleFilter;
     }
 
+    @Deprecated
     public QueryOptions(final List<FilterOption> filters, final SearchFields multipleFilter) {
         this(0, DEFAULT_NUMBER_OF_RESULTS, Collections.<OrderByOption> emptyList(), filters, multipleFilter);
+    }
+
+    public QueryOptions(final List<OrderByOption> orderByOptions, final List<FilterOption> filters, final SearchFields multipleFilter) {
+        this(0, DEFAULT_NUMBER_OF_RESULTS, orderByOptions, filters, multipleFilter);
     }
 
     public QueryOptions(final int fromIndex, final int numberOfResults, final Class<? extends PersistentObject> clazz, final String fieldName,
@@ -107,15 +122,6 @@ public class QueryOptions implements Serializable {
         numberOfResults = DEFAULT_NUMBER_OF_RESULTS;
         orderByOptions = new ArrayList<OrderByOption>();
         orderByOptions.add(new OrderByOption(clazz, fieldName, orderByType));
-        filters = Collections.emptyList();
-        multipleFilter = null;
-    }
-
-    public QueryOptions(final int fromIndex, final int numberOfResults) {
-        super();
-        this.fromIndex = fromIndex;
-        this.numberOfResults = numberOfResults;
-        orderByOptions = Collections.emptyList();
         filters = Collections.emptyList();
         multipleFilter = null;
     }

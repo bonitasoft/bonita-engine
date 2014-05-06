@@ -75,4 +75,10 @@ public class SProfileEntryUpdateBuilderImpl implements SProfileEntryUpdateBuilde
         return this;
     }
 
+    @Override
+    public SProfileEntryUpdateBuilder setCustom(final boolean custom) {
+        descriptor.addField(SProfileEntryBuilderFactory.CUSTOM, custom);
+        return this;
+    }
+
 }

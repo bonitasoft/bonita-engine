@@ -21,10 +21,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class CustomUserInfoValueImporterTest {
-    
+
     private static final String SKILLS_NAME = "Skills";
 
     private static final String SKILLS_VALUE = "Java";
@@ -41,59 +40,59 @@ public class CustomUserInfoValueImporterTest {
 
     @Mock
     private SCustomUserInfoValueAPI infoAPI;
-    
+
     @Mock
     private SCustomUserInfoDefinition skillsDef;
 
     @Mock
     private SCustomUserInfoDefinition locationDef;
-    
+
     private CustomUserInfoValueImporter importer;
-    
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         given(skillsDef.getId()).willReturn(SKILLS_ID);
         given(locationDef.getId()).willReturn(LOCATION_ID);
-        
+
         Map<String, SCustomUserInfoDefinition> infoDefinitions = new HashMap<String, SCustomUserInfoDefinition>(1);
         infoDefinitions.put(SKILLS_NAME, skillsDef);
         infoDefinitions.put(LOCATION_NAME, locationDef);
-        
+
         importer = new CustomUserInfoValueImporter(infoAPI, infoDefinitions);
     }
-    
+
     @Test
     public void importCustomUserInfoValues_should_call_setCustomUserInfoValue() throws Exception {
-        //given
+        // given
         List<ExportedCustomUserInfoValue> customUserInfoValues = new ArrayList<ExportedCustomUserInfoValue>(2);
         customUserInfoValues.add(new ExportedCustomUserInfoValue(SKILLS_NAME, SKILLS_VALUE));
         customUserInfoValues.add(new ExportedCustomUserInfoValue(LOCATION_NAME, LOCATION_VALUE));
-        
-        //when
+
+        // when
         importer.imporCustomUserInfoValues(customUserInfoValues, USER_ID);
 
-        //then
+        // then
         verify(infoAPI, times(1)).set(SKILLS_ID, USER_ID, SKILLS_VALUE);
         verify(infoAPI, times(1)).set(LOCATION_ID, USER_ID, LOCATION_VALUE);
     }
-    
-    
+
     @Test
     public void importUsers_should_throw_OrganizationImportException_if_value_name_isnt_conform_to_definition_name() throws Exception {
-        //given
+        // given
         String notDefinedName = "no exist in definition";
         ExportedCustomUserInfoValue invalidValue = new ExportedCustomUserInfoValue(notDefinedName, "any value");
-        
+
         try {
-            //when
+            // when
             importer.imporCustomUserInfoValues(Arrays.asList(invalidValue), USER_ID);
             fail("exception expected");
         } catch (SImportOrganizationException e) {
-            //then
-            String expectedMessage = "The XML file is inconsistent. A custom user info value is refenced with name '" + notDefinedName + "', but no custom user info definition is defined with this name.";
+            // then
+            String expectedMessage = "The XML file is inconsistent. A custom user info value is refenced with name '" + notDefinedName
+                    + "', but no custom user info definition is defined with this name.";
             assertThat(e.getMessage()).isEqualTo(expectedMessage);
         }
-        
+
     }
 
 }

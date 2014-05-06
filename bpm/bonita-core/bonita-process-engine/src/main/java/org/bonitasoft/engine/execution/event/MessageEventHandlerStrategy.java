@@ -20,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -86,14 +87,17 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final ProcessDefinitionService processDefinitionService;
 
+    private final TransientDataService transientDataService;
+
     public MessageEventHandlerStrategy(final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService) {
+            final ProcessDefinitionService processDefinitionService, final TransientDataService transientDataService) {
         super(eventInstanceService);
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.dataInstanceService = dataInstanceService;
         this.processDefinitionService = processDefinitionService;
+        this.transientDataService = transientDataService;
     }
 
     @Override
@@ -209,7 +213,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         // create data
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
-                    expressionContext, expressionResolverService, dataInstanceService);
+                    expressionContext);
             dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name());
             TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {

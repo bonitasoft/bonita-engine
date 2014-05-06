@@ -21,12 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -63,6 +64,50 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
  */
 public class PlatformServiceImpl implements PlatformService {
 
+    private static final String LOG_ACTIVATE_TENANT = "activateTenant";
+
+    private static final String LOG_DELETE_TENANT_OBJECTS = "deleteTenantObjects";
+
+    private static final String LOG_DEACTIVE_TENANT = "deactiveTenant";
+
+    private static final String LOG_UPDATE_TENANT = "updateTenant";
+
+    private static final String LOG_UPDATE_PLATFORM = "updatePlatform";
+
+    private static final String LOG_GET_TENANTS = "getTenants";
+
+    private static final String LOG_GET_PLATFORM = "getPlatform";
+
+    private static final String LOG_DELETE_TENANT_TABLES = "deleteTenantTables";
+
+    private static final String LOG_DELETE_TENANT = "deleteTenant";
+
+    private static final String LOG_DELETE_PLATFORM_TABLES = "deletePlatformTables";
+
+    private static final String LOG_DELETE_PLATFORM = "deletePlatform";
+
+    private static final String LOG_CREATE_TENANT_TABLES = "createTenantTables";
+
+    private static final String LOG_CREATE_TENANT = "createTenant";
+
+    private static final String LOG_CREATE_PLATFORM = "createPlatform";
+
+    private static final String LOG_CREATE_PLATFORM_TABLES = "createPlatformTables";
+
+    private static final String LOG_IS_PLATFORM_CREATED = "isPlatformCreated";
+
+    private static final String QUERY_GET_DEFAULT_TENANT = "getDefaultTenant";
+
+    private static final String QUERY_GET_NUMBER_OF_TENANTS = "getNumberOfTenants";
+
+    private static final String QUERY_GET_TENANTS_BY_IDS = "getTenantsByIds";
+
+    private static final String QUERY_GET_TENANT_BY_NAME = "getTenantByName";
+
+    private static final String QUERY_GET_TENANT_BY_ID = "getTenantById";
+
+    private static final String QUERY_GET_PLATFORM = "getPlatform";
+
     private static String CACHE_KEY = "PLATFORM";
 
     private final PersistenceService platformPersistenceService;
@@ -91,22 +136,22 @@ public class PlatformServiceImpl implements PlatformService {
     public void createPlatformTables() throws SPlatformCreationException {
         // create platform tables
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createPlatformTables"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES));
         }
         try {
             platformPersistenceService.createStructure();
             platformPersistenceService.postCreateStructure();
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createPlatformTables"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatformTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES, e));
             }
             throw new SPlatformCreationException("Unable to create platform tables : " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatformTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES, e));
             }
             throw new SPlatformCreationException("Unable to create platform tables : " + e.getMessage(), e);
         }
@@ -115,27 +160,27 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void createPlatform(final SPlatform platform) throws SPlatformCreationException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createPlatform"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_CREATE_PLATFORM));
         }
         // if platform doesn't exist, insert it
         try {
             platformPersistenceService.insert(platform);
             cachePlatform(platform);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createPlatform"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_PLATFORM));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatform", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_PLATFORM, e));
             }
             throw new SPlatformCreationException("Unable to insert the platform row : " + e.getMessage(), e);
-            }
         }
+    }
 
     @Override
     public long createTenant(final STenant tenant) throws STenantCreationException, STenantAlreadyExistException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_CREATE_TENANT));
         }
         // check if the tenant already exists. If yes, throws
         // TenantAlreadyExistException
@@ -145,7 +190,7 @@ public class PlatformServiceImpl implements PlatformService {
             existingTenant = getTenantByName(tenantName);
         } catch (final STenantNotFoundException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
             }
             // OK
         }
@@ -158,7 +203,7 @@ public class PlatformServiceImpl implements PlatformService {
             platformPersistenceService.insert(tenant);
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
             }
             throw new STenantCreationException("Unable to insert the tenant row : " + e.getMessage(), e);
         }
@@ -171,17 +216,17 @@ public class PlatformServiceImpl implements PlatformService {
                 tenantPersistenceService.initializeStructure(replacements);
             }
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createTenant"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_TENANT));
             }
             return tenant.getId();
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
             }
             throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
             }
             throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
         }
@@ -197,12 +242,12 @@ public class PlatformServiceImpl implements PlatformService {
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenantTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT_TABLES, e));
             }
             throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenantTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT_TABLES, e));
             }
             throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
         }
@@ -222,12 +267,12 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void deletePlatform() throws SPlatformDeletionException, SPlatformNotFoundException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deletePlatform"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_PLATFORM));
         }
         final SPlatform platform = readPlatform();
         List<STenant> existingTenants;
         try {
-            existingTenants = getTenants(QueryOptions.defaultQueryOptions());
+            existingTenants = getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id", OrderByType.ASC));
         } catch (final STenantException e) {
             throw new SPlatformDeletionException(e);
         }
@@ -240,14 +285,14 @@ public class PlatformServiceImpl implements PlatformService {
             platformPersistenceService.delete(platform);
             platformCacheService.clear(CACHE_KEY);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deletePlatform"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_DELETE_PLATFORM));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatform", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_PLATFORM, e));
             }
             throw new SPlatformDeletionException("Unable to delete the platform row : " + e.getMessage(), e);
-        } catch (SCacheException e) {
+        } catch (final SCacheException e) {
             throw new SPlatformDeletionException("Unable to delete the platform from cache : " + e.getMessage(), e);
         }
     }
@@ -255,24 +300,24 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void deletePlatformTables() throws SPlatformDeletionException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deletePlatformTables"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES));
         }
         // delete platform tables
         try {
             platformPersistenceService.preDropStructure();
             platformPersistenceService.deleteStructure();
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deletePlatformTables"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatformTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES, e));
             }
 
             throw new SPlatformDeletionException("Unable to delete platform tables : " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatformTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES, e));
             }
 
             throw new SPlatformDeletionException("Unable to delete platform tables : " + e.getMessage(), e);
@@ -282,7 +327,7 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void deleteTenant(final long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_TENANT));
         }
         final STenant tenant = getTenant(tenantId);
         if (tenant.getStatus().equals(STenant.ACTIVATED)) {
@@ -292,7 +337,7 @@ public class PlatformServiceImpl implements PlatformService {
             platformPersistenceService.delete(tenant);
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT, e));
             }
             throw new STenantDeletionException("Unable to delete the tenant : " + e.getMessage(), e);
         }
@@ -307,16 +352,16 @@ public class PlatformServiceImpl implements PlatformService {
                 tenantPersistenceService.deleteStructure();
             }
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteTenantTables"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_DELETE_TENANT_TABLES));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenantTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_TABLES, e));
             }
             throw new STenantDeletionException("Unable to delete tenant tables: " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenantTables", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_TABLES, e));
             }
             throw new STenantDeletionException("Unable to delete tenant tables : " + e.getMessage(), e);
         }
@@ -325,7 +370,7 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void deleteTenantObjects(final long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteTenantObjects"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_TENANT_OBJECTS));
         }
         final STenant tenant = getTenant(tenantId);
         if (tenant.getStatus().equals(STenant.ACTIVATED)) {
@@ -337,12 +382,12 @@ public class PlatformServiceImpl implements PlatformService {
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenantObjects", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_OBJECTS, e));
             }
             throw new STenantDeletionException("Unable to delete the tenant object : " + e.getMessage(), e);
         } catch (final IOException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteTenantObjects", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_OBJECTS, e));
             }
             throw new STenantDeletionException("Unable to delete the tenant object : " + e.getMessage(), e);
         }
@@ -358,7 +403,7 @@ public class PlatformServiceImpl implements PlatformService {
                 cachePlatform(sPlatform);
             }
             return sPlatform;
-        } catch (SCacheException e) {
+        } catch (final SCacheException e) {
             throw new SPlatformNotFoundException("Platform not present in cache.", e);
         }
     }
@@ -371,30 +416,30 @@ public class PlatformServiceImpl implements PlatformService {
      */
     private void cachePlatform(final SPlatform platform) {
         try {
-        platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
-        } catch (SCacheException e) {
+            platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
+        } catch (final SCacheException e) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Can't cache the platform, maybe the platform cache service is not started yet");
         }
     }
 
     private SPlatform readPlatform() throws SPlatformNotFoundException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatform"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_GET_PLATFORM));
         }
         SPlatform platform = null;
         try {
-            platform = platformPersistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class));
+            platform = platformPersistenceService.selectOne(new SelectOneDescriptor<SPlatform>(QUERY_GET_PLATFORM, null, SPlatform.class));
             if (platform == null) {
                 throw new SPlatformNotFoundException("No platform found");
             }
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPlatform"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_GET_PLATFORM));
             }
             return platform;
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "getPlatform", "Unable to check if a platform already exists : " + e.getMessage()));
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_GET_PLATFORM, "Unable to check if a platform already exists : " + e.getMessage()));
             }
             throw new SPlatformNotFoundException("Unable to check if a platform already exists : " + e.getMessage(), e);
         }
@@ -403,19 +448,19 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public STenant getTenant(final long id) throws STenantNotFoundException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), QUERY_GET_TENANT_BY_ID));
         }
         STenant tenant;
         try {
-            tenant = platformPersistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, id));
+            tenant = platformPersistenceService.selectById(new SelectByIdDescriptor<STenant>(QUERY_GET_TENANT_BY_ID, STenant.class, id));
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with id: " + id);
             }
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             throw new STenantNotFoundException("Unable to get the tenant : " + e.getMessage(), e);
         }
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), QUERY_GET_TENANT_BY_ID));
         }
         return tenant;
     }
@@ -423,7 +468,7 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public boolean isPlatformCreated() {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "isPlatformCreated"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_IS_PLATFORM_CREATED));
         }
         boolean flag = false;
         try {
@@ -431,12 +476,12 @@ public class PlatformServiceImpl implements PlatformService {
             flag = true;
         } catch (final SPlatformNotFoundException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "isPlatformCreated", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_IS_PLATFORM_CREATED, e));
             }
             return false;
         }
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "isPlatformCreated"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_IS_PLATFORM_CREATED));
         }
         return flag;
     }
@@ -444,12 +489,12 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public STenant getTenantByName(final String name) throws STenantNotFoundException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getTenantByName"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), QUERY_GET_TENANT_BY_NAME));
         }
         STenant tenant;
         try {
             final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), name);
-            tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class));
+            tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_TENANT_BY_NAME, parameters, STenant.class));
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with name: " + name);
             }
@@ -457,7 +502,7 @@ public class PlatformServiceImpl implements PlatformService {
             throw new STenantNotFoundException("Unable to check if a tenant already exists: " + e.getMessage(), e);
         }
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getTenantByName"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), QUERY_GET_TENANT_BY_NAME));
         }
         return tenant;
     }
@@ -465,22 +510,22 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public STenant getDefaultTenant() throws STenantNotFoundException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDefaultTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), QUERY_GET_DEFAULT_TENANT));
         }
         STenant tenant = null;
         try {
-            tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>("getDefaultTenant", null, STenant.class));
+            tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_DEFAULT_TENANT, null, STenant.class));
             if (tenant == null) {
                 throw new STenantNotFoundException("No default tenant found");
             }
         } catch (final SBonitaReadException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDefaultTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), QUERY_GET_DEFAULT_TENANT, e));
             }
             throw new STenantNotFoundException("Unable to check if a default tenant already exists: " + e.getMessage(), e);
         }
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDefaultTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), QUERY_GET_DEFAULT_TENANT));
         }
         return tenant;
     }
@@ -488,12 +533,13 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public List<STenant> getTenants(final Collection<Long> ids, final QueryOptions queryOptions) throws STenantNotFoundException, STenantException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getTenants"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_GET_TENANTS));
         }
         List<STenant> tenants;
         try {
             final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
-            tenants = platformPersistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, queryOptions));
+            tenants = platformPersistenceService
+                    .selectList(new SelectListDescriptor<STenant>(QUERY_GET_TENANTS_BY_IDS, parameters, STenant.class, queryOptions));
             if (tenants.size() != ids.size()) {
                 throw new STenantNotFoundException("Unable to retrieve all tenants by ids. Expected: " + ids + ", retrieved: " + tenants);
             }
@@ -501,7 +547,7 @@ public class PlatformServiceImpl implements PlatformService {
             throw new STenantException("Problem getting list of tenants: " + e.getMessage(), e);
         }
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getTenants"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_GET_TENANTS));
         }
         return tenants;
     }
@@ -509,18 +555,18 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void updatePlatform(final SPlatform platform, final EntityUpdateDescriptor descriptor) throws SPlatformUpdateException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updatePlatform"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_UPDATE_PLATFORM));
         }
         final UpdateDescriptor desc = new UpdateDescriptor(platform);
         desc.addFields(descriptor.getFields());
         try {
             platformPersistenceService.update(desc);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "updatePlatform"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_UPDATE_PLATFORM));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updatePlatform", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_UPDATE_PLATFORM, e));
             }
             throw new SPlatformUpdateException("Problem while updating platform: " + platform, e);
         }
@@ -529,9 +575,9 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void updateTenant(final STenant tenant, final EntityUpdateDescriptor descriptor) throws STenantUpdateException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_UPDATE_TENANT));
         }
-        String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
+        final String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
         if (tenantName != null) {
             try {
                 if (getTenantByName(tenantName).getId() != tenant.getId()) {
@@ -546,11 +592,11 @@ public class PlatformServiceImpl implements PlatformService {
         try {
             platformPersistenceService.update(desc);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "updateTenant"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_UPDATE_TENANT));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_UPDATE_TENANT, e));
             }
             throw new STenantUpdateException("Problem while updating tenant: " + tenant, e);
         }
@@ -559,36 +605,36 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public boolean activateTenant(final long tenantId) throws STenantNotFoundException, STenantActivationException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "activateTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_ACTIVATE_TENANT));
         }
         final STenant tenant = getTenant(tenantId);
         if (isTenantActivated(tenant)) {
             return false;
-        } else {
-            final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
-            try {
-                platformPersistenceService.update(desc);
-                if (trace) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "activateTenant"));
-                }
-            } catch (final SPersistenceException e) {
-                if (trace) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "activateTenant", e));
-                }
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                }
-                throw new STenantActivationException("Problem while activating tenant : " + tenant, e);
-            }
-            return true;
         }
+
+        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
+        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
+        try {
+            platformPersistenceService.update(desc);
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_ACTIVATE_TENANT));
+            }
+        } catch (final SPersistenceException e) {
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_ACTIVATE_TENANT, e));
+            }
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+            }
+            throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
+        }
+        return true;
     }
 
     @Override
     public void deactiveTenant(final long tenantId) throws STenantNotFoundException, STenantDeactivationException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deactiveTenant"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DEACTIVE_TENANT));
         }
         final STenant tenant = getTenant(tenantId);
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
@@ -596,11 +642,11 @@ public class PlatformServiceImpl implements PlatformService {
         try {
             platformPersistenceService.update(desc);
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deactiveTenant"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_DEACTIVE_TENANT));
             }
         } catch (final SPersistenceException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deactiveTenant", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DEACTIVE_TENANT, e));
             }
             throw new STenantDeactivationException("Problem while deactivating tenant: " + tenant, e);
         }
@@ -609,16 +655,16 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public List<STenant> getTenants(final QueryOptions queryOptions) throws STenantException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getTenants"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_GET_TENANTS));
         }
         List<STenant> tenants;
         try {
-            tenants = platformPersistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, queryOptions));
+            tenants = platformPersistenceService.selectList(new SelectListDescriptor<STenant>(LOG_GET_TENANTS, null, STenant.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new STenantException("Problem getting list of tenants : " + e.getMessage(), e);
         }
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getTenants"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_GET_TENANTS));
         }
         return tenants;
     }
@@ -626,18 +672,19 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public int getNumberOfTenants() throws STenantException {
         if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfTenants"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), QUERY_GET_NUMBER_OF_TENANTS));
         }
         final Map<String, Object> emptyMap = Collections.emptyMap();
         try {
-            final Long read = platformPersistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenants", emptyMap, STenant.class, Long.class));
+            final Long read = platformPersistenceService.selectOne(new SelectOneDescriptor<Long>(QUERY_GET_NUMBER_OF_TENANTS, emptyMap, STenant.class,
+                    Long.class));
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getNumberOfTenants"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), QUERY_GET_NUMBER_OF_TENANTS));
             }
             return read.intValue();
         } catch (final SBonitaReadException e) {
             if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfTenants", e));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), QUERY_GET_NUMBER_OF_TENANTS, e));
             }
             throw new STenantException(e);
         }

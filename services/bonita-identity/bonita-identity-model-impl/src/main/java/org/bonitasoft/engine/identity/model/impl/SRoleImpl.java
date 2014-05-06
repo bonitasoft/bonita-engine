@@ -36,7 +36,7 @@ public class SRoleImpl extends SNamedElementImpl implements SRole {
 
     public SRoleImpl() {
         super();
-    };
+    }
 
     @Override
     public String getDiscriminator() {

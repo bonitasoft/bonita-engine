@@ -9,8 +9,6 @@ ALTER TABLE command DROP CONSTRAINT fk_command_tenantId;
 ALTER TABLE connector_instance DROP CONSTRAINT fk_connector_instance_tenantId;
 ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId;
 ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId;
-ALTER TABLE datasource DROP CONSTRAINT fk_datasource_tenantId;
-ALTER TABLE datasourceparameter DROP CONSTRAINT fk_datasourceparameter_tenantId;
 ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId;
 ALTER TABLE document_content DROP CONSTRAINT fk_document_content_tenantId;

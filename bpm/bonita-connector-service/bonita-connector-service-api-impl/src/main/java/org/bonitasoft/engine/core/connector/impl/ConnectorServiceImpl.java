@@ -69,6 +69,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.tracking.TimeTracker;
+import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -109,9 +111,11 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private final TechnicalLoggerService logger;
 
+    private final TimeTracker timeTracker;
+
     public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor, final ParserFactory parserFactory,
             final ReadSessionAccessor sessionAccessor, final ExpressionResolverService expressionResolverService, final OperationService operationService,
-            final DependencyService dependencyService, final TechnicalLoggerService logger) {
+            final DependencyService dependencyService, final TechnicalLoggerService logger, final TimeTracker timeTracker) {
         this.cacheService = cacheService;
         this.connectorExecutor = connectorExecutor;
         this.sessionAccessor = sessionAccessor;
@@ -123,6 +127,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         this.operationService = operationService;
         this.dependencyService = dependencyService;
         this.logger = logger;
+        this.timeTracker = timeTracker;
     }
 
     @Override
@@ -200,21 +205,39 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     public void executeOutputOperation(final List<SOperation> outputs, final SExpressionContext expressionContext, final ConnectorResult result)
             throws SConnectorException {
+        final long startTime = System.currentTimeMillis();
         try {
             expressionContext.setInputValues(new HashMap<String, Object>(result.getResult()));
             operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
             disconnect(result);
         } catch (final SOperationExecutionException e) {
             throw new SConnectorException(e);
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("ConnectorResult: ");
+                desc.append(result);
+                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS, desc.toString(), (endTime - startTime));
+            }
         }
     }
 
     @Override
     public void disconnect(final ConnectorResult result) throws SConnectorException {
+        final long startTime = System.currentTimeMillis();
         try {
             connectorExecutor.disconnect(new SConnectorAdapter(result.getConnector()));
         } catch (final org.bonitasoft.engine.connector.exception.SConnectorException e) {
             throw new SConnectorException(e);
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("ConnectorResult: ");
+                desc.append(result);
+                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT, desc.toString(), (endTime - startTime));
+            }
         }
     }
 
@@ -268,7 +291,8 @@ public class ConnectorServiceImpl implements ConnectorService {
             }
             final String implementationClassName = implementation.getImplementationClassName();
 
-            final Map<String, Object> inputParameters = evaluateInputParameters(connectorInputParameters, sexpContext, inputValues);
+            final Map<String, Object> inputParameters = evaluateInputParameters(implementation.getDefinitionId(), connectorInputParameters, sexpContext,
+                    inputValues);
             final ConnectorResult connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
 
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -312,19 +336,33 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     @Override
-    public Map<String, Object> evaluateInputParameters(final Map<String, SExpression> parameters, final SExpressionContext sExpressionContext,
+    public Map<String, Object> evaluateInputParameters(final String connectorId, final Map<String, SExpression> parameters,
+            final SExpressionContext sExpressionContext,
             final Map<String, Map<String, Serializable>> inputValues) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
+        final long startTime = System.currentTimeMillis();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(parameters.size());
-        for (final Entry<String, SExpression> input : parameters.entrySet()) {
-            if (sExpressionContext != null) {
-                final String key = input.getKey();
-                if (inputValues != null && !inputValues.isEmpty() && inputValues.containsKey(key)) {
-                    sExpressionContext.setSerializableInputValues(inputValues.get(key));
+        try {
+            for (final Entry<String, SExpression> input : parameters.entrySet()) {
+                if (sExpressionContext != null) {
+                    final String key = input.getKey();
+                    if (inputValues != null && !inputValues.isEmpty() && inputValues.containsKey(key)) {
+                        sExpressionContext.setSerializableInputValues(inputValues.get(key));
+                    }
+                    inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue(), sExpressionContext));
+                } else {
+                    inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
                 }
-                inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue(), sExpressionContext));
-            } else {
-                inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
+            }
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("Connector ID: ");
+                desc.append(connectorId);
+                desc.append(" - input parameters: ");
+                desc.append(inputParameters);
+                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS, desc.toString(), (endTime - startTime));
             }
         }
         return inputParameters;
@@ -493,9 +531,8 @@ public class ConnectorServiceImpl implements ConnectorService {
                     }
                     zipEntry = zipInputstream.getNextEntry();
                     continue;
-                } else {
-                    newFile.getParentFile().mkdirs();
                 }
+                newFile.getParentFile().mkdirs();
                 IOUtil.copyFile(zipInputstream, newFile);
 
                 zipInputstream.closeEntry();

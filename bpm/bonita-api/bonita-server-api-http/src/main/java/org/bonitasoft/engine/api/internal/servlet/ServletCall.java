@@ -95,15 +95,15 @@ public abstract class ServletCall {
                 try {
                     final FileItemStream item = iter.next();
                     final InputStream stream = item.openStream();
-                    if (item.getFieldName().startsWith(BINARY_PARAMETER)) {
+                    String fieldName = item.getFieldName();
+                    if (fieldName.startsWith(BINARY_PARAMETER)) {
                         binaryParameters.add(IOUtil.getAllContentFrom(stream));
                     } else {
-                        final String value = new String(IOUtil.getAllContentFrom(stream));
-                        parameters.put(item.getFieldName(), value);
+                        String read = IOUtil.read(stream);
+                        parameters.put(fieldName, read);
                     }
                     stream.close();
-                } catch (final Throwable t) {
-                    t.printStackTrace();
+                } catch (final Exception t) {
                     throw new IOException(t);
                 }
             }

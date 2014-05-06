@@ -79,7 +79,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
             STransactionCreationException, STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
-        final Object result = expressionService.evaluate(expression, dependencyValues, resolvedExpressions);
+        final Object result = expressionService.evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
         getTransactionService().complete();
         return result;
     }

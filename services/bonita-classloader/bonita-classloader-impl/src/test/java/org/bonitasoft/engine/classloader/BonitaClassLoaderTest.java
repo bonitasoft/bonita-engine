@@ -11,7 +11,7 @@ import org.junit.Test;
 public class BonitaClassLoaderTest {
 
     @Test
-    public void releaseShouldRemoveAllScopeFolderAndItsContent() throws Exception {
+    public void releaseShouldRemoveAllScopeFolderAndItsContent() {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest");

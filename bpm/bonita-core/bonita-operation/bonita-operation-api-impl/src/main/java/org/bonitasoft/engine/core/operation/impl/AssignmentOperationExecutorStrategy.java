@@ -14,9 +14,10 @@
 package org.bonitasoft.engine.core.operation.impl;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
+import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 
 /**
  * AssignmentOperationExecutorStrategy is the default Bonita strategy to execute data assignment operations
@@ -26,7 +27,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class AssignmentOperationExecutorStrategy extends UpdateDataOperationExecutorStrategy {
+public class AssignmentOperationExecutorStrategy implements OperationExecutorStrategy {
 
     /**
      * The Operation type of this strategy, as a String
@@ -39,15 +40,13 @@ public class AssignmentOperationExecutorStrategy extends UpdateDataOperationExec
      * @param dataInstanceService
      *            how to access to the data
      */
-    public AssignmentOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
-        super(dataInstanceService);
+    public AssignmentOperationExecutorStrategy() {
     }
 
     @Override
-    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext) throws SOperationExecutionException {
         // do not check if value is external, see ENGINE-1739
-        if (!operation.getLeftOperand().isExternal()) {
+        if (operation.getLeftOperand().getType().equals(SLeftOperand.TYPE_DATA)) {
             checkReturnType(value, operation, expressionContext);
         }
         // no processing on the value, just return it

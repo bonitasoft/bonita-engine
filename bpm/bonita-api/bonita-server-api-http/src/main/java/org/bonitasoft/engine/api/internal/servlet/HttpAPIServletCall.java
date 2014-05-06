@@ -57,7 +57,7 @@ public class HttpAPIServletCall extends ServletCall {
 
     private static final String OPTIONS = "options";
 
-    private static final XStream xstream = new XStream();
+    private static final XStream XSTREAM = new XStream();
 
     public HttpAPIServletCall(final HttpServletRequest request, final HttpServletResponse response) throws FileUploadException, IOException {
         super(request, response);
@@ -85,15 +85,15 @@ public class HttpAPIServletCall extends ServletCall {
 
             Map<String, Serializable> myOptions = new HashMap<String, Serializable>();
             if (options != null && !options.isEmpty()) {
-                myOptions = fromXML(options, xstream);
+                myOptions = fromXML(options, XSTREAM);
             }
             List<String> myClassNameParameters = new ArrayList<String>();
             if (parametersClasses != null && !parametersClasses.isEmpty() && !parametersClasses.equals(ARRAY)) {
-                myClassNameParameters = fromXML(parametersClasses, xstream);
+                myClassNameParameters = fromXML(parametersClasses, XSTREAM);
             }
             Object[] myParametersValues = new Object[0];
             if (parametersValues != null && !parametersValues.isEmpty() && !parametersValues.equals(NULL)) {
-                myParametersValues = fromXML(parametersValues, xstream);
+                myParametersValues = fromXML(parametersValues, XSTREAM);
                 if (myParametersValues != null && !(myParametersValues.length == 0)) {
                     final Iterator<byte[]> binaryParameters = getBinaryParameters().iterator();
                     for (int i = 0; i < myParametersValues.length; i++) {
@@ -117,7 +117,7 @@ public class HttpAPIServletCall extends ServletCall {
 
             String invokeMethodSerialized = null;
             if (invokeMethod != null) {
-                invokeMethodSerialized = toXML(invokeMethod, xstream);
+                invokeMethodSerialized = toXML(invokeMethod, XSTREAM);
             }
 
             // add charset avoid encoding problems
@@ -167,9 +167,9 @@ public class HttpAPIServletCall extends ServletCall {
             result = exception;
         }
         // ignore fields suppressedExceptions and stackTrance causing exceptions in some cases
-        xstream.omitField(Throwable.class, "suppressedExceptions");
+        XSTREAM.omitField(Throwable.class, "suppressedExceptions");
         // xstream.omitField(Throwable.class, "stackTrace");
-        return toXML(result, xstream);
+        return toXML(result, XSTREAM);
     }
 
     private String toXML(final Object object, final XStream xstream) {

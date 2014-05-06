@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -43,15 +42,11 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.TestStates;
@@ -928,67 +923,6 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         deleteUser(jules.getId());
     }
 
-    @Test
-    public void searchPendingTasksSupervisedBy() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        final long activityInstanceId = activities.get(0).getId();
-        // create user
-        final User user1 = createUser("user1", "bpm");
-        // before supervisor
-        SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
-        SearchResult<HumanTaskInstance> result = getProcessAPI().searchPendingTasksSupervisedBy(user1.getId(), searchOptions.done());
-        assertNotNull(result);
-        assertEquals(0, result.getCount());
-        assertNotNull(result.getResult());
-        assertEquals(0, result.getResult().size());
-        // after supervisor
-        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
-
-        searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
-        // search and check result
-        result = getProcessAPI().searchPendingTasksSupervisedBy(user1.getId(), searchOptions.done());
-        assertNotNull(result);
-        assertEquals(1, result.getCount());
-        final List<HumanTaskInstance> humanTaskInstanceList = result.getResult();
-        assertNotNull(humanTaskInstanceList);
-        assertEquals(1, humanTaskInstanceList.size());
-        assertEquals(activityInstanceId, humanTaskInstanceList.get(0).getId());
-
-        // add supervisor by role and group
-        final User supervisor = createUser("supervisor", "bpm");
-        final Map<String, Object> map = createSupervisorByRoleAndGroup(processDefinition.getId(), supervisor.getId());
-        final ProcessSupervisor supervisorByRole = (ProcessSupervisor) map.get("supervisorByRole");
-        final ProcessSupervisor supervisorByGroup = (ProcessSupervisor) map.get("supervisorByGroup");
-        final Role role = (Role) map.get("roleId");
-        final Group group = (Group) map.get("groupId");
-        final UserMembership membership = (UserMembership) map.get("membership");
-        assertEquals(supervisorByRole.getRoleId(), role.getId());
-        assertEquals(supervisorByGroup.getGroupId(), group.getId());
-        assertEquals(membership.getUserId(), supervisor.getId());
-        assertEquals(membership.getRoleId(), role.getId());
-        assertEquals(membership.getGroupId(), group.getId());
-
-        searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
-        // search and check result
-        result = getProcessAPI().searchPendingTasksSupervisedBy(supervisor.getId(), searchOptions.done());
-        assertNotNull(result);
-        assertEquals(1, result.getCount());
-        final List<HumanTaskInstance> humanTaskInstanceList2 = result.getResult();
-        assertNotNull(humanTaskInstanceList2);
-        assertEquals(1, humanTaskInstanceList2.size());
-        assertEquals(activityInstanceId, humanTaskInstanceList2.get(0).getId());
-
-        deleteSupervisor(supervisor1.getSupervisorId());
-        deleteRoleGroupSupervisor(map, supervisor.getId());
-        deleteUser(supervisor);
-        deleteUser(user1);
-        disableAndDeleteProcess(processDefinition);
-    }
-
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "Apostrophe" }, jira = "ENGINE-366")
     public void searchPendingTasksWithApostrophe() throws Exception {
         searchPendingTasks("userTask'1", ACTOR_NAME);
@@ -1169,7 +1103,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         processBuilder.addUserTask("userTask", ACTOR_NAME);
         processBuilder.addTransition("autoTask", "sendTask");
         processBuilder.addTransition("sendTask", "userTask");
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user.getId(), processBuilder);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user, processBuilder);
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -1185,7 +1119,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final long userId,
+    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final User user,
             final ProcessDefinitionBuilder processDefinitionBuilder) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefinitionBuilder.done());
@@ -1199,10 +1133,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     private List<BarResource> generateDefaultConnectorImplementations() throws IOException {

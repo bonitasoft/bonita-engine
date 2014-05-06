@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -50,8 +51,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
             final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource) throws SPersistenceException {
-        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource);
+            final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
+            ClassNotFoundException {
+        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
+                enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
     }
 
@@ -84,15 +87,15 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     }
 
     private void setTenantByClassReflector(final PersistentObject entity, Long tenantId) throws SPersistenceException {
-            try {
-                tenantId = getTenantId();
-                ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
-            } catch (final SReflectException e) {
-                throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
-            } catch (final STenantIdNotSetException e) {
-                throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
-            }
+        try {
+            tenantId = getTenantId();
+            ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
+        } catch (final SReflectException e) {
+            throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
+        } catch (final STenantIdNotSetException e) {
+            throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
         }
+    }
 
     @Override
     protected Session getSession(final boolean useTenant) throws SPersistenceException {
@@ -155,10 +158,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final PersistentObjectId id = new PersistentObjectId(selectDescriptor.getId(), getTenantId());
             Class<? extends PersistentObject> mappedClass = null;
-                mappedClass = getMappedClass(selectDescriptor.getEntityType());
+            mappedClass = getMappedClass(selectDescriptor.getEntityType());
             return (T) session.get(mappedClass, id);
-            } catch (final SPersistenceException e) {
-                throw new SBonitaReadException(e);
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e);
         } catch (final STenantIdNotSetException e) {
             return super.selectById(session, selectDescriptor);
         } catch (final AssertionFailure af) {
@@ -177,8 +180,9 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
-            final Query query = session.createQuery(getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName)
-                    + " WHERE tenantId= :tenantId", filters, null));
+            final boolean enableWordSearch = isWordSearchEnabled(entityClass);
+
+            final Query query = session.createQuery(getQueryString(entityClassName, filters, enableWordSearch));
             query.setLong(TENANT_ID, getTenantId());
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -188,4 +192,14 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             throw new SPersistenceException(e);
         }
     }
+
+    private String getQueryString(final String entityClassName, final List<FilterOption> filters, final boolean enableWordSearch) {
+        if (filters == null || filters.isEmpty()) {
+            return "DELETE FROM " + entityClassName + " WHERE tenantId= :tenantId";
+        } else {
+            return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId",
+                    filters, null, enableWordSearch);
+        }
+    }
+
 }

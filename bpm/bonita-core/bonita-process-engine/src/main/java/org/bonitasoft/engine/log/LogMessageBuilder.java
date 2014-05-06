@@ -52,6 +52,18 @@ public class LogMessageBuilder {
         return stb.toString();
     }
 
+    public static String buildExecuteTaskContextMessage(final SFlowNodeInstance flowNodeInstance, final String username, final long executerUserId,
+            final long executerSubstituteId) {
+        final StringBuilder stb = new StringBuilder();
+        stb.append("The user <" + username + "> ");
+        if (executerUserId != executerSubstituteId) {
+            stb.append("acting as delegate of the user with id = <" + executerUserId + "> ");
+        }
+        stb.append("has executed the task");
+        stb.append(LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+        return stb.toString();
+    }
+
     /**
      * Build message "The user <session.getUsername> (acting as delegate of user with id <starterId>)"
      * 
@@ -65,7 +77,7 @@ public class LogMessageBuilder {
         stb.append(session.getUserName());
         stb.append("> ");
         if (starterId != session.getUserId()) {
-            stb.append("acting as delegate of user with id = <");
+            stb.append("acting as delegate of the user with id = <");
             stb.append(starterId);
             stb.append("> ");
         }

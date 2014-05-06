@@ -22,8 +22,9 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
  */
 public interface SContactInfoLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
+    @Override
     SContactInfoLogBuilder createNewInstance();
-    
+
     String getContactInfoUserIdKey();
 
 }

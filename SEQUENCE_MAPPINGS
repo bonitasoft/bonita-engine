@@ -25,10 +25,6 @@ LOG
 queriable_log -> 30
 queriable_log_parameter -> 31 
 
-DATA
-dataSource -> 50
-dataSourceParameter -> 51
-
 Archive
 employee -> 60
 laptop -> 61
@@ -106,6 +102,10 @@ ExternalIdentityMapping -> 10070
 
 MigrationPlan
 MigrationPlanDescriptor -> 10100
+
+Token -> 10110
+
+Page -> 10120
 
 =Archived objects==
 

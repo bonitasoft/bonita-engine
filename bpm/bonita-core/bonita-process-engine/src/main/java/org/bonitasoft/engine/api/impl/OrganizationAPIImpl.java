@@ -79,7 +79,7 @@ public class OrganizationAPIImpl {
         profileService.deleteAllProfileMembers();
         activityInstanceService.deleteAllPendingMappings();
         activityInstanceService.deleteAllHiddenTasks();
-        supervisorService.deleteAllSupervisors();
+        supervisorService.deleteAllProcessSupervisors();
         externalIdentityMappingService.deleteAllExternalIdentityMappings();
         identityService.deleteAllUserMemberships();
         identityService.deleteAllGroups();

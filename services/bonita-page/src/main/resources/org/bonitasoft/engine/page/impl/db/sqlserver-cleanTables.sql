@@ -1,0 +1,2 @@
+DELETE FROM page
+GO

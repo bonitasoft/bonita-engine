@@ -26,9 +26,9 @@
 
 	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="name" value="GROOVY_SCRIPT_CACHE_NAME" />
-		<property name="timeToLiveSeconds" value="3600" />
 		<property name="maxElementsInMemory" value="10000" />
 		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
 	</bean>
 
 	<bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">

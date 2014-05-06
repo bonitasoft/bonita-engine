@@ -28,4 +28,8 @@ public final class ProfileEntrySearchDescriptor {
 
     public static final String PARENT_ID = "parentId";
 
+    public static final String PAGE = "page";
+
+    public static final String CUSTOM = "custom";
+
 }

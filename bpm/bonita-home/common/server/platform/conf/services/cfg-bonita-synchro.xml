@@ -3,7 +3,7 @@
 
 	<bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl" >
 		<constructor-arg name="initialCapacity" value="50" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="cacheService" ref="platformCacheService" />
 	</bean>
 

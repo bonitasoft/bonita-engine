@@ -4,7 +4,7 @@
 	<bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
 		<constructor-arg name="sessionProvider" ref="sessionProvider" />
 		<constructor-arg name="applicationName" value="BPM" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>

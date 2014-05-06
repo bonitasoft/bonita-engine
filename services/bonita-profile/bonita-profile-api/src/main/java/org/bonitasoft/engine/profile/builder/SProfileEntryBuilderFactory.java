@@ -36,6 +36,8 @@ public interface SProfileEntryBuilderFactory {
 
     String TYPE = "type";
 
+    String CUSTOM = "custom";
+
     SProfileEntryBuilder createNewInstance(String name, long profileId);
 
     SProfileEntryBuilder createNewInstance(SProfileEntry profileEntry);

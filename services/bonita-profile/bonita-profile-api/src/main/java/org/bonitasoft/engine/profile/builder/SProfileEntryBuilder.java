@@ -32,6 +32,8 @@ public interface SProfileEntryBuilder {
 
     SProfileEntryBuilder setIndex(long index);
 
+    SProfileEntryBuilder setCustom(Boolean custom);
+
     SProfileEntry done();
 
 }

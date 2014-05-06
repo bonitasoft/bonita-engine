@@ -31,7 +31,6 @@ public class TcpServer {
         final int nbOfPorts = ports.size();
         int i = 1;
         final ServerAPI apiImpl = ServerAPIFactory.getServerAPI();
-        // System.out.println(this.getClass().getSimpleName() + " - starting...");
         for (final int port : ports) {
             final String threadName = ServerSocketThread.class.getSimpleName() + "-" + String.format("%" + nbOfPorts + "d", i) + "-p" + port;
             sockets.add(new ServerSocketThread(threadName, apiImpl, port));

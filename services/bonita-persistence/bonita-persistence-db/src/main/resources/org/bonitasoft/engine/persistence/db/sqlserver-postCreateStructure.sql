@@ -19,10 +19,6 @@ ALTER TABLE data_instance ADD CONSTRAINT fk_data_instance_tenantId FOREIGN KEY (
 GO
 ALTER TABLE data_mapping ADD CONSTRAINT fk_data_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
-ALTER TABLE datasource ADD CONSTRAINT fk_datasource_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
-GO
-ALTER TABLE datasourceparameter ADD CONSTRAINT fk_datasourceparameter_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
-GO
 ALTER TABLE dependency ADD CONSTRAINT fk_dependency_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_dependencymapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)

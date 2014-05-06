@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<processDefinition xmlns="http://www.bonitasoft.org/ns/process/client/6.0" bos_version="6.0-SNAPSHOT" description="Description" displayDescription="plop2" displayName="plop" name="Name" version="1.0">
+  <stringIndexes>
+    <stringIndex index="1"/>
+    <stringIndex index="2"/>
+    <stringIndex index="3"/>
+    <stringIndex index="4"/>
+    <stringIndex index="5"/>
+  </stringIndexes>
+  <flowElements>
+    <transitions>
+      <transition id="814417081174018087" name="BoundaryEvent_-&gt;_ManualTask" source="-8138421435916323700" target="-7721793631546079018"/>
+    </transitions>
+    <connectors>
+      <connector activationEvent="ON_ENTER" connectorId="testConnectorThatThrowException" failAction="FAIL" name="testConnectorThatThrowException" version="1.0">
+        <inputs/>
+        <outputs/>
+      </connector>
+    </connectors>
+    <dataDefinitions>
+      <dataDefinition className="java.io.Serializable" name="BlobData" transient="false">
+        <description>blolbDescription</description>
+      </dataDefinition>
+      <dataDefinition className="java.lang.Boolean" name="BooleanData" transient="false"/>
+    </dataDefinitions>
+    <documentDefinitions>
+      <documentDefinition mimeType="application/octet-stream" name="Doc">
+        <url>plop</url>
+      </documentDefinition>
+    </documentDefinitions>
+    <flowNodes>
+      <automaticTask id="-5197363258520844205" name="AutomaticTask">
+        <dataDefinitions/>
+        <operations/>
+        <boundaryEvents/>
+      </automaticTask>
+      <callActivity callableElementType="PROCESS" id="-6527826397705796895" name="CallActivity">
+        <dataDefinitions/>
+        <operations/>
+        <boundaryEvents/>
+        <callableElement expressionType="TYPE_CONSTANT" name="Name" returnType="java.lang.String">
+          <content>Name</content>
+        </callableElement>
+        <callableElementVersion expressionType="TYPE_CONSTANT" name="1.0" returnType="java.lang.String">
+          <content>1.0</content>
+        </callableElementVersion>
+      </callActivity>
+      <manualTask actorName="Actor Name" id="-7721793631546079018" name="ManualTask">
+        <incomingTransition idref="814417081174018087"/>
+        <dataDefinitions/>
+        <operations/>
+        <boundaryEvents>
+          <boundaryEvent id="-8138421435916323700" interrupting="true" name="BoundaryEvent">
+            <outgoingTransition idref="814417081174018087"/>
+            <catchSignalEventTrigger name="signalName"/>
+          </boundaryEvent>
+        </boundaryEvents>
+      </manualTask>
+      <userTask actorName="Actor Name" id="-7232375228202947387" name="UserTask">
+        <dataDefinitions/>
+        <operations/>
+        <boundaryEvents/>
+        <userFilter name="test" userFilterId="org.bonitasoft.engine.filter.user.testFilter" version="1.0">
+          <inputs>
+            <input name="userId">
+              <expression expressionType="TYPE_CONSTANT" name="3" returnType="java.lang.Long">
+                <content>3</content>
+              </expression>
+            </input>
+          </inputs>
+        </userFilter>
+      </userTask>
+      <receiveTask id="-5348266538787308968" name="ReceiveTask">
+        <dataDefinitions/>
+        <operations/>
+        <boundaryEvents/>
+        <catchMessageEventTrigger name="messageName"/>
+      </receiveTask>
+      <sendTask id="-7260779579682331227" name="SendTask">
+        <dataDefinitions/>
+        <operations/>
+        <boundaryEvents/>
+        <throwMessageEventTrigger name="messageName">
+          <targetProcess expressionType="TYPE_CONSTANT" name="Name" returnType="java.lang.String">
+            <content>Name</content>
+          </targetProcess>
+        </throwMessageEventTrigger>
+      </sendTask>
+      <gateway description="Description" gatewayType="PARALLEL" id="-4753426110937317943" name="Gateway"/>
+      <intermediateCatchEvent id="-6376742524635855342" interrupting="true" name="IntermediateCatchEvent"/>
+      <intermediateThrowEvent id="-5722864864097221590" name="IntermediateThrowEvent"/>
+      <endEvent id="-5277748868329970553" name="EndEvent"/>
+    </flowNodes>
+  </flowElements>
+  <dependencies>
+    <parameters/>
+    <actors>
+      <actor name="Actor Name"/>
+      <actor name="actor2">
+        <description>Description</description>
+      </actor>
+    </actors>
+  </dependencies>
+  <actorInitiator name="Actor Name"/>
+</processDefinition>

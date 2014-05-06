@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -123,6 +123,7 @@ public class SCommentServiceImpl implements SCommentService {
         }
     }
 
+    @Deprecated
     @Override
     public List<SComment> getComments(final long processInstanceId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
@@ -154,9 +155,27 @@ public class SCommentServiceImpl implements SCommentService {
             recorder.recordInsert(insertRecord, insertEvent);
             return sComment;
         } catch (final SRecorderException e) {
-            throw new SCommentAddException("Impossible to create comment.", e);
+            throw new SCommentAddException(processInstanceId, "human", e);
         } catch (final SSessionNotFoundException e) {
             throw new SCommentAddException("Session is not found.", e);
+        }
+    }
+
+    @Override
+    public SComment addSystemComment(final long processInstanceId, final String comment) throws SCommentAddException {
+        NullCheckingUtil.checkArgsNotNull(processInstanceId);
+        NullCheckingUtil.checkArgsNotNull(comment);
+        try {
+            final SComment sComment = BuilderFactory.get(SSystemCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, null).done();
+            final InsertRecord insertRecord = new InsertRecord(sComment);
+            SInsertEvent insertEvent = null;
+            if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
+                insertEvent = getInsertEvent(sComment);
+            }
+            recorder.recordInsert(insertRecord, insertEvent);
+            return sComment;
+        } catch (final SRecorderException e) {
+            throw new SCommentAddException(processInstanceId, "system", e);
         }
     }
 
@@ -171,7 +190,7 @@ public class SCommentServiceImpl implements SCommentService {
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
-            throw new SCommentDeletionException("Impossible to delete comment.", e);
+            throw new SCommentDeletionException("Can't delete the comment " + comment, e);
         }
     }
 
@@ -185,7 +204,7 @@ public class SCommentServiceImpl implements SCommentService {
                     delete(sComment);
                 }
             }
-        } while (sComments.size() > 0);
+        } while (sComments != null && sComments.size() > 0);
     }
 
     private long getUserId() throws SSessionNotFoundException {
@@ -277,24 +296,6 @@ public class SCommentServiceImpl implements SCommentService {
             return persistenceService.searchEntity(SAComment.class, searchOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
-        }
-    }
-
-    @Override
-    public SComment addSystemComment(final long processInstanceId, final String comment) throws SCommentAddException {
-        NullCheckingUtil.checkArgsNotNull(processInstanceId);
-        NullCheckingUtil.checkArgsNotNull(comment);
-        try {
-            final SComment sComment = BuilderFactory.get(SSystemCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, null).done();
-            final InsertRecord insertRecord = new InsertRecord(sComment);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
-                insertEvent = getInsertEvent(sComment);
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
-            return sComment;
-        } catch (final SRecorderException e) {
-            throw new SCommentAddException("Impossible to create system comment.", e);
         }
     }
 

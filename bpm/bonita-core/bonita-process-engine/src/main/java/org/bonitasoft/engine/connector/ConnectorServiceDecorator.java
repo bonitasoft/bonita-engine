@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,6 +40,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
  * 
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ConnectorServiceDecorator implements ConnectorService {
 
@@ -55,10 +56,9 @@ public class ConnectorServiceDecorator implements ConnectorService {
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
             throws SConnectorException {
-        final SExpression apiAccessorExpression;
-        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
         final Map<String, SExpression> parameters = new HashMap<String, SExpression>(connectorInputParameters);
-        parameters.put("connectorApiAccessor", apiAccessorExpression);
+        parameters.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
+        parameters.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
         return connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, parameters, inputValues,
                 classLoader, sexpContext);
     }
@@ -87,17 +87,16 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public Map<String, Object> evaluateInputParameters(final Map<String, SExpression> parameters, final SExpressionContext sExpressionContext,
+    public Map<String, Object> evaluateInputParameters(final String connectorId, final Map<String, SExpression> parameters,
+            final SExpressionContext sExpressionContext,
             final Map<String, Map<String, Serializable>> inputValues) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
-        SExpression apiAccessorExpression;
-        SExpression engineExecutionContext;
-        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
-        engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext();
+        SExpression apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
+        SExpression engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext();
         final Map<String, SExpression> newParameters = new HashMap<String, SExpression>(parameters);
         newParameters.put("connectorApiAccessor", apiAccessorExpression);
         newParameters.put("engineExecutionContext", engineExecutionContext);
-        return connectorService.evaluateInputParameters(newParameters, sExpressionContext, inputValues);
+        return connectorService.evaluateInputParameters(connectorId, newParameters, sExpressionContext, inputValues);
     }
 
     @Override

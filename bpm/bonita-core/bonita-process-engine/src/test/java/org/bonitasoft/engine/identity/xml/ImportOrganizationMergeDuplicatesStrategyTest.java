@@ -23,10 +23,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class ImportOrganizationMergeDuplicatesStrategyTest {
-    
+
     private static final long USER_ID = 2L;
 
     private static final long DEFINITION_ID = 1L;
@@ -37,46 +36,46 @@ public class ImportOrganizationMergeDuplicatesStrategyTest {
 
     @Mock
     private IdentityService identityService;
-    
+
     @Mock
     private SCustomUserInfoValueAPI userInfoValueAPI;
-    
+
     @InjectMocks
     private ImportOrganizationMergeDuplicatesStrategy strategy;
-    
+
     @Mock
     private SUser existingUser;
-    
+
     private ExportedUserImpl userToImport;
-    
+
     private ExportedCustomUserInfoValue customUserInfoValue;
-    
+
     @Mock
     private SCustomUserInfoDefinition infoDef;
-    
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         given(existingUser.getId()).willReturn(USER_ID);
         given(infoDef.getId()).willReturn(DEFINITION_ID);
-        
+
         customUserInfoValue = new ExportedCustomUserInfoValue(SKILLS_NAME, SKILLS_VALUE);
 
         userToImport = new ExportedUserImpl();
         userToImport.addCustomUserInfoValues(customUserInfoValue);
     }
-    
+
     @Test
     public void foundExistingCustomUserInfoDefinition_should_call_service_to_update_element() throws Exception {
-        //given
+        // given
         String newDescription = "updated description";
         SCustomUserInfoDefinition existingUserInfoDefinition = mock(SCustomUserInfoDefinition.class);
         CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator("name", newDescription);
         EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newDescription);
-        
-        //when
+
+        // when
         strategy.foundExistingCustomUserInfoDefinition(existingUserInfoDefinition, creator);
 
-        //then
+        // then
         verify(identityService, times(1)).updateCustomUserInfoDefinition(existingUserInfoDefinition, updateDescriptor);
     }
 
@@ -86,18 +85,17 @@ public class ImportOrganizationMergeDuplicatesStrategyTest {
         EntityUpdateDescriptor updateDescriptor = builder.done();
         return updateDescriptor;
     }
-    
+
     @Test
     public void foundExistingUser_show_call_customUserInfoValueImporter() throws Exception {
-        //given
+        // given
         given(identityService.getCustomUserInfoDefinitionByName(SKILLS_NAME)).willReturn(infoDef);
-        
-        //when
+
+        // when
         strategy.foundExistingUser(existingUser, userToImport);
 
-        //then
+        // then
         verify(userInfoValueAPI, times(1)).set(DEFINITION_ID, USER_ID, SKILLS_VALUE);
     }
-
 
 }

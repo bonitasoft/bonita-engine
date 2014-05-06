@@ -143,20 +143,19 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException;
 
     /**
-     * Get the list of all {@link SMessageInstance}s that are "In Progress", that is, that a work is running or should be running.
+     * Resets all Message Instances marked as handled, so that they are elligible to match Waiting Events again.
      * 
-     * @return the list of all matching {@link SMessageInstance}s
-     * @throws SMessageInstanceReadException
-     *             if a read error occurs.
+     * @throws SMessageModificationException
+     *             if an error occurs when resetting the 'handled' flag.
      */
-    public List<SMessageInstance> getInProgressMessageInstances() throws SMessageInstanceReadException;
+    int resetProgressMessageInstances() throws SMessageModificationException;
 
     /**
-     * Get the list of all {@link WaitingEvent}s that are "In Progress", that is, that a work is running or should be running.
+     * Resets all Waiting Message Events marked as 'in progress", so that they are elligible to match Message Instances again.
      * 
-     * @return the list of all matching {@link WaitingEvent}s
-     * @throws SWaitingEventReadException
-     *             if a read error occurs.
+     * @return the number of waiting events reset.
+     * @throws SWaitingEventModificationException
+     *             if an error occurs when resetting the 'progress' flag.
      */
-    public List<SWaitingMessageEvent> getInProgressWaitingMessageEvents() throws SWaitingEventReadException;
+    int resetInProgressWaitingEvents() throws SWaitingEventModificationException;
 }

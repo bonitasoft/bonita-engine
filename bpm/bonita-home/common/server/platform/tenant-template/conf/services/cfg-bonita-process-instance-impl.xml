@@ -3,10 +3,10 @@
 
     <bean id="activityInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl">
         <constructor-arg name="recorder" ref="recorderSync" />
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="processInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">
@@ -14,7 +14,7 @@
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="activityService" ref="activityInstanceService" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
@@ -31,7 +31,7 @@
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="gatewayInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
@@ -39,7 +39,7 @@
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="tokenService" ref="tokenService" />
     </bean>
 
@@ -51,8 +51,9 @@
     <bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="eventService" ref="eventService" />
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+		<constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
 </beans>

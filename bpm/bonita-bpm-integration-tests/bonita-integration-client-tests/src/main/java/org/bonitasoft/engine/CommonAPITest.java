@@ -22,6 +22,7 @@ import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
 import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Rule;
@@ -91,6 +92,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkNoUsers());
         messages.addAll(checkNoGroups());
         messages.addAll(checkNoRoles());
+        messages.addAll(checkNoSupervisors());
         messages.addAll(checkNoProcessDefinitions());
         messages.addAll(checkNoProcessIntances());
         messages.addAll(checkNoArchivedProcessIntances());
@@ -123,7 +125,7 @@ public abstract class CommonAPITest extends APITestUtil {
         bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
 
-    protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final long userId, final ProcessDefinitionBuilder designProcessDefinition,
+    protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final User user, final ProcessDefinitionBuilder designProcessDefinition,
             final String filterName) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -136,10 +138,7 @@ public abstract class CommonAPITest extends APITestUtil {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {

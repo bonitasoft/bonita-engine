@@ -52,8 +52,8 @@ public class SearchArchivedProcessInstancesDescriptor extends SearchEntityDescri
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.ID, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getIdKey()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STARTED_BY,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartedByKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STARTED_BY_DELEGATE,
-                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartedByDelegateKey()));
+        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STARTED_BY_SUBSTITUTE,
+                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartedBySubstituteKey()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.START_DATE,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartDateKey()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.END_DATE, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getEndDateKey()));

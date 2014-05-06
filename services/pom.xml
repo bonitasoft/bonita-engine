@@ -28,7 +28,6 @@
 		<module>bonita-document</module>
 		<module>bonita-xml</module>
 		<module>bonita-events</module>
-		<module>bonita-data</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
 		<module>bonita-test-util</module>
@@ -52,6 +51,8 @@
 		<module>bonita-incident</module>
 		<module>bonita-builder</module>
 		<module>bonita-theme</module>
+		<module>bonita-page</module>
+		<module>bonita-time-tracker</module>
 	</modules>
 	
 	<profiles>

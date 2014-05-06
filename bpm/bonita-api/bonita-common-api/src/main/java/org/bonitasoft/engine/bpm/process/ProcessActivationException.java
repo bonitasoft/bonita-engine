@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
  * 
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class ProcessActivationException extends ExecutionException {
 
@@ -35,6 +36,13 @@ public class ProcessActivationException extends ExecutionException {
 
     public ProcessActivationException(final String message) {
         super(message);
+    }
+
+    public ProcessActivationException(final long processDefinitionId, final String name, final String version) {
+        super("The process definition is not enabled !!");
+        setProcessDefinitionIdOnContext(processDefinitionId);
+        setProcessDefinitionNameOnContext(name);
+        setProcessDefinitionVersionOnContext(version);
     }
 
 }

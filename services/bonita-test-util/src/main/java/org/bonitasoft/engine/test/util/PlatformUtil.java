@@ -16,6 +16,7 @@ package org.bonitasoft.engine.test.util;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
@@ -42,7 +43,8 @@ public class PlatformUtil {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, created, status, false);
+            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, created, status,
+                    false);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
             platformService.activateTenant(tenant.getId());
@@ -58,7 +60,8 @@ public class PlatformUtil {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, created, status, true);
+            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class)
+                    .createNewInstance(tenantName, createdBy, created, status, true);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
             platformService.activateTenant(tenant.getId());
@@ -115,7 +118,8 @@ public class PlatformUtil {
             transactionService.complete();
         }
 
-        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
+        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class)
+                .createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
         try {
             transactionService.begin();
             platformService.createPlatform(platform);
@@ -127,8 +131,8 @@ public class PlatformUtil {
     public static void deletePlatform(final TransactionService transactionService, final PlatformService platformService) throws Exception {
         try {
             transactionService.begin();
-            List<STenant> existingTenants;
-            existingTenants = platformService.getTenants(QueryOptions.defaultQueryOptions());
+            final List<STenant> existingTenants = platformService.getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id",
+                    OrderByType.ASC));
             if (existingTenants.size() > 0) {
                 for (final STenant sTenant : existingTenants) {
                     final long tenantId = sTenant.getId();

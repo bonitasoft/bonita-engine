@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -62,14 +63,15 @@ import org.xml.sax.SAXException;
 public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         if (expression.getDependencies().size() != 1 || expression.getDependencies().get(0) == null) {
             throw new SExpressionDependencyMissingException("XPathReadExpressionExecutorStrategy must have exactly one dependency");
         }
 
         final String expressionName = expression.getName();
         final String returnType = expression.getReturnType();
+        final String messageForException = "Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy";
         try {
             final QName qname = getXPathConstants(returnType);
             if (qname == null) {
@@ -90,27 +92,22 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final XPathExpression exp = xpath.compile(expression.getContent());
             return transType(exp.evaluate(document, qname), returnType);
         } catch (final XPathExpressionException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
-                    expressionName);
+            throw new SExpressionEvaluationException(messageForException, e, expressionName);
         } catch (final ParserConfigurationException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
-                    expressionName);
+            throw new SExpressionEvaluationException(messageForException, e, expressionName);
         } catch (final SAXException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
-                    expressionName);
+            throw new SExpressionEvaluationException(messageForException, e, expressionName);
         } catch (final IOException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
-                    expressionName);
+            throw new SExpressionEvaluationException(messageForException, e, expressionName);
         } catch (final SBonitaRuntimeException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
-                    expressionName);
+            throw new SExpressionEvaluationException(messageForException, e, expressionName);
         }
     }
 
     private Object transType(final Object result, final String returnType) {
         try {
             if (Boolean.class.getName().equals(returnType)) {
-                return result != null && (((String) result).equalsIgnoreCase("true") || result.equals("1"));
+                return result != null && ("true".equalsIgnoreCase(((String) result)) || "1".equals(result));
             }
             if (Long.class.getName().equals(returnType)) {
                 return Long.parseLong((String) result);
@@ -166,11 +163,11 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }

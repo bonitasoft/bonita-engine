@@ -74,16 +74,15 @@ public class UserFilterTest extends CommonAPITest {
 
     @Test
     public void filterTask() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilter", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), designProcessDefinition, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilter");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -100,16 +99,15 @@ public class UserFilterTest extends CommonAPITest {
      */
     @Test
     public void filterTaskWithUserFilterNotFound() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilter", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithClassNotFound", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), designProcessDefinition, "TestFilterWithClassNotFound");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterWithClassNotFound");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -123,33 +121,32 @@ public class UserFilterTest extends CommonAPITest {
      */
     @Test
     public void filterTaskWithUserFilterThatThrowException() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder processWithRuntime = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterRuntimeException", "1.0");
-        processWithRuntime.addActor(delivery).addDescription("Delivery all day and night long");
+        processWithRuntime.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         processWithRuntime.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = processWithRuntime.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = processWithRuntime.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0").addInput("exception",
                 new ExpressionBuilder().createConstantStringExpression("runtime"));
         processWithRuntime.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionWithRuntime = deployProcessWithTestFilter(delivery, john.getId(), processWithRuntime,
+        final ProcessDefinition processDefinitionWithRuntime = deployProcessWithTestFilter(ACTOR_NAME, john, processWithRuntime,
                 "TestFilterThatThrowException");
         final ProcessDefinitionBuilder processWithException = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterNormalException", "1.0");
-        processWithException.addActor(delivery).addDescription("Delivery all day and night long");
+        processWithException.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         processWithException.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask2 = processWithException.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask2 = processWithException.addUserTask("step2", ACTOR_NAME);
         addUserTask2.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0").addInput("exception",
                 new ExpressionBuilder().createConstantStringExpression("normal"));
         processWithException.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionWithException = deployProcessWithTestFilter(delivery, john.getId(), processWithException,
+        final ProcessDefinition processDefinitionWithException = deployProcessWithTestFilter(ACTOR_NAME, john, processWithException,
                 "TestFilterThatThrowException");
         final ProcessDefinitionBuilder processWithNoClassDef = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterNoClassDef", "1.0");
-        processWithNoClassDef.addActor(delivery).addDescription("Delivery all day and night long");
+        processWithNoClassDef.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         processWithNoClassDef.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask3 = processWithNoClassDef.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask3 = processWithNoClassDef.addUserTask("step2", ACTOR_NAME);
         addUserTask3.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowNoClassDef", "1.0").addInput("exception",
                 new ExpressionBuilder().createConstantStringExpression("normal"));
         processWithNoClassDef.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionNoClassDef = deployProcessWithTestFilter(delivery, john.getId(), processWithNoClassDef,
+        final ProcessDefinition processDefinitionNoClassDef = deployProcessWithTestFilter(ACTOR_NAME, john, processWithNoClassDef,
                 "TestFilterThatThrowNoClassDef");
 
         final ProcessInstance processInstanceException = getProcessAPI().startProcess(processDefinitionWithException.getId());
@@ -167,16 +164,15 @@ public class UserFilterTest extends CommonAPITest {
 
     @Test
     public void filterTaskWithAutoAssign() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithAutoAssign", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), designProcessDefinition, "TestFilterWithAutoAssign");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterWithAutoAssign");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -190,30 +186,28 @@ public class UserFilterTest extends CommonAPITest {
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void filterTaskWithNullInput() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterUsingActorName", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0").addInput("userIds", null);
         designProcessDefinition.addTransition("step1", "step2");
-        deployProcessWithTestFilter(delivery, john.getId(), designProcessDefinition, "TestFilterUsingActorName");
+        deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterUsingActorName");
     }
 
     @Test
     public void filterTaskUsingFilterName() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterUsingActorName", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0").addInput(
                 "userIds",
-                new ExpressionBuilder().createGroovyScriptExpression("myScript", "['" + delivery + "':" + james.getId() + "l,'notDelivery':" + jack.getId()
+                new ExpressionBuilder().createGroovyScriptExpression("myScript", "['" + ACTOR_NAME + "':" + james.getId() + "l,'notACTOR_NAME':" + jack.getId()
                         + "l]", Map.class.getName()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), designProcessDefinition, "TestFilterUsingActorName");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterUsingActorName");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -230,21 +224,19 @@ public class UserFilterTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void updateUserFilterAfterAUserDeletion() throws Exception {
-        final String delivery = "Delivery men";
-
         final Group group = createGroup("group1");
         final Role role = createRole("role1");
         createUserMembership(jack.getUserName(), "role1", "group1");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
-        processBuilder.addActor(delivery);
+        processBuilder.addActor(ACTOR_NAME);
         processBuilder.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput("groupId",
                 new ExpressionBuilder().createConstantLongExpression(group.getId()));
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), processBuilder, "GroupUserFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, processBuilder, "GroupUserFilter");
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
@@ -291,14 +283,13 @@ public class UserFilterTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void doNotUpateAHumanTaskIfNoUserFilterIsDefined() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("doNotUpateAHumanTaskIfNoUserFilterIsDefined", "1.0");
-        processBuilder.addActor(delivery);
+        processBuilder.addActor(ACTOR_NAME);
         processBuilder.addAutomaticTask("step1");
-        processBuilder.addUserTask("step2", delivery);
+        processBuilder.addUserTask("step2", ACTOR_NAME);
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTask("step2");
@@ -316,21 +307,19 @@ public class UserFilterTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void updateUserFilterAfterAUserAdd() throws Exception {
-        final String delivery = "Delivery men";
-
         final Group group = createGroup("group1");
         final Role role = createRole("role1");
         createUserMembership(jack.getUserName(), "role1", "group1");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("updateUserFilterAfterAUserAdd", "1.0");
-        processBuilder.addActor(delivery);
+        processBuilder.addActor(ACTOR_NAME);
         processBuilder.addAutomaticTask("step1");
-        final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", delivery);
+        final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput("groupId",
                 new ExpressionBuilder().createConstantLongExpression(group.getId()));
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), processBuilder, "GroupUserFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, processBuilder, "GroupUserFilter");
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());

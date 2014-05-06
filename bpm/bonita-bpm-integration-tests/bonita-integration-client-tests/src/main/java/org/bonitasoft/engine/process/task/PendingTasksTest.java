@@ -1,13 +1,13 @@
 package org.bonitasoft.engine.process.task;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -21,29 +21,51 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserNotFoundException;
+import org.bonitasoft.engine.identity.UserSearchDescriptor;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.util.CollectionUtils;
 
 public class PendingTasksTest extends CommonAPITest {
+
+    private static final String JOHN = "john";
+
+    private static final String JACK = "jack";
+
+    private User john;
+
+    private User jack;
 
     @Before
     public void beforeTest() throws BonitaException {
         login();
+        john = createUser(JOHN, "bpm");
+        jack = createUser(JACK, "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
+        deleteUser(JOHN);
+        deleteUser(JACK);
+        VariableStorage.clearAll();
         logout();
     }
 
@@ -151,7 +173,6 @@ public class PendingTasksTest extends CommonAPITest {
     @Test
     public void getPendingHumanTaskInstancePriorityAndExpectedEndDate() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        final long userId = user.getId();
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final TaskPriority priority = TaskPriority.HIGHEST;
@@ -162,14 +183,12 @@ public class PendingTasksTest extends CommonAPITest {
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDesignDefinition).done();
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser(ACTOR_NAME, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
         final Date before = new Date();
         Thread.sleep(100);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("deliver", startProcess);
-        final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, ActivityInstanceCriterion.DEFAULT);
+        final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
         Thread.sleep(100);
         final Date after = new Date();
         assertEquals(1, activityInstances.size());
@@ -178,7 +197,7 @@ public class PendingTasksTest extends CommonAPITest {
         final long time = humanTaskInstance.getExpectedEndDate().getTime();
         assertTrue(before.getTime() + oneDay < time && time < after.getTime() + oneDay);
         disableAndDeleteProcess(processDefinition);
-        deleteUser(userId);
+        deleteUser(user);
     }
 
     @Test
@@ -264,8 +283,6 @@ public class PendingTasksTest extends CommonAPITest {
 
     @Test
     public void actorMappedToGroup() throws Exception {
-        final User john = createUser("john", "bpm");
-        final User jack = createUser("jack", "bpm");
         final Group mainGroup = createGroup("main");
         final Role member = createRole("member");
         final UserMembership m1 = getIdentityAPI().addUserMembership(john.getId(), mainGroup.getId(), member.getId());
@@ -281,14 +298,10 @@ public class PendingTasksTest extends CommonAPITest {
         deleteUserMembership(m2.getId());
         deleteGroups(mainGroup);
         deleteRoles(member);
-        deleteUser(jack);
-        deleteUser(john);
     }
 
     @Test
     public void actorMappedToDifferrentGroup() throws Exception {
-        final User john = createUser("john", "bpm");
-        final User jack = createUser("jack", "bpm");
         final Group mainGroup = createGroup("main");
         final Group secondGroup = createGroup("second");
         final Role member = createRole("member");
@@ -306,14 +319,10 @@ public class PendingTasksTest extends CommonAPITest {
         deleteUserMembership(m2.getId());
         deleteGroups(secondGroup, mainGroup);
         deleteRoles(member);
-        deleteUser(jack);
-        deleteUser(john);
     }
 
     @Test
     public void actorMappedToGrandChildGroup() throws Exception {
-        final User john = createUser("john", "bpm");
-        final User jack = createUser("jack", "bpm");
         final Group mainGroup = createGroup("main");
         final Group childGroup = createGroup("child", "/main");
         final Group grandChildGroup = createGroup("gChild", "/main/child");
@@ -334,15 +343,11 @@ public class PendingTasksTest extends CommonAPITest {
             deleteUserMembership(m2.getId());
             deleteGroups(grandChildGroup, childGroup, mainGroup);
             deleteRoles(member);
-            deleteUser(jack);
-            deleteUser(john);
         }
     }
 
     @Test
     public void actorMappedToChildGroup() throws Exception {
-        final User john = createUser("john", "bpm");
-        final User jack = createUser("jack", "bpm");
         final Group mainGroup = createGroup("main");
         final Group secondGroup = createGroup("second", "/main");
         final Role member = createRole("member");
@@ -360,8 +365,6 @@ public class PendingTasksTest extends CommonAPITest {
             deleteUserMembership(m2.getId());
             deleteGroups(secondGroup, mainGroup);
             deleteRoles(member);
-            deleteUser(jack);
-            deleteUser(john);
         }
     }
 
@@ -379,6 +382,324 @@ public class PendingTasksTest extends CommonAPITest {
         getProcessAPI().addGroupToActor(processActor.getId(), mainGroup.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void searchPossibleUsersOfTaskUserActor() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jaakko);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        final List<User> possibleUsers = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done()).getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void searchPossibleUsersOfTaskUserActorWithoutMembership() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        // createUserMembership(jack.getUserName(), role.getName(), group.getName());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jaakko);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> possibleUsers = searchResult.getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void searchPossibleUsersOfTaskRoleActor() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", role);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> possibleUsers = searchResult.getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void searchPossibleUsersOfTaskGroupActor() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> possibleUsers = searchResult.getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-6798", classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "possible users", "pagination" })
+    @Test
+    public void searchPossibleUsersOfTaskShouldReturnAllUsersInThePaginationRange() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Role role = createRole("role");
+        final int USER_LIST_SIZE = 21;
+        final List<User> users = new ArrayList<User>(USER_LIST_SIZE);
+        for (int i = 0; i < USER_LIST_SIZE; i++) {
+            User newUser = createUser("user_" + i, "pwd");
+            users.add(newUser);
+            createUserMembership(newUser.getUserName(), role.getName(), group.getName());
+        }
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("getPossible_pagination", "1.1");
+        String actorName = "major";
+        String activityName = "step1";
+        designProcessDefinition.addActor(actorName);
+        designProcessDefinition.addUserTask(activityName, actorName);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), actorName, users);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask(activityName, processInstance);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 30);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(21, searchResult.getCount());
+        final List<User> possibleUsers = searchResult.getResult();
+        // make sure the list is not limited to 20:
+        assertEquals(21, possibleUsers.size());
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUsers(users);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void searchPossibleUsersOfTaskSubGroupActor() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Group group2 = createGroup("gr", group.getPath());
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jack.getUserName(), role.getName(), group.getPath());
+        createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(2, searchResult.getCount());
+        List<User> possibleUsers = searchResult.getResult();
+
+        assertEquals(2, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+        assertEquals(jack, possibleUsers.get(1));
+
+        builder = new SearchOptionsBuilder(1, 10);
+        builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+
+        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(2, searchResult.getCount());
+        possibleUsers = searchResult.getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jack, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
+            "possible users", "human task" })
+    @Test
+    public void searchPossibleUsersOfFilteredTask() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Group group2 = createGroup("gr", group.getPath());
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
+        createUserMembership(jack.getUserName(), role.getName(), group2.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.2");
+        designProcessDefinition.addActor("acme");
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = designProcessDefinition.addUserTask("step1", "acme");
+        taskDefinitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+                new ExpressionBuilder().createConstantLongExpression(jaakko.getId()));
+        final UserTaskDefinitionBuilder definitionBuilder = designProcessDefinition.addUserTask("step2", "acme");
+        definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
+                new ExpressionBuilder().createConstantLongExpression(jack.getId()));
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter("acme", jaakko, designProcessDefinition, "TestFilter");
+        getProcessAPI().addUserToActor("acme", processDefinition, jack.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        waitForUserTask("step2", processInstance);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 2);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        final List<User> possibleUsers = searchResult.getResult();
+
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
+            "possible users", "human task" })
+    @Test
+    public void searchPossibleUsersShouldReturnThoseStartingWithSearchedNamed() throws Exception {
+        loginWith(JOHN, "bpm");
+        final Group group = createGroup("group");
+        final Group group2 = createGroup("gr", group.getPath());
+        final Role role = createRole("role");
+        final User jaakko = createUser("jaakko", "bpm");
+        createUserMembership(jack.getUserName(), role.getName(), group.getPath());
+        createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
+        designProcessDefinition.addActor("acme");
+        designProcessDefinition.addUserTask("step1", "acme");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        builder.searchTerm("jac");
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        List<User> possibleUsers = searchResult.getResult();
+
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jack, possibleUsers.get(0));
+
+        builder = new SearchOptionsBuilder(0, 1);
+        builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        builder.searchTerm("jaa");
+
+        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        assertEquals(1, searchResult.getCount());
+        possibleUsers = searchResult.getResult();
+        assertEquals(1, possibleUsers.size());
+        assertEquals(jaakko, possibleUsers.get(0));
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void getPossibleUsersOfUnknownTask() throws Exception {
+        loginWith(JOHN, "bpm");
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
+
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(-156l, builder.done());
+        assertEquals(0, searchResult.getCount());
+        final List<User> possibleUsers = searchResult.getResult();
+        assertTrue(CollectionUtils.isEmpty(possibleUsers));
     }
 
 }

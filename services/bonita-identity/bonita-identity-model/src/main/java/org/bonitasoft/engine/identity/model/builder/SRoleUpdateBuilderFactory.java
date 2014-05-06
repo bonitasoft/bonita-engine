@@ -19,7 +19,8 @@ package org.bonitasoft.engine.identity.model.builder;
  * @author Matthieu Chaffotte
  */
 public interface SRoleUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
-    
+
+    @Override
     SRoleUpdateBuilder createNewInstance();
 
 }

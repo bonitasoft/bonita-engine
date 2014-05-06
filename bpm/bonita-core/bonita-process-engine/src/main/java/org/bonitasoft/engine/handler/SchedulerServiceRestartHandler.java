@@ -15,6 +15,8 @@ package org.bonitasoft.engine.handler;
 
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 
 /**
@@ -24,13 +26,17 @@ public class SchedulerServiceRestartHandler implements RestartHandler {
 
     private final SchedulerService schedulerService;
 
-    public SchedulerServiceRestartHandler(final SchedulerService schedulerService) {
+    private final TechnicalLoggerService technicalLoggerService;
+
+    public SchedulerServiceRestartHandler(final SchedulerService schedulerService, final TechnicalLoggerService technicalLoggerService) {
         super();
         this.schedulerService = schedulerService;
+        this.technicalLoggerService = technicalLoggerService;
     }
 
     @Override
     public void execute() throws SBonitaException {
+        technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Rescheduling all scheduler Triggers in ERROR state");
         schedulerService.rescheduleErroneousTriggers();
     }
 

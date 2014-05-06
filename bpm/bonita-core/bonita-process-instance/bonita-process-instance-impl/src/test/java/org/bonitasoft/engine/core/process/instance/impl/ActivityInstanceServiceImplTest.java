@@ -15,9 +15,9 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ActivityInstanceServiceImplTest {
 
     @Mock
-    private ReadPersistenceService persistenceService;
+    private PersistenceService persistenceService;
 
     @InjectMocks
     private ActivityInstanceServiceImpl activityInstanceService;

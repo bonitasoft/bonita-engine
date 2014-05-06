@@ -46,7 +46,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
 
     private long executedBy;
 
-    private long executedByDelegate;
+    private long executedBySubstitute;
 
     private long flownodeDefinitionId;
 
@@ -147,12 +147,23 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
     }
 
     @Override
-    public long getExecutedByDelegate() {
-        return executedByDelegate;
+    public long getExecutedBySubstitute() {
+        return executedBySubstitute;
     }
 
+    public void setExecutedBySubstitute(long executedBySubstitute) {
+        this.executedBySubstitute = executedBySubstitute;
+    }
+
+    @Deprecated
+    @Override
+    public long getExecutedByDelegate() {
+        return getExecutedBySubstitute();
+    }
+
+    @Deprecated
     public void setExecutedByDelegate(long executedByDelegate) {
-        this.executedByDelegate = executedByDelegate;
+        setExecutedBySubstitute(executedByDelegate);
     }
 
     @Override
@@ -172,7 +183,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
-        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
+        result = prime * result + (int) (executedBySubstitute ^ executedBySubstitute >>> 32);
         result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
         result = prime * result + (int) (parentProcessInstanceId ^ parentProcessInstanceId >>> 32);
         result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
@@ -219,7 +230,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         if (executedBy != other.executedBy) {
             return false;
         }
-        if (executedByDelegate != other.executedByDelegate) {
+        if (executedBySubstitute != other.executedBySubstitute) {
             return false;
         }
         if (parentContainerId != other.parentContainerId) {

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.process.task;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
@@ -67,7 +66,6 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,6 +110,8 @@ public class ReceiveTasksTest extends CommonAPITest {
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
+        // we check after that that the waiting event is still here
+        forceMatchingOfEvents();
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
@@ -121,9 +121,6 @@ public class ReceiveTasksTest extends CommonAPITest {
 
         final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(1, searchResult.getCount());
-
-        final WaitForStep waitForStep = new WaitForStep(50, 2000, "userTask1", receiveMessageProcessInstance.getId(), getProcessAPI());
-        assertFalse("Task userTask1 not found", waitForStep.waitUntil());
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -157,7 +154,7 @@ public class ReceiveTasksTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
+        forceMatchingOfEvents();
         waitForUserTask("userTask1", receiveMessageProcessInstance);
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
@@ -194,6 +191,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m3", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        forceMatchingOfEvents();
         waitForUserTask("userTask1", receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -225,8 +223,12 @@ public class ReceiveTasksTest extends CommonAPITest {
             receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                     "delivery", user, "m4", null, null, null);
             final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+            waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", "waiting");
+            forceMatchingOfEvents();
             waitForUserTask("userTask1", receiveMessageProcessInstance);
             final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
+            waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", "waiting");
+            forceMatchingOfEvents();
             waitForUserTask("userTask1", receiveMessageProcessInstance2);
         } finally {
             disableAndDeleteProcess(sendMessageProcess1);
@@ -260,6 +262,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        forceMatchingOfEvents();
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 20000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());

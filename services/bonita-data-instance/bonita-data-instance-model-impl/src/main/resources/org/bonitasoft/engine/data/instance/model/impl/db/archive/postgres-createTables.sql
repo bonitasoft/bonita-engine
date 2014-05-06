@@ -22,6 +22,9 @@ CREATE TABLE arch_data_instance (
 	sourceObjectId INT8 NOT NULL,
 	PRIMARY KEY (tenantid, id)
 );
+
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId);
+
 CREATE TABLE arch_data_mapping (
     tenantid INT8 NOT NULL,
 	id INT8 NOT NULL,
@@ -33,3 +36,5 @@ CREATE TABLE arch_data_mapping (
 	sourceObjectId INT8 NOT NULL,
 	PRIMARY KEY (tenantid, id)
 );
+
+CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId);

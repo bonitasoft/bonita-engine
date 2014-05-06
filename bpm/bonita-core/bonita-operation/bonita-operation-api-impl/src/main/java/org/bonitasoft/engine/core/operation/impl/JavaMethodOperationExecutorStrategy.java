@@ -15,30 +15,29 @@ package org.bonitasoft.engine.core.operation.impl;
 
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 
 /**
  * @author Zhang Bole
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class JavaMethodOperationExecutorStrategy extends UpdateDataOperationExecutorStrategy {
+public class JavaMethodOperationExecutorStrategy implements OperationExecutorStrategy {
 
     public static final String TYPE_JAVA_METHOD = "JAVA_METHOD";
 
-    public JavaMethodOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
-        super(dataInstanceService);
+    public JavaMethodOperationExecutorStrategy() {
     }
 
     @Override
-    public Object getValue(final SOperation operation, final Object valueToSetObjectWith, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
         final String dataToSet = operation.getLeftOperand().getName();
         final Object objectToInvokeJavaMethodOn = expressionContext.getInputValues().get(dataToSet);
         if (objectToInvokeJavaMethodOn == null) {
-            throw new SOperationExecutionException("data " + dataToSet + " does not exist in the context " + containerId + " " + containerType);
+            throw new SOperationExecutionException("data " + dataToSet + " does not exist");
         }
         final String[] split = operation.getOperator().split(":", 2);
         final String operator = split[0];

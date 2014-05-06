@@ -59,7 +59,7 @@ CREATE TABLE user_contactinfo (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   userId BIGINT NOT NULL,
-  email VARCHAR(50),
+  email VARCHAR(255),
   phone VARCHAR(50),
   mobile VARCHAR(50),
   fax VARCHAR(50),

@@ -23,6 +23,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SContactInfoUpdateBuilderFactoryImpl implements SContactInfoUpdateBuilderFactory {
 
+    @Override
     public SContactInfoUpdateBuilder createNewInstance() {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SContactInfoUpdateBuilderImpl(descriptor);

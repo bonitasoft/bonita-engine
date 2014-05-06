@@ -14,13 +14,14 @@
 package org.bonitasoft.engine.operation;
 
 /**
- * Type of the left operand.
  * 
- *  * @deprecated As of 6.0 use {@link OperatorType} instead
+ * @deprecated use constants of LeftOperand
+ * 
+ *             Type of the left operand.
  * 
  * @author Emmanuel Duchastenier
  */
 @Deprecated
 public enum LeftOperandType {
-    DATA, SEARCH_INDEX
+    DATA, SEARCH_INDEX, DOCUMENT, EXTERNAL_DATA, TRANSIENT_DATA
 }

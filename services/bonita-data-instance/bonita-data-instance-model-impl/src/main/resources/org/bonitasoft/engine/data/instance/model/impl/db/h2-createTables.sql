@@ -20,7 +20,6 @@ CREATE TABLE data_instance (
 	discriminant VARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)
 );
-
 CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId);
 
 CREATE TABLE data_mapping (
@@ -33,5 +32,4 @@ CREATE TABLE data_mapping (
 	UNIQUE (tenantId, containerId, containerType, dataName),
 	PRIMARY KEY (tenantid, id)
 );
-
 CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId);

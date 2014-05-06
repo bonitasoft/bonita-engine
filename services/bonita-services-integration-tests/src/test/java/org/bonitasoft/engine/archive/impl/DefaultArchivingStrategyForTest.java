@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
-import org.bonitasoft.engine.archive.ArchivingStrategy;
 
 /**
  * @author Celine Souchet
  */
-public class DefaultArchivingStrategyForTest extends AbstractArchivingStrategy implements ArchivingStrategy {
+public class DefaultArchivingStrategyForTest extends AbstractArchivingStrategy {
 
     public DefaultArchivingStrategyForTest() {
         super();

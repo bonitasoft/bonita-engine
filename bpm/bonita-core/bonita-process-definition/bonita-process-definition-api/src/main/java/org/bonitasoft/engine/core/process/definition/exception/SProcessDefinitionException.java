@@ -34,4 +34,10 @@ public class SProcessDefinitionException extends SBonitaException {
         super(message, cause);
     }
 
+    public SProcessDefinitionException(final String message, final long processDefinitionId, final String name, final String version) {
+        super(message);
+        setProcessDefinitionIdOnContext(processDefinitionId);
+        setProcessDefinitionNameOnContext(name);
+        setProcessDefinitionVersionOnContext(version);
+    }
 }

@@ -25,7 +25,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class UserImporterTest {
 
@@ -47,48 +46,49 @@ public class UserImporterTest {
 
     @Mock
     private IdentityService identityService;
-    
+
     @Mock
     private ImportOrganizationStrategy strategy;
-    
+
     @Mock
     private TenantServiceAccessor serviceAccessor;
-    
+
     @Mock
     private CustomUserInfoValueImporter userInfoValueImporter;
-    
+
     private UserImporter importer;
-    
+
     @Mock
-    private SCustomUserInfoDefinition  skills;
-    
+    private SCustomUserInfoDefinition skills;
+
     @Mock
-    private SCustomUserInfoDefinition  location;
-    
+    private SCustomUserInfoDefinition location;
+
     @Mock
     private SUser persistedUser;
-    
+
     private ExportedUser userToImport;
 
     private ExportedCustomUserInfoValue skillsValue;
+
     private ExportedCustomUserInfoValue locationValue;
-    
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         given(serviceAccessor.getIdentityService()).willReturn(identityService);
         importer = new UserImporter(serviceAccessor, strategy, 5, userInfoValueImporter);
-        
+
         given(persistedUser.getId()).willReturn(USER_ID);
-        
+
         given(skills.getName()).willReturn(SKILLS_NAME);
         given(skills.getId()).willReturn(SKILLS_ID);
-        
+
         given(location.getName()).willReturn(LOCATION_NAME);
         given(location.getId()).willReturn(LOCATION_ID);
-        
+
         skillsValue = new ExportedCustomUserInfoValue(SKILLS_NAME, SKILLS_VALUE);
         locationValue = new ExportedCustomUserInfoValue(LOCATION_NAME, lOCATION_VALUE);
-        
+
         userToImport = getUser(FIRST_USER, Arrays.asList(skillsValue, locationValue));
     }
 
@@ -100,31 +100,31 @@ public class UserImporterTest {
         }
         return userImpl;
     }
-    
+
     @Test
     public void importUsers_should_call_customUserInfoValueImporter_if_the_user_doesnt_exist() throws Exception {
-        //given
+        // given
         given(identityService.getNumberOfUsers(any(QueryOptions.class))).willReturn(0L);
         given(identityService.createUser(any(SUser.class))).willReturn(persistedUser);
-        
-        //when
+
+        // when
         importer.importUsers(Arrays.asList(userToImport));
 
-        //then
+        // then
         verify(userInfoValueImporter, times(1)).imporCustomUserInfoValues(Arrays.asList(skillsValue, locationValue), USER_ID);
     }
 
     @Test
     public void importUsers_shouldnt_call_customUserInfoValueImporter_if_the_user_exists() throws Exception {
-        //given
+        // given
         given(identityService.getNumberOfUsers(any(QueryOptions.class))).willReturn(1L);
         given(identityService.getUserByUserName(FIRST_USER)).willReturn(persistedUser);
-        
-        //when
+
+        // when
         importer.importUsers(Arrays.asList(userToImport));
-        
-        //then
-        verify(userInfoValueImporter, never()).imporCustomUserInfoValues(Matchers.<List<ExportedCustomUserInfoValue>>any(), anyLong());
+
+        // then
+        verify(userInfoValueImporter, never()).imporCustomUserInfoValues(Matchers.<List<ExportedCustomUserInfoValue>> any(), anyLong());
     }
 
 }

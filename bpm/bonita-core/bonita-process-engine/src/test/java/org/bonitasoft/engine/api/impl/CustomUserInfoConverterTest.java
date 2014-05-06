@@ -13,7 +13,7 @@ import org.junit.Test;
 public class CustomUserInfoConverterTest {
 
     @Test
-    public void should_convert_server_definition_into_client_definition() throws Exception {
+    public void should_convert_server_definition_into_client_definition() {
         CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
         CustomUserInfoDefinitionImpl definition = converter.convert(
@@ -25,7 +25,7 @@ public class CustomUserInfoConverterTest {
     }
 
     @Test
-    public void should_convert_server_value_into_client_value() throws Exception {
+    public void should_convert_server_value_into_client_value() {
         CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
         CustomUserInfoValue value = converter.convert(
@@ -37,7 +37,7 @@ public class CustomUserInfoConverterTest {
     }
 
     @Test
-    public void should_return_null_when_trying_to_convert_a_null_value() throws Exception {
+    public void should_return_null_when_trying_to_convert_a_null_value() {
         CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
         CustomUserInfoValue value = converter.convert((SCustomUserInfoValue) null);

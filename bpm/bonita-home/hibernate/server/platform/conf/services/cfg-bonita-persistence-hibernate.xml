@@ -7,9 +7,15 @@
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
@@ -19,29 +25,39 @@
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="journalConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
 		<constructor-arg name="properties">
-			<props>
-				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
-				<prop key="hibernate.current_session_context_class">jta</prop>
-				<prop key="hibernate.transaction.factory_class">org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory</prop>
-				<prop key="hibernate.transaction.jta.platform">${hibernate.transaction.jta_platform}</prop>
-				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
-				<prop key="hibernate.interceptor">${hibernate.journal.interceptor}</prop>
-				<prop key="hibernate.show_sql">${hibernate.journal.show_sql}</prop>
-				<prop key="hibernate.format_sql">${hibernate.journal.format_sql}</prop>
-				<prop key="hibernate.use_sql_comments">${hibernate.journal.use_sql_comments}</prop>
-				<prop key="hibernate.generate_statistics">false</prop>
-				<prop key="hibernate.connection.shutdown">true</prop>
-				<prop key="hibernate.validator.autoregister_listeners">false</prop>
-				<prop key="hibernate.validator.apply_to_ddl">false</prop>
-				<prop key="javax.persistence.validation.mode">NONE</prop>
-			</props>
+			<bean class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+				<property name="map">
+					<map>
+						<entry key="hibernate.connection.datasource" value="${database.journal.datasource.name}"/>
+						<entry key="hibernate.current_session_context_class" value="jta" />
+						<entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
+						<entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
+						<entry key="hibernate.dialect" value="${hibernate.journal.dialect}" />
+						<entry key="hibernate.interceptor" value="${hibernate.journal.interceptor}" />
+						<entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
+						<entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />
+						<entry key="hibernate.use_sql_comments" value="${hibernate.journal.use_sql_comments}" />
+						<entry key="hibernate.generate_statistics" value="false" />
+						<entry key="hibernate.connection.shutdown" value="true" />
+						<entry key="hibernate.validator.autoregister_listeners" value="false" />
+						<entry key="hibernate.validator.apply_to_ddl" value="false" />
+						<entry key="javax.persistence.validation.mode" value="NONE" />
+					</map>
+				</property>
+			</bean>
 		</constructor-arg>
 		<constructor-arg name="interfaceToClassMapping">
 			<map>
@@ -50,8 +66,6 @@
 				<entry key="org.bonitasoft.engine.platform.model.STenant" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
 				<entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
 				<!-- services -->
-				<entry key="org.bonitasoft.engine.data.model.SDataSource" value="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" />
-				<entry key="org.bonitasoft.engine.data.model.SDataSourceParameter" value="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
@@ -185,7 +199,6 @@
 	<bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl">
 		<property name="hbmResources">
 			<list>
-				<ref bean="hbm-bonita-data-model" />
 				<ref bean="hbm-bonita-dependency-model" />
 				<ref bean="hbm-bonita-dependency-platform-model" />
 				<ref bean="hbm-bonita-document-model" />

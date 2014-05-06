@@ -54,7 +54,8 @@ public class OperationBuilder {
     }
 
     /**
-     * Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
+     * @deprecated use setLeftOperand(String,String)
+     *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
      * 
      * @param name
      *            the name of the left operand
@@ -62,8 +63,41 @@ public class OperationBuilder {
      *            is the data managed externally and thus should not be tried to be updated?
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
+    @Deprecated
     public OperationBuilder setLeftOperand(final String name, final boolean external) {
         operation.setLeftOperand(new LeftOperandBuilder().createNewInstance(name).setExternal(external).done());
+        return this;
+    }
+
+    /**
+     * @deprecated use setLeftOperand(String,String)
+     * 
+     *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
+     * 
+     * @param name
+     *            the name of the left operand
+     * @param external
+     * @return this builder itself, so that calls the various exposed methods can be chained.
+     */
+    @Deprecated
+    public OperationBuilder setLeftOperand(final String name, LeftOperandType type, final boolean external) {
+        if (type == LeftOperandType.DATA && external) {
+            type = LeftOperandType.EXTERNAL_DATA;
+        }
+        operation.setLeftOperand(new LeftOperandBuilder().createNewInstance(name).setType(type.name()).done());
+        return this;
+    }
+
+    /**
+     * Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
+     * 
+     * @param name
+     *            the name of the left operand
+     * @param external
+     * @return this builder itself, so that calls the various exposed methods can be chained.
+     */
+    public OperationBuilder setLeftOperand(final String name, final String type) {
+        operation.setLeftOperand(new LeftOperandBuilder().createNewInstance(name).setType(type).done());
         return this;
     }
 
@@ -109,7 +143,7 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDataOperation(final String dataName, final Expression expression) {
-        return createNewInstance().setLeftOperand(dataName, false).setRightOperand(expression).setType(OperatorType.ASSIGNMENT).done();
+        return createNewInstance().setLeftOperand(dataName, LeftOperand.TYPE_DATA).setRightOperand(expression).setType(OperatorType.ASSIGNMENT).done();
     }
 
     /**
@@ -125,11 +159,11 @@ public class OperationBuilder {
      * @param expression
      *            the Expression to evaluate that represents the new value to set.
      * @return the newly created <code>Operation</code>.
-     * @see OperatorType#BUSINESS_DATA_JAVA_SETTER
      */
     public Operation createBusinessDataSetAttributeOperation(final String businessDataName, final String methodName, final String methodParamType,
             final Expression expression) {
-        return createNewInstance().setLeftOperand(businessDataName, false).setRightOperand(expression).setType(OperatorType.BUSINESS_DATA_JAVA_SETTER)
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setRightOperand(expression)
+                .setType(OperatorType.JAVA_METHOD)
                 .setOperator(methodName).setOperatorInputType(methodParamType).done();
     }
 
@@ -144,38 +178,58 @@ public class OperationBuilder {
      * @see OperatorType#ATTACH_EXISTING_BUSINESS_DATA
      */
     public Operation attachBusinessDataSetAttributeOperation(final String businessDataName, final Expression expressionReturningBusinessData) {
-        return createNewInstance().setLeftOperand(businessDataName, false).setRightOperand(expressionReturningBusinessData)
-                .setType(OperatorType.ATTACH_EXISTING_BUSINESS_DATA).done();
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))
+                .setRightOperand(expressionReturningBusinessData)
+                .setType(OperatorType.ASSIGNMENT).done();
     }
 
     /**
+     * 
+     * create an operation that update a document
+     * 
      * @param docName
+     *            the name of the document
      * @param expression
+     *            the expression that returns a {@link DocumentValue}
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocument(final String docName, final Expression expression) {
-        return createNewInstance().setLeftOperand(docName, false).setType(OperatorType.DOCUMENT_CREATE_UPDATE).setRightOperand(expression).done();
+        return createNewInstance().setLeftOperand(docName, LeftOperand.TYPE_DOCUMENT).setType(OperatorType.ASSIGNMENT).setRightOperand(expression).done();
     }
 
     /**
+     * 
+     * create an operation that update an xml data using a xpath expression
+     * 
      * @param xmlName
+     *            name of the data
      * @param xPath
+     *            the xpath expression
      * @param setValue
+     *            the value to set the node in the data with
      * @return the newly created <code>Operation</code>.
      */
     public Operation createXPathOperation(final String xmlName, final String xPath, final Expression setValue) {
-        return createNewInstance().setLeftOperand(xmlName, false).setType(OperatorType.XPATH_UPDATE_QUERY).setOperator(xPath).setRightOperand(setValue).done();
+        return createNewInstance().setLeftOperand(xmlName, LeftOperand.TYPE_DATA).setType(OperatorType.XPATH_UPDATE_QUERY).setOperator(xPath)
+                .setRightOperand(setValue).done();
     }
 
     /**
+     * 
+     * create an operation that update a data that contains a java object
+     * 
      * @param objectName
+     *            the name of the data
      * @param methodName
+     *            the method to call on this data to update it
      * @param methodParamType
+     *            the type of the parameter of the method
      * @param methodParams
+     *            the value to call the method with
      * @return the newly created <code>Operation</code>.
      */
     public Operation createJavaMethodOperation(final String objectName, final String methodName, final String methodParamType, final Expression methodParams) {
-        return createNewInstance().setLeftOperand(objectName, false).setType(OperatorType.JAVA_METHOD).setOperator(methodName)
+        return createNewInstance().setLeftOperand(objectName, LeftOperand.TYPE_DATA).setType(OperatorType.JAVA_METHOD).setOperator(methodName)
                 .setOperatorInputType(methodParamType).setRightOperand(methodParams).done();
     }
 
@@ -189,7 +243,7 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetStringIndexOperation(final int index, final Expression setValue) {
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createSearchIndexLeftOperand(index)).setType(OperatorType.STRING_INDEX)
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createSearchIndexLeftOperand(index)).setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(setValue).done();
     }
 
@@ -197,6 +251,9 @@ public class OperationBuilder {
      * @return the newly built <code>Operation</code>.
      */
     public Operation done() {
+        if (operation.getType() == null) {
+            throw new IllegalStateException("The type of the expression is not set");
+        }
         return operation;
     }
 

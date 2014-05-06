@@ -7,8 +7,10 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
 
@@ -27,6 +29,17 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         return getServicesBuilder().getTransactionService();
     }
 
+    protected void deleteGatewayInstance(final SGatewayInstance gatewayInstance) throws SBonitaException {
+        transactionService.begin();
+        try {
+            getServicesBuilder().getRecorder().recordDelete(new DeleteRecord(gatewayInstanceService().getGatewayInstance(gatewayInstance.getId())), null);
+        } catch (final SBonitaException e) {
+            throw new SFlowNodeDeletionException(e);
+        } finally {
+            transactionService.complete();
+        }
+    }
+
     @Test
     public void testCreateAndGetGatewayInstance() throws SBonitaException {
         final SGatewayInstance gatewayInstance = BuilderFactory.get(SGatewayInstanceBuilderFactory.class)
@@ -37,6 +50,8 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         final SGatewayInstance gatewayInstanceRes = getGatewayInstanceFromDB(gatewayInstance.getId());
 
         checkGateway(gatewayInstance, gatewayInstanceRes, 2, 3);
+
+        deleteGatewayInstance(gatewayInstanceRes);
     }
 
     private SGatewayInstance getGatewayInstanceFromDB(final Long gatewayId) throws SBonitaException {
@@ -71,7 +86,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         getTransactionService().complete();
     }
 
-    @Test
+    // @Test
     public void testCheckMergingCondition() {
         // it's implement need to be improved
     }
@@ -92,6 +107,8 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         final SGatewayInstance gatewayInstanceRes2 = getGatewayInstanceFromDB(gatewayInstance.getId());
         assertNotNull(gatewayInstanceRes2);
         assertEquals(2, gatewayInstanceRes2.getStateId());
+
+        deleteGatewayInstance(gatewayInstanceRes);
     }
 
     @Test
@@ -110,5 +127,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         final SGatewayInstance gatewayInstanceRes2 = getGatewayInstanceFromDB(gatewayInstance.getId());
         assertNotNull(gatewayInstanceRes2);
         assertEquals("1,2,3,4", gatewayInstanceRes2.getHitBys());
+
+        deleteGatewayInstance(gatewayInstanceRes);
     }
 }

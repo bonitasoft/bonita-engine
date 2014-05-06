@@ -49,7 +49,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
 
     private long executedBy;
 
-    private long executedByDelegate;
+    private long executedBySubstitute;
 
     private String kind;
 
@@ -71,7 +71,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         displayDescription = flowNodeInstance.getDisplayDescription();
         description = flowNodeInstance.getDescription();
         executedBy = flowNodeInstance.getExecutedBy();
-        executedByDelegate = flowNodeInstance.getExecutedByDelegate();
+        executedBySubstitute = flowNodeInstance.getExecutedBySubstitute();
         flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
     }
 
@@ -182,12 +182,12 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
     }
 
     @Override
-    public long getExecutedByDelegate() {
-        return executedByDelegate;
+    public long getExecutedBySubstitute() {
+        return executedBySubstitute;
     }
 
-    public void setExecutedByDelegate(long executedByDelegate) {
-        this.executedByDelegate = executedByDelegate;
+    public void setExecutedBySubstitute(long executedBySubstitute) {
+        this.executedBySubstitute = executedBySubstitute;
     }
 
     @Override
@@ -216,7 +216,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
-        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
+        result = prime * result + (int) (executedBySubstitute ^ executedBySubstitute >>> 32);
         result = prime * result + (int) (expectedEndDate ^ expectedEndDate >>> 32);
         result = prime * result + (kind == null ? 0 : kind.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
@@ -265,7 +265,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         if (executedBy != other.executedBy) {
             return false;
         }
-        if (executedByDelegate != other.executedByDelegate) {
+        if (executedBySubstitute != other.executedBySubstitute) {
             return false;
         }
         if (expectedEndDate != other.expectedEndDate) {

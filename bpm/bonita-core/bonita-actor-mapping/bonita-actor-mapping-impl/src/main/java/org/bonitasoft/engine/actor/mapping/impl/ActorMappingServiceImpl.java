@@ -231,7 +231,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public void deleteActors(final long scopeId) throws SActorDeletionException {
-        final SelectListDescriptor<SActor> selectDescriptor = SelectDescriptorBuilder.getActorsOfScope(scopeId);
+        final SelectListDescriptor<SActor> selectDescriptor = SelectDescriptorBuilder.getActorsOfScope(scopeId, 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS,
+                "name", OrderByType.ASC);
         try {
             final List<SActor> actors = persistenceService.selectList(selectDescriptor);
             for (final SActor actor : actors) {
@@ -426,7 +427,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public List<SActor> getActors(final long scopeId) throws SBonitaReadException {
-        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getActorsOfScope(scopeId);
+        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getActorsOfScope(scopeId, 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS,
+                "name", OrderByType.ASC);
         return persistenceService.selectList(descriptor);
     }
 

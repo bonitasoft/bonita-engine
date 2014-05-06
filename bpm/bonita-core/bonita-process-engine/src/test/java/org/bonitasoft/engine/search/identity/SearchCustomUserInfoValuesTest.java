@@ -13,6 +13,8 @@
  */
 package org.bonitasoft.engine.search.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,8 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Vincent Elcrin
@@ -45,10 +45,10 @@ public class SearchCustomUserInfoValuesTest {
     private SearchOptions options;
 
     @Test
-    public void should_return_a_list_of_CustomUserInfoValues() throws Exception {
+    public void should_return_a_list_of_CustomUserInfoValues() {
         SearchCustomUserInfoValues search = new SearchCustomUserInfoValues(service, descriptor, options);
 
-        List<CustomUserInfoValue> result = search.convertToClientObjects(Arrays.<SCustomUserInfoValue>asList(
+        List<CustomUserInfoValue> result = search.convertToClientObjects(Arrays.<SCustomUserInfoValue> asList(
                 new DummySCustomUserInfoValue(1L, 3L, 1L, ""),
                 new DummySCustomUserInfoValue(2L, 4L, 1L, "")));
 

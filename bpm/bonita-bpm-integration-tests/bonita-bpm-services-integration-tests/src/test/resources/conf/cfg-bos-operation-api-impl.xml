@@ -2,24 +2,26 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
  	<bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
  		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
+ 		<constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
  		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
- 		<constructor-arg name="logger" ref="technicalLoggerService" />
+ 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
  	</bean>
 
 	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor" />
 
-	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-	</bean>
+	<bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider" autowire="byType" />
 
-	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-	</bean>
+	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy" />
 
-	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
+	<bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
+	
+	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
+
+	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy" />
+
+	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy" />
 
 </beans>

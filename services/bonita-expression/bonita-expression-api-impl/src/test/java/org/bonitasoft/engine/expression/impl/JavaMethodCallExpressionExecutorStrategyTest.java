@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -67,7 +68,7 @@ public class JavaMethodCallExpressionExecutorStrategyTest {
         final SExpression expression = new SExpressionImpl("exp1", "toString", ExpressionExecutorStrategy.TYPE_JAVA_METHOD_CALL, String.class.getName(), null,
                 Collections.singletonList(listDep));
 
-        final Object result = methodCall.evaluate(expression, Collections.<String, Object> emptyMap(), listResolvedExp);
+        final Object result = methodCall.evaluate(expression, Collections.<String, Object> emptyMap(), listResolvedExp, ContainerState.ACTIVE);
         assertEquals(list.toString(), result);
     }
 
@@ -76,7 +77,7 @@ public class JavaMethodCallExpressionExecutorStrategyTest {
         final SExpression expression = new SExpressionImpl("exp1", "getShippingAddress", ExpressionExecutorStrategy.TYPE_JAVA_METHOD_CALL,
                 String.class.getName(), null, Collections.singletonList(orderDep));
 
-        final Object result = methodCall.evaluate(expression, Collections.<String, Object> emptyMap(), orderResolvedExp);
+        final Object result = methodCall.evaluate(expression, Collections.<String, Object> emptyMap(), orderResolvedExp, ContainerState.ACTIVE);
         assertEquals(order.getShippingAddress(), result);
     }
 
@@ -85,7 +86,7 @@ public class JavaMethodCallExpressionExecutorStrategyTest {
         final SExpression expression = new SExpressionImpl("exp1", "getReferenceNumber", ExpressionExecutorStrategy.TYPE_JAVA_METHOD_CALL,
                 Long.class.getName(), null, Collections.singletonList(orderDep));
 
-        final Object result = methodCall.evaluate(expression, Collections.<String, Object> emptyMap(), orderResolvedExp);
+        final Object result = methodCall.evaluate(expression, Collections.<String, Object> emptyMap(), orderResolvedExp, ContainerState.ACTIVE);
         assertEquals(order.getReferenceNumber(), result);
     }
 
@@ -97,7 +98,7 @@ public class JavaMethodCallExpressionExecutorStrategyTest {
         expressions.add(new SExpressionImpl("exp1", "getReferenceNumber", ExpressionExecutorStrategy.TYPE_JAVA_METHOD_CALL, Long.class.getName(), null,
                 Collections.singletonList(orderDep)));
 
-        final List<Object> result = methodCall.evaluate(expressions, Collections.<String, Object> emptyMap(), orderResolvedExp);
+        final List<Object> result = methodCall.evaluate(expressions, Collections.<String, Object> emptyMap(), orderResolvedExp, ContainerState.ACTIVE);
         assertEquals(order.getShippingAddress(), result.get(0));
         assertEquals(order.getReferenceNumber(), result.get(1));
     }

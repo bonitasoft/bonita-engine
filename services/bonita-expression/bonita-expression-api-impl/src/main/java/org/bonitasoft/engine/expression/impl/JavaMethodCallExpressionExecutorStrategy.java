@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -32,8 +33,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final SExpression dependency = expression.getDependencies().get(0);
         final Object object = resolvedExpressions.get(dependency.getDiscriminant());
         try {
@@ -59,11 +60,11 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> result = new ArrayList<Object>(2);
         for (final SExpression expression : expressions) {
-            result.add(evaluate(expression, context, resolvedExpressions));
+            result.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return result;
     }

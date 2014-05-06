@@ -35,6 +35,8 @@ public class AuthAwareCookieManager extends CookieManager {
 
     /* ---------------- Fields -------------- */
 
+    private static final String ARGUMENT_IS_NULL = "Argument is null";
+
     private CookiePolicy policyCallback;
 
     private final Map<HttpCookie, List<String>> authMap = new HashMap<HttpCookie, List<String>>();
@@ -83,7 +85,7 @@ public class AuthAwareCookieManager extends CookieManager {
     public Map<String, List<String>> get(final URI uri, final Map<String, List<String>> requestHeaders) {
         // pre-condition check
         if (uri == null || requestHeaders == null) {
-            throw new IllegalArgumentException("Argument is null");
+            throw new IllegalArgumentException(ARGUMENT_IS_NULL);
         }
 
         final Map<String, List<String>> cookieMap = new java.util.HashMap<String, List<String>>();
@@ -118,7 +120,7 @@ public class AuthAwareCookieManager extends CookieManager {
     public void put(final URI uri, final Map<String, List<String>> responseHeaders) {
         // pre-condition check
         if (uri == null || responseHeaders == null) {
-            throw new IllegalArgumentException("Argument is null");
+            throw new IllegalArgumentException(ARGUMENT_IS_NULL);
         }
 
         // if there's no default CookieStore, no need to remember any cookie
@@ -157,7 +159,8 @@ public class AuthAwareCookieManager extends CookieManager {
     private boolean shouldAcceptInternal(final URI uri, final HttpCookie cookie) {
         try {
             return policyCallback.shouldAccept(uri, cookie);
-        } catch (final Exception ignored) { // pretect against malicious callback
+        } catch (final Exception ignored) {
+            // pretect against malicious callback
             return false;
         }
     }

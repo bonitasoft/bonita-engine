@@ -27,6 +27,7 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -54,14 +55,17 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
     private final TechnicalLoggerService logger;
 
+    private final boolean debugEnabled;
+
     public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService, final ClassLoaderService classLoaderService,
             final TechnicalLoggerService logger) {
         this.cacheService = cacheService;
         this.classLoaderService = classLoaderService;
         this.logger = logger;
+        debugEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
-    private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
+    Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
         /*
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
@@ -70,10 +74,14 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         final String key = Thread.currentThread().getId() + SCRIPT_KEY + definitionId + expressionContent.hashCode();
         Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
-        if (script != null && script.getClass().getClassLoader() != shell.getClassLoader()) {
+        // getClassLoader return the InnerClassLoader getParent return the shell classloader
+        if (script != null && script.getClass().getClassLoader().getParent() != shell.getClassLoader()) {
+            ClassLoader classLoader = script.getClass().getClassLoader();
             script = null;
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Invalidating script from cache because of outdated ClassLoader ...");
+            cacheService.remove(GROOVY_SCRIPT_CACHE_NAME, key);
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Invalidating script because expected classloader <" + classLoader + "> but was <"
+                        + shell.getClassLoader() + ">");
             }
         }
 
@@ -84,7 +92,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         return script;
     }
 
-    private GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
+    GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
         String key = null;
         GroovyShell shell = null;
         if (definitionId != null) {
@@ -95,18 +103,21 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             ClassLoader classLoader;
             if (definitionId != null) {
                 classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
-                cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
             } else {
                 classLoader = Thread.currentThread().getContextClassLoader();
             }
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Create a new groovy classloader for " + definitionId + " " + classLoader);
+            }
             shell = new GroovyShell(classLoader);
+            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
         }
         return shell;
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         final String expressionName = expression.getName();
         try {
@@ -127,7 +138,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script : " + expression, e,
                     expressionName);
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             String message = e.getMessage();
             if (message == null || message.isEmpty()) {
                 message = "No message";
@@ -143,11 +154,11 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +25,7 @@ public class WorkServiceTest extends CommonServiceTest {
     }
 
     @After
-    public void after() throws TimeoutException, SBonitaException {
+    public void after() throws SBonitaException {
         getWorkService().stop();
     }
 

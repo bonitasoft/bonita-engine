@@ -4,7 +4,7 @@
 	<bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
 		<constructor-arg name="definitiveArchiveDescriptor" ref="definitiveArchiveDescriptor" />
 		<constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="archivingStrategy" ref="archivingStrategy" />
 		<constructor-arg ref="transactionService" />
 	</bean>

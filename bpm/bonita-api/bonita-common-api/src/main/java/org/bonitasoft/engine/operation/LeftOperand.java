@@ -19,8 +19,21 @@ import java.io.Serializable;
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  */
 public interface LeftOperand extends Serializable {
+
+    static String TYPE_DATA = "DATA";
+
+    static String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
+
+    static String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
+
+    static String TYPE_DOCUMENT = "DOCUMENT";
+
+    static String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
+
+    static String TYPE_TRANSIENT_DATA = "TRANSIENT_DATA";
 
     String getName();
 
@@ -31,10 +44,19 @@ public interface LeftOperand extends Serializable {
     String getDataName();
 
     /**
-     * @deprecated As of 6.0 use {@link Operation#getType()} instead
+     * The type of the left operand
+     * 
+     * It define what kind of resource the operation will update
+     * 
+     * @return
+     *         the type of the left operand
+     */
+    String getType();
+
+    /**
+     * 
+     * @deprecated As of 6.3.0 replaced by {@link #getType()}
      */
     @Deprecated
-    LeftOperandType getType();
-
     boolean isExternal();
 }

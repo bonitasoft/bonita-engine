@@ -77,7 +77,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
         if (technicalLoggerService == null) {
-            technicalLoggerService = SpringPlatformFileSystemBeanAccessor.getService(TechnicalLoggerService.class);
+            technicalLoggerService = SpringPlatformFileSystemBeanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
         }
         return technicalLoggerService;
     }

@@ -1,22 +1,40 @@
 package org.bonitasoft.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessRuntimeAPI;
+import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ComparisonOperator;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.process.Employee;
 import org.bonitasoft.engine.process.Secretary;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -30,6 +48,10 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
 
     private static final String JOHN = "john";
 
+    private User user;
+
+    private ProcessDefinition processDefinition;
+
     @After
     public void afterTest() throws BonitaException {
         deleteUser(JOHN);
@@ -39,7 +61,7 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        createUser(JOHN, "bpm");
+        user = createUser(JOHN, "bpm");
         logout();
         loginWith(JOHN, "bpm");
     }
@@ -119,4 +141,56 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(classes = { DataInstance.class }, concept = BPMNConcept.OPERATION, keywords = { "Expression",
+            "Transient data" }, story = "Compare two objects with operator GREATER_THAN.", jira = "BS-1379")
+    @Test
+    public void should_operation_with_transient_data_reevaluate_the_definition_if_lost() throws Exception {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTransientData",
+                String.valueOf(System.currentTimeMillis()));
+        builder.addActor("actor");
+        builder.addUserTask("step1", "actor").addData("tData", String.class.getName(),
+                new ExpressionBuilder().createConstantStringExpression("The default value")).isTransient();
+        processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
+        getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTask("step1");
+
+        // evaluate the expression of the transient data, it should return the default value
+        assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The default value");
+        // update it using operation
+        updateDataWithOperation(step1, "The updated value", "tData");
+        // evaluate it: it should return the updated value
+        assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The updated value");
+        // clear the cache
+        getTenantAccessor().getCacheService().clear("transient_data");
+        // evaluate it: it should return the default value
+        assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The default value");
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long tenantId = sessionAccessor.getTenantId();
+            return TenantServiceSingleton.getInstance(tenantId);
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
+
+    private void updateDataWithOperation(final HumanTaskInstance step1, final String value, final String name) throws InvalidExpressionException,
+            UpdateException {
+        Operation operation = new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
+                .setRightOperand(new ExpressionBuilder().createConstantStringExpression(value)).setType(OperatorType.ASSIGNMENT).done();
+        getProcessAPI().updateActivityInstanceVariables(Arrays.asList(operation), step1.getId(), null);
+    }
+
+    private Map<String, Serializable> evaluateTransientDataWithExpression(final HumanTaskInstance step1) throws ExpressionEvaluationException,
+            InvalidExpressionException {
+        Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<Expression, Map<String, Serializable>>();
+        expressionMap
+                .put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()), Collections.<String, Serializable> emptyMap());
+        Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(step1.getId(), expressionMap);
+        return result;
+    }
 }

@@ -30,5 +30,5 @@ public enum DocumentCriterion {
 
     URL_ASC, URL_DESC,
 
-    DEFAULT
+    DEFAULT;
 }

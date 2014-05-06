@@ -961,10 +961,9 @@ public class MultiInstanceTest extends CommonAPITest {
         }
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, john.getId(), processDefinition);
-        addMappingOfActorsForUser(actorName, jack.getId(), processDefinition);
-        addMappingOfActorsForUser(actorName, jenny.getId(), processDefinition);
-
+        getProcessAPI().addUserToActor(actorName, processDefinition, john.getId());
+        getProcessAPI().addUserToActor(actorName, processDefinition, jack.getId());
+        getProcessAPI().addUserToActor(actorName, processDefinition, jenny.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }

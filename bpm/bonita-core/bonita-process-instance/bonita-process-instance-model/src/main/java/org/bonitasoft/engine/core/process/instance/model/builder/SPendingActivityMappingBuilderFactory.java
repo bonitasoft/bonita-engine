@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
@@ -21,6 +20,10 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
 public interface SPendingActivityMappingBuilderFactory {
 
     static final String ACTOR_ID = "actorId";
+
+    static final String ACTIVITY_ID = "activityId";
+
+    static final String USER_ID = "userId";
 
     SPendingActivityMappingBuilder createNewInstanceForUser(final long activityId, final long userId);
 

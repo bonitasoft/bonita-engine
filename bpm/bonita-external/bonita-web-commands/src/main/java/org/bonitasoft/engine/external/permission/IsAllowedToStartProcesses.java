@@ -64,7 +64,7 @@ public class IsAllowedToStartProcesses extends TenantCommand {
 
         checkIfUserExists(userId);
 
-        if (processDefinitionIds.size() > 0) {
+        if (!processDefinitionIds.isEmpty()) {
             for (Long processDefinitionId : processDefinitionIds) {
                 try {
                     List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId);

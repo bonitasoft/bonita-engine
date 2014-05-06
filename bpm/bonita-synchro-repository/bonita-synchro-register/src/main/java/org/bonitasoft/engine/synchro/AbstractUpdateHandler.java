@@ -57,7 +57,6 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
             UserTransactionService userTransactionService = tenantServiceAccessor.getUserTransactionService();
             userTransactionService.registerBonitaSynchronization(synchronization);
-            // System.out.println("++++++++++++++++++++ " + this.getClass().getSimpleName() + " executing for event " + event + " +++++++++++++++++++++");
         } catch (final STransactionNotFoundException e) {
             e.printStackTrace();
             throw new SHandlerExecutionException(e);
@@ -82,7 +81,7 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
             }
             final Object invoke = method.invoke(object);
             id = (Long) invoke;
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             System.err.println("AbstractUpdateHandler: No id on object " + object);
         }
         return id;
@@ -91,7 +90,7 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
     private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
         try {
             return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }
     }

@@ -19,6 +19,5 @@
 		<module>bonita-process-comment-api-impl</module>
 		<module>bonita-process-comment-model</module>
 		<module>bonita-process-comment-model-impl</module>
-		<module>bonita-process-comment-model-impl-hibernate</module>
 	</modules>
 </project>

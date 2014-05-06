@@ -18,8 +18,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -58,7 +56,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
@@ -80,10 +77,6 @@ public class ServerAPIImpl implements ServerAPI {
     private final boolean cleanSession;
 
     private TechnicalLoggerService technicalLogger;
-
-    private String hostname = null;
-
-    private boolean hostnameResolutionAlreadyTried = false;
 
     private enum SessionType {
         PLATFORM, API;
@@ -137,10 +130,10 @@ public class ServerAPIImpl implements ServerAPI {
                 throw sapire.getCause();
             }
         } catch (final BonitaRuntimeException bre) {
-            fillGlobalContextForException(sessionAccessor, session, bre);
+            fillGlobalContextForException(session, bre);
             throw createServerWrappedException(bre);
         } catch (final BonitaException be) {
-            fillGlobalContextForException(sessionAccessor, session, be);
+            fillGlobalContextForException(session, be);
             throw createServerWrappedException(be);
         } catch (final UndeclaredThrowableException ute) {
             technicalDebugLog(ute);
@@ -148,7 +141,7 @@ public class ServerAPIImpl implements ServerAPI {
         } catch (final Throwable cause) {
             technicalDebugLog(cause);
             final BonitaRuntimeException throwableToWrap = new BonitaRuntimeException(cause);
-            fillGlobalContextForException(sessionAccessor, session, throwableToWrap);
+            fillGlobalContextForException(session, throwableToWrap);
             throw createServerWrappedException(throwableToWrap);
         } finally {
             cleanSessionIfNeeded(sessionAccessor);
@@ -162,29 +155,8 @@ public class ServerAPIImpl implements ServerAPI {
         return new ServerWrappedException(throwableToWrap);
     }
 
-    private void fillGlobalContextForException(final SessionAccessor sessionAccessor, final Session session, final BonitaContextException be) {
-        fillTenantIdContextForException(sessionAccessor, be);
+    private void fillGlobalContextForException(final Session session, final BonitaContextException be) {
         fillUserNameContextForException(session, be);
-        fillHostnameContextForException(be);
-        fillThreadIdContextForException(be);
-    }
-
-    private void fillThreadIdContextForException(final BonitaContextException be) {
-        be.setThreadId(Thread.currentThread().getId());
-    }
-
-    private void fillHostnameContextForException(final BonitaContextException be) {
-        if (hostname == null && !hostnameResolutionAlreadyTried) {
-            hostnameResolutionAlreadyTried = true;
-            try {
-                hostname = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                technicalDebugLog(e);
-            }
-        }
-        if (hostname != null) {
-            be.setHostname(hostname);
-        }
     }
 
     private void fillUserNameContextForException(final Session session, final BonitaContextException be) {
@@ -193,18 +165,6 @@ public class ServerAPIImpl implements ServerAPI {
             if (userName != null) {
                 be.setUserName(userName);
             }
-        }
-    }
-
-    private void fillTenantIdContextForException(final SessionAccessor sessionAccessor, final BonitaContextException be) {
-        if (sessionAccessor != null) {
-            long tenantId = -1;
-            try {
-                tenantId = sessionAccessor.getTenantId();
-            } catch (STenantIdNotSetException e) {
-                technicalDebugLog(e);
-            }
-            be.setTenantId(tenantId);
         }
     }
 

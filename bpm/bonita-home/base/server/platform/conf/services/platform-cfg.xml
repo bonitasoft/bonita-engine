@@ -14,18 +14,18 @@
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+        <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="eventService" />
     </bean>
 
     <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
         <constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
     <bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />

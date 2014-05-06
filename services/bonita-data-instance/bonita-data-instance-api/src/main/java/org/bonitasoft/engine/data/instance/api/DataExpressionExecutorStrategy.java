@@ -25,6 +25,7 @@ import javax.lang.model.SourceVersion;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -47,9 +48,9 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        return evaluate(Collections.singletonList(expression), context, resolvedExpressions).get(0);
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+        return evaluate(Collections.singletonList(expression), context, resolvedExpressions, containerState).get(0);
     }
 
     @Override
@@ -67,8 +68,8 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         final int maxExpressionSize = expressions.size();
         final ArrayList<String> dataNames = new ArrayList<String>(maxExpressionSize);
         final HashMap<String, Serializable> results = new HashMap<String, Serializable>(maxExpressionSize);

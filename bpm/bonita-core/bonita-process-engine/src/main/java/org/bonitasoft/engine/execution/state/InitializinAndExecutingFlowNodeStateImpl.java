@@ -98,7 +98,8 @@ public class InitializinAndExecutingFlowNodeStateImpl extends FlowNodeStateWithC
     }
 
     @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+        stateBehaviors.updateDisplayDescriptionAfterCompletion(processDefinition, flowNodeInstance);
     }
 
 }

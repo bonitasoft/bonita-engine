@@ -7,10 +7,18 @@
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </set>
+        </constructor-arg>
 	</bean>
+    
+    
 
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="journal" />
@@ -19,9 +27,15 @@
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="journalConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
@@ -50,8 +64,6 @@
 				<entry key="org.bonitasoft.engine.platform.model.STenant" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
 				<entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
 				<!-- services -->
-				<entry key="org.bonitasoft.engine.data.model.SDataSource" value="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" />
-				<entry key="org.bonitasoft.engine.data.model.SDataSourceParameter" value="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
@@ -185,7 +197,6 @@
 	<bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl">
 		<property name="hbmResources">
 			<list>
-				<ref bean="hbm-bonita-data-model" />
 				<ref bean="hbm-bonita-dependency-model" />
 				<ref bean="hbm-bonita-dependency-platform-model" />
 				<ref bean="hbm-bonita-document-model" />

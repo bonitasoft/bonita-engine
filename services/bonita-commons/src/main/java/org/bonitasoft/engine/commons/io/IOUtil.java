@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-20123 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
@@ -55,10 +57,19 @@ import org.w3c.dom.Document;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class IOUtil {
 
-    private static final int BUFF_SIZE = 100000;
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    private static final int BUFFER_SIZE = 100000;
+
+    public static final String FILE_ENCODING = "UTF-8";
+
+    private IOUtil() {
+        // For Sonar
+    }
 
     public static File createDirectory(final String path) {
         final File file = new File(path);
@@ -242,7 +253,7 @@ public class IOUtil {
         if (in == null) {
             throw new IOException("The InputStream is null!");
         }
-        final byte[] buffer = new byte[BUFF_SIZE];
+        final byte[] buffer = new byte[BUFFER_SIZE];
         final byte[] resultArray;
         BufferedInputStream bis = null;
         ByteArrayOutputStream result = null;
@@ -266,6 +277,46 @@ public class IOUtil {
             }
         }
         return resultArray;
+    }
+
+    /**
+     * Read the contents from the given FileInputStream. Return the result as a String.
+     * 
+     * @param inputStream
+     *            the stream to read from
+     * @return the content read from the inputStream, as a String
+     */
+    public static String read(final InputStream inputStream) {
+        final Scanner scanner = new Scanner(inputStream, FILE_ENCODING);
+        final StringBuilder text = new StringBuilder();
+        try {
+            boolean isFirst = true;
+            while (scanner.hasNextLine()) {
+                if (isFirst) {
+                    text.append(scanner.nextLine());
+                } else {
+                    text.append(LINE_SEPARATOR + scanner.nextLine());
+                }
+                isFirst = false;
+            }
+        } finally {
+            scanner.close();
+        }
+        return text.toString();
+    }
+
+    /**
+     * Read the contents of the given file.
+     * 
+     * @param file
+     */
+    public static String read(final File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        try {
+            return read(inputStream);
+        } finally {
+            inputStream.close();
+        }
     }
 
     /**
@@ -425,6 +476,123 @@ public class IOUtil {
         } finally {
             fos.close();
         }
+    }
+
+    public static byte[] zip(final Map<String, byte[]> files) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
+            for (final Entry<String, byte[]> file : files.entrySet()) {
+                zos.putNextEntry(new ZipEntry(file.getKey()));
+                zos.write(file.getValue());
+                zos.closeEntry();
+            }
+            return baos.toByteArray();
+        } finally {
+            zos.close();
+        }
+    }
+
+    public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
+        final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
+        ZipEntry zipEntry = null;
+
+        try {
+            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+                extractZipEntry(zipInputstream, zipEntry, outputFolder);
+            }
+        } finally {
+            zipInputstream.close();
+        }
+    }
+
+    private static void extractZipEntry(final ZipInputStream zipInputstream, final ZipEntry zipEntry, final File outputFolder) throws FileNotFoundException,
+            IOException {
+        try {
+            final String entryName = zipEntry.getName();
+            // entryName = entryName.replace('/', File.separatorChar);
+            // entryName = entryName.replace('\\', File.separatorChar);
+
+            // For each entry, a file is created in the output directory "folder"
+            final File outputFile = new File(outputFolder.getAbsolutePath(), entryName);
+
+            // If the entry is a directory, it creates in the output folder, and we go to the next entry (return).
+            if (zipEntry.isDirectory()) {
+                mkdirs(outputFile);
+                return;
+            }
+            writeZipInputToFile(zipInputstream, outputFile);
+        } finally {
+            zipInputstream.closeEntry();
+        }
+    }
+
+    private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
+        // The input is a file. An FileOutputStream is created to write the content of the new file.
+        mkdirs(outputFile.getParentFile());
+        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        try {
+            try {
+                // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
+                int bytesRead;
+                final byte[] buffer = new byte[BUFFER_SIZE];
+                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+            } finally {
+                fileOutputStream.close();
+            }
+        } catch (final IOException ioe) {
+            // In case of error, the file is deleted
+            outputFile.delete();
+            throw ioe;
+        }
+    }
+
+    private static boolean mkdirs(final File file) {
+        if (!file.exists()) {
+            return file.mkdirs();
+        }
+        return true;
+    }
+
+    public static File createTempDirectory(final String fileName) throws IOException {
+        final File temp = File.createTempFile(fileName, String.valueOf(System.currentTimeMillis()));
+        temp.setReadable(true);
+        temp.setWritable(true);
+
+        if (!temp.delete()) {
+            throw new IOException("Could not delete temporary file : " + temp.getAbsolutePath());
+        }
+        mkdirs(temp);
+        return temp;
+    }
+
+    /**
+     * @param string
+     * @throws IOException
+     */
+    public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {
+        final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipEntry zipEntry = null;
+        try {
+            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+                if (!entryName.equals(zipEntry.getName())) {
+                    continue;
+                }
+                int bytesRead;
+                final byte[] buffer = new byte[BUFFER_SIZE];
+                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+                return byteArrayOutputStream.toByteArray();
+            }
+        } finally {
+            zipInputstream.close();
+            byteArrayOutputStream.close();
+        }
+        throw new IOException("Entry " + entryName + " does not exists in the zip file");
     }
 
     public static byte[] toByteArray(Document document) throws IOException, TransformerException {

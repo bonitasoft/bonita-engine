@@ -90,7 +90,7 @@ public class TestsInitializer {
         }
         List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread"/* bonecp related */);
+                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */);
         for (String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return false;
@@ -150,7 +150,7 @@ public class TestsInitializer {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             Class<?> initializerClass = contextClassLoader.loadClass(getInitializerListenerClassName());
             initializerClass.getMethod("unload").invoke(null);
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             System.out.println("Unable to execute the unload handler, maybe test are not local: " + e.getMessage());
             // not in local, do nothing
         }

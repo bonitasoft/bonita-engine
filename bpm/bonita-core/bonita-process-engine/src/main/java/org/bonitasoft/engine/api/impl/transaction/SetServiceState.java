@@ -15,12 +15,15 @@ package org.bonitasoft.engine.api.impl.transaction;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -54,6 +57,11 @@ public class SetServiceState implements Callable<Void>, Serializable {
             final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
             final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
 
+            // refresh the tenant classloader:
+            tenantServiceAccessor.getDependencyService().refreshClassLoader(ScopeType.TENANT, tenantId);
+
+            refreshClassloaderOfProcessDefinitions(tenantServiceAccessor);
+
             // Set the right classloader:
             final ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
             final ClassLoader serverClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
@@ -77,6 +85,21 @@ public class SetServiceState implements Callable<Void>, Serializable {
             // reset previous class loader:
             Thread.currentThread().setContextClassLoader(baseClassLoader);
         }
+    }
+
+    protected void refreshClassloaderOfProcessDefinitions(final TenantServiceAccessor tenantServiceAccessor) throws SBonitaException {
+        final DependencyService dependencyService = tenantServiceAccessor.getDependencyService();
+        final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+        List<Long> processDefinitionIds;
+        final int maxResults = 100;
+        int startIndex = 0;
+        do {
+            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(startIndex, maxResults);
+            for (final Long id : processDefinitionIds) {
+                dependencyService.refreshClassLoader(ScopeType.PROCESS, id);
+            }
+            startIndex += maxResults;
+        } while (processDefinitionIds.size() == maxResults);
     }
 
     public PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,

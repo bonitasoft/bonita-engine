@@ -49,22 +49,39 @@ import org.junit.Test;
 public class OrganizationTest extends CommonAPITest {
 
     private static final String SKILLS_VALUE = "Java";
+
     private static final String SKILLS_UPDATED_VALUE = "Java, Groovy";
+
     private static final String LOCATION_VALUE = "Engineering";
+
     private static final String QA = "QA";
+
     private static final String ENGINE = "Engine";
+
     private static final String WEB_TEAM_MANAGER = "Web Team Manager";
+
     private static final String JOHNNYFOOTBALL = "johnnyfootball";
+
     private static final String DEVELOPER = "Developer";
+
     private static final String WEB_TEAM = "web team";
+
     private static final String BONITA_MANAGER = "Bonita Manager";
+
     private static final String MANAGER = "Manager";
+
     private static final String WEB_GROUP_NAME = "Web";
+
     private static final String LIUYANYAN_USERNAME = "liuyanyan";
+
     private static final String ANTHONY_USERNAME = "anthony.birembault";
+
     private static final String SKILLS_DESCRIPTION = "The user skills";
+
     private static final String SKILLS_NAME = "Skills";
+
     private static final String LOCATION_NAME = "Office location";
+
     private static final String UTF_8 = "UTF-8";
 
     @Before
@@ -80,17 +97,17 @@ public class OrganizationTest extends CommonAPITest {
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" }, jira = "")
     @Test
     public void importOrganization() throws Exception {
-        //when
+        // when
         importOrganization("simpleOrganization.xml");
-        
-        //then
+
+        // then
         Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap = checkDefaultCustomUserInfoDefinitons();
         checkDefaultUsers();
         checkDefaultCustomUserInfoValues(userInfoDefinitonsMap);
         checkDefaultGroups();
         checkDefaultRoles();
         checkDefaultMembership();
-       
+
         // clean-up
         getIdentityAPI().deleteOrganization();
     }
@@ -101,7 +118,7 @@ public class OrganizationTest extends CommonAPITest {
     }
 
     private void checkCustomUserInfoValuesAfterUpdate(Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws Exception {
-        //the first user is not present in the second file to import, so his information keep the same
+        // the first user is not present in the second file to import, so his information keep the same
         checkDefaultCustomUserInfoValueForFirstUser(userInfoDefinitonsMap);
         checkCustomUserInfoValueForSecondUserAfterUpdate(userInfoDefinitonsMap);
     }
@@ -126,10 +143,10 @@ public class OrganizationTest extends CommonAPITest {
     private void checkDefaultCustomUserInfoValueForFirstUser(Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) throws UserNotFoundException {
         User user = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
         SearchOptions searchOptions = getCustomUserInfoValueSearchOptions(user);
-        
+
         SearchResult<CustomUserInfoValue> searchResult = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
         assertThat(searchResult.getCount()).isEqualTo(2);
-        
+
         checkCustomUserInfo(searchResult.getResult().get(0), LOCATION_NAME, LOCATION_VALUE, userInfoDefinitonsMap);
         checkCustomUserInfo(searchResult.getResult().get(1), SKILLS_NAME, SKILLS_VALUE, userInfoDefinitonsMap);
     }
@@ -142,7 +159,8 @@ public class OrganizationTest extends CommonAPITest {
         return searchOptions;
     }
 
-    private void checkCustomUserInfo(CustomUserInfoValue customUserInfoValue, String expectedName, String expectedValue, Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) {
+    private void checkCustomUserInfo(CustomUserInfoValue customUserInfoValue, String expectedName, String expectedValue,
+            Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) {
         assertThat(customUserInfoValue.getDefinitionId()).isEqualTo(userInfoDefinitonsMap.get(expectedName).getId());
         assertThat(customUserInfoValue.getValue()).isEqualTo(expectedValue);
     }
@@ -153,26 +171,26 @@ public class OrganizationTest extends CommonAPITest {
 
         CustomUserInfoDefinition firstDefinition = customUserInfoDefinitions.get(0);
         CustomUserInfoDefinition secondDefinition = customUserInfoDefinitions.get(1);
-        
+
         checkCustomUserInfoDefinition(LOCATION_NAME, null, firstDefinition);
         checkCustomUserInfoDefinition(SKILLS_NAME, SKILLS_DESCRIPTION, secondDefinition);
-        
+
         Map<String, CustomUserInfoDefinition> userInfoDefMap = new HashMap<String, CustomUserInfoDefinition>(2);
         userInfoDefMap.put(firstDefinition.getName(), firstDefinition);
         userInfoDefMap.put(secondDefinition.getName(), secondDefinition);
         return userInfoDefMap;
     }
-    
+
     private Map<String, CustomUserInfoDefinition> checkCustomUserInfoDefinitonsAfterUpdate() {
         List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
         assertThat(customUserInfoDefinitions.size()).isEqualTo(2);
-        
+
         CustomUserInfoDefinition firstDefinition = customUserInfoDefinitions.get(0);
         CustomUserInfoDefinition secondDefinition = customUserInfoDefinitions.get(1);
 
         checkCustomUserInfoDefinition(LOCATION_NAME, "The office location", firstDefinition);
         checkCustomUserInfoDefinition(SKILLS_NAME, "The user skills were updated", secondDefinition);
-        
+
         Map<String, CustomUserInfoDefinition> userInfoDefMap = new HashMap<String, CustomUserInfoDefinition>(2);
         userInfoDefMap.put(firstDefinition.getName(), firstDefinition);
         userInfoDefMap.put(secondDefinition.getName(), secondDefinition);
@@ -489,12 +507,11 @@ public class OrganizationTest extends CommonAPITest {
         final GroupCreator groupCreator2 = new GroupCreator(WEB_GROUP_NAME);
         groupCreator2.setDisplayName(WEB_TEAM);
         final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
-        
 
         getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
         getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
 
-        CustomUserInfoDefinition userInfoDefinition = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("ToDelete"));
+        getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("ToDelete"));
 
         assertEquals(1, getIdentityAPI().getNumberOfUserMemberships(persistedUser1.getId()));
         assertEquals(2, getIdentityAPI().getNumberOfGroups());
@@ -738,21 +755,21 @@ public class OrganizationTest extends CommonAPITest {
         assertEquals(getSession().getUserId(), persistedMembership2.getAssignedBy());
 
         // clean-up
-        getIdentityAPI().deleteOrganization();;
+        getIdentityAPI().deleteOrganization();
 
     }
 
     @Cover(classes = { IdentityAPI.class, ImportPolicy.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Import", "Policy" }, story = "Import a new organization keep the old, if duplicates elements replace existing ones, add new elements", jira = "ENGINE-428")
     @Test
     public void importOrganizationMergeDuplicates() throws Exception {
-        //given
+        // given
         final ImportPolicy policy = ImportPolicy.MERGE_DUPLICATES;
         importAndCheckFirstSimpleOrganization();
-        
-        //when
+
+        // when
         importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
 
-        //then
+        // then
         Map<String, CustomUserInfoDefinition> infoDefinitonsAfterUpdate = checkCustomUserInfoDefinitonsAfterUpdate();
         checkUsersAfterUpdate();
         checkCustomUserInfoValuesAfterUpdate(infoDefinitonsAfterUpdate);
@@ -773,7 +790,7 @@ public class OrganizationTest extends CommonAPITest {
         assertEquals(ANTHONY_USERNAME, persistedMembership.getUsername());
         // check assignedBy for membership
         assertEquals(getSession().getUserId(), persistedMembership.getAssignedBy());
-        
+
         User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         final UserMembership persistedMembership1 = getIdentityAPI().getUserMemberships(persistedUser1.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC)
                 .get(0);
@@ -798,11 +815,11 @@ public class OrganizationTest extends CommonAPITest {
         assertEquals(BONITA_MANAGER, persistedRole.getDisplayName());
         // check createdBy for role
         assertEquals(getSession().getUserId(), persistedRole.getCreatedBy());
-        
+
         final Role persistedRole1 = getIdentityAPI().getRoleByName(DEVELOPER);
         assertNotNull(persistedRole1);
         assertEquals("Bonitasoft developer", persistedRole1.getDisplayName());
-        
+
         final Role persistedRole2 = getIdentityAPI().getRoleByName("Tester");
         assertNotNull(persistedRole2);
     }
@@ -828,10 +845,10 @@ public class OrganizationTest extends CommonAPITest {
         User persistedUser = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
         assertEquals(WEB_TEAM_MANAGER, persistedUser.getJobTitle());
         assertEquals(getSession().getUserId(), persistedUser.getCreatedBy());
-        
+
         User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         assertNotNull(persistedUser1);
-        
+
         final User persistedUser2 = getIdentityAPI().getUserByUserName(JOHNNYFOOTBALL);
         assertNotNull(persistedUser2);
     }
@@ -1011,10 +1028,10 @@ public class OrganizationTest extends CommonAPITest {
     }
 
     private void importAndCheckFirstSimpleOrganization() throws Exception {
-        //when
+        // when
         importOrganization("simpleOrganizationDuplicates1.xml");
 
-        //then
+        // then
         Map<String, CustomUserInfoDefinition> userInfoDefinitons = checkDefaultCustomUserInfoDefinitons();
         checkDefaultUsers();
         checkDefaultCustomUserInfoValues(userInfoDefinitons);
@@ -1047,7 +1064,7 @@ public class OrganizationTest extends CommonAPITest {
         final Group persistedGroup = getIdentityAPI().getGroupByPath(WEB_GROUP_NAME);
         assertEquals(WEB_TEAM, persistedGroup.getDisplayName());
         assertEquals(getSession().getUserId(), persistedGroup.getCreatedBy());
-        
+
         final Group persistedGroup1 = getIdentityAPI().getGroupByPath(ENGINE);
         assertNotNull(persistedGroup1);
     }
@@ -1056,7 +1073,7 @@ public class OrganizationTest extends CommonAPITest {
         final User persistedUser = getIdentityAPI().getUserByUserName(ANTHONY_USERNAME);
         assertEquals(WEB_TEAM_MANAGER, persistedUser.getJobTitle());
         assertEquals(getSession().getUserId(), persistedUser.getCreatedBy());
-        
+
         final User persistedUser1 = getIdentityAPI().getUserByUserName(LIUYANYAN_USERNAME);
         assertNotNull(persistedUser1);
     }
@@ -1064,14 +1081,14 @@ public class OrganizationTest extends CommonAPITest {
     @Test
     public void exportOrganization() throws Exception {
         // create records for user role, group and membership
-        //users
+        // users
         final User persistedUser1 = getIdentityAPI().createUser(LIUYANYAN_USERNAME, "bpm");
 
         final UserCreator creator = new UserCreator(ANTHONY_USERNAME, "bpm");
         creator.setJobTitle(WEB_TEAM_MANAGER);
         final User persistedUser2 = getIdentityAPI().createUser(creator);
 
-        //roles
+        // roles
         final RoleCreator rc1 = new RoleCreator(DEVELOPER);
         rc1.setDisplayName("Bonita developer");
         final Role persistedRole1 = getIdentityAPI().createRole(rc1);
@@ -1079,7 +1096,7 @@ public class OrganizationTest extends CommonAPITest {
         rc2.setDisplayName(BONITA_MANAGER);
         final Role persistedRole2 = getIdentityAPI().createRole(rc2);
 
-        //groups
+        // groups
         final GroupCreator groupCreator1 = new GroupCreator(ENGINE);
         groupCreator1.setDisplayName("engine team");
         final Group persistedGroup1 = getIdentityAPI().createGroup(groupCreator1);
@@ -1088,17 +1105,17 @@ public class OrganizationTest extends CommonAPITest {
         groupCreator2.setDisplayName(WEB_TEAM);
         final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
 
-        //membership
+        // membership
         final UserMembership membership1 = getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
         final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
-        
-        //custom user info definition
+
+        // custom user info definition
         CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(SKILLS_NAME, SKILLS_DESCRIPTION));
         getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(LOCATION_NAME));
-        
-        //custom user info value
+
+        // custom user info value
         getIdentityAPI().setCustomUserInfoValue(skills.getId(), persistedUser1.getId(), SKILLS_VALUE);
-        
+
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
 

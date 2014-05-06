@@ -17,35 +17,26 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
-import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.test.util.TestUtil;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -64,60 +55,15 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
 
     protected DataInstanceService dataInstanceService;
 
-    protected static DataService dataSourceService;
-
-    protected static SDataSourceBuilderFactory dataSourceBuilderFactory;
-
-    protected static SDataSourceBuilder dataSourceBuilder;
-
-    protected static SDataSource dataSource;
-
-    protected static SDataSource transientDataSource;
-
     protected abstract DataInstanceService getDataInstanceServiceImplementation();
 
     static {
         expressionService = getServicesBuilder().buildExpressionService();
-        dataSourceService = getServicesBuilder().buildDataService();
-        dataSourceBuilderFactory = BuilderFactory.get(SDataSourceBuilderFactory.class);
     }
 
     @Before
     public void setupDataInstanceService() {
         dataInstanceService = getDataInstanceServiceImplementation();
-    }
-
-    @BeforeClass
-    public static void setUpPersistence() throws Exception {
-        dataSource = createDataInstanceDataSource(DataInstanceServiceImpl.DEFAULT_DATA_SOURCE, DataInstanceServiceImpl.DATA_SOURCE_VERSION,
-                DataInstanceDataSourceImpl.class);
-        transientDataSource = createDataInstanceDataSource(DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE,
-                DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE_VERSION, TransientDataInstanceDataSource.class);
-    }
-
-    private static SDataSource createDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion,
-            final Class<? extends DataInstanceDataSource> clazz) throws Exception {
-        getTransactionService().begin();
-        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName())
-                .done();
-        dataSourceService.createDataSource(dataSource);
-        getTransactionService().complete();
-        return dataSource;
-    }
-
-    @AfterClass
-    public static void tearDownPersistence() throws Exception {
-        TestUtil.closeTransactionIfOpen(getTransactionService());
-        removeDataInstanceDataSource(dataSource);
-        removeDataInstanceDataSource(transientDataSource);
-    }
-
-    private static void removeDataInstanceDataSource(final SDataSource dataSource) throws Exception {
-        getTransactionService().begin();
-        if (dataSource != null) {
-            dataSourceService.removeDataSource(dataSource.getId());
-        }
-        getTransactionService().complete();
     }
 
     private SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
@@ -148,7 +94,7 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
     private void evaluateDefaultValueOf(final SDataDefinition dataDefinition, final SDataInstanceBuilder dataInstanceBuilder) throws SBonitaException {
         final SExpression expression = dataDefinition.getDefaultValueExpression();
         if (expression != null) {
-            dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression, EMPTY_RESOLVED_EXPRESSIONS));
+            dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
         }
     }
 

@@ -17,6 +17,16 @@
 		<copy todir="${target.dir}/conf" overwrite="true">
 			<fileset dir="${basedir}/src/test/resources/conf" includes="**/*" />
 		</copy>
+		<loadfile srcFile="${basedir}/pom.xml" property="project.version">
+			<filterchain>
+				<linecontains>
+					<contains value="version>"/>
+				</linecontains>
+				<headfilter lines="1"/>
+				<replaceregex pattern=".*&lt;version&gt;(.*)&lt;/version&gt;.*" replace="\1" />
+			</filterchain>
+		</loadfile>
+		<echo file="${basedir}/target/home/server/platform/conf/VERSION" append="false">${project.version}</echo>
 	</target>
 
 </project>

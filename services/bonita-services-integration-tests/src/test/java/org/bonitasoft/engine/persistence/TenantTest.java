@@ -856,4 +856,44 @@ public class TenantTest extends CommonServiceTest {
         assertEquals(priviousSize, humans.size());
         getTransactionService().complete();
     }
+
+
+
+
+    @Test
+    public void search_Humans_With_Fields_Starting_With_Prefix() throws Exception {
+        getTransactionService().begin();
+
+        final Human human = PersistenceTestUtil.buildHuman("humanFN", "humanLN", 24);
+        persistenceService.insert(human);
+        final Parent parent = PersistenceTestUtil.buildParent("parentFN", "parentLN", 36);
+        persistenceService.insert(parent);
+        final Child child = buildChild("child1FN", "child11LN", 5, parent);
+        persistenceService.insert(child);
+
+        QueryOptions queryOptions = buildQueryOptionsOrderByFirstnameASC("hum");
+
+        final List<Human> allHumans = persistenceService.selectList(new SelectListDescriptor<Human>("getAllHumans", null, Human.class, queryOptions));
+
+        persistenceService.delete(child);
+        persistenceService.delete(parent);
+        persistenceService.delete(human);
+
+        getTransactionService().complete();
+
+        assertEquals(1, allHumans.size());
+    }
+
+
+    protected QueryOptions buildQueryOptionsOrderByFirstnameASC(final String searchTerm) {
+        Map<Class<? extends PersistentObject>, Set<String>> allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
+        final Set<String> fields = new HashSet<String>(2);
+        fields.add("firstName");
+        fields.add("lastName");
+        allFields.put(Human.class, fields);
+        QueryOptions queryOptions =new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstName", OrderByType.ASC)),
+                new ArrayList<FilterOption>(0), new SearchFields(Arrays.asList(searchTerm), allFields));
+        return queryOptions;
+    }
+
 }

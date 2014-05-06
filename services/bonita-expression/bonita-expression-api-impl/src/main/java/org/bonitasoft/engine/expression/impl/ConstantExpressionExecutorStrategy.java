@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -39,7 +40,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
 
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
-        if (expression.getContent().trim().equals("")) {
+        if ("".equals(expression.getContent().trim())) {
             throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression : " + expression, expression.getName());
         }
     }
@@ -50,8 +51,8 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         Serializable result;
         final String returnType = expression.getReturnType();
@@ -76,18 +77,18 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
                         + expressionContent, expression.getName());
             }
         } catch (final NumberFormatException e) {
-            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent,
+            throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent, e,
                     expression.getName());
         }
         return result;
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }
@@ -111,7 +112,8 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
 
             final String month = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$3");
             if (month != null && !month.isEmpty() && Integer.valueOf(month) < 13) {
-                calendar.set(Calendar.MONTH, Integer.valueOf(month) - 1); // MONTH value from 0 to 11
+                // MONTH value from 0 to 11
+                calendar.set(Calendar.MONTH, Integer.valueOf(month) - 1);
             }
 
             final String day = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$6");
@@ -139,11 +141,11 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
                 calendar.set(Calendar.MILLISECOND, Integer.valueOf(fractional));
             }
 
-            final String TZsign = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$17");
-            final String TZhour = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$18");
-            final String TZminutes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$19");
-            final TimeZone tz = TimeZone.getTimeZone("GMT" + TZsign + TZhour + TZminutes);
-            if (!TZsign.isEmpty() && !TZhour.isEmpty() && !TZminutes.isEmpty() && tz != null) {
+            final String tzSign = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$17");
+            final String tzHour = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$18");
+            final String tzMinutes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$19");
+            final TimeZone tz = TimeZone.getTimeZone("GMT" + tzSign + tzHour + tzMinutes);
+            if (!tzSign.isEmpty() && !tzHour.isEmpty() && !tzMinutes.isEmpty() && tz != null) {
                 calendar.setTimeZone(tz);
             }
 

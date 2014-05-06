@@ -13,6 +13,12 @@
  */
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -32,12 +38,6 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
 
 /**
  * @author Vincent Elcrin
@@ -59,8 +59,8 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void update_should_call_service_to_update_custom_user_info_when_exist() throws Exception {
-        DummySCustomUserInfoValue value = new DummySCustomUserInfoValue(1L);
-        SCustomUserInfoValueUpdateBuilderImpl builder = new SCustomUserInfoValueUpdateBuilderImpl(new EntityUpdateDescriptor());
+        final DummySCustomUserInfoValue value = new DummySCustomUserInfoValue(1L);
+        final SCustomUserInfoValueUpdateBuilderImpl builder = new SCustomUserInfoValueUpdateBuilderImpl(new EntityUpdateDescriptor());
         given(updateFactory.createNewInstance()).willReturn(builder);
 
         api.update(value, new CustomUserInfoValueUpdater("value"));
@@ -70,10 +70,10 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void update_should_return_updated_value() throws Exception {
-        DummySCustomUserInfoValue updatedValue = new DummySCustomUserInfoValue(2L, 1L, 1L, "update");
+        final DummySCustomUserInfoValue updatedValue = new DummySCustomUserInfoValue(2L, 1L, 1L, "update");
         given(service.getCustomUserInfoValue(2L)).willReturn(updatedValue);
 
-        SCustomUserInfoValue result = api.update(new DummySCustomUserInfoValue(2L),
+        final SCustomUserInfoValue result = api.update(new DummySCustomUserInfoValue(2L),
                 new CustomUserInfoValueUpdater("value"));
 
         assertThat(result.getValue()).isEqualTo("update");
@@ -91,7 +91,7 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_delete_CustomUserInfoValue_when_value_is_null() throws Exception {
-        SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
+        final SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, null);
@@ -101,7 +101,7 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_delete_SCustomUserInfoValue_when_value_is_empty() throws Exception {
-        SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
+        final SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, "");
@@ -113,7 +113,7 @@ public class SCustomUserInfoValueAPITest {
     public void set_should_return_updated_value_when_value_is_deleted() throws Exception {
         given(createFactory.createNewInstance()).willReturn(new SCustomUserInfoValueBuilderImpl(new SCustomUserInfoValueImpl()));
 
-        SCustomUserInfoValue value = api.set(1L, 2L, "");
+        final SCustomUserInfoValue value = api.set(1L, 2L, "");
 
         assertThat(value.getDefinitionId()).isEqualTo(1L);
         assertThat(value.getUserId()).isEqualTo(2L);
@@ -122,7 +122,7 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_update_SCustomUserInfoValue_when_value_exist() throws Exception {
-        SCustomUserInfoValue value = new DummySCustomUserInfoValue(642L);
+        final SCustomUserInfoValue value = new DummySCustomUserInfoValue(642L);
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, "update");

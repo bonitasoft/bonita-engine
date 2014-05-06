@@ -40,7 +40,7 @@ public final class ServicesAccessor implements ServicesResolver {
         super();
         try {
             context = new AbsoluteFileSystemXmlApplicationContext(getResourceList(), true, null);
-        } catch (final Throwable t) {
+        } catch (final Exception t) {
             t.printStackTrace();
             throw new RuntimeException(t);
         }

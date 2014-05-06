@@ -19,7 +19,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.builder.SThemeBuilder;

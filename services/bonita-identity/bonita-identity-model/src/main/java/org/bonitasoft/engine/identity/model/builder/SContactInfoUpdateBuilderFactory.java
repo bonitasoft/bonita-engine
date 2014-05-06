@@ -18,6 +18,7 @@ package org.bonitasoft.engine.identity.model.builder;
  */
 public interface SContactInfoUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
 
+    @Override
     SContactInfoUpdateBuilder createNewInstance();
-    
+
 }

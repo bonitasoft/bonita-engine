@@ -20,11 +20,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-data-source</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-expression-resolver-api</artifactId>
 			<version>${project.version}</version>

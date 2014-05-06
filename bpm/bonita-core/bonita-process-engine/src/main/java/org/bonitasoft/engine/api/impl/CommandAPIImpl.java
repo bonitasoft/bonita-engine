@@ -383,7 +383,7 @@ public class CommandAPIImpl implements CommandAPI {
                     @Override
                     public SCommand call() throws Exception {
                         return fetch(commandService);
-                    };
+                    }
                 });
             } catch (final Exception e) {
                 throw new SCommandNotFoundException(e);

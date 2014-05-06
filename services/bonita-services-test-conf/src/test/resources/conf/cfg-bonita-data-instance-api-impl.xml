@@ -2,22 +2,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="dataInstanceService" class="org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl">
-		<constructor-arg name="dataSourceService" ref="dataService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-	</bean>
-
-	<bean id="persistentDataInstanceDSConf" class="org.bonitasoft.engine.data.instance.PersistentDataInstanceDataSourceConfiguration">
-		<constructor-arg name="persistenceRead" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
-    </bean>
-
-	<bean id="transientDataInstanceDSConf" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSourceConfiguration">
-		<constructor-arg name="cacheService" ref="cacheService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy">

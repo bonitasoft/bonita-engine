@@ -51,9 +51,9 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        return evaluate(Collections.singletonList(expression), context, resolvedExpressions).get(0);
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+        return evaluate(Collections.singletonList(expression), context, resolvedExpressions, containerState).get(0);
     }
 
     @Override
@@ -62,8 +62,8 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
         final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
         final Long time = (Long) context.get("time");

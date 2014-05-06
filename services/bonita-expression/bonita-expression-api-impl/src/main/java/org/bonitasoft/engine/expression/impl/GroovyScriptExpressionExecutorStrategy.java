@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -37,17 +38,18 @@ import org.bonitasoft.engine.expression.model.SExpression;
 public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         final ClassLoader scriptClassLoader = Thread.currentThread().getContextClassLoader();
         final String expressionName = expression.getName();
         try {
             final GroovyShell shell = new GroovyShell(scriptClassLoader);
-            final Script script = shell.parse(expressionContent);// can put the name here
+            // can put the name here
+            final Script script = shell.parse(expressionContent);
             final Binding binding = new Binding(context);
             script.setBinding(binding);
-            return script.evaluate(expressionContent);// .evaluate(expressionContent);run()
+            return script.evaluate(expressionContent);
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
@@ -67,11 +69,11 @@ public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpre
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }

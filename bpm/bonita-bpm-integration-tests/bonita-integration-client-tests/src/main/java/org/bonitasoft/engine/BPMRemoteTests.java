@@ -16,10 +16,10 @@ import org.bonitasoft.engine.login.PlatformLoginAPITest;
 import org.bonitasoft.engine.operation.OperationTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandTest;
 import org.bonitasoft.engine.process.ProcessTests;
-import org.bonitasoft.engine.process.SupervisorTest;
 import org.bonitasoft.engine.process.task.ManualTasksTest;
 import org.bonitasoft.engine.profile.ProfileTests;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
+import org.bonitasoft.engine.supervisor.SupervisorTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -36,7 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformLoginAPITest.class,
         CommandTest.class,
         ExternalCommandsTest.class,
-        SupervisorTest.class,
+        SupervisorTests.class,
         OperationTest.class,
         ManualTasksTest.class,
         CallActivityTest.class,

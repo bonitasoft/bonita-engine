@@ -51,15 +51,6 @@ public class EntityMemberImpl implements EntityMember {
         this.displayNamePart3 = displayNamePart3;
     }
 
-    // public EntityMemberImpl(final long entityMemberId, final String externalId, final long userId, final long groupId, final long roleId) {
-    // super();
-    // this.entityMemberId = entityMemberId;
-    // this.externalId = externalId;
-    // this.userId = userId;
-    // this.groupId = groupId;
-    // this.roleId = roleId;
-    // }
-
     @Override
     public long getEntityMemberId() {
         return entityMemberId;

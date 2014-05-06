@@ -39,6 +39,7 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.LoginService;
@@ -52,7 +53,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -90,6 +90,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
@@ -169,8 +170,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private DataInstanceService dataInstanceService;
 
-    private DataService dataService;
-
     private ParserFactory parserFactory;
 
     private OperationService operationService;
@@ -225,6 +224,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private TenantConfiguration tenantConfiguration;
 
+    private TransientDataService transientDataService;
+    private TimeTracker timeTracker;
+
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
         this.tenantId = tenantId;
@@ -236,6 +238,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
         }
         return readSessionAccessor;
+    }
+
+    @Override
+    public TimeTracker getTimeTracker() {
+        if (timeTracker == null) {
+            timeTracker = beanAccessor.getService(TimeTracker.class);
+        }
+        return this.timeTracker;
     }
 
     @Override
@@ -281,7 +291,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
         if (technicalLoggerService == null) {
-            technicalLoggerService = beanAccessor.getService(TechnicalLoggerService.class);
+            technicalLoggerService = beanAccessor.getService("tenantTechnicalLoggerService", TechnicalLoggerService.class);
         }
         return technicalLoggerService;
     }
@@ -509,14 +519,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             dataInstanceService = beanAccessor.getService(DataInstanceService.class);
         }
         return dataInstanceService;
-    }
-
-    @Override
-    public DataService getDataService() {
-        if (dataService == null) {
-            dataService = beanAccessor.getService(DataService.class);
-        }
-        return dataService;
     }
 
     @Override
@@ -758,6 +760,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             themeService = beanAccessor.getService(ThemeService.class);
         }
         return themeService;
+    }
+
+    @Override
+    public TransientDataService getTransientDataService() {
+        if (transientDataService == null) {
+            transientDataService = beanAccessor.getService(TransientDataService.class);
+        }
+        return transientDataService;
     }
 
     @Override

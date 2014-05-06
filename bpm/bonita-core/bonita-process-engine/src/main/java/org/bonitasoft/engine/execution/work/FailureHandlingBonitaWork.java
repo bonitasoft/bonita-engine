@@ -41,7 +41,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         super(work);
     }
 
-    protected void logIncident(final Throwable cause, final Throwable exceptionWhenHandlingFailure) {
+    protected void logIncident(final Exception cause, final Exception exceptionWhenHandlingFailure) {
         final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
         final IncidentService incidentService = getTenantAccessor().getIncidentService();
         incidentService.report(getTenantId(), incident);
@@ -101,7 +101,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     private void logException(final TechnicalLoggerService loggerService, final Throwable e) {
         if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : " + e);
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : ", e);
         } else {
             String message = e.getMessage();
             if (message == null || message.isEmpty()) {
@@ -114,7 +114,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Exception e, final Map<String, Object> context) {
         try {
             getWrappedWork().handleFailure(e, context);
-        } catch (final Throwable e1) {
+        } catch (final Exception e1) {
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work [" + getDescription() + "]"
                     + ". You may consider restarting the system. This will restart all works.", e);
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure. ", e1);
@@ -122,24 +122,24 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         }
     }
 
-    private boolean mustNotPutInFailedState(final Throwable e) {
-        return e instanceof SFlowNodeNotFoundException
-                || e instanceof SProcessInstanceNotFoundException
-                || e instanceof SProcessDefinitionNotFoundException
-                || isTransitionFromTerminalState(e);
+    private boolean mustNotPutInFailedState(final Throwable cause) {
+        return cause instanceof SFlowNodeNotFoundException
+                || cause instanceof SProcessInstanceNotFoundException
+                || cause instanceof SProcessDefinitionNotFoundException
+                || isTransitionFromTerminalState(cause);
     }
 
-    boolean isTransitionFromTerminalState(final Throwable t) {
-        if (!(t instanceof SIllegalStateTransition)) {
+    boolean isTransitionFromTerminalState(final Throwable cause) {
+        if (!(cause instanceof SIllegalStateTransition)) {
             return false;
         }
-        SIllegalStateTransition e = (SIllegalStateTransition) t;
+        SIllegalStateTransition e = (SIllegalStateTransition) cause;
         return e.isTransitionFromTerminalState();
     }
 
-    protected void logFailureCause(final TechnicalLoggerService loggerService, final Throwable e) {
+    protected void logFailureCause(final TechnicalLoggerService loggerService, final Throwable cause) {
         if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", cause);
         }
     }
 }

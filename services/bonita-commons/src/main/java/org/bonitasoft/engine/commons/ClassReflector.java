@@ -37,6 +37,8 @@ public class ClassReflector {
     static {
         methods = new HashMap<String, Method>();
     }
+    
+    private final static Object MUTEX = new Object();
 
     public static Collection<Method> getAccessibleGetters(final Class<?> clazz) {
         final Collection<Method> methods = new HashSet<Method>();
@@ -124,10 +126,19 @@ public class ClassReflector {
         }
         stringBuilder.append(')');
         final String key = stringBuilder.toString();
-        if (!methods.containsKey(key)) {
-            methods.put(key, clazz.getMethod(methodName, parameterTypes));
-        }
+        putIfAbsent(clazz, methodName, key, parameterTypes);
         return methods.get(key);
+    }
+
+    private static void putIfAbsent(final Class<?> clazz, final String methodName, final String key, final Class<?>... parameterTypes) throws NoSuchMethodException {
+        if (!methods.containsKey(key)) {
+            synchronized (MUTEX) {
+                // ensure that key was not put before between check and lock
+                if (!methods.containsKey(key)) {
+                    methods.put(key, clazz.getMethod(methodName, parameterTypes));
+                }
+            }
+        }
     }
 
     public static Method getMethodByName(final Class<?> clazz, final String methodName) {
@@ -136,14 +147,31 @@ public class ClassReflector {
         stringBuilder.append('.');
         stringBuilder.append(methodName);
         final String key = stringBuilder.toString();
+        putIfAbsent(clazz, methodName, key);
+        return methods.get(key);
+    }
+
+    private static void putIfAbsent(final Class<?> clazz, final String methodName, final String key) {
         if (!methods.containsKey(key)) {
-            for (final Method method : clazz.getMethods()) {
-                if (method.getName().equals(methodName)) {
+            synchronized (MUTEX) {
+                // ensure that key was not put before between check and lock
+                if (!methods.containsKey(key)) {
+                    Method method = getFirstMethodWithName(clazz, methodName);
                     methods.put(key, method);
                 }
             }
         }
-        return methods.get(key);
+    }
+    
+    public static Method getFirstMethodWithName(final Class<?> clazz, final String methodName) {
+        Method selectedMethod = null;
+        for (final Method method : clazz.getMethods()) {
+            if (method.getName().equals(methodName)) {
+                selectedMethod = method;
+                break;
+            }
+        }
+        return selectedMethod;
     }
 
     public static void invokeMethodByName(final Object entity, final String methodName, final Object... parameterValues) throws SReflectException {

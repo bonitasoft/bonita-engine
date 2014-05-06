@@ -37,7 +37,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     private long processDefinitionId;
 
     private long processInstanceId;
-    
+
     private long parentActivityInstanceId;
 
     private String displayName;
@@ -50,7 +50,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
 
     private long executedBy;
 
-    private long executedByDelegate;
+    private long executedBySubstitute;
 
     private long flownodeDefinitionId;
 
@@ -113,13 +113,12 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     public void setProcessInstanceId(long processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
-    
-    
+
+    @Override
     public long getParentActivityInstanceId() {
         return parentActivityInstanceId;
     }
-    
-    
+
     public void setParentActivityInstanceId(long parentActivityInstanceId) {
         this.parentActivityInstanceId = parentActivityInstanceId;
     }
@@ -170,12 +169,23 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     }
 
     @Override
-    public long getExecutedByDelegate() {
-        return executedByDelegate;
+    public long getExecutedBySubstitute() {
+        return executedBySubstitute;
     }
 
-    public void setExecutedByDelegate(long executedByDelegate) {
-        this.executedByDelegate = executedByDelegate;
+    public void setExecutedBySubstitute(long executedBySubstitute) {
+        this.executedBySubstitute = executedBySubstitute;
+    }
+
+    @Deprecated
+    @Override
+    public long getExecutedByDelegate() {
+        return getExecutedBySubstitute();
+    }
+
+    @Deprecated
+    public void setExecutedByDelegate(long executedBySubstitute) {
+        setExecutedBySubstitute(executedBySubstitute);
     }
 
     @Override
@@ -205,7 +215,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
-        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
+        result = prime * result + (int) (executedBySubstitute ^ executedBySubstitute >>> 32);
         result = prime * result + (int) (flownodeDefinitionId ^ flownodeDefinitionId >>> 32);
         result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
         result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
@@ -260,7 +270,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         if (executedBy != other.executedBy) {
             return false;
         }
-        if (executedByDelegate != other.executedByDelegate) {
+        if (executedBySubstitute != other.executedBySubstitute) {
             return false;
         }
         if (flownodeDefinitionId != other.flownodeDefinitionId) {

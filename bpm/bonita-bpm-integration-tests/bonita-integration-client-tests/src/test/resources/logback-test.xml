@@ -9,7 +9,7 @@
 
 	<logger name="org.bonitasoft" level="TRACE" />
 
-	<root level="TRACE">
+	<root level="WARN">
 		<appender-ref ref="STDOUT" />
 	</root>
 <!--   Show events of synchro repository -->

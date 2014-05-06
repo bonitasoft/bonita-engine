@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.operation;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
-import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 
 /**
@@ -27,35 +26,20 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 public interface OperationExecutorStrategy {
 
     /**
+     * 
+     * Calculate the new value of the left operand base of right operand expression value
+     * 
      * @param operation
-     * @param value
-     * @param containerId
-     * @param containerType
+     * @param rightOperandValue
+     *            result of the evaluation of right operand expression
      * @param expressionContext
      * @return
+     *         the new value to set the left operand with
      * @throws SOperationExecutionException
      */
-    Object getValue(SOperation operation, Object value, long containerId, String containerType, SExpressionContext expressionContext)
+    Object computeNewValueForLeftOperand(SOperation operation, Object rightOperandValue, SExpressionContext expressionContext)
             throws SOperationExecutionException;
 
-    /**
-     * Update the object according to
-     * 
-     * @param sLeftOperand
-     * @param newValue
-     * @param containerId
-     * @param containerType
-     * @throws SOperationExecutionException
-     */
-    void update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
-
-    /**
-     * Returns the type of the operation which identifies the strategy among all.
-     * 
-     * @return the operation type
-     */
     String getOperationType();
-
-    boolean shouldPerformUpdateAtEnd();
 
 }

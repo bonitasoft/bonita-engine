@@ -6,7 +6,7 @@ CREATE TABLE process_instance (
   description VARCHAR(255),
   startDate INT8 NOT NULL,
   startedBy INT8 NOT NULL,
-  startedByDelegate INT8 NOT NULL,
+  startedBySubstitute INT8 NOT NULL,
   endDate INT8 NOT NULL,
   stateId INT NOT NULL,
   stateCategory VARCHAR(50) NOT NULL,
@@ -33,6 +33,8 @@ CREATE TABLE token (
   parent_ref_id INT8 NULL,
   PRIMARY KEY (tenantid, id)
 );
+
+CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
 
 CREATE TABLE flownode_instance (
   tenantid INT8 NOT NULL,
@@ -76,7 +78,7 @@ CREATE TABLE flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy INT8,
-  executedByDelegate INT8,
+  executedBySubstitute INT8,
   activityInstanceId INT8,
   state_executing BOOLEAN DEFAULT FALSE,
   abortedByBoundary INT8,
@@ -87,7 +89,6 @@ CREATE TABLE flownode_instance (
   token_ref_id INT8 NULL,
   PRIMARY KEY (tenantid, id)
 );
-
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
 
@@ -106,6 +107,7 @@ CREATE TABLE connector_instance (
   stackTrace TEXT,
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent);
 
 CREATE TABLE event_trigger_instance (
 	tenantid INT8 NOT NULL,
@@ -149,6 +151,7 @@ CREATE TABLE waiting_event (
   	correlation5 VARCHAR(128),
   	PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_waiting_event ON waiting_event (progress, tenantid, kind, locked, active);
 
 CREATE TABLE message_instance (
 	tenantid INT8 NOT NULL,
@@ -167,6 +170,7 @@ CREATE TABLE message_instance (
   	correlation5 VARCHAR(128),
   	PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_message_instance ON message_instance (messageName, targetProcess, correlation1, correlation2, correlation3);
 
 CREATE TABLE pending_mapping (
 	tenantid INT8 NOT NULL,
@@ -176,6 +180,7 @@ CREATE TABLE pending_mapping (
   	userId INT8,
   	PRIMARY KEY (tenantid, id)
 );
+CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
 
 CREATE TABLE hidden_activity (
 	tenantid INT8 NOT NULL,

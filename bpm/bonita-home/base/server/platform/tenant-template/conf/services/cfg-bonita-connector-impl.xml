@@ -4,11 +4,12 @@
 	<bean id="connectorExecutor" class="org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl">
 		<constructor-arg name="queueCapacity" value="10" />
 		<constructor-arg name="corePoolSize" value="5" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="maximumPoolSize" value="100" />
 		<constructor-arg name="keepAliveTimeSeconds" value="100" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
 	</bean>
 
 </beans>

@@ -5,7 +5,6 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
@@ -102,10 +101,6 @@ public class ServicesBuilder implements ServicesResolver {
         return getAccessor().getInstanceOf(PlatformService.class);
     }
 
-    public DataService buildDataService() {
-        return getAccessor().getInstanceOf(DataService.class);
-    }
-
     public SessionAccessor buildSessionAccessor() {
         return getAccessor().getInstanceOf(SessionAccessor.class);
     }
@@ -167,7 +162,7 @@ public class ServicesBuilder implements ServicesResolver {
     }
 
     public TechnicalLoggerService buildTechnicalLoggerService() {
-        return getAccessor().getInstanceOf(TechnicalLoggerService.class);
+        return getAccessor().getInstanceOf("tenantTechnicalLoggerService", TechnicalLoggerService.class);
     }
 
     public CommandService buildCommandService() {

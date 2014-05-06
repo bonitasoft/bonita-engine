@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ public class InMemoryTemporaryDocumentServiceImpl implements DocumentService {
         try {
             sDocument.getClass().getMethod("setId", String.class).invoke(sDocument, documentId);
             return sDocument;
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             inMemoryDocStore.remove(documentId);
             inMemoryContentStore.remove(documentId);
             throw new SDocumentStorageException(e);
@@ -59,13 +59,11 @@ public class InMemoryTemporaryDocumentServiceImpl implements DocumentService {
 
     @Override
     public void deleteDocumentContent(final String documentId) throws SDocumentContentNotFoundException, SDocumentNotFoundException {
-        // final String documentId = sDocument.getStorageId();
-
         if (inMemoryDocStore.remove(documentId) == null) {
-            throw new SDocumentNotFoundException("the Document with documentID:" + documentId + "doesn't exist.");
+            throw new SDocumentNotFoundException(documentId);
         }
         if (inMemoryContentStore.remove(documentId) == null) {
-            throw new SDocumentContentNotFoundException("the DocumentContent with documentID:" + documentId + "doesn't exist.");
+            throw new SDocumentContentNotFoundException(documentId);
         }
     }
 

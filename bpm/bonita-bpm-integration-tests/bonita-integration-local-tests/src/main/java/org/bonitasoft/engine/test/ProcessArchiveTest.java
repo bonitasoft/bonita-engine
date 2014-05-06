@@ -97,6 +97,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         waitForUserTaskAndExecuteIt("step1", p3, john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
@@ -105,7 +106,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
                 assertTrue(saProcDataInstances.size() > 0);
 
                 return null;
-            };
+            }
         });
         waitForProcessToFinish(p1);
         waitForProcessToFinish(p2);
@@ -116,6 +117,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
@@ -123,7 +125,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
                 assertEquals(toString(saActDataInstances), 0, saActDataInstances.size());
                 assertEquals(0, saProcDataInstances.size());
                 return null;
-            };
+            }
 
             private String toString(final List<SADataInstance> saActDataInstances) {
                 final StringBuilder stb = new StringBuilder("[");
@@ -149,6 +151,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final TransitionService transitionService = tenantAccessor.getTransitionInstanceService();
         Callable<Long> getNumberOfArchivedTransitionInstances = new Callable<Long>() {
+
             @Override
             public Long call() throws Exception {
                 return transitionService.getNumberOfArchivedTransitionInstances(null);
@@ -206,6 +209,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 assertEquals(3, commentService.getNumberOfComments(null));
@@ -223,6 +227,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 assertEquals(0, commentService.getNumberOfComments(null));
@@ -236,6 +241,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction(new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 assertEquals(0, commentService.getNumberOfComments(null));
@@ -253,8 +259,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
-        .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
-        .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
+                .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
@@ -277,8 +283,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
-        .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
-        .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
+                .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());

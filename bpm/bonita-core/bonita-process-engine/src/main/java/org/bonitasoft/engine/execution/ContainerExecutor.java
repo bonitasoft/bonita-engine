@@ -52,7 +52,7 @@ public interface ContainerExecutor {
      *            The identifier of the process instance
      * @param executerId
      *            The identifier of the user which execute the flow node
-     * @param executerDelegateId
+     * @param executerSubstituteId
      *            The identifier of the delegated user which execute the flow node
      * @return The new state of the flow node after execution
      * @throws SFlowNodeReadException
@@ -60,7 +60,7 @@ public interface ContainerExecutor {
      *             Throw if there is an error when execute the flow node
      */
     FlowNodeState executeFlowNode(long flowNodeInstanceId, SExpressionContext contextDependency, List<SOperation> operations, long processInstanceId,
-            final Long executerId, final Long executerDelegateId) throws SFlowNodeReadException, SFlowNodeExecutionException;
+            final Long executerId, final Long executerSubstituteId) throws SFlowNodeReadException, SFlowNodeExecutionException;
 
     /**
      * @return The handled type

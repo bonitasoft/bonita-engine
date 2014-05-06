@@ -15,8 +15,6 @@ CREATE INDEX fk_breakpoint_process_instanceId_idx ON breakpoint(inst_id ASC, ten
 CREATE INDEX fk_data_instance_tenantId_idx ON data_instance(tenantid ASC);
 CREATE INDEX fk_data_mapping_data_instanceId_idx ON data_mapping(dataInstanceId ASC, tenantid ASC);
 CREATE INDEX fk_data_mapping_tenantId_idx ON data_mapping(tenantid ASC);
-CREATE INDEX fk_datasource_tenantId_idx ON datasource(tenantid ASC);
-CREATE INDEX fk_datasourceparameter_tenantId_idx ON datasourceparameter(tenantid ASC);
 CREATE INDEX fk_dependency_tenantId_idx ON dependency(tenantid ASC);
 CREATE INDEX fk_dependencymapping_tenantId_idx ON dependencymapping(tenantid ASC);
 CREATE INDEX fk_document_content_tenantId_idx ON document_content(tenantid ASC);
@@ -104,8 +102,6 @@ ALTER TABLE command ADD CONSTRAINT fk_command_tenantId FOREIGN KEY (tenantid) RE
 ALTER TABLE connector_instance ADD CONSTRAINT fk_connector_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE data_instance ADD CONSTRAINT fk_data_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE data_mapping ADD CONSTRAINT fk_data_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE datasource ADD CONSTRAINT fk_datasource_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE datasourceparameter ADD CONSTRAINT fk_datasourceparameter_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE dependency ADD CONSTRAINT fk_dependency_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_dependencymapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE document_content ADD CONSTRAINT fk_document_content_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);

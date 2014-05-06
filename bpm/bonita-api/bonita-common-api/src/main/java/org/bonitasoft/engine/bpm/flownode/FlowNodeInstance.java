@@ -73,15 +73,23 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
     String getDisplayName();
 
     /**
-     * @return id of the user who originally executed the flow node
+     * @return The identifier of the user who executed the flow node
      * @since 6.0.1
      */
     long getExecutedBy();
 
     /**
-     * @return id of the user (delegate) who executed the flow node for the original executer
-     * @since 6.0.1
+     * @return The identifier of the substitute user (as Process manager or Administrator) who executed the flow node.
+     * @since 6.3.0
      */
+    long getExecutedBySubstitute();
+
+    /**
+     * @return The identifier of the substitute user (as Process manager or Administrator) who executed the flow node.
+     * @since 6.0.1
+     * @deprecated since 6.3.0, use {@link FlowNodeInstance#getExecutedBySubstitute()}
+     */
+    @Deprecated
     long getExecutedByDelegate();
 
     /**

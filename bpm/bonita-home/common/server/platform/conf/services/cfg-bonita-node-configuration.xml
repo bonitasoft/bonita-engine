@@ -20,6 +20,7 @@
 
 	<bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
 		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>

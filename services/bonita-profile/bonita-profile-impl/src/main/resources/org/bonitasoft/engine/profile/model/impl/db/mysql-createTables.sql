@@ -23,6 +23,7 @@ CREATE TABLE profileentry (
   index_ BIGINT,
   type VARCHAR(50),
   page VARCHAR(50),
+  custom BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
 

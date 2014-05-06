@@ -107,7 +107,7 @@ public class SequenceManagerImplTest {
         InOrder inOrder = inOrder(lockService, connection);
         assertEquals(110, sequenceManager.getNextId("myClass", 1));
         inOrder.verify(lockService).lock(SEQUENCE_ID, TenantSequenceManagerImpl.SEQUENCE, TENANTID);
-        inOrder.verify(connection).commit();;
+        inOrder.verify(connection).commit();
         inOrder.verify(lockService).unlock(lock, TENANTID);
     }
 

@@ -145,8 +145,8 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         final CallActivityBuilder callActivity = callingProcessDefinitionBuilder.addCallActivity("callActivity", targetProcessNameExpr,
                 targetProcessVersionExpr);
         final Expression rightOperand = new ExpressionBuilder().createDataExpression(dataName, dataType);
-        callActivity.addDataInputOperation(buildOperation(dataName, OperatorType.ASSIGNMENT, "=", rightOperand));
-        callActivity.addDataOutputOperation(buildOperation(dataName, OperatorType.ASSIGNMENT, "=", rightOperand));
+        callActivity.addDataInputOperation(buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
+        callActivity.addDataOutputOperation(buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
         callingProcessDefinitionBuilder.addEndEvent("end");
         callingProcessDefinitionBuilder.addTransition("start", "callActivity").addTransition("callActivity", "Step1").addTransition("Step1", "end");
         final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(), ACTOR_NAME,

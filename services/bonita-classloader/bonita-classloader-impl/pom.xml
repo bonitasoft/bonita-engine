@@ -24,11 +24,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.xbean</groupId>
 			<artifactId>xbean-classloader</artifactId>
 			<version>3.7</version>

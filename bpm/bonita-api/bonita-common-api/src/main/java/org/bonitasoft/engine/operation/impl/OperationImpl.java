@@ -148,4 +148,9 @@ public class OperationImpl implements Operation {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Operation [ set " + leftOperand + " using " + type + " " + operator + " with" + rightOperand + "]";
+    }
+
 }

@@ -17,15 +17,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.TenantPersistenceService;
@@ -67,19 +71,79 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected final DataSource datasource;
 
+    private final Set<Class<? extends PersistentObject>> wordSearchExclusionMappings = new HashSet<Class<? extends PersistentObject>>();
+
+    private final boolean enableWordSearch;
+
+    protected final TechnicalLoggerService logger;
+
+    public AbstractDBPersistenceService(final String name, final String statementDelimiter, final String likeEscapeCharacter,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+        this.name = name;
+        this.sequenceManager = null;
+        this.datasource = null;
+        this.statementDelimiter = statementDelimiter;
+        this.likeEscapeCharacter = likeEscapeCharacter;
+        this.enableWordSearch = enableWordSearch;
+        if (wordSearchExclusionMappings != null) {
+            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
+                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
+                if (!PersistentObject.class.isAssignableFrom(clazz)) {
+                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz + " because it does not implements "
+                            + PersistentObject.class);
+                }
+                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
+            }
+        }
+        this.logger = logger;
+    }
+
     public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
-            final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource) {
+            final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
         initTablesFiles(dbConfigurationsProvider, name);
         this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
+        this.enableWordSearch = enableWordSearch;
+        this.logger = logger;
+
+        if (enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "The word based search feature is experimental, using it in production may impact performances.");
+        }
+        if (wordSearchExclusionMappings != null && !wordSearchExclusionMappings.isEmpty()) {
+            if (!enableWordSearch && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "You defined an exclusion mapping for the word based search feature, but it is not enabled.");
+            }
+            for (final String wordSearchExclusionMapping : wordSearchExclusionMappings) {
+                final Class<?> clazz = Class.forName(wordSearchExclusionMapping);
+                if (!PersistentObject.class.isAssignableFrom(clazz)) {
+                    throw new RuntimeException("Unable to add a word search exclusion mapping for class " + clazz + " because it does not implements "
+                            + PersistentObject.class);
+                }
+                this.wordSearchExclusionMappings.add((Class<? extends PersistentObject>) clazz);
+            }
+        }
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    protected boolean isWordSearchEnabled(final Class<? extends PersistentObject> entityClass) {
+        if (!enableWordSearch || entityClass == null) {
+            return false;
+        }
+        for (final Class<? extends PersistentObject> exclusion : wordSearchExclusionMappings) {
+            if (exclusion.isAssignableFrom(entityClass)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void initTablesFiles(final DBConfigurationsProvider dbConfigurationsProvider, final String persistenceDBConfigFilter) {
@@ -293,17 +357,29 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     /**
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
-    protected String getLikeEscapeClause(final String term) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(" LIKE '");
+    protected String buildLikeEscapeClause(final String term, final String prefixPattern, final String suffixPattern) {
+        return " LIKE '" + (prefixPattern != null ? prefixPattern : "") + escapeTerm(term) + (suffixPattern != null ? suffixPattern : "") + "' ESCAPE '"
+                + getLikeEscapeCharacter() + "'";
+    }
+
+    /**
+     * @param term
+     * @return
+     */
+    protected String escapeTerm(final String term) {
         // 1) escape ' character by adding another ' character
         // 2) protect escape character if this character is used in data
         // 3) escape % character (sql query wildcard) by adding escape character
         // 4) escape _ character (sql query wildcard) by adding escape character
-        builder.append(term.replaceAll("'", "''").replaceAll(likeEscapeCharacter, likeEscapeCharacter + likeEscapeCharacter)
-                .replaceAll("%", likeEscapeCharacter + "%").replaceAll("_", likeEscapeCharacter + "_"));
-        builder.append("%' ESCAPE '").append(likeEscapeCharacter).append('\'');
-        return builder.toString();
+        return term
+                .replaceAll("'", "''")
+                .replaceAll(getLikeEscapeCharacter(), getLikeEscapeCharacter() + getLikeEscapeCharacter())
+                .replaceAll("%", getLikeEscapeCharacter() + "%")
+                .replaceAll("_", getLikeEscapeCharacter() + "_");
+    }
+
+    protected String getLikeEscapeCharacter() {
+        return likeEscapeCharacter;
     }
 
 }

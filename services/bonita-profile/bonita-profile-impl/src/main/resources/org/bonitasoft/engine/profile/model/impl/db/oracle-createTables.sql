@@ -23,6 +23,7 @@ CREATE TABLE profileentry (
   index_ NUMBER(19, 0),
   type VARCHAR2(50),
   page VARCHAR2(50),
+  custom NUMBER(1) DEFAULT 0,
   PRIMARY KEY (tenantId, id)
 );
 

@@ -93,7 +93,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                         e);
             }
             final List<ArchivedProcessInstance> archivedPInstances = getArchivedProcessInstanceList.getResult();
-            if (archivedPInstances.size() > 0) {
+            if (!archivedPInstances.isEmpty()) {
                 processDefinitionId = archivedPInstances.get(0).getProcessDefinitionId();
             }
         }

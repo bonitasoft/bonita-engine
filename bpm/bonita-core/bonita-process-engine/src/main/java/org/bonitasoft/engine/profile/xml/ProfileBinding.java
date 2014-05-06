@@ -28,7 +28,7 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class ProfileBinding extends ElementBinding {
 
-    private ExportedProfileBuilder profileBuilder = null;
+    protected ExportedProfileBuilder profileBuilder = null;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -106,7 +107,7 @@ public class EventsHandler {
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
             final ProcessInstanceService processInstanceService, final TokenService tokenService,
-            final TechnicalLoggerService logger) {
+            final TechnicalLoggerService logger, final TransientDataService transientDataService) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -117,7 +118,7 @@ public class EventsHandler {
         handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
-                bpmInstancesCreator, dataInstanceService, processDefinitionService));
+                bpmInstancesCreator, dataInstanceService, processDefinitionService, transientDataService));
         handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
