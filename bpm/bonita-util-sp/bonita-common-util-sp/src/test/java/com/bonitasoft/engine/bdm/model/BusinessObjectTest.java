@@ -1,10 +1,12 @@
-package com.bonitasoft.engine.bdm;
+package com.bonitasoft.engine.bdm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
 import org.junit.Test;
+
+import com.bonitasoft.engine.bdm.model.BusinessObject;
 
 public class BusinessObjectTest {
 

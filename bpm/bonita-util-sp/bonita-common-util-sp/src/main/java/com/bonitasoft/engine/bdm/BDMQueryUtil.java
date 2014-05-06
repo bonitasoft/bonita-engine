@@ -17,6 +17,11 @@ import java.util.Set;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+
 /**
  * @author Romain Bioteau
  * @author Matthieu Chaffotte

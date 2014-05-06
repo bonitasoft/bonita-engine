@@ -39,9 +39,9 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;

@@ -9,8 +9,8 @@
 package com.bonitasoft.engine.bdm.server;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 

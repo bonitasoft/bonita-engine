@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 

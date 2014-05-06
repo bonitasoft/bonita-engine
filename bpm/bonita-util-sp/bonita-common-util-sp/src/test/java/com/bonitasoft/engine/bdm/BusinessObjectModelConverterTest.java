@@ -8,6 +8,7 @@ import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
 
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.io.IOUtils;
 
 public class BusinessObjectModelConverterTest {

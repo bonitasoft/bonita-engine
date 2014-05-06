@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBException;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.BOMBuilder;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 
 public class IOUtilsTest {
 

@@ -18,11 +18,11 @@ import java.util.Map;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Query;
-import com.bonitasoft.engine.bdm.QueryParameter;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;

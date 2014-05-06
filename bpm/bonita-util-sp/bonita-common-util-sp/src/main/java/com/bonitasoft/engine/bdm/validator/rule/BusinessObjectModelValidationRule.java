@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**

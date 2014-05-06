@@ -19,7 +19,7 @@ import java.util.List;
 import javax.lang.model.SourceVersion;
 
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
-import com.bonitasoft.engine.bdm.QueryParameter;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 public class QueryParameterValidationRule implements ValidationRule {

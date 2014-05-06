@@ -14,12 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.Query;
-import com.bonitasoft.engine.bdm.QueryParameter;
-import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;

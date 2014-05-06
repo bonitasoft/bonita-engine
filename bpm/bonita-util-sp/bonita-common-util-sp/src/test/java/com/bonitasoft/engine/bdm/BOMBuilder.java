@@ -2,6 +2,11 @@ package com.bonitasoft.engine.bdm;
 
 import java.util.List;
 
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.FieldType;
+
 public class BOMBuilder {
 
     private Field buildField(final String name, final FieldType type) {
