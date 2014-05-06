@@ -139,7 +139,7 @@ public class TenantTest {
         try {
             identityAPI.getNumberOfUsers();
             fail("should not be able to call an api on a deactivated tenant");
-        } catch (InvalidSessionException e) {
+        } catch (final InvalidSessionException e) {
             platformAPI.activateTenant(tenantId);
         }
 
@@ -148,9 +148,9 @@ public class TenantTest {
     @Test(expected = TenantIsPausedException.class)
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
     public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
-        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
-        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
         tenantManagementAPI.pause();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         apiSession = loginAPI.login(tenantId, userName, password);
@@ -165,12 +165,12 @@ public class TenantTest {
     @Test
     @Cover(classes = { ServerAPI.class }, jira = "BS-7101", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
     public void should_be_able_to_login_only_with_technical_user_on_paused_tenant() throws Exception {
-        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         apiTestSPUtil.loginWith(userName, password, tenantId);
-        IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
-        User john = identityAPI.createUser("john", "bpm");
-        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        final IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
+        final User john = identityAPI.createUser("john", "bpm");
+        final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
         tenantManagementAPI.pause();
         loginAPI.logout(apiTestSPUtil.getSession());
         // login with normal user: not working
@@ -186,7 +186,7 @@ public class TenantTest {
         TenantAPIAccessor.getTenantManagementAPI(loginWithTechnical).resume();
         loginAPI.logout(loginWithTechnical);
         // can now login with normal user
-        APISession login = loginAPI.login(tenantId, "john", "bpm");
+        final APISession login = loginAPI.login(tenantId, "john", "bpm");
         loginAPI.logout(login);
 
         // delete the user
@@ -198,10 +198,10 @@ public class TenantTest {
     @Test
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
     public void pauseAnnotatedAPIMethodShouldBePossibleOnPausedTenant() throws Exception {
-        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
         apiTestSPUtil.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);
-        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
         tenantManagementAPI.pause();
         try {
             tenantManagementAPI.isPaused();
@@ -209,6 +209,7 @@ public class TenantTest {
             apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
             apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
             apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
+            apiTestSPUtil.getPageAPI().searchPages(new SearchOptionsBuilder(0, 1).done());
             // test with bos accessor
             org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
             org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
@@ -224,7 +225,7 @@ public class TenantTest {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         APISession apiSession = loginAPI.login(tenantId, userName, password);
         ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
-        ProcessDefinitionBuilderExt processDefinitionBuilderExt = new ProcessDefinitionBuilderExt();
+        final ProcessDefinitionBuilderExt processDefinitionBuilderExt = new ProcessDefinitionBuilderExt();
         processDefinitionBuilderExt.createNewInstance("aProcess", "1.0");
 
         processDefinitionBuilderExt.addStartEvent("start").addTimerEventTriggerDefinition(TimerType.CYCLE,
@@ -249,9 +250,10 @@ public class TenantTest {
 
             @Override
             protected boolean check() throws Exception {
-                SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+                final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
                 searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, deploy.getId());
-                SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances = fprocessAPI.searchArchivedProcessInstances(searchOptionsBuilder.done());
+                final SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances = fprocessAPI.searchArchivedProcessInstances(searchOptionsBuilder
+                        .done());
                 return searchArchivedProcessInstances.getCount() > 1;
             }
         }.waitUntil();

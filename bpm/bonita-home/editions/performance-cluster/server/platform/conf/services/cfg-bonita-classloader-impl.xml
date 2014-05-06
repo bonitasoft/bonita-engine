@@ -6,7 +6,7 @@
 		class="com.bonitasoft.engine.classloader.ClusteredClassLoaderService" depends-on="hazelcastInstance">
 		<constructor-arg name="classLoaderService" ref="normalClassLoader" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
 	</bean>
 	<bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
       <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -15,7 +15,7 @@
     <bean id="normalClassLoader" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
         <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
         <constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>

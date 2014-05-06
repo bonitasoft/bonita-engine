@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
 
@@ -19,74 +19,74 @@ import org.junit.Test;
  */
 public class APIAccessorTest {
 
-    private Method getAPIMethod(final String methodName) {
+    private Method getAPIMethod(final String methodName) throws Exception {
         final Method[] declaredMethods = APIAccessor.class.getDeclaredMethods();
         for (final Method method : declaredMethods) {
             if (method.getName().equals(methodName)) {
                 return method;
             }
         }
-        return null;
+        throw new Exception("method " + methodName + " not found");
+    }
+
+    private void checkMethodReturnExpectedReturnType(String methodName, String expected) throws Exception {
+        final Method method = getAPIMethod(methodName);
+        assertThat(method.getReturnType().getName()).as("method " + methodName + " sould return type " + expected).isEqualTo(expected);
     }
 
     @Test
-    public void checkIdentyAPI() throws SecurityException {
-        final Method method = getAPIMethod("getIdentityAPI");
-        assertEquals("com.bonitasoft.engine.api.IdentityAPI", method.getReturnType().getName());
+    public void checkIdentyAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getIdentityAPI", "com.bonitasoft.engine.api.IdentityAPI");
     }
 
     @Test
-    public void checkgetProcessAPI() throws SecurityException {
-        final Method method = getAPIMethod("getProcessAPI");
-        assertEquals("com.bonitasoft.engine.api.ProcessAPI", method.getReturnType().getName());
+    public void checkgetProcessAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getProcessAPI", "com.bonitasoft.engine.api.ProcessAPI");
     }
 
     @Test
-    public void checkMonitoringAPI() throws SecurityException {
-        final Method method = getAPIMethod("getMonitoringAPI");
-        assertEquals("com.bonitasoft.engine.api.MonitoringAPI", method.getReturnType().getName());
+    public void checkMonitoringAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getMonitoringAPI", "com.bonitasoft.engine.api.MonitoringAPI");
     }
 
     @Test
-    public void checkPlatformMonitoringAPI() throws SecurityException {
-        final Method method = getAPIMethod("getPlatformMonitoringAPI");
-        assertEquals("com.bonitasoft.engine.api.PlatformMonitoringAPI", method.getReturnType().getName());
+    public void checkPlatformMonitoringAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getPlatformMonitoringAPI", "com.bonitasoft.engine.api.PlatformMonitoringAPI");
     }
 
     @Test
-    public void checkgetLogAPI() throws SecurityException {
-        final Method method = getAPIMethod("getLogAPI");
-        assertEquals("com.bonitasoft.engine.api.LogAPI", method.getReturnType().getName());
+    public void checkgetLogAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getLogAPI", "com.bonitasoft.engine.api.LogAPI");
     }
 
     @Test
-    public void checkgetThemeAPI() throws SecurityException {
-        final Method method = getAPIMethod("getThemeAPI");
-        assertEquals("com.bonitasoft.engine.api.ThemeAPI", method.getReturnType().getName());
+    public void checkgetThemeAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getThemeAPI", "com.bonitasoft.engine.api.ThemeAPI");
     }
 
     @Test
-    public void checkNodeAPI() throws SecurityException {
-        final Method method = getAPIMethod("getNodeAPI");
-        assertEquals("com.bonitasoft.engine.api.NodeAPI", method.getReturnType().getName());
+    public void checkNodeAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getNodeAPI", "com.bonitasoft.engine.api.NodeAPI");
     }
 
     @Test
-    public void checkCommandAPI() throws SecurityException {
-        final Method method = getAPIMethod("getCommandAPI");
-        assertEquals("org.bonitasoft.engine.api.CommandAPI", method.getReturnType().getName());
+    public void checkCommandAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getCommandAPI", "org.bonitasoft.engine.api.CommandAPI");
     }
 
     @Test
-    public void checkReportingAPI() throws SecurityException {
-        final Method method = getAPIMethod("getReportingAPI");
-        assertEquals("com.bonitasoft.engine.api.ReportingAPI", method.getReturnType().getName());
+    public void checkReportingAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getReportingAPI", "com.bonitasoft.engine.api.ReportingAPI");
     }
 
     @Test
-    public void checkProfileAPI() throws SecurityException {
-        final Method method = getAPIMethod("getProfileAPI");
-        assertEquals("com.bonitasoft.engine.api.ProfileAPI", method.getReturnType().getName());
+    public void checkProfileAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getProfileAPI", "com.bonitasoft.engine.api.ProfileAPI");
+    }
+
+    @Test
+    public void checkPageAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getPageAPI", "com.bonitasoft.engine.api.PageAPI");
     }
 
 }

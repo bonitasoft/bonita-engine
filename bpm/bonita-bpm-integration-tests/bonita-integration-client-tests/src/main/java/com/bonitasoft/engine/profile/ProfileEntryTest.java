@@ -8,7 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -38,6 +40,10 @@ import org.junit.Test;
  * @author Celine Souchet
  */
 public class ProfileEntryTest extends AbstractProfileTest {
+
+    private static final String ENTRY_DESCRIPTION = "entry description";
+
+    private static final String ENTRY_TYPE_LINK = ProfileEntryType.LINK.toString().toLowerCase();
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create and delete profile entry.", jira = "")
     @Test
@@ -188,62 +194,62 @@ public class ProfileEntryTest extends AbstractProfileTest {
         final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
 
         // Create Profile entry 1
-        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistinguser")
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("tasklistinguser")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator1));
 
         // Create Profile entry 2
-        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistingadmin")
-                .setParentId(folderProfileEntry.getId());
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("tasklistingadmin")
+                .setParentId(folderProfileEntry.getId()).setCustom(true);
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
 
         // Create Profile entry 3
-        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistinguser")
-                .setParentId(folderProfileEntry.getId());
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("caselistinguser")
+                .setParentId(folderProfileEntry.getId()).setCustom(false);
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
 
         // Create Profile entry 4
-        final ProfileEntryCreator profileEntryCreator4 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistingadmin")
+        final ProfileEntryCreator profileEntryCreator4 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("caselistingadmin")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator4));
 
         // Create Profile entry 5
-        final ProfileEntryCreator profileEntryCreator5 = new ProfileEntryCreator("", profileId).setType("link").setPage("processlistinguser")
+        final ProfileEntryCreator profileEntryCreator5 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("processlistinguser")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator5));
 
         // Create Profile entry 6
-        final ProfileEntryCreator profileEntryCreator6 = new ProfileEntryCreator("", profileId).setType("link").setPage("processlistingadmin")
+        final ProfileEntryCreator profileEntryCreator6 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("processlistingadmin")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator6));
 
         // Create Profile entry 7
-        final ProfileEntryCreator profileEntryCreator7 = new ProfileEntryCreator("", profileId).setType("link").setPage("userlistingadmin")
+        final ProfileEntryCreator profileEntryCreator7 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("userlistingadmin")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator7));
 
         // Create Profile entry 8
-        final ProfileEntryCreator profileEntryCreator8 = new ProfileEntryCreator("", profileId).setType("link").setPage("grouplistingadmin")
+        final ProfileEntryCreator profileEntryCreator8 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("grouplistingadmin")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator8));
 
         // Create Profile entry 9
-        final ProfileEntryCreator profileEntryCreator9 = new ProfileEntryCreator("", profileId).setType("link").setPage("rolelistingadmin")
+        final ProfileEntryCreator profileEntryCreator9 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("rolelistingadmin")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator9));
 
         // Create Profile entry 10
-        final ProfileEntryCreator profileEntryCreator10 = new ProfileEntryCreator("", profileId).setType("link").setPage("importexportorganization")
+        final ProfileEntryCreator profileEntryCreator10 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("importexportorganization")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator10));
 
         // Create Profile entry 11
-        final ProfileEntryCreator profileEntryCreator11 = new ProfileEntryCreator("", profileId).setType("link").setPage("profilelisting")
+        final ProfileEntryCreator profileEntryCreator11 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("profilelisting")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator11));
 
         // Create Profile entry 12
-        final ProfileEntryCreator profileEntryCreator12 = new ProfileEntryCreator("", profileId).setType("link").setPage("reportlistingadminext")
+        final ProfileEntryCreator profileEntryCreator12 = new ProfileEntryCreator("", profileId).setType(ENTRY_TYPE_LINK).setPage("reportlistingadminext")
                 .setParentId(folderProfileEntry.getId());
         profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator12));
 
@@ -256,8 +262,11 @@ public class ProfileEntryTest extends AbstractProfileTest {
             assertEquals(profileEntries.get(resultProfileEntries.indexOf(resultProfileEntry)).getId(), resultProfileEntry.getId());
         }
         assertEquals(0L, resultProfileEntries.get(0).getIndex());
+        assertFalse(resultProfileEntries.get(0).isCustom());
         assertEquals(2L, resultProfileEntries.get(1).getIndex());
+        assertTrue(resultProfileEntries.get(1).isCustom());
         assertEquals(4L, resultProfileEntries.get(2).getIndex());
+        assertFalse(resultProfileEntries.get(2).isCustom());
         assertEquals(6L, resultProfileEntries.get(3).getIndex());
         assertEquals(8L, resultProfileEntries.get(4).getIndex());
         assertEquals(10L, resultProfileEntries.get(5).getIndex());
@@ -272,11 +281,66 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfile(profileId);
     }
 
+    @Test
+    public void searchProfileEntryByPage() throws BonitaException {
+
+        // given
+        final String pageToSearch = "tasklistinguser";
+        final String profileEntryName = "entry1";
+
+        // Create Profile1
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+
+        // Create Folder Profile Entry
+        final ProfileEntryCreator folderCreator = new ProfileEntryCreator("folderName", profileId).setType("folder");
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(folderCreator);
+        final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
+
+        // custom page
+        final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(profileEntryName, profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
+                        .setDescription(ENTRY_DESCRIPTION)
+                        .setCustom(true)
+                        .setParentId(folderProfileEntry.getId()));
+        profileEntries.add(createProfileEntry);
+
+        // page with same name but not a custom page
+        profileEntries.add(getProfileAPI().createProfileEntry(
+                new ProfileEntryCreator(profileEntryName, profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
+                        .setDescription(ENTRY_DESCRIPTION)
+                        .setCustom(false)
+                        .setParentId(folderProfileEntry.getId())));
+
+        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator("entry2", profileId).setType(ENTRY_TYPE_LINK).setPage("tasklistingadmin")
+                .setDescription(ENTRY_DESCRIPTION)
+                .setParentId(folderProfileEntry.getId()).setCustom(true)));
+
+        profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator("entry3", profileId).setType(ENTRY_TYPE_LINK).setPage("caselistinguser")
+                .setDescription(ENTRY_DESCRIPTION)
+                .setParentId(folderProfileEntry.getId()).setCustom(false)));
+
+        // when
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PAGE, pageToSearch);
+        builder.filter(ProfileEntrySearchDescriptor.CUSTOM, new Boolean(true));
+
+        final List<ProfileEntry> resultProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+
+        // then
+        assertThat(resultProfileEntries).as("should contain 1 item with pageToSearch").hasSize(1).containsOnly(createProfileEntry);
+
+        // cleanup
+        getProfileAPI().deleteProfile(profileId);
+    }
+
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
     @Test(expected = CreationException.class)
     public void createProfileEntryWithWrongParameter() throws Exception {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry2")
-                .setType("link");
+                .setType(ENTRY_TYPE_LINK);
         getProfileAPI().createProfileEntry(profileEntryCreator);
     }
 
@@ -293,7 +357,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         updateDescriptor.description("Updated Description profileEntry3");
         updateDescriptor.parentId(1L);
         updateDescriptor.profileId(adminProfileId);
-        updateDescriptor.type("link");
+        updateDescriptor.type(ENTRY_TYPE_LINK);
         updateDescriptor.page("myPage");
         updateDescriptor.index(0L);
         final ProfileEntry upDateProfileEntryResult = getProfileAPI().updateProfileEntry(createdProfile.getId(), updateDescriptor);
@@ -478,7 +542,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
 
         final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
-        updateDescriptor.type("link");
+        updateDescriptor.type(ENTRY_TYPE_LINK);
         updateDescriptor.page("");
         getProfileAPI().updateProfileEntry(createdProfileEntry.getId(), updateDescriptor);
     }
@@ -487,7 +551,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test(expected = UpdateException.class)
     public void updateProfileEntryNotExisting() throws Exception {
         final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
-        updateDescriptor.type("link");
+        updateDescriptor.type(ENTRY_TYPE_LINK);
         updateDescriptor.page(null);
         updateDescriptor.index(0L);
         getProfileAPI().updateProfileEntry(16464654L, updateDescriptor);

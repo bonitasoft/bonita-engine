@@ -12,7 +12,7 @@
 				</entry>
 			</map>
 		</constructor-arg>
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="employeeHandler" class="org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl" />

@@ -105,7 +105,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
             ManualTaskInstance manualUserTask = null;
             if (addChild) {
                 getProcessAPI().assignUserTask(step1.getId(), donaBenta.getId());
-                final ManualTaskCreator taskCreator = buildManualTaskCreator(step1.getId(), "childOfStep1", "childOfStep1", donaBenta.getId(), "child task",
+                final ManualTaskCreator taskCreator = buildManualTaskCreator(step1.getId(), "childOfStep1", donaBenta.getId(), "child task",
                         new Date(), TaskPriority.NORMAL);
                 manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
             }

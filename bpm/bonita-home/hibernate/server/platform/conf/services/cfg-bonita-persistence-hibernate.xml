@@ -7,9 +7,15 @@
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
@@ -19,7 +25,7 @@
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 		<property name="classesToPurge">
@@ -27,6 +33,12 @@
 				<value>org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl</value>
 			</list>
 		</property>
+        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="wordSearchExclusionMappings">
+            <set>
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </set>
+        </constructor-arg>
 	</bean>
 
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
@@ -38,7 +50,6 @@
 				<prop key="hibernate.transaction.jta.platform">${hibernate.transaction.jta_platform}</prop>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
 				<prop key="hibernate.interceptor">${hibernate.journal.interceptor}</prop>
-				<prop key="net.sf.ehcache.configurationResourceName">ehcache.xml</prop>
 				<prop key="hibernate.show_sql">${hibernate.journal.show_sql}</prop>
 				<prop key="hibernate.format_sql">${hibernate.journal.format_sql}</prop>
 				<prop key="hibernate.use_sql_comments">${hibernate.journal.use_sql_comments}</prop>
@@ -58,8 +69,6 @@
 				<entry key="org.bonitasoft.engine.platform.model.STenant" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
 				<entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
 				<!-- services -->
-				<entry key="org.bonitasoft.engine.data.model.SDataSource" value="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" />
-				<entry key="org.bonitasoft.engine.data.model.SDataSourceParameter" value="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
@@ -150,6 +159,9 @@
 				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="com.bonitasoft.engine.core.reporting.SReportImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
+				<entry key="com.bonitasoft.engine.page.SPage" value="com.bonitasoft.engine.page.impl.SPageImpl" />
+				<entry key="com.bonitasoft.engine.page.SPageContent" value="com.bonitasoft.engine.page.impl.SPageContentImpl" />
+				<entry key="com.bonitasoft.engine.page.SPageWithContent" value="com.bonitasoft.engine.page.impl.SPageWithContentImpl" />
 
 				<entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
 				<entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
@@ -266,7 +278,6 @@
 			<list>
 				<ref bean="hbm-bonita-log-model" />
 				<ref bean="hbm-bonita-platform-model" />
-				<ref bean="hbm-bonita-data-model" />
 				<ref bean="hbm-bonita-dependency-model" />
 				<ref bean="hbm-bonita-dependency-platform-model" />
 				<ref bean="hbm-bonita-identity-model" />
@@ -291,6 +302,7 @@
 				<ref bean="hbm-bos-supervisor-mapping" />
 				<ref bean="hbm-bos-external-identity-mapping" />
 				<ref bean="hbm-bos-reporting-model" />
+				<ref bean="hbm-bos-page-model" />
 			</list>
 		</property>
 		<!-- L2 cache -->
@@ -306,8 +318,6 @@
 				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="read-write" />

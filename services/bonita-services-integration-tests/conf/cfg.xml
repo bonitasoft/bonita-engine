@@ -17,7 +17,7 @@
 	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
@@ -34,7 +34,7 @@
     <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
         <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
         <constructor-arg name="temporaryFolder" value="${java.io.tmpdir}" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />

@@ -16,15 +16,21 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.Index;
@@ -396,5 +402,53 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @since 6.1
      */
     ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(long connectorInstanceId) throws ConnectorInstanceNotFoundException;
+
+    /**
+     * Search for archived flow node instances (activities, gateways and events) supervised by the specified user.
+     * 
+     * @param supervisorId
+     *            The identifier of the supervising user.
+     * @param searchOptions
+     *            The search options (pagination, filter, order sort).
+     * @return A {@link SearchResult} containing the search result.
+     * @throws InvalidSessionException
+     *             If the session is invalid, e.g. the session has expired.
+     * @throws SearchException
+     *             If the search could not be completed correctly.
+     * @since 6.3
+     */
+    SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Search for archived flow node instances (activities, gateways and events) supervised by the specified user.
+     * 
+     * @param supervisorId
+     *            The identifier of the supervising user.
+     * @param searchOptions
+     *            The search options (pagination, filter, order sort).
+     * @return A {@link SearchResult} containing the search result.
+     * @throws InvalidSessionException
+     *             If the session is invalid, e.g. the session has expired.
+     * @throws SearchException
+     *             If the search could not be completed correctly.
+     * @since 6.3
+     */
+    SearchResult<ArchivedActivityInstance> searchArchivedActivityInstancesSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Search for flow node instances (activities, gateways and events) supervised by the specified user.
+     * 
+     * @param supervisorId
+     *            The identifier of the supervising user.
+     * @param searchOptions
+     *            The search options (pagination, filter, order sort).
+     * @return A {@link SearchResult} containing the search result.
+     * @throws InvalidSessionException
+     *             If the session is invalid, e.g. the session has expired.
+     * @throws SearchException
+     *             If the search could not be completed correctly.
+     * @since 6.3
+     */
+    SearchResult<FlowNodeInstance> searchFlowNodeInstancesSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
 
 }

@@ -52,7 +52,7 @@ public class RefBusinessDataServiceImplTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    private SRefBusinessDataInstance buildSRefBusinessDataInstance(final String name, final long dataId) {
+    private SRefBusinessDataInstance buildSRefBusinessDataInstance() {
         final SRefBusinessDataInstanceImpl instance = new SRefBusinessDataInstanceImpl();
         instance.setName("myLeaveRequest");
         instance.setDataId(45l);
@@ -68,7 +68,7 @@ public class RefBusinessDataServiceImplTest {
     public void getRefBusinessDataInstanceReturnsTheRightObject() throws Exception {
         final String name = "myLeaveRequest";
         final long dataId = 45;
-        final SRefBusinessDataInstance expectedDataInstance = buildSRefBusinessDataInstance(name, dataId);
+        final SRefBusinessDataInstance expectedDataInstance = buildSRefBusinessDataInstance();
         when(persistence.selectOne(buildGetDescriptor(name, dataId))).thenReturn(expectedDataInstance);
 
         final SRefBusinessDataInstance actualDataInstance = service.getRefBusinessDataInstance(name, dataId);
@@ -96,7 +96,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test
     public void updateRefBusinessData() throws Exception {
-        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance("myData", -1);
+        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
         final long dataId = 564654654654654l;
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);
@@ -109,7 +109,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test(expected = SRefBusinessDataInstanceModificationException.class)
     public void updateRefBusinessDataThrowException() throws Exception {
-        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance("myData", -1);
+        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
         final long dataId = 564654654654654l;
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);
@@ -121,7 +121,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test
     public void addRefBusinessData() throws Exception {
-        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance("myData", -1);
+        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
 
         service.addRefBusinessDataInstance(refBusinessDataInstance);
 
@@ -130,7 +130,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test(expected = SRefBusinessDataInstanceCreationException.class)
     public void addRefBusinessDataThrowException() throws Exception {
-        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance("myData", -1);
+        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
 
         doThrow(new SRecorderException("ouch!")).when(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), null);
 

@@ -109,14 +109,14 @@ public class OperationTest extends CommonAPITest {
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
         addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
                 new ExpressionBuilder().createConstantStringExpression("newValue1")));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(2), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue2"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(3), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue3"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(4), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue4"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(5), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createConstantStringExpression("newValue5"));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(2,
+                new ExpressionBuilder().createConstantStringExpression("newValue2")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(3,
+                new ExpressionBuilder().createConstantStringExpression("newValue3")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(4,
+                new ExpressionBuilder().createConstantStringExpression("newValue4")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(5,
+                new ExpressionBuilder().createConstantStringExpression("newValue5")));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createConstantStringExpression("value1"));
@@ -157,8 +157,8 @@ public class OperationTest extends CommonAPITest {
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
         addAutomaticTask.addOperation(new LeftOperandBuilder().createDataLeftOperand("baseData"), OperatorType.ASSIGNMENT, null, null,
                 new ExpressionBuilder().createConstantStringExpression("changedData"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(1), OperatorType.STRING_INDEX, null, null,
-                new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
+                new ExpressionBuilder().createDataExpression("baseData", String.class.getName())));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
@@ -183,7 +183,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step1", actorName);
         designProcessDefinition.addUserTask("step3", actorName);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(1), OperatorType.STRING_INDEX, null, null, null);
+        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1, null));
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.done();
@@ -491,11 +491,11 @@ public class OperationTest extends CommonAPITest {
     @Cover(classes = Operation.class, concept = BPMNConcept.CONNECTOR, keywords = { "Operation", "JavaMethodOperationExecutorStrategy", "primitive type" }, story = "execution of an JavaMethod operation with primitive parameters", jira = "ENGINE-1067")
     @Test
     public void javaMethodOperationWithPrimitiveParameters() throws Exception {
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt();
-        final ProcessDefinitionBuilderExt pBuilder = processDefinitionBuilder.createNewInstance("javaMethodOperationWithPrimitiveParameters",
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "javaMethodOperationWithPrimitiveParameters",
                 String.valueOf(System.currentTimeMillis()));
-        final AutomaticTaskDefinitionBuilder task1Def = pBuilder
-                .addActor("actor")
+        final AutomaticTaskDefinitionBuilder task1Def = processDefinitionBuilder
+                .addActor(ACTOR_NAME)
                 .addData(
                         "myDatum",
                         "java.lang.StringBuilder",
@@ -503,11 +503,9 @@ public class OperationTest extends CommonAPITest {
                                 "java.lang.StringBuilder")).addAutomaticTask("step1");
         task1Def.addOperation(new OperationBuilder().createJavaMethodOperation("myDatum", "append", "int",
                 new ExpressionBuilder().createConstantIntegerExpression(55)));
-        task1Def.addUserTask("step2", "actor").addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(pBuilder.done()).done());
-        addMappingOfActorsForUser("actor", john.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        task1Def.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, john);
+
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance activityInstance = waitForUserTask("step2", processInstance);
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDatum", activityInstance.getId());

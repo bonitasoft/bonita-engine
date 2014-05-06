@@ -20,7 +20,7 @@ public class ProfileEntryCreator implements Serializable {
     private static final long serialVersionUID = -1414989152963184543L;
 
     public enum ProfileEntryField {
-        NAME, PROFILE_ID, DESCRIPTION, PARENT_ID, TYPE, PAGE, INDEX;
+        NAME, PROFILE_ID, DESCRIPTION, PARENT_ID, TYPE, PAGE, INDEX, CUSTOM;
     }
 
     private final Map<ProfileEntryField, Serializable> fields;
@@ -63,6 +63,11 @@ public class ProfileEntryCreator implements Serializable {
 
     public ProfileEntryCreator setIndex(final long index) {
         fields.put(ProfileEntryField.INDEX, index);
+        return this;
+    }
+
+    public ProfileEntryCreator setCustom(final Boolean custom) {
+        fields.put(ProfileEntryField.CUSTOM, custom);
         return this;
     }
 

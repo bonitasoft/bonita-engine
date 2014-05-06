@@ -10,6 +10,9 @@
 	<artifactId>bonita-bpm-integration-tests</artifactId>
 	<packaging>pom</packaging>
 
+	<modules>
+		<module>bonita-query-tests</module>
+	</modules>
 	
 	<build>
 		<plugins>
@@ -43,7 +46,7 @@
 				<module>bonita-integration-local-tests</module>
 			</modules>
 		</profile>
-
+		
 		<profile>
 			<id>all</id>
 			<modules>

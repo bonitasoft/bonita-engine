@@ -79,7 +79,7 @@ public class HiddenTaskTest extends CommonAPISPTest {
         final List<HumanTaskInstance> pendingTasks = checkNbOPendingTasks.getPendingHumanTasks();
         final HumanTaskInstance task1 = pendingTasks.get(0);
         getProcessAPI().assignUserTask(task1.getId(), user.getId());
-        final ManualTaskCreator taskCreator = buildManualTaskCreator(task1.getId(), "MySubTask", "My visible hidden sub-task", user.getId(),
+        final ManualTaskCreator taskCreator = buildManualTaskCreator(task1.getId(), "MySubTask", user.getId(),
                 "Sub task that should be shown as hidden when so", null, TaskPriority.NORMAL);
         final ManualTaskInstance manualTask = getProcessAPI().addManualUserTask(taskCreator);
 

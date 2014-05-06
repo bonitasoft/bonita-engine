@@ -15,13 +15,14 @@ import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
+import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
+import com.bonitasoft.engine.api.ThemeAPI;
 
 /**
  * @author Matthieu Chaffotte
@@ -79,6 +80,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     @Override
     public ThemeAPI getThemeAPI() {
         return new ThemeAPIExt();
+    }
+
+    @Override
+    public PageAPI getPageAPI() {
+        return new PageAPIExt();
     }
 
 }

@@ -1,11 +1,3 @@
-/*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
- * BonitaSoft is a trademark of BonitaSoft SA.
- * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
- * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
- *******************************************************************************/
 package com.bonitasoft.engine.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,8 +35,11 @@ import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.Field;
 import com.bonitasoft.engine.bdm.FieldType;
+import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.business.data.ClassloaderRefresher;
+import com.bonitasoft.engine.io.IOUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Romain Bioteau
@@ -92,18 +87,18 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         employee.addQuery("getNoEmployees", "SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'", List.class.getName());
-        employee.addQuery("getEmployees", "SELECT e FROM BonitaEmployee e", List.class.getName());
-        employee.addQuery("getEmployeeByFirstNameAndLastName", "SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName",
-                EMPLOYEE_QUALIF_CLASSNAME);
-        employee.addQuery("getEmployeeByLastName", "SELECT e FROM BonitaEmployee e WHERE e.lastName=:lastName", EMPLOYEE_QUALIF_CLASSNAME);
+        final Query query = employee.addQuery("getEmployeeByFirstNameAndLastName",
+                "SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName", EMPLOYEE_QUALIF_CLASSNAME);
+        query.addQueryParameter("firstName", String.class.getName());
+        query.addQueryParameter("lastName", String.class.getName());
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         return model;
     }
 
     @BeforeClass
-    public static void initTestClass() {
-        clientFolder = new File(System.getProperty("java.io.tmpdir"), "client");
+    public static void initTestClass() throws IOException {
+        clientFolder = IOUtils.createTempDirectory("ExecuteBDMQueryCommandIT_client");
         clientFolder.mkdirs();
     }
 
@@ -136,16 +131,18 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     protected void loadClientJars() throws Exception {
         contextClassLoader = Thread.currentThread().getContextClassLoader();
-        byte[] clientBDMZip = getTenantManagementAPI().getClientBDMZip();
-        ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader, EMPLOYEE_QUALIF_CLASSNAME,
-                clientFolder);
+        final byte[] clientBDMZip = getTenantManagementAPI().getClientBDMZip();
+        final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader,
+                EMPLOYEE_QUALIF_CLASSNAME, clientFolder);
         Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
     }
 
     @After
     public void afterTest() throws BonitaException {
         // reset previous classloader:
-        Thread.currentThread().setContextClassLoader(contextClassLoader);
+        if (contextClassLoader != null) {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
 
         logout();
         login();
@@ -158,71 +155,69 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         logout();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void should_execute_returns_empty_list() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "getNoEmployees");
+        parameters.put(QUERY_NAME, "BonitaEmployee.getNoEmployees");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(START_INDEX, 0);
         parameters.put(MAX_RESULTS, 10);
-        Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
-        assertThat(result).isNotNull().isInstanceOf(List.class);
-        assertThat((List<Serializable>) result).isEmpty();
+        final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
+
+        assertThat(deserializeListResult(result)).isNotNull().isInstanceOf(List.class).isEmpty();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void should_execute_returns_employee_list() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "getEmployees");
+        parameters.put(QUERY_NAME, "BonitaEmployee.find");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(START_INDEX, 0);
         parameters.put(MAX_RESULTS, 10);
-        Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
-        assertThat(result).isNotNull().isInstanceOf(List.class);
-        assertThat((List<Serializable>) result).hasSize(3);
+        final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
+
+        assertThat(deserializeListResult(result)).isNotNull().isInstanceOf(List.class).hasSize(3);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getListFromQueryShouldLimitToMaxResults() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "getEmployees");
+        parameters.put(QUERY_NAME, "BonitaEmployee.find");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(START_INDEX, 0);
         parameters.put(MAX_RESULTS, 2);
-        Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
-        assertThat(result).isNotNull().isInstanceOf(List.class);
-        assertThat((List<Serializable>) result).hasSize(2);
+        final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
+
+        assertThat(deserializeListResult(result)).isNotNull().isInstanceOf(List.class).hasSize(2);
     }
 
     @Test
     public void should_execute_returns_a_single_employee() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "getEmployeeByFirstNameAndLastName");
+        parameters.put(QUERY_NAME, "BonitaEmployee.getEmployeeByFirstNameAndLastName");
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         queryParameters.put("firstName", "Romain");
         queryParameters.put("lastName", "Bioteau");
         parameters.put(QUERY_PARAMETERS, (Serializable) queryParameters);
 
-        Serializable result = getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
-        assertThat(result).isNotNull().isInstanceOf(Entity.class);
-        assertThat(result.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
-        assertThat(result.getClass().getMethod("getFirstName", new Class[0]).invoke(result)).isEqualTo("Romain");
-        assertThat(result.getClass().getMethod("getLastName", new Class[0]).invoke(result)).isEqualTo("Bioteau");
+        final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
+        final Serializable employee = deserializeSimpleResult(result);
+        assertThat(employee).isNotNull().isInstanceOf(Entity.class);
+        assertThat(employee.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
+        assertThat(employee.getClass().getMethod("getFirstName", new Class[0]).invoke(employee)).isEqualTo("Romain");
+        assertThat(employee.getClass().getMethod("getLastName", new Class[0]).invoke(employee)).isEqualTo("Bioteau");
     }
 
     @Test(expected = CommandExecutionException.class)
     public void should_execute_throw_a_CommandExecutionException_if_result_is_not_single() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(QUERY_NAME, "getEmployeeByLastName");
+        parameters.put(QUERY_NAME, "BonitaEmployee.findByLastName");
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         queryParameters.put("lastName", "Bioteau");
@@ -246,10 +241,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createNewInstance("myEmployee").done(),
-                OperatorType.CREATE_BUSINESS_DATA, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
+                OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
-        DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
+        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
         final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
@@ -258,6 +253,18 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         getProcessAPI().executeFlowNode(userTask.getId());
 
         disableAndDeleteProcess(definition.getId());
+    }
+
+    private Serializable deserializeSimpleResult(final byte[] result) throws Exception {
+        final Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME);
+        final ObjectMapper mapper = new ObjectMapper();
+        return (Serializable) mapper.readValue(result, loadClass);
+    }
+
+    private List<?> deserializeListResult(final byte[] result) throws Exception {
+        final Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME);
+        final ObjectMapper mapper = new ObjectMapper();
+        return (List<?>) mapper.readValue(result, mapper.getTypeFactory().constructCollectionType(List.class, loadClass));
     }
 
 }

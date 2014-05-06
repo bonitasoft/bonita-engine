@@ -33,7 +33,7 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      * @throws LoginException
      *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
      * @throws TenantIsPausedException
-     *             occurs when we try to login with an other user than the technical user on a tenant that is paused.
+     *             if the tenant is paused. No login is allowed for users other than the technical user.
      * @since 6.0
      */
     @NoSessionRequired
@@ -44,14 +44,14 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      * 
      * @param tenantId
      *            the tenant identifier
-     * @param userName
-     *            the user name
-     * @param password
-     *            the password
+     * @param credentials
+     *            the credentials to login with. Can be username / password, SSO ticket, ... depending on the implementation.
      * @return the session to use with other tenant API methods
      * @throws LoginException
      *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
      *             since 6.0
+     * @throws TenantIsPausedException
+     *             if the tenant is paused. No login is allowed for users other than the technical user.
      */
     @NoSessionRequired
     APISession login(long tenantId, Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException;

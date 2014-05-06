@@ -16,6 +16,5 @@
 	<modules>
 		<module>bonita-reporting-api</module>
 		<module>bonita-reporting-impl</module>
-		<module>bonita-reporting-impl-hibernate</module>
 	</modules>
 </project>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+   <query name="getPageById">
+		SELECT page
+		FROM com.bonitasoft.engine.page.impl.SPageImpl AS page
+		WHERE page.id = :id
+	</query>
+
+   <query name="getPageByName">
+		SELECT page
+		FROM com.bonitasoft.engine.page.impl.SPageImpl AS page
+		WHERE page.name = :pageName
+	</query>
+
+	<query name="getNumberOfSPage">
+		SELECT COUNT(page)
+		FROM com.bonitasoft.engine.page.impl.SPageImpl AS page
+	</query>
+
+	<query name="searchSPage">
+		SELECT page
+		FROM com.bonitasoft.engine.page.impl.SPageImpl AS page
+	</query>
+
+	<query name="getPageContent">
+		SELECT pagecontent
+		FROM com.bonitasoft.engine.page.impl.SPageContentImpl AS pagecontent
+		WHERE pagecontent.id = :id
+	</query>
+
+</hibernate-mapping>

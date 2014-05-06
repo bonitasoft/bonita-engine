@@ -7,6 +7,8 @@ import com.bonitasoft.engine.bdm.Entity;
  */
 class SimpleBizData implements Entity {
 
+    private static final long serialVersionUID = 1L;
+
     private final Long id;
 
     public SimpleBizData(final Long id) {

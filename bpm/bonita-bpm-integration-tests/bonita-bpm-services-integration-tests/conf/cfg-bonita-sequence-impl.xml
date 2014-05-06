@@ -37,8 +37,6 @@
 				<!-- <entry key="24" value="100" />P-metadata_def -->
 				<!-- <entry key="25" value="100" />P-metadata_val -->
 				<!-- <entry key="26" value="100" />user_contactinfo -->
-				<!-- <entry key="50" value="100" />dataSource -->
-				<!-- <entry key="51" value="100" />dataSourceParameter -->
 				<!-- <entry key="60" value="100" />employee -->
 				<!-- <entry key="61" value="100" />laptop -->
 				<!-- <entry key="62" value="100" />address -->
@@ -76,8 +74,6 @@
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="3" />
 				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="4" />
 				<!--  tenant -->
-				<entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="10" />
-				<entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="11" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="10" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="11" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="20" />

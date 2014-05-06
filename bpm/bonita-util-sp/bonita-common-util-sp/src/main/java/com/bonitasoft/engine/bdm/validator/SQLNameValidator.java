@@ -1,7 +1,11 @@
-/**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- */
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator;
 
 import java.io.IOException;
@@ -12,11 +16,10 @@ import java.util.Set;
 
 /**
  * @author Romain Bioteau
- * 
  */
 public class SQLNameValidator {
 
-    private int maxLength;
+    private final int maxLength;
 
     static Set<String> sqlKeywords;
     static {
@@ -27,7 +30,7 @@ public class SQLNameValidator {
         this(255);
     }
 
-    public SQLNameValidator(int maxLength) {
+    public SQLNameValidator(final int maxLength) {
         this.maxLength = maxLength;
         if (sqlKeywords.isEmpty()) {
             initializeSQLKeywords();
@@ -41,7 +44,7 @@ public class SQLNameValidator {
             resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords");
             scanner = new Scanner(resourceAsStream);
             while (scanner.hasNext()) {
-                String word = (String) scanner.nextLine();
+                final String word = scanner.nextLine();
                 sqlKeywords.add(word.trim());
             }
         } finally {
@@ -51,7 +54,7 @@ public class SQLNameValidator {
             if (resourceAsStream != null) {
                 try {
                     resourceAsStream.close();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -59,11 +62,11 @@ public class SQLNameValidator {
 
     }
 
-    public boolean isValid(String name) {
+    public boolean isValid(final String name) {
         return name.matches("[a-zA-Z][\\d\\w#@]{0," + maxLength + "}$") && !isSQLKeyword(name);
     }
 
-    public boolean isSQLKeyword(String name) {
+    public boolean isSQLKeyword(final String name) {
         return sqlKeywords.contains(name.toUpperCase());
     }
 

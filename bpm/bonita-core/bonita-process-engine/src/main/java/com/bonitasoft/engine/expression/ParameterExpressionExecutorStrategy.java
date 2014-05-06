@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -42,28 +43,28 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        long processDefinitionId;
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         try {
             if (context != null && !context.isEmpty()) {
                 if (context.containsKey(PROCESS_DEFINITION_ID)) {
-                    processDefinitionId = (Long) context.get(PROCESS_DEFINITION_ID);
-                    final SParameter para = parameterService.get(processDefinitionId, expressionContent);
+                    final long processDefinitionId = (Long) context.get(PROCESS_DEFINITION_ID);
+                    final SParameter parameter = parameterService.get(processDefinitionId, expressionContent);
                     try {
                         final String returnType = expression.getReturnType();
                         if (Boolean.class.getName().equals(returnType)) {
-                            return Boolean.parseBoolean(para.getValue());
+                            return Boolean.parseBoolean(parameter.getValue());
                         } else if (Double.class.getName().equals(returnType)) {
-                            return Double.parseDouble(para.getValue());
+                            return Double.parseDouble(parameter.getValue());
                         } else if (Integer.class.getName().equals(returnType)) {
-                            return Integer.parseInt(para.getValue());
+                            return Integer.parseInt(parameter.getValue());
                         } else if (String.class.getName().equals(returnType)) {
-                            return para.getValue();
+                            return parameter.getValue();
                         }
                     } catch (final NumberFormatException e) {
-                        throw new SExpressionEvaluationException("Can't convert value = " + para.getValue() + " in type = returnType", e, expression.getName());
+                        throw new SExpressionEvaluationException("Can't convert value = " + parameter.getValue() + " in type = returnType", e,
+                                expression.getName());
                     }
                 } else {
                     throw new SExpressionDependencyMissingException("Mandatory dependency processDefinitionId is missing.");
@@ -92,11 +93,11 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions));
+            list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
         return list;
     }

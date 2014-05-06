@@ -242,4 +242,62 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      */
     void replayActivity(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
+    /**
+     * Get the number of processes supervisors mapped to a specific user.
+     * 
+     * @param userId
+     *            The identifier of the user
+     * @param searchOptions
+     *            The search criteria.
+     * @return The number of processes supervisors for a given user
+     * @throws SearchException
+     *             If an exception occurs when getting the processes supervisors.
+     * @since 6.3
+     */
+    long getNumberOfProcessSupervisorsForUser(long processDefinitionId);
+
+    /**
+     * Get the number of processes supervisors mapped to a specific group.
+     * 
+     * @param groupId
+     *            The identifier of the group
+     * @param searchOptions
+     *            The search criteria.
+     * @return The number of processes supervisors for a given group
+     * @throws SearchException
+     *             If an exception occurs when getting the processes supervisors.
+     * @since 6.3
+     */
+    long getNumberOfProcessSupervisorsForGroup(long processDefinitionId);
+
+    /**
+     * Get the number of processes supervisors mapped to a specific role.
+     * 
+     * @param roleId
+     *            The identifier of the role
+     * @param searchOptions
+     *            The search criteria.
+     * @return The number of processes supervisors for a given role
+     * @throws SearchException
+     *             If an exception occurs when getting the processes supervisors.
+     * @since 6.3
+     */
+    long getNumberOfProcessSupervisorsForRole(long processDefinitionId);
+
+    /**
+     * Get the number of processes supervisors mapped to a specific membership.
+     * 
+     * @param groupId
+     *            The identifier of the group
+     * @param roleId
+     *            The identifier of the role
+     * @param searchOptions
+     *            The search criteria.
+     * @return The number of processes supervisors for a given user
+     * @throws SearchException
+     *             If an exception occurs when getting the processes supervisors.
+     * @since 6.3
+     */
+    long getNumberOfProcessSupervisorsForMembership(long processDefinitionId);
+
 }

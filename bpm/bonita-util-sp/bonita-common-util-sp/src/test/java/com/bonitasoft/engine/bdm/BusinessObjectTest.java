@@ -36,12 +36,12 @@ public class BusinessObjectTest {
         object.addField(field);
         object.addUniqueConstraint("unique", "field");
     }
-    
+
     @Test
-	public void should_addQuery() throws Exception {
-		BusinessObject businessObject = new BusinessObject();
-		Query query = businessObject.addQuery("userByName","Select u FROM User u WHERE u.name='romain'",List.class.getName());
-		assertThat(businessObject.getQueries()).containsExactly(query);
-	}
+    public void should_addQuery() throws Exception {
+        final BusinessObject businessObject = new BusinessObject();
+        final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
+        assertThat(businessObject.getQueries()).containsExactly(query);
+    }
 
 }

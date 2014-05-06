@@ -127,7 +127,7 @@ public class IOUtils {
         return createDirectory(tmpDirectory);
     }
 
-    public static File createSubDirectory(final File directory, final String child) throws IOException {
+    public static File createSubDirectory(final File directory, final String child) {
         final File subDir = new File(directory, child);
         return createDirectory(subDir);
     }

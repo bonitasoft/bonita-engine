@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.persistence;
 
+import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -29,9 +31,10 @@ public class TenantHibernatePersistenceService extends org.bonitasoft.engine.per
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
             final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource) throws SPersistenceException {
+            final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, sessionAccessor, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager,
-                datasource);
+                datasource, enableWordSearch, wordSearchExclusionMappings);
     }
 
     @Override

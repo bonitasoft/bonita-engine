@@ -76,7 +76,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
 
     @Override
     public SRefBusinessDataInstance addRefBusinessDataInstance(final SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException {
-        final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUISNESS_DATA_INSTANCE_ADDED, instance);
+        final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUISNESS_DATA_INSTANCE_ADDED);
         final InsertRecord insertRecord = new InsertRecord(instance);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(REF_BUSINESS_DATA_INSTANCE, EventActionType.CREATED)) {
@@ -93,7 +93,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         return instance;
     }
 
-    protected SRefBusinessDataInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SRefBusinessDataInstance instance) {
+    protected SRefBusinessDataInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
         final SRefBusinessDataInstanceLogBuilder logBuilder = BuilderFactory.get(SRefBusinessDataInstanceLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);

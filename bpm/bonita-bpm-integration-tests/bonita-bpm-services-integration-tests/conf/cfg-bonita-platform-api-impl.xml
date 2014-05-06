@@ -8,7 +8,7 @@
 				<ref bean="persistenceService" />
 			</list>
 		</constructor-arg>
-		<constructor-arg ref="technicalLoggerService" />
+		<constructor-arg ref="platformTechnicalLoggerService" />
 		<constructor-arg ref="platformCacheService" />
 		<constructor-arg ref="platformProperties" />
 	</bean>

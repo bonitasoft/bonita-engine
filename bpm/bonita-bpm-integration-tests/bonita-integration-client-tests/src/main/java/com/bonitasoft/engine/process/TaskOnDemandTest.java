@@ -79,14 +79,14 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertEquals("userTask1", toDoTasks.get(0).getName());
 
         final Date dueDate = new Date(System.currentTimeMillis());
-        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", "newTask1", jack.getId(), "add new manual user task",
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", jack.getId(), "add new manual user task",
                 dueDate, TaskPriority.NORMAL);
         getProcessAPI().addManualUserTask(taskCreator);
-        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", "newTask2", john.getId(), "add new manual user task", dueDate,
+        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", john.getId(), "add new manual user task", dueDate,
                 TaskPriority.NORMAL);
         final ManualTaskInstance m2 = getProcessAPI().addManualUserTask(taskCreator);
         // can we properly add a sub task of a sub task?:
-        taskCreator = buildManualTaskCreator(m2.getId(), "newTask21", "newTask21", jack.getId(), "add new manual user task child of newTask2", dueDate,
+        taskCreator = buildManualTaskCreator(m2.getId(), "newTask21", jack.getId(), "add new manual user task child of newTask2", dueDate,
                 TaskPriority.NORMAL);
         final ManualTaskInstance m21 = getProcessAPI().addManualUserTask(taskCreator);
         assertTrue("m11.getParentContainerId() should not be 1", 1 != m21.getParentContainerId());
@@ -113,16 +113,16 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         getProcessAPI().assignUserTask(parentTask.getId(), john.getId());
 
         final Date dueDate = new Date(System.currentTimeMillis() + 1200000L);
-        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", "newTask1", jack.getId(), "add new manual user task",
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", jack.getId(), "add new manual user task",
                 dueDate, TaskPriority.NORMAL);
         getProcessAPI().addManualUserTask(taskCreator);
 
-        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", "newTask2", john.getId(), "add new manual user task", dueDate,
+        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", john.getId(), "add new manual user task", dueDate,
                 TaskPriority.NORMAL);
         final ManualTaskInstance m2 = getProcessAPI().addManualUserTask(taskCreator);
         // can we properly add a sub task of a sub task?:
 
-        taskCreator = buildManualTaskCreator(m2.getId(), "newTask21", "newTask21", jack.getId(), "add new manual user task child of newTask2", dueDate,
+        taskCreator = buildManualTaskCreator(m2.getId(), "newTask21", jack.getId(), "add new manual user task child of newTask2", dueDate,
                 TaskPriority.NORMAL);
         final ManualTaskInstance m21 = getProcessAPI().addManualUserTask(taskCreator);
         assertTrue("m11.getParentContainerId() should not be 1", 1 != m21.getParentContainerId());
@@ -156,19 +156,19 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertEquals("userTask1", toDoTasks.get(0).getName());
 
         final Date dueDate = new Date(System.currentTimeMillis());
-        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", "New task 1", jack.getId(), "add new manual user task",
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", jack.getId(), "add new manual user task",
                 dueDate, TaskPriority.NORMAL);
         ManualTaskInstance m1 = getProcessAPI().addManualUserTask(taskCreator);
 
-        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", "newTask2", john.getId(), "add new manual user task", dueDate,
+        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", john.getId(), "add new manual user task", dueDate,
                 TaskPriority.NORMAL);
         final ManualTaskInstance m2 = getProcessAPI().addManualUserTask(taskCreator);
 
-        assertEquals("New task 1", m1.getDisplayName());
+        assertEquals("newTask1", m1.getDisplayName());
         assertEquals("add new manual user task", m1.getDisplayDescription());
         assertEquals("add new manual user task", m1.getDescription());
         m1 = (ManualTaskInstance) getProcessAPI().getActivityInstance(m1.getId());
-        assertEquals("New task 1", m1.getDisplayName());
+        assertEquals("newTask1", m1.getDisplayName());
         assertEquals("add new manual user task", m1.getDisplayDescription());
         assertEquals("add new manual user task", m1.getDescription());
         assertEquals(dueDate, m2.getExpectedEndDate());
@@ -208,7 +208,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertEquals("userTask1", toDoTasks.get(0).getName());
 
         final Date dueDate = new Date(System.currentTimeMillis());
-        final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", "newTask2", john.getId(), "add new manual user task",
+        final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask2", john.getId(), "add new manual user task",
                 dueDate, TaskPriority.NORMAL);
         final ManualTaskInstance subtask = getProcessAPI().addManualUserTask(taskCreator);
         CheckNbAssignedTaskOf checkNbAssignedTaskOfJohn = new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, true, 2, john);
@@ -273,7 +273,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertEquals("userTask1", toDoTasks.get(0).getName());
 
         final Date dueDate = new Date(System.currentTimeMillis());
-        final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", "newTask1", john.getId(), "add new manual user task",
+        final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask1", john.getId(), "add new manual user task",
                 dueDate, TaskPriority.NORMAL);
         final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
         final Date claimedDate = manualUserTask.getClaimedDate();

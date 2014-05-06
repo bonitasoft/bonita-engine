@@ -71,6 +71,9 @@
         		<entry key="JOB_PARAMETER_CREATED:INTERNAL" value="true" />
         		<entry key="MESSAGE_INSTANCE_CREATED:INTERNAL" value="true" />
         		<entry key="MESSAGE_INSTANCE_UPDATED:INTERNAL" value="true" />
+        		<entry key="PAGE_CREATED:INTERNAL" value="true" />
+        		<entry key="PAGE_DELETED:INTERNAL" value="true" />
+        		<entry key="PAGE_UPDATED:INTERNAL" value="true" />
         		<entry key="PENDING_ACTIVITY_MAPPING_CREATED:INTERNAL" value="true" />
         		<entry key="PROCESS_DEFINITION_CREATED:INTERNAL" value="true" />
         		<entry key="PROCESS_DEFINITION_DELETED:INTERNAL" value="true" />
@@ -107,7 +110,7 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="platformService" ref="platformService" />
 		<constructor-arg name="delayable" value="false" />
 	</bean>

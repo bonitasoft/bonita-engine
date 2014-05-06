@@ -5,7 +5,7 @@
 		<constructor-arg name="handlers">
 			<map />
 		</constructor-arg>
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 	</bean>
 

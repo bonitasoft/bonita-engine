@@ -10,12 +10,10 @@ package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
-import com.bonitasoft.engine.theme.ThemeTest;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({

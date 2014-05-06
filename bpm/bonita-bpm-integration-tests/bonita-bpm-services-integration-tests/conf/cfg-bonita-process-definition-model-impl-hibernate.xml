@@ -12,6 +12,8 @@
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="process_definition" />
 				<entry key="org.bonitasoft.engine.core.process.definition.model.SActor" value="actor" />
+				<entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
+				<entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
 			</map>
 		</property>
 	</bean>

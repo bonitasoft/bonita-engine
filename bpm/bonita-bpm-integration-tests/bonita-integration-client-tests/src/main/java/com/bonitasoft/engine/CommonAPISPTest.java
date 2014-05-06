@@ -57,16 +57,19 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
 
         @Override
         public void succeeded(final Description d) {
-            List<String> clean = null;
             try {
-                clean = clean();
-            } catch (final BonitaException e) {
-                throw new BonitaRuntimeException(e);
-            }
-            LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.info("-----------------------------------------------------------------------------------------------");
-            if (!clean.isEmpty()) {
-                throw new BonitaRuntimeException(clean.toString());
+                List<String> clean = null;
+                try {
+                    clean = clean();
+                } catch (final BonitaException e) {
+                    throw new BonitaRuntimeException(e);
+                }
+                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+                if (!clean.isEmpty()) {
+                    throw new BonitaRuntimeException(clean.toString());
+                }
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
     };

@@ -45,6 +45,9 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
+import com.bonitasoft.engine.core.reporting.processor.QueryPreProcessor;
+import com.bonitasoft.engine.core.reporting.processor.Vendor;
+
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -69,10 +72,13 @@ public class ReportingServiceImpl implements ReportingService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public ReportingServiceImpl(final DataSource dataSource, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+    private QueryPreProcessor queryPreProcessor;
+
+    public ReportingServiceImpl(final DataSource dataSource, final ReadPersistenceService persistenceService, final QueryPreProcessor queryPreProcessor,
+            final Recorder recorder, final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
         this.dataSource = dataSource;
         this.persistenceService = persistenceService;
+        this.queryPreProcessor = queryPreProcessor;
         this.eventService = eventService;
         this.recorder = recorder;
         this.logger = logger;
@@ -86,10 +92,12 @@ public class ReportingServiceImpl implements ReportingService {
             throw new SQLException("The statement is not a SELECT query");
         }
         final Connection connection = dataSource.getConnection();
+        String query = queryPreProcessor.preProcessFor(Vendor.fromDatabaseMetadata(connection.getMetaData()), selectQuery);
+
         try {
             final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
-                return executeQuery(selectQuery, statement);
+                return executeQuery(query, statement);
             } finally {
                 if (statement != null) {
                     statement.close();
@@ -101,7 +109,8 @@ public class ReportingServiceImpl implements ReportingService {
         }
     }
 
-    private String executeQuery(final String selectQuery, final Statement statement) throws SQLException {
+    /** protected for mocking */
+    protected String executeQuery(final String selectQuery, final Statement statement) throws SQLException {
         final ResultSet resultSet = statement.executeQuery(selectQuery);
         try {
             return parseResultSet(resultSet);

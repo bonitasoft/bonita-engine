@@ -11,7 +11,7 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="actor" />
-				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="actormember" />
+				<entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
 			</map>
 		</property>
 	</bean>

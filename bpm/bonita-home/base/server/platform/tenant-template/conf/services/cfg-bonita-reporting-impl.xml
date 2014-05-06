@@ -4,10 +4,12 @@
 	<bean id="reportingService" class="com.bonitasoft.engine.core.reporting.ReportingServiceImpl">
 		<constructor-arg name="dataSource" ref="bonitaDSJNDI" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="queryPreProcessor" ref="queryPreProcessor" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
 
+    <bean id="queryPreProcessor" class="com.bonitasoft.engine.core.reporting.processor.QueryPreProcessor" />
 </beans>

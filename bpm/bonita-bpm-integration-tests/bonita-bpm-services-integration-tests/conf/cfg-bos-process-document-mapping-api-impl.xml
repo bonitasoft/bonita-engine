@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="documentMappingService" class="org.bonitasoft.engine.core.process.document.mapping.impl.DocumentMappingServiceImpl">
-		<constructor-arg name="technicalLogger" ref="technicalLoggerService"/>
+		<constructor-arg name="technicalLogger" ref="platformTechnicalLoggerService"/>
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />

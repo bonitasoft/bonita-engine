@@ -123,8 +123,42 @@
             <type>link</type>
             <page>thememoredetailsadminext</page>
           </profileEntry>
+          <profileEntry name="Custom Pages">
+            <parentName>Portal</parentName>
+            <index>4</index>
+            <description>All custom pages</description>
+            <type>link</type>
+            <page>pagelisting</page>
+          </profileEntry>
         </childrenEntries>
       </parentProfileEntry>	
     </profileEntries>
   </profile>
+	<profile name="Process manager" isDefault="true">
+		<description>The Process manager can supervise designated apps, and manage cases and tasks of those apps.</description>
+		<iconPath>/profiles/profilePM.png</iconPath>
+		<profileEntries>
+			<parentProfileEntry name="Tasks">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>My tasks</description>
+				<type>link</type>
+				<page>tasklistingpm</page>
+			</parentProfileEntry>
+			<parentProfileEntry name="Cases">
+				<parentName>NULL</parentName>
+				<index>2</index>
+				<description>My cases</description>
+				<type>link</type>
+				<page>caselistingpm</page>
+			</parentProfileEntry>
+			<parentProfileEntry name="Apps">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>My processes</description>
+				<type>link</type>
+				<page>processlistingpm</page>
+			</parentProfileEntry>
+		</profileEntries>
+	</profile>
 </profiles:proFiles>

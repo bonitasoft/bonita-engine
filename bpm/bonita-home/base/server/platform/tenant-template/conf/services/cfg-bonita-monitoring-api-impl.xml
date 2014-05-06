@@ -9,7 +9,7 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="jobHandler" ref="jobHandler" />
-		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
+		<constructor-arg name="technicalLog" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />

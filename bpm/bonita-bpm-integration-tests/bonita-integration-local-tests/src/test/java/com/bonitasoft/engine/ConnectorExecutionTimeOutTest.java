@@ -65,7 +65,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
                 .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(5000));
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user, designProcessDefinition);
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -95,7 +95,6 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addShortTextData("value", null);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final List<BarResource> resources = new ArrayList<BarResource>();
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/connector-with-custom-type.bak", "connector-with-custom-type.jar");
@@ -103,9 +102,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         businessArchiveBuilder.addConnectorImplementation(resources.get(0));
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(ACTOR_NAME, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = this.waitForUserTask("step1", process);
         final Map<String, Expression> params = Collections.emptyMap();

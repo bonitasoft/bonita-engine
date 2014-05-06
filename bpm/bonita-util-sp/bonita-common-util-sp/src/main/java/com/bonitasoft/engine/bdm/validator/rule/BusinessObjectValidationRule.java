@@ -1,7 +1,11 @@
-/**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- */
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
 import java.util.HashSet;
@@ -25,7 +29,7 @@ public class BusinessObjectValidationRule implements ValidationRule {
 
     private static final int MAX_TABLENAME_LENGTH = 30;
 
-    private SQLNameValidator sqlNameValidator;
+    private final SQLNameValidator sqlNameValidator;
 
     public BusinessObjectValidationRule() {
         sqlNameValidator = new SQLNameValidator(MAX_TABLENAME_LENGTH);
@@ -57,8 +61,8 @@ public class BusinessObjectValidationRule implements ValidationRule {
         if (bo.getFields().isEmpty()) {
             status.addError(qualifiedName + " must have at least one field declared");
         }
-        Set<String> constraintNames = new HashSet<String>();
-        Set<String> queryNames = BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo);
+        final Set<String> constraintNames = new HashSet<String>();
+        final Set<String> queryNames = BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo);
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
             if (constraintNames.contains(uc.getName())) {
                 status.addError("The constraint named \"" + uc.getName() + "\" already exists for " + bo.getQualifiedName());
@@ -84,10 +88,10 @@ public class BusinessObjectValidationRule implements ValidationRule {
         return status;
     }
 
-    private String getSimpleName(String qualifiedName) {
+    private String getSimpleName(final String qualifiedName) {
         String simpleName = qualifiedName;
         if (simpleName.indexOf(".") != -1) {
-            String[] split = simpleName.split("\\.");
+            final String[] split = simpleName.split("\\.");
             simpleName = split[split.length - 1];
         }
         return simpleName;

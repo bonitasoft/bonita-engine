@@ -3,7 +3,7 @@
 
 	<bean id="lockService" class="com.bonitasoft.engine.lock.impl.ClusteredLockService" scope="singleton" >
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="lockTimeout" value="60" />
 	</bean>
 

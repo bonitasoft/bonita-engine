@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.monitoring.mbean.impl;
 
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;

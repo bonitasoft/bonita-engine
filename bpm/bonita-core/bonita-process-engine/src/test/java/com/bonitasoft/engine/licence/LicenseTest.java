@@ -107,4 +107,9 @@ public class LicenseTest {
         valideFeature(Features.TRACEABILITY);
     }
 
+    @Test
+    public void customPages() {
+        valideFeature(Features.CUSTOM_PAGE);
+    }
+
 }

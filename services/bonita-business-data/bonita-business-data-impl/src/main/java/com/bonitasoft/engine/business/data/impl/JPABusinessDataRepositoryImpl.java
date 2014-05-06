@@ -28,6 +28,8 @@ import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -47,11 +49,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private EntityManagerFactory entityManagerFactory;
 
-    private EntityManager entityManager;
+    private final ThreadLocal<EntityManager> managers = new ThreadLocal<EntityManager>();
 
     private final BusinessDataModelRepository businessDataModelRepository;
 
-    public JPABusinessDataRepositoryImpl(final BusinessDataModelRepository businessDataModelRepository, final Map<String, Object> configuration) {
+    private final TransactionService transactionService;
+
+    public JPABusinessDataRepositoryImpl(final TransactionService transactionService, final BusinessDataModelRepository businessDataModelRepository,
+            final Map<String, Object> configuration) {
+        this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
         this.configuration = new HashMap<String, Object>(configuration);
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
@@ -101,12 +107,18 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new IllegalStateException("The BDR is not started");
         }
 
-        if (entityManager == null || !entityManager.isOpen()) {
-            entityManager = entityManagerFactory.createEntityManager();
-        } else {
-            entityManager.joinTransaction();
+        EntityManager manager = managers.get();
+        if (manager == null || !manager.isOpen()) {
+            manager = entityManagerFactory.createEntityManager();
+            try {
+                transactionService.registerBonitaSynchronization(new RemoveEntityManagerSynchronization(managers));
+            } catch (final STransactionNotFoundException stnfe) {
+                throw new IllegalStateException(stnfe);
+            }
+            managers.set(manager);
         }
-        return entityManager;
+        manager.joinTransaction();
+        return manager;
     }
 
     @Override

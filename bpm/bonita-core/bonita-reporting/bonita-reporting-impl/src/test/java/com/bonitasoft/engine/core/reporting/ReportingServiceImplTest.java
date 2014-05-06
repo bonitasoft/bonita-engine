@@ -8,10 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.reporting;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -27,50 +31,71 @@ import javax.sql.DataSource;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@SuppressWarnings("javadoc")
+import com.bonitasoft.engine.core.reporting.processor.QueryPreProcessor;
+import com.bonitasoft.engine.core.reporting.processor.Vendor;
+
+@RunWith(MockitoJUnitRunner.class)
 public class ReportingServiceImplTest {
 
     private static String lineSeparator = "\n";
 
+    private ReportingServiceImpl reportingService;
+
+    @Mock
+    private Connection connection;
+
+    @Mock
+    private ReadPersistenceService persistence;
+
+    @Mock
+    private Recorder recorder;
+
+    @Mock
+    private QueryPreProcessor preProcessor;
+
+    @Before
+    public void setUp() throws Exception {
+        DataSource dataSource = mock(DataSource.class);
+        when(dataSource.getConnection()).thenReturn(connection);
+        reportingService = new ReportingServiceImpl(dataSource, persistence, preProcessor, recorder, mock(EventService.class), mock(TechnicalLoggerService.class), mock(QueriableLoggerService.class));
+    }
+
+    private SReport aReport(final long reportId) {
+        final SReport expected = new SReportImpl("report1", 123456, 45, true);
+        expected.setId(reportId);
+        return expected;
+    }
+
     @Test(expected = SQLException.class)
     public void cannotExecuteADeleteStatement() throws SQLException {
-        final EventService eventService = mock(EventService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, null, null, eventService, null, null);
-        serviceImpl.selectList("DELETE FROM activities;");
+        reportingService.selectList("DELETE FROM activities;");
     }
 
     @Test(expected = SQLException.class)
     public void cannotExecuteAnUpdateStatement() throws SQLException {
-        final EventService eventService = mock(EventService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, null, null, eventService, null, null);
-        serviceImpl.selectList("UPDATE activities SET name = 'step2';");
+        reportingService.selectList("UPDATE activities SET name = 'step2';");
     }
 
     @Test
     public void executeASelectQuery() throws SQLException {
-        final EventService eventService = mock(EventService.class);
         final String sql = "SELECT id, name  FROM activities;";
-        final DataSource dataSource = mock(DataSource.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(dataSource, null, null, eventService, null, null);
-        final Connection connection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(connection);
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         final ResultSet resultSet = mock(ResultSet.class);
@@ -84,19 +109,15 @@ public class ReportingServiceImplTest {
         when(resultSet.getObject(1)).thenReturn(1l, 424l);
         when(resultSet.getObject(2)).thenReturn("step1", "step2");
 
-        final String actual = serviceImpl.selectList(sql);
+        final String actual = reportingService.selectList(sql);
+
         final String expected = "ID,NAME" + lineSeparator + "1,step1" + lineSeparator + "424,step2" + lineSeparator;
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
     public void should_selectList_escaping_comma_quotes() throws Exception {
-        final EventService eventService = mock(EventService.class);
         final String sql = "SELECT id, name  FROM activities;";
-        final DataSource dataSource = mock(DataSource.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(dataSource, null, null, eventService, null, null);
-        final Connection connection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(connection);
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         final ResultSet resultSet = mock(ResultSet.class);
@@ -112,186 +133,108 @@ public class ReportingServiceImplTest {
         when(resultSet.getObject(2)).thenReturn("\"dsd\" , s tep1", "s\"t\"ep2");
         when(resultSet.getObject(3)).thenReturn(1, 2);
 
-        final String actual = serviceImpl.selectList(sql);
+        final String actual = reportingService.selectList(sql);
+
         final String expected = "ID,NAME,COUNTER" + lineSeparator + "1,\"\"\"dsd\"\" , s tep1\",1" + lineSeparator + "424,\"s\"\"t\"\"ep2\",2" + lineSeparator;
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test(expected = SQLException.class)
     public void connectionCloses() throws SQLException {
-        final EventService eventService = mock(EventService.class);
         final String sql = "SELECT COUNT(*) FROM activities;";
-        final DataSource dataSource = mock(DataSource.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(dataSource, null, null, eventService, null, null);
-        final Connection connection = mock(Connection.class);
-        when(dataSource.getConnection()).thenReturn(connection);
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
-        doAnswer(new Answer<Object>() {
+        doThrow(new SQLException()).when(connection).close();
 
-            @Override
-            public Object answer(final InvocationOnMock invocation) throws Throwable {
-                throw new SQLException();
-            }
-
-        }).when(connection).close();
-        serviceImpl.selectList(sql);
+        reportingService.selectList(sql);
     }
 
     @Test
     public void getNumberOfReports() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
+        final long expectedReportNumber = 50;
         final QueryOptions options = mock(QueryOptions.class);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
-        final long expected = 50;
-        when(persistence.getNumberOfEntities(SReport.class, options, null)).thenReturn(expected);
-        final long numberOfReports = serviceImpl.getNumberOfReports(options);
-        Assert.assertEquals(expected, numberOfReports);
+        when(persistence.getNumberOfEntities(SReport.class, options, null)).thenReturn(expectedReportNumber);
+
+        final long numberOfReports = reportingService.getNumberOfReports(options);
+
+        assertEquals(expectedReportNumber, numberOfReports);
     }
 
     @Test(expected = SBonitaSearchException.class)
     public void getNumberOfReportsThrowsException() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
         final QueryOptions options = mock(QueryOptions.class);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         when(persistence.getNumberOfEntities(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
-        serviceImpl.getNumberOfReports(options);
+
+        reportingService.getNumberOfReports(options);
     }
 
     @Test
     public void searchReports() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
         final QueryOptions options = mock(QueryOptions.class);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         final List<SReport> expected = new ArrayList<SReport>();
         expected.add(new SReportImpl("report1", 123456, 45, true));
         expected.add(new SReportImpl("report2", 12345656, 145, false));
         when(persistence.searchEntity(SReport.class, options, null)).thenReturn(expected);
 
-        final List<SReport> reports = serviceImpl.searchReports(options);
-        Assert.assertEquals(expected, reports);
+        final List<SReport> reports = reportingService.searchReports(options);
+
+        assertEquals(expected, reports);
     }
 
     @Test(expected = SBonitaSearchException.class)
     public void searchReportsThrowsException() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
         final QueryOptions options = mock(QueryOptions.class);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         when(persistence.searchEntity(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
-        serviceImpl.searchReports(options);
+
+        reportingService.searchReports(options);
     }
 
     @Test
     public void getReport() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         final long reportId = 15;
-        final SReport expected = new SReportImpl("report1", 123456, 45, true);
-        expected.setId(reportId);
+        final SReport expected = aReport(reportId);
         when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
 
-        final SReport report = serviceImpl.getReport(reportId);
-        Assert.assertEquals(expected, report);
+        final SReport report = reportingService.getReport(reportId);
+
+        assertEquals(expected, report);
     }
 
     @Test(expected = SReportNotFoundException.class)
     public void getReportThrowsReportNotFoundException() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         final long reportId = 15;
-        final SReport expected = new SReportImpl("report1", 123456, 45, true);
-        expected.setId(reportId);
         when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(null);
 
-        serviceImpl.getReport(reportId);
+        reportingService.getReport(reportId);
     }
 
     @Test(expected = SBonitaReadException.class)
     public void getReportThrowsException() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, null, eventService, logger, null);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         final long reportId = 15;
-        final SReport expected = new SReportImpl("report1", 123456, 45, true);
-        expected.setId(reportId);
         when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenThrow(new SBonitaReadException("ouch!"));
 
-        serviceImpl.getReport(reportId);
-    }
-
-    @Test
-    public void deleteReport() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final Recorder recorder = mock(Recorder.class);
-        final QueriableLoggerService loggerService = mock(QueriableLoggerService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, recorder, eventService, logger, loggerService);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
-        final long reportId = 15;
-        final SReport expected = new SReportImpl("report1", 123456, 45, true);
-        expected.setId(reportId);
-
-        doAnswer(new Answer<Object>() {
-
-            @Override
-            public Object answer(final InvocationOnMock invocation) {
-                // Deletion OK
-                return null;
-            }
-
-        }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
-        when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
-
-        serviceImpl.deleteReport(reportId);
+        reportingService.getReport(reportId);
     }
 
     @Test(expected = SReportDeletionException.class)
     public void deleteReportThrowsReportNotFoundException() throws SBonitaException {
-        final EventService eventService = mock(EventService.class);
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-        final Recorder recorder = mock(Recorder.class);
-        final QueriableLoggerService loggerService = mock(QueriableLoggerService.class);
-        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(null, persistence, recorder, eventService, logger, loggerService);
-        when(logger.isLoggable(ReportingServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
         final long reportId = 15;
-        final SReport expected = new SReportImpl("report1", 123456, 45, true);
-        expected.setId(reportId);
-
-        doAnswer(new Answer<Object>() {
-
-            @Override
-            public Object answer(final InvocationOnMock invocation) throws Throwable {
-                throw new SRecorderException("ouch !");
-            }
-
-        }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        final SReport expected = aReport(reportId);
+        doThrow(new SRecorderException("ouch !")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
-        when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
-        serviceImpl.deleteReport(reportId);
+        reportingService.deleteReport(reportId);
     }
 
+    @Test
+    public void should_preprocess_query_before_execute_it() throws Exception {
+        ReportingServiceImpl reportingServicespy = spy(reportingService);
+        doReturn("something we don't care").when(reportingServicespy).executeQuery(anyString(), any(Statement.class));
+
+        reportingServicespy.selectList("SELECT something FROM somewhere");
+
+        InOrder inOrder = inOrder(preProcessor, reportingServicespy);
+        inOrder.verify(preProcessor).preProcessFor(Vendor.OTHER, "SELECT something FROM somewhere");
+        inOrder.verify(reportingServicespy).executeQuery(anyString(), any(Statement.class));
+    }
 }

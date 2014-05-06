@@ -29,11 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SContext;
+import org.bonitasoft.engine.commons.exceptions.SExceptionContext;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -41,6 +42,7 @@ import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -99,8 +101,8 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
     private HashMap<String, Object> buildBusinessDataExpressionContext(final long containerId, final DataInstanceContainer containerType) {
         final HashMap<String, Object> context = new HashMap<String, Object>();
-        context.put(SExpressionContext.containerIdKey, containerId);
-        context.put(SExpressionContext.containerTypeKey, containerType.name());
+        context.put(SExpressionContext.CONTAINER_ID_KEY, containerId);
+        context.put(SExpressionContext.CONTAINER_TYPE_KEY, containerType.name());
         return context;
     }
 
@@ -126,7 +128,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
         when(flowNodeInstanceService.getProcessInstanceId(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(proccessInstanceId);
 
-        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
+        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
 
         assertThat(fetchedBizData).isEqualTo(expectedBizData);
     }
@@ -142,10 +144,10 @@ public class BusinessDataExpressionExecutorStrategyTest {
         doThrow(new SRefBusinessDataInstanceNotFoundException(444L, "toto")).when(refBusinessDataService).getRefBusinessDataInstance(anyString(), anyLong());
 
         try {
-            businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
+            businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
             fail("should throw Exception");
         } catch (SBonitaException e) {
-            assertThat(((SBonitaException) e.getCause()).getContext().get(SContext.PROCESS_INSTANCE_ID)).isEqualTo(proccessInstanceId);
+            assertThat(((SBonitaException) e.getCause()).getContext().get(SExceptionContext.PROCESS_INSTANCE_ID)).isEqualTo(proccessInstanceId);
         }
     }
 
@@ -157,7 +159,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final HashMap<String, Object> context = buildBusinessDataExpressionContext(flowNode.getId(), DataInstanceContainer.ACTIVITY_INSTANCE);
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
 
-        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
+        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
 
         assertThat(fetchedBizData).isEqualTo(expectedBizData);
     }
@@ -170,7 +172,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         context.put(bizDataName, expectedBizData);
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(bizDataName);
 
-        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
+        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
 
         assertThat(fetchedBizData).isEqualTo(expectedBizData);
         verifyZeroInteractions(businessDataRepository);
@@ -191,7 +193,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
 
         final List<Object> fetchedBizDatas = businessDataExpressionExecutorStrategy.evaluate(
-                Arrays.asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), context, null);
+                Arrays.asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), context, null, ContainerState.ACTIVE);
 
         assertThat(fetchedBizDatas).contains(firstBizData, secondBizData);
     }
@@ -203,11 +205,12 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SExpression secondbuildBusinessDataExpression = buildBusinessDataExpression("sameName");
         final BusinessDataExpressionExecutorStrategy strategy = spy(new BusinessDataExpressionExecutorStrategy(refBusinessDataService, businessDataRepository,
                 flowNodeInstanceService));
-        doReturn(new Object()).when(strategy).evaluate(any(SExpression.class), anyMap(), anyMap());
+        final ContainerState active = ContainerState.ACTIVE;
+        doReturn(new Object()).when(strategy).evaluate(any(SExpression.class), anyMap(), anyMap(), Matchers.eq(active));
 
-        strategy.evaluate(asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), null, null);
+        strategy.evaluate(asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), null, null, active);
 
-        verify(strategy, times(1)).evaluate(any(SExpression.class), anyMap(), anyMap());
+        verify(strategy, times(1)).evaluate(any(SExpression.class), anyMap(), anyMap(), Matchers.eq(active));
     }
 
     @Test
