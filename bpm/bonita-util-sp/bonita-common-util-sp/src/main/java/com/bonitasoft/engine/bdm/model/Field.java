@@ -11,6 +11,7 @@ package com.bonitasoft.engine.bdm.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Matthieu Chaffotte
@@ -37,12 +38,14 @@ public class Field {
     @XmlAttribute
     private Boolean collection;
 
+    @XmlElement
+    private Relationship relationship;
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) {
-
         this.name = name;
     }
 
@@ -76,6 +79,14 @@ public class Field {
 
     public void setCollection(final Boolean collection) {
         this.collection = collection;
+    }
+
+    public Relationship getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(Relationship relationship) {
+        this.relationship = relationship;
     }
 
     @Override

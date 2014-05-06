@@ -53,7 +53,7 @@
 						<phase>process-classes</phase>
 						<configuration>
 							<includes>
-								<include>com/bonitasoft/engine/bdm/BusinessObjectModel.java</include>
+								<include>com/bonitasoft/engine/bdm/model/BusinessObjectModel.java</include>
 							</includes>
 							<outputDirectory>${project.build.directory}/schemas</outputDirectory>
 						</configuration>

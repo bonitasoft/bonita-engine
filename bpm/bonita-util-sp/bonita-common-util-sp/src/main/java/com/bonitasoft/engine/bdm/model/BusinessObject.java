@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -26,6 +27,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(propOrder = { "description", "fields", "uniqueConstraints", "queries" })
 public class BusinessObject {
 
+    @XmlID
     @XmlAttribute(required = true)
     private String qualifiedName;
 
