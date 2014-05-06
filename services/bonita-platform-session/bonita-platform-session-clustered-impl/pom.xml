@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.platform.session</groupId>
 		<artifactId>bonita-platform-session</artifactId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.0</version>
 	</parent>
 
 	<artifactId>bonita-platform-session-clustered-impl</artifactId>
