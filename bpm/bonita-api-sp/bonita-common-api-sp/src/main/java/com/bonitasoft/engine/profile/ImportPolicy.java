@@ -12,6 +12,7 @@ package com.bonitasoft.engine.profile;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * 
  */
 public enum ImportPolicy {
 

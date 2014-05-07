@@ -10,6 +10,7 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -117,8 +118,11 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *         A List<String> is a warning message list in case of non-existing User, Group or Role to map the profile to.
      * @throws ExecutionException
      *             If can't import profiles
+     * 
+     * @deprecated use {@link #importProfiles(byte[], ImportPolicy)}
      * @since 6.0
      */
+    @Deprecated
     List<String> importProfilesUsingSpecifiedPolicy(byte[] xmlContent, ImportPolicy policy) throws ExecutionException;
 
     /**
@@ -220,5 +224,12 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @since 6.0
      */
     ProfileEntry updateProfileEntry(long id, ProfileEntryUpdater updater) throws ProfileEntryNotFoundException, UpdateException;
+
+    /**
+     * 
+     * 
+     * @since 6.3.1
+     */
+    List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException;
 
 }

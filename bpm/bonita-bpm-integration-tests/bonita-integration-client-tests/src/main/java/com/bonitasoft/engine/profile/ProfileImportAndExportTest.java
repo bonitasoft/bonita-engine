@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -143,7 +144,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
          */
         final InputStream xmlStreamig = ProfileImportAndExportTest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
         final List<String> warningMsgsig = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamig), ImportPolicy.IGNORE_DUPLICATES);
-        assertEquals("Role with name role60 not found.", warningMsgsig.get(0));
+        assertThat(warningMsgsig.get(0)).containsIgnoringCase("Unable to find the role role60 on Plop");
 
         // check profiles
         builder = new SearchOptionsBuilder(0, 10);
@@ -229,28 +230,28 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final InputStream xmlStreamrp = ProfileImportAndExportTest.class.getResourceAsStream("replaceOnDuplicateProfile.xml");
         final List<String> warningMsgsrl = getProfileAPI()
                 .importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamrp), ImportPolicy.REPLACE_DUPLICATES);
-        assertEquals("Group with path /groupPath1 not found.", warningMsgsrl.get(0));
+        assertEquals("Unable to find the group /groupPath1 on Process owner", warningMsgsrl.get(0));
 
         // check profiles
         builder = new SearchOptionsBuilder(0, 10);
-        builder.sort(ProfileSearchDescriptor.ID, Order.ASC);
+        builder.sort(ProfileSearchDescriptor.NAME, Order.ASC);
         final SearchResult<Profile> searchedProfilesResrl = getProfileAPI().searchProfiles(builder.done());
         final long older1 = newResult.get(0).getId();
         final long newId1 = searchedProfilesResrl.getResult().get(1).getId();
-        final long newId2 = searchedProfilesResrl.getResult().get(2).getId();
         assertEquals(5l, searchedProfilesResrl.getCount());
         assertEquals(older1, searchedProfilesResrl.getResult().get(0).getId());
         assertEquals("Administrator", searchedProfilesResrl.getResult().get(0).getName());
         assertEquals("Administrator profile", searchedProfilesResrl.getResult().get(0).getDescription());
-        assertEquals("User", searchedProfilesResrl.getResult().get(1).getName());
-        assertEquals("User profile", searchedProfilesResrl.getResult().get(1).getDescription());
-        assertEquals("Plop", searchedProfilesResrl.getResult().get(2).getName());
-        assertEquals("Plop profile", searchedProfilesResrl.getResult().get(2).getDescription());
+        assertEquals("Plop", searchedProfilesResrl.getResult().get(1).getName());
+        assertEquals("Plop profile", searchedProfilesResrl.getResult().get(1).getDescription());
 
-        // check new profile entry
+        // check user profile entries
         final SearchOptionsBuilder builderNewId1 = new SearchOptionsBuilder(0, 25);
         builderNewId1.sort(ProfileEntrySearchDescriptor.NAME, Order.ASC);
-        builderNewId1.filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1);
+        long userProfileId = getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).filter(ProfileEntrySearchDescriptor.NAME, "User").done())
+                .getResult().get(0).getId();
+        builderNewId1.filter(ProfileEntrySearchDescriptor.PROFILE_ID,
+                userProfileId);
         final List<ProfileEntry> searchedProfileEntriesRes2rl = getProfileAPI().searchProfileEntries(builderNewId1.done()).getResult();
         assertNotNull(searchedProfileEntriesRes2rl);
         assertEquals(17, searchedProfileEntriesRes2rl.size());
@@ -261,7 +262,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         // check older profile entry replaced with new id
         final SearchOptionsBuilder builderNewId2 = new SearchOptionsBuilder(0, 25);
         builderNewId2.sort(ProfileEntrySearchDescriptor.NAME, Order.ASC);
-        builderNewId2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId2);
+        builderNewId2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1);
         final List<ProfileEntry> searchedProfileEntriesRes3rl = getProfileAPI().searchProfileEntries(builderNewId2.done()).getResult();
         assertNotNull(searchedProfileEntriesRes3rl);
         assertEquals(1, searchedProfileEntriesRes3rl.size());
@@ -271,7 +272,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
 
         // check new profile mapping
         final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 25);
-        builder1.filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1);
+        builder1.filter(ProfileEntrySearchDescriptor.PROFILE_ID, userProfileId);
         final SearchResult<ProfileMember> searchpmRes1rl = getProfileAPI().searchProfileMembers("user", builder1.done());
         assertEquals(0, searchpmRes1rl.getCount());
 
@@ -279,7 +280,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final SearchResult<ProfileMember> searchpmRes1Group = getProfileAPI().searchProfileMembers("group", builder1.done());
         assertEquals(1, searchpmRes1Group.getCount());
         assertEquals(group1.getId(), searchpmRes1Group.getResult().get(0).getGroupId());
-        assertEquals(newId1, searchpmRes1Group.getResult().get(0).getProfileId());
+        assertEquals(userProfileId, searchpmRes1Group.getResult().get(0).getProfileId());
 
         // for memebership
         final SearchResult<ProfileMember> searchpmRes1mem = getProfileAPI().searchProfileMembers("roleAndGroup", builder1.done());
@@ -287,7 +288,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
 
         // for user
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 25);
-        builder2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId2);
+        builder2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1);
         final SearchResult<ProfileMember> searchpmRes = getProfileAPI().searchProfileMembers("user", builder2.done());
         assertEquals(0, searchpmRes.getCount());
 
