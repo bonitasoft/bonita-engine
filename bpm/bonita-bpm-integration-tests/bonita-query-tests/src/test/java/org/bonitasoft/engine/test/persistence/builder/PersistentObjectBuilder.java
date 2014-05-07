@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-public abstract class PersistentObjectBuilder<T extends PersistentObject> {
+public abstract class PersistentObjectBuilder<T extends PersistentObject, B extends PersistentObjectBuilder<T, B>> {
 
     public static final long DEFAULT_TENANT_ID = 1L;
 
@@ -12,13 +12,25 @@ public abstract class PersistentObjectBuilder<T extends PersistentObject> {
 
     protected T persistentObject;
 
+    protected B thisBuilder;
+
+    public PersistentObjectBuilder() {
+        thisBuilder = getThisBuilder();
+    }
+
     public T build() {
         persistentObject = _build();
-        persistentObject.setId(id);
-        persistentObject.setTenantId(DEFAULT_TENANT_ID);
+        fill(persistentObject);
         return persistentObject;
     }
 
+    protected T fill(T persistent) {
+        persistent.setId(id);
+        persistent.setTenantId(DEFAULT_TENANT_ID);
+        return persistent;
+    }
+
+    abstract B getThisBuilder();
     abstract T _build();
 
 }

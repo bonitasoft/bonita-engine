@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -44,6 +43,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
@@ -315,7 +315,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     }
 
     @Test
-    public void getChildrenInstanceIdsOfProcessInstance() throws Exception {
+    public void getNoChildrenInstanceIdsFromProcessInstance() throws Exception {
         final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
@@ -323,9 +323,34 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         final List<Long> ids = getProcessAPI().getChildrenInstanceIdsOfProcessInstance(pi0.getId(), 0, 10, ProcessInstanceCriterion.DEFAULT);
         assertEquals(0, ids.size());
-        // TODO FIXME check child more than 0 in order, waiting for CallActivity
-
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void getSingleChildInstanceOfProcessInstance() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("SubProcessInAInstance", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addAutomaticTask("step2")
+                .addUserTask("userSubTask", ACTOR_NAME).addTransition("step1", "userSubTask").addTransition("userSubTask", "step2");
+
+        final ProcessDefinition subProcess = deployAndEnableWithActor(builder.done(), ACTOR_NAME, pedro);
+
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(subProcess.getName());
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(subProcess.getVersion());
+
+        final ProcessDefinitionBuilder builderProc = new ProcessDefinitionBuilder().createNewInstance("executeInstanceSequentialWithSubProcess", "1.1");
+        builderProc.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addStartEvent("start")
+                .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+        builderProc.addAutomaticTask("step3").addEndEvent("end").addTransition("start", "callActivity").addTransition("callActivity", "step3")
+                .addUserTask("userTask", ACTOR_NAME).addTransition("step3", "userTask").addTransition("userTask", "end");
+
+        DesignProcessDefinition processDefinition = builderProc.done();
+        final ProcessDefinition mainProcess = deployAndEnableWithActor(processDefinition, ACTOR_NAME, pedro);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
+        HumanTaskInstance userTask = waitForUserTask("userSubTask");
+
+        final List<Long> ids = getProcessAPI().getChildrenInstanceIdsOfProcessInstance(processInstance.getId(), 0, 10, ProcessInstanceCriterion.DEFAULT);
+        assertThat(ids).isNotEmpty().hasSize(1).containsExactly(userTask.getParentProcessInstanceId());
+        disableAndDeleteProcess(mainProcess, subProcess);
     }
 
     @Test
