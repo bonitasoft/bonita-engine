@@ -179,7 +179,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final Parser parser = tenantAccessor.getProfileParser();
         final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
         return new ProfilesImporter(profileService, identityService, profiles, org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
-                .importProfiles();
+                .importProfiles(SessionInfos.getUserIdFromSession());
 
     }
 
