@@ -43,6 +43,7 @@ import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.XMLWriter;
 
 import com.bonitasoft.engine.api.ProfileAPI;
+import com.bonitasoft.engine.api.impl.transaction.profile.DeleteProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.ExportAllProfiles;
 import com.bonitasoft.engine.api.impl.transaction.profile.ExportProfilesSpecified;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfile;
@@ -270,7 +271,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            profileService.deleteProfileEntry(id);;
+            new DeleteProfileEntry(profileService, id).execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
