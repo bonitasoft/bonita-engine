@@ -641,7 +641,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             inputStream.close();
         }
         List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
-        new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles();
+        new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {

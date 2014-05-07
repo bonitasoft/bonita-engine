@@ -22,7 +22,6 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
-import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -78,35 +77,38 @@ public class ProfilesImporter {
      */
     public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
             final ImportPolicy policy) {
-        this.profileService = profileService;
-        this.identityService = identityService;
-        this.exportedProfiles = exportedProfiles;
+        this(profileService, identityService, exportedProfiles, getStrategy(profileService, policy));
+    }
+
+    private static ProfileImportStategy getStrategy(final ProfileService profileService, final ImportPolicy policy) {
         switch (policy) {
             case DELETE_EXISTING:
-                importStrategy = new DeleteExistingImportStrategy(profileService);
-                break;
+                return new DeleteExistingImportStrategy(profileService);
             case FAIL_ON_DUPLICATES:
-                importStrategy = new FailOnDuplicateImportStrategy();
-                break;
+                return new FailOnDuplicateImportStrategy();
             case IGNORE_DUPLICATES:
-                importStrategy = new IgnoreDuplicateImportStrategy();
-                break;
+                return new IgnoreDuplicateImportStrategy();
             case REPLACE_DUPLICATES:
-                importStrategy = new ReplaceDuplicateImportStrategy(profileService);
-                break;
+                return new ReplaceDuplicateImportStrategy(profileService);
             default:
-                importStrategy = null;
-                break;
+                return null;
 
         }
     }
 
-    public List<ImportStatus> importProfiles() throws ExecutionException {
+    ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
+            final ProfileImportStategy importStrategy) {
+        this.profileService = profileService;
+        this.identityService = identityService;
+        this.exportedProfiles = exportedProfiles;
+        this.importStrategy = importStrategy;
+    }
+
+    public List<ImportStatus> importProfiles(final long importerId) throws ExecutionException {
 
         importStrategy.beforeImport();
         try {
             final List<ImportStatus> importStatus = new ArrayList<ImportStatus>(exportedProfiles.size());
-            final long importerId = SessionInfos.getUserIdFromSession();
             for (final ExportedProfile exportedProfile : exportedProfiles) {
                 if (exportedProfile.getName() == null || exportedProfile.getName().isEmpty()) {
                     continue;
@@ -114,6 +116,7 @@ public class ProfilesImporter {
                 ImportStatus currentStatus = new ImportStatus(exportedProfile.getName());
                 importStatus.add(currentStatus);
                 SProfile existingProfile = null;
+
                 try {
                     existingProfile = profileService.getProfileByName(exportedProfile.getName());
                     currentStatus.setStatus(Status.REPLACED);
@@ -126,6 +129,7 @@ public class ProfilesImporter {
                     currentStatus.setStatus(Status.SKIPPED);
                     continue;
                 }
+
                 final long profileId = newProfile.getId();
 
                 /*
@@ -240,7 +244,7 @@ public class ProfilesImporter {
         return errors;
     }
 
-    private SProfile importTheProfile(final long importerId,
+    SProfile importTheProfile(final long importerId,
             final ExportedProfile exportedProfile,
             final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
             SProfileUpdateException,
@@ -255,7 +259,7 @@ public class ProfilesImporter {
         return newProfile;
     }
 
-    private SProfile createProfile(final ExportedProfile exportedProfile, final long importerId) {
+    SProfile createProfile(final ExportedProfile exportedProfile, final long importerId) {
         boolean isDefault = exportedProfile.isDefault();
         final long creationDate = System.currentTimeMillis();
         return BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(exportedProfile.getName(),
@@ -263,13 +267,13 @@ public class ProfilesImporter {
 
     }
 
-    private SProfileEntry createProfileEntry(final ExportedParentProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
+    SProfileEntry createProfileEntry(final ExportedParentProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(exportedProfileEntry.getName(), profileId)
                 .setDescription(exportedProfileEntry.getDescription()).setIndex(exportedProfileEntry.getIndex()).setPage(exportedProfileEntry.getPage())
                 .setParentId(parentId).setType(exportedProfileEntry.getType()).done();
     }
 
-    private SProfileEntry createProfileEntry(final ExportedProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
+    SProfileEntry createProfileEntry(final ExportedProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(exportedProfileEntry.getName(), profileId)
                 .setDescription(exportedProfileEntry.getDescription()).setIndex(exportedProfileEntry.getIndex()).setPage(exportedProfileEntry.getPage())
                 .setParentId(parentId).setType(exportedProfileEntry.getType()).done();

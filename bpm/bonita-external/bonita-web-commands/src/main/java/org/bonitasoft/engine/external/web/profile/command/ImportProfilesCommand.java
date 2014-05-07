@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
@@ -64,7 +65,7 @@ public class ImportProfilesCommand extends TenantCommand {
             final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
 
             return (Serializable) ProfilesImporter.toWarnings(new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.DELETE_EXISTING)
-                    .importProfiles());
+                    .importProfiles(SessionInfos.getUserIdFromSession()));
         } catch (ExecutionException e) {
             throw new SCommandExecutionException(e);
         }
