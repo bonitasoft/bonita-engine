@@ -8,18 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
 import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetProfile;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -44,13 +40,9 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.SValidationException;
-import org.bonitasoft.engine.xml.SXMLParseException;
 import org.bonitasoft.engine.xml.XMLWriter;
 
 import com.bonitasoft.engine.api.ProfileAPI;
-import com.bonitasoft.engine.api.impl.transaction.profile.DeleteProfile;
-import com.bonitasoft.engine.api.impl.transaction.profile.DeleteProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.ExportAllProfiles;
 import com.bonitasoft.engine.api.impl.transaction.profile.ExportProfilesSpecified;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfile;
@@ -124,13 +116,10 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        final GetProfile getProfile = new GetProfile(profileService, id);
         try {
-            getProfile.execute();
-            final SProfile sProfile = getProfile.getResult();
+            final SProfile sProfile = profileService.getProfile(id);
             if (!sProfile.isDefault()) {
-                final DeleteProfile deleteProfileTransaction = new DeleteProfile(profileService, id);
-                deleteProfileTransaction.execute();
+                profileService.deleteProfile(sProfile);
             } else {
                 throw new DeletionException("Can't delete a default profile. Profile id = <" + id + ">, name = <" + sProfile.getName() + ">");
             }
@@ -187,7 +176,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Parser parser = tenantAccessor.getProfileParser();
-        final List<ExportedProfile> profiles = getProfilesFromXML(new String(xmlContent), parser);
+        final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
         return new ProfilesImporter(profileService, identityService, profiles, org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
                 .importProfiles();
 
@@ -196,37 +185,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     @Deprecated
     public List<String> importProfilesUsingSpecifiedPolicy(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
-        List<String> warns = toWarnings(importProfiles(xmlContent, policy));
-        return warns;
-    }
-
-    private List<String> toWarnings(final List<ImportStatus> importProfiles) {
-        ArrayList<String> warns = new ArrayList<String>();
-        for (ImportStatus importStatus : importProfiles) {
-            for (ImportError error : importStatus.getErrors()) {
-                warns.add("Unable to find the " + error.getType().name().toLowerCase() + " " + error.getName() + " on " + importStatus.getName());
-            }
-        }
-        return warns;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws ExecutionException {
-        StringReader reader = new StringReader(xmlContent);
-        try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            return (List<ExportedProfile>) parser.getObjectFromXML(reader);
-        } catch (final IOException ioe) {
-            throw new ExecutionException(ioe);
-        } catch (final SValidationException e) {
-            throw new ExecutionException(e);
-        } catch (final SXMLParseException e) {
-            throw new ExecutionException(e);
-        } finally {
-            reader.close();
-        }
+        return ProfilesImporter.toWarnings(importProfiles(xmlContent, policy));
     }
 
     @Override
@@ -310,10 +269,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     public void deleteProfileEntry(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-
-        final DeleteProfileEntry deleteProfileEntryTransaction = new DeleteProfileEntry(profileService, id);
         try {
-            deleteProfileEntryTransaction.execute();
+            profileService.deleteProfileEntry(id);;
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
