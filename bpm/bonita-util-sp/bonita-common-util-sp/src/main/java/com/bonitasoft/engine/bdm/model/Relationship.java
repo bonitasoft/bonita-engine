@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlIDREF;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Relationship {
     
-    private enum Mode {
+    private enum Type {
         AGGREGATION, COMPOSITION;
     }
     
@@ -17,7 +17,7 @@ public class Relationship {
     private BusinessObject businessObject;
 
     @XmlElement(required = true)
-    private Mode mode;
+    private Type type;
 
     public BusinessObject getBusinessObject() {
         return businessObject;
@@ -27,12 +27,12 @@ public class Relationship {
         this.businessObject = businessObject;
     }
 
-    public Mode getMode() {
-        return mode;
+    public Type getType() {
+        return type;
     }
 
-    public void setMode(Mode mode) {
-        this.mode = mode;
+    public void setType(Type type) {
+        this.type = type;
     }
 
 }
