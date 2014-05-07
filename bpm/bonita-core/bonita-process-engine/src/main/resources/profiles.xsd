@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xsd:schema xmlns="http://www.bonitasoft.org/ns/profile/6.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/profile/6.0">
+<xsd:schema xmlns="http://www.bonitasoft.org/ns/profile/6.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/profile/6.1">
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			profiles Schema 1.0
@@ -8,7 +8,7 @@
 		</xsd:documentation>
 	</xsd:annotation>
 
-    <xsd:element name="proFiles" >
+    <xsd:element name="profiles" >
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element name="profile" maxOccurs="unbounded" type="Profile" minOccurs="0" />
@@ -19,7 +19,6 @@
 	<xsd:complexType name="Profile">
 		<xsd:all>
 			<xsd:element name="description" type="xsd:string" minOccurs="0" />
-			<xsd:element name="iconPath" type="xsd:string" minOccurs="0" />
 			<xsd:element name="profileEntries" type="ProfileEntries" minOccurs="0"/>
 			<xsd:element name="profileMapping" type="profileMapping" minOccurs="0"/>
 		</xsd:all>		
@@ -39,6 +38,7 @@
 						<xsd:element name="page" type="xsd:string" minOccurs="0" />
 						<xsd:element name="childrenEntries" type="childrenEntries" minOccurs="0"/>
 					</xsd:all>
+					<xsd:attribute name="isCustom" type="xsd:boolean" use="required" />
 					<xsd:attribute name="name" type="xsd:string" use="required" />
 				</xsd:complexType>
 			</xsd:element>
@@ -56,6 +56,7 @@
 						<xsd:element name="type" type="xsd:string" minOccurs="0" />
 						<xsd:element name="page" type="xsd:string" minOccurs="0" />
 					</xsd:all>
+					<xsd:attribute name="isCustom" type="xsd:boolean" use="required" />
 					<xsd:attribute name="name" type="xsd:string" use="required" />
 				</xsd:complexType>
 			</xsd:element>

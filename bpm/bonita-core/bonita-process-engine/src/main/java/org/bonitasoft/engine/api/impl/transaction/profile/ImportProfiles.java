@@ -72,12 +72,13 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
                 final SProfile sprofile = BuilderFactory.get(SProfileBuilderFactory.class)
                         .createNewInstance(exportedProfile.getName(), exportedProfile.isDefault(), creationDate, importer, creationDate, importer)
                         .setDescription(exportedProfile.getDescription())
-                        .setIconPath(exportedProfile.getIconPath()).done();
+                        .setIconPath(null).done();
                 final SProfile newProfile = profileService.createProfile(sprofile);
                 // insert profileEntries
                 final List<ExportedParentProfileEntry> parentProfileEntries = exportedProfile.getParentProfileEntries();
                 for (final ExportedParentProfileEntry parentprofileEntry : parentProfileEntries) {
-                    final SProfileEntry sproEntry = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentprofileEntry.getName(), newProfile.getId())
+                    final SProfileEntry sproEntry = BuilderFactory.get(SProfileEntryBuilderFactory.class)
+                            .createNewInstance(parentprofileEntry.getName(), newProfile.getId())
                             .setDescription(parentprofileEntry.getDescription()).setIndex(parentprofileEntry.getIndex()).setPage(parentprofileEntry.getPage())
                             .setParentId(0).setType(parentprofileEntry.getType()).done();
                     final SProfileEntry parentEntry = profileService.createProfileEntry(sproEntry);
@@ -85,7 +86,8 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
                     final List<ExportedProfileEntry> childrenProEn = parentprofileEntry.getChildProfileEntries();
                     if (childrenProEn != null && childrenProEn.size() > 0) {
                         for (final ExportedProfileEntry childProfileEntry : childrenProEn) {
-                            final SProfileEntry sproEntrytp = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childProfileEntry.getName(), newProfile.getId())
+                            final SProfileEntry sproEntrytp = BuilderFactory.get(SProfileEntryBuilderFactory.class)
+                                    .createNewInstance(childProfileEntry.getName(), newProfile.getId())
                                     .setDescription(childProfileEntry.getDescription()).setIndex(childProfileEntry.getIndex())
                                     .setPage(childProfileEntry.getPage()).setParentId(parentEntry.getId()).setType(childProfileEntry.getType()).done();
                             profileService.createProfileEntry(sproEntrytp);

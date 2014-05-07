@@ -21,6 +21,8 @@ public class ExportedProfileEntry {
 
     private final String name;
 
+    private boolean isCustom;
+
     private String description;
 
     private String type;
@@ -143,6 +145,14 @@ public class ExportedProfileEntry {
 
     public void setPage(final String page) {
         this.page = page;
+    }
+
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public void setCustom(final boolean isCustom) {
+        this.isCustom = isCustom;
     }
 
 }

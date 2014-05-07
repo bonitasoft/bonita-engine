@@ -23,6 +23,8 @@ public class ExportedParentProfileEntry {
 
     private final String name;
 
+    private boolean isCustom;
+
     private String description;
 
     private String type;
@@ -39,7 +41,7 @@ public class ExportedParentProfileEntry {
         return childProfileEntries;
     }
 
-    public void setChildProfileEntries(List<ExportedProfileEntry> childProfileEntries) {
+    public void setChildProfileEntries(final List<ExportedProfileEntry> childProfileEntries) {
         this.childProfileEntries = childProfileEntries;
     }
 
@@ -76,7 +78,7 @@ public class ExportedParentProfileEntry {
         return parentName;
     }
 
-    public void setParentName(String parentName) {
+    public void setParentName(final String parentName) {
         this.parentName = parentName;
     }
 
@@ -130,7 +132,7 @@ public class ExportedParentProfileEntry {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -138,7 +140,7 @@ public class ExportedParentProfileEntry {
         return index;
     }
 
-    public void setIndex(long index) {
+    public void setIndex(final long index) {
         this.index = index;
     }
 
@@ -146,8 +148,16 @@ public class ExportedParentProfileEntry {
         return page;
     }
 
-    public void setPage(String page) {
+    public void setPage(final String page) {
         this.page = page;
+    }
+
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public void setCustom(final boolean isCustom) {
+        this.isCustom = isCustom;
     }
 
 }

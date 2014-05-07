@@ -29,8 +29,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
 
     private String description;
 
-    private String iconPath;
-
     private Date creationDate;
 
     private long createdBy;
@@ -63,11 +61,11 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
 
     @Override
     public String getIconPath() {
-        return iconPath;
+        return null;
     }
 
     public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
+        // nothing to do
     }
 
     @Override
@@ -112,7 +110,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
         int result = super.hashCode();
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
@@ -143,13 +140,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
                 return false;
             }
         } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
             return false;
         }
         if (creationDate == null) {
