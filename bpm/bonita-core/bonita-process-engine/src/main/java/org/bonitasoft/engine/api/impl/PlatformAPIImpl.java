@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -625,7 +624,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         return targetDir;
     }
 
-    @SuppressWarnings("unchecked")
     protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
         final Parser parser = tenantServiceAccessor.getProfileParser();
         final ProfileService profileService = tenantServiceAccessor.getProfileService();
@@ -642,19 +640,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             inputStream.close();
         }
-
-        StringReader reader = new StringReader(xmlContent);
-        List<ExportedProfile> profiles;
-        try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            profiles = (List<ExportedProfile>) parser.getObjectFromXML(reader);
-            // importer -1 because we create the tenant
-            new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles();
-        } finally {
-            reader.close();
-        }
+        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
+        new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles();
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {

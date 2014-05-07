@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,9 @@ import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.xml.Parser;
+import org.bonitasoft.engine.xml.SValidationException;
+import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * 
@@ -254,6 +259,35 @@ public class ProfilesImporter {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(exportedProfileEntry.getName(), profileId)
                 .setDescription(exportedProfileEntry.getDescription()).setIndex(exportedProfileEntry.getIndex()).setPage(exportedProfileEntry.getPage())
                 .setParentId(parentId).setType(exportedProfileEntry.getType()).done();
+    }
+
+    public static List<String> toWarnings(final List<ImportStatus> importProfiles) {
+        ArrayList<String> warns = new ArrayList<String>();
+        for (ImportStatus importStatus : importProfiles) {
+            for (ImportError error : importStatus.getErrors()) {
+                warns.add("Unable to find the " + error.getType().name().toLowerCase() + " " + error.getName() + " on " + importStatus.getName());
+            }
+        }
+        return warns;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws ExecutionException {
+        StringReader reader = new StringReader(xmlContent);
+        try {
+            parser.validate(reader);
+            reader.close();
+            reader = new StringReader(xmlContent);
+            return (List<ExportedProfile>) parser.getObjectFromXML(reader);
+        } catch (final IOException ioe) {
+            throw new ExecutionException(ioe);
+        } catch (final SValidationException e) {
+            throw new ExecutionException(e);
+        } catch (final SXMLParseException e) {
+            throw new ExecutionException(e);
+        } finally {
+            reader.close();
+        }
     }
 
 }
