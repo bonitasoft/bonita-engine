@@ -19,21 +19,7 @@ import java.util.List;
  * @author Zhao Na
  * @author Celine Souchet
  */
-public class ExportedParentProfileEntry {
-
-    private final String name;
-
-    private boolean isCustom;
-
-    private String description;
-
-    private String type;
-
-    private String parentName;
-
-    private long index;
-
-    private String page;
+public class ExportedParentProfileEntry extends ExportedProfileEntry {
 
     private List<ExportedProfileEntry> childProfileEntries;
 
@@ -46,40 +32,7 @@ public class ExportedParentProfileEntry {
     }
 
     public ExportedParentProfileEntry(final String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        result = prime * result + (page == null ? 0 : page.hashCode());
-        result = prime * result + (parentName == null ? 0 : parentName.hashCode());
-        result = prime * result + (int) (index ^ (index >>> 32));
-        return result;
-    }
-
-    public String getParentName() {
-        return parentName;
-    }
-
-    public void setParentName(final String parentName) {
-        this.parentName = parentName;
+        super(name);
     }
 
     @Override
@@ -92,72 +45,22 @@ public class ExportedParentProfileEntry {
         }
         if (getClass() != obj.getClass()) {
             return false;
+
         }
-        final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
-        if (description == null) {
-            if (other.description != null) {
+        if (!compareExportedProfileEntry(obj)) {
+            return false;
+        } else {
+            final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
+            if (getChildProfileEntries() == null) {
+                if (other.getChildProfileEntries() != null) {
+                    return false;
+                }
+            } else if (!getChildProfileEntries().equals(other.getChildProfileEntries())) {
                 return false;
             }
-        } else if (!description.equals(other.description)) {
-            return false;
         }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        if (page == null) {
-            if (other.page != null) {
-                return false;
-            }
-        } else if (!page.equals(other.page)) {
-            return false;
-        }
-        if (index != other.index) {
-            return false;
-        }
-        if (parentName == null) {
-            if (other.parentName != null) {
-                return false;
-            }
-        } else if (!parentName.equals(other.parentName)) {
-            return false;
-        }
+
         return true;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(final String type) {
-        this.type = type;
-    }
-
-    public long getIndex() {
-        return index;
-    }
-
-    public void setIndex(final long index) {
-        this.index = index;
-    }
-
-    public String getPage() {
-        return page;
-    }
-
-    public void setPage(final String page) {
-        this.page = page;
-    }
-
-    public boolean isCustom() {
-        return isCustom;
-    }
-
-    public void setCustom(final boolean isCustom) {
-        this.isCustom = isCustom;
     }
 
 }
