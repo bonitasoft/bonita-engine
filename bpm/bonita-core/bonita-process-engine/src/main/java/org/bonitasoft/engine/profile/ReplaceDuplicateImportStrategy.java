@@ -46,10 +46,14 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
             throws ExecutionException,
             SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
         profileService.deleteAllProfileEntriesOfProfile(existingProfile);
-        // TODO delete or not delete?????
         profileService.deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
-        return profileService.updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId)/* TODO */);
+        if (exportedProfile.isDefault()) {
+            // do not update if it is a default profile
+            return existingProfile;
+        } else {
+            return profileService.updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId));
+        }
     }
 
     private EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId) {

@@ -131,7 +131,10 @@ public class ProfilesImporter {
                 /*
                  * Import mapping with pages
                  */
-                importProfileEntries(profileService, exportedProfile.getParentProfileEntries(), profileId);
+                if (existingProfile == null || !exportedProfile.isDefault()) {
+                    // update entries only if it's a custom profile
+                    currentStatus.getErrors().addAll(importProfileEntries(profileService, exportedProfile.getParentProfileEntries(), profileId));
+                }
 
                 /*
                  * Import mapping with organization
@@ -145,33 +148,44 @@ public class ProfilesImporter {
         }
     }
 
-    private void importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries, final long profileId)
+    private List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
+            final long profileId)
             throws SProfileEntryCreationException {
+        ArrayList<ImportError> errors = new ArrayList<ImportError>();
         for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
-            /*
-             * if( parentProfileEntry.isCustom())
-             * find: parentProfileEntry.getPage()
-             */
-            /*
-             * before create check there is at least one child
-             */
+            List<ImportError> parentErrors = null;
+            if ((parentErrors = checkParentProfileEntryForError(parentProfileEntry)) != null) {
+                errors.addAll(parentErrors);
+                continue;
+            }
             final SProfileEntry parentEntry = profileService.createProfileEntry(createProfileEntry(parentProfileEntry, profileId, 0));
             final long parentProfileEntryId = parentEntry.getId();
             final List<ExportedProfileEntry> childrenProEn = parentProfileEntry.getChildProfileEntries();
             if (childrenProEn != null && childrenProEn.size() > 0) {
                 for (final ExportedProfileEntry childProfileEntry : childrenProEn) {
+                    ImportError error;
+                    if ((error = checkChildProfileEntryForError(childProfileEntry)) != null) {
+                        errors.add(error);
+                        continue;
+                    }
                     profileService.createProfileEntry(createProfileEntry(childProfileEntry, profileId, parentProfileEntryId));
-                    // TODO check page exists
                 }
             }
         }
+        return errors;
+    }
+
+    protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
+        return null;
+    }
+
+    protected List<ImportError> checkParentProfileEntryForError(final ExportedParentProfileEntry parentProfileEntry) {
+        return null;
     }
 
     private List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
             final long profileId,
             final ExportedProfileMapping exportedProfileMapping) throws SProfileMemberCreationException {
-        // TODO if not delete check merge status
-
         ArrayList<ImportError> errors = new ArrayList<ImportError>();
 
         for (final String userName : exportedProfileMapping.getUsers()) {
