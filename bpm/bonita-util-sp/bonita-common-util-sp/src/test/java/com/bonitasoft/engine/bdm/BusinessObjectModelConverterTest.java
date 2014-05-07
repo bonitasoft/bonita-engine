@@ -88,6 +88,14 @@ public class BusinessObjectModelConverterTest {
         assertThat(transformedModel).isEqualTo(model);
     }
 
+    @Test
+    public void should_be_backward_compatible() throws Exception {
+        byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
+        BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        convertor.unmarshall(xml);
+        // expect no unmarshalling exception
+    }
+    
     private BusinessObjectModel marshallUnmarshall(BusinessObjectModel model) throws JAXBException, IOException, SAXException {
         BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         byte[] marshall = convertor.marshall(model);
