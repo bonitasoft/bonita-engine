@@ -157,7 +157,6 @@ public class ProfileTest extends AbstractProfileTest {
         final Profile upDateProfileResult = getProfileAPI().getProfile(createdProfile.getId());
         assertEquals("Updated Name", upDateProfileResult.getName());
         assertEquals("Updated description", upDateProfileResult.getDescription());
-        assertEquals("Updated iconPath", upDateProfileResult.getIconPath());
         assertEquals(createdProfile.isDefault(), upDateProfileResult.isDefault());
         assertNotEquals(createdProfile.getLastUpdateDate(), upDateProfileResult.getLastUpdateDate());
 

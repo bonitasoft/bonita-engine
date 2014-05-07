@@ -30,10 +30,15 @@ public class ExportProfileMapping extends AbstractExportProfiles {
 
     @Override
     protected XMLNode getProfilesXmlNode() throws SBonitaException {
-        final String NS_PREFIX = "profilemappings";
-        final String NAME_SPACE = "http://www.bonitasoft.org/ns/profilemapping/6.0";
-        final XMLNode profileMappingNode = new XMLNode(NS_PREFIX + ":profileMappings");
-        profileMappingNode.addAttribute("xmlns:" + NS_PREFIX, NAME_SPACE);
+        final StringBuilder stringBuilderXmlNode = new StringBuilder();
+        stringBuilderXmlNode.append(PROFILE_MAPPING_NAMESPACE_PREFIX);
+        stringBuilderXmlNode.append(":");
+        stringBuilderXmlNode.append(PROFILE_MAPPING_TAG_NAME);
+        final XMLNode profileMappingNode = new XMLNode(stringBuilderXmlNode.toString());
+        final StringBuilder stringBuilderAttribute = new StringBuilder();
+        stringBuilderAttribute.append("xmlns:");
+        stringBuilderAttribute.append(PROFILE_MAPPING_NAMESPACE_PREFIX);
+        profileMappingNode.addAttribute(stringBuilderAttribute.toString(), PROFILE_MAPPING_NAMESPACE);
 
         // get all profiles
         int index = 0;

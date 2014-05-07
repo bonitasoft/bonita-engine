@@ -100,7 +100,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     public Profile createProfile(final ProfileCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
-        Map<ProfileField, Serializable> fields = creator.getFields();
+        final Map<ProfileField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ProfileField.NAME);
         if (name == null || name.isEmpty()) {
             throw new CreationException("Name is mandatory.");
@@ -200,7 +200,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         List<String> warnings;
 
         final Parser parser = tenantAccessor.getProfileParser();
-        TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final List<ExportedProfile> profiles = getProfilesFromXML(new String(xmlContent), parser);
 
         switch (policy) {
@@ -350,7 +350,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-        Serializable updatedName = updateDescriptor.getFields().get(ProfileUpdater.ProfileField.NAME);
+        final Serializable updatedName = updateDescriptor.getFields().get(ProfileUpdater.ProfileField.NAME);
         if (updatedName != null) {
             SearchResult<Profile> searchProfiles;
             try {
@@ -359,7 +359,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                 if (searchProfiles.getCount() > 0) {
                     throw new AlreadyExistsException("A profile with the name '" + updatedName + "' already exists");
                 }
-            } catch (SearchException e) {
+            } catch (final SearchException e) {
                 throw new UpdateException("Cannot check if a profile with the name '" + updatedName + "' already exists", e);
             }
         }
@@ -463,7 +463,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         ProfileEntry updatedSProfileEntry = null;
         try {
             updatedSProfileEntry = getProfileEntry(id);
-        } catch (ProfileEntryNotFoundException e) {
+        } catch (final ProfileEntryNotFoundException e) {
             throw new UpdateException(e.getCause());
         }
         return updatedSProfileEntry;
@@ -473,7 +473,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     private ProfileCreator getProfileCreator(final ExportedProfile exportedProfile) {
         final ProfileCreator creator = new ProfileCreator(exportedProfile.getName());
         creator.setDescription(exportedProfile.getDescription());
-        creator.setIconPath(exportedProfile.getIconPath());
         return creator;
     }
 

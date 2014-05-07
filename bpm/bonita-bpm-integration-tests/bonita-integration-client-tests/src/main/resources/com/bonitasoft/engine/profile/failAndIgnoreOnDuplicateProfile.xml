@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
-
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
 	<profile name="Plop" isDefault="true">
 		<description>Plop profile</description>
-		<iconPath>/profiles/plop.png</iconPath>
 		<profileEntries>
-			<parentProfileEntry name="PlopEntry">
+			<parentProfileEntry name="PlopEntry" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>4</index>
 				<description>BPM DES</description>
@@ -19,12 +17,10 @@
 			</roles>
 		</profileMapping>
 	</profile>
-
 	<profile name="Team Manager" isDefault="false">
 		<description>TM profile</description>
-		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>
-			<parentProfileEntry name="Home">
+			<parentProfileEntry name="Home" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>0</index>
 				<description>My team activitys dashboard</description>
@@ -39,4 +35,4 @@
 			</users>
 		</profileMapping>
 	</profile>
-</profiles:proFiles>
+</profiles:profiles>

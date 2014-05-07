@@ -102,7 +102,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         final SProfile sProfile = BuilderFactory.get(SProfileBuilderFactory.class)
                 .createNewInstance(exportedProfile.getName(), exportedProfile.isDefault(), creationDate, importerId, creationDate, importerId)
                 .setDescription(exportedProfile.getDescription())
-                .setIconPath(exportedProfile.getIconPath()).done();
+                .setIconPath(null).done();
         return profileService.createProfile(sProfile).getId();
     }
 

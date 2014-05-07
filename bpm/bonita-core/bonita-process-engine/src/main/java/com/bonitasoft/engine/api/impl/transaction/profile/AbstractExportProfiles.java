@@ -39,7 +39,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
 /**
  * @author Celine Souchet
  */
-public abstract class AbstractExportProfiles implements TransactionContentWithResult<String> {
+public abstract class AbstractExportProfiles implements TransactionContentWithResult<String>, IProfileNameSpace
+{
 
     private static final int NUMBER_OF_RESULTS = 100;
 
@@ -121,6 +122,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         final XMLNode parentProfileEntryNode = new XMLNode("parentProfileEntry");
         final String parentProfileEntryName = parentEntry.getName();
         parentProfileEntryNode.addAttribute("name", parentProfileEntryName);
+        parentProfileEntryNode.addAttribute("isCustom", parentEntry.isCustom());
         parentProfileEntryNode.addChild("parentName", "NULL");
         parentProfileEntryNode.addChild("index", parentEntry.getIndex() + "");
         parentProfileEntryNode.addChild("description", parentEntry.getDescription());
@@ -155,6 +157,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
     private XMLNode getChildProfileEntryXmlNode(final SProfileEntry childProfileEntry, final String parentProfileEntryName) {
         final XMLNode childProfileEntryNode = new XMLNode("profileEntry");
         childProfileEntryNode.addAttribute("name", childProfileEntry.getName());
+        childProfileEntryNode.addAttribute("isCustom", childProfileEntry.isCustom());
         childProfileEntryNode.addChild("parentName", parentProfileEntryName);
         childProfileEntryNode.addChild("index", childProfileEntry.getIndex() + "");
         childProfileEntryNode.addChild("description", childProfileEntry.getDescription());
