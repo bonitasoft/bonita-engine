@@ -86,7 +86,6 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         profileNode.addAttribute("name", sProfile.getName());
         profileNode.addAttribute("isDefault", String.valueOf(sProfile.isDefault()));
         profileNode.addChild("description", sProfile.getDescription());
-        profileNode.addChild("iconPath", sProfile.getIconPath());
 
         final XMLNode profileEntriesXmlNode = getProfileEntriesXmlNode(sProfile.getId());
         if (profileEntriesXmlNode != null) {
