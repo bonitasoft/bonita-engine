@@ -24,12 +24,22 @@ import com.bonitasoft.engine.io.IOUtils;
  */
 public class BusinessObjectModelConverter {
 
+    private static final String BOM_XSD = "/bom.xsd";
+
     private static final String BOM_XML = "bom.xml";
 
+    private final URL xsdUrl;
+
+    public BusinessObjectModelConverter() {
+        xsdUrl = BusinessObjectModel.class.getResource(BOM_XSD);
+    }
+
     public byte[] zip(final BusinessObjectModel bom) throws IOException, JAXBException, SAXException {
-        final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
-        final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
-        return IOUtils.zip(BOM_XML, bomXML);
+        return IOUtils.zip(BOM_XML, marshall(bom));
+    }
+
+    public byte[] marshall(final BusinessObjectModel bom) throws JAXBException, IOException, SAXException {
+        return IOUtils.marshallObjectToXML(bom, xsdUrl);
     }
 
     public BusinessObjectModel unzip(final byte[] zippedBOM) throws IOException, JAXBException, SAXException {
@@ -38,8 +48,11 @@ public class BusinessObjectModelConverter {
         if (bomXML == null) {
             throw new IOException("the file " + BOM_XML + " is missing in the zip");
         }
-        final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
-        return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, resource);
+        return unmarshall(bomXML);
+    }
+
+    public BusinessObjectModel unmarshall(final byte[] bomXML) throws JAXBException, IOException, SAXException {
+        return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, xsdUrl);
     }
 
 }

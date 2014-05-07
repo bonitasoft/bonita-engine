@@ -9,6 +9,21 @@ import com.bonitasoft.engine.bdm.model.FieldType;
 
 public class BOMBuilder {
 
+    private BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+
+    public static BOMBuilder aBOM() {
+        return new BOMBuilder();
+    }
+
+    public BOMBuilder withBO(BusinessObject bo) {
+        businessObjectModel.addBusinessObject(bo);
+        return this;
+    }
+
+    public BusinessObjectModel build() {
+        return businessObjectModel;
+    }
+
     private Field buildField(final String name, final FieldType type) {
         final Field field = new Field();
         field.setName(name);
@@ -69,11 +84,11 @@ public class BOMBuilder {
         bom.addBusinessObject(employee);
         return bom;
     }
-    
+
     public BusinessObjectModel buildBOMWithQuery() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         final BusinessObject employee = buildMyBusinessObject();
-        employee.addQuery("employeeByName","Select e FROM Employee e WHERE e.name='romain'",List.class.getName());
+        employee.addQuery("employeeByName", "Select e FROM Employee e WHERE e.name='romain'", List.class.getName());
         bom.addBusinessObject(employee);
         return bom;
     }

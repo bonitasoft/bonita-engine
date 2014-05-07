@@ -1,5 +1,9 @@
 package com.bonitasoft.engine.bdm;
 
+import static com.bonitasoft.engine.bdm.BOMBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aCompositionField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -7,7 +11,9 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.io.IOUtils;
 
@@ -32,7 +38,7 @@ public class BusinessObjectModelConverterTest {
 
         assertThat(actual).isEqualTo(bom);
     }
-    
+
     @Test
     public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithQuery() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
@@ -71,4 +77,20 @@ public class BusinessObjectModelConverterTest {
         convertor.unzip(zip);
     }
 
+    @Test
+    public void aBom_could_have_fields_with_relationships() throws Exception {
+        BusinessObject compositeBO = aBO("compositeBO").withField(aBooleanField("boolean").build()).build();
+        BusinessObject composedBO = aBO("composedBO").withField(aCompositionField("composite", compositeBO).build()).build();
+        BusinessObjectModel model = aBOM().withBO(compositeBO).withBO(composedBO).build();
+
+        BusinessObjectModel transformedModel = marshallUnmarshall(model);
+
+        assertThat(transformedModel).isEqualTo(model);
+    }
+
+    private BusinessObjectModel marshallUnmarshall(BusinessObjectModel model) throws JAXBException, IOException, SAXException {
+        BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        byte[] marshall = convertor.marshall(model);
+        return convertor.unmarshall(marshall);
+    }
 }

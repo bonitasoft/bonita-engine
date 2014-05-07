@@ -97,6 +97,7 @@ public class Field {
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (nullable == null ? 0 : nullable.hashCode());
         result = prime * result + (type == null ? 0 : type.hashCode());
+        result = prime * result + (relationship == null ? 0 : relationship.hashCode());
         return result;
     }
 
@@ -136,12 +137,19 @@ public class Field {
         if (type != other.type) {
             return false;
         }
+        if (relationship == null) {
+            if (other.relationship != null) {
+                return false;
+            }
+        } else if (!relationship.equals(other.relationship)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "Field [name=" + name + ", type=" + type + ", nullable=" + nullable + ", length=" + length + "]";
+        return "Field [name=" + name + ", type=" + type + ", nullable=" + nullable + ", length=" + length + ", relation="+ relationship + "]";
     }
 
 }

@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 public class BusinessObject {
 
     @XmlID
-    @XmlAttribute(required = true)
+    @XmlAttribute
     private String qualifiedName;
 
     @XmlElement
