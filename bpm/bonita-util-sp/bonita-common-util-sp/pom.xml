@@ -41,6 +41,18 @@
 	</dependencies>
 
 	<build>
+	   <resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>${project.build.directory}/schemas</directory>
+				<excludes>
+				    <exclude>**/*.class</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -50,16 +62,35 @@
 						<goals>
 							<goal>schemagen</goal>
 						</goals>
-						<phase>process-classes</phase>
+						<phase>generate-resources</phase>
 						<configuration>
 							<includes>
-								<include>com/bonitasoft/engine/bdm/model/BusinessObjectModel.java</include>
+								<include>com/bonitasoft/engine/bdm/model/*.java</include>
 							</includes>
 							<outputDirectory>${project.build.directory}/schemas</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                       <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <move file="${project.build.directory}/schemas/schema1.xsd"
+                                    toFile="${project.build.directory}/schemas/bom.xsd" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> 
 		</plugins>
 	</build>
 </project>

@@ -25,8 +25,9 @@ public enum FieldType {
     BOOLEAN(Boolean.class),
     BYTE(Byte.class),
     SHORT(Short.class),
-    CHAR(Character.class);
-
+    CHAR(Character.class),
+    BUSINESSOBJECT(BusinessObject.class);
+    
     private Class<?> clazz;
 
     private FieldType(final Class<?> clazz) {
