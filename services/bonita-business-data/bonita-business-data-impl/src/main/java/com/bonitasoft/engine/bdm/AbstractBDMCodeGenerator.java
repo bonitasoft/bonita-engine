@@ -77,10 +77,25 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         final JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
         entityAnnotation.param("name", entityClass.name());
 
+        final List<Index> indexes = bo.getIndexes();
+        if (indexes != null && !indexes.isEmpty()) {
+            final JAnnotationUse hibTabAnnotation = addAnnotation(entityClass, org.hibernate.annotations.Table.class);
+            hibTabAnnotation.param("appliesTo", entityClass.name().toUpperCase());
+            final JAnnotationArrayMember indexesArray = hibTabAnnotation.paramArray("indexes");
+            for (final Index index : indexes) {
+                final JAnnotationUse indexAnnotation = indexesArray.annotate(org.hibernate.annotations.Index.class);
+                indexAnnotation.param("name", index.getName().toUpperCase());
+                final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
+                for (final String fieldName : index.getFieldNames()) {
+                    columnParamArray.param(fieldName.toUpperCase());
+                }
+            }
+        }
+
         final JAnnotationUse tableAnnotation = addAnnotation(entityClass, Table.class);
         tableAnnotation.param("name", entityClass.name().toUpperCase());
-        final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
 
+        final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
         if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {

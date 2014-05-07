@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema version="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:element name="businessObjectModel" type="businessObjectModel"/>
 
@@ -39,17 +39,24 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="indexes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="index" type="index" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
     <xs:attribute name="qualifiedName" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="field">
     <xs:sequence/>
-    <xs:attribute name="collection" type="xs:boolean"/>
-    <xs:attribute name="length" type="xs:int"/>
-    <xs:attribute name="nullable" type="xs:boolean"/>
-    <xs:attribute name="type" type="fieldType" use="required"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="fieldType" use="required"/>
+    <xs:attribute name="nullable" type="xs:boolean"/>
+    <xs:attribute name="length" type="xs:int"/>
+    <xs:attribute name="collection" type="xs:boolean"/>
   </xs:complexType>
 
   <xs:complexType name="uniqueConstraint">
@@ -75,30 +82,43 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
-    <xs:attribute name="returnType" type="xs:string" use="required"/>
-    <xs:attribute name="content" type="xs:string" use="required"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="content" type="xs:string" use="required"/>
+    <xs:attribute name="returnType" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="queryParameter">
     <xs:sequence/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
     <xs:attribute name="className" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="index">
+    <xs:sequence>
+      <xs:element name="fieldNames">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="fieldName" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:simpleType name="fieldType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="STRING"/>
-      <xs:enumeration value="TEXT"/>
-      <xs:enumeration value="INTEGER"/>
-      <xs:enumeration value="DOUBLE"/>
-      <xs:enumeration value="LONG"/>
       <xs:enumeration value="FLOAT"/>
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="SHORT"/>
       <xs:enumeration value="DATE"/>
+      <xs:enumeration value="TEXT"/>
+      <xs:enumeration value="CHAR"/>
+      <xs:enumeration value="LONG"/>
       <xs:enumeration value="BOOLEAN"/>
       <xs:enumeration value="BYTE"/>
-      <xs:enumeration value="SHORT"/>
-      <xs:enumeration value="CHAR"/>
+      <xs:enumeration value="DOUBLE"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

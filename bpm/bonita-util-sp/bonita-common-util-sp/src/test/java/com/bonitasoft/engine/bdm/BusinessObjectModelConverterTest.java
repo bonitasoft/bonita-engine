@@ -31,7 +31,7 @@ public class BusinessObjectModelConverterTest {
 
         assertThat(actual).isEqualTo(bom);
     }
-    
+
     @Test
     public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithQuery() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
@@ -68,6 +68,16 @@ public class BusinessObjectModelConverterTest {
         final byte[] zip = IOUtils.zip("bonita", "bpm".getBytes());
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         convertor.unzip(zip);
+    }
+
+    @Test
+    public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithIndex() throws Exception {
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = new BOMBuilder().buildBOMWithIndex();
+        final byte[] zip = convertor.zip(bom);
+        final BusinessObjectModel actual = convertor.unzip(zip);
+
+        assertThat(actual).isEqualTo(bom);
     }
 
 }

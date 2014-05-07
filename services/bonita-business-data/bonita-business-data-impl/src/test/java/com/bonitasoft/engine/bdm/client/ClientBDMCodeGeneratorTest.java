@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -430,6 +431,28 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         assertThat(namedQueriesAnnotation).isNotNull();
         final Map<String, JAnnotationValue> annotationMembers = namedQueriesAnnotation.getAnnotationMembers();
         assertThat(annotationMembers).hasSize(1);
+    }
+
+    @Test
+    public void addIndexAnnotation() throws Exception {
+        final BusinessObjectModel model = new BusinessObjectModel();
+        final Field field = new Field();
+        field.setName("firstName");
+        field.setType(FieldType.STRING);
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName("Employee");
+        employeeBO.addField(field);
+        employeeBO.addIndex("IDX_1", "firstName, lastName");
+        model.addBusinessObject(employeeBO);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator.generate(destDir);
+
+        final File employeeFile = new File(destDir, "Employee.java");
+        final URL resource = ClientBDMCodeGeneratorTest.class.getResource("Employee.test");
+        final File expected = new File(resource.toURI());
+
+        assertThat(employeeFile).hasContentEqualTo(expected);
     }
 
 }
