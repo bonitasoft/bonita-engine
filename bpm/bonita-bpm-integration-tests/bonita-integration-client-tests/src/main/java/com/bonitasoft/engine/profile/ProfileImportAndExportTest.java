@@ -14,16 +14,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.assertj.core.util.xml.XmlStringPrettyFormatter;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.Profile;
@@ -37,6 +34,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -47,70 +45,51 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
-    public void exportAllProfiles() throws BonitaException, IOException {
-        final Map<Long, Long> numberOfProfileMembers = getProfileAPI().getNumberOfProfileMembers(Arrays.asList(adminProfileId, userProfileId));
-        assertNotNull(numberOfProfileMembers);
-        assertEquals(2, numberOfProfileMembers.size());
-        assertEquals(Long.valueOf(5), numberOfProfileMembers.get(adminProfileId));
-        assertEquals(Long.valueOf(1), numberOfProfileMembers.get(userProfileId));
+    public void exportAllProfiles() throws Exception {
+        // given
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("AllProfiles.xml"))));
 
-        final byte[] profilebytes = getProfileAPI().exportAllProfiles();
+        // when
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(getProfileAPI().exportAllProfiles()));
 
-        final String xmlStr = new String(profilebytes);
-        final String[] isDefaults = xmlStr.split("profile isDefault=\"");
-        assertEquals(5, isDefaults.length);
-        assertEquals("true", isDefaults[1].substring(0, isDefaults[1].indexOf('\"')));
-        assertEquals("false", isDefaults[2].substring(0, isDefaults[2].indexOf('\"')));
-        assertEquals("true", isDefaults[3].substring(0, isDefaults[3].indexOf('\"')));
-        assertEquals("false", isDefaults[4].substring(0, isDefaults[4].indexOf('\"')));
-
-        final String[] strs = xmlStr.split("profile isDefault=.*name=\"");
-        assertEquals(5, strs.length);
-        assertEquals("Administrator", strs[1].substring(0, strs[1].indexOf('\"')));
-        assertEquals("Process owner", strs[2].substring(0, strs[2].indexOf('\"')));
-        // assertEquals("Process owner", strs[3].substring(0, strs[3].indexOf("\"")));
-        // assertEquals("User", strs[4].substring(0, strs[4].indexOf("\"")));
-
-        final File f = new File("AllProfiles.xml");
-        if (!f.exists()) {
-            f.createNewFile();
+        // then
+        final Diff diff = new Diff(xmlPrettyFormatExported, xmlPrettyFormatExpected);
+        if (!diff.similar())
+        {
+            // nb: similar is regardless of order
+            assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExported);
         }
-        final FileOutputStream fileOutputStream = new FileOutputStream(f);
-        fileOutputStream.write(profilebytes);
-        fileOutputStream.flush();
-        fileOutputStream.close();
-        f.delete();
+
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export specified profiles.", jira = "")
     @Test
-    public void exportProfilesSpecified() throws BonitaException, IOException {
-        final List<Long> profileIds = new ArrayList<Long>();
-        profileIds.add(adminProfileId);
-        profileIds.add(userProfileId);
-        final Map<Long, Long> numberOfProfileMembers = getProfileAPI().getNumberOfProfileMembers(profileIds);
-        assertNotNull(numberOfProfileMembers);
-        assertEquals(2, numberOfProfileMembers.size());
-        assertEquals(Long.valueOf(5), numberOfProfileMembers.get(adminProfileId));
-        assertEquals(Long.valueOf(1), numberOfProfileMembers.get(userProfileId));
+    public void exportProfilesSpecified() throws Exception {
+        // given
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("AdministratorProfile.xml"))));
 
-        final long[] profIds = { profileIds.get(1).longValue() };
-        final byte[] profilebytes = getProfileAPI().exportProfilesWithIdsSpecified(profIds);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
+        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
+        assertEquals(1, profiles.size());
+        final Profile profile1 = profiles.get(0);
+        final long[] profilesIds = new long[1];
+        profilesIds[0] = profile1.getId();
 
-        final String xmlStr = new String(profilebytes);
-        final String[] strs = xmlStr.split("profile isDefault=.*name=\"");
-        assertEquals(2, strs.length);
-        assertEquals("User", strs[1].substring(0, strs[1].indexOf('\"')));
+        // when
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter
+                .xmlPrettyFormat(new String(getProfileAPI().exportProfilesWithIdsSpecified(profilesIds)));
 
-        final File f = new File("Profiles.xml");
-        if (!f.exists()) {
-            f.createNewFile();
+        // then
+        final Diff diff = new Diff(xmlPrettyFormatExported, xmlPrettyFormatExpected);
+        if (!diff.similar())
+        {
+            // nb: similar is regardless of order
+            assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExported);
         }
-        final FileOutputStream fileOutputStream = new FileOutputStream(f);
-        fileOutputStream.write(profilebytes);
-        fileOutputStream.flush();
-        fileOutputStream.close();
-        f.delete();
+
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
@@ -248,7 +227,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         // check user profile entries
         final SearchOptionsBuilder builderNewId1 = new SearchOptionsBuilder(0, 25);
         builderNewId1.sort(ProfileEntrySearchDescriptor.NAME, Order.ASC);
-        long userProfileId = getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).filter(ProfileEntrySearchDescriptor.NAME, "User").done())
+        final long userProfileId = getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).filter(ProfileEntrySearchDescriptor.NAME, "User").done())
                 .getResult().get(0).getId();
         builderNewId1.filter(ProfileEntrySearchDescriptor.PROFILE_ID,
                 userProfileId);
