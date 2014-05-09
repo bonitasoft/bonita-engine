@@ -1,9 +1,23 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+/**
+ * @author Colin PUY
+ */
 @XmlType(name = "associationField")
 public class AssociationField extends Field {
 
@@ -36,31 +50,21 @@ public class AssociationField extends Field {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((reference == null) ? 0 : reference.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
+        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(reference).append(type).toHashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
+    public boolean equals(final Object obj) {
+        if (obj instanceof AssociationField) {
+            final AssociationField other = (AssociationField) obj;
+            return new EqualsBuilder()
+                    .appendSuper(super.equals(obj))
+                    .append(reference, other.reference)
+                    .append(type, other.type)
+                    .isEquals();
+        } else {
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        AssociationField other = (AssociationField) obj;
-        if (reference == null) {
-            if (other.reference != null)
-                return false;
-        } else if (!reference.equals(other.reference))
-            return false;
-        if (type != other.type)
-            return false;
-        return true;
+        }
     }
-    
-    
+
 }

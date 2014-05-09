@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -5,6 +13,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+/**
+ * @author Colin PUY
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType
 public abstract class Field {
@@ -12,7 +26,7 @@ public abstract class Field {
     public static final String PERSISTENCE_ID = "persistenceId";
 
     public static final String PERSISTENCE_VERSION = "persistenceVersion";
-    
+
     @XmlAttribute(required = true)
     private String name;
 
@@ -48,40 +62,20 @@ public abstract class Field {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((collection == null) ? 0 : collection.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((nullable == null) ? 0 : nullable.hashCode());
-        return result;
+        return new HashCodeBuilder(17, 37).append(collection).append(name).append(nullable).toHashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
+    public boolean equals(final Object obj) {
+        if (obj instanceof Field) {
+            final Field other = (Field) obj;
+            return new EqualsBuilder()
+                    .append(collection, other.collection)
+                    .append(name, other.name)
+                    .append(nullable, other.nullable)
+                    .isEquals();
+        } else {
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Field other = (Field) obj;
-        if (collection == null) {
-            if (other.collection != null)
-                return false;
-        } else if (!collection.equals(other.collection))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (nullable == null) {
-            if (other.nullable != null)
-                return false;
-        } else if (!nullable.equals(other.nullable))
-            return false;
-        return true;
+        }
     }
-    
-    
 }

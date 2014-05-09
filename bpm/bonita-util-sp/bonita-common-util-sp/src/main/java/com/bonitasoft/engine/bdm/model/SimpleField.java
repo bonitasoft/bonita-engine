@@ -11,6 +11,9 @@ package com.bonitasoft.engine.bdm.model;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -41,41 +44,21 @@ public class SimpleField extends Field {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (length == null ? 0 : length.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(length).append(type).toHashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+        if (obj instanceof SimpleField) {
+            final SimpleField other = (SimpleField) obj;
+            return new EqualsBuilder()
+                    .appendSuper(super.equals(obj))
+                    .append(length, other.length)
+                    .append(type, other.type)
+                    .isEquals();
+        } else {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SimpleField other = (SimpleField) obj;
-        if (length == null) {
-            if (other.length != null) {
-                return false;
-            }
-        } else if (!length.equals(other.length)) {
-            return false;
-        }
-        if (type != other.type) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "Field [type=" + type + ", length=" + length + "]";
     }
 
 }
