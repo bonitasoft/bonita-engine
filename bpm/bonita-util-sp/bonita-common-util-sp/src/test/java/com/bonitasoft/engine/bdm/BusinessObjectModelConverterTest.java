@@ -79,31 +79,10 @@ public class BusinessObjectModelConverterTest {
     }
 
     @Test
-    public void aBom_could_have_fields_with_relationships() throws Exception {
-        BusinessObject compositeBO = aBO("compositeBO").withField(aBooleanField("boolean").build()).build();
-        RelationField field = new RelationField();
-        field.setName("composed");
-        field.setType(Type.AGGREGATION);
-        field.setReference(compositeBO);
-        BusinessObject composedBO = aBO("composedBO").withField(field).withField(aBooleanField("simple").build()).build();
-        BusinessObjectModel model = aBOM().withBO(compositeBO).withBO(composedBO).build();
-
-        BusinessObjectModel transformedModel = marshallUnmarshall(model);
-
-        assertThat(transformedModel).isEqualTo(model);
-    }
-
-    @Test
     public void should_be_backward_compatible() throws Exception {
         byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
         BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         convertor.unmarshall(xml);
         // expect no unmarshalling exception
-    }
-    
-    private BusinessObjectModel marshallUnmarshall(BusinessObjectModel model) throws JAXBException, IOException, SAXException {
-        BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
-        byte[] marshall = convertor.marshall(model);
-        return convertor.unmarshall(marshall);
     }
 }
