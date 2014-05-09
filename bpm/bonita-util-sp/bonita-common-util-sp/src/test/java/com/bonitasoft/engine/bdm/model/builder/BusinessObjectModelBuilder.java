@@ -1,15 +1,17 @@
 package com.bonitasoft.engine.bdm.model.builder;
 
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aSimpleField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aDateField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aDoubleField;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aTextField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anIntegerField;
 
 import java.util.List;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.field.Field;
-import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 public class BusinessObjectModelBuilder {
@@ -29,29 +31,15 @@ public class BusinessObjectModelBuilder {
         return businessObjectModel;
     }
 
-    private SimpleField buildField(final String name, final FieldType type) {
-        final SimpleField field = new SimpleField();
-        field.setName(name);
-        field.setType(type);
-        return field;
-    }
-
     private BusinessObject buildMyBusinessObject() {
-        final SimpleField dateField = buildField("dateField", FieldType.DATE);
-        dateField.setNullable(Boolean.FALSE);
-        final SimpleField doubleField = buildField("doubleField", FieldType.DOUBLE);
-        final SimpleField integerField = buildField("integerField", FieldType.INTEGER);
-        final SimpleField textField = buildField("textField", FieldType.TEXT);
-
-        final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName("BusinessObject");
-        employee.addField(aStringField("stringField").nullable().build());
-        employee.addField(aBooleanField("booleanField"));
-        employee.addField(dateField);
-        employee.addField(doubleField);
-        employee.addField(integerField);
-        employee.addField(textField);
-        return employee;
+        return aBO("BusinessObject")
+                .withField(aStringField("stringField").nullable().build())
+                .withField(aBooleanField("booleanField"))
+                .withField(aDateField("dateField").notNullable().build())
+                .withField(aDoubleField("doubleField").build())
+                .withField(anIntegerField("integerField").build())
+                .withField(aTextField("textField").build())
+                .build();
     }
 
     public BusinessObjectModel buildDefaultBOM() {

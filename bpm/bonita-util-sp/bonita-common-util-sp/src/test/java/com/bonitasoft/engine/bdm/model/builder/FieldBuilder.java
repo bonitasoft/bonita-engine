@@ -1,7 +1,11 @@
 package com.bonitasoft.engine.bdm.model.builder;
 
 import static com.bonitasoft.engine.bdm.model.field.FieldType.BOOLEAN;
+import static com.bonitasoft.engine.bdm.model.field.FieldType.DATE;
+import static com.bonitasoft.engine.bdm.model.field.FieldType.DOUBLE;
+import static com.bonitasoft.engine.bdm.model.field.FieldType.INTEGER;
 import static com.bonitasoft.engine.bdm.model.field.FieldType.STRING;
+import static com.bonitasoft.engine.bdm.model.field.FieldType.TEXT;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.field.Field;
@@ -10,7 +14,13 @@ import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
-public class FieldBuilder {
+public abstract class FieldBuilder {
+
+    protected final Field field;
+
+    private FieldBuilder(Field field) {
+        this.field = field;
+    }
 
     public static Field aBooleanField(String name) {
         return aSimpleField().withName(name).ofType(BOOLEAN).build();
@@ -19,7 +29,27 @@ public class FieldBuilder {
     public static SimpleFieldBuilder aStringField(String name) {
         return aSimpleField().withName(name).ofType(STRING);
     }
-    
+
+    public static SimpleFieldBuilder aDateField(String name) {
+        return aSimpleField().withName(name).ofType(DATE);
+    }
+
+    public static SimpleFieldBuilder aDoubleField(String name) {
+        return aSimpleField().withName(name).ofType(DOUBLE);
+    }
+
+    public static SimpleFieldBuilder anIntegerField(String name) {
+        return aSimpleField().withName(name).ofType(INTEGER);
+    }
+
+    public static SimpleFieldBuilder aTextField(String name) {
+        return aSimpleField().withName(name).ofType(TEXT);
+    }
+
+    public static SimpleFieldBuilder aSimpleField() {
+        return new SimpleFieldBuilder();
+    }
+
     public static Field anAggregationField(String name, BusinessObject reference) {
         RelationField relationField = new RelationField();
         relationField.setName(name);
@@ -27,31 +57,50 @@ public class FieldBuilder {
         relationField.setReference(reference);
         return relationField;
     }
+
+    public FieldBuilder withName(String name) {
+        field.setName(name);
+        return this;
+    }
     
-    public static SimpleFieldBuilder aSimpleField() {
-        return new SimpleFieldBuilder();
+    public FieldBuilder nullable() {
+        field.setNullable(true);
+        return this;
+    }
+    
+    public FieldBuilder notNullable() {
+        field.setNullable(false);
+        return this;
+    }
+    
+    public Field build() {
+        return field;
     }
 
+    /**
+     * SimpleFieldBuilder 
+     */
     public static class SimpleFieldBuilder extends FieldBuilder {
-        private SimpleField field = new SimpleField();
 
-        public SimpleFieldBuilder withName(String name) {
-            field.setName(name);
+        public SimpleFieldBuilder() {
+            super(new SimpleField());
+        }
+
+        public SimpleFieldBuilder ofType(FieldType type) {
+            ((SimpleField) field).setType(type);
             return this;
         }
-        
-        public SimpleFieldBuilder ofType(FieldType type) {
-            field.setType(type);
-            return this;
+
+        public SimpleFieldBuilder withName(String name) {
+            return (SimpleFieldBuilder) super.withName(name);
         }
         
         public SimpleFieldBuilder nullable() {
-            field.setNullable(true);
-            return this;
+            return (SimpleFieldBuilder) super.nullable();
         }
 
-        public SimpleField build() {
-            return field;
+        public SimpleFieldBuilder notNullable() {
+            return (SimpleFieldBuilder) super.notNullable();
         }
     }
 }
