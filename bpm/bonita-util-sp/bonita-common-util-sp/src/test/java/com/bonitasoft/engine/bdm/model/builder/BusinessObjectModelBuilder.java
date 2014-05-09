@@ -48,10 +48,6 @@ public class BusinessObjectModelBuilder {
         return bom;
     }
 
-    public BusinessObjectModel buildEmptyBOM() {
-        return new BusinessObjectModel();
-    }
-
     public BusinessObjectModel buildBOMWithAnEmptyEntity() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(new BusinessObject());

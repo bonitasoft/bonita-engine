@@ -45,13 +45,6 @@ public class BusinessObjectModelConverterTest {
     }
 
     @Test(expected = JAXBException.class)
-    public void zipAnEmptyBOMShouldThrowAnException() throws Exception {
-        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
-        final BusinessObjectModel bom = new BusinessObjectModelBuilder().buildEmptyBOM();
-        convertor.zip(bom);
-    }
-
-    @Test(expected = JAXBException.class)
     public void zipAnBOMWithAnEmptyShouldThrowAnException() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = new BusinessObjectModelBuilder().buildBOMWithAnEmptyEntity();

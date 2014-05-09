@@ -18,7 +18,6 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 import org.xml.sax.SAXException;
 
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder;
@@ -54,19 +53,22 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
             marshallUnmarshall(actual);
             failWithMessage("Expected <%s> not to be marshallizable", actual);
         } catch (Exception e) {
+            // OK
         }
         return this;
     }
 
     private BusinessObjectModel marshallUnmarshall(BusinessObject bo) throws JAXBException, IOException, SAXException {
-        BusinessObjectModelBuilder model = aBOM().withBO(bo);
+        BusinessObjectModelBuilder bom = aBOM().withBO(bo);
+        addReferencedBoToBom(bo, bom);
+        return Marshaller.marshallUnmarshall(bom.build());
+    }
+
+    private void addReferencedBoToBom(BusinessObject bo, BusinessObjectModelBuilder bom) {
         for (Field field : bo.getFields()) {
             if (field instanceof RelationField) {
-                model.withBO(((RelationField) field).getReference());
+                bom.withBO(((RelationField) field).getReference());
             }
         }
-        BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
-        byte[] marshall = convertor.marshall(model.build());
-        return convertor.unmarshall(marshall);
     }
 }
