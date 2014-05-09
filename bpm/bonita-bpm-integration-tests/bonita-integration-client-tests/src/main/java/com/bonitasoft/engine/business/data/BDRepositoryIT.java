@@ -53,9 +53,9 @@ import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
-import com.bonitasoft.engine.bdm.model.FieldType;
 import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
@@ -74,17 +74,17 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
-        final Field firstName = new Field();
+        final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
         firstName.setLength(Integer.valueOf(10));
 
-        final Field lastName = new Field();
+        final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         lastName.setNullable(Boolean.FALSE);
 
-        final Field phoneNumbers = new Field();
+        final SimpleField phoneNumbers = new SimpleField();
         phoneNumbers.setName("phoneNumbers");
         phoneNumbers.setType(FieldType.STRING);
         phoneNumbers.setLength(Integer.valueOf(10));
@@ -190,7 +190,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private byte[] buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("aField");
         field.setType(FieldType.STRING);
         bo.addField(field);
