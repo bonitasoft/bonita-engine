@@ -12,30 +12,33 @@ import static com.bonitasoft.engine.bdm.model.assertion.FieldAssert.assertThat;
 
 import org.junit.Test;
 
+/**
+ * @author Colin PUY
+ */
 public class SimpleFieldTest {
 
     @Test
     public void should_not_be_marshallizable_without_name_and_type() throws Exception {
         SimpleField field = new SimpleField();
         field.setName("aName");
-        
+
         assertThat(field).cannotBeMarshalled();
-        
+
         field = new SimpleField();
         field.setType(FieldType.BOOLEAN);
-        
+
         assertThat(field).cannotBeMarshalled();
     }
-    
+
     @Test
     public void should_be_marshallizable_with_name_and_type() throws Exception {
         SimpleField field = new SimpleField();
         field.setName("aName");
         field.setType(FieldType.BOOLEAN);
-        
+
         assertThat(field).canBeMarshalled();
     }
-    
+
     @Test
     public void should_have_other_optionnal_attributes() throws Exception {
         SimpleField field = new SimpleField();
@@ -44,7 +47,7 @@ public class SimpleFieldTest {
         field.setCollection(true);
         field.setLength(123);
         field.setNullable(true);
-        
+
         assertThat(field).canBeMarshalled();
     }
 }
