@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.xml.XMLNode;
@@ -23,33 +24,49 @@ import org.bonitasoft.engine.xml.XMLWriter;
  */
 public class ExportAllProfiles extends AbstractExportProfiles {
 
+    private final int index = 0;
+
     public ExportAllProfiles(final ProfileService profileService, final IdentityService identityService, final XMLWriter writer) {
         super(profileService, identityService, writer);
     }
 
     @Override
     protected XMLNode getProfilesXmlNode() throws SBonitaException {
+        final XMLNode profilesNode = getXmlProfilesNode();
+
+        final List<SProfile> sProfiles = getProfiles();
+        while (sProfiles.size() > 0) {
+            for (final SProfile sProfile : sProfiles) {
+                profilesNode.addChild(getProfileXmlNode(sProfile));
+            }
+            // index++;
+            // sProfiles = searchProfiles(index);
+        }
+
+        return profilesNode;
+    }
+
+    private void addNameSpaceToNode(final XMLNode profilesNode) {
+        final StringBuilder stringBuilderPrefix = new StringBuilder();
+        stringBuilderPrefix.append("xmlns:");
+        stringBuilderPrefix.append(PROFILES_NAMESPACE_PREFIX);
+        profilesNode.addAttribute(stringBuilderPrefix.toString(), PROFILES_NAMESPACE);
+    }
+
+    private XMLNode getXmlProfilesNode() {
         final StringBuilder stringBuilderNodeName = new StringBuilder();
         stringBuilderNodeName.append(PROFILES_NAMESPACE_PREFIX);
         stringBuilderNodeName.append(":");
         stringBuilderNodeName.append(PROFILES_TAG_NAME);
         final XMLNode profilesNode = new XMLNode(stringBuilderNodeName.toString());
-        final StringBuilder stringBuilderPrefix = new StringBuilder();
-        stringBuilderPrefix.append("xmlns:");
-        stringBuilderPrefix.append(PROFILES_NAMESPACE_PREFIX);
-        profilesNode.addAttribute(stringBuilderPrefix.toString(), PROFILES_NAMESPACE);
-
-        int index = 0;
-        List<SProfile> sProfiles = searchProfiles(index);
-        while (sProfiles.size() > 0) {
-            for (final SProfile sProfile : sProfiles) {
-                profilesNode.addChild(getProfileXmlNode(sProfile));
-            }
-            index++;
-            sProfiles = searchProfiles(index);
-        }
+        addNameSpaceToNode(profilesNode);
 
         return profilesNode;
+    }
+
+    private List<SProfile> getProfiles() throws SBonitaSearchException {
+        final List<SProfile> sProfiles = searchProfiles(0);
+        return sProfiles;
     }
 
 }

@@ -29,7 +29,7 @@ import com.bonitasoft.engine.page.PageService;
  * @author Baptiste Mesta
  * 
  */
-public class ProfilesImporterEx extends ProfilesImporter {
+public class ProfilesImporterExt extends ProfilesImporter {
 
     private final PageService pageService;
 
@@ -39,22 +39,21 @@ public class ProfilesImporterEx extends ProfilesImporter {
      * @param exportedProfiles
      * @param policy
      */
-    public ProfilesImporterEx(final ProfileService profileService, final IdentityService identityService, final PageService pageService,
+    public ProfilesImporterExt(final ProfileService profileService, final IdentityService identityService, final PageService pageService,
             final List<ExportedProfile> exportedProfiles, final ImportPolicy policy) {
         super(profileService, identityService, exportedProfiles, policy);
         this.pageService = pageService;
     }
 
-    @Override
     protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
-        String page = childProfileEntry.getPage();
+        final String page = childProfileEntry.getPage();
         if (page != null && !page.isEmpty()) { // there is a page
             if (childProfileEntry.isCustom()) { // it's a custom page
                 try {
                     if (pageService.getPageByName(childProfileEntry.getPage()) == null) {
                         return new ImportError(childProfileEntry.getPage(), Type.PAGE);
                     }
-                } catch (SBonitaReadException e) {
+                } catch (final SBonitaReadException e) {
                     return new ImportError(childProfileEntry.getPage(), Type.PAGE);
                 }
             }
@@ -62,18 +61,17 @@ public class ProfilesImporterEx extends ProfilesImporter {
         return null;
     }
 
-    @Override
     protected List<ImportError> checkParentProfileEntryForError(final ExportedParentProfileEntry parentProfileEntry) {
-        List<ExportedProfileEntry> childProfileEntries = parentProfileEntry.getChildProfileEntries();
+        final List<ExportedProfileEntry> childProfileEntries = parentProfileEntry.getChildProfileEntries();
         if (childProfileEntries == null || childProfileEntries.isEmpty()) {// no children
-            ImportError error = checkChildProfileEntryForError(parentProfileEntry);
+            final ImportError error = checkChildProfileEntryForError(parentProfileEntry);
             if (error != null) {
                 return Arrays.asList(error);
             }
         } else {
-            ArrayList<ImportError> errors = new ArrayList<ImportError>();
-            for (ExportedProfileEntry childProfileEntry : childProfileEntries) {
-                ImportError checkChildProfileEntryForError = checkChildProfileEntryForError(childProfileEntry);
+            final ArrayList<ImportError> errors = new ArrayList<ImportError>();
+            for (final ExportedProfileEntry childProfileEntry : childProfileEntries) {
+                final ImportError checkChildProfileEntryForError = checkChildProfileEntryForError(childProfileEntry);
                 if (checkChildProfileEntryForError != null) {
                     errors.add(checkChildProfileEntryForError);
                 }

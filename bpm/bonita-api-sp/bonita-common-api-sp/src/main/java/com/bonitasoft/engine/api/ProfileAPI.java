@@ -54,9 +54,29 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             If can't create the new profile
      * @throws AlreadyExistsException
      *             If the profile already exists
+     * @deprecated use {@link #createProfile(String name, String description)}
      * @since 6.0
      */
+    @Deprecated
     Profile createProfile(String name, String description, String iconPath) throws AlreadyExistsException, CreationException;
+
+    /**
+     * Create a new custom profile
+     * 
+     * @param name
+     *            the profile name
+     * @param description
+     *            the profile description
+     * @param iconPath
+     *            the profile icon path
+     * @return The new created custom profile
+     * @throws CreationException
+     *             If can't create the new profile
+     * @throws AlreadyExistsException
+     *             If the profile already exists
+     * @since 6.3.1
+     */
+    Profile createProfile(String name, String description) throws AlreadyExistsException, CreationException;
 
     /**
      * Create a new custom profile

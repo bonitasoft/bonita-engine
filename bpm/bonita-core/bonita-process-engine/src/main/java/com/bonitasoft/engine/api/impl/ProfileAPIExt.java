@@ -105,10 +105,17 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
+    @Deprecated
     public Profile createProfile(final String name, final String description, final String iconPath) throws CreationException {
         final ProfileCreator creator = new ProfileCreator(name);
         creator.setDescription(description);
-        creator.setIconPath(iconPath);
+        return createProfile(creator);
+    }
+
+    @Override
+    public Profile createProfile(final String name, final String description) throws CreationException {
+        final ProfileCreator creator = new ProfileCreator(name);
+        creator.setDescription(description);
         return createProfile(creator);
     }
 

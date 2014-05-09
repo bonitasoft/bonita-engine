@@ -39,7 +39,7 @@ import org.junit.Test;
  * @author Julien Mege
  * @author Celine Souchet
  */
-public class ProfileEntryTest extends AbstractProfileTest {
+public class ProfileEntryITest extends AbstractProfileTest {
 
     private static final String ENTRY_DESCRIPTION = "entry description";
 

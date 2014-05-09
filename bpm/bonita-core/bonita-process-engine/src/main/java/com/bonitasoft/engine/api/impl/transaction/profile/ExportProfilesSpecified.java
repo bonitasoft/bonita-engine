@@ -13,6 +13,7 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.xml.XMLNode;
 import org.bonitasoft.engine.xml.XMLWriter;
@@ -43,11 +44,16 @@ public class ExportProfilesSpecified extends AbstractExportProfiles {
         stringBuilder.append(PROFILES_NAMESPACE_PREFIX);
         profilesNode.addAttribute(stringBuilder.toString(), PROFILES_NAMESPACE);
 
-        final List<SProfile> sProfiles = getProfileService().getProfiles(profileIds);
+        final List<SProfile> sProfiles = getProfiles();
         for (final SProfile sProfile : sProfiles) {
             profilesNode.addChild(getProfileXmlNode(sProfile));
         }
         return profilesNode;
+    }
+
+    private List<SProfile> getProfiles() throws SProfileNotFoundException {
+        final List<SProfile> sProfiles = getProfileService().getProfiles(profileIds);
+        return sProfiles;
     }
 
 }

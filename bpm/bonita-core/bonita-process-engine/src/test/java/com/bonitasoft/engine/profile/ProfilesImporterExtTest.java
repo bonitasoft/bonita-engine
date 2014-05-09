@@ -25,7 +25,7 @@ import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.SPage;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProfilesImporterExTest {
+public class ProfilesImporterExtTest {
 
     private final List<ExportedProfile> exportedProfiles = null;
 
@@ -40,11 +40,11 @@ public class ProfilesImporterExTest {
     @Mock
     private ProfileService profileService;
 
-    private ProfilesImporterEx profilesImporterEx;
+    private ProfilesImporterExt profilesImporterExt;
 
     @Before
     public void before() {
-        profilesImporterEx = new ProfilesImporterEx(profileService, identityService, pageService, exportedProfiles, policy);
+        profilesImporterExt = new ProfilesImporterExt(profileService, identityService, pageService, exportedProfiles, policy);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class ProfilesImporterExTest {
         ExportedProfileEntry childProfileEntry = createChild("defaultPage", false);
         when(pageService.getPageByName("customPage")).thenReturn(mock(SPage.class));
 
-        ImportError error = profilesImporterEx.checkChildProfileEntryForError(childProfileEntry);
+        ImportError error = profilesImporterExt.checkChildProfileEntryForError(childProfileEntry);
 
         assertThat(error).isNull();
     }
@@ -61,7 +61,7 @@ public class ProfilesImporterExTest {
     public void should_checkChildProfileEntryForError_return_null_if_default_page() throws Exception {
         ExportedProfileEntry childProfileEntry = createChild("defaultPage", false);
 
-        ImportError error = profilesImporterEx.checkChildProfileEntryForError(childProfileEntry);
+        ImportError error = profilesImporterExt.checkChildProfileEntryForError(childProfileEntry);
 
         assertThat(error).isNull();
     }
@@ -70,7 +70,7 @@ public class ProfilesImporterExTest {
     public void should_checkChildProfileEntryForError_return_error_if_custom_page_do_not_exists() throws Exception {
         ExportedProfileEntry childProfileEntry = createChild("customPage", true);
 
-        ImportError error = profilesImporterEx.checkChildProfileEntryForError(childProfileEntry);
+        ImportError error = profilesImporterExt.checkChildProfileEntryForError(childProfileEntry);
 
         assertThat(error).isEqualTo(new ImportError("customPage", Type.PAGE));
     }
@@ -80,7 +80,7 @@ public class ProfilesImporterExTest {
         ExportedParentProfileEntry parentProfileEntry = createParent("customPage", true);
         when(pageService.getPageByName("customPage")).thenReturn(mock(SPage.class));
 
-        List<ImportError> error = profilesImporterEx.checkParentProfileEntryForError(parentProfileEntry);
+        List<ImportError> error = profilesImporterExt.checkParentProfileEntryForError(parentProfileEntry);
 
         assertThat(error).isNull();
     }
@@ -89,7 +89,7 @@ public class ProfilesImporterExTest {
     public void should_checkParentProfileEntryForError_return_erro_if_custom_page_do_not_exists() throws Exception {
         ExportedParentProfileEntry parentProfileEntry = createParent("customPage", true);
 
-        List<ImportError> error = profilesImporterEx.checkParentProfileEntryForError(parentProfileEntry);
+        List<ImportError> error = profilesImporterExt.checkParentProfileEntryForError(parentProfileEntry);
 
         assertThat(error.get(0)).isEqualTo(new ImportError("customPage", Type.PAGE));
     }
@@ -114,7 +114,7 @@ public class ProfilesImporterExTest {
         parentProfileEntry.setChildProfileEntries(Arrays.asList(createChild("p1", true), createChild("p2", false)));
         when(pageService.getPageByName("p1")).thenReturn(mock(SPage.class));
 
-        List<ImportError> error = profilesImporterEx.checkParentProfileEntryForError(parentProfileEntry);
+        List<ImportError> error = profilesImporterExt.checkParentProfileEntryForError(parentProfileEntry);
 
         assertThat(error).isNull();
     }
@@ -125,7 +125,7 @@ public class ProfilesImporterExTest {
         parentProfileEntry.setChildProfileEntries(Arrays.asList(createChild("p1", true), createChild("p2", true)));
         when(pageService.getPageByName("p2")).thenReturn(mock(SPage.class));
 
-        List<ImportError> error = profilesImporterEx.checkParentProfileEntryForError(parentProfileEntry);
+        List<ImportError> error = profilesImporterExt.checkParentProfileEntryForError(parentProfileEntry);
 
         assertThat(error).isNull();
     }
@@ -135,7 +135,7 @@ public class ProfilesImporterExTest {
         ExportedParentProfileEntry parentProfileEntry = new ExportedParentProfileEntry("Mine");
         parentProfileEntry.setChildProfileEntries(Arrays.asList(createChild("p1", true), createChild("p2", true)));
 
-        List<ImportError> error = profilesImporterEx.checkParentProfileEntryForError(parentProfileEntry);
+        List<ImportError> error = profilesImporterExt.checkParentProfileEntryForError(parentProfileEntry);
 
         assertThat(error.size()).isEqualTo(2);
     }

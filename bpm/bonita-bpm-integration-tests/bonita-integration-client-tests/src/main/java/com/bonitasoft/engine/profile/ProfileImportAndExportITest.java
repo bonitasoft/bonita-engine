@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 
-public class ProfileImportAndExportTest extends AbstractProfileTest {
+public class ProfileImportAndExportITest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
@@ -95,7 +95,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
     @Test
     public void importAndExport() throws BonitaException, IOException, SAXException {
-        final InputStream xmlStream1 = ProfileImportAndExportTest.class.getResourceAsStream("AllProfiles.xml");
+        final InputStream xmlStream1 = ProfileImportAndExportITest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
         final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(xmlContent, ImportPolicy.DELETE_EXISTING);
         assertEquals(0, warningMsgs1.size());
@@ -121,7 +121,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         /**
          * FailAndIgnoreOnDuplicate
          */
-        final InputStream xmlStreamig = ProfileImportAndExportTest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
+        final InputStream xmlStreamig = ProfileImportAndExportITest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
         final List<String> warningMsgsig = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamig), ImportPolicy.IGNORE_DUPLICATES);
         assertThat(warningMsgsig.get(0)).containsIgnoringCase("Unable to find the role role60 on Plop");
 
@@ -206,7 +206,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         assertNotNull(searchedProfileEntriesrl);
         assertEquals(24, searchedProfileEntriesrl.size());
 
-        final InputStream xmlStreamrp = ProfileImportAndExportTest.class.getResourceAsStream("replaceOnDuplicateProfile.xml");
+        final InputStream xmlStreamrp = ProfileImportAndExportITest.class.getResourceAsStream("replaceOnDuplicateProfile.xml");
         final List<String> warningMsgsrl = getProfileAPI()
                 .importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamrp), ImportPolicy.REPLACE_DUPLICATES);
         assertEquals("Unable to find the group /groupPath1 on Process owner", warningMsgsrl.get(0));
@@ -288,7 +288,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profiles and delete existing.", jira = "")
     @Test
     public void importProfilesDeleteExisting() throws BonitaException, IOException {
-        final InputStream xmlStream1 = ProfileImportAndExportTest.class.getResourceAsStream("AllProfiles.xml");
+        final InputStream xmlStream1 = ProfileImportAndExportITest.class.getResourceAsStream("AllProfiles.xml");
         final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream1), ImportPolicy.DELETE_EXISTING);
         assertEquals(0, warningMsgs1.size());
 
@@ -323,7 +323,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
             assertNotNull(getProfileAPI().searchProfileEntries(builder.done()).getResult());
         }
 
-        final InputStream xmlStream = ProfileImportAndExportTest.class.getResourceAsStream("deleteExistingProfile.xml");
+        final InputStream xmlStream = ProfileImportAndExportITest.class.getResourceAsStream("deleteExistingProfile.xml");
         final List<String> warningMsgs = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
         assertEquals(0, warningMsgs.size());
 
