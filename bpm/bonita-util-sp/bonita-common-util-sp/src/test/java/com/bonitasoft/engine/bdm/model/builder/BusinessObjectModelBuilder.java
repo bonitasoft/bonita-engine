@@ -1,21 +1,26 @@
-package com.bonitasoft.engine.bdm;
+package com.bonitasoft.engine.bdm.model.builder;
+
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aSimpleField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
 
 import java.util.List;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
-public class BOMBuilder {
+public class BusinessObjectModelBuilder {
 
     private BusinessObjectModel businessObjectModel = new BusinessObjectModel();
 
-    public static BOMBuilder aBOM() {
-        return new BOMBuilder();
+    public static BusinessObjectModelBuilder aBOM() {
+        return new BusinessObjectModelBuilder();
     }
 
-    public BOMBuilder withBO(BusinessObject bo) {
+    public BusinessObjectModelBuilder withBO(BusinessObject bo) {
         businessObjectModel.addBusinessObject(bo);
         return this;
     }
@@ -32,9 +37,6 @@ public class BOMBuilder {
     }
 
     private BusinessObject buildMyBusinessObject() {
-        final SimpleField stringField = buildField("stringField", FieldType.STRING);
-        stringField.setNullable(Boolean.TRUE);
-        final SimpleField booleanField = buildField("booleanField", FieldType.BOOLEAN);
         final SimpleField dateField = buildField("dateField", FieldType.DATE);
         dateField.setNullable(Boolean.FALSE);
         final SimpleField doubleField = buildField("doubleField", FieldType.DOUBLE);
@@ -43,8 +45,8 @@ public class BOMBuilder {
 
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName("BusinessObject");
-        employee.addField(stringField);
-        employee.addField(booleanField);
+        employee.addField(aStringField("stringField").nullable().build());
+        employee.addField(aBooleanField("booleanField"));
         employee.addField(dateField);
         employee.addField(doubleField);
         employee.addField(integerField);

@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model.assertion;
 
-import static com.bonitasoft.engine.bdm.BOMBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
 
 import java.io.IOException;
 
@@ -18,10 +18,10 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 import org.xml.sax.SAXException;
 
-import com.bonitasoft.engine.bdm.BOMBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
 
@@ -59,7 +59,7 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
     }
 
     private BusinessObjectModel marshallUnmarshall(BusinessObject bo) throws JAXBException, IOException, SAXException {
-        BOMBuilder model = aBOM().withBO(bo);
+        BusinessObjectModelBuilder model = aBOM().withBO(bo);
         for (Field field : bo.getFields()) {
             if (field instanceof RelationField) {
                 model.withBO(((RelationField) field).getReference());
