@@ -22,7 +22,7 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
  */
 public class RelationFieldTest {
 
-    private BusinessObject aBo = aBO("boName").withField(aBooleanField("aField").build()).build();
+    private BusinessObject aBo = aBO("boName").withField(aBooleanField("aField")).build();
 
     @Test
     public void should_not_be_marshallizable_without_name_type_and_reference() throws Exception {

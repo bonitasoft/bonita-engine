@@ -42,7 +42,7 @@ public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
     public FieldAssert cannotBeMarshalled() {
         try {
             marshallUnmarshall(actual);
-            failWithMessage("Expected <%s> to not be marshallizable but was", actual);
+            failWithMessage("Expected <%s> to not be marshallizable", actual);
         } catch (Exception e) {
         }
         return this;

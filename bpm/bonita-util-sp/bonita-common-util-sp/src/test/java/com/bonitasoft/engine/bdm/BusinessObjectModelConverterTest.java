@@ -1,8 +1,5 @@
 package com.bonitasoft.engine.bdm;
 
-import static com.bonitasoft.engine.bdm.BOMBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -10,12 +7,8 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.io.IOUtils;
 
 public class BusinessObjectModelConverterTest {

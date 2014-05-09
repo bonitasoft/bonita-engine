@@ -33,7 +33,7 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 public class BusinessObject {
 
     @XmlID
-    @XmlAttribute
+    @XmlAttribute(required = true)
     private String qualifiedName;
 
     @XmlElement
