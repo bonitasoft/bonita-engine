@@ -26,9 +26,9 @@ import javax.persistence.FetchType;
 
 import org.apache.commons.lang3.text.WordUtils;
 
-import com.bonitasoft.engine.bdm.model.Field;
-import com.bonitasoft.engine.bdm.model.FieldType;
-import com.bonitasoft.engine.bdm.model.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;

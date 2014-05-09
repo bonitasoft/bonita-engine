@@ -21,6 +21,10 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 
+import com.bonitasoft.engine.bdm.model.field.AssociationField;
+import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
+
 /**
  * @author Matthieu Chaffotte
  */

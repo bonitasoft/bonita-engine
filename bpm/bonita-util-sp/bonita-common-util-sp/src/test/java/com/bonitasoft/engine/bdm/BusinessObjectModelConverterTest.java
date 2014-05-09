@@ -14,8 +14,8 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.AssociationField;
-import com.bonitasoft.engine.bdm.model.AssociationField.Type;
+import com.bonitasoft.engine.bdm.model.field.AssociationField;
+import com.bonitasoft.engine.bdm.model.field.AssociationField.Type;
 import com.bonitasoft.engine.io.IOUtils;
 
 public class BusinessObjectModelConverterTest {

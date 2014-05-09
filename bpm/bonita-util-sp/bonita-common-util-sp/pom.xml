@@ -65,7 +65,7 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<includes>
-								<include>com/bonitasoft/engine/bdm/model/*.java</include>
+								<include>com/bonitasoft/engine/bdm/model/**/*.java</include>
 							</includes>
 							<outputDirectory>${project.build.directory}/schemas</outputDirectory>
 						</configuration>

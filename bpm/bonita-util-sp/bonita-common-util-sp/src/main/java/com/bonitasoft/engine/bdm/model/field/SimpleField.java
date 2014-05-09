@@ -6,60 +6,54 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.bdm.model;
+package com.bonitasoft.engine.bdm.model.field;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * @author Colin PUY
+ * @author Matthieu Chaffotte
  */
-@XmlType(name = "associationField")
-public class AssociationField extends Field {
-
-    public enum Type {
-        AGGREGATION, COMPOSITION;
-    }
+@XmlType(name = "simpleField")
+public class SimpleField extends Field {
 
     @XmlAttribute(required = true)
-    private Type type;
+    private FieldType type;
 
-    @XmlIDREF
-    @XmlAttribute(required = true)
-    private BusinessObject reference;
+    @XmlAttribute
+    private Integer length;
 
-    public Type getType() {
+    public FieldType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(final FieldType type) {
         this.type = type;
     }
 
-    public BusinessObject getReference() {
-        return reference;
+    public Integer getLength() {
+        return length;
     }
 
-    public void setReference(BusinessObject reference) {
-        this.reference = reference;
+    public void setLength(final Integer length) {
+        this.length = length;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(reference).append(type).toHashCode();
+        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(length).append(type).toHashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof AssociationField) {
-            final AssociationField other = (AssociationField) obj;
+        if (obj instanceof SimpleField) {
+            final SimpleField other = (SimpleField) obj;
             return new EqualsBuilder()
                     .appendSuper(super.equals(obj))
-                    .append(reference, other.reference)
+                    .append(length, other.length)
                     .append(type, other.type)
                     .isEquals();
         } else {

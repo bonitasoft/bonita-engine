@@ -6,9 +6,11 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.bdm.model;
+package com.bonitasoft.engine.bdm.model.field;
 
 import java.util.Date;
+
+import com.bonitasoft.engine.bdm.model.BusinessObject;
 
 /**
  * @author Matthieu Chaffotte

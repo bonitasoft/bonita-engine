@@ -1,7 +1,7 @@
 package com.bonitasoft.engine.bdm.model.builder;
 
-import com.bonitasoft.engine.bdm.model.SimpleField;
-import com.bonitasoft.engine.bdm.model.FieldType;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 public class FieldBuilder {
 

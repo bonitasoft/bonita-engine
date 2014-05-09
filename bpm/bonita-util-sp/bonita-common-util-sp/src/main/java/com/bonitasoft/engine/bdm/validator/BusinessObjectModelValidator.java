@@ -16,10 +16,10 @@ import java.util.Set;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;

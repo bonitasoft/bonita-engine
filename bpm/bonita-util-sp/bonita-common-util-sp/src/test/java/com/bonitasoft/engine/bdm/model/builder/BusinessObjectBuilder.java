@@ -1,7 +1,7 @@
 package com.bonitasoft.engine.bdm.model.builder;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.field.Field;
 
 public class BusinessObjectBuilder {
 

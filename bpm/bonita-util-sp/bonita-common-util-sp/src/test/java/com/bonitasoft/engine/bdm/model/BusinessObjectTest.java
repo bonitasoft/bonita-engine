@@ -7,6 +7,8 @@ import java.util.List;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 public class BusinessObjectTest {
 

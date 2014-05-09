@@ -1,10 +1,10 @@
-package com.bonitasoft.engine.bdm.model;
+package com.bonitasoft.engine.bdm.model.field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.model.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 public class SimpleFieldTest {
 
