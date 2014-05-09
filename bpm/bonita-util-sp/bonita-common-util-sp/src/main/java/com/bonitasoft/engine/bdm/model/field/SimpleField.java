@@ -8,11 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model.field;
 
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author Matthieu Chaffotte
@@ -61,4 +64,10 @@ public class SimpleField extends Field {
         }
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
+                .append("name", getName()).append("nullalble", isNullable()).append("collection", isCollection())
+                .append("length", length).append("type", type).toString();
+    }
 }
