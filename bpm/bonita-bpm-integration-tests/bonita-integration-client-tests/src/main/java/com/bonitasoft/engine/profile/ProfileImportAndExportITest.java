@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.Profile;
@@ -122,8 +123,11 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
          * FailAndIgnoreOnDuplicate
          */
         final InputStream xmlStreamig = ProfileImportAndExportITest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
-        final List<String> warningMsgsig = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamig), ImportPolicy.IGNORE_DUPLICATES);
-        assertThat(warningMsgsig.get(0)).containsIgnoringCase("Unable to find the role role60 on Plop");
+        final List<ImportStatus> warningMsgsig = getProfileAPI().importProfiles(IOUtils.toByteArray(xmlStreamig), ImportPolicy.IGNORE_DUPLICATES);
+        final ImportStatus actual = warningMsgsig.get(0);
+        assertThat(actual.getName()).isEqualTo("Plop");
+        assertThat(actual.getErrors()).hasSize(1);
+        assertThat(actual.getErrors().get(0).getName()).isEqualTo("role60");
 
         // check profiles
         builder = new SearchOptionsBuilder(0, 10);
@@ -207,9 +211,15 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
         assertEquals(24, searchedProfileEntriesrl.size());
 
         final InputStream xmlStreamrp = ProfileImportAndExportITest.class.getResourceAsStream("replaceOnDuplicateProfile.xml");
-        final List<String> warningMsgsrl = getProfileAPI()
-                .importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamrp), ImportPolicy.REPLACE_DUPLICATES);
-        assertEquals("Unable to find the group /groupPath1 on Process owner", warningMsgsrl.get(0));
+        final List<ImportStatus> warningMsgsrl = getProfileAPI()
+                .importProfiles(IOUtils.toByteArray(xmlStreamrp), ImportPolicy.REPLACE_DUPLICATES);
+
+        final ImportStatus actual2 = warningMsgsrl.get(0);
+        assertThat(actual2.getName()).isEqualTo("Process owner");
+        assertThat(actual2.getErrors()).hasSize(2);
+        assertThat(actual2.getErrors().get(0).getName()).isEqualTo("/groupPath1");
+
+        // assertEquals("Unable to find the group /groupPath1 on Process owner", warningMsgsrl.get(0));
 
         // check profiles
         builder = new SearchOptionsBuilder(0, 10);
@@ -279,7 +289,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
          * ExportAndImport
          */
         final byte[] xmlBytes = getProfileAPI().exportAllProfiles();
-        getProfileAPI().importProfilesUsingSpecifiedPolicy(xmlBytes, ImportPolicy.DELETE_EXISTING);
+        getProfileAPI().importProfiles(xmlBytes, ImportPolicy.DELETE_EXISTING);
 
         final byte[] profilebytes = xmlBytes;
         assertEquals(new String(xmlBytes), new String(profilebytes));
