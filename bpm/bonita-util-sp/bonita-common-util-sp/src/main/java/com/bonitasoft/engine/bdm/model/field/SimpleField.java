@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 /**
  * @author Matthieu Chaffotte
  */
-@XmlType(name = "simpleField")
+@XmlType
 public class SimpleField extends Field {
 
     @XmlAttribute(required = true)

@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 
-import com.bonitasoft.engine.bdm.model.field.AssociationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
@@ -42,7 +42,7 @@ public class BusinessObject {
     @XmlElementWrapper(name = "fields", required = true)
     @XmlElements({
             @XmlElement(name = "field", type = SimpleField.class, required = true),
-            @XmlElement(name = "associationField", type = AssociationField.class, required = true)
+            @XmlElement(name = "relationField", type = RelationField.class, required = true)
     })
     private List<Field> fields;
 

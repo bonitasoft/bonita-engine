@@ -20,8 +20,8 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 /**
  * @author Colin PUY
  */
-@XmlType(name = "associationField")
-public class AssociationField extends Field {
+@XmlType
+public class RelationField extends Field {
 
     public enum Type {
         AGGREGATION, COMPOSITION;
@@ -57,8 +57,8 @@ public class AssociationField extends Field {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof AssociationField) {
-            final AssociationField other = (AssociationField) obj;
+        if (obj instanceof RelationField) {
+            final RelationField other = (RelationField) obj;
             return new EqualsBuilder()
                     .appendSuper(super.equals(obj))
                     .append(reference, other.reference)

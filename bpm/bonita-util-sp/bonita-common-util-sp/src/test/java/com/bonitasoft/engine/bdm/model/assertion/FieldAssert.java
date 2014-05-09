@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
 import com.bonitasoft.engine.bdm.BOMBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.field.AssociationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.Field;
 
 public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
@@ -50,8 +50,8 @@ public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
 
     private BusinessObjectModel marshallUnmarshall(Field field) throws JAXBException, IOException, SAXException {
         BOMBuilder model = aBOM().withBO(aBO("someUglyNameMightNotAppear").withField(field).build());
-        if (field instanceof AssociationField) {
-            AssociationField f = (AssociationField) field;
+        if (field instanceof RelationField) {
+            RelationField f = (RelationField) field;
             model.withBO(f.getReference());
         }
 

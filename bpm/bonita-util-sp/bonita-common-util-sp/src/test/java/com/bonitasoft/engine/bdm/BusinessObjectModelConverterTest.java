@@ -14,8 +14,8 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.field.AssociationField;
-import com.bonitasoft.engine.bdm.model.field.AssociationField.Type;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.io.IOUtils;
 
 public class BusinessObjectModelConverterTest {
@@ -81,7 +81,7 @@ public class BusinessObjectModelConverterTest {
     @Test
     public void aBom_could_have_fields_with_relationships() throws Exception {
         BusinessObject compositeBO = aBO("compositeBO").withField(aBooleanField("boolean").build()).build();
-        AssociationField field = new AssociationField();
+        RelationField field = new RelationField();
         field.setName("composed");
         field.setType(Type.AGGREGATION);
         field.setReference(compositeBO);

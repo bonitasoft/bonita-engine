@@ -15,32 +15,32 @@ import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.field.AssociationField.Type;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 
 /**
  * @author Colin PUY
  */
-public class AssociationFieldTest {
+public class RelationFieldTest {
 
     private BusinessObject aBo = aBO("boName").withField(aBooleanField("aField").build()).build();
 
     @Test
     public void should_not_be_marshallizable_without_name_type_and_reference() throws Exception {
-        AssociationField field = new AssociationField();
+        RelationField field = new RelationField();
         field.setName("aName");
         field.setType(Type.AGGREGATION);
 
         assertThat(field).cannotBeMarshalled();
 
         //
-        field = new AssociationField();
+        field = new RelationField();
         field.setType(Type.AGGREGATION);
         field.setReference(aBo);
 
         assertThat(field).cannotBeMarshalled();
 
         //
-        field = new AssociationField();
+        field = new RelationField();
         field.setReference(aBo);
         field.setName("aName");
 
@@ -49,7 +49,7 @@ public class AssociationFieldTest {
 
     @Test
     public void should_be_marshallizable_with_only_name_type_and_reference() throws Exception {
-        AssociationField field = new AssociationField();
+        RelationField field = new RelationField();
         field.setName("aName");
         field.setType(Type.AGGREGATION);
         field.setReference(aBo);
