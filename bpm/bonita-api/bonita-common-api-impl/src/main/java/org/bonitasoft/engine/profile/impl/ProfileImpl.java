@@ -64,10 +64,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
         return null;
     }
 
-    public void setIconPath(final String iconPath) {
-        // nothing to do
-    }
-
     @Override
     public Date getCreationDate() {
         return creationDate;

@@ -43,7 +43,13 @@ public class ImportError {
 
     @Override
     public String toString() {
-        return "ImportError [name=" + name + ", type=" + type + "]";
+        final StringBuilder builder = new StringBuilder();
+        builder.append("ImportError [name=");
+        builder.append(name);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override
@@ -57,6 +63,7 @@ public class ImportError {
 
     @Override
     public boolean equals(final Object obj) {
+
         if (this == obj) {
             return true;
         }
@@ -66,7 +73,7 @@ public class ImportError {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        ImportError other = (ImportError) obj;
+        final ImportError other = (ImportError) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -78,6 +85,7 @@ public class ImportError {
             return false;
         }
         return true;
+
     }
 
 }

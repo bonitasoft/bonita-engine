@@ -1652,7 +1652,6 @@ public class ModelConvertor {
         return sOperations;
     }
 
-
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
             final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors) {
         if (sConnectorImplementationDescriptors != null) {
@@ -1862,7 +1861,6 @@ public class ModelConvertor {
         profileImpl.setId(sProfile.getId());
         profileImpl.setDefault(sProfile.isDefault());
         profileImpl.setDescription(sProfile.getDescription());
-        profileImpl.setIconPath(sProfile.getIconPath());
         profileImpl.setCreationDate(new Date(sProfile.getCreationDate()));
         profileImpl.setCreatedBy(sProfile.getCreatedBy());
         profileImpl.setLastUpdateDate(new Date(sProfile.getLastUpdateDate()));
@@ -1964,7 +1962,6 @@ public class ModelConvertor {
         final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
         return themeImpl;
     }
-
 
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();

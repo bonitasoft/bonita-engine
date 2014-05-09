@@ -49,12 +49,6 @@ public class SProfileBuilderImpl implements SProfileBuilder {
     }
 
     @Override
-    public SProfileBuilder setIconPath(final String iconPath) {
-        profile.setIconPath(iconPath);
-        return this;
-    }
-
-    @Override
     public SProfileBuilder setCreationDate(final long creationDate) {
         profile.setCreationDate(creationDate);
         return this;
