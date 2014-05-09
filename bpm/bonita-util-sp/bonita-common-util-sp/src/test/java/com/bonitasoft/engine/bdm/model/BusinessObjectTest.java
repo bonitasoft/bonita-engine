@@ -18,9 +18,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+/**
+ * @author Colin PUY
+ */
 public class BusinessObjectTest {
-    
-    private BusinessObject aBo = aBO("boName").withField(aBooleanField("aField")).build();
     
     @Test
     public void should_have_a_qualifiedName_and_at_least_one_field() throws Exception {
@@ -48,9 +49,28 @@ public class BusinessObjectTest {
         BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName("aQualifiedName");
         businessObject.addField(aBooleanField("aSimpleField"));
-        businessObject.addField(anAggregationField("aggregationField", aBo));
+        businessObject.addField(anAggregationField("aggregationField", aBO("boName").withField(aBooleanField("aField")).build()));
         
         assertThat(businessObject).canBeMarshalled();
+    }
+    
+    @Test
+    public void could_have_optional_uniqueConstraints() throws Exception {
+        BusinessObject bo = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).build();
+        
+        bo.addUniqueConstraint("const", "field1");
+        bo.addUniqueConstraint("const2", "field2");
+        
+        assertThat(bo).canBeMarshalled();
+    }
+    
+    @Test
+    public void could_have_optional_queries() throws Exception {
+        BusinessObject bo = aBO("aBo").withField(aBooleanField("field")).build();
+        
+        bo.addQuery("query", "select something from something", "returnType");
+        
+        assertThat(bo).canBeMarshalled();
     }
     
     @Test

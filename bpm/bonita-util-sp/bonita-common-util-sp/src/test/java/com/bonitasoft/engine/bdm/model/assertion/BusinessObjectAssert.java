@@ -44,7 +44,7 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
             Assertions.assertThat(bom.getBusinessObjects().get(0)).isNotNull();
             isEqualTo(bom.getBusinessObjects().get(0));
         } catch (Exception e) {
-            failWithMessage("Expected <%s> to be marshallizable but wasn't : <%s>", actual, e.getCause());
+            failWithMessage("Expected <%s> to be marshallizable : <%s>", actual, e.getCause());
         }
         return this;
     }
@@ -52,7 +52,7 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
     public BusinessObjectAssert cannotBeMarshalled() {
         try {
             marshallUnmarshall(actual);
-            failWithMessage("Expected <%s> to not be marshallizable", actual);
+            failWithMessage("Expected <%s> not to be marshallizable", actual);
         } catch (Exception e) {
         }
         return this;
