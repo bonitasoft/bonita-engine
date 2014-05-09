@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.FieldType;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -45,7 +45,7 @@ public class FieldValidationRuleTest {
 	public void shoudAppliesTo_UniqueConstraint() throws Exception {
 		assertThat(fieldValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
 		assertThat(fieldValidationRule.appliesTo(new BusinessObject())).isFalse();
-		assertThat(fieldValidationRule.appliesTo(new Field())).isTrue();
+		assertThat(fieldValidationRule.appliesTo(new SimpleField())).isTrue();
 		assertThat(fieldValidationRule.appliesTo(new UniqueConstraint())).isFalse();
 	}
 	
@@ -56,7 +56,7 @@ public class FieldValidationRuleTest {
 	
 	@Test
 	public void shoudCheckRule_returns_valid_status() throws Exception {
-		Field field = new Field();
+		SimpleField field = new SimpleField();
 		field.setName("name");
 		field.setType(FieldType.STRING);
 		ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
@@ -65,12 +65,12 @@ public class FieldValidationRuleTest {
 	
 	@Test
 	public void shoudCheckRule_returns_error_status() throws Exception {
-		Field field = new Field();
+		SimpleField field = new SimpleField();
 		field.setName("name");
 		ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
 		assertThat(validationStatus.isOk()).isFalse();
 
-		field = new Field();
+		field = new SimpleField();
 		field.setName("");
 		field.setType(FieldType.STRING);
 		validationStatus = fieldValidationRule.checkRule(field);

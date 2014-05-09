@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.FieldType;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
@@ -42,7 +42,7 @@ public class BDMQueryUtilTest {
         // given:
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("com.corp.Arrival");
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("people");
         field.setType(FieldType.INTEGER);
         bo.addField(field);
@@ -71,8 +71,8 @@ public class BDMQueryUtilTest {
         assertThat(queries).hasSize(3);
     }
 
-    protected Field aStringField(final String name) {
-        final Field field = new Field();
+    protected SimpleField aStringField(final String name) {
+        final SimpleField field = new SimpleField();
         field.setName(name);
         field.setType(FieldType.STRING);
         return field;
@@ -86,7 +86,7 @@ public class BDMQueryUtilTest {
     public void should_createQuerForUniqueConstraint_return_query_with_parameters() throws Exception {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("name");
         field.setType(FieldType.STRING);
         bo.addField(field);
@@ -105,7 +105,7 @@ public class BDMQueryUtilTest {
     public void should_createQueryForField_return_query_with_parameters() throws Exception {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("name");
         field.setType(FieldType.STRING);
         bo.addField(field);
@@ -122,7 +122,7 @@ public class BDMQueryUtilTest {
     public void should_createSelectAllQueryreturn_query_without_parameters() throws Exception {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("name");
         field.setType(FieldType.STRING);
         bo.addField(field);
@@ -147,7 +147,7 @@ public class BDMQueryUtilTest {
     @Test
     public void createDefaultQueryForFieldShouldGenerateOrderByPersistenceId() throws Exception {
         // when:
-        final String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new Field());
+        final String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new SimpleField());
         // then:
         assertThat(queryContent).contains("ORDER BY n.persistenceId");
     }

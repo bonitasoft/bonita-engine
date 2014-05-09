@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.FieldType;
 
 public class BOMBuilder {
@@ -24,22 +24,22 @@ public class BOMBuilder {
         return businessObjectModel;
     }
 
-    private Field buildField(final String name, final FieldType type) {
-        final Field field = new Field();
+    private SimpleField buildField(final String name, final FieldType type) {
+        final SimpleField field = new SimpleField();
         field.setName(name);
         field.setType(type);
         return field;
     }
 
     private BusinessObject buildMyBusinessObject() {
-        final Field stringField = buildField("stringField", FieldType.STRING);
+        final SimpleField stringField = buildField("stringField", FieldType.STRING);
         stringField.setNullable(Boolean.TRUE);
-        final Field booleanField = buildField("booleanField", FieldType.BOOLEAN);
-        final Field dateField = buildField("dateField", FieldType.DATE);
+        final SimpleField booleanField = buildField("booleanField", FieldType.BOOLEAN);
+        final SimpleField dateField = buildField("dateField", FieldType.DATE);
         dateField.setNullable(Boolean.FALSE);
-        final Field doubleField = buildField("doubleField", FieldType.DOUBLE);
-        final Field integerField = buildField("integerField", FieldType.INTEGER);
-        final Field textField = buildField("textField", FieldType.TEXT);
+        final SimpleField doubleField = buildField("doubleField", FieldType.DOUBLE);
+        final SimpleField integerField = buildField("integerField", FieldType.INTEGER);
+        final SimpleField textField = buildField("textField", FieldType.TEXT);
 
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName("BusinessObject");
@@ -72,7 +72,7 @@ public class BOMBuilder {
         final BusinessObjectModel bom = new BusinessObjectModel();
         final BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName("BusinessObject");
-        businessObject.addField(new Field());
+        businessObject.addField(new SimpleField());
         bom.addBusinessObject(businessObject);
         return bom;
     }

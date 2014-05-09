@@ -5,7 +5,7 @@ import java.util.List;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.FieldType;
 
 public class BOMBuilder {
@@ -15,10 +15,10 @@ public class BOMBuilder {
     }
 
     public BusinessObjectModel build() {
-        final Field firstName = new Field();
+        final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
-        final Field lastName = new Field();
+        final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         final BusinessObject employee = new BusinessObject();
@@ -47,10 +47,10 @@ public class BOMBuilder {
     }
 
     public BusinessObjectModel buildComplex() {
-        final Field firstName = new Field();
+        final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
-        final Field lastName = new Field();
+        final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         final BusinessObject employee = new BusinessObject();
@@ -65,7 +65,7 @@ public class BOMBuilder {
     }
 
     public BusinessObjectModel buildPerson() {
-        final Field nickNames = new Field();
+        final SimpleField nickNames = new SimpleField();
         nickNames.setName("nickNames");
         nickNames.setType(FieldType.STRING);
         nickNames.setLength(Integer.valueOf(15));

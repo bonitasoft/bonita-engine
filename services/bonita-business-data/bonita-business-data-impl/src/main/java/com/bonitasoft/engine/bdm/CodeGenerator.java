@@ -28,6 +28,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import com.bonitasoft.engine.bdm.model.Field;
 import com.bonitasoft.engine.bdm.model.FieldType;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -124,7 +125,10 @@ public class CodeGenerator {
     }
 
     protected JFieldVar addListField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
-        final JClass fieldClass = getModel().ref(field.getType().getClazz());
+        JClass fieldClass = null;
+        if (field instanceof SimpleField) {
+            fieldClass = getModel().ref(((SimpleField)field).getType().getClazz());
+        }
         final JClass fieldListClass = narrowClass(List.class, fieldClass);
         final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
 
@@ -170,8 +174,11 @@ public class CodeGenerator {
     }
 
     private JMethod addListMethod(final JDefinedClass definedClass, final Field field, final String listMethodName, final String parameterName) {
-        final JClass fieldClass = getModel().ref(field.getType().getClazz());
-
+        JClass fieldClass = null;
+        if (field instanceof SimpleField) {
+            fieldClass = getModel().ref(((SimpleField)field).getType().getClazz());
+        }
+        
         final StringBuilder builder = new StringBuilder(parameterName);
         builder.append(WordUtils.capitalize(field.getName()));
 
@@ -207,7 +214,7 @@ public class CodeGenerator {
 
     public String getGetterName(final Field field) {
         final StringBuilder builder = new StringBuilder();
-        if (FieldType.BOOLEAN.equals(field.getType())) {
+        if (field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType())) {
             builder.append("is");
         } else {
             builder.append("get");

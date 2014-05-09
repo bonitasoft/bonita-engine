@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -44,14 +44,14 @@ public class BusinessObjectModelValidationRuleTest {
 	public void shoudAppliesTo_UniqueConstraint() throws Exception {
 		assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObjectModel())).isTrue();
 		assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObject())).isFalse();
-		assertThat(businessObjectModelValidationRule.appliesTo(new Field())).isFalse();
+		assertThat(businessObjectModelValidationRule.appliesTo(new SimpleField())).isFalse();
 		assertThat(businessObjectModelValidationRule.appliesTo(new UniqueConstraint())).isFalse();
 	}
 
 
 	@Test(expected=IllegalArgumentException.class)
 	public void shouddCheckRule_throw_IllegalArgumentException() throws Exception {
-		businessObjectModelValidationRule.checkRule(new Field());
+		businessObjectModelValidationRule.checkRule(new SimpleField());
 	}
 	
 	@Test

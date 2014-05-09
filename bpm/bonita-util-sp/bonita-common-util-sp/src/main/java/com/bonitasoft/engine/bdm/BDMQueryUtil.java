@@ -20,6 +20,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Field;
 import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 
 /**
@@ -82,7 +83,9 @@ public class BDMQueryUtil {
         final Query q = new Query(name, content, businessObject.getQualifiedName());
         for (final String fieldName : uniqueConstraint.getFieldNames()) {
             final Field f = getField(fieldName, businessObject);
-            q.addQueryParameter(f.getName(), f.getType().getClazz().getName());
+            if (f instanceof SimpleField) {
+                q.addQueryParameter(f.getName(), ((SimpleField) f).getType().getClazz().getName());
+            }
         }
         return q;
     }
@@ -97,7 +100,9 @@ public class BDMQueryUtil {
         final String name = createQueryNameForField(field);
         final String content = createQueryContentForField(businessObject.getQualifiedName(), field);
         final Query q = new Query(name, content, List.class.getName());
-        q.addQueryParameter(field.getName(), field.getType().getClazz().getName());
+        if (field instanceof SimpleField) {
+            q.addQueryParameter(field.getName(), ((SimpleField)field).getType().getClazz().getName());
+        }
         return q;
     }
 

@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -58,7 +58,7 @@ public class QueryValidationRuleTest {
 	public void shouldAppliesTo_UniqueConstraint() throws Exception {
 		assertThat(queryValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
 		assertThat(queryValidationRule.appliesTo(new BusinessObject())).isFalse();
-		assertThat(queryValidationRule.appliesTo(new Field())).isFalse();
+		assertThat(queryValidationRule.appliesTo(new SimpleField())).isFalse();
 		assertThat(queryValidationRule.appliesTo(new UniqueConstraint())).isFalse();
 		assertThat(queryValidationRule.appliesTo(new Query())).isTrue();
 	}

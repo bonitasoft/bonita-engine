@@ -3,7 +3,6 @@ package com.bonitasoft.engine.bdm;
 import static com.bonitasoft.engine.bdm.BOMBuilder.aBOM;
 import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aCompositionField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -15,6 +14,8 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.AssociationField;
+import com.bonitasoft.engine.bdm.model.AssociationField.Type;
 import com.bonitasoft.engine.io.IOUtils;
 
 public class BusinessObjectModelConverterTest {
@@ -80,7 +81,11 @@ public class BusinessObjectModelConverterTest {
     @Test
     public void aBom_could_have_fields_with_relationships() throws Exception {
         BusinessObject compositeBO = aBO("compositeBO").withField(aBooleanField("boolean").build()).build();
-        BusinessObject composedBO = aBO("composedBO").withField(aCompositionField("composite", compositeBO).build()).build();
+        AssociationField field = new AssociationField();
+        field.setName("composed");
+        field.setType(Type.AGGREGATION);
+        field.setReference(compositeBO);
+        BusinessObject composedBO = aBO("composedBO").withField(field).withField(aBooleanField("simple").build()).build();
         BusinessObjectModel model = aBOM().withBO(compositeBO).withBO(composedBO).build();
 
         BusinessObjectModel transformedModel = marshallUnmarshall(model);

@@ -32,6 +32,7 @@ import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Field;
 import com.bonitasoft.engine.bdm.model.FieldType;
 import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -157,7 +158,12 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
         for (final Field field : bo.getFields()) {
             if (field.isCollection() != null && field.isCollection()) {
-                final JClass fieldClass = getModel().ref(field.getType().getClazz());
+
+                JClass fieldClass = null;
+                if (field instanceof SimpleField) {
+                    fieldClass = getModel().ref(((SimpleField) field).getType().getClazz());
+                }
+
                 final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
                 copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz)
                         .arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
@@ -181,24 +187,28 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
-        final Boolean collection = field.isCollection();
-        JFieldVar fieldVar;
-        if (collection != null && collection) {
-            fieldVar = addListField(entityClass, field);
-        } else {
-            fieldVar = addField(entityClass, field.getName(), toJavaType(field.getType()));
-        }
-        final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
-        columnAnnotation.param("name", field.getName().toUpperCase());
-        final Boolean nullable = field.isNullable();
-        columnAnnotation.param("nullable", nullable == null || nullable);
-        if (field.getType() == FieldType.DATE) {
-            final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
-            temporalAnnotation.param("value", TemporalType.TIMESTAMP);
-        } else if (FieldType.TEXT.equals(field.getType())) {
-            addAnnotation(fieldVar, Lob.class);
-        } else if (FieldType.STRING.equals(field.getType()) && field.getLength() != null && field.getLength() > 0) {
-            columnAnnotation.param("length", field.getLength());
+        JFieldVar fieldVar = null;
+        if (field instanceof SimpleField) {
+            SimpleField sfield = (SimpleField) field;
+            final Boolean collection = field.isCollection();
+            if (collection != null && collection) {
+                fieldVar = addListField(entityClass, field);
+            } else {
+                fieldVar = addField(entityClass, field.getName(), toJavaType(sfield.getType()));
+            }
+            final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
+            columnAnnotation.param("name", field.getName().toUpperCase());
+            final Boolean nullable = field.isNullable();
+            columnAnnotation.param("nullable", nullable == null || nullable);
+
+            if (sfield.getType() == FieldType.DATE) {
+                final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
+                temporalAnnotation.param("value", TemporalType.TIMESTAMP);
+            } else if (FieldType.TEXT.equals(sfield.getType())) {
+                addAnnotation(fieldVar, Lob.class);
+            } else if (FieldType.STRING.equals(sfield.getType()) && sfield.getLength() != null && sfield.getLength() > 0) {
+                columnAnnotation.param("length", sfield.getLength());
+            }
         }
         return fieldVar;
     }

@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -42,7 +42,7 @@ public class UniqueConstraintValidationRuleTest {
 	public void shoudAppliesTo_UniqueConstraint() throws Exception {
 		assertThat(uniqueConstraintValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
 		assertThat(uniqueConstraintValidationRule.appliesTo(new BusinessObject())).isFalse();
-		assertThat(uniqueConstraintValidationRule.appliesTo(new Field())).isFalse();
+		assertThat(uniqueConstraintValidationRule.appliesTo(new SimpleField())).isFalse();
 		assertThat(uniqueConstraintValidationRule.appliesTo(new UniqueConstraint())).isTrue();
 	}
 	

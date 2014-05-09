@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.FieldType;
 
 /**
@@ -49,7 +49,7 @@ public class BusinessObjectModelValidatorTest {
 		BusinessObjectModel bom = new BusinessObjectModel();
 		BusinessObject bo = new BusinessObject();
 		bo.setQualifiedName("org.bonita.Car");
-		Field nameField = new Field();
+		SimpleField nameField = new SimpleField();
 		nameField.setName("bmw");
 		nameField.setType(FieldType.STRING);
 		bo.addField(nameField);
@@ -62,7 +62,7 @@ public class BusinessObjectModelValidatorTest {
 		BusinessObjectModel bom = new BusinessObjectModel();
 		BusinessObject bo = new BusinessObject();
 		bo.setQualifiedName("org.bonita.Car");
-		Field nameField = new Field();
+		SimpleField nameField = new SimpleField();
 		nameField.setName("bmw 5");
 		bo.getFields().add(nameField);
 		bom.addBusinessObject(bo);

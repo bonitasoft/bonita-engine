@@ -11,6 +11,7 @@ package com.bonitasoft.engine.bdm.validator.rule;
 import javax.lang.model.SourceVersion;
 
 import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -44,7 +45,7 @@ public class FieldValidationRule implements ValidationRule {
             status.addError(name + " is not a valid field identifier");
             return status;
         }
-        if (field.getType() == null) {
+        if (field instanceof SimpleField && ((SimpleField) field).getType() == null) {
             status.addError(name + " must have a type declared");
         }
         return status;

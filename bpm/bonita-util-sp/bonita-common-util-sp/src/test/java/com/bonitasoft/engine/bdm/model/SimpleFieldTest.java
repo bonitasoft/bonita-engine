@@ -4,26 +4,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 
-public class FieldTest {
+public class SimpleFieldTest {
 
     @Test
     public void setNameShouldWorksWithARightName() {
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("fistName");
     }
 
     @Test
     public void setNameShouldWorksWithARightNameFirstLetterInUpperCase() {
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("FistName");
     }
 
     @Test
     public void hashCodeIsBasedOnFieldClassAttributes() throws Exception {
-        Field field = new Field();
-        Field other = new Field();
+        SimpleField field = new SimpleField();
+        SimpleField other = new SimpleField();
 
         assertThat(field.hashCode()).isEqualTo(other.hashCode());
     }

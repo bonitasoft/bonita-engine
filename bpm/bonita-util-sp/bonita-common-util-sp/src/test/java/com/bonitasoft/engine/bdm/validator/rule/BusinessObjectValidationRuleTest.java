@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -47,20 +47,20 @@ public class BusinessObjectValidationRuleTest {
     public void shoudAppliesTo_UniqueConstraint() throws Exception {
         assertThat(businessObjectValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
         assertThat(businessObjectValidationRule.appliesTo(new BusinessObject())).isTrue();
-        assertThat(businessObjectValidationRule.appliesTo(new Field())).isFalse();
+        assertThat(businessObjectValidationRule.appliesTo(new SimpleField())).isFalse();
         assertThat(businessObjectValidationRule.appliesTo(new UniqueConstraint())).isFalse();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouddCheckRule_throw_IllegalArgumentException() throws Exception {
-        businessObjectValidationRule.checkRule(new Field());
+        businessObjectValidationRule.checkRule(new SimpleField());
     }
 
     @Test
     public void shoudCheckRule_returns_valid_status() throws Exception {
         BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo");
-        Field field = new Field();
+        SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         ValidationStatus validationStatus = businessObjectValidationRule.checkRule(bo);
@@ -79,7 +79,7 @@ public class BusinessObjectValidationRuleTest {
         assertThat(validationStatus.isOk()).isFalse();
 
         bo.setQualifiedName("org.bonita.Bo 2");
-        Field field = new Field();
+        SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         validationStatus = businessObjectValidationRule.checkRule(bo);
@@ -96,7 +96,7 @@ public class BusinessObjectValidationRuleTest {
     public void shoudCheckRule_returns_error_status_for_duplicated_query_name() throws Exception {
         BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
-        Field field = new Field();
+        SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         bo.addQuery("toto", "titi", List.class.getName());
@@ -109,7 +109,7 @@ public class BusinessObjectValidationRuleTest {
     public void shoudCheckRule_returns_error_status_for_duplicated_constraint_name() throws Exception {
         BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
-        Field field = new Field();
+        SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         bo.addUniqueConstraint("toto", "firstName");

@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 
@@ -35,7 +36,10 @@ public class BusinessObject {
     private String description;
 
     @XmlElementWrapper(name = "fields", required = true)
-    @XmlElement(name = "field", required = true)
+    @XmlElements({
+            @XmlElement(name = "field", type = SimpleField.class, required = true),
+            @XmlElement(name = "associationField", type = AssociationField.class, required = true)
+    })
     private List<Field> fields;
 
     @XmlElementWrapper(name = "uniqueConstraints")

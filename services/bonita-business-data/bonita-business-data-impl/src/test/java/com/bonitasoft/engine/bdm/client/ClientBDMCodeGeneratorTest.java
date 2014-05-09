@@ -31,7 +31,7 @@ import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.CompilableCode;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Field;
+import com.bonitasoft.engine.bdm.model.SimpleField;
 import com.bonitasoft.engine.bdm.model.FieldType;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
@@ -112,7 +112,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void shouldAddColumnField_CreatePrimitiveAttribute_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         nameField.setLength(Integer.valueOf(45));
@@ -146,7 +146,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void shouldAddBasicField_AddAFieldWithTemporalAnnotation_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("name");
         nameField.setType(FieldType.DATE);
         nameField.setNullable(Boolean.FALSE);
@@ -177,7 +177,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void shouldAddAccessors_AddAccessorMethods_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
@@ -197,7 +197,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void shouldAddBooleanAccessors_AddAccessorMethods_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field foundField = new Field();
+        final SimpleField foundField = new SimpleField();
         foundField.setName("found");
         foundField.setType(FieldType.BOOLEAN);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
@@ -260,7 +260,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
 
-        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+        final JFieldVar idFieldVar = definedClass.fields().get(SimpleField.PERSISTENCE_ID);
         assertThat(idFieldVar).isNotNull();
         assertThat(idFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Long.class.getName()));
         assertThat(idFieldVar.annotations()).hasSize(2);
@@ -278,7 +278,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addPersistenceVersionFieldAndAccessors(definedClass);
 
-        final JFieldVar versionFieldVar = definedClass.fields().get(Field.PERSISTENCE_VERSION);
+        final JFieldVar versionFieldVar = definedClass.fields().get(SimpleField.PERSISTENCE_VERSION);
         assertThat(versionFieldVar).isNotNull();
         assertThat(versionFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Long.class.getName()));
         assertThat(versionFieldVar.annotations()).hasSize(1);
@@ -291,7 +291,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void shouldAddColumnField() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("description");
         nameField.setType(FieldType.TEXT);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
@@ -305,7 +305,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void should_AddDao_generate_Dao_interface_with_query_methods_signature() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
@@ -322,11 +322,11 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void queryGenerationReturningListShouldAddPaginationParameters() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
-        final Field ageField = new Field();
+        final SimpleField ageField = new SimpleField();
         ageField.setName("age");
         ageField.setType(FieldType.INTEGER);
         employeeBO.getFields().add(ageField);
@@ -375,11 +375,11 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void should_AddDao_generate_Dao_interface_with_unique_constraint_methods_signature() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        final Field nameField = new Field();
+        final SimpleField nameField = new SimpleField();
         nameField.setName("firstName");
         nameField.setType(FieldType.STRING);
 
-        final Field lastnameField = new Field();
+        final SimpleField lastnameField = new SimpleField();
         lastnameField.setName("lastName");
         lastnameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);

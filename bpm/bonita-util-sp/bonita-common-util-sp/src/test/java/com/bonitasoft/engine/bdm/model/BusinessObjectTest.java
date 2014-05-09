@@ -30,7 +30,7 @@ public class BusinessObjectTest {
 
     @Test
     public void addUniqueConstraintShouldWorkIfTheFieldExists() throws Exception {
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("field");
         field.setType(FieldType.STRING);
 
