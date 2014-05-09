@@ -59,6 +59,12 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
         this.description = description;
     }
 
+    @Deprecated
+    public void setIconPath(final String iconPath) {
+        // nothing to do
+    }
+
+    @Deprecated
     @Override
     public String getIconPath() {
         return null;
