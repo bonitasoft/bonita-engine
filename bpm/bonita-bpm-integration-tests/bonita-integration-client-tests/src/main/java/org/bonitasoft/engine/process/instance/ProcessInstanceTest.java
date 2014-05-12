@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -406,20 +407,26 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void getProcessInstances() throws Exception {
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_ASC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_ASC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_ASC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.DEFAULT);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_ASC);
-    }
-
-    private void getProcessInstancesOrderByProcessInstanceCriterion(final ProcessInstanceCriterion processInstanceCriterion) throws Exception {
         final List<ProcessDefinition> processDefinitions = createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(3, pedro);
         final List<ProcessInstance> processInstances = startNbProcess(processDefinitions);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_ASC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_ASC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_ASC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.DEFAULT, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_ASC, processInstances);
+        // Clean up
+        disableAndDeleteProcess(processDefinitions);
+
+        // We check that there are no resident process instances in DB:
+        assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
+    }
+
+    private void getProcessInstancesOrderByProcessInstanceCriterion(final ProcessInstanceCriterion processInstanceCriterion,
+            final List<ProcessInstance> processInstances) throws Exception {
 
         // We asked for creation date descending order:
         final List<ProcessInstance> resultProcessInstances = getProcessAPI().getProcessInstances(0, 10, processInstanceCriterion);
@@ -506,11 +513,6 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 break;
         }
 
-        // Clean up
-        disableAndDeleteProcess(processDefinitions);
-
-        // We check that there are no resident process instances in DB:
-        assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
     }
 
     @Test
