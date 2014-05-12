@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-classloader</artifactId>
 		<groupId>com.bonitasoft.engine.classloader</groupId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-classloader-clustered</artifactId>
@@ -28,7 +28,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
