@@ -100,7 +100,7 @@ public class TransientDataLeftOperandHandlerTest {
     }
 
     @Test
-    public void should_retrieve_reevaluate_definition_id_not_found() throws Exception {
+    public void should_retrieve_reevaluate_definition_if_not_found() throws Exception {
         // given
         long processDefId = 12l;
         long taskId = 42l;
@@ -130,5 +130,37 @@ public class TransientDataLeftOperandHandlerTest {
                 eq(DataInstanceContainer.ACTIVITY_INSTANCE),
                 any(SExpressionContext.class));
         verify(logger).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
+    }
+
+    @Test
+    public void should_update_reevaluate_definition_if_not_found() throws Exception {
+        // given
+        long processDefId = 12l;
+        long taskId = 42l;
+        long taskDefId = 55l;
+        SUserTaskInstanceImpl task = new SUserTaskInstanceImpl("myTask", taskDefId, 23l, 23l, 5l, STaskPriority.HIGHEST, processDefId, 23l);
+        SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
+        SUserTaskDefinitionImpl taskDef = new SUserTaskDefinitionImpl(taskDefId, "myTasl", "actor");
+        STextDefinitionImpl sTextDefinitionImpl = new STextDefinitionImpl();
+        sTextDefinitionImpl.setTransientData(true);
+        sTextDefinitionImpl.setName("myData");
+        sTextDefinitionImpl.setDefaultValueExpression(null);
+        taskDef.addSDataDefinition(sTextDefinitionImpl);
+        processContainer.addActivity(taskDef);
+        SProcessDefinitionImpl sProcessDefinitionImpl = new SProcessDefinitionImpl("MyProcess", "1.0");
+        sProcessDefinitionImpl.setProcessContainer(processContainer);
+        doReturn(task).when(flownodeInstanceService).getFlowNodeInstance(taskId);
+        doReturn(sProcessDefinitionImpl).when(processDefinitionService).getProcessDefinition(processDefId);
+        SShortTextDataInstanceImpl data = createData();
+        doThrow(SDataInstanceNotFoundException.class).doReturn(data).when(transientDataService).getDataInstance("myData", taskId, "ctype");
+
+        // when
+        transientDataLeftOperandHandler.update(createLeftOperand("myData"), "newValue", taskId, "ctype");
+
+        // then
+        verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition> asList(sTextDefinitionImpl)), eq(taskId),
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE),
+                any(SExpressionContext.class));
+        verify(logger, times(2)).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
     }
 }
