@@ -3,7 +3,7 @@ package org.bonitasoft.engine.test.persistence.builder;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 
 
-public class UserBuilder extends PersistentObjectBuilder<SUserImpl> {
+public class UserBuilder extends PersistentObjectBuilder<SUserImpl, UserBuilder> {
 
     private String userName = "userName" + id;
 
@@ -11,6 +11,11 @@ public class UserBuilder extends PersistentObjectBuilder<SUserImpl> {
         return new UserBuilder();
     }
     
+    @Override
+    UserBuilder getThisBuilder() {
+        return this;
+    }
+
     @Override
     public SUserImpl _build() {
         SUserImpl user = new SUserImpl();

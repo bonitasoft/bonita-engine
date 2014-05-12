@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +8,15 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
@@ -50,11 +52,14 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
     private static DataInstanceService dataInstanceService;
 
+    private static ActivityInstanceService activityInstanceService;
+
     static {
         bpmServicesBuilder = new BPMServicesBuilder();
         processInstanceService = getProcessInstanceService();
         transactionService = bpmServicesBuilder.getTransactionService();
         dataInstanceService = bpmServicesBuilder.getDataInstanceService();
+        activityInstanceService = bpmServicesBuilder.getActivityInstanceService();
     }
 
     static ProcessInstanceService getProcessInstanceService() {
@@ -190,6 +195,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         // first create parent process instance
         transactionService.begin();
         final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
+        final SCallActivityInstanceBuilderFactory sCallActivityInstanceBuilder = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         final SProcessInstance parentProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(parentProcessInstance);
@@ -197,11 +203,16 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
         transactionService.begin();
         // second create 10 child processes:
+        SActivityInstance activityInstance = sCallActivityInstanceBuilder.createNewCallActivityInstance("callActivity", 1,
+                parentProcessInstance.getContainerId(),
+                parentProcessInstance.getContainerId(), processDefinitionId, parentProcessInstance.getId(),
+                parentProcessInstance.getId()).done();
+        activityInstanceService.createActivityInstance(activityInstance);
         final List<Long> childInstanceIds = new ArrayList<Long>();
         SProcessInstance childProcessInstance;
         for (int i = 0; i < 10; i++) {
             childProcessInstance = sProcessInstanceBuilder.createNewInstance("child process instance " + i, processDefinitionId)
-                    .setContainerId(parentProcessInstance.getId()).done();
+                    .setContainerId(parentProcessInstance.getId()).setCallerId(activityInstance.getId(), SFlowNodeType.CALL_ACTIVITY).done();
             processInstanceService.createProcessInstance(childProcessInstance);
             childInstanceIds.add(childProcessInstance.getId());
         }
@@ -240,10 +251,14 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         assertEquals(childInstanceIds.get(7), childInstanceIdList4.get(2));
         assertEquals(childInstanceIds.get(6), childInstanceIdList4.get(3));
 
+        activityInstanceService.deleteFlowNodeInstance(activityInstance);
+
         transactionService.complete();
+
 
         // clean up:
         cleanUpAllProcessInstances();
+
     }
 
     @Test
@@ -251,6 +266,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         // first create parent process instance and test
         transactionService.begin();
         final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
+        final SCallActivityInstanceBuilderFactory sCallActivityInstanceBuilder = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         final SProcessInstance parentProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(parentProcessInstance);
@@ -262,13 +278,19 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         // second create 10 child processes:
         final List<Long> childInstanceIds = new ArrayList<Long>();
         SProcessInstance childProcessInstance;
+        SActivityInstance activityInstance = sCallActivityInstanceBuilder.createNewCallActivityInstance("callActivity", 1,
+                parentProcessInstance.getContainerId(),
+                parentProcessInstance.getContainerId(), processDefinitionId, parentProcessInstance.getId(),
+                parentProcessInstance.getId()).done();
+        activityInstanceService.createActivityInstance(activityInstance);
         for (int i = 0; i < 10; i++) {
             childProcessInstance = sProcessInstanceBuilder.createNewInstance("child process instance " + i, processDefinitionId)
-                    .setContainerId(parentProcessInstance.getId()).done();
+                    .setContainerId(parentProcessInstance.getId()).setCallerId(activityInstance.getId(), SFlowNodeType.CALL_ACTIVITY).done();
             processInstanceService.createProcessInstance(childProcessInstance);
             childInstanceIds.add(childProcessInstance.getId());
         }
         numberOfChild = processInstanceService.getNumberOfChildInstancesOfProcessInstance(parentProcessInstance.getId());
+        activityInstanceService.deleteFlowNodeInstance(activityInstance);
         transactionService.complete();
         assertEquals(childInstanceIds.size(), numberOfChild);
 

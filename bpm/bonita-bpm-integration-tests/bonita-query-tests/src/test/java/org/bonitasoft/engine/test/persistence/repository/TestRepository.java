@@ -5,13 +5,16 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -106,5 +109,17 @@ public class TestRepository {
         getSession().save(sProcessSupervisor);
         return (SProcessSupervisor) getSession().get(sProcessSupervisor.getClass(),
                 new PersistentObjectId(sProcessSupervisor.getId(), sProcessSupervisor.getTenantId()));
+    }
+
+    public SProcessInstanceImpl add(final SProcessInstanceImpl sProcessInstance) {
+        getSession().save(sProcessInstance);
+        return (SProcessInstanceImpl) getSession().get(sProcessInstance.getClass(),
+                new PersistentObjectId(sProcessInstance.getId(), sProcessInstance.getTenantId()));
+    }
+
+    public SFlowNodeInstance add(final SFlowNodeInstanceImpl sFlowNode) {
+        getSession().save(sFlowNode);
+        return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(),
+                new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }
 }
