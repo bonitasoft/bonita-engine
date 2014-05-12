@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -251,10 +252,10 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         assertEquals(childInstanceIds.get(7), childInstanceIdList4.get(2));
         assertEquals(childInstanceIds.get(6), childInstanceIdList4.get(3));
 
+        activityInstance = activityInstanceService.getActivityInstance(activityInstance.getId());
         activityInstanceService.deleteFlowNodeInstance(activityInstance);
 
         transactionService.complete();
-
 
         // clean up:
         cleanUpAllProcessInstances();
