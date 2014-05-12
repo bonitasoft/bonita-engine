@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +23,11 @@ import java.util.List;
  * 
  * @author Baptiste Mesta
  * 
+ * @since 6.3.1
  */
-public class ImportStatus {
+public class ImportStatus implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public enum Status {
         ADDED, REPLACED, SKIPPED
