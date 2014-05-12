@@ -45,18 +45,18 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
     public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile)
             throws ExecutionException,
             SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
-        profileService.deleteAllProfileEntriesOfProfile(existingProfile);
         profileService.deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
         if (exportedProfile.isDefault()) {
             // do not update if it is a default profile
             return existingProfile;
         } else {
+            profileService.deleteAllProfileEntriesOfProfile(existingProfile);
             return profileService.updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId));
         }
     }
 
-    private EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId) {
+    EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId) {
         final SProfileUpdateBuilder updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.setDescription(exportedProfile.getDescription());
         updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(importerId);

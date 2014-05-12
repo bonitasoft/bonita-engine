@@ -22,8 +22,8 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -152,7 +152,7 @@ public class ProfilesImporter {
         }
     }
 
-    private List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
+    List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
             final long profileId)
             throws SProfileEntryCreationException {
         ArrayList<ImportError> errors = new ArrayList<ImportError>();
@@ -187,7 +187,7 @@ public class ProfilesImporter {
         return null;
     }
 
-    private List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
+    List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
             final long profileId,
             final ExportedProfileMapping exportedProfileMapping) throws SProfileMemberCreationException {
         ArrayList<ImportError> errors = new ArrayList<ImportError>();
@@ -223,7 +223,7 @@ public class ProfilesImporter {
             profileService.addGroupToProfile(profileId, group.getId(), group.getName(), group.getParentPath());
         }
 
-        for (final BEntry<String, String> membership : exportedProfileMapping.getMemberships()) {
+        for (final Pair<String, String> membership : exportedProfileMapping.getMemberships()) {
             SGroup group = null;
             try {
                 group = identityService.getGroupByPath(membership.getKey());

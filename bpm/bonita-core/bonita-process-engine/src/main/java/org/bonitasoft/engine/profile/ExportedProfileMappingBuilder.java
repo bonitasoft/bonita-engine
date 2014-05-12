@@ -15,7 +15,7 @@ package org.bonitasoft.engine.profile;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 
 /**
@@ -46,7 +46,7 @@ public class ExportedProfileMappingBuilder {
         return this;
     }
 
-    public ExportedProfileMappingBuilder setMemberships(final List<BEntry<String, String>> memberships) {
+    public ExportedProfileMappingBuilder setMemberships(final List<Pair<String, String>> memberships) {
         profileMapping.setMemberships(memberships);
         return this;
     }
