@@ -29,7 +29,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class DataLeftOperandHandler implements LeftOperandHandler {
 
@@ -47,8 +46,8 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-            updateDataInstance(leftOperand, containerId, containerType, newValue);
-        }
+        updateDataInstance(leftOperand, containerId, containerType, newValue);
+    }
 
     protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceException {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
@@ -58,12 +57,32 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
         dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
     }
 
+    private void checkReturnType(final Object value, final SDataInstance sDataInstance) throws SOperationExecutionException {
+        if (value != null) {
+            final Object dataValue = sDataInstance.getValue();
+            /*
+             * if the object is null (data is not initialized) the return type is not checked
+             * but the data instance service should throw an exception
+             */
+            if (dataValue != null) {
+                final Class<?> dataEffectiveType = dataValue.getClass();
+                final Class<?> evaluatedReturnedType = value.getClass();
+                if (!(dataEffectiveType.isAssignableFrom(evaluatedReturnedType) || dataEffectiveType.equals(evaluatedReturnedType))) {
+                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataEffectiveType
+                            + " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + sDataInstance.getName() + "'");
+                }
+            }
+        }
+    }
+
     private void updateDataInstance(final SLeftOperand leftOperand, final long containerId, final String containerType, final Object expressionResult)
             throws SOperationExecutionException {
         final String dataInstanceName = leftOperand.getName();
         SDataInstance sDataInstance;
         try {
             sDataInstance = getDataInstance(dataInstanceName, containerId, containerType);
+            // Specific return type check for Data:
+            checkReturnType(expressionResult, sDataInstance);
             update(sDataInstance, expressionResult);
         } catch (final SDataInstanceException e) {
             throw new SOperationExecutionException(e);

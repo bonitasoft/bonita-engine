@@ -241,12 +241,12 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<Long> getChildInstanceIdsOfProcessInstance(final Class<SProcessInstance> class1, final long processInstanceId,
             final QueryOptions queryOptions) {
-        final Map<String, Object> map = Collections.singletonMap("containerId", (Object) processInstanceId);
+        final Map<String, Object> map = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
         return new SelectListDescriptor<Long>("getChildInstanceIdsOfProcessInstance", map, class1, queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfChildInstancesOfProcessInstance(final long processInstanceId) {
-        final Map<String, Object> parameters = Collections.singletonMap("containerId", (Object) processInstanceId);
+        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
         return new SelectOneDescriptor<Long>("getNumberOfChildInstancesOfProcessInstance", parameters, SProcessInstance.class, Long.class);
 
     }
