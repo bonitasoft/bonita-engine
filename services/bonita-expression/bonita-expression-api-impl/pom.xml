@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-expression</artifactId>
 		<groupId>org.bonitasoft.engine.expression</groupId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-expression-api-impl</artifactId>
@@ -45,7 +45,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
