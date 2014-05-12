@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.util</groupId>
 		<artifactId>bonita-util-sp</artifactId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-util-sp</artifactId>
@@ -25,7 +25,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
