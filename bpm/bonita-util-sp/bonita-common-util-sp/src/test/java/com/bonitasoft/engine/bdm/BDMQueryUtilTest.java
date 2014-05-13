@@ -13,7 +13,9 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 
 /**
  * @author Romain Bioteau
@@ -71,10 +73,33 @@ public class BDMQueryUtilTest {
         assertThat(queries).hasSize(3);
     }
 
+    @Test
+    public void createProvidedQueriesForShouldNotGenerateAQueryForRelationField() throws Exception {
+        // given:
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("com.corp.Arrival");
+        bo.addField(aStringField("unikAttr"));
+        bo.addField(aRelationField("employee"));
+
+        // when:
+        final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
+
+        // then:
+        assertThat(queries).hasSize(2);
+    }
+
     protected SimpleField aStringField(final String name) {
         final SimpleField field = new SimpleField();
         field.setName(name);
         field.setType(FieldType.STRING);
+        return field;
+    }
+
+    protected RelationField aRelationField(final String name) {
+        final RelationField field = new RelationField();
+        field.setName(name);
+        field.setType(Type.COMPOSITION);
+        field.setReference(null);
         return field;
     }
 

@@ -101,7 +101,7 @@ public class BDMQueryUtil {
         final String content = createQueryContentForField(businessObject.getQualifiedName(), field);
         final Query q = new Query(name, content, List.class.getName());
         if (field instanceof SimpleField) {
-            q.addQueryParameter(field.getName(), ((SimpleField)field).getType().getClazz().getName());
+            q.addQueryParameter(field.getName(), ((SimpleField) field).getType().getClazz().getName());
         }
         return q;
     }
@@ -162,11 +162,13 @@ public class BDMQueryUtil {
             queries.add(query);
         }
         for (final Field f : businessObject.getFields()) {
-            if (f.isCollection() == null || !f.isCollection()) {
-                final String potentialConflictingQueryName = createQueryNameForField(f);
-                if (!queryNames.contains(potentialConflictingQueryName)) {
-                    final Query query = createQueryForField(businessObject, f);
-                    queries.add(query);
+            if (f instanceof SimpleField) {
+                if (f.isCollection() == null || !f.isCollection()) {
+                    final String potentialConflictingQueryName = createQueryNameForField(f);
+                    if (!queryNames.contains(potentialConflictingQueryName)) {
+                        final Query query = createQueryForField(businessObject, f);
+                        queries.add(query);
+                    }
                 }
             }
         }
