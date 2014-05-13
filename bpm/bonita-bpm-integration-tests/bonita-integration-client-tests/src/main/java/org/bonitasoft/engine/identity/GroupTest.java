@@ -2,6 +2,7 @@ package org.bonitasoft.engine.identity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -260,7 +261,7 @@ public class GroupTest extends CommonAPITest {
     }
 
     @Test
-    public void testUpdateGroup() throws BonitaException {
+    public void updateGroup() throws BonitaException {
         final Group testGroup1 = getIdentityAPI().getGroup(defaultGroup.getId());
         assertEquals("test", testGroup1.getName());
 
@@ -278,7 +279,7 @@ public class GroupTest extends CommonAPITest {
     }
 
     @Test
-    public void testUpdateParentGroupPath() throws BonitaException {
+    public void updateParentGroupPath() throws BonitaException {
         final Group newRootGroup = createGroup("BonitaSoft", "BonitaSoft", "BonitaSoft company");
 
         final String groupL2Name = "France";
@@ -306,8 +307,26 @@ public class GroupTest extends CommonAPITest {
         getIdentityAPI().deleteGroup(newRootGroup.getId());
     }
 
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7115", keywords = { "group", "parent path", "empty", "null" })
     @Test
-    public void testUpdateGroupNameAlsoUpdateChildren() throws BonitaException {
+    public void when_update_group_with_empty_parent_path_it_is_set_to_null() throws BonitaException {
+        final String parentGroupPath = "/parentPath";
+        final Group group = createGroup("BonitaSoft", parentGroupPath);
+        Group result = getIdentityAPI().getGroup(group.getId());
+        assertEquals("The parent path must be equals to " + parentGroupPath + ".", parentGroupPath, result.getParentPath());
+
+        // update parent path
+        final GroupUpdater updateDescriptor = new GroupUpdater();
+        updateDescriptor.updateParentPath("");
+        getIdentityAPI().updateGroup(group.getId(), updateDescriptor);
+        result = getIdentityAPI().getGroup(group.getId());
+        assertNull("The parent path must be null.", result.getParentPath());
+
+        getIdentityAPI().deleteGroup(group.getId());
+    }
+
+    @Test
+    public void updateGroupNameAlsoUpdateChildren() throws BonitaException {
         final Group newRootGroup = createGroup("BonitaSoft", "BonitaSoft", "BonitaSoft company");
 
         final String groupL2Name = "France";
@@ -336,7 +355,7 @@ public class GroupTest extends CommonAPITest {
     }
 
     @Test
-    public void testUpdateGroupNameAndParenthAlsoUpdateAllChildrenInfos() throws BonitaException {
+    public void updateGroupNameAndParenthAlsoUpdateAllChildrenInfos() throws BonitaException {
         // arrange
         Group parentGroup = getIdentityAPI().createGroup("France", defaultGroup.getPath());
         Group childGroup = getIdentityAPI().createGroup("Grenoble", parentGroup.getPath());
@@ -359,7 +378,7 @@ public class GroupTest extends CommonAPITest {
     }
 
     @Test(expected = GroupNotFoundException.class)
-    public void testUpdateGroupsNotFoundException() throws BonitaException {
+    public void updateGroupsNotFoundException() throws BonitaException {
         final GroupUpdater updateDescriptor = new GroupUpdater();
         updateDescriptor.updateName("newtest");
         updateDescriptor.updateDisplayName("newlabel");
