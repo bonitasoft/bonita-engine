@@ -135,7 +135,7 @@ public class ProfilesImporter {
                 /*
                  * Import mapping with pages
                  */
-                if (existingProfile == null || !exportedProfile.isDefault()) {
+                if (existingProfile == null || !exportedProfile.isDefault() && !existingProfile.isDefault()) {
                     // update entries only if it's a custom profile
                     currentStatus.getErrors().addAll(importProfileEntries(profileService, exportedProfile.getParentProfileEntries(), profileId));
                 }

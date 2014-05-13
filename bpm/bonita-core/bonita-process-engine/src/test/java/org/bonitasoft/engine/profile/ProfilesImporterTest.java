@@ -123,6 +123,31 @@ public class ProfilesImporterTest {
     }
 
     @Test
+    public void should_importProfiles_on_default_with_replace_do_not_delete_profile_entries() throws Exception {
+        // given
+        ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
+
+        exportedProfile.getParentProfileEntries().add(
+                createParent("p1", "page1", true));
+        exportedProfile.getParentProfileEntries().add(
+                createParent("p2",
+                        createChild("c1", "pagec1", true),
+                        createChild("c2", "pagec2", false)));
+        createImporter(new ReplaceDuplicateImportStrategy(profileService), exportedProfile);
+        SProfile existingProfile = mock(SProfile.class);
+        doReturn(true).when(existingProfile).isDefault();
+        doReturn(existingProfile).when(profileService).getProfileByName(exportedProfile.getName());
+        // when
+        List<ImportStatus> importProfiles = profilesImporter.importProfiles(-1);
+
+        // then
+        verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
+        verify(profileService, never()).deleteAllProfileEntriesOfProfile(any(SProfile.class));
+        verify(profilesImporter, never()).importProfileEntries(any(ProfileService.class), anyListOf(ExportedParentProfileEntry.class), anyLong());
+        assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
+    }
+
+    @Test
     public void should_importProfiles_add_profile() throws Exception {
         // given
         ExportedProfile exportedProfile = new ExportedProfile("MineNotDefault", false);

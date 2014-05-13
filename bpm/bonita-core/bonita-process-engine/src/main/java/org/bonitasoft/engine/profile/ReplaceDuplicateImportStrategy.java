@@ -47,7 +47,7 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
             SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
         profileService.deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
-        if (exportedProfile.isDefault()) {
+        if (exportedProfile.isDefault() || existingProfile.isDefault()) {
             // do not update if it is a default profile
             return existingProfile;
         } else {
