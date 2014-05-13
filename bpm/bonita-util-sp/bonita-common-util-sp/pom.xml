@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.util</groupId>
 		<artifactId>bonita-util-sp</artifactId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-util-sp</artifactId>
@@ -25,7 +25,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
@@ -37,6 +36,12 @@
 			<artifactId>lambdaj</artifactId>
 			<version>2.3.3</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>hamcrest-all</artifactId>
+					<groupId>org.hamcrest</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -86,7 +91,7 @@
                        <goals>
                             <goal>run</goal>
                         </goals>
-                        <phase>generate-resources</phase>
+                        <phase>process-resources</phase>
                         <configuration>
                             <target>
                                 <move file="${project.build.directory}/schemas/schema1.xsd"

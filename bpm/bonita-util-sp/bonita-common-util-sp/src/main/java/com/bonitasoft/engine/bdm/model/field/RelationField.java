@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 
@@ -38,7 +40,7 @@ public class RelationField extends Field {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(final Type type) {
         this.type = type;
     }
 
@@ -46,7 +48,7 @@ public class RelationField extends Field {
         return reference;
     }
 
-    public void setReference(BusinessObject reference) {
+    public void setReference(final BusinessObject reference) {
         this.reference = reference;
     }
 
@@ -59,14 +61,16 @@ public class RelationField extends Field {
     public boolean equals(final Object obj) {
         if (obj instanceof RelationField) {
             final RelationField other = (RelationField) obj;
-            return new EqualsBuilder()
-                    .appendSuper(super.equals(obj))
-                    .append(reference, other.reference)
-                    .append(type, other.type)
-                    .isEquals();
+            return new EqualsBuilder().appendSuper(super.equals(obj)).append(reference, other.reference).append(type, other.type).isEquals();
         } else {
             return false;
         }
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("name", getName()).append("type", type).append("reference", reference)
+                .toString();
     }
 
 }

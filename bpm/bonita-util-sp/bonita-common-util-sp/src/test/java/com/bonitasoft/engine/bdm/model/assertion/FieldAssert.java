@@ -18,11 +18,11 @@ import com.bonitasoft.engine.bdm.model.field.RelationField;
 
 public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
 
-    protected FieldAssert(Field actual) {
+    protected FieldAssert(final Field actual) {
         super(actual, FieldAssert.class);
     }
 
-    public static FieldAssert assertThat(Field actual) {
+    public static FieldAssert assertThat(final Field actual) {
         return new FieldAssert(actual);
     }
 
@@ -41,20 +41,20 @@ public class FieldAssert extends AbstractAssert<FieldAssert, Field> {
     public FieldAssert cannotBeMarshalled() {
         try {
             marshallUnmarshall(actual);
-            failWithMessage("Expected <%s> to not be marshallizable", actual);
+            failWithMessage("Expected <%s> not to be marshallizable", actual);
         } catch (Exception e) {
             // OK
         }
         return this;
     }
 
-    private BusinessObjectModel marshallUnmarshall(Field field) throws JAXBException, IOException, SAXException {
+    private BusinessObjectModel marshallUnmarshall(final Field field) throws JAXBException, IOException, SAXException {
         BusinessObjectModelBuilder bom = aBOM().withBO(aBO("someUglyNameMightNotAppear").withField(field).build());
         addReferencedBoToBom(field, bom);
         return Marshaller.marshallUnmarshall(bom.build());
     }
 
-    private void addReferencedBoToBom(Field field, BusinessObjectModelBuilder bom) {
+    private void addReferencedBoToBom(final Field field, final BusinessObjectModelBuilder bom) {
         if (field instanceof RelationField) {
             RelationField f = (RelationField) field;
             bom.withBO(f.getReference());

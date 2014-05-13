@@ -21,15 +21,15 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 
-import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "description", "fields", "uniqueConstraints", "queries" })
+@XmlType(propOrder = { "description", "fields", "uniqueConstraints", "queries", "indexes" })
 public class BusinessObject {
 
     @XmlID
@@ -40,15 +40,17 @@ public class BusinessObject {
     private String description;
 
     @XmlElementWrapper(name = "fields", required = true)
-    @XmlElements({
-            @XmlElement(name = "field", type = SimpleField.class, required = true),
-            @XmlElement(name = "relationField", type = RelationField.class, required = true)
-    })
+    @XmlElements({ @XmlElement(name = "field", type = SimpleField.class, required = true),
+            @XmlElement(name = "relationField", type = RelationField.class, required = true) })
     private List<Field> fields;
 
     @XmlElementWrapper(name = "uniqueConstraints")
     @XmlElement(name = "uniqueConstraint")
     private List<UniqueConstraint> uniqueConstraints;
+
+    @XmlElementWrapper(name = "indexes")
+    @XmlElement(name = "index", required = false)
+    private List<Index> indexes;
 
     @XmlElementWrapper(name = "queries")
     @XmlElement(name = "query")
@@ -58,6 +60,7 @@ public class BusinessObject {
         fields = new ArrayList<Field>();
         uniqueConstraints = new ArrayList<UniqueConstraint>();
         queries = new ArrayList<Query>();
+        indexes = new ArrayList<Index>();
     }
 
     public String getQualifiedName() {
@@ -124,12 +127,35 @@ public class BusinessObject {
         this.queries = queries;
     }
 
+    public Index addIndex(final String name, final String... fieldNames) {
+        if (fieldNames == null || fieldNames.length == 0) {
+            throw new IllegalArgumentException("fieldNames cannot be null or empty");
+        }
+        final Index index = new Index();
+        index.setName(name);
+
+        index.setFieldNames(Arrays.asList(fieldNames));
+        if (indexes.add(index)) {
+            return index;
+        }
+        return null;
+    }
+
+    public List<Index> getIndexes() {
+        return indexes;
+    }
+
+    public void setIndexes(final List<Index> indexes) {
+        this.indexes = indexes;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (fields == null ? 0 : fields.hashCode());
+        result = prime * result + (indexes == null ? 0 : indexes.hashCode());
         result = prime * result + (qualifiedName == null ? 0 : qualifiedName.hashCode());
         result = prime * result + (queries == null ? 0 : queries.hashCode());
         result = prime * result + (uniqueConstraints == null ? 0 : uniqueConstraints.hashCode());
@@ -162,6 +188,13 @@ public class BusinessObject {
         } else if (!fields.equals(other.fields)) {
             return false;
         }
+        if (indexes == null) {
+            if (other.indexes != null) {
+                return false;
+            }
+        } else if (!indexes.equals(other.indexes)) {
+            return false;
+        }
         if (qualifiedName == null) {
             if (other.qualifiedName != null) {
                 return false;
@@ -189,7 +222,7 @@ public class BusinessObject {
     @Override
     public String toString() {
         return "BusinessObject [qualifiedName=" + qualifiedName + ", description=" + description + ", fields=" + fields + ", uniqueConstraints="
-                + uniqueConstraints + ", queries=" + queries + "]";
+                + uniqueConstraints + ", indexes=" + indexes + ", queries=" + queries + "]";
     }
 
 }

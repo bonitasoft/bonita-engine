@@ -22,25 +22,29 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
  */
 public class RelationFieldTest {
 
-    private BusinessObject aBo = aBO("boName").withField(aBooleanField("aField")).build();
+    private final BusinessObject aBo = aBO("boName").withField(aBooleanField("aField")).build();
 
     @Test
-    public void should_not_be_marshallizable_without_name_type_and_reference() throws Exception {
+    public void should_not_be_marshallizable_without_reference() throws Exception {
         RelationField field = new RelationField();
         field.setName("aName");
         field.setType(Type.AGGREGATION);
 
         assertThat(field).cannotBeMarshalled();
+    }
 
-        //
-        field = new RelationField();
+    @Test
+    public void should_not_be_marshallizable_without_name() throws Exception {
+        RelationField field = new RelationField();
         field.setType(Type.AGGREGATION);
         field.setReference(aBo);
 
         assertThat(field).cannotBeMarshalled();
+    }
 
-        //
-        field = new RelationField();
+    @Test
+    public void should_not_be_marshallizable_without_type() throws Exception {
+        RelationField field = new RelationField();
         field.setReference(aBo);
         field.setName("aName");
 
