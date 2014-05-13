@@ -1168,9 +1168,8 @@ public class ModelConvertor {
                 expList.add(toExpression(sexp));
             }
             return expList;
-        } else {
-            return Collections.emptyList();
         }
+        return Collections.emptyList();
     }
 
     public static Expression toExpression(final SExpression sexp) {
@@ -1372,9 +1371,8 @@ public class ModelConvertor {
                 contactInfoBuilder.setZipCode(zipCode);
             }
             return contactInfoBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final long userId) {
@@ -1651,7 +1649,6 @@ public class ModelConvertor {
         }
         return sOperations;
     }
-
 
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
             final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors) {
@@ -1964,7 +1961,6 @@ public class ModelConvertor {
         final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
         return themeImpl;
     }
-
 
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
