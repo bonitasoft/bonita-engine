@@ -96,6 +96,11 @@
 									<type>jar</type>
 								</artifactItem>
 								<artifactItem>
+									<groupId>org.hibernate</groupId>
+									<artifactId>hibernate-core</artifactId>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
 									<artifactId>bonita-client-sp</artifactId>
 									<version>${project.version}</version>
