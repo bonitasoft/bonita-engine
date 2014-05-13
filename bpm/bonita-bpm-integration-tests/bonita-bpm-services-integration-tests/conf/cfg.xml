@@ -132,7 +132,6 @@
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="tokenService" ref="tokenService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-		<constructor-arg name="transientDataService" ref="transientDataService" />
 	</bean>
 
 	<bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
