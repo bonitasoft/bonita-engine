@@ -179,6 +179,38 @@ public class ProfilesImporter {
         return errors;
     }
 
+    // protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
+    // final String page = childProfileEntry.getPage();
+    // if (page != null && !page.isEmpty()) { // there is a page
+    // if (childProfileEntry.isCustom()) {
+    // return new ImportError(childProfileEntry.getPage(), Type.PAGE);
+    // }
+    // }
+    // return null;
+    // }
+    //
+    // protected List<ImportError> checkParentProfileEntryForError(final ExportedParentProfileEntry parentProfileEntry) {
+    // final List<ExportedProfileEntry> childProfileEntries = parentProfileEntry.getChildProfileEntries();
+    // if (childProfileEntries == null || childProfileEntries.isEmpty()) {// no children
+    // final ImportError error = checkChildProfileEntryForError(parentProfileEntry);
+    // if (error != null) {
+    // return Arrays.asList(error);
+    // }
+    // } else {
+    // final ArrayList<ImportError> errors = new ArrayList<ImportError>();
+    // for (final ExportedProfileEntry childProfileEntry : childProfileEntries) {
+    // final ImportError checkChildProfileEntryForError = checkChildProfileEntryForError(childProfileEntry);
+    // if (checkChildProfileEntryForError != null) {
+    // errors.add(checkChildProfileEntryForError);
+    // }
+    // }
+    // // we do not import the parent only if no child have an existing page
+    // if (errors.size() == childProfileEntries.size()) {
+    // return errors;
+    // }
+    // }
+    // return null;
+    // }
     protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
         return null;
     }

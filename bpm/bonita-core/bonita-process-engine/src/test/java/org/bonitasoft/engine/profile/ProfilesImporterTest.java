@@ -384,6 +384,23 @@ public class ProfilesImporterTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    public void should_importProfileMapping_return_error_if_role_and_group_membership_do_not_exists() throws Exception {
+        // given
+        createImporter(new IgnoreDuplicateImportStrategy());
+        ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        exportedProfileMapping.setMemberships(Arrays.asList(new Pair<String, String>("group", "role")));
+        doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
+        doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
+        // when
+        List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
+
+        // then
+        assertThat(importProfileMapping.get(1)).isEqualTo(new ImportError("role", Type.ROLE));
+        assertThat(importProfileMapping.get(0)).isEqualTo(new ImportError("group", Type.GROUP));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
     public void should_importProfileMapping_return_no_error_if_membershi_exists() throws Exception {
         // given
         createImporter(new IgnoreDuplicateImportStrategy());

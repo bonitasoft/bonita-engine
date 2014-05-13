@@ -26,8 +26,14 @@ import org.bonitasoft.engine.profile.model.SProfile;
  */
 public abstract class ProfileImportStategy {
 
+    /**
+     * what to do before the import
+     */
     public abstract void beforeImport() throws ExecutionException;
 
+    /**
+     * return the imported version of the exportedProfile
+     */
     public abstract SProfile whenProfileExists(final long importerId,
             final ExportedProfile exportedProfile,
             final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException,
