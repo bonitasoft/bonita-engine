@@ -13,14 +13,14 @@ public class ServerBDMJarBuilderITest {
 
     /* Just to test we have no errors in full chain. Must be improved */
     @Test
-    public void jar_builder_should_goes_well_without_errors() throws Exception {
+    public void jar_builder_should_go_well_without_errors() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         bdmJarBuilder.build(aBOM().build(), TrueFileFilter.TRUE);
     }
 
     @Test
-    public void jar_builder_should_goes_well_without_errors_with_queries() throws Exception {
+    public void jar_builder_should_go_well_without_errors_with_queries() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();
@@ -28,7 +28,7 @@ public class ServerBDMJarBuilderITest {
     }
 
     @Test
-    public void jar_builder_should_goes_well_without_errors_with_queries2() throws Exception {
+    public void jar_builder_should_go_well_without_errors_with_queries2() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();

@@ -86,6 +86,12 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
+									<artifactId>bonita-server-sp</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.bonitasoft.engine</groupId>
 									<artifactId>bonita-common-sp</artifactId>
 									<version>${project.version}</version>
 									<type>jar</type>

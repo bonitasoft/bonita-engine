@@ -315,7 +315,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
-        final String daoContent = readGeneratedDAOFile();
+        final String daoContent = readGeneratedDAOInterface();
         assertThat(daoContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
     }
 
@@ -340,7 +340,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
-        final String daoContent = readGeneratedDAOFile();
+        final String daoContent = readGeneratedDAOInterface();
 
         assertThat(daoContent).contains("public List<Employee> getEmployeesByNameAndAge(Integer miEdad, String myName, int startIndex, int maxResults)");
     }
@@ -393,7 +393,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
     }
 
-    private String readGeneratedDAOFile() throws IOException {
+    private String readGeneratedDAOInterface() throws IOException {
         final File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replace(".", File.separator) + "DAO.java");
         return FileUtils.readFileToString(daoInterface);
     }
