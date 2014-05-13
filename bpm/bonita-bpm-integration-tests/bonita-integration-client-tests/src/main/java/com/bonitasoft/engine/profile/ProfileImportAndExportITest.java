@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -106,6 +108,47 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
         final byte[] profilebytes = getProfileAPI().exportAllProfiles();
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.compareXML(new String(xmlContent), new String(profilebytes));
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
+    @Test
+    public void importAndExportWithMissingCustomPage() throws BonitaException, IOException, SAXException {
+        String xmlAsText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<profiles:profiles xmlns:profiles=\"http://www.bonitasoft.org/ns/profile/6.1\">"
+                + "<profile isDefault=\"false\" name=\"ImportExportProfile\"> "
+                + "<description>ImportExportProfileDescription</description>"
+                + "<profileEntries>"
+                + "<parentProfileEntry isCustom=\"true\" name=\"menu3\">"
+                + "<parentName>NULL</parentName>"
+                + "<index>0</index>"
+                + "<type>link</type>"
+                + "<page>unknown</page>"
+                + "</parentProfileEntry>"
+                + "</profileEntries>"
+                + "<profileMapping>"
+                + "<roles>"
+                + "<role>unknown</role>"
+                + "</roles>"
+                + "<groups>"
+                + "<group>unknown</group>"
+                + "</groups>"
+                + "</profileMapping>"
+                + "</profile>"
+                + "</profiles:profiles>";
+
+        final byte[] xmlContent = xmlAsText
+                .getBytes("UTF-8");
+
+        final List<ImportStatus> status = getProfileAPI().importProfiles(xmlContent, ImportPolicy.DELETE_EXISTING);
+
+        assertThat(status.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        List<ImportError> errors = status.get(0).getErrors();
+        System.out.println(errors);
+        assertThat(errors.size()).isEqualTo(3);
+        assertThat(errors.get(0)).isEqualTo(new ImportError("unknown", Type.PAGE));
+        assertThat(errors.get(1)).isEqualTo(new ImportError("unknown", Type.ROLE));
+        assertThat(errors.get(2)).isEqualTo(new ImportError("unknown", Type.GROUP));
+
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profile on other duplicate.", jira = "")

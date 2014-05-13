@@ -49,6 +49,7 @@ import com.bonitasoft.engine.api.impl.transaction.profile.ExportProfilesSpecifie
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfile;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
+import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
 import com.bonitasoft.engine.profile.ProfileCreator.ProfileField;
@@ -57,6 +58,7 @@ import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater.ProfileEntryUpdateField;
 import com.bonitasoft.engine.profile.ProfileUpdater;
+import com.bonitasoft.engine.profile.ProfilesImporterExt;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
@@ -184,8 +186,10 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Parser parser = tenantAccessor.getProfileParser();
+        PageService pageService = tenantAccessor.getPageService();
         final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
-        return new ProfilesImporter(profileService, identityService, profiles, org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
+        return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
+                org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
                 .importProfiles(SessionInfos.getUserIdFromSession());
 
     }

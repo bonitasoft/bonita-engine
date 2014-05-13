@@ -246,7 +246,16 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
     ProfileEntry updateProfileEntry(long id, ProfileEntryUpdater updater) throws ProfileEntryNotFoundException, UpdateException;
 
     /**
+     * Import profiles from XML file.
      * 
+     * @param xmlContent
+     *            xml content to import
+     * @param policy
+     *            import policy to define different ways of how to import xml content in different case
+     * @return
+     *         A list that is the result of the import, there is one element for each profile
+     * @throws ExecutionException
+     *             If there is an unexpected error during the imports
      * 
      * @since 6.3.1
      */

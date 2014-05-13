@@ -12,10 +12,26 @@ package com.bonitasoft.engine.profile;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  * 
  */
 public enum ImportPolicy {
 
-    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES; // , MERGE_DUPLICATES (Merge should retain existing IDs)
+    /**
+     * Delete all profiles before importing the XML file
+     */
+    DELETE_EXISTING,
+    /**
+     * In case of conflict on the name, it replaces completely the profile including profile entries and profile mappings
+     */
+    REPLACE_DUPLICATES,
+    /**
+     * Throw exception in case of already existing profile with the same name
+     */
+    FAIL_ON_DUPLICATES,
+    /**
+     * In case of conflict on the name, the profile is not imported and the existing profile is kept unmodified
+     */
+    IGNORE_DUPLICATES;
 
 }
