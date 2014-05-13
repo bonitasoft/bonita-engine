@@ -17,11 +17,11 @@ import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
  */
 public class BusinessObjectModelAssert extends AbstractAssert<BusinessObjectModelAssert, BusinessObjectModel> {
 
-    protected BusinessObjectModelAssert(BusinessObjectModel actual) {
+    protected BusinessObjectModelAssert(final BusinessObjectModel actual) {
         super(actual, BusinessObjectModelAssert.class);
     }
 
-    public static BusinessObjectModelAssert assertThat(BusinessObjectModel actual) {
+    public static BusinessObjectModelAssert assertThat(final BusinessObjectModel actual) {
         return new BusinessObjectModelAssert(actual);
     }
 

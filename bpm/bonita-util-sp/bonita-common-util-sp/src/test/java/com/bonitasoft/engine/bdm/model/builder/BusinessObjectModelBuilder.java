@@ -16,13 +16,13 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 public class BusinessObjectModelBuilder {
 
-    private BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+    private final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
 
     public static BusinessObjectModelBuilder aBOM() {
         return new BusinessObjectModelBuilder();
     }
 
-    public BusinessObjectModelBuilder withBO(BusinessObject bo) {
+    public BusinessObjectModelBuilder withBO(final BusinessObject bo) {
         businessObjectModel.addBusinessObject(bo);
         return this;
     }
@@ -32,14 +32,9 @@ public class BusinessObjectModelBuilder {
     }
 
     private BusinessObject buildMyBusinessObject() {
-        return aBO("BusinessObject")
-                .withField(aStringField("stringField").nullable().build())
-                .withField(aBooleanField("booleanField"))
-                .withField(aDateField("dateField").notNullable().build())
-                .withField(aDoubleField("doubleField").build())
-                .withField(anIntegerField("integerField").build())
-                .withField(aTextField("textField").build())
-                .build();
+        return aBO("BusinessObject").withField(aStringField("stringField").nullable().build()).withField(aBooleanField("booleanField"))
+                .withField(aDateField("dateField").notNullable().build()).withField(aDoubleField("doubleField").build())
+                .withField(anIntegerField("integerField").build()).withField(aTextField("textField").build()).build();
     }
 
     public BusinessObjectModel buildDefaultBOM() {
@@ -79,4 +74,11 @@ public class BusinessObjectModelBuilder {
         return bom;
     }
 
+    public BusinessObjectModel buildBOMWithIndex() {
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObject employee = buildMyBusinessObject();
+        employee.addIndex("idx_45", "stringField", "doubleField");
+        bom.addBusinessObject(employee);
+        return bom;
+    }
 }

@@ -54,11 +54,7 @@ public class SimpleField extends Field {
     public boolean equals(final Object obj) {
         if (obj instanceof SimpleField) {
             final SimpleField other = (SimpleField) obj;
-            return new EqualsBuilder()
-                    .appendSuper(super.equals(obj))
-                    .append(length, other.length)
-                    .append(type, other.type)
-                    .isEquals();
+            return new EqualsBuilder().appendSuper(super.equals(obj)).append(length, other.length).append(type, other.type).isEquals();
         } else {
             return false;
         }
@@ -66,8 +62,8 @@ public class SimpleField extends Field {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
-                .append("name", getName()).append("nullalble", isNullable()).append("collection", isCollection())
+        return new ToStringBuilder(this, SHORT_PREFIX_STYLE).append("name", getName()).append("nullable", isNullable()).append("collection", isCollection())
                 .append("length", length).append("type", type).toString();
     }
+
 }

@@ -72,4 +72,14 @@ public class BusinessObjectModelConverterTest {
         convertor.unmarshall(xml);
         // expect no unmarshalling exception
     }
+
+    public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithIndex() throws Exception {
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = new BusinessObjectModelBuilder().buildBOMWithIndex();
+        final byte[] zip = convertor.zip(bom);
+        final BusinessObjectModel actual = convertor.unzip(zip);
+
+        assertThat(actual).isEqualTo(bom);
+    }
+
 }

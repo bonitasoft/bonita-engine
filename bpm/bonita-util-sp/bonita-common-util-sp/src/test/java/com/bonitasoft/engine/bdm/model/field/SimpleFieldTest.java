@@ -18,14 +18,17 @@ import org.junit.Test;
 public class SimpleFieldTest {
 
     @Test
-    public void should_not_be_marshallizable_without_name_and_type() throws Exception {
+    public void should_not_be_marshallizable_without_name() throws Exception {
         SimpleField field = new SimpleField();
-        field.setName("aName");
+        field.setType(FieldType.BOOLEAN);
 
         assertThat(field).cannotBeMarshalled();
+    }
 
-        field = new SimpleField();
-        field.setType(FieldType.BOOLEAN);
+    @Test
+    public void should_not_be_marshallizable_without_type() throws Exception {
+        SimpleField field = new SimpleField();
+        field.setName("aName");
 
         assertThat(field).cannotBeMarshalled();
     }
