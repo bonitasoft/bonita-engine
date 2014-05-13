@@ -52,7 +52,11 @@ public class RelationField extends Field {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(reference).append(type).toHashCode();
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(type);
+        if (reference != null) {
+            hashCodeBuilder = hashCodeBuilder.append(reference.getQualifiedName()).append(reference.getDescription());
+        }
+        return hashCodeBuilder.toHashCode();
     }
 
     @Override
