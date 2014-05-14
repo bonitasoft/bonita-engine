@@ -66,7 +66,7 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
 
     private void addReferencedBoToBom(BusinessObject bo, BusinessObjectModelBuilder bom) {
         for (Field field : bo.getFields()) {
-            if (field instanceof RelationField) {
+            if (field instanceof RelationField && !bo.equals(((RelationField) field).getReference())) {
                 bom.withBO(((RelationField) field).getReference());
             }
         }

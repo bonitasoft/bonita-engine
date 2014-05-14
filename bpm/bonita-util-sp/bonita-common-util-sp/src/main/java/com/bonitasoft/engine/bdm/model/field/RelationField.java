@@ -65,7 +65,14 @@ public class RelationField extends Field {
     public boolean equals(final Object obj) {
         if (obj instanceof RelationField) {
             final RelationField other = (RelationField) obj;
-            return new EqualsBuilder().appendSuper(super.equals(obj)).append(reference, other.reference).append(type, other.type).isEquals();
+            if (reference == null ^ other.reference == null) {
+                return false;
+            }
+            EqualsBuilder builder = new EqualsBuilder().appendSuper(super.equals(obj)).append(type, other.type);
+            if (reference != null && other.reference != null) {
+                builder = builder.append(reference.getQualifiedName(), other.reference.getQualifiedName());
+            }
+            return builder.isEquals();
         } else {
             return false;
         }

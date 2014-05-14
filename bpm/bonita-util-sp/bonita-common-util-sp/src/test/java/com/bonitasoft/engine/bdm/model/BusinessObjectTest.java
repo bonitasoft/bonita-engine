@@ -13,14 +13,10 @@ import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anAggregationField;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
-
-import com.bonitasoft.engine.bdm.model.builder.FieldBuilder;
 
 /**
  * @author Colin PUY
@@ -59,7 +55,6 @@ public class BusinessObjectTest {
     }
 
     @Test
-    @Ignore("Fix me")
     public void could_have_relationFields_referencing_itself() throws Exception {
         BusinessObject bo = aBO("aBo").build();
 
