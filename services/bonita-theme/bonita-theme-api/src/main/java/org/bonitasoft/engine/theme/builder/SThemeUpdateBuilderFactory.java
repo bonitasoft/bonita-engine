@@ -18,13 +18,13 @@ package org.bonitasoft.engine.theme.builder;
  */
 public interface SThemeUpdateBuilderFactory {
 
-    static final String CONTENT = "content";
+    String CONTENT = "content";
 
-    static final String CSS_CONTENT = "cssContent";
+    String CSS_CONTENT = "cssContent";
 
-    static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    String LAST_UPDATE_DATE = "lastUpdateDate";
 
-    static final String TYPE = "type";
+    String TYPE = "type";
 
     SThemeUpdateBuilder createNewInstance();
 

@@ -23,17 +23,17 @@ import java.io.Serializable;
  */
 public interface LeftOperand extends Serializable {
 
-    static final String TYPE_DATA = "DATA";
+    String TYPE_DATA = "DATA";
 
-    static final String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
+    String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
 
-    static final String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
+    String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
 
-    static final String TYPE_DOCUMENT = "DOCUMENT";
+    String TYPE_DOCUMENT = "DOCUMENT";
 
-    static final String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
+    String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
 
-    static final String TYPE_TRANSIENT_DATA = "TRANSIENT_DATA";
+    String TYPE_TRANSIENT_DATA = "TRANSIENT_DATA";
 
     String getName();
 
