@@ -42,7 +42,7 @@ import org.bonitasoft.engine.xml.XMLWriter;
 public abstract class AbstractExportProfiles implements TransactionContentWithResult<String>, IProfileNameSpace
 {
 
-    private static final int NUMBER_OF_RESULTS = QueryOptions.UNLIMITED_NUMBER_OF_RESULTS;
+    private static final int NUMBER_OF_RESULTS = 100;
 
     private final static String USER_SUFFIX = "ForUser";
 
