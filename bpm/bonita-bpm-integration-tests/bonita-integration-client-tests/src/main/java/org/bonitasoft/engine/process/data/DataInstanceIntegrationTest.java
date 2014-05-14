@@ -171,8 +171,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     @Test
     public void getDateDataInstanceFromProcess() throws Exception {
         final ProcessDefinition processDefinition = operateProcess(user, "var1",
-                new ExpressionBuilder().createConstantDateExpression("2013-07-18T14:49:26.86+02:00"),
-                Date.class.getName());
+                new ExpressionBuilder().createConstantDateExpression("2013-07-18T14:49:26.86+02:00"), Date.class.getName());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
@@ -319,8 +318,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         assertEquals(1, processDataInstances.get(0).getValue());
 
         // Execute pending task
-        assertTrue("expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("expected an activity", new CheckNbOfActivities(getProcessAPI(), 20, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.get(0);
         assignAndExecuteStep(activityInstance, user.getId());
@@ -938,10 +936,6 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         return createProcessWithActorAndHumanTaskAndStringData(new ExpressionBuilder().createConstantStringExpression("beforeUpdate"), false).done();
     }
 
-    private DesignProcessDefinition createProcessWithActorAndHumanTaskAndNullStringDataTransient() throws Exception {
-        return createProcessWithActorAndHumanTaskAndStringData(new ExpressionBuilder().createConstantStringExpression("beforeUpdate"), true).done();
-    }
-
     private ProcessDefinitionBuilder createProcessWithActorAndHumanTaskAndStringData(final Expression defaultValue, final boolean isTransient) {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
@@ -975,7 +969,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     }
 
     private ProcessDefinition deployAndEnableProcWithPersistedAndTransientVariable(final String userTaskName) throws InvalidExpressionException,
-            BonitaException, InvalidProcessDefinitionException {
+    BonitaException, InvalidProcessDefinitionException {
         final String startName = "start";
         final String endName = "end";
         final Expression defaultValue = new ExpressionBuilder().createConstantStringExpression("default");

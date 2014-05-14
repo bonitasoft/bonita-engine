@@ -241,7 +241,6 @@ import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.job.impl.FailedJobImpl;
-import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.operation.impl.LeftOperandImpl;
@@ -1629,14 +1628,15 @@ public class ModelConvertor {
         if (operation == null) {
             return null;
         }
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
+        return BuilderFactory
+                .get(SOperationBuilderFactory.class)
+                .createNewInstance()
+                .setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
-                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
-                        .setName(operation.getLeftOperand().getName())
-                        .setType(operation.getLeftOperand().getType())
-                        .done())
-                .done();
+                .setLeftOperand(
+                        BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
+                                .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -1960,10 +1960,6 @@ public class ModelConvertor {
         final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
         final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
         return themeImpl;
-    }
-
-    private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
     }
 
 }
