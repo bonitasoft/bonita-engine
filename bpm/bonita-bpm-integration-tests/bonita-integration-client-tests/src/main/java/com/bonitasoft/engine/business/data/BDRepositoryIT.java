@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,8 +200,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(model);
-        return zip;
+        return converter.zip(model);
     }
 
     @Test
@@ -573,6 +573,39 @@ public class BDRepositoryIT extends CommonAPISPTest {
             System.err.println(eee.getMessage());
             return null;
         }
+    }
+
+    @Test
+    public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
+        final String businessDataName = "employee";
+        processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().deleteBusinessDataOperation(businessDataName));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstanceId);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
+                Collections.<String, Serializable> emptyMap());
+
+        Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        assertThat(result.get("countEmployee")).isEqualTo(1L);
+
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForUserTask("step2", processInstanceId);
+        result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        assertThat(result.get("countEmployee")).isEqualTo(0L);
+
+        disableAndDeleteProcess(definition.getId());
     }
 
 }

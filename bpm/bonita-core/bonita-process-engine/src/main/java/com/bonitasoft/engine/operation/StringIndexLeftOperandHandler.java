@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
- * BonitaSoft is a trademark of BonitaSoft SA.
+ * Copyright (C) 2009, 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
@@ -36,8 +36,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
 
     private final ActivityInstanceService activityInstanceService;
 
-    public StringIndexLeftOperandHandler(final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService) {
+    public StringIndexLeftOperandHandler(final ProcessInstanceService processInstanceService, final ActivityInstanceService activityInstanceService) {
         this.processInstanceService = processInstanceService;
         this.activityInstanceService = activityInstanceService;
     }
@@ -93,6 +92,11 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     @Override
     public String getType() {
         return SLeftOperand.TYPE_SEARCH_INDEX;
+    }
+
+    @Override
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+        throw new SOperationExecutionException("Deleting a string index is not supported");
     }
 
     @Override
