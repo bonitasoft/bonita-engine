@@ -23,6 +23,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorState;
  */
 public class ConnectorInstanceImpl extends NamedElementImpl implements ConnectorInstance {
 
+    private static final long serialVersionUID = 2148709030350403891L;
+
     private final long containerId;
 
     private final String containerType;
@@ -45,8 +47,6 @@ public class ConnectorInstanceImpl extends NamedElementImpl implements Connector
         this.state = state;
         this.activationEvent = activationEvent;
     }
-
-    private static final long serialVersionUID = 2148709030350403891L;
 
     @Override
     public long getContainerId() {

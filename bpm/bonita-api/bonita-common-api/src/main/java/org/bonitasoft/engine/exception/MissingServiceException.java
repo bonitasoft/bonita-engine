@@ -10,27 +10,22 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package org.bonitasoft.engine.exception;
 
 /**
- * 
  * Happens when a service is missing from the configuration
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 public class MissingServiceException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
 
     public MissingServiceException(final String string) {
         super(string);
     }
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
 }

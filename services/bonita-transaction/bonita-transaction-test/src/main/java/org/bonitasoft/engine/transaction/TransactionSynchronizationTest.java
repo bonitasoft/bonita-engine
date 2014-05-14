@@ -13,9 +13,9 @@ import org.junit.Test;
 
 public abstract class TransactionSynchronizationTest {
 
-    protected abstract TransactionService getTxService() throws Exception;
-
     TransactionService txService;
+
+    protected abstract TransactionService getTxService() throws Exception;
 
     @Before
     public void before() throws Exception {

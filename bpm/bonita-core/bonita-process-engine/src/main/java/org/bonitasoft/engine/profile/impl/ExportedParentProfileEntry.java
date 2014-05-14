@@ -35,16 +35,16 @@ public class ExportedParentProfileEntry {
 
     private List<ExportedProfileEntry> childProfileEntries;
 
+    public ExportedParentProfileEntry(final String name) {
+        this.name = name;
+    }
+
     public List<ExportedProfileEntry> getChildProfileEntries() {
         return childProfileEntries;
     }
 
-    public void setChildProfileEntries(List<ExportedProfileEntry> childProfileEntries) {
+    public void setChildProfileEntries(final List<ExportedProfileEntry> childProfileEntries) {
         this.childProfileEntries = childProfileEntries;
-    }
-
-    public ExportedParentProfileEntry(final String name) {
-        this.name = name;
     }
 
     public String getName() {
@@ -68,7 +68,7 @@ public class ExportedParentProfileEntry {
         result = prime * result + (type == null ? 0 : type.hashCode());
         result = prime * result + (page == null ? 0 : page.hashCode());
         result = prime * result + (parentName == null ? 0 : parentName.hashCode());
-        result = prime * result + (int) (index ^ (index >>> 32));
+        result = prime * result + (int) (index ^ index >>> 32);
         return result;
     }
 
@@ -76,7 +76,7 @@ public class ExportedParentProfileEntry {
         return parentName;
     }
 
-    public void setParentName(String parentName) {
+    public void setParentName(final String parentName) {
         this.parentName = parentName;
     }
 
@@ -130,7 +130,7 @@ public class ExportedParentProfileEntry {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -138,7 +138,7 @@ public class ExportedParentProfileEntry {
         return index;
     }
 
-    public void setIndex(long index) {
+    public void setIndex(final long index) {
         this.index = index;
     }
 
@@ -146,7 +146,7 @@ public class ExportedParentProfileEntry {
         return page;
     }
 
-    public void setPage(String page) {
+    public void setPage(final String page) {
         this.page = page;
     }
 

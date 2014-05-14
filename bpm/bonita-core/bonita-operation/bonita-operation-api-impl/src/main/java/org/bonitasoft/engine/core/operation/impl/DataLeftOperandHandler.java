@@ -35,13 +35,13 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
 
     private final DataInstanceService dataInstanceService;
 
+    public DataLeftOperandHandler(final DataInstanceService dataInstanceService) {
+        this.dataInstanceService = dataInstanceService;
+    }
+
     @Override
     public String getType() {
         return "DATA";
-    }
-
-    public DataLeftOperandHandler(final DataInstanceService dataInstanceService) {
-        this.dataInstanceService = dataInstanceService;
     }
 
     @Override

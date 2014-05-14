@@ -21,6 +21,8 @@ import java.security.SecureRandom;
  */
 public class PlatformSessionIdGenerator {
 
+    private static volatile SecureRandom numberGenerator = null;
+
     public static long getNextId() {
         SecureRandom ng = numberGenerator;
         if (ng == null) {
@@ -28,7 +30,5 @@ public class PlatformSessionIdGenerator {
         }
         return ng.nextLong();
     }
-
-    private static volatile SecureRandom numberGenerator = null;
 
 }

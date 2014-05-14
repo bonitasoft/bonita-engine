@@ -17,8 +17,8 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -29,11 +29,11 @@ public abstract class CRUDELogBuilder implements HasCRUDEAction, SLogBuilder {
 
     protected SQueriableLogBuilder queriableLogBuilder;
 
+    private static final String SEPARATOR = "_";
+
     protected CRUDELogBuilder() {
         queriableLogBuilder = new SQueriableLogBuilderImpl();
     }
-    
-    private static final String SEPARATOR = "_";
 
     protected abstract String getActionTypePrefix();
 

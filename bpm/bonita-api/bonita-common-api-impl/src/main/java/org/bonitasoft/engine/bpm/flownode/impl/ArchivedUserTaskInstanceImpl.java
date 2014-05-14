@@ -21,11 +21,11 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
  */
 public class ArchivedUserTaskInstanceImpl extends ArchivedHumanTaskInstanceImpl implements ArchivedUserTaskInstance {
 
+    private static final long serialVersionUID = -5611907403212645478L;
+
     public ArchivedUserTaskInstanceImpl(final String name) {
         super(name);
     }
-
-    private static final long serialVersionUID = -5611907403212645478L;
 
     @Override
     public FlowNodeType getType() {

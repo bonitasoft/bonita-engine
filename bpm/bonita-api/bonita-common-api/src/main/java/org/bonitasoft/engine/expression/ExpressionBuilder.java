@@ -28,12 +28,14 @@ import org.w3c.dom.NodeList;
 /**
  * Builds a new {@link Expression}. This class provides utility methods for building of different Expression types.
  * Attributes Name and ReturnType must be set.
- * 
+ *
  * @author Feng Hui
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
 public class ExpressionBuilder {
+
+    private static List<String> INVALID_PRIMITIVE_TYPES = Arrays.asList("char", "byte", "long", "int", "float", "double", "short", "boolean");
 
     public static final String NOT_EQUALS_COMPARATOR = "!=";
 
@@ -80,11 +82,6 @@ public class ExpressionBuilder {
         numericTypes.add(byte.class.getName());
     }
 
-    // public ExpressionBuilder createNewInstance() {
-    // expression = new ExpressionImpl();
-    // return this;
-    // }
-
     public ExpressionBuilder createNewInstance(final String name) {
         expression = new ExpressionImpl();
         setName(name);
@@ -93,7 +90,7 @@ public class ExpressionBuilder {
 
     /**
      * The name of the built expression is set to the value of the constant.
-     * 
+     *
      * @param value
      *            the value of this CONSTANT expression
      * @since 6.0
@@ -109,7 +106,7 @@ public class ExpressionBuilder {
 
     /**
      * Build a constant expression with date type and value in ISO-8601 format
-     * 
+     *
      * @param value
      *            a date defined with the ISO-8601 format
      * @return The corresponding expression
@@ -184,7 +181,7 @@ public class ExpressionBuilder {
 
     /**
      * Builds a new expression with the specified attributes
-     * 
+     *
      * @return the newly built {@link Expression}
      * @throws InvalidExpressionException
      *             is name or returnType is not set or set to an empty String.
@@ -260,7 +257,7 @@ public class ExpressionBuilder {
 
     /**
      * Sets the type of this expression.
-     * 
+     *
      * @param expressionType
      *            the expression type to use.
      * @return this ExpressionBuilder itself, for chain calls.
@@ -271,11 +268,9 @@ public class ExpressionBuilder {
         return this;
     }
 
-    private static List<String> INVALID_PRIMITIVE_TYPES = Arrays.asList("char", "byte", "long", "int", "float", "double", "short", "boolean");
-
     /**
      * Sets the return type of the underlining expression.
-     * 
+     *
      * @param returnType
      *            the return type to set on the expression.
      * @return this ExpressionBuilder itself.
@@ -509,7 +504,7 @@ public class ExpressionBuilder {
 
     /**
      * Create an expression to call a simple Java method (without parameters)
-     * 
+     *
      * @param name
      *            the expression name
      * @param methodName
