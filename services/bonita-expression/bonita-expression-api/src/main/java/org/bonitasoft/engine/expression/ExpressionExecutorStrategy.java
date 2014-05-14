@@ -71,6 +71,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_BUSINESS_DATA = "TYPE_BUSINESS_DATA";
 
+    String TYPE_BUSINESS_OBJECT_DAO = "TYPE_BUSINESS_OBJECT_DAO";
+
     String TYPE_QUERY_BUSINESS_DATA = "TYPE_QUERY_BUSINESS_DATA";
 
     ExpressionKind KIND_CONSTANT = new ExpressionKind(TYPE_CONSTANT);
@@ -98,6 +100,8 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_XPATH_READ = new ExpressionKind(TYPE_XPATH_READ);
 
     ExpressionKind KIND_BUSINESS_DATA = new ExpressionKind(TYPE_BUSINESS_DATA);
+
+    ExpressionKind KIND_BUSINESS_OBJECT_DAO = new ExpressionKind(TYPE_BUSINESS_OBJECT_DAO);
 
     ExpressionKind KIND_QUERY_BUSINESS_DATA = new ExpressionKind(TYPE_QUERY_BUSINESS_DATA);
 

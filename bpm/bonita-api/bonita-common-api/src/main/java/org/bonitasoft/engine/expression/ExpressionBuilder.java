@@ -145,6 +145,23 @@ public class ExpressionBuilder {
                 .done();
     }
 
+    /**
+     * Builds an <code>Expression</code> that evaluates to a Business Object Server DAO.
+     * 
+     * @param businessObjectDAOName
+     *            name of the DAO to evaluate.
+     * @param daoInterfaceClassName
+     *            class name of the interface of the DAO to instantiate.
+     * @return the newly created expression.
+     * @throws InvalidExpressionException
+     *             if the expression cannot be built because it is invalid.
+     */
+    public Expression buildBusinessObjectDAOExpression(final String businessObjectDAOName, final String daoInterfaceClassName)
+            throws InvalidExpressionException {
+        return createNewInstance(businessObjectDAOName).setContent(businessObjectDAOName).setExpressionType(ExpressionType.TYPE_BUSINESS_OBJECT_DAO)
+                .setReturnType(daoInterfaceClassName).done();
+    }
+
     public Expression createQueryBusinessDataExpression(final String expressionName, final String queryName, final String returnType,
             final Expression... dependencies) throws InvalidExpressionException {
         return createNewInstance(expressionName).setContent(queryName).setExpressionType(ExpressionType.TYPE_QUERY_BUSINESS_DATA).setReturnType(returnType)
