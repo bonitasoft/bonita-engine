@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
-import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
@@ -264,7 +263,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     if ((defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance)) == null) {
                         chosenTransitionDefinitions = new ArrayList<STransitionDefinition>(1);
                     } else {
-                        return Lists.newArrayList(defaultTransition);
+                        List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>(1);
+                        transitions.add(defaultTransition);
+                        return transitions;
                     }
                 } else {
                     chosenTransitionDefinitions = evaluateTransitionsForImpliciteGateway(sDefinition, flowNodeInstance, outgoingTransitionDefinitions,
