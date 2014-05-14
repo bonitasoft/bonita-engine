@@ -49,7 +49,7 @@ public class TCPServerAPI implements ServerAPI {
     }
 
     private TcpDestination getTcpdDestinationFromPattern(final String s) {
-        final int separatorIndex = s.indexOf(":");
+        final int separatorIndex = s.indexOf(':');
         final String host = s.substring(0, separatorIndex);
         final int port = Integer.valueOf(s.substring(separatorIndex + 1));
         final TcpDestination tcpDestination = new TcpDestination(host, port);
