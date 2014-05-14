@@ -8,14 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Colin PUY
  */
-public class SimpleFieldValidationRule extends ValidationRule {
+public class SimpleFieldValidationRule extends ValidationRule<SimpleField> {
 
     @Override
     public boolean appliesTo(Object modelElement) {
@@ -23,10 +22,9 @@ public class SimpleFieldValidationRule extends ValidationRule {
     }
 
     @Override
-    public ValidationStatus validate(Object modelElement) {
-        final Field field = (Field) modelElement;
+    public ValidationStatus validate(SimpleField field) {
         final ValidationStatus status = new ValidationStatus();
-        if (field instanceof SimpleField && ((SimpleField) field).getType() == null) {
+        if (field.getType() == null) {
             status.addError(field.getName() + " must have a type declared");
         }
         return status;

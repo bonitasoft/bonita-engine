@@ -14,7 +14,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectModelValidationRule extends ValidationRule {
+public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel> {
 
     @Override
     public boolean appliesTo(final Object modelElement) {
@@ -22,8 +22,7 @@ public class BusinessObjectModelValidationRule extends ValidationRule {
     }
 
     @Override
-    public ValidationStatus validate(final Object modelElement) {
-        final BusinessObjectModel bom = (BusinessObjectModel) modelElement;
+    public ValidationStatus validate(final BusinessObjectModel bom) {
         final ValidationStatus status = new ValidationStatus();
         if (bom.getBusinessObjects().isEmpty()) {
             status.addError("Business object model must have at least one business object declared");

@@ -25,7 +25,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectValidationRule extends ValidationRule {
+public class BusinessObjectValidationRule extends ValidationRule<BusinessObject> {
 
     private static final int MAX_TABLENAME_LENGTH = 30;
 
@@ -41,9 +41,7 @@ public class BusinessObjectValidationRule extends ValidationRule {
     }
 
     @Override
-    public ValidationStatus validate(final Object modelElement) {
-        final BusinessObject bo = (BusinessObject) modelElement;
-
+    public ValidationStatus validate(final BusinessObject bo) {
         final ValidationStatus status = new ValidationStatus();
         final String qualifiedName = bo.getQualifiedName();
         if (qualifiedName == null) {

@@ -17,7 +17,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class FieldValidationRule extends ValidationRule {
+public class FieldValidationRule extends ValidationRule<Field> {
 
     private static final int MAX_COLUMNAME_LENGTH = 50;
 
@@ -33,8 +33,7 @@ public class FieldValidationRule extends ValidationRule {
     }
 
     @Override
-    public ValidationStatus validate(final Object modelElement) {
-        final Field field = (Field) modelElement;
+    public ValidationStatus validate(final Field field) {
         final ValidationStatus status = new ValidationStatus();
         final String name = field.getName();
         if (name == null || !SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name) || isForbiddenIdentifier(name)) {
