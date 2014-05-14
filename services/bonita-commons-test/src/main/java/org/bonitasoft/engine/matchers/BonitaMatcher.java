@@ -46,7 +46,7 @@ public class BonitaMatcher<T> extends BaseMatcher<T> {
         boolean matche = true;
         for (final Matcher<T> matcher : matchers) {
             matche &= matcher.matches(item);
-            if (matche == false) {
+            if (!matche) {
                 return false;
             }
         }
