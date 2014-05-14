@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,27 +26,18 @@ public class BusinessObjectValidationRuleTest {
 
     private BusinessObjectValidationRule businessObjectValidationRule;
 
-    /**
-     * @throws java.lang.Exception
-     */
     @Before
     public void setUp() throws Exception {
         businessObjectValidationRule = new BusinessObjectValidationRule();
     }
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
-    public void shoudAppliesTo_UniqueConstraint() throws Exception {
+    public void should_apply_to_businessObject() throws Exception {
         assertThat(businessObjectValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
-        assertThat(businessObjectValidationRule.appliesTo(new BusinessObject())).isTrue();
         assertThat(businessObjectValidationRule.appliesTo(new SimpleField())).isFalse();
         assertThat(businessObjectValidationRule.appliesTo(new UniqueConstraint())).isFalse();
+
+        assertThat(businessObjectValidationRule.appliesTo(new BusinessObject())).isTrue();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -55,6 +45,16 @@ public class BusinessObjectValidationRuleTest {
         businessObjectValidationRule.checkRule(new SimpleField());
     }
 
+    @Test
+    public void should_validate_that_qualified_name_is_not_null() throws Exception {
+        BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName(null);
+        
+        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
+        
+        assertThat(validationStatus.isOk()).isFalse();
+    }
+    
     @Test
     public void shoudCheckRule_returns_valid_status() throws Exception {
         BusinessObject bo = new BusinessObject();

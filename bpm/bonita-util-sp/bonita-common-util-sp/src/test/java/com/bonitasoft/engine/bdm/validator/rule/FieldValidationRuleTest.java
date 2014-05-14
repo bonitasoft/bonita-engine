@@ -36,7 +36,7 @@ public class FieldValidationRuleTest {
     }
 
     @Test
-    public void should_applies_to_fields() throws Exception {
+    public void should_apply_to_fields() throws Exception {
         assertThat(fieldValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
         assertThat(fieldValidationRule.appliesTo(new BusinessObject())).isFalse();
         assertThat(fieldValidationRule.appliesTo(new UniqueConstraint())).isFalse();
