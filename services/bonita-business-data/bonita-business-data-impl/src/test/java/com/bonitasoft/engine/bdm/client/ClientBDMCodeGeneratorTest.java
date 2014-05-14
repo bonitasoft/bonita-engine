@@ -72,7 +72,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.setQualifiedName("Employee");
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.buildASTFromBom();
+        bdmCodeGenerator.buildJavaModelFromBom();
         assertThat(bdmCodeGenerator.getModel()._getClass("Employee")).isNotNull();
     }
 

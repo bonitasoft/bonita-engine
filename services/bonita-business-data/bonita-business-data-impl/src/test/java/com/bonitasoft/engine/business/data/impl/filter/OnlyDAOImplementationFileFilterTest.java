@@ -10,28 +10,25 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.business.data.impl.filter.OnlyDAOFileFilter;
-
 /**
  * @author Romain
- * 
  */
-public class OnlyDAOFileFilterTest {
+public class OnlyDAOImplementationFileFilterTest {
 
-    private OnlyDAOFileFilter fileFilter;
+    private OnlyDAOImplementationFileFilter fileFilter;
 
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-        fileFilter = new OnlyDAOFileFilter();
+        fileFilter = new OnlyDAOImplementationFileFilter();
     }
 
     @Test
     public void should_accept_return_true() throws Exception {
         File f = new File("EmployeeDAO.class");
-        assertThat(fileFilter.accept(f)).isTrue();
+        assertThat(fileFilter.accept(f)).isFalse();
 
         f = new File("EmployeeDAOImpl.class");
         assertThat(fileFilter.accept(f)).isTrue();

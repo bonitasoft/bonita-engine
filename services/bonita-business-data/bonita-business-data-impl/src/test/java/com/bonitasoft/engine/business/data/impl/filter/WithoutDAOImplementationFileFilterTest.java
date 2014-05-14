@@ -7,26 +7,21 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.business.data.impl.filter.WithoutDAOFileFilter;
+public class WithoutDAOImplementationFileFilterTest {
 
-public class WithoutDAOFileFilterTest {
-
-    private WithoutDAOFileFilter fileFilter;
+    private WithoutDAOImplementationFileFilter fileFilter;
 
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-        fileFilter = new WithoutDAOFileFilter();
+        fileFilter = new WithoutDAOImplementationFileFilter();
     }
 
     @Test
     public void should_accept_return_false() throws Exception {
-        File f = new File("EmployeeDAO.class");
-        assertThat(fileFilter.accept(f)).isFalse();
-
-        f = new File("EmployeeDAOImpl.class");
+        File f = new File("EmployeeDAOImpl.class");
         assertThat(fileFilter.accept(f)).isFalse();
 
         f = new File("Employee.java");

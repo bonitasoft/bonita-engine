@@ -46,8 +46,8 @@ import com.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import com.bonitasoft.engine.business.data.impl.filter.OnlyDAOFileFilter;
-import com.bonitasoft.engine.business.data.impl.filter.WithoutDAOFileFilter;
+import com.bonitasoft.engine.business.data.impl.filter.OnlyDAOImplementationFileFilter;
+import com.bonitasoft.engine.business.data.impl.filter.WithoutDAOImplementationFileFilter;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;
 
@@ -198,11 +198,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         // Build jar with Model
-        final byte[] modelJarContent = builder.build(model, new WithoutDAOFileFilter());
+        final byte[] modelJarContent = builder.build(model, new WithoutDAOImplementationFileFilter());
         resources.put(MODEL_JAR_NAME, modelJarContent);
 
         // Build jar with DAO
-        final byte[] daoJarContent = builder.build(model, new OnlyDAOFileFilter());
+        final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
 
         return IOUtil.generateZip(resources);

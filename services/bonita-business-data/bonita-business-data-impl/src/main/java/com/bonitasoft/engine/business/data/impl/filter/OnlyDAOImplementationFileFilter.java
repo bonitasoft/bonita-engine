@@ -13,14 +13,13 @@ import java.io.File;
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 
 /**
- * @author Romain
- * 
+ * @author Romain Bioteau
  */
-public class WithoutDAOFileFilter extends AbstractFileFilter {
+public class OnlyDAOImplementationFileFilter extends AbstractFileFilter {
 
     @Override
-    public boolean accept(File file) {
+    public boolean accept(final File file) {
         String name = file.getName();
-        return name.endsWith(".class") && !name.endsWith("DAO.class") && !file.getName().endsWith("DAOImpl.class");
+        return name.endsWith("DAOImpl.class");
     }
 }
