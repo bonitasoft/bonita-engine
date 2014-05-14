@@ -72,7 +72,7 @@
 						<goals>
 							<goal>schemagen</goal>
 						</goals>
-						<phase>generate-resources</phase>
+						<phase>generate-sources</phase>
 						<configuration>
 							<includes>
 								<include>com/bonitasoft/engine/bdm/model/**/*.java</include>
@@ -91,7 +91,7 @@
                        <goals>
                             <goal>run</goal>
                         </goals>
-                        <phase>process-resources</phase>
+                        <phase>process-sources</phase>
                         <configuration>
                             <target>
                                 <move file="${project.build.directory}/schemas/schema1.xsd"
