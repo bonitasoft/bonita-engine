@@ -5,6 +5,7 @@
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public class UniqueConstraintValidationRuleTest {
 		uc.setName("MY_CONSTRAINT_");
 		uc.setFieldNames(Arrays.asList("f1"));
 		ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
-		assertThat(validationStatus.isOk()).isTrue();
+		assertThat(validationStatus).isOk();
 	}
 
 	@Test
@@ -66,21 +67,21 @@ public class UniqueConstraintValidationRuleTest {
 		uc.setName("MY_CONSTRAINT_");
 		uc.setFieldNames(Collections.<String>emptyList());
 		ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
-		assertThat(validationStatus.isOk()).isFalse();
+		assertThat(validationStatus).isNotOk();
 
 		uc = new UniqueConstraint();
 		uc.setName("");
 		uc.setFieldNames(Arrays.asList("f1"));
 		validationStatus = uniqueConstraintValidationRule.validate(uc);
-		assertThat(validationStatus.isOk()).isFalse();
+		assertThat(validationStatus).isNotOk();
 		
 		uc.setName(null);
 		validationStatus = uniqueConstraintValidationRule.validate(uc);
-		assertThat(validationStatus.isOk()).isFalse();
+		assertThat(validationStatus).isNotOk();
 		
 		uc.setName("with whitespaces ");
 		validationStatus = uniqueConstraintValidationRule.validate(uc);
-		assertThat(validationStatus.isOk()).isFalse();
+		assertThat(validationStatus).isNotOk();
 	}
 
 

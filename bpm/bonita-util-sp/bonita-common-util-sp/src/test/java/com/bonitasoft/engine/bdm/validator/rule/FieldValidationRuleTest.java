@@ -5,6 +5,7 @@
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
@@ -55,7 +56,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isTrue();
+        assertThat(validationStatus).isOk();
     }
 
     @Test
@@ -64,7 +65,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -73,7 +74,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -82,7 +83,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -91,7 +92,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -100,7 +101,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -109,7 +110,7 @@ public class FieldValidationRuleTest {
 
         ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     /**

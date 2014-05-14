@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class SimpleFieldValidationRuleTest {
 
         ValidationStatus validationStatus = simpleFieldValidationRule.validate(simpleField);
 
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -45,6 +45,6 @@ public class SimpleFieldValidationRuleTest {
 
         ValidationStatus validationStatus = simpleFieldValidationRule.validate(simpleField);
 
-        assertThat(validationStatus.isOk()).isTrue();
+        assertThat(validationStatus).isOk();
     }
 }

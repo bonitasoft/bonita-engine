@@ -5,6 +5,7 @@
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class BusinessObjectValidationRuleTest {
         
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
     
     @Test
@@ -63,11 +64,11 @@ public class BusinessObjectValidationRuleTest {
         field.setName("firstName");
         bo.addField(field);
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isTrue();
+        assertThat(validationStatus).isOk();
 
         bo.addUniqueConstraint("_UC_1", "firstName");
         validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isTrue();
+        assertThat(validationStatus).isOk();
     }
 
     @Test
@@ -75,19 +76,19 @@ public class BusinessObjectValidationRuleTest {
         BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
 
         bo.setQualifiedName("org.bonita.Bo 2");
         SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
 
         bo.setQualifiedName("org.bonita.Bo2");
         bo.addUniqueConstraint("_UC_1", "dontExists");
         validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
 
     }
 
@@ -101,7 +102,7 @@ public class BusinessObjectValidationRuleTest {
         bo.addQuery("toto", "titi", List.class.getName());
         bo.addQuery("toto", "titi", List.class.getName());
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
     @Test
@@ -114,7 +115,7 @@ public class BusinessObjectValidationRuleTest {
         bo.addUniqueConstraint("toto", "firstName");
         bo.addUniqueConstraint("toto", "firstName");
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
-        assertThat(validationStatus.isOk()).isFalse();
+        assertThat(validationStatus).isNotOk();
     }
 
 }
