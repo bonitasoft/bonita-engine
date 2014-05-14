@@ -15,7 +15,6 @@ package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 
 /**
@@ -182,20 +181,16 @@ public class OperationBuilder {
     }
 
     /**
-     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that remove the existing Business Data of the current process.
+     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that remove the named Business Data of the current process.
      *
      * @param businessDataName
      *            the name of the reference in the process.
      * @return the newly created <code>Operation</code>.
-     * @see OperatorType#ASSIGNMENT
+     * @see OperatorType#DELETION
      */
     public Operation deleteBusinessDataOperation(final String businessDataName) {
-        final ExpressionImpl expression = new ExpressionImpl();
-        expression.setContent("NONE");
-        expression.setReturnType("NONE");
-
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setRightOperand(expression)
-                .setType(OperatorType.DELETION).done();
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setType(OperatorType.DELETION)
+                .done();
     }
 
     /**
