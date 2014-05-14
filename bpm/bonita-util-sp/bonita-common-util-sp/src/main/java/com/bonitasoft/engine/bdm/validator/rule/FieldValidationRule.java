@@ -11,7 +11,6 @@ package com.bonitasoft.engine.bdm.validator.rule;
 import javax.lang.model.SourceVersion;
 
 import com.bonitasoft.engine.bdm.model.field.Field;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
