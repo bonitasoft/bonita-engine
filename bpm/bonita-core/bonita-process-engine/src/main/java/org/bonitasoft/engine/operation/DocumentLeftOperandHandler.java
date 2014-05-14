@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2013, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -38,8 +38,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * The document that will be update/created have the name given to the leftOperand (leftOperand.getName())
  * If the document already exists on the process instance (document with same name), it is update.
  * If there is no document with this name, it is created.
- * 
+ *
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
@@ -141,6 +142,11 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
     @Override
     public String getType() {
         return LeftOperand.TYPE_DOCUMENT;
+    }
+
+    @Override
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+        throw new SOperationExecutionException("Deleting a document is not supported");
     }
 
     @Override

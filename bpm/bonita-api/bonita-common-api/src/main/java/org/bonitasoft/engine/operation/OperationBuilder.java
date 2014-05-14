@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -13,18 +13,21 @@
  **/
 package org.bonitasoft.engine.operation;
 
+import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 
 /**
  * Utilitary builder to creation <code>Operation</code> objects. <code>Operation</code>s are a way to 'assign', 'operate', 'set a new value', ... on something.
  * See {@link OperatorType} for the different types of operation.
- * 
+ *
  * @see OperatorType
  * @see Operation
  * @author Zhang Bole
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
  */
 public class OperationBuilder {
 
@@ -32,7 +35,7 @@ public class OperationBuilder {
 
     /**
      * Initiate the building of a new <code>Operation</code>. The <code>Operation</code> building will be complete when calling the {@link #done()} method.
-     * 
+     *
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
     public OperationBuilder createNewInstance() {
@@ -42,7 +45,7 @@ public class OperationBuilder {
 
     /**
      * Sets the <code>LeftOperand</code> of this operation. A <code>LeftOperand</code> can be obtained by using <code>LeftOperandBuilder</code>.
-     * 
+     *
      * @param leftOperand
      *            the <code>LeftOperand</code> to set.
      * @return this builder itself, so that calls the various exposed methods can be chained.
@@ -56,7 +59,6 @@ public class OperationBuilder {
     /**
      * @deprecated use setLeftOperand(String,String)
      *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
-     * 
      * @param name
      *            the name of the left operand
      * @param external
@@ -71,9 +73,7 @@ public class OperationBuilder {
 
     /**
      * @deprecated use setLeftOperand(String,String)
-     * 
      *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
-     * 
      * @param name
      *            the name of the left operand
      * @param external
@@ -90,7 +90,7 @@ public class OperationBuilder {
 
     /**
      * Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
-     * 
+     *
      * @param name
      *            the name of the left operand
      * @param external
@@ -149,7 +149,7 @@ public class OperationBuilder {
     /**
      * Creates a new operation of type {@link OperatorType#BUSINESS_DATA_JAVA_SETTER} that allows to update a Business Data by calling a Java setter on one of
      * its attributes.
-     * 
+     *
      * @param businessDataName
      *            the name of the business data to update.
      * @param methodName
@@ -163,13 +163,12 @@ public class OperationBuilder {
     public Operation createBusinessDataSetAttributeOperation(final String businessDataName, final String methodName, final String methodParamType,
             final Expression expression) {
         return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setRightOperand(expression)
-                .setType(OperatorType.JAVA_METHOD)
-                .setOperator(methodName).setOperatorInputType(methodParamType).done();
+                .setType(OperatorType.JAVA_METHOD).setOperator(methodName).setOperatorInputType(methodParamType).done();
     }
 
     /**
-     * Creates a new operation of type {@link OperatorType#ATTACH_EXISTING_BUSINESS_DATA} that associates an existing Business Data to the current process.
-     * 
+     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that associates an existing Business Data to the current process.
+     *
      * @param businessDataName
      *            the name of the reference in the process.
      * @param expressionReturningBusinessData
@@ -179,14 +178,29 @@ public class OperationBuilder {
      */
     public Operation attachBusinessDataSetAttributeOperation(final String businessDataName, final Expression expressionReturningBusinessData) {
         return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))
-                .setRightOperand(expressionReturningBusinessData)
-                .setType(OperatorType.ASSIGNMENT).done();
+                .setRightOperand(expressionReturningBusinessData).setType(OperatorType.ASSIGNMENT).done();
     }
 
     /**
-     * 
+     * Creates a new operation of type {@link OperatorType#ASSIGNMENT} that remove the existing Business Data of the current process.
+     *
+     * @param businessDataName
+     *            the name of the reference in the process.
+     * @return the newly created <code>Operation</code>.
+     * @see OperatorType#ASSIGNMENT
+     */
+    public Operation deleteBusinessDataOperation(final String businessDataName) {
+        final ExpressionImpl expression = new ExpressionImpl();
+        expression.setContent("NONE");
+        expression.setReturnType("NONE");
+
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName)).setRightOperand(expression)
+                .setType(OperatorType.DELETION).done();
+    }
+
+    /**
      * create an operation that update a document
-     * 
+     *
      * @param docName
      *            the name of the document
      * @param expression
@@ -198,9 +212,8 @@ public class OperationBuilder {
     }
 
     /**
-     * 
      * create an operation that update an xml data using a xpath expression
-     * 
+     *
      * @param xmlName
      *            name of the data
      * @param xPath
@@ -215,9 +228,8 @@ public class OperationBuilder {
     }
 
     /**
-     * 
      * create an operation that update a data that contains a java object
-     * 
+     *
      * @param objectName
      *            the name of the data
      * @param methodName
@@ -235,7 +247,7 @@ public class OperationBuilder {
 
     /**
      * Creates a new operation that sets a new value to a String search index.
-     * 
+     *
      * @param index
      *            the search index to set
      * @param setValue

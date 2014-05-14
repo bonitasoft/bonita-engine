@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package org.bonitasoft.engine.core.operation.impl;
@@ -29,6 +29,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class DataLeftOperandHandler implements LeftOperandHandler {
 
@@ -90,10 +91,15 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
+    public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+        throw new SOperationExecutionException("Deleting a data is not supported");
+    }
+
+    @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
         try {
             return getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType()).getValue();
-        } catch (SDataInstanceException e) {
+        } catch (final SDataInstanceException e) {
             throw new SBonitaReadException("Unable to retrieve the data", e);
         }
     }
