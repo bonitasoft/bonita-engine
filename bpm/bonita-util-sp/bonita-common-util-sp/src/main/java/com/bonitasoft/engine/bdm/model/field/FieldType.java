@@ -10,8 +10,6 @@ package com.bonitasoft.engine.bdm.model.field;
 
 import java.util.Date;
 
-import com.bonitasoft.engine.bdm.model.BusinessObject;
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -27,8 +25,7 @@ public enum FieldType {
     BOOLEAN(Boolean.class),
     BYTE(Byte.class),
     SHORT(Short.class),
-    CHAR(Character.class),
-    BUSINESSOBJECT(BusinessObject.class);
+    CHAR(Character.class);
     
     private Class<?> clazz;
 
