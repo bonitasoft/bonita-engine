@@ -11,6 +11,7 @@ package com.bonitasoft.engine.bdm.model;
 import static com.bonitasoft.engine.bdm.model.assertion.BusinessObjectModelAssert.assertThat;
 import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anAggregationField;
 
 import org.junit.Test;
 
@@ -27,6 +28,20 @@ public class BusinessObjectModelTest {
         
         // 
         businessObjectModel.addBusinessObject(aBO("aBo").withField(aStringField("aField").build()).build());
+        
+        assertThat(businessObjectModel).canBeMarshalled();
+    }
+    
+    @Test
+    public void should_have_already_declared_business_object_in_relation_fields() throws Exception {
+        BusinessObject notInModelBO = aBO("notInModelBo").withField(aStringField("aField").build()).build();
+        BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+        businessObjectModel.addBusinessObject(aBO("aBo").withField(anAggregationField("aggreg", notInModelBO)).build());
+        
+        assertThat(businessObjectModel).cannotBeMarshalled();
+        
+        // we add referenced BO to model
+        businessObjectModel.addBusinessObject(notInModelBO);
         
         assertThat(businessObjectModel).canBeMarshalled();
     }
