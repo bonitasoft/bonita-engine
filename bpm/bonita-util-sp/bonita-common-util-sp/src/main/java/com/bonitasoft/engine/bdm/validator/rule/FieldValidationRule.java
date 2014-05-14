@@ -45,9 +45,6 @@ public class FieldValidationRule implements ValidationRule {
             status.addError(name + " is not a valid field identifier");
             return status;
         }
-        if (field instanceof SimpleField && ((SimpleField) field).getType() == null) {
-            status.addError(name + " must have a type declared");
-        }
         return status;
     }
 
