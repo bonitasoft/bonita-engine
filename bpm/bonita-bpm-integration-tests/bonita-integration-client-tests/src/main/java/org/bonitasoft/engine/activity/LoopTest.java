@@ -201,14 +201,14 @@ public class LoopTest extends CommonAPITest {
         final int loopMax = 3;
         builder.addData("myData", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(0));
         builder.addUserTask("step1", delivery)
-                .addLoop(false, condition)
-                .addOperation(
-                        new LeftOperandBuilder().createNewInstance("myData").done(),
-                        OperatorType.ASSIGNMENT,
-                        "=",
-                        null,
-                        new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingData1", "myData + 1",
-                                Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("myData", Integer.class.getName()))));
+        .addLoop(false, condition)
+        .addOperation(
+                new LeftOperandBuilder().createNewInstance("myData").done(),
+                OperatorType.ASSIGNMENT,
+                "=",
+                null,
+                new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingData1", "myData + 1",
+                        Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("myData", Integer.class.getName()))));
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -225,14 +225,14 @@ public class LoopTest extends CommonAPITest {
 
         disableAndDeleteProcess(processDefinition);
     }
-    
+
     @Test
     public void abortProcessWithActiveLoopActivity() throws Exception {
         // given
-        String loopName = "step1";
-        String userTaskName = "step2";
+        final String loopName = "step1";
+        final String userTaskName = "step2";
         final ProcessDefinition processDefinition = deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(loopName, userTaskName);
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTask(loopName, processInstance.getId());
         // when
@@ -245,7 +245,7 @@ public class LoopTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(String loopName, String parallelTaskName)
+    private ProcessDefinition deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(final String loopName, final String parallelTaskName)
             throws InvalidExpressionException, BonitaException, InvalidProcessDefinitionException {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         final String delivery = "Delivery men";
@@ -262,8 +262,7 @@ public class LoopTest extends CommonAPITest {
         builder.addTransition(loopName, "terminate");
         builder.addTransition(parallelTaskName, "terminate");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
-        return processDefinition;
+        return deployAndEnableWithActor(builder.done(), delivery, john);
     }
 
 }

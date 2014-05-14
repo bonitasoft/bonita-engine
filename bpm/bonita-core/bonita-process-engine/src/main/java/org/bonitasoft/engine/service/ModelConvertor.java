@@ -1636,7 +1636,7 @@ public class ModelConvertor {
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                                .setType(operation.getLeftOperand().getType()).done()).done();
+                        .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -1958,8 +1958,7 @@ public class ModelConvertor {
     public static Theme toTheme(final STheme sTheme) {
         final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
         final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
-        final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
-        return themeImpl;
+        return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
     }
 
 }

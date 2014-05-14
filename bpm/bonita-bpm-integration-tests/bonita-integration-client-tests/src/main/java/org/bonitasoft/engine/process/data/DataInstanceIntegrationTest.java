@@ -969,7 +969,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     }
 
     private ProcessDefinition deployAndEnableProcWithPersistedAndTransientVariable(final String userTaskName) throws InvalidExpressionException,
-    BonitaException, InvalidProcessDefinitionException {
+            BonitaException, InvalidProcessDefinitionException {
         final String startName = "start";
         final String endName = "end";
         final Expression defaultValue = new ExpressionBuilder().createConstantStringExpression("default");
@@ -983,7 +983,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         builder.addTransition(startName, userTaskName);
         builder.addTransition(userTaskName, endName);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
-        return processDefinition;
+        return deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
     }
+
 }

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api.impl;
@@ -271,8 +271,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
         try {
             createProfileMember.execute();
-            ProfileMember profileMember = ModelConvertor.toProfileMember(createProfileMember.getResult());
-            return profileMember;
+            return ModelConvertor.toProfileMember(createProfileMember.getResult());
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }

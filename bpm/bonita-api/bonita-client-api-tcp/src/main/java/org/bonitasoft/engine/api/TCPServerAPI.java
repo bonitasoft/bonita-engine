@@ -52,8 +52,7 @@ public class TCPServerAPI implements ServerAPI {
         final int separatorIndex = s.indexOf(':');
         final String host = s.substring(0, separatorIndex);
         final int port = Integer.valueOf(s.substring(separatorIndex + 1));
-        final TcpDestination tcpDestination = new TcpDestination(host, port);
-        return tcpDestination;
+        return new TcpDestination(host, port);
     }
 
     @Override

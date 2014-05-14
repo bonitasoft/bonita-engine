@@ -135,8 +135,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
         processDocumentBuilder.setCreationDate(System.currentTimeMillis());
         processDocumentBuilder.setHasContent(hasContent);
         processDocumentBuilder.setURL(documentUrl);
-        final SProcessDocument document = processDocumentBuilder.done();
-        return document;
+        return processDocumentBuilder.done();
     }
 
     @Override
