@@ -15,7 +15,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Colin PUY
  */
-public class SimpleFieldValidationRule implements ValidationRule {
+public class SimpleFieldValidationRule extends ValidationRule {
 
     @Override
     public boolean appliesTo(Object modelElement) {
@@ -23,7 +23,7 @@ public class SimpleFieldValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(Object modelElement) {
+    public ValidationStatus validate(Object modelElement) {
         final Field field = (Field) modelElement;
         final ValidationStatus status = new ValidationStatus();
         if (field instanceof SimpleField && ((SimpleField) field).getType() == null) {

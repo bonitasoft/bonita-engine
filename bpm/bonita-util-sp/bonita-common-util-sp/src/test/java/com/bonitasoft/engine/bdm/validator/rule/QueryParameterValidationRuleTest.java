@@ -16,7 +16,7 @@ public class QueryParameterValidationRuleTest {
     public void checkRuleShouldForbidStartIndexAsQueryParameterName() throws Exception {
         QueryParameter queryParam = new QueryParameter("startIndex", Object.class.getName());
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors().get(0)).contains("is a reserved parameter name");
     }
@@ -25,7 +25,7 @@ public class QueryParameterValidationRuleTest {
     public void checkRuleShouldForbidMaxResultsAsQueryParameterName() throws Exception {
         QueryParameter queryParam = new QueryParameter("maxResults", Object.class.getName());
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors()).hasSize(1);
         assertThat(status.getErrors().get(0)).contains("is a reserved parameter name");
@@ -35,7 +35,7 @@ public class QueryParameterValidationRuleTest {
     public void aQueryParameterNameShouldHaveAName() throws Exception {
         QueryParameter queryParam = new QueryParameter();
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors().get(0)).contains("must have name");
     }
@@ -44,7 +44,7 @@ public class QueryParameterValidationRuleTest {
     public void aQueryParameterNameShouldHaveANonEmptyName() throws Exception {
         QueryParameter queryParam = new QueryParameter("", Object.class.getName());
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors().get(0)).contains("must have name");
     }
@@ -53,7 +53,7 @@ public class QueryParameterValidationRuleTest {
     public void aQueryParameterNameShouldHaveAVAlidJavaIdentifierName() throws Exception {
         QueryParameter queryParam = new QueryParameter("1_manu", Object.class.getName());
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors().get(0)).contains("is not a valid Java identifier");
     }
@@ -62,7 +62,7 @@ public class QueryParameterValidationRuleTest {
     public void aQueryParameterClassNameShouldHaveAName() throws Exception {
         QueryParameter queryParam = new QueryParameter("aValidParamName", null);
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors().get(0)).contains("query parameter must have a classname");
     }
@@ -71,7 +71,7 @@ public class QueryParameterValidationRuleTest {
     public void aQueryParameterClassNameShouldHaveANonEmptyName() throws Exception {
         QueryParameter queryParam = new QueryParameter("aValidParamName", "");
 
-        ValidationStatus status = new QueryParameterValidationRule().checkRule(queryParam);
+        ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
 
         assertThat(status.getErrors().get(0)).contains("query parameter must have a classname");
     }

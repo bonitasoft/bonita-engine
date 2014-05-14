@@ -14,7 +14,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectModelValidationRule implements ValidationRule {
+public class BusinessObjectModelValidationRule extends ValidationRule {
 
     @Override
     public boolean appliesTo(final Object modelElement) {
@@ -22,11 +22,7 @@ public class BusinessObjectModelValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(BusinessObjectModelValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
+    public ValidationStatus validate(final Object modelElement) {
         final BusinessObjectModel bom = (BusinessObjectModel) modelElement;
         final ValidationStatus status = new ValidationStatus();
         if (bom.getBusinessObjects().isEmpty()) {

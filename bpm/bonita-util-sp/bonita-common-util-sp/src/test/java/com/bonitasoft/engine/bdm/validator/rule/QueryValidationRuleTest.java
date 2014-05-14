@@ -71,47 +71,47 @@ public class QueryValidationRuleTest {
 	@Test
 	public void shouldCheckRule_return_valid_status() throws Exception {
 		Query q = new Query("findByName", "Select toto where titi = toto",List.class.getName());
-		ValidationStatus checkRule = queryValidationRule.checkRule(q);
+		ValidationStatus checkRule = queryValidationRule.validate(q);
 		assertThat(checkRule.isOk()).isTrue();
 	}
 
 	@Test
 	public void shouldCheckRule_return_error_status_if_no_name() throws Exception {
 		Query q = new Query("", "Select toto where titi = toto",List.class.getName());
-		ValidationStatus checkRule = queryValidationRule.checkRule(q);
+		ValidationStatus checkRule = queryValidationRule.validate(q);
 		assertThat(checkRule.isOk()).isFalse();
 		
 		q = new Query(null, "Select toto where titi = toto",List.class.getName());
-		checkRule = queryValidationRule.checkRule(q);
+		checkRule = queryValidationRule.validate(q);
 		assertThat(checkRule.isOk()).isFalse();
 	}
 
 	@Test
 	public void shouldCheckRule_return_error_status_if_name_too_long() throws Exception {
 		Query q = new Query("dsfhsdjkhfdjskfhjksdhfjksdhfjkshfjksdhfjksdhfjksdhfjksdhfjkdsfhjkdshfjjkdshfjskdhfjksdhfdjskhfhfjkhsdfkjsdhfksduzeiryzueiryuzieryuigsdhjgfhjgriuzegrjkg", "Select toto where titi = toto",List.class.getName());
-		ValidationStatus checkRule = queryValidationRule.checkRule(q);
+		ValidationStatus checkRule = queryValidationRule.validate(q);
 		assertThat(checkRule.isOk()).isFalse();
 	}
 
 	@Test
 	public void shouldCheckRule_return_error_status_if_no_content() throws Exception {
 		Query q = new Query("toto", "",List.class.getName());
-		ValidationStatus checkRule = queryValidationRule.checkRule(q);
+		ValidationStatus checkRule = queryValidationRule.validate(q);
 		assertThat(checkRule.isOk()).isFalse();
 
 		q = new Query("toto", null,List.class.getName());
-		checkRule = queryValidationRule.checkRule(q);
+		checkRule = queryValidationRule.validate(q);
 		assertThat(checkRule.isOk()).isFalse();
 	}
 	
 	@Test
     public void shouldCheckRule_return_error_status_if_no_returnType() throws Exception {
         Query q = new Query("toto", "select","");
-        ValidationStatus checkRule = queryValidationRule.checkRule(q);
+        ValidationStatus checkRule = queryValidationRule.validate(q);
         assertThat(checkRule.isOk()).isFalse();
 
         q = new Query("toto", "select","");
-        checkRule = queryValidationRule.checkRule(q);
+        checkRule = queryValidationRule.validate(q);
         assertThat(checkRule.isOk()).isFalse();
     }
 

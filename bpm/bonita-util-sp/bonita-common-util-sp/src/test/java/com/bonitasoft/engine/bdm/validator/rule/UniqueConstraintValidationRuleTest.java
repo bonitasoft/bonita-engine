@@ -56,7 +56,7 @@ public class UniqueConstraintValidationRuleTest {
 		UniqueConstraint uc = new UniqueConstraint();
 		uc.setName("MY_CONSTRAINT_");
 		uc.setFieldNames(Arrays.asList("f1"));
-		ValidationStatus validationStatus = uniqueConstraintValidationRule.checkRule(uc);
+		ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
 		assertThat(validationStatus.isOk()).isTrue();
 	}
 
@@ -65,21 +65,21 @@ public class UniqueConstraintValidationRuleTest {
 		UniqueConstraint uc = new UniqueConstraint();
 		uc.setName("MY_CONSTRAINT_");
 		uc.setFieldNames(Collections.<String>emptyList());
-		ValidationStatus validationStatus = uniqueConstraintValidationRule.checkRule(uc);
+		ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
 		assertThat(validationStatus.isOk()).isFalse();
 
 		uc = new UniqueConstraint();
 		uc.setName("");
 		uc.setFieldNames(Arrays.asList("f1"));
-		validationStatus = uniqueConstraintValidationRule.checkRule(uc);
+		validationStatus = uniqueConstraintValidationRule.validate(uc);
 		assertThat(validationStatus.isOk()).isFalse();
 		
 		uc.setName(null);
-		validationStatus = uniqueConstraintValidationRule.checkRule(uc);
+		validationStatus = uniqueConstraintValidationRule.validate(uc);
 		assertThat(validationStatus.isOk()).isFalse();
 		
 		uc.setName("with whitespaces ");
-		validationStatus = uniqueConstraintValidationRule.checkRule(uc);
+		validationStatus = uniqueConstraintValidationRule.validate(uc);
 		assertThat(validationStatus.isOk()).isFalse();
 	}
 

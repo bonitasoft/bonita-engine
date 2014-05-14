@@ -13,7 +13,7 @@ import javax.lang.model.SourceVersion;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class QueryValidationRule implements ValidationRule {
+public class QueryValidationRule extends ValidationRule {
 
     private static final int MAX_QUERY_NAME_LENGTH = 150;
 
@@ -23,10 +23,7 @@ public class QueryValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(QueryValidationRule.class.getName() + " doesn't handle validation for " + modelElement.getClass().getName());
-        }
+    public ValidationStatus validate(final Object modelElement) {
         final Query query = (Query) modelElement;
         final ValidationStatus status = new ValidationStatus();
         final String name = query.getName();

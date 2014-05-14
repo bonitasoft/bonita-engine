@@ -12,7 +12,7 @@ import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class UniqueConstraintValidationRule implements ValidationRule {
+public class UniqueConstraintValidationRule extends ValidationRule {
 
     private static final int MAX_CONSTRAINTNAME_LENGTH = 25;
 
@@ -28,11 +28,7 @@ public class UniqueConstraintValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(UniqueConstraintValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
+    public ValidationStatus validate(final Object modelElement) {
         final UniqueConstraint uc = (UniqueConstraint) modelElement;
         final ValidationStatus status = new ValidationStatus();
         final String name = uc.getName();

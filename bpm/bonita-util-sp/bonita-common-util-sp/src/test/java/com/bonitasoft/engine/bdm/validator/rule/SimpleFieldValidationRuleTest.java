@@ -33,7 +33,7 @@ public class SimpleFieldValidationRuleTest {
     public void should_validate_that_type_is_not_empty() throws Exception {
         SimpleField simpleField = new SimpleField();
 
-        ValidationStatus validationStatus = simpleFieldValidationRule.checkRule(simpleField);
+        ValidationStatus validationStatus = simpleFieldValidationRule.validate(simpleField);
 
         assertThat(validationStatus.isOk()).isFalse();
     }
@@ -43,7 +43,7 @@ public class SimpleFieldValidationRuleTest {
         SimpleField simpleField = new SimpleField();
         simpleField.setType(FieldType.BOOLEAN);
 
-        ValidationStatus validationStatus = simpleFieldValidationRule.checkRule(simpleField);
+        ValidationStatus validationStatus = simpleFieldValidationRule.validate(simpleField);
 
         assertThat(validationStatus.isOk()).isTrue();
     }

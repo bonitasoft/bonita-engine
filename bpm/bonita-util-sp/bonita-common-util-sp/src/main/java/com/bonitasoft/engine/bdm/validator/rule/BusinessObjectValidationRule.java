@@ -25,7 +25,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectValidationRule implements ValidationRule {
+public class BusinessObjectValidationRule extends ValidationRule {
 
     private static final int MAX_TABLENAME_LENGTH = 30;
 
@@ -41,11 +41,7 @@ public class BusinessObjectValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(BusinessObjectValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
+    public ValidationStatus validate(final Object modelElement) {
         final BusinessObject bo = (BusinessObject) modelElement;
 
         final ValidationStatus status = new ValidationStatus();

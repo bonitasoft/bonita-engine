@@ -62,12 +62,12 @@ public class BusinessObjectModelValidatorTest {
 		BusinessObjectModel bom = new BusinessObjectModel();
 		BusinessObject bo = new BusinessObject();
 		bo.setQualifiedName("org.bonita.Car");
-		SimpleField nameField = new SimpleField();
-		nameField.setName("bmw 5");
-		bo.getFields().add(nameField);
+		SimpleField fieldWithTwoErrors = new SimpleField();
+		fieldWithTwoErrors.setName("bmw 5");
+		bo.getFields().add(fieldWithTwoErrors);
 		bom.addBusinessObject(bo);
 		ValidationStatus validationStatus = validator.validate(bom);
 		assertThat(validationStatus.isOk()).isFalse();
-		assertThat(validationStatus.getErrors()).hasSize(1);
+		assertThat(validationStatus.getErrors()).hasSize(2);
 	}
 }

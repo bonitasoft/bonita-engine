@@ -22,7 +22,7 @@ import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class QueryParameterValidationRule implements ValidationRule {
+public class QueryParameterValidationRule extends ValidationRule {
 
     public static final List<String> FORBIDDEN_PARAMETER_NAMES = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 
@@ -32,11 +32,7 @@ public class QueryParameterValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(QueryParameterValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
+    public ValidationStatus validate(final Object modelElement) {
         final QueryParameter parameter = (QueryParameter) modelElement;
         final ValidationStatus status = new ValidationStatus();
         final String name = parameter.getName();

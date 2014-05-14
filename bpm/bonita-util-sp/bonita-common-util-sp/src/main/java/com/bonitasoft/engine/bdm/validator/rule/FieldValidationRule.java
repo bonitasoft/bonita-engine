@@ -17,7 +17,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class FieldValidationRule implements ValidationRule {
+public class FieldValidationRule extends ValidationRule {
 
     private static final int MAX_COLUMNAME_LENGTH = 50;
 
@@ -33,10 +33,7 @@ public class FieldValidationRule implements ValidationRule {
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(FieldValidationRule.class.getName() + " doesn't handle validation for " + modelElement.getClass().getName());
-        }
+    public ValidationStatus validate(final Object modelElement) {
         final Field field = (Field) modelElement;
         final ValidationStatus status = new ValidationStatus();
         final String name = field.getName();

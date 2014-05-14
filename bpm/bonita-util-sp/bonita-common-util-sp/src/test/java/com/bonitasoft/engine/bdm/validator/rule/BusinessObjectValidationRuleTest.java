@@ -62,11 +62,11 @@ public class BusinessObjectValidationRuleTest {
         SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
-        ValidationStatus validationStatus = businessObjectValidationRule.checkRule(bo);
+        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isTrue();
 
         bo.addUniqueConstraint("_UC_1", "firstName");
-        validationStatus = businessObjectValidationRule.checkRule(bo);
+        validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isTrue();
     }
 
@@ -74,19 +74,19 @@ public class BusinessObjectValidationRuleTest {
     public void shoudCheckRule_returns_error_status() throws Exception {
         BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
-        ValidationStatus validationStatus = businessObjectValidationRule.checkRule(bo);
+        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isFalse();
 
         bo.setQualifiedName("org.bonita.Bo 2");
         SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
-        validationStatus = businessObjectValidationRule.checkRule(bo);
+        validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isFalse();
 
         bo.setQualifiedName("org.bonita.Bo2");
         bo.addUniqueConstraint("_UC_1", "dontExists");
-        validationStatus = businessObjectValidationRule.checkRule(bo);
+        validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isFalse();
 
     }
@@ -100,7 +100,7 @@ public class BusinessObjectValidationRuleTest {
         bo.addField(field);
         bo.addQuery("toto", "titi", List.class.getName());
         bo.addQuery("toto", "titi", List.class.getName());
-        ValidationStatus validationStatus = businessObjectValidationRule.checkRule(bo);
+        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isFalse();
     }
 
@@ -113,7 +113,7 @@ public class BusinessObjectValidationRuleTest {
         bo.addField(field);
         bo.addUniqueConstraint("toto", "firstName");
         bo.addUniqueConstraint("toto", "firstName");
-        ValidationStatus validationStatus = businessObjectValidationRule.checkRule(bo);
+        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus.isOk()).isFalse();
     }
 

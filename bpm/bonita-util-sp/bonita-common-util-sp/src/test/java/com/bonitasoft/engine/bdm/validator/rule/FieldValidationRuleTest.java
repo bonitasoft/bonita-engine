@@ -53,7 +53,7 @@ public class FieldValidationRuleTest {
     public void should_return_a_valid_status_when_name_is_not_a_forbidden_one() throws Exception {
         Field field = aFieldWithName("aGoodName");
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isTrue();
     }
@@ -62,7 +62,7 @@ public class FieldValidationRuleTest {
     public void should_validate_that_name_is_not_empty() throws Exception {
         Field field = aFieldWithName("");
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isFalse();
     }
@@ -71,7 +71,7 @@ public class FieldValidationRuleTest {
     public void should_validate_that_name_is_not_null() throws Exception {
         Field field = aFieldWithName(null);
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isFalse();
     }
@@ -80,7 +80,7 @@ public class FieldValidationRuleTest {
     public void should_validate_that_name_has_no_whitespace() throws Exception {
         Field field = aFieldWithName("with whitespaces ");
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isFalse();
     }
@@ -89,7 +89,7 @@ public class FieldValidationRuleTest {
     public void should_validate_that_name_is_not_a_java_keyword() throws Exception {
         Field field = aFieldWithName("import");
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isFalse();
     }
@@ -98,7 +98,7 @@ public class FieldValidationRuleTest {
     public void should_validate_that_name_is_not_persistenceId_wich_is_a_business_data_model_keyword() throws Exception {
         Field field = aFieldWithName(Field.PERSISTENCE_ID.toUpperCase());
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isFalse();
     }
@@ -107,7 +107,7 @@ public class FieldValidationRuleTest {
     public void should_validate_that_name_is_not_persistenceVersion_wich_is_a_business_data_model_keyword() throws Exception {
         Field field = aFieldWithName(Field.PERSISTENCE_VERSION.toLowerCase());
 
-        ValidationStatus validationStatus = fieldValidationRule.checkRule(field);
+        ValidationStatus validationStatus = fieldValidationRule.validate(field);
 
         assertThat(validationStatus.isOk()).isFalse();
     }

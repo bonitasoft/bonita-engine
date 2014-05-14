@@ -59,14 +59,14 @@ public class BusinessObjectModelValidationRuleTest {
 		BusinessObjectModel bom = new BusinessObjectModel();
 		BusinessObject bo = new BusinessObject();
 		bom.addBusinessObject(bo);
-		ValidationStatus validationStatus = businessObjectModelValidationRule.checkRule(bom);
+		ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
 		assertThat(validationStatus.isOk()).isTrue();
 	}
 	
 	@Test
 	public void shoudCheckRule_returns_error_status() throws Exception {
 		BusinessObjectModel bom = new BusinessObjectModel();
-		ValidationStatus validationStatus = businessObjectModelValidationRule.checkRule(bom);
+		ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
 		assertThat(validationStatus.isOk()).isFalse();
 	}
 }
