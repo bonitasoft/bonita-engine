@@ -225,13 +225,16 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
+        }
+        final DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
         return new EqualsBuilder().append(displayName, other.displayName).append(displayDescription, other.displayDescription)
                 .append(parameters, other.parameters).append(actors, other.actors).append(actorInitiator, other.actorInitiator)
                 .append(flowElementContainer, other.flowElementContainer).append(stringIndexLabel1, other.stringIndexLabel1)
