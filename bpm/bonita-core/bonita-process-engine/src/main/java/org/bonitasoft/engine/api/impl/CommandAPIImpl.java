@@ -93,8 +93,7 @@ public class CommandAPIImpl implements CommandAPI {
         // FIXME method in dependency service which get a dependency using its name
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jar, tenantAccessor.getTenantId(),
-                ScopeType.TENANT);
+        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jar, tenantAccessor.getTenantId(), ScopeType.TENANT);
         try {
             addSDependency.execute();
         } catch (final SDependencyAlreadyExistsException e) {
@@ -121,7 +120,7 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public CommandDescriptor register(final String name, final String description, final String implementation) throws AlreadyExistsException,
-            CreationException {
+    CreationException {
         CommandDescriptor existingCommandDescriptor = null;
         try {
             existingCommandDescriptor = getCommand(name);
@@ -145,7 +144,7 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     private TenantCommand fetchTenantCommand(final SCommandFetcher commandFetcher, final boolean transactionManagedManually) throws SCommandNotFoundException,
-            SCommandParameterizationException {
+    SCommandParameterizationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         try {
@@ -170,44 +169,42 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public Serializable execute(final String commandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+    CommandParameterizationException, CommandExecutionException {
         return execute(new SCommandFetcherByName(commandName), parameters);
     }
 
     @Override
     public Serializable execute(final long commandId, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+    CommandParameterizationException, CommandExecutionException {
         return execute(new SCommandFetcherById(commandId), parameters);
     }
 
     private Serializable execute(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+    CommandParameterizationException, CommandExecutionException {
         return executeCommand(commandFetcher, parameters, false);
     }
 
     @Override
     @CustomTransactions
     public Serializable executeWithUserTransactions(final String commandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+    CommandParameterizationException, CommandExecutionException {
         return executeWithUserTransactions(new SCommandFetcherByName(commandName), parameters);
     }
 
     @Override
     @CustomTransactions
     public Serializable executeWithUserTransactions(final long commandId, final Map<String, Serializable> parameters) throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+    CommandParameterizationException, CommandExecutionException {
         return executeWithUserTransactions(new SCommandFetcherById(commandId), parameters);
     }
 
     private Serializable executeWithUserTransactions(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters)
-            throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
         return executeCommand(commandFetcher, parameters, true);
     }
 
     private Serializable executeCommand(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters,
-            final boolean transactionManagedManually) throws CommandNotFoundException,
-            CommandParameterizationException, CommandExecutionException {
+            final boolean transactionManagedManually) throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         try {
@@ -217,7 +214,7 @@ public class CommandAPIImpl implements CommandAPI {
             throw new CommandExecutionException(scee);
         } catch (final SCommandParameterizationException scpe) {
             throw new CommandParameterizationException(scpe);
-        } catch (SCommandNotFoundException e) {
+        } catch (final SCommandNotFoundException e) {
             throw new CommandNotFoundException(e);
         }
     }
@@ -273,7 +270,7 @@ public class CommandAPIImpl implements CommandAPI {
     private CommandDescriptor getCommand(final SCommandFetcher commandFetcher) throws CommandNotFoundException {
         final CommandService commandService = getTenantAccessor().getCommandService();
         try {
-            SCommand sCommand = commandFetcher.fetch(commandService);
+            final SCommand sCommand = commandFetcher.fetch(commandService);
             return ModelConvertor.toCommandDescriptor(sCommand);
         } catch (final SBonitaException e) {
             throw new CommandNotFoundException(e);
@@ -291,7 +288,7 @@ public class CommandAPIImpl implements CommandAPI {
 
         final CommandService commandService = getTenantAccessor().getCommandService();
         try {
-            List<SCommand> commands = commandService.getAllCommands(startIndex, maxResults, sCommandCriterion);
+            final List<SCommand> commands = commandService.getAllCommands(startIndex, maxResults, sCommandCriterion);
             return ModelConvertor.toCommandDescriptors(commands);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -318,11 +315,11 @@ public class CommandAPIImpl implements CommandAPI {
         final CommandService commandService = getTenantAccessor().getCommandService();
         try {
             final EntityUpdateDescriptor changeDescriptor = getCommandUpdateDescriptor(updateDescriptor, commandUpdateBuilder);
-            SCommand sCommand = commandFetcher.fetch(commandService);
+            final SCommand sCommand = commandFetcher.fetch(commandService);
             commandService.update(sCommand, changeDescriptor);
         } catch (final SCommandNotFoundException scnfe) {
             throw new UpdateException(scnfe);
-        } catch (SCommandUpdateException e) {
+        } catch (final SCommandUpdateException e) {
             throw new UpdateException(e);
         }
     }
@@ -372,7 +369,7 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     // Utility classes to factorize how we fetch a TenantCommand
-    private static abstract class SCommandFetcher {
+    private abstract static class SCommandFetcher {
 
         abstract SCommand fetch(final CommandService commandService) throws SCommandNotFoundException;
 
