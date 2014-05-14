@@ -24,12 +24,8 @@ public class FieldValidationRule extends ValidationRule<Field> {
     private final SQLNameValidator sqlNameValidator;
 
     public FieldValidationRule() {
+        super(Field.class);
         sqlNameValidator = new SQLNameValidator(MAX_COLUMNAME_LENGTH);
-    }
-
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof Field;
     }
 
     @Override

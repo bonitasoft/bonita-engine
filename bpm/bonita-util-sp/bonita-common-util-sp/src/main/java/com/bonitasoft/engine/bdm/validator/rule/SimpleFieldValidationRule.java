@@ -16,9 +16,8 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
  */
 public class SimpleFieldValidationRule extends ValidationRule<SimpleField> {
 
-    @Override
-    public boolean appliesTo(Object modelElement) {
-        return modelElement instanceof SimpleField;
+    public SimpleFieldValidationRule() {
+        super(SimpleField.class);
     }
 
     @Override

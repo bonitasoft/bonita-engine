@@ -10,7 +10,7 @@ package com.bonitasoft.engine.bdm.validator.rule;
 
 /**
  * Tests the validity of Query parameters
- *
+ * 
  * @author Emmanuel Duchastenier
  */
 import java.util.Arrays;
@@ -26,9 +26,8 @@ public class QueryParameterValidationRule extends ValidationRule<QueryParameter>
 
     public static final List<String> FORBIDDEN_PARAMETER_NAMES = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof QueryParameter;
+    public QueryParameterValidationRule() {
+        super(QueryParameter.class);
     }
 
     @Override

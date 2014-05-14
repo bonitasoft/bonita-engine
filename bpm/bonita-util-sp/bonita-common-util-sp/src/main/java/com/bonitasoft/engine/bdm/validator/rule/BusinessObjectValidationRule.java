@@ -32,12 +32,8 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
     private final SQLNameValidator sqlNameValidator;
 
     public BusinessObjectValidationRule() {
+        super(BusinessObject.class);
         sqlNameValidator = new SQLNameValidator(MAX_TABLENAME_LENGTH);
-    }
-
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof BusinessObject;
     }
 
     @Override

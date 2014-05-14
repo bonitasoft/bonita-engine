@@ -16,9 +16,8 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
  */
 public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel> {
 
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof BusinessObjectModel;
+    public BusinessObjectModelValidationRule() {
+        super(BusinessObjectModel.class);
     }
 
     @Override

@@ -15,7 +15,15 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
  */
 public abstract class ValidationRule<T> {
 
-    public abstract boolean appliesTo(Object modelElement);
+    private Class<T> classToApply;
+
+    public ValidationRule(Class<T> classToApply) {
+        this.classToApply = classToApply;
+    }
+    
+    public boolean appliesTo(Object modelElement) {
+        return modelElement != null && classToApply.isAssignableFrom(modelElement.getClass());
+    }
 
     abstract ValidationStatus validate(T modelElement);
     

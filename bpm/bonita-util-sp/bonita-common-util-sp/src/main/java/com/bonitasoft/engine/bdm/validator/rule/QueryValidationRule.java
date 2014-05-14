@@ -14,11 +14,11 @@ import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 public class QueryValidationRule extends ValidationRule<Query> {
+
     private static final int MAX_QUERY_NAME_LENGTH = 150;
 
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof Query;
+    public QueryValidationRule() {
+        super(Query.class);
     }
 
     @Override

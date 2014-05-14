@@ -19,12 +19,8 @@ public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstra
     private final SQLNameValidator sqlNameValidator;
 
     public UniqueConstraintValidationRule() {
+        super(UniqueConstraint.class);
         sqlNameValidator = new SQLNameValidator(MAX_CONSTRAINTNAME_LENGTH);
-    }
-
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof UniqueConstraint;
     }
 
     @Override
