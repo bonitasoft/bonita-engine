@@ -51,9 +51,20 @@ public abstract class FieldBuilder {
     }
 
     public static Field anAggregationField(String name, BusinessObject reference) {
+        RelationField relationField = aRelationField(name, reference);
+        relationField.setType(Type.AGGREGATION);
+        return relationField;
+    }
+    
+    public static Field aCompositionField(String name, BusinessObject reference) {
+        RelationField relationField = aRelationField(name, reference);
+        relationField.setType(Type.COMPOSITION);
+        return relationField;
+    }
+    
+    private static RelationField aRelationField(String name, BusinessObject reference) {
         RelationField relationField = new RelationField();
         relationField.setName(name);
-        relationField.setType(Type.AGGREGATION);
         relationField.setReference(reference);
         return relationField;
     }

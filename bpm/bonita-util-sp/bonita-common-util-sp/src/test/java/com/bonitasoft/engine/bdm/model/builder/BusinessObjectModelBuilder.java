@@ -26,6 +26,13 @@ public class BusinessObjectModelBuilder {
         businessObjectModel.addBusinessObject(bo);
         return this;
     }
+    
+    public BusinessObjectModelBuilder withBOs(final BusinessObject... bos) {
+        for (BusinessObject bo : bos) {
+            businessObjectModel.addBusinessObject(bo);
+        }
+        return this;
+    }
 
     public BusinessObjectModel build() {
         return businessObjectModel;
