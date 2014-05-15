@@ -47,6 +47,7 @@ import com.sun.tools.xjc.util.NullStream;
 
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class CodeGenerator {
 
@@ -97,7 +98,7 @@ public class CodeGenerator {
         return definedClass.field(JMod.PRIVATE, type, fieldName);
     }
 
-    public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final JType type) {
+    public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final JClass type) {
         validateFieldName(fieldName);
         if (type == null) {
             throw new IllegalArgumentException("Field type cannot be null");
@@ -145,11 +146,7 @@ public class CodeGenerator {
         }
     }
 
-    public JType toJavaType(final Field field) {
-        return toJavaClass(field);
-    }
-
-    public JType toJavaType(final FieldType type) {
+    public JClass toJavaClass(final FieldType type) {
         return getModel().ref(type.getClazz());
     }
 

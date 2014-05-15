@@ -219,43 +219,43 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
-    public void shouldToJavaType_ReturnIntegerClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.INTEGER).name()).isEqualTo(Integer.class.getSimpleName());
+    public void shouldToJavaClass_ReturnIntegerClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.INTEGER).name()).isEqualTo(Integer.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnStringClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.STRING).name()).isEqualTo(String.class.getSimpleName());
+    public void shouldToJavaClass_ReturnStringClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.STRING).name()).isEqualTo(String.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnLongClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.LONG).name()).isEqualTo(Long.class.getSimpleName());
+    public void shouldToJavaClass_ReturnLongClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.LONG).name()).isEqualTo(Long.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnDoubleClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.DOUBLE).name()).isEqualTo(Double.class.getSimpleName());
+    public void shouldToJavaClass_ReturnDoubleClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.DOUBLE).name()).isEqualTo(Double.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnFloatClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.FLOAT).name()).isEqualTo(Float.class.getSimpleName());
+    public void shouldToJavaClass_ReturnFloatClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.FLOAT).name()).isEqualTo(Float.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnBooleanClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.BOOLEAN).name()).isEqualTo(Boolean.class.getSimpleName());
+    public void shouldToJavaClass_ReturnBooleanClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.BOOLEAN).name()).isEqualTo(Boolean.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnDateClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.DATE).name()).isEqualTo(Date.class.getSimpleName());
+    public void shouldToJavaClass_ReturnDateClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.DATE).name()).isEqualTo(Date.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaType_ReturnStringTextClass() throws Exception {
-        assertThat(bdmCodeGenerator.toJavaType(FieldType.TEXT).name()).isEqualTo(String.class.getSimpleName());
+    public void shouldToJavaClass_ReturnStringTextClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaClass(FieldType.TEXT).name()).isEqualTo(String.class.getSimpleName());
     }
 
     @Test

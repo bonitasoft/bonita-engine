@@ -58,6 +58,7 @@ import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
@@ -65,6 +66,7 @@ import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
@@ -207,8 +209,14 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             if (field.isCollection() != null && field.isCollection()) {
                 final JClass fieldClass = toJavaClass(field);
                 final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
-                copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz)
-                        .arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
+                if (field instanceof SimpleField) {
+                    copyBody.assign(JExpr.refthis(field.getName()),
+                            JExpr._new(arrayListFieldClazz).arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
+                } else {
+                    copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz));
+                    final JForEach forEach = copyBody.forEach(fieldClass, "i", JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
+                    forEach.body().invoke(JExpr.refthis(field.getName()), "add").arg(JExpr._new(fieldClass).arg(forEach.var()));
+                }
             } else {
                 copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
             }
@@ -216,14 +224,14 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
-        final JFieldVar idFieldVar = addField(entityClass, Field.PERSISTENCE_ID, toJavaType(FieldType.LONG));
+        final JFieldVar idFieldVar = addField(entityClass, Field.PERSISTENCE_ID, toJavaClass(FieldType.LONG));
         addAnnotation(idFieldVar, Id.class);
         addAnnotation(idFieldVar, GeneratedValue.class);
         addAccessors(entityClass, idFieldVar);
     }
 
     public void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
-        final JFieldVar versionField = addField(entityClass, Field.PERSISTENCE_VERSION, toJavaType(FieldType.LONG));
+        final JFieldVar versionField = addField(entityClass, Field.PERSISTENCE_VERSION, toJavaClass(FieldType.LONG));
         addAnnotation(versionField, Version.class);
         addAccessors(entityClass, versionField);
     }
@@ -234,7 +242,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         if (collection != null && collection) {
             fieldVar = addListField(entityClass, field);
         } else {
-            fieldVar = addField(entityClass, field.getName(), toJavaType(field));
+            fieldVar = addField(entityClass, field.getName(), toJavaClass(field));
         }
 
         if (field instanceof SimpleField) {
@@ -251,9 +259,9 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             if (sfield.getType() == FieldType.DATE) {
                 final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
                 temporalAnnotation.param("value", TemporalType.TIMESTAMP);
-            } else if (FieldType.TEXT.equals(sfield.getType())) {
+            } else if (FieldType.TEXT == sfield.getType()) {
                 addAnnotation(fieldVar, Lob.class);
-            } else if (FieldType.STRING.equals(sfield.getType()) && sfield.getLength() != null && sfield.getLength() > 0) {
+            } else if (FieldType.STRING == sfield.getType() && sfield.getLength() != null && sfield.getLength() > 0) {
                 columnAnnotation.param("length", sfield.getLength());
             }
         } else {

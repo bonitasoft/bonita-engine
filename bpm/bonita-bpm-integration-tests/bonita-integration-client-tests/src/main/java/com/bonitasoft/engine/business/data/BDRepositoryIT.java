@@ -56,6 +56,8 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
@@ -75,6 +77,23 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
+        final SimpleField street = new SimpleField();
+        street.setName("street");
+        street.setType(FieldType.STRING);
+        final SimpleField city = new SimpleField();
+        city.setName("city");
+        city.setType(FieldType.STRING);
+        final BusinessObject addressBO = new BusinessObject();
+        addressBO.setQualifiedName("org.bonita.pojo.Address");
+        addressBO.addField(street);
+        addressBO.addField(city);
+
+        final RelationField address = new RelationField();
+        address.setType(Type.COMPOSITION);
+        address.setName("address");
+        address.setCollection(Boolean.FALSE);
+        address.setReference(addressBO);
+
         final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
@@ -96,6 +115,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.addField(firstName);
         employee.addField(lastName);
         employee.addField(phoneNumbers);
+        employee.addField(address);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
@@ -123,6 +143,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         model.addBusinessObject(person);
+        model.addBusinessObject(addressBO);
         return model;
     }
 
@@ -429,15 +450,15 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Test
     public void shouldBeAbleToRunDAOCallThroughGroovy() throws Exception {
-        String firstName = "FlofFlof";
-        String lastName = "Boudin";
+        final String firstName = "FlofFlof";
+        final String lastName = "Boudin";
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "shouldBeAbleToRunDAOCallThroughGroovy", "6.3.1");
         final String employeeDAOName = "employeeDAO";
-        String bizDataName = "myEmployee";
+        final String bizDataName = "myEmployee";
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1").addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName),
