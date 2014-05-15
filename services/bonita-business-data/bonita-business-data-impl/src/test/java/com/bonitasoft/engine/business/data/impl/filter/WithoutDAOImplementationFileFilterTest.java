@@ -24,13 +24,16 @@ public class WithoutDAOImplementationFileFilterTest {
         File f = new File("EmployeeDAOImpl.class");
         assertThat(fileFilter.accept(f)).isFalse();
 
-        f = new File("Employee.java");
+        f = new File("EmployeeDAOImpl.java");
         assertThat(fileFilter.accept(f)).isFalse();
     }
 
     @Test
     public void should_accept_return_true() throws Exception {
         File f = new File("Employee.class");
+        assertThat(fileFilter.accept(f)).isTrue();
+
+        f = new File("Employee.java");
         assertThat(fileFilter.accept(f)).isTrue();
     }
 
