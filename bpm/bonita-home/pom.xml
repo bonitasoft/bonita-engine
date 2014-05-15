@@ -12,16 +12,25 @@
 
 	<name>Bonita Home</name>
 
-
 	<dependencies>
 		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common-sp</artifactId>
+			<groupId>com.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-business-data-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-client-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -85,8 +94,20 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
+									<groupId>com.bonitasoft.engine.data</groupId>
+									<artifactId>bonita-business-data-api</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-commons</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-server-sp</artifactId>
+									<artifactId>bonita-client-sp</artifactId>
 									<version>${project.version}</version>
 									<type>jar</type>
 								</artifactItem>
@@ -104,12 +125,6 @@
 								<artifactItem>
 									<groupId>org.hibernate</groupId>
 									<artifactId>hibernate-core</artifactId>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-client-sp</artifactId>
-									<version>${project.version}</version>
 									<type>jar</type>
 								</artifactItem>
 								<artifactItem>
