@@ -21,10 +21,15 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
  * @author Matthieu Chaffotte
@@ -163,81 +168,34 @@ public class BusinessObject {
     private boolean isACompositionField(Field field) {
         return field instanceof RelationField && Type.COMPOSITION == ((RelationField) field).getType();
     }
-    
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        result = prime * result + (indexes == null ? 0 : indexes.hashCode());
-        result = prime * result + (qualifiedName == null ? 0 : qualifiedName.hashCode());
-        result = prime * result + (queries == null ? 0 : queries.hashCode());
-        result = prime * result + (uniqueConstraints == null ? 0 : uniqueConstraints.hashCode());
-        return result;
+        return new HashCodeBuilder(17, 37).append(description).append(fields).append(indexes).append(qualifiedName).append(queries).append(uniqueConstraints)
+                .toHashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+        if (obj instanceof BusinessObject) {
+            final BusinessObject other = (BusinessObject) obj;
+            return new EqualsBuilder().append(description, other.description).append(fields, other.fields).append(indexes, other.indexes)
+                    .append(qualifiedName, other.qualifiedName).append(queries, other.queries).append(uniqueConstraints, other.uniqueConstraints).isEquals();
+        } else {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BusinessObject other = (BusinessObject) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        if (indexes == null) {
-            if (other.indexes != null) {
-                return false;
-            }
-        } else if (!indexes.equals(other.indexes)) {
-            return false;
-        }
-        if (qualifiedName == null) {
-            if (other.qualifiedName != null) {
-                return false;
-            }
-        } else if (!qualifiedName.equals(other.qualifiedName)) {
-            return false;
-        }
-        if (queries == null) {
-            if (other.queries != null) {
-                return false;
-            }
-        } else if (!queries.equals(other.queries)) {
-            return false;
-        }
-        if (uniqueConstraints == null) {
-            if (other.uniqueConstraints != null) {
-                return false;
-            }
-        } else if (!uniqueConstraints.equals(other.uniqueConstraints)) {
-            return false;
-        }
-        return true;
     }
 
     @Override
     public String toString() {
-        return "BusinessObject [qualifiedName=" + qualifiedName + ", description=" + description + ", fields=" + fields + ", uniqueConstraints="
-                + uniqueConstraints + ", indexes=" + indexes + ", queries=" + queries + "]";
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("description", description)
+                .append("fields", fields)
+                .append("indexes", indexes)
+                .append("qualifiedName", qualifiedName)
+                .append("queries", queries)
+                .append("uniqueConstraints", uniqueConstraints)
+                .toString();
     }
 
 }

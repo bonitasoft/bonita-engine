@@ -21,6 +21,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -42,7 +44,7 @@ public class BusinessObjectModel {
         return businessObjects;
     }
 
-    public void setBusinessObjects(final List<BusinessObject> businessObjects) {
+    public void setBusinessObjects(List<BusinessObject> businessObjects) {
         this.businessObjects = businessObjects;
     }
 
@@ -57,7 +59,7 @@ public class BusinessObjectModel {
         }
         return set;
     }
-    
+
     public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
         List<BusinessObject> refs = new ArrayList<BusinessObject>();
         for (BusinessObject bo : businessObjects) {
@@ -65,35 +67,22 @@ public class BusinessObjectModel {
         }
         return refs;
     }
-    
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (businessObjects == null ? 0 : businessObjects.hashCode());
-        return result;
+        return new HashCodeBuilder().append(businessObjects).toHashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+        if (obj instanceof BusinessObjectModel) {
+            final BusinessObjectModel other = (BusinessObjectModel) obj;
+            return new EqualsBuilder()
+                    .append(businessObjects, other.businessObjects)
+                    .isEquals();
+        } else {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BusinessObjectModel other = (BusinessObjectModel) obj;
-        if (businessObjects == null) {
-            if (other.businessObjects != null) {
-                return false;
-            }
-        } else if (!businessObjects.equals(other.businessObjects)) {
-            return false;
-        }
-        return true;
     }
 
     @Override
