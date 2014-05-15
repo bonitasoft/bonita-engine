@@ -1168,9 +1168,8 @@ public class ModelConvertor {
                 expList.add(toExpression(sexp));
             }
             return expList;
-        } else {
-            return Collections.emptyList();
         }
+        return Collections.emptyList();
     }
 
     public static Expression toExpression(final SExpression sexp) {
@@ -1372,9 +1371,8 @@ public class ModelConvertor {
                 contactInfoBuilder.setZipCode(zipCode);
             }
             return contactInfoBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final long userId) {
@@ -1443,7 +1441,7 @@ public class ModelConvertor {
         final Map<GroupField, Serializable> fields = creator.getFields();
         groupBuilder.setName((String) fields.get(GroupField.NAME));
         final String parentPath = (String) fields.get(GroupField.PARENT_PATH);
-        if (parentPath != null) {
+        if (parentPath != null && !parentPath.isEmpty()) {
             groupBuilder.setParentPath(parentPath);
         }
         final String displayName = (String) fields.get(GroupField.DISPLAY_NAME);
