@@ -319,6 +319,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 		SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
 		        + ", but no outgoing transition had a valid condition.");
 		exception.setProcessDefinitionNameOnContext(sDefinition.getName());
+		exception.setProcessDefinitionVersionOnContext(sDefinition.getVersion());
 		exception.setProcessInstanceIdOnContext(flowNodeInstance.getParentProcessInstanceId());
 		throw exception;
 	}
