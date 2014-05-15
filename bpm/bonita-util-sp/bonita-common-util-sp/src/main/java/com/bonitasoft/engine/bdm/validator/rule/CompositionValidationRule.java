@@ -32,7 +32,30 @@ public class CompositionValidationRule extends ValidationRule<BusinessObjectMode
 
     @Override
     ValidationStatus validate(BusinessObjectModel bom) {
-        return validateThatCompositeObjectsAreComposedOnlyInOneBo(bom);
+        ValidationStatus status = validateThatCompositeObjectsAreComposedOnlyInOneBo(bom);
+        status.addValidationStatus(validateThatThereIsNoCycleDependencies(bom));
+        return status;
+    }
+
+    private ValidationStatus validateThatThereIsNoCycleDependencies(BusinessObjectModel bom) {
+        ValidationStatus validationStatus = new ValidationStatus();
+        for (BusinessObject bo : bom.getBusinessObjects()) {
+                validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(bo, new ArrayList<BusinessObject>()));
+        }
+        return validationStatus;
+    }
+
+    private ValidationStatus validateThatThereIsNoCycleDependencies(BusinessObject bo, List<BusinessObject> bos) {
+        ValidationStatus validationStatus = new ValidationStatus();
+        bos.add(bo);
+        for (BusinessObject businessObject : bo.getReferencedBusinessObjectsByComposition()) {
+                if (bos.contains(businessObject)) {
+                    validationStatus.addError("Business object " + businessObject.getQualifiedName() + " has a circular composition reference to itself");
+                } else {
+                    validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(businessObject, bos));
+                }
+        }
+        return validationStatus;
     }
 
     private ValidationStatus validateThatCompositeObjectsAreComposedOnlyInOneBo(BusinessObjectModel bom) {

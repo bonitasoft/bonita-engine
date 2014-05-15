@@ -7,7 +7,6 @@ import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anAggregation
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
@@ -27,7 +26,6 @@ public class CompositionValidationRuleTest {
     }
 
     @Test
-    @Ignore("Not yet implemented")
     public void should_validate_that_a_composite_object_cannot_have_one_of_its_ancestor_as_a_child() throws Exception {
         BusinessObject daughter = aBO("daughter").build();
         BusinessObject mother = aBO("mother").withField(aCompositionField("daughter", daughter)).build();
@@ -42,7 +40,6 @@ public class CompositionValidationRuleTest {
     }
     
     @Test
-    @Ignore("Not yet implemented")
     public void should_validate_that_a_bo_cannot_compose_itself() throws Exception {
         BusinessObject daughter = aBO("daughter").build();
         daughter.addField(aCompositionField("toto", daughter));
@@ -67,7 +64,7 @@ public class CompositionValidationRuleTest {
     }
 
     @Test
-    public void a_bom_with_no_relation_fields_is_valid() throws Exception {
+    public void should_validate_that_a_bom_with_no_relation_fields_is_valid() throws Exception {
         BusinessObjectModel bom = aBOM().withBO(aBO("aBo").build()).build();
 
         ValidationStatus validationStatus = rule.validate(bom);
@@ -76,7 +73,7 @@ public class CompositionValidationRuleTest {
     }
 
     @Test
-    public void a_bom_with_no_composition_is_valid() throws Exception {
+    public void should_validate_that_a_bom_with_no_composition_is_valid() throws Exception {
         BusinessObject aggregated = aBO("aggregated").build();
         BusinessObject bo = aBO("aBo").withField(anAggregationField("aggreg", aggregated)).build();
         BusinessObjectModel bom = aBOM().withBOs(bo, aggregated).build();
