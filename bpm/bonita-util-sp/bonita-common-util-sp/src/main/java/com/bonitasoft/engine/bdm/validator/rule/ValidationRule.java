@@ -25,7 +25,7 @@ public abstract class ValidationRule<T> {
         return modelElement != null && classToApply.isAssignableFrom(modelElement.getClass());
     }
 
-    abstract ValidationStatus validate(T modelElement);
+    protected abstract ValidationStatus validate(T modelElement);
     
     @SuppressWarnings("unchecked")
     public ValidationStatus checkRule(Object modelElement) {

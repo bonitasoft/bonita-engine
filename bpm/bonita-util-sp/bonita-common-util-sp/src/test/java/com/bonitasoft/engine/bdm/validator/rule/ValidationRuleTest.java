@@ -90,7 +90,7 @@ public class ValidationRuleTest {
         }
 
         @Override
-        ValidationStatus validate(Exception modelElement) {
+        protected ValidationStatus validate(Exception modelElement) {
             return validationStatus;
         }
     }
