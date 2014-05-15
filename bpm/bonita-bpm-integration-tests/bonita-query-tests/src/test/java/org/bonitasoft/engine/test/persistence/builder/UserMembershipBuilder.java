@@ -4,7 +4,7 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 
 
-public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembershipImpl> {
+public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembershipImpl, UserMembershipBuilder> {
 
     private long groupId;
     private long userId;
@@ -14,6 +14,11 @@ public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembersh
         return new UserMembershipBuilder();
     }
     
+    @Override
+    UserMembershipBuilder getThisBuilder() {
+        return this;
+    }
+
     @Override
     SUserMembershipImpl _build() {
         SUserMembershipImpl membership = new SUserMembershipImpl();

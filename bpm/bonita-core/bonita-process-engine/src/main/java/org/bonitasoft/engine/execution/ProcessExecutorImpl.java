@@ -230,7 +230,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return flowNodeExecutor.stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerSubstituteId);
     }
 
-    private List<STransitionDefinition> evaluateOutgoingTransitions(final List<STransitionDefinition> outgoingTransitionDefinitions,
+    protected List<STransitionDefinition> evaluateOutgoingTransitions(final List<STransitionDefinition> outgoingTransitionDefinitions,
             final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         List<STransitionDefinition> chosenTransitionDefinitions = Collections.emptyList();
         // int nbOfTokenToMerge = 1;// may be > 1 in case of gateway
@@ -259,7 +259,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 chosenTransitionDefinitions = new ArrayList<STransitionDefinition>(outgoingTransitionDefinitions);
             } else {
                 if (outgoingTransitionDefinitions.isEmpty()) {
-                    chosenTransitionDefinitions = new ArrayList<STransitionDefinition>(1);
+                    STransitionDefinition defaultTransition = null;
+                    if ((defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance)) == null) {
+                        chosenTransitionDefinitions = new ArrayList<STransitionDefinition>(1);
+                    } else {
+                        List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>(1);
+                        transitions.add(defaultTransition);
+                        return transitions;
+                    }
                 } else {
                     chosenTransitionDefinitions = evaluateTransitionsForImpliciteGateway(sDefinition, flowNodeInstance, outgoingTransitionDefinitions,
                             sExpressionContext);
@@ -323,7 +330,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return chosenTransitions;
     }
 
-    private List<STransitionDefinition> evaluateTransitionsForImpliciteGateway(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
+    protected List<STransitionDefinition> evaluateTransitionsForImpliciteGateway(final SProcessDefinition sDefinition,
+            final SFlowNodeInstance flowNodeInstance,
             final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
         final int transitionNumber = outgoingTransitionDefinitions.size();
         final List<STransitionDefinition> conditionalTransitions = new ArrayList<STransitionDefinition>(transitionNumber);

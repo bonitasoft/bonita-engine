@@ -108,7 +108,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is node started. Start it first");
         }
-        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, this.timeTracker);
+        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
         final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
             return getValue(submit);
@@ -123,16 +123,20 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             disconnectSilently(sConnector);
             throw new SConnectorException("The connector timed out " + sConnector);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT)) {
-                final long endTime = System.currentTimeMillis();
-                final StringBuilder desc = new StringBuilder();
-                desc.append("Connector: ");
-                desc.append(sConnector);
-                desc.append(" - ");
-                desc.append("inputParameters: ");
-                desc.append(inputParameters);
-                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, desc.toString(), (endTime - startTime));
-            }
+            track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, startTime, sConnector, inputParameters);
+        }
+    }
+
+    private void track(final String recordName, final long startTime, final SConnector sConnector, final Map<String, Object> inputParameters) {
+        if (timeTracker.isTrackable(recordName)) {
+            final long endTime = System.currentTimeMillis();
+            final StringBuilder desc = new StringBuilder();
+            desc.append("Connector: ");
+            desc.append(sConnector);
+            desc.append(" - ");
+            desc.append("inputParameters: ");
+            desc.append(inputParameters);
+            timeTracker.track(recordName, desc.toString(), endTime - startTime);
         }
     }
 
@@ -143,7 +147,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     void disconnectSilently(final SConnector sConnector) {
         try {
             sConnector.disconnect();
-        } catch (final Throwable t) {
+        } catch (final Exception t) {
             if (this.loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                 this.loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occured while disconnecting the connector: " + sConnector, t);
             }
@@ -156,7 +160,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             sConnector.disconnect();
         } catch (final SConnectorException e) {
             throw e;
-        } catch (final Throwable t) {
+        } catch (final Exception t) {
             throw new SConnectorException(t);
         }
     }
@@ -170,12 +174,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private final TimeTracker timeTracker;
-
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final TimeTracker timeTracker) {
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
-            this.timeTracker = timeTracker;
         }
 
         @Override
@@ -195,18 +196,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                 } catch (final SessionIdNotSetException e) {
                     // nothing, no session has been created
                 }
-                if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE)) {
-                    final long endTime = System.currentTimeMillis();
-                    final StringBuilder desc = new StringBuilder();
-                    desc.append("Connector: ");
-                    desc.append(sConnector);
-                    desc.append(" - ");
-                    desc.append("inputParameters: ");
-                    desc.append(inputParameters);
-                    this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE, desc.toString(), (endTime - startTime));
-                }
+                track(TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE, startTime, sConnector, inputParameters);
             }
         }
+
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
