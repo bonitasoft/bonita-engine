@@ -21,9 +21,9 @@ import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
  * 
  * @author Colin PUY
  */
-public class CycleCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
+public class CyclicCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
 
-    public CycleCompositionValidationRule() {
+    public CyclicCompositionValidationRule() {
         super(BusinessObjectModel.class);
     }
 
@@ -36,14 +36,14 @@ public class CycleCompositionValidationRule extends ValidationRule<BusinessObjec
         return validationStatus;
     }
 
-    private ValidationStatus validateThatThereIsNoCycleDependencies(BusinessObject bo, List<BusinessObject> bos) {
+    private ValidationStatus validateThatThereIsNoCycleDependencies(BusinessObject bo, List<BusinessObject> parentBOs) {
         ValidationStatus validationStatus = new ValidationStatus();
-        bos.add(bo);
+        parentBOs.add(bo);
         for (BusinessObject businessObject : bo.getReferencedBusinessObjectsByComposition()) {
-            if (bos.contains(businessObject)) {
+            if (parentBOs.contains(businessObject)) {
                 validationStatus.addError("Business object " + businessObject.getQualifiedName() + " has a circular composition reference to itself");
             } else {
-                validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(businessObject, bos));
+                validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(businessObject, parentBOs));
             }
         }
         return validationStatus;

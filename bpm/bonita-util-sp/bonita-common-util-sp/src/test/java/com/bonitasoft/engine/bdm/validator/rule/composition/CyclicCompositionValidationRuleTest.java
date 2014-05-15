@@ -12,6 +12,7 @@ import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aCompositionField;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,13 +24,13 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Colin PUY
  */
-public class CycleCompositionValidationRuleTest {
+public class CyclicCompositionValidationRuleTest {
 
-    private CycleCompositionValidationRule rule;
+    private CyclicCompositionValidationRule rule;
 
     @Before
     public void initRule() {
-        rule = new CycleCompositionValidationRule();
+        rule = new CyclicCompositionValidationRule();
     }
 
     @Test
