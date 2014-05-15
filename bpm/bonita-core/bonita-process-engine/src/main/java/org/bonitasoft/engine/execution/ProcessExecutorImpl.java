@@ -298,18 +298,32 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
         }
         if (!transitionFound) {
-            final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
-            if (defaultTransition == null) {
-                throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + ", but no outgoing transition had a valid condition.");
-            }
+            final STransitionDefinition defaultTransition = getDefaultTransitionIfExists(sDefinition, flowNodeInstance);
             chosenTransitions.add(defaultTransition);
             outgoingTransitionDefinitions.add(defaultTransition);
         }
         return chosenTransitions;
     }
 
-    private List<STransitionDefinition> evaluateTransitionsInclusively(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
+	private STransitionDefinition getDefaultTransitionIfExists(final SProcessDefinition sDefinition,
+			final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+		final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
+		if (defaultTransition == null) {
+		    throwSActivityExecutionException(sDefinition, flowNodeInstance);
+		}
+		return defaultTransition;
+	}
+
+	private void throwSActivityExecutionException(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
+			throws SActivityExecutionException {
+		SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
+		        + ", but no outgoing transition had a valid condition.");
+		exception.setProcessDefinitionNameOnContext(sDefinition.getName());
+		exception.setProcessInstanceIdOnContext(flowNodeInstance.getParentProcessInstanceId());
+		throw exception;
+	}
+
+    List<STransitionDefinition> evaluateTransitionsInclusively(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
             final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
         final List<STransitionDefinition> chosenTransitions = new ArrayList<STransitionDefinition>(outgoingTransitionDefinitions.size());
         for (final STransitionDefinition sTransitionDefinition : outgoingTransitionDefinitions) {
@@ -319,11 +333,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
         }
         if (chosenTransitions.isEmpty()) {
-            final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
-            if (defaultTransition == null) {
-                throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + ", but no outgoing transition had a valid condition.");
-            }
+            final STransitionDefinition defaultTransition = getDefaultTransitionIfExists(sDefinition, flowNodeInstance);
             chosenTransitions.add(defaultTransition);
             outgoingTransitionDefinitions.add(defaultTransition);
         }
@@ -356,11 +366,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (!conditionalTransitions.isEmpty()) {
             chosenTransitions.addAll(conditionalTransitions);
         } else if (!conditionalFalseTransitions.isEmpty()) {
-            final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
-            if (defaultTransition == null) {
-                throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + ", but no outgoing transition had a valid condition.");
-            }
+            final STransitionDefinition defaultTransition = getDefaultTransitionIfExists(sDefinition, flowNodeInstance);
             chosenTransitions.add(defaultTransition);
         }
         return chosenTransitions;
@@ -839,17 +845,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return transitionsDescriptor;
     }
 
-    /**
-     * execute the implicit end of an element
-     * 
-     * @param numberOfTokenToMerge
-     * @param tokenRefId
-     * @param processInstanceId
-     * @param processDefinition
-     * @throws SBonitaException
-     * @throws SWorkRegisterException
-     * @throws SGatewayModificationException
-     */
     private void implicitEnd(final SProcessDefinition processDefinition, final long processInstanceId, final int numberOfTokenToMerge, final Long tokenRefId)
             throws SGatewayModificationException, SWorkRegisterException, SBonitaException {
         final SToken token = tokenService.getToken(processInstanceId, tokenRefId);
