@@ -109,7 +109,7 @@ public interface ExpressionExecutorStrategy {
      * This list must contain only types with no dependencies
      */
     List<ExpressionKind> NO_DEPENDENCY_EXPRESSION_EVALUATION_ORDER = Arrays.asList(KIND_ENGINE_CONSTANT, KIND_VARIABLE, KIND_CONSTANT, KIND_INPUT,
-            KIND_PARAMETER, KIND_DOCUMENT, KIND_BUSINESS_DATA/* , KIND_PATTERN, KIND_READ_ONLY_SCRIPT_GROOVY, KIND_LIST */);
+            KIND_PARAMETER, KIND_DOCUMENT, KIND_BUSINESS_DATA, KIND_BUSINESS_OBJECT_DAO/* , KIND_PATTERN, KIND_READ_ONLY_SCRIPT_GROOVY, KIND_LIST */);
 
     /**
      * @param expression
