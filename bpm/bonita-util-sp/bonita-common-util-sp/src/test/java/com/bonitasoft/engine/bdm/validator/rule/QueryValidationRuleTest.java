@@ -16,6 +16,7 @@
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -68,6 +69,16 @@ public class QueryValidationRuleTest {
 		queryValidationRule.checkRule(new BusinessObject());
 	}
 
+	@Test
+    public void should_validate_that_query_name_is_a_valid_java_identifier() throws Exception {
+        Query query = new Query();
+        query.setName(" a not valid java identifier");
+        
+        ValidationStatus validationStatus = queryValidationRule.validate(query);
+        
+        assertThat(validationStatus).isNotOk();
+    }
+	
 	@Test
 	public void shouldCheckRule_return_valid_status() throws Exception {
 		Query q = new Query("findByName", "Select toto where titi = toto",List.class.getName());
