@@ -5,7 +5,6 @@ import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aCompositionField;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anAggregationField;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -13,7 +12,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.builder.FieldBuilder;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
@@ -89,7 +87,7 @@ public class CompositionValidationRuleTest {
     }
 
     @Test
-    public void a_bom_with_composed_bo_in_only_one_bo_is_valid() throws Exception {
+    public void should_validate_that_a_bom_with_composed_bo_in_only_one_bo_is_valid() throws Exception {
         BusinessObject composite = aBO("composite").build();
         BusinessObject bo = aBO("aBo").withField(aCompositionField("composite", composite)).build();
         BusinessObject composite2 = aBO("composite2").build();
@@ -102,11 +100,11 @@ public class CompositionValidationRuleTest {
     }
     
     @Test
-    public void a_bom_with_a_bo_composed_in_two_bos_is_invalid() throws Exception {
+    public void should_validate_that_a_bom_with_a_bo_composed_in_two_bos_is_invalid() throws Exception {
         BusinessObject composite = aBO("composite").build();
-        BusinessObject bo = aBO("aBo").withField(aCompositionField("boOneComposite", composite)).build();
-        BusinessObject bo2 = aBO("aBo2").withField(aCompositionField("boTwoComposite", composite)).build();
-        BusinessObjectModel bom = aBOM().withBOs(bo, bo2, composite).build();
+        BusinessObject firstBO = aBO("firstBO").withField(aCompositionField("boOneComposite", composite)).build();
+        BusinessObject secondBO = aBO("secondBO").withField(aCompositionField("boTwoComposite", composite)).build();
+        BusinessObjectModel bom = aBOM().withBOs(firstBO, secondBO, composite).build();
 
         ValidationStatus validationStatus = rule.validate(bom);
 

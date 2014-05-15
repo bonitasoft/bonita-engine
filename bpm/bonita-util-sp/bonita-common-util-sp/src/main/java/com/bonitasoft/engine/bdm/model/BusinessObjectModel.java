@@ -23,8 +23,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -60,12 +58,12 @@ public class BusinessObjectModel {
         return set;
     }
     
-    public List<RelationField> getCompositionFields() {
-        List<RelationField> list = new ArrayList<RelationField>();
-        for (BusinessObject bo : getBusinessObjects()) {
-            list.addAll(bo.getCompositionFields());
+    public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
+        List<BusinessObject> refs = new ArrayList<BusinessObject>();
+        for (BusinessObject bo : businessObjects) {
+            refs.addAll(bo.getReferencedBusinessObjectsByComposition());
         }
-        return list;
+        return refs;
     }
     
     @Override

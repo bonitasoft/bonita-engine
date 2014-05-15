@@ -150,14 +150,18 @@ public class BusinessObject {
         this.indexes = indexes;
     }
 
-    public List<RelationField> getCompositionFields() {
-        List<RelationField> list = new ArrayList<RelationField>();
-        for (Field f : getFields()) {
-            if (f instanceof RelationField && ((RelationField) f).getType().equals(Type.COMPOSITION)) {
-                list.add((RelationField) f);
+    public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
+        List<BusinessObject> refs = new ArrayList<BusinessObject>();
+        for (Field field : fields) {
+            if (isACompositionField(field)) {
+                refs.add(((RelationField) field).getReference());
             }
         }
-        return list;
+        return refs;
+    }
+
+    private boolean isACompositionField(Field field) {
+        return field instanceof RelationField && Type.COMPOSITION == ((RelationField) field).getType();
     }
     
     @Override

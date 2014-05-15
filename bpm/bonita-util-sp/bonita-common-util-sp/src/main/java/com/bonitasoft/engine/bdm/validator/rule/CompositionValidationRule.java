@@ -13,9 +13,17 @@ import java.util.List;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
+/**
+ * Composition validation rules.
+ * <ul>
+ *  <li>Validate that a business object used in a composition is used in only one composition</li>
+ *  <li>Validate that a business object used in a composition cannot have one of it's ancestor as a child (Circular references)</li>
+ * </ul>
+ *  
+ * @author Colin PUY
+ */
 public class CompositionValidationRule extends ValidationRule<BusinessObjectModel> {
 
     public CompositionValidationRule() {
@@ -24,22 +32,17 @@ public class CompositionValidationRule extends ValidationRule<BusinessObjectMode
 
     @Override
     ValidationStatus validate(BusinessObjectModel bom) {
-        List<RelationField> compositionFields = bom.getCompositionFields();
-        return getValidationStatus(compositionFields);
+        return validateThatCompositeObjectsAreComposedOnlyInOneBo(bom);
     }
 
-    // TODO rename
-    // TODO retrieve only composite BO, not relations
-    private ValidationStatus getValidationStatus(List<RelationField> compositionFields) {
+    private ValidationStatus validateThatCompositeObjectsAreComposedOnlyInOneBo(BusinessObjectModel bom) {
         ValidationStatus validationStatus = new ValidationStatus();
-
-        List<BusinessObject> compositeBOs = new ArrayList<BusinessObject>();
-        for (RelationField compositionField : compositionFields) {
-            if (compositeBOs.contains(compositionField.getReference())) {
-                validationStatus.addError("Business object " + compositionField.getReference().getQualifiedName()
-                        + " is composed in two business objects");
+        List<BusinessObject> alreadyComposedBOs = new ArrayList<BusinessObject>();
+        for (BusinessObject compositeBO : bom.getReferencedBusinessObjectsByComposition()) {
+            if (alreadyComposedBOs.contains(compositeBO)) {
+                validationStatus.addError("Business object " + compositeBO.getQualifiedName() + " is referenced by composition in two business objects");
             } else {
-                compositeBOs.add(compositionField.getReference());
+                alreadyComposedBOs.add(compositeBO);
             }
         }
         return validationStatus;
