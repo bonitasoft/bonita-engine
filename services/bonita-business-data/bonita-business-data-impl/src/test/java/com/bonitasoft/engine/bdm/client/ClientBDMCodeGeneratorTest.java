@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
@@ -34,7 +35,10 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
@@ -261,7 +265,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
 
-        final JFieldVar idFieldVar = definedClass.fields().get(SimpleField.PERSISTENCE_ID);
+        final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
         assertThat(idFieldVar).isNotNull();
         assertThat(idFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Long.class.getName()));
         assertThat(idFieldVar.annotations()).hasSize(2);
@@ -279,7 +283,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addPersistenceVersionFieldAndAccessors(definedClass);
 
-        final JFieldVar versionFieldVar = definedClass.fields().get(SimpleField.PERSISTENCE_VERSION);
+        final JFieldVar versionFieldVar = definedClass.fields().get(Field.PERSISTENCE_VERSION);
         assertThat(versionFieldVar).isNotNull();
         assertThat(versionFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Long.class.getName()));
         assertThat(versionFieldVar.annotations()).hasSize(1);
@@ -448,11 +452,96 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(model);
         bdmCodeGenerator.generate(destDir);
 
-        final File employeeFile = new File(destDir, "Employee.java");
-        final URL resource = ClientBDMCodeGeneratorTest.class.getResource("Employee.test");
+        assertFilesAreEqual("Employee.java", "Employee.test");
+    }
+
+    @Test
+    public void addSimpleReferenceWithComposition() throws Exception {
+        final BusinessObjectModel model = build(true, false);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator.generate(destDir);
+
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.test");
+    }
+
+    @Test
+    public void addListReferenceWithComposition() throws Exception {
+        final BusinessObjectModel model = build(true, true);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator.generate(destDir);
+
+        assertFilesAreEqual("Employee.java", "EmployeeListComposition.test");
+    }
+
+    @Test
+    public void addSimpleReferenceWithAggregation() throws Exception {
+        final BusinessObjectModel model = build(false, false);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator.generate(destDir);
+
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.test");
+    }
+
+    @Test
+    public void addListReferenceWithAggregation() throws Exception {
+        final BusinessObjectModel model = build(false, true);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator.generate(destDir);
+
+        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.test");
+    }
+
+    private BusinessObjectModel build(final boolean composition, final boolean collection) {
+        final SimpleField street = new SimpleField();
+        street.setName("street");
+        street.setType(FieldType.STRING);
+        final SimpleField city = new SimpleField();
+        city.setName("city");
+        city.setType(FieldType.STRING);
+        final BusinessObject addressBO = new BusinessObject();
+        addressBO.setQualifiedName("Address");
+        addressBO.addField(street);
+        addressBO.addField(city);
+
+        final SimpleField field = new SimpleField();
+        field.setName("firstName");
+        field.setType(FieldType.STRING);
+        final RelationField address = new RelationField();
+        if (composition) {
+            address.setType(Type.COMPOSITION);
+        } else {
+            address.setType(Type.AGGREGATION);
+        }
+        if (collection) {
+            address.setName("addresses");
+            address.setCollection(Boolean.TRUE);
+        } else {
+            address.setName("address");
+            address.setCollection(Boolean.FALSE);
+        }
+        address.setReference(addressBO);
+
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName("Employee");
+        employeeBO.addField(field);
+        employeeBO.addField(address);
+
+        final BusinessObjectModel model = new BusinessObjectModel();
+        model.addBusinessObject(employeeBO);
+        model.addBusinessObject(addressBO);
+        return model;
+    }
+
+    private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws URISyntaxException {
+        final File file = new File(destDir, qualifiedName);
+        final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
 
-        assertThat(employeeFile).hasContentEqualTo(expected);
+        assertThat(file).hasContentEqualTo(expected);
     }
 
 }

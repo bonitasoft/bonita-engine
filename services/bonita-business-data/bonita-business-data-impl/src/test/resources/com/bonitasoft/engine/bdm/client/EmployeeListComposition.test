@@ -1,22 +1,22 @@
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Version;
-import org.hibernate.annotations.Index;
 
 
 /**
  * 
  */
 @javax.persistence.Entity(name = "Employee")
-@org.hibernate.annotations.Table(appliesTo = "EMPLOYEE", indexes = {
-    @Index(name = "IDX_1", columnNames = {
-        "FIRSTNAME, LASTNAME"
-    })
-})
-@javax.persistence.Table(name = "EMPLOYEE")
+@Table(name = "EMPLOYEE")
 @NamedQueries({
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
@@ -32,6 +32,10 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
+    @OneToMany(fetch = FetchType.EAGER, cascade = {
+        CascadeType.ALL
+    })
+    private List<Address> addresses = new ArrayList<Address>(10);
 
     public Employee() {
     }
@@ -40,6 +44,7 @@ public class Employee
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();
+        this.addresses = new ArrayList<Address>(employee.getAddresses());
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -64,6 +69,22 @@ public class Employee
 
     public String getFirstName() {
         return firstName;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void addToAddresses(Address addTo) {
+        addresses.add(addTo);
+    }
+
+    public void removeFromAddresses(Address removeFrom) {
+        addresses.remove(removeFrom);
     }
 
     @Override
@@ -105,6 +126,15 @@ public class Employee
                 return false;
             }
         }
+        if (addresses == null) {
+            if (other.addresses!= null) {
+                return false;
+            }
+        } else {
+            if (!addresses.equals(other.addresses)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -127,6 +157,11 @@ public class Employee
             firstNameCode = firstName.hashCode();
         }
         result = ((prime*result)+ firstNameCode);
+        int addressesCode = 0;
+        if (addresses!= null) {
+            addressesCode = addresses.hashCode();
+        }
+        result = ((prime*result)+ addressesCode);
         return result;
     }
 

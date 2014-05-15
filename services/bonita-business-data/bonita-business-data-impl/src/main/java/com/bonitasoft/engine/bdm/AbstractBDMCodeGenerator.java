@@ -17,13 +17,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,6 +45,8 @@ import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -95,21 +102,48 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         final JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
         entityAnnotation.param("name", entityClass.name());
 
-        final List<Index> indexes = bo.getIndexes();
-        if (indexes != null && !indexes.isEmpty()) {
-            final JAnnotationUse hibTabAnnotation = addAnnotation(entityClass, org.hibernate.annotations.Table.class);
-            hibTabAnnotation.param("appliesTo", entityClass.name().toUpperCase());
-            final JAnnotationArrayMember indexesArray = hibTabAnnotation.paramArray("indexes");
-            for (final Index index : indexes) {
-                final JAnnotationUse indexAnnotation = indexesArray.annotate(org.hibernate.annotations.Index.class);
-                indexAnnotation.param("name", index.getName().toUpperCase());
-                final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
-                for (final String fieldName : index.getFieldNames()) {
-                    columnParamArray.param(fieldName.toUpperCase());
-                }
-            }
+        addIndexAnnotations(bo, entityClass);
+        addUniqueConstraintAnnotations(bo, entityClass);
+        addQueriesAnnotation(bo, entityClass);
+
+        addFieldsAndMethods(bo, entityClass);
+
+        addDefaultConstructor(entityClass);
+        addCopyConstructor(entityClass, bo);
+
+        addEqualsMethod(entityClass);
+        addHashCodeMethod(entityClass);
+
+        return entityClass;
+    }
+
+    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+        addPersistenceIdFieldAndAccessors(entityClass);
+        addPersistenceVersionFieldAndAccessors(entityClass);
+
+        for (final Field field : bo.getFields()) {
+            final JFieldVar fieldVar = addField(entityClass, field);
+            addAccessors(entityClass, fieldVar);
+            addModifiers(entityClass, field);
+        }
+    }
+
+    private void addQueriesAnnotation(final BusinessObject bo, final JDefinedClass entityClass) {
+        final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
+        final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
+
+        // Add provided queries
+        for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
         }
 
+        // Add custom queries
+        for (final Query query : bo.getQueries()) {
+            addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
+        }
+    }
+
+    private void addUniqueConstraintAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
         final JAnnotationUse tableAnnotation = addAnnotation(entityClass, Table.class);
         tableAnnotation.param("name", entityClass.name().toUpperCase());
 
@@ -125,36 +159,23 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
                 }
             }
         }
+    }
 
-        final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
-        final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
-
-        // Add provided queries
-        for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
-            addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
+    private void addIndexAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
+        final List<Index> indexes = bo.getIndexes();
+        if (indexes != null && !indexes.isEmpty()) {
+            final JAnnotationUse hibTabAnnotation = addAnnotation(entityClass, org.hibernate.annotations.Table.class);
+            hibTabAnnotation.param("appliesTo", entityClass.name().toUpperCase());
+            final JAnnotationArrayMember indexesArray = hibTabAnnotation.paramArray("indexes");
+            for (final Index index : indexes) {
+                final JAnnotationUse indexAnnotation = indexesArray.annotate(org.hibernate.annotations.Index.class);
+                indexAnnotation.param("name", index.getName().toUpperCase());
+                final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
+                for (final String fieldName : index.getFieldNames()) {
+                    columnParamArray.param(fieldName.toUpperCase());
+                }
+            }
         }
-
-        // Add custom queries
-        for (final Query query : bo.getQueries()) {
-            addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
-        }
-
-        addPersistenceIdFieldAndAccessors(entityClass);
-        addPersistenceVersionFieldAndAccessors(entityClass);
-
-        for (final Field field : bo.getFields()) {
-            final JFieldVar fieldVar = addField(entityClass, field);
-            addAccessors(entityClass, fieldVar);
-            addModifiers(entityClass, field);
-        }
-
-        addDefaultConstructor(entityClass);
-        addCopyConstructor(entityClass, bo);
-
-        addEqualsMethod(entityClass);
-        addHashCodeMethod(entityClass);
-
-        return entityClass;
     }
 
     private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray, final String name, final String content) {
@@ -178,18 +199,13 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
         final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
-        final JVar param = copyConstructor.param(entityClass, WordUtils.capitalize(entityClass.name()));
+        final JVar param = copyConstructor.param(entityClass, WordUtils.uncapitalize(entityClass.name()));
         final JBlock copyBody = copyConstructor.body();
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
         for (final Field field : bo.getFields()) {
             if (field.isCollection() != null && field.isCollection()) {
-
-                JClass fieldClass = null;
-                if (field instanceof SimpleField) {
-                    fieldClass = getModel().ref(((SimpleField) field).getType().getClazz());
-                }
-
+                final JClass fieldClass = toJavaClass(field);
                 final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
                 copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz)
                         .arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
@@ -214,13 +230,18 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
         JFieldVar fieldVar = null;
+        final Boolean collection = field.isCollection();
+        if (collection != null && collection) {
+            fieldVar = addListField(entityClass, field);
+        } else {
+            fieldVar = addField(entityClass, field.getName(), toJavaType(field));
+        }
+
         if (field instanceof SimpleField) {
-            SimpleField sfield = (SimpleField) field;
-            final Boolean collection = field.isCollection();
+            final SimpleField sfield = (SimpleField) field;
             if (collection != null && collection) {
-                fieldVar = addListField(entityClass, field);
-            } else {
-                fieldVar = addField(entityClass, field.getName(), toJavaType(sfield.getType()));
+                final JAnnotationUse collectionAnnotation = addAnnotation(fieldVar, ElementCollection.class);
+                collectionAnnotation.param("fetch", FetchType.EAGER);
             }
             final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
             columnAnnotation.param("name", field.getName().toUpperCase());
@@ -234,6 +255,19 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
                 addAnnotation(fieldVar, Lob.class);
             } else if (FieldType.STRING.equals(sfield.getType()) && sfield.getLength() != null && sfield.getLength() > 0) {
                 columnAnnotation.param("length", sfield.getLength());
+            }
+        } else {
+            final RelationField rfield = (RelationField) field;
+            JAnnotationUse relation = null;
+            if (collection != null && collection) {
+                relation = addAnnotation(fieldVar, OneToMany.class);
+            } else {
+                relation = addAnnotation(fieldVar, ManyToOne.class);
+            }
+            relation.param("fetch", FetchType.EAGER);
+            if (rfield.getType() == Type.COMPOSITION) {
+                final JAnnotationArrayMember cascade = relation.paramArray("cascade");
+                cascade.param(CascadeType.ALL);
             }
         }
         return fieldVar;
@@ -250,10 +284,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             addAddMethod(entityClass, field);
             addRemoveMethod(entityClass, field);
         }
-    }
-
-    public JType toJavaType(final FieldType type) {
-        return getModel().ref(type.getClazz());
     }
 
     @Override
