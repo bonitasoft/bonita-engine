@@ -54,7 +54,7 @@ public class ConnectorExecutorImplTest {
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         final TimeTracker timeTracker = mock(TimeTracker.class);
         connectorExecutorImpl = new ConnectorExecutorImpl(0, 0, loggerService, 0, 0, sessionAccessor, sessionService, timeTracker);
-        connectorExecutorImpl.useExecutor(executorService);
+        connectorExecutorImpl.setExecutor(executorService);
     }
 
     @Test
