@@ -238,6 +238,15 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         this.executorService = executorService;
     }
 
+    // For unit tests
+    ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
     @Override
     public void stop() {
         if (executorService != null) {
