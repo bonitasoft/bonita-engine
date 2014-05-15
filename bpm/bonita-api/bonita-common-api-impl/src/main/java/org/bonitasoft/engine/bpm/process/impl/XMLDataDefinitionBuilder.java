@@ -49,11 +49,21 @@ public class XMLDataDefinitionBuilder extends DataDefinitionBuilder {
         return xml;
     }
 
+    /**
+     * Sets the XML name space.
+     * @param nameSpace XML name space
+     * @return
+     */
     public XMLDataDefinitionBuilder setNamespace(final String nameSpace) {
         ((XMLDataDefinitionImpl) getDataDefinition()).setNamespace(nameSpace);
         return this;
     }
 
+    /**
+     * Sets the XML element.
+     * @param element XML element
+     * @return
+     */
     public XMLDataDefinitionBuilder setElement(final String element) {
         ((XMLDataDefinitionImpl) getDataDefinition()).setElement(element);
         return this;

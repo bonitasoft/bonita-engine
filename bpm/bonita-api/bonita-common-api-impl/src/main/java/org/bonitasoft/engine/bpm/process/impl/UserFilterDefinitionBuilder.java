@@ -44,6 +44,12 @@ public class UserFilterDefinitionBuilder extends FlowElementContainerBuilder {
         }
     }
 
+    /**
+     * Adds a user filter input.
+     * @param name input name.
+     * @param value expression representing the input value.
+     * @return
+     */
     public UserFilterDefinitionBuilder addInput(final String name, final Expression value) {
         if (value == null) {
             processDefinitionBuilder.addError("The input " + name + " of user filter " + userFilterDefinition.getName() + " is null");

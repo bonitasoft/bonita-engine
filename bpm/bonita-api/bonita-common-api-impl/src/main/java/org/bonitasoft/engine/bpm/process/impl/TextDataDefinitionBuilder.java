@@ -50,6 +50,10 @@ public class TextDataDefinitionBuilder extends DataDefinitionBuilder {
         return text;
     }
 
+    /**
+     * Sets this data as long text (more than 255 characters).
+     * @return
+     */
     public TextDataDefinitionBuilder isLongText() {
         ((TextDataDefinitionImpl) getDataDefinition()).setLongText(true);
         return this;

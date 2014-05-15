@@ -48,6 +48,13 @@ public class MultiInstanceLoopCharacteristicsBuilder {
         activityDefinition.setLoopCharacteristics(entity);
     }
 
+    /**
+     * Adds a condition completion on this multi-instance
+     * 
+     * @param completionCondition
+     *            expression used as completion condition. The return type must be boolean
+     * @return
+     */
     public MultiInstanceLoopCharacteristicsBuilder addCompletionCondition(final Expression completionCondition) {
         entity.setCompletionCondition(completionCondition);
         if (!Boolean.class.getName().equals(completionCondition.getReturnType())) {
@@ -56,16 +63,46 @@ public class MultiInstanceLoopCharacteristicsBuilder {
         return this;
     }
 
+    /**
+     * Adds a data output reference. A data output reference must be used when the instance is initialized using a collection:
+     * {@link ActivityDefinitionBuilder#addMultiInstance(boolean, String)}. It represents the output generated for all instances:
+     * {@link MultiInstanceLoopCharacteristicsBuilder#addDataOutputItemRef(String)}
+     * 
+     * @param loopDataOutputRef
+     *            name of process data that will store the collection output. This data must be previously added at the process level.
+     * @return
+     * @see MultiInstanceLoopCharacteristicsBuilder#addDataOutputItemRef(String)
+     */
     public MultiInstanceLoopCharacteristicsBuilder addLoopDataOutputRef(final String loopDataOutputRef) {
         entity.setLoopDataOutputRef(loopDataOutputRef);
         return this;
     }
 
+    /**
+     * Adds a data input item reference on this multi-instance. A data input item reference must be used when the instance is initialized using a collection:
+     * {@link ActivityDefinitionBuilder#addMultiInstance(boolean, String)}. It represents the collection element related to each instance. For instance, if the
+     * collection used to create the multi-instance is a list containing the elements A and B, in the first instance the data input item reference value will be
+     * A and in the second one, B.
+     * 
+     * @param dataItemRef
+     *            name of activity data that will store the collection element related to each instance. This data must be previously added at the activity
+     *            level.
+     * @return
+     */
     public MultiInstanceLoopCharacteristicsBuilder addDataInputItemRef(final String dataItemRef) {
         entity.setDataInputItemRef(dataItemRef);
         return this;
     }
 
+    /**
+     * Adds a data output item reference on this multi-instance. A data output item reference must be used when the instance is initialized using a collection:
+     * {@link ActivityDefinitionBuilder#addMultiInstance(boolean, String)}. It represents the output generated for each instance. All data output item reference
+     * will be added in the data output reference: {@link MultiInstanceLoopCharacteristicsBuilder#addLoopDataOutputRef(String)}.
+     * 
+     * @param dataItemRef
+     *            name of activity data that will store the output related each instance. This data must be previously added at the activity level.
+     * @return
+     */
     public MultiInstanceLoopCharacteristicsBuilder addDataOutputItemRef(final String dataItemRef) {
         entity.setDataOutputItemRef(dataItemRef);
         return this;

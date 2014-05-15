@@ -34,15 +34,32 @@ public class ManualTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         return new ManualTaskDefinitionImpl(name, actorName);
     }
 
+    /**
+     * Adds a user filter on this manual task.
+     * @param name filter name in this task.
+     * @param userFilterId user filter identifier.
+     * @param version user filter version.
+     * @return
+     */
     public UserFilterDefinitionBuilder addUserFilter(final String name, final String userFilterId, final String version) {
         return new UserFilterDefinitionBuilder(getProcessBuilder(), getContainer(), name, userFilterId, version, (HumanTaskDefinitionImpl) getActivity());
     }
 
+    /**
+     * Sets the expected duration for this human task.
+     * @param time how long (in milliseconds) this task is expected to take.
+     * @return
+     */
     public ManualTaskDefinitionBuilder addExpectedDuration(final long time) {
         ((ManualTaskDefinitionImpl) getActivity()).setExpectedDuration(time);
         return this;
     }
 
+    /**
+     * Sets the task priority.
+     * @param priority task priority.
+     * @return
+     */
     public ManualTaskDefinitionBuilder addPriority(final String priority) {
         ((ManualTaskDefinitionImpl) getActivity()).setPriority(priority);
         return this;

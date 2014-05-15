@@ -38,21 +38,50 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
         return activity;
     }
 
+    /**
+     * Sets the name of target process
+     * 
+     * @param callableElement
+     *            expression representing the process name
+     * @return
+     */
     public CallActivityBuilder setCallableElement(final Expression callableElement) {
         ((CallActivityDefinitionImpl) getActivity()).setCallableElement(callableElement);
         return this;
     }
 
+    /**
+     * Sets the version of target process
+     * 
+     * @param callableElementVersion
+     *            expression representing the process version
+     * @return
+     */
     public CallActivityBuilder setCallableElementVersion(final Expression callableElementVersion) {
         ((CallActivityDefinitionImpl) getActivity()).setCallableElementVersion(callableElementVersion);
         return this;
     }
 
+    /**
+     * Adds a data input operation on this call activity. Data input operations will be evaluated during the target process instantiation and can be used to
+     * transfer data from the caller process to the called one
+     * 
+     * @param dataInputOperation
+     *            data input operation
+     * @return
+     */
     public CallActivityBuilder addDataInputOperation(final Operation dataInputOperation) {
         ((CallActivityDefinitionImpl) getActivity()).addDataInputOperation(dataInputOperation);
         return this;
     }
 
+    /**
+     * Adds a data output operation on this call activity. Data output operations will be evaluated during the target process completion and can be used to transfer data from called process to the caller one
+     * 
+     * @param dataOutputOperation
+     *            data output operation
+     * @return
+     */
     public CallActivityBuilder addDataOutputOperation(final Operation dataOutputOperation) {
         ((CallActivityDefinitionImpl) getActivity()).addDataOutputOperation(dataOutputOperation);
         return this;

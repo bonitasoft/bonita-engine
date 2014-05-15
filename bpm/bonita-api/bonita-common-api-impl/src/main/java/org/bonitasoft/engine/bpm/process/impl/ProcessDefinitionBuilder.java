@@ -29,6 +29,7 @@ import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -38,7 +39,6 @@ import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -47,7 +47,7 @@ import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
- * Build a process definition
+ * Builder to define a process.
  * 
  * @author Baptiste Mesta
  * @author Yanyan Liu
@@ -66,6 +66,17 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private List<String> designErrors;
 
+    /**
+     * Initiates the building of a new {@link DesignProcessDefinition} with the given name and version. This method is the entry point of this builder. It must
+     * be called before any other method. The <code>DesignProcessDefinition</code> building will be completed when the method {@link #done()} or
+     * {@link #getProcess()} is called.
+     * 
+     * @param name
+     *            the process name
+     * @param version
+     *            the process version
+     * @return
+     */
     public ProcessDefinitionBuilder createNewInstance(final String name, final String version) {
         designErrors = new ArrayList<String>(5);
         if (name == null || name.isEmpty()) {
@@ -76,6 +87,13 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         return this;
     }
 
+    /**
+     * Validates the process consistency and return it
+     * 
+     * @return the process being build
+     * @throws InvalidProcessDefinitionException
+     *             when the process definition is inconsistent. The exception contains causes
+     */
     public DesignProcessDefinition done() throws InvalidProcessDefinitionException {
         validateProcess();
         if (!designErrors.isEmpty()) {
@@ -365,11 +383,25 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         return this;
     }
 
+    /**
+     * Sets the process display name. When set, It is used to replace the name in the Bonita BPM Portal
+     * 
+     * @param name
+     *            display name
+     * @return
+     */
     public ProcessDefinitionBuilder addDisplayName(final String name) {
         process.setDisplayName(name);
         return this;
     }
 
+    /**
+     * Sets the process display description
+     * 
+     * @param description
+     *            display description
+     * @return
+     */
     public ProcessDefinitionBuilder addDisplayDescription(final String description) {
         process.setDisplayDescription(description);
         return this;
@@ -412,13 +444,13 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     @Override
-    public UserTaskDefinitionBuilder addUserTask(final String activityName, final String actorName) {
-        return new UserTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), activityName, actorName);
+    public UserTaskDefinitionBuilder addUserTask(final String taskName, final String actorName) {
+        return new UserTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName, actorName);
     }
 
     @Override
-    public AutomaticTaskDefinitionBuilder addAutomaticTask(final String activityName) {
-        return new AutomaticTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), activityName);
+    public AutomaticTaskDefinitionBuilder addAutomaticTask(final String taskName) {
+        return new AutomaticTaskDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), taskName);
     }
 
     @Override
@@ -442,8 +474,8 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     @Override
-    public TransitionDefinitionBuilder addTransition(final String source, final String target, final Expression expression) {
-        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), source, target, expression, false);
+    public TransitionDefinitionBuilder addTransition(final String source, final String target, final Expression condition) {
+        return new TransitionDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), source, target, condition, false);
     }
 
     @Override
@@ -547,14 +579,36 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
     }
 
+    /**
+     * Adds an actor on this process
+     * 
+     * @param actorName
+     *            actor name
+     * @see #addActor(String, boolean)
+     */
     public ActorDefinitionBuilder addActor(final String actorName) {
         return new ActorDefinitionBuilder(this, process, actorName, false);
     }
 
+    /**
+     * Adds an actor on this process
+     * 
+     * @param name
+     *            actor name
+     * @param initiator
+     *            defines whether it's the actor initiator (actor that's able to start the process)
+     * @return
+     */
     public ActorDefinitionBuilder addActor(final String name, final boolean initiator) {
         return new ActorDefinitionBuilder(this, process, name, initiator);
     }
 
+    /**
+     * Adds an actor initiator on this process. The actor initiator is the one that will start the process.
+     * 
+     * @param actorName
+     * @return
+     */
     public ActorDefinitionBuilder setActorInitiator(final String actorName) {
         return new ActorDefinitionBuilder(this, process, actorName, true);
     }
@@ -565,7 +619,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     /**
-     * validate the process consistency and return it
+     * Validates the process consistency and return it
      * 
      * @return
      *         the process being build

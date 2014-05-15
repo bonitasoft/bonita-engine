@@ -38,18 +38,26 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
         this.processDefinitionBuilder = processDefinitionBuilder;
     }
 
+    /**
+     * Validates the process consistency and return it
+     * 
+     * @return
+     *         the process being build
+     * @throws InvalidProcessDefinitionException
+     *             when the process definition is inconsistent. The exception contains causes
+     */
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return processDefinitionBuilder.done();
     }
 
     @Override
-    public UserTaskDefinitionBuilder addUserTask(final String activityName, final String actorName) {
-        return new UserTaskDefinitionBuilder(processDefinitionBuilder, container, activityName, actorName);
+    public UserTaskDefinitionBuilder addUserTask(final String taskName, final String actorName) {
+        return new UserTaskDefinitionBuilder(processDefinitionBuilder, container, taskName, actorName);
     }
 
     @Override
-    public AutomaticTaskDefinitionBuilder addAutomaticTask(final String activityName) {
-        return new AutomaticTaskDefinitionBuilder(processDefinitionBuilder, container, activityName);
+    public AutomaticTaskDefinitionBuilder addAutomaticTask(final String taskName) {
+        return new AutomaticTaskDefinitionBuilder(processDefinitionBuilder, container, taskName);
     }
 
     @Override
@@ -73,8 +81,8 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     }
 
     @Override
-    public TransitionDefinitionBuilder addTransition(final String source, final String target, final Expression expression) {
-        return new TransitionDefinitionBuilder(processDefinitionBuilder, container, source, target, expression, false);
+    public TransitionDefinitionBuilder addTransition(final String source, final String target, final Expression condition) {
+        return new TransitionDefinitionBuilder(processDefinitionBuilder, container, source, target, condition, false);
     }
 
     @Override

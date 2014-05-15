@@ -97,6 +97,10 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
         return this;
     }
 
+    /**
+     * Marks this data as transient
+     * @return
+     */
     public DataDefinitionBuilder isTransient() {
         dataDefinition.setTransientData(true);
         return this;
