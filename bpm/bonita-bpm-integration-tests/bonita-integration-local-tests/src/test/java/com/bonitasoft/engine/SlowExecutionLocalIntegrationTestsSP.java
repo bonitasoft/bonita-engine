@@ -28,6 +28,7 @@ import com.bonitasoft.engine.identity.SPIdentityTests;
 import com.bonitasoft.engine.platform.SPPlatformLoginTest;
 import com.bonitasoft.engine.platform.SPPlatformTest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
+import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
@@ -51,7 +52,7 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
         SPPlatformTest.class,
         SPTimerBoundaryEventTest.class,
         SPIdentityTests.class,
-        TenantPauseTestSP.class,
+        TenantMaintenanceIT.class,
         SPProcessManagementTest.class, 
 })
 @Initializer(TestsInitializerSP.class)

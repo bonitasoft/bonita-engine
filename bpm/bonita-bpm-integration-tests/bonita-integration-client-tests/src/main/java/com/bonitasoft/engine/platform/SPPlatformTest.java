@@ -41,7 +41,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.bonitasoft.engine.APITestSPUtil;
-import com.bonitasoft.engine.SPBPMTestUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
@@ -98,7 +98,7 @@ public class SPPlatformTest {
     public void setUp() throws Exception {
         if (!platformAPI.isPlatformCreated()) {
             platformAPI.createPlatform();
-            SPBPMTestUtil.createEnvironmentWithDefaultTenant();
+            BPMTestSPUtil.createEnvironmentWithDefaultTenant();
             createTenants();
         }
     }

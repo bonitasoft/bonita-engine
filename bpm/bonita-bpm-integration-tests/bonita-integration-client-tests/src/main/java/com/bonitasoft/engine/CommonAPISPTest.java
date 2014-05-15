@@ -82,13 +82,13 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
      */
     private List<String> clean() throws BonitaException {
         final List<String> messages = new ArrayList<String>();
-        final PlatformSession platformSession = SPBPMTestUtil.loginPlatform();
+        final PlatformSession platformSession = BPMTestSPUtil.loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final List<Tenant> tenants = platformAPI.searchTenants(new SearchOptionsBuilder(0, 100).done()).getResult();
-        SPBPMTestUtil.logoutPlatform(platformSession);
+        BPMTestSPUtil.logoutOnPlatform(platformSession);
 
         for (final Tenant tenant : tenants) {
-            login(tenant.getId());
+            loginOnTenantWithTechnicalLogger(tenant.getId());
             messages.addAll(checkNoCommands());
             messages.addAll(checkNoUsers());
             messages.addAll(checkNoGroups());

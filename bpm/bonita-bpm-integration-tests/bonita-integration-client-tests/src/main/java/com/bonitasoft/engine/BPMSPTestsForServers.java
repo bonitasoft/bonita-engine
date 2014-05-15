@@ -26,13 +26,13 @@ public class BPMSPTestsForServers {
     public static void beforeAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.beforeClass()");
         apiTestUtil.createPlatformStructure();
-        SPBPMTestUtil.createEnvironmentWithDefaultTenant();
+        BPMTestSPUtil.createEnvironmentWithDefaultTenant();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
     public static void afterAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.afterClass()");
-        SPBPMTestUtil.destroyPlatformAndTenants();
+        BPMTestSPUtil.destroyPlatformAndTenants();
         apiTestUtil.deletePlatformStructure();
     }
 

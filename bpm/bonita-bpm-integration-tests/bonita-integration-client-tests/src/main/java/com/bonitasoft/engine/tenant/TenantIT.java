@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine;
+package com.bonitasoft.engine.tenant;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,6 +47,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.bonitasoft.engine.APITestSPUtil;
+import com.bonitasoft.engine.TestsInitializerSP;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPI;
@@ -68,7 +70,7 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantTest {
+public class TenantIT {
 
     private final static String userName = "tenant_name";
 
@@ -149,7 +151,7 @@ public class TenantTest {
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
     public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
-        apiTestSPUtil.loginWith(userName, password, tenantId);
+        apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
         final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
         tenantManagementAPI.pause();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
@@ -167,7 +169,7 @@ public class TenantTest {
     public void should_be_able_to_login_only_with_technical_user_on_paused_tenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        apiTestSPUtil.loginWith(userName, password, tenantId);
+        apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
         final IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
         final User john = identityAPI.createUser("john", "bpm");
         final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
@@ -199,7 +201,7 @@ public class TenantTest {
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
     public void pauseAnnotatedAPIMethodShouldBePossibleOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
-        apiTestSPUtil.loginWith(userName, password, tenantId);
+        apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
         apiTestSPUtil.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);
         final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
         tenantManagementAPI.pause();
@@ -283,7 +285,7 @@ public class TenantTest {
         final List<User> users = getUser.getUsers();
         assertNotNull(users);
         assertEquals(1, users.size());
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(TenantTest.this.apiSession);
+        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(TenantIT.this.apiSession);
         identityAPI.deleteUser("auser1");
     }
 
