@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 
 /**
  * @author Matthieu Chaffotte
@@ -149,6 +150,16 @@ public class BusinessObject {
         this.indexes = indexes;
     }
 
+    public List<RelationField> getCompositionFields() {
+        List<RelationField> list = new ArrayList<RelationField>();
+        for (Field f : getFields()) {
+            if (f instanceof RelationField && ((RelationField) f).getType().equals(Type.COMPOSITION)) {
+                list.add((RelationField) f);
+            }
+        }
+        return list;
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;

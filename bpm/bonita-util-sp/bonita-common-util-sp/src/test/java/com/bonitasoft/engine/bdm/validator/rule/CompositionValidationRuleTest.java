@@ -42,6 +42,18 @@ public class CompositionValidationRuleTest {
 
         assertThat(validationStatus).isNotOk();
     }
+    
+    @Test
+    @Ignore("Not yet implemented")
+    public void should_validate_that_a_bo_cannot_compose_itself() throws Exception {
+        BusinessObject daughter = aBO("daughter").build();
+        daughter.addField(aCompositionField("toto", daughter));
+        BusinessObjectModel bom = aBOM().withBOs(daughter).build();
+
+        ValidationStatus validationStatus = rule.validate(bom);
+
+        assertThat(validationStatus).isNotOk();
+    }
 
     @Test
     public void should_validate_that_a_composite_object_can_be_composed_only_once() throws Exception {
