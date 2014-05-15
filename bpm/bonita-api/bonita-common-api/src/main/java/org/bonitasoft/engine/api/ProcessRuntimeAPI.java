@@ -476,7 +476,7 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Execute an activity that is in an unstable state.
+     * Executes a flow node that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
      * 
      * @param flownodeInstanceId
@@ -488,7 +488,7 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
-     * Start an flow node that is is a non stable state on behalf of a given user
+     * Executes a flow node that is in a stable state on behalf of a given user
      * Will make the flow node go in the next stable state and then continue the execution of the process
      * If userId equals 0, the logged-in user is declared as the executer of the flow node.
      * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
