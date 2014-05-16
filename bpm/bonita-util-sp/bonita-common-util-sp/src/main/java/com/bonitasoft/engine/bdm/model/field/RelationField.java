@@ -28,6 +28,10 @@ public class RelationField extends Field {
     public enum Type {
         AGGREGATION, COMPOSITION;
     }
+    
+    public enum FetchType {
+        EAGER
+    }
 
     @XmlAttribute(required = true)
     private Type type;
@@ -36,6 +40,9 @@ public class RelationField extends Field {
     @XmlAttribute(required = true)
     private BusinessObject reference;
 
+    @XmlAttribute(required = true)
+    private FetchType fetchType = FetchType.EAGER;
+    
     public Type getType() {
         return type;
     }
@@ -50,6 +57,14 @@ public class RelationField extends Field {
 
     public void setReference(final BusinessObject reference) {
         this.reference = reference;
+    }
+
+    public FetchType getFetchType() {
+        return fetchType;
+    }
+    
+    public void setFetchType(FetchType fetchType) {
+        this.fetchType = fetchType;
     }
 
     @Override
