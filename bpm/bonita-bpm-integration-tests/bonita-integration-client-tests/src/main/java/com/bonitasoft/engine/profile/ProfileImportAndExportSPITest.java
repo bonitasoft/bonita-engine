@@ -24,6 +24,7 @@ import org.assertj.core.util.xml.XmlStringPrettyFormatter;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.ImportStatus.Status;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.Profile;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -44,7 +46,7 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 
-public class ProfileImportAndExportITest extends AbstractProfileTest {
+public class ProfileImportAndExportSPITest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
@@ -98,7 +100,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
     @Test
     public void importAndExport() throws BonitaException, IOException, SAXException {
-        final InputStream xmlStream1 = ProfileImportAndExportITest.class.getResourceAsStream("AllProfiles.xml");
+        final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
         final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(xmlContent, ImportPolicy.DELETE_EXISTING);
         assertEquals(0, warningMsgs1.size());
@@ -110,10 +112,50 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
         XMLUnit.compareXML(new String(xmlContent), new String(profilebytes));
     }
 
+    @Test
+    public void importProfileReplaceDuplicate_should_skip_new_default_profile() throws BonitaException, IOException, SAXException {
+        // given
+        final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("SkipNewDefaultProfile.xml");
+        final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
+
+        // when
+        final List<ImportStatus> importStatusResults = getProfileAPI().importProfiles(xmlContent, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        assertThat(importStatusResults).hasSize(2);
+        final ImportStatus expectedImportStatus = new ImportStatus("Plop");
+        expectedImportStatus.setStatus(Status.SKIPPED);
+
+        assertThat(importStatusResults).contains(expectedImportStatus);
+
+    }
+
+    @Test
+    public void importProfileReplaceDuplicate_should_skip_default_profile_modification() throws BonitaException, IOException, SAXException {
+        // given
+        final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("Profile_Data_bug.xml");
+        final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
+
+        // when
+        final List<ImportStatus> importStatusResults = getProfileAPI().importProfiles(xmlContent, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        final SearchOptions options = new SearchOptionsBuilder(0, 1).filter(ProfileSearchDescriptor.NAME, "Administrator").done();
+        final SearchResult<Profile> searchProfiles = getProfileAPI().searchProfiles(options);
+
+        assertThat(searchProfiles.getResult()).hasSize(1);
+        assertThat(searchProfiles.getResult().get(0).isDefault()).as("Administrator profile should be a default profile").isTrue();
+
+        final ImportStatus administratorImportStatus = importStatusResults.get(0);
+        assertThat(administratorImportStatus.getName()).as("Administrator should have imported").isEqualTo("Administrator");
+        assertThat(administratorImportStatus.getStatus()).as("Administrator should have imported").isEqualTo(Status.REPLACED);
+
+    }
+
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
     @Test
     public void importAndExportWithMissingCustomPage() throws BonitaException, IOException, SAXException {
-        String xmlAsText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        final String xmlAsText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<profiles:profiles xmlns:profiles=\"http://www.bonitasoft.org/ns/profile/6.1\">"
                 + "<profile isDefault=\"false\" name=\"ImportExportProfile\"> "
                 + "<description>ImportExportProfileDescription</description>"
@@ -142,7 +184,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
         final List<ImportStatus> status = getProfileAPI().importProfiles(xmlContent, ImportPolicy.DELETE_EXISTING);
 
         assertThat(status.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        List<ImportError> errors = status.get(0).getErrors();
+        final List<ImportError> errors = status.get(0).getErrors();
         System.out.println(errors);
         assertThat(errors.size()).isEqualTo(3);
         assertThat(errors.get(0)).isEqualTo(new ImportError("unknown", Type.PAGE));
@@ -165,7 +207,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
         /**
          * FailAndIgnoreOnDuplicate
          */
-        final InputStream xmlStreamig = ProfileImportAndExportITest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
+        final InputStream xmlStreamig = ProfileImportAndExportSPITest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
         final List<ImportStatus> warningMsgsig = getProfileAPI().importProfiles(IOUtils.toByteArray(xmlStreamig), ImportPolicy.IGNORE_DUPLICATES);
         final ImportStatus actual = warningMsgsig.get(0);
         assertThat(actual.getName()).isEqualTo("Plop");
@@ -253,7 +295,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
         assertNotNull(searchedProfileEntriesrl);
         assertEquals(24, searchedProfileEntriesrl.size());
 
-        final InputStream xmlStreamrp = ProfileImportAndExportITest.class.getResourceAsStream("replaceOnDuplicateProfile.xml");
+        final InputStream xmlStreamrp = ProfileImportAndExportSPITest.class.getResourceAsStream("replaceOnDuplicateProfile.xml");
         final List<ImportStatus> warningMsgsrl = getProfileAPI()
                 .importProfiles(IOUtils.toByteArray(xmlStreamrp), ImportPolicy.REPLACE_DUPLICATES);
 
@@ -341,7 +383,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profiles and delete existing.", jira = "")
     @Test
     public void importProfilesDeleteExisting() throws BonitaException, IOException {
-        final InputStream xmlStream1 = ProfileImportAndExportITest.class.getResourceAsStream("AllProfiles.xml");
+        final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("AllProfiles.xml");
         final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream1), ImportPolicy.DELETE_EXISTING);
         assertEquals(0, warningMsgs1.size());
 
@@ -376,7 +418,7 @@ public class ProfileImportAndExportITest extends AbstractProfileTest {
             assertNotNull(getProfileAPI().searchProfileEntries(builder.done()).getResult());
         }
 
-        final InputStream xmlStream = ProfileImportAndExportITest.class.getResourceAsStream("deleteExistingProfile.xml");
+        final InputStream xmlStream = ProfileImportAndExportSPITest.class.getResourceAsStream("deleteExistingProfile.xml");
         final List<String> warningMsgs = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
         assertEquals(0, warningMsgs.size());
 

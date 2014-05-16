@@ -16,11 +16,11 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.bonitasoft.engine.TestsInitializerSP;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({ ProfileITest.class,
-        ProfileEntryITest.class,
-        ProfileMemberITest.class,
-        ProfileImportAndExportITest.class })
+@SuiteClasses({ ProfileSPITest.class,
+        ProfileEntrySPITest.class,
+        ProfileMemberSPITest.class,
+        ProfileImportAndExportSPITest.class })
 @Initializer(TestsInitializerSP.class)
-public class ProfileAllITest {
+public class ProfileAllSPITest {
 
 }

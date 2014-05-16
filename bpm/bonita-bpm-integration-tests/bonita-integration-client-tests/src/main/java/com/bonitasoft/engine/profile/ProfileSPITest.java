@@ -37,7 +37,7 @@ import com.bonitasoft.engine.api.ProfileAPI;
  * @author Celine Souchet
  */
 @SuppressWarnings("javadoc")
-public class ProfileITest extends AbstractProfileTest {
+public class ProfileSPITest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.", jira = "")
     @Test
