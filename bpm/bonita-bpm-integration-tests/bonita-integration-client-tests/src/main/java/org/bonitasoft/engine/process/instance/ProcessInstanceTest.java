@@ -800,4 +800,24 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         disableAndDeleteProcess(processDefinition);
     }
+
+    @Test
+    public void runDeleteParentArchivedProcessInstanceAndElements_should_not_delete_process_instance_not_yet_archived() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).
+                addTransition("step1", "step2").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro));
+        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", pi, pedro);
+        long nbDeleted = getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);
+
+        // there is one archived process instance deleted because the former process_instance state has been archived
+        assertThat(nbDeleted).isEqualTo(1);
+        waitForUserTaskAndExecuteIt("step2", pi, pedro);
+        waitForProcessToFinish(pi);
+        disableAndDeleteProcess(processDefinition);
+    }
+
 }
