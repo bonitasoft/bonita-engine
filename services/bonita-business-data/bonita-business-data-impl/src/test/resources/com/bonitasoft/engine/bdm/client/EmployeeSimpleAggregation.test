@@ -29,7 +29,7 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
     private Address address;
 
     public Employee() {

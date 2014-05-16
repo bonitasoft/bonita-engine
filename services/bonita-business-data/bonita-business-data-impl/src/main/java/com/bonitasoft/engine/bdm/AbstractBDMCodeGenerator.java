@@ -239,6 +239,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
         JFieldVar fieldVar = null;
         final Boolean collection = field.isCollection();
+        final Boolean nullable = field.isNullable();
         if (collection != null && collection) {
             fieldVar = addListField(entityClass, field);
         } else {
@@ -253,7 +254,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             }
             final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
             columnAnnotation.param("name", field.getName().toUpperCase());
-            final Boolean nullable = field.isNullable();
             columnAnnotation.param("nullable", nullable == null || nullable);
 
             if (sfield.getType() == FieldType.DATE) {
@@ -269,8 +269,11 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             JAnnotationUse relation = null;
             if (collection != null && collection) {
                 relation = addAnnotation(fieldVar, OneToMany.class);
+                // final JAnnotationUse joinColumn = addAnnotation(fieldVar, JoinColumn.class);
+                // joinColumn.param("nullable", nullable == null || nullable);
             } else {
                 relation = addAnnotation(fieldVar, ManyToOne.class);
+                relation.param("optional", nullable == null || nullable);
             }
             relation.param("fetch", FetchType.EAGER);
             if (rfield.getType() == Type.COMPOSITION) {
