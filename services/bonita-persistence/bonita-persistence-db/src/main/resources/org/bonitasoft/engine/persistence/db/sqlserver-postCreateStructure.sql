@@ -33,6 +33,8 @@ ALTER TABLE external_identity_mapping ADD CONSTRAINT fk_external_identity_mappin
 GO
 ALTER TABLE flownode_instance ADD CONSTRAINT fk_flownode_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
+ALTER TABLE flownode_instance ADD CONSTRAINT fk_flownode_inst_to_proc_inst FOREIGN KEY (tenantid, logicalGroup4) REFERENCES process_instance(tenantid, id);
+GO
 ALTER TABLE group_ ADD CONSTRAINT fk_group__tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
 ALTER TABLE hidden_activity ADD CONSTRAINT fk_hidden_activity_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
