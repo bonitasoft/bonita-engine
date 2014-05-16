@@ -68,6 +68,22 @@ public class BusinessObjectModel {
         return refs;
     }
 
+    public List<UniqueConstraint> getUniqueConstraints() {
+        List<UniqueConstraint> constraints = new ArrayList<UniqueConstraint>();
+        for (BusinessObject bo : businessObjects) {
+            constraints.addAll(bo.getUniqueConstraints());
+        }
+        return constraints;
+    }
+    
+    public List<Index> getIndexes() {
+        List<Index> indexes = new ArrayList<Index>();
+        for (BusinessObject bo : businessObjects) {
+            indexes.addAll(bo.getIndexes());
+        }
+        return indexes;
+    }
+    
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(businessObjects).toHashCode();

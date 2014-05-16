@@ -1,6 +1,8 @@
 package com.bonitasoft.engine.bdm.model.builder;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.Index;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
 
 public class BusinessObjectBuilder {
@@ -24,5 +26,14 @@ public class BusinessObjectBuilder {
         businessObject.addField(field);
         return this;
     }
+    
+    public BusinessObjectBuilder withUniqueConstraint(UniqueConstraint uniqueConstraint) {
+        businessObject.addUniqueConstraint(uniqueConstraint);
+        return this;
+    }
 
+    public BusinessObjectBuilder withIndex(Index index) {
+        businessObject.addIndex(index);
+        return this;
+    }
 }

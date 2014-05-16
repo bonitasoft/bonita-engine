@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Index {
+public class Index implements NamedElement {
 
     @XmlAttribute(required = true)
     private String name;

@@ -97,18 +97,20 @@ public class BusinessObject {
         this.description = description;
     }
 
+    public void addUniqueConstraint(UniqueConstraint uniqueConstraint) {
+        uniqueConstraints.add(uniqueConstraint);
+    }
+    
     public UniqueConstraint addUniqueConstraint(final String name, final String... fieldNames) {
         if (fieldNames == null || fieldNames.length == 0) {
             throw new IllegalArgumentException("fieldNames cannot be null or empty");
         }
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setName(name);
-
         uniqueConstraint.setFieldNames(Arrays.asList(fieldNames));
-        if (uniqueConstraints.add(uniqueConstraint)) {
-            return uniqueConstraint;
-        }
-        return null;
+        
+        addUniqueConstraint(uniqueConstraint);
+        return uniqueConstraint;
     }
 
     public List<UniqueConstraint> getUniqueConstraints() {
@@ -132,6 +134,10 @@ public class BusinessObject {
     public void setQueries(final List<Query> queries) {
         this.queries = queries;
     }
+    
+    public void addIndex(Index index) {
+        indexes.add(index);
+    }
 
     public Index addIndex(final String name, final String... fieldNames) {
         if (fieldNames == null || fieldNames.length == 0) {
@@ -141,10 +147,8 @@ public class BusinessObject {
         index.setName(name);
 
         index.setFieldNames(Arrays.asList(fieldNames));
-        if (indexes.add(index)) {
-            return index;
-        }
-        return null;
+        addIndex(index);
+        return index;
     }
 
     public List<Index> getIndexes() {
