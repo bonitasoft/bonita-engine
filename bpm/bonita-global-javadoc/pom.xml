@@ -51,13 +51,9 @@
 							<finalName>Bonita-BPM-Engine-${project.version}</finalName>
         					<stylesheetfile>stylesheet.css</stylesheetfile>
 							<includeDependencySources>true</includeDependencySources>
-							<!-- Can't get this exclude below to work: -->
-<!--         					<dependencySourceExcludes> -->
-<!--         						<dependencySourceExclude>com.bonitasoft.engine.bpm.breakpoint.*:*</dependencySourceExclude> -->
-<!--         					</dependencySourceExcludes> -->
-<!-- 							<excludePackageNames>com.bonitasoft.engine.bpm.breakpoint.*</excludePackageNames> -->
+							<excludePackageNames>com.bonitasoft.engine.bpm.breakpoint</excludePackageNames>
 						</configuration>
-					</execution>
+						</execution>
 				</executions>
 			</plugin>
 		</plugins>
