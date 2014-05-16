@@ -85,9 +85,9 @@ public class ProfilesImporter {
             case DELETE_EXISTING:
                 return new DeleteExistingImportStrategy(profileService);
             case FAIL_ON_DUPLICATES:
-                return new FailOnDuplicateImportStrategy();
+                return new FailOnDuplicateImportStrategy(profileService);
             case IGNORE_DUPLICATES:
-                return new IgnoreDuplicateImportStrategy();
+                return new IgnoreDuplicateImportStrategy(profileService);
             case REPLACE_DUPLICATES:
                 return new ReplaceDuplicateImportStrategy(profileService);
             default:
@@ -113,14 +113,14 @@ public class ProfilesImporter {
                 if (exportedProfile.getName() == null || exportedProfile.getName().isEmpty()) {
                     continue;
                 }
-                ImportStatus currentStatus = new ImportStatus(exportedProfile.getName());
+                final ImportStatus currentStatus = new ImportStatus(exportedProfile.getName());
                 importStatus.add(currentStatus);
                 SProfile existingProfile = null;
 
                 try {
                     existingProfile = profileService.getProfileByName(exportedProfile.getName());
                     currentStatus.setStatus(Status.REPLACED);
-                } catch (SProfileNotFoundException e1) {
+                } catch (final SProfileNotFoundException e1) {
                     // profile does not exists
                 }
                 final SProfile newProfile = importTheProfile(importerId, exportedProfile, existingProfile);
@@ -147,7 +147,7 @@ public class ProfilesImporter {
             }
             return importStatus;
 
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
     }
@@ -155,7 +155,7 @@ public class ProfilesImporter {
     List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
             final long profileId)
             throws SProfileEntryCreationException {
-        ArrayList<ImportError> errors = new ArrayList<ImportError>();
+        final ArrayList<ImportError> errors = new ArrayList<ImportError>();
         for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
             List<ImportError> parentErrors = null;
             if ((parentErrors = checkParentProfileEntryForError(parentProfileEntry)) != null) {
@@ -222,7 +222,7 @@ public class ProfilesImporter {
     List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
             final long profileId,
             final ExportedProfileMapping exportedProfileMapping) throws SProfileMemberCreationException {
-        ArrayList<ImportError> errors = new ArrayList<ImportError>();
+        final ArrayList<ImportError> errors = new ArrayList<ImportError>();
 
         for (final String userName : exportedProfileMapping.getUsers()) {
             SUser user = null;
@@ -286,13 +286,18 @@ public class ProfilesImporter {
             newProfile = importStrategy.whenProfileExists(importerId, exportedProfile, existingProfile);
         } else {
             // create profile
-            newProfile = profileService.createProfile(createProfile(exportedProfile, importerId));
+            if (importStrategy.canCreateProfileIfNotExists(exportedProfile)) {
+                newProfile = profileService.createProfile(createSProfile(exportedProfile, importerId));
+            }
+            else {
+                newProfile = null;
+            }
         }
         return newProfile;
     }
 
-    SProfile createProfile(final ExportedProfile exportedProfile, final long importerId) {
-        boolean isDefault = exportedProfile.isDefault();
+    SProfile createSProfile(final ExportedProfile exportedProfile, final long importerId) {
+        final boolean isDefault = exportedProfile.isDefault();
         final long creationDate = System.currentTimeMillis();
         return BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(exportedProfile.getName(),
                 isDefault, creationDate, importerId, creationDate, importerId).setDescription(exportedProfile.getDescription()).done();
@@ -312,9 +317,9 @@ public class ProfilesImporter {
     }
 
     public static List<String> toWarnings(final List<ImportStatus> importProfiles) {
-        ArrayList<String> warns = new ArrayList<String>();
-        for (ImportStatus importStatus : importProfiles) {
-            for (ImportError error : importStatus.getErrors()) {
+        final ArrayList<String> warns = new ArrayList<String>();
+        for (final ImportStatus importStatus : importProfiles) {
+            for (final ImportError error : importStatus.getErrors()) {
                 warns.add("Unable to find the " + error.getType().name().toLowerCase() + " " + error.getName() + " on " + importStatus.getName());
             }
         }

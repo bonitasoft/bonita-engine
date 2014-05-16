@@ -30,10 +30,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
 
-    private final ProfileService profileService;
-
     public ReplaceDuplicateImportStrategy(final ProfileService profileService) {
-        this.profileService = profileService;
+        super(profileService);
     }
 
     @Override
@@ -45,15 +43,20 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
     public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile)
             throws ExecutionException,
             SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
-        profileService.deleteAllProfileMembersOfProfile(existingProfile);
+        getProfileService().deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
         if (exportedProfile.isDefault() || existingProfile.isDefault()) {
             // do not update if it is a default profile
             return existingProfile;
         } else {
-            profileService.deleteAllProfileEntriesOfProfile(existingProfile);
-            return profileService.updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId));
+            getProfileService().deleteAllProfileEntriesOfProfile(existingProfile);
+            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId));
         }
+    }
+
+    @Override
+    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
+        return !exportedProfile.isDefault();
     }
 
     EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId) {

@@ -35,10 +35,8 @@ import org.bonitasoft.engine.profile.model.SProfile;
  */
 public class DeleteExistingImportStrategy extends ProfileImportStategy {
 
-    private final ProfileService profileService;
-
     public DeleteExistingImportStrategy(final ProfileService profileService) {
-        this.profileService = profileService;
+        super(profileService);
     }
 
     @Override
@@ -49,13 +47,13 @@ public class DeleteExistingImportStrategy extends ProfileImportStategy {
         try {
             List<SProfile> profiles;
             do {
-                profiles = profileService.searchProfiles(queryOptions);
+                profiles = getProfileService().searchProfiles(queryOptions);
 
                 for (final SProfile sProfile : profiles) {
-                    profileService.deleteProfile(sProfile);
+                    getProfileService().deleteProfile(sProfile);
                 }
             } while (!profiles.isEmpty());
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
     }
@@ -66,4 +64,10 @@ public class DeleteExistingImportStrategy extends ProfileImportStategy {
         // nothing to do because we deleted all profiles
         return null;
     }
+
+    @Override
+    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
+        return true;
+    }
+
 }

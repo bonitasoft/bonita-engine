@@ -26,6 +26,12 @@ import org.bonitasoft.engine.profile.model.SProfile;
  */
 public abstract class ProfileImportStategy {
 
+    private final ProfileService profileService;
+
+    public ProfileImportStategy(final ProfileService profileService) {
+        this.profileService = profileService;
+    }
+
     /**
      * what to do before the import
      */
@@ -38,5 +44,22 @@ public abstract class ProfileImportStategy {
             final ExportedProfile exportedProfile,
             final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException,
             SProfileMemberDeletionException, SProfileUpdateException;
+
+    /**
+     * return the imported version of the exportedProfile
+     */
+    public abstract boolean canCreateProfileIfNotExists(ExportedProfile exportedProfile);
+
+    /**
+     * convert {@link ExportedProfile} to {@link SProfile}
+     * 
+     * @param exportedProfile
+     * @param importerId
+     * @return
+     */
+
+    protected ProfileService getProfileService() {
+        return profileService;
+    }
 
 }

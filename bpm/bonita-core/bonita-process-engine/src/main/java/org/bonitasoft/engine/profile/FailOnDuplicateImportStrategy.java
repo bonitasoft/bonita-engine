@@ -26,7 +26,8 @@ import org.bonitasoft.engine.profile.model.SProfile;
  */
 public class FailOnDuplicateImportStrategy extends ProfileImportStategy {
 
-    public FailOnDuplicateImportStrategy() {
+    public FailOnDuplicateImportStrategy(final ProfileService profileService) {
+        super(profileService);
     }
 
     @Override
@@ -39,6 +40,11 @@ public class FailOnDuplicateImportStrategy extends ProfileImportStategy {
             throws ExecutionException,
             SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
         throw new ExecutionException("There's a same name profile when import a profile named " + exportedProfile.getName());
+    }
+
+    @Override
+    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
+        return true;
     }
 
 }

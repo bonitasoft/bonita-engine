@@ -26,7 +26,8 @@ import org.bonitasoft.engine.profile.model.SProfile;
  */
 public class IgnoreDuplicateImportStrategy extends ProfileImportStategy {
 
-    public IgnoreDuplicateImportStrategy() {
+    public IgnoreDuplicateImportStrategy(final ProfileService profileService) {
+        super(profileService);
     }
 
     @Override
@@ -40,6 +41,11 @@ public class IgnoreDuplicateImportStrategy extends ProfileImportStategy {
             SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
         // will be skipped
         return null;
+    }
+
+    @Override
+    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
+        return true;
     }
 
 }
