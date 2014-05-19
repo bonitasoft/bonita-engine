@@ -2,6 +2,7 @@ package org.bonitasoft.engine.profile.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.api.ImportError;
 import org.junit.Test;
 
 public class ExportedProfileEntryTest {
@@ -52,6 +53,48 @@ public class ExportedProfileEntryTest {
         shouldNotBeEquals(entry1, null);
         shouldNotBeEquals(null, null);
         shouldNotBeEquals(null, entry1);
+
+    }
+
+    @Test
+    public void should_get_error() throws Exception {
+        // given
+        final ExportedProfileEntry entry = new ExportedProfileEntry(null);
+
+        // when
+        final ImportError hasError = entry.getError();
+
+        // then
+        assertThat(hasError).isNotNull();
+
+    }
+
+    @Test
+    public void should_get_no_error() throws Exception {
+        // given
+        final ExportedProfileEntry entry = new ExportedProfileEntry("name");
+        entry.setPage("page");
+
+        // when
+        final ImportError hasError = entry.getError();
+
+        // then
+        assertThat(hasError).isNull();
+
+    }
+
+    @Test
+    public void should_has_error_when_page_is_null
+            () throws Exception {
+        // given
+        final ExportedProfileEntry entry = new ExportedProfileEntry("name");
+        entry.setPage(null);
+
+        // when
+        final boolean hasError = entry.hasError();
+
+        // then
+        assertThat(hasError).isTrue();
 
     }
 }

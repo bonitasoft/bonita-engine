@@ -2,6 +2,10 @@ package org.bonitasoft.engine.profile.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.bonitasoft.engine.api.ImportError;
 import org.junit.Test;
 
 public class ExportedParentProfileEntryTest {
@@ -54,4 +58,66 @@ public class ExportedParentProfileEntryTest {
         shouldNotBeEquals(null, entry1);
 
     }
+
+    @Test
+    public void should_get_one_errors() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry(null);
+
+        // when
+        final List<ImportError> errors = parentEntry.getErrors();
+
+        // then
+        assertThat(errors).isNotEmpty().hasSize(1);
+        assertThat(parentEntry.hasErrors()).isTrue();
+
+    }
+
+    @Test
+    public void should_get_child_errors() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
+        childEntry.setPage(null);
+        parentEntry.setChildProfileEntries(Arrays.asList(childEntry));
+
+        // when
+        final List<ImportError> errors = parentEntry.getErrors();
+
+        // then
+        assertThat(errors).isNotEmpty().hasSize(1);
+        assertThat(parentEntry.hasErrors()).isTrue();
+
+    }
+
+    @Test
+    public void should_get_no_errors_with_valid_children() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
+        childEntry.setPage("page");
+
+        // when
+        final List<ImportError> errors = parentEntry.getErrors();
+
+        // then
+        assertThat(errors).isNull();
+        assertThat(parentEntry.hasErrors()).isFalse();
+
+    }
+
+    @Test
+    public void should_get_no_errors() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+
+        // when
+        final List<ImportError> errors = parentEntry.getErrors();
+
+        // then
+        assertThat(errors).isNull();
+        assertThat(parentEntry.hasErrors()).isFalse();
+
+    }
+
 }

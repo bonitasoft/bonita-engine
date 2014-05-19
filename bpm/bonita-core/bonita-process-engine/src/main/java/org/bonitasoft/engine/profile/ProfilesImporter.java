@@ -152,24 +152,22 @@ public class ProfilesImporter {
         }
     }
 
-    List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
+    protected List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
             final long profileId)
             throws SProfileEntryCreationException {
         final ArrayList<ImportError> errors = new ArrayList<ImportError>();
         for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
-            List<ImportError> parentErrors = null;
-            if ((parentErrors = checkParentProfileEntryForError(parentProfileEntry)) != null) {
-                errors.addAll(parentErrors);
+            if (parentProfileEntry.hasErrors()) {
+                errors.addAll(parentProfileEntry.getErrors());
                 continue;
             }
             final SProfileEntry parentEntry = profileService.createProfileEntry(createProfileEntry(parentProfileEntry, profileId, 0));
             final long parentProfileEntryId = parentEntry.getId();
-            final List<ExportedProfileEntry> childrenProEn = parentProfileEntry.getChildProfileEntries();
-            if (childrenProEn != null && childrenProEn.size() > 0) {
-                for (final ExportedProfileEntry childProfileEntry : childrenProEn) {
-                    ImportError error;
-                    if ((error = checkChildProfileEntryForError(childProfileEntry)) != null) {
-                        errors.add(error);
+            final List<ExportedProfileEntry> childrenProfileEntry = parentProfileEntry.getChildProfileEntries();
+            if (childrenProfileEntry != null && childrenProfileEntry.size() > 0) {
+                for (final ExportedProfileEntry childProfileEntry : childrenProfileEntry) {
+                    if (childProfileEntry.hasError()) {
+                        errors.add(childProfileEntry.getError());
                         continue;
                     }
                     profileService.createProfileEntry(createProfileEntry(childProfileEntry, profileId, parentProfileEntryId));
@@ -177,46 +175,6 @@ public class ProfilesImporter {
             }
         }
         return errors;
-    }
-
-    // protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
-    // final String page = childProfileEntry.getPage();
-    // if (page != null && !page.isEmpty()) { // there is a page
-    // if (childProfileEntry.isCustom()) {
-    // return new ImportError(childProfileEntry.getPage(), Type.PAGE);
-    // }
-    // }
-    // return null;
-    // }
-    //
-    // protected List<ImportError> checkParentProfileEntryForError(final ExportedParentProfileEntry parentProfileEntry) {
-    // final List<ExportedProfileEntry> childProfileEntries = parentProfileEntry.getChildProfileEntries();
-    // if (childProfileEntries == null || childProfileEntries.isEmpty()) {// no children
-    // final ImportError error = checkChildProfileEntryForError(parentProfileEntry);
-    // if (error != null) {
-    // return Arrays.asList(error);
-    // }
-    // } else {
-    // final ArrayList<ImportError> errors = new ArrayList<ImportError>();
-    // for (final ExportedProfileEntry childProfileEntry : childProfileEntries) {
-    // final ImportError checkChildProfileEntryForError = checkChildProfileEntryForError(childProfileEntry);
-    // if (checkChildProfileEntryForError != null) {
-    // errors.add(checkChildProfileEntryForError);
-    // }
-    // }
-    // // we do not import the parent only if no child have an existing page
-    // if (errors.size() == childProfileEntries.size()) {
-    // return errors;
-    // }
-    // }
-    // return null;
-    // }
-    protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
-        return null;
-    }
-
-    protected List<ImportError> checkParentProfileEntryForError(final ExportedParentProfileEntry parentProfileEntry) {
-        return null;
     }
 
     List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
@@ -234,16 +192,6 @@ public class ProfilesImporter {
             }
             profileService.addUserToProfile(profileId, user.getId(), user.getFirstName(), user.getLastName(), user.getUserName());
         }
-        for (final String roleName : exportedProfileMapping.getRoles()) {
-            SRole role = null;
-            try {
-                role = identityService.getRoleByName(roleName);
-            } catch (final SRoleNotFoundException e) {
-                errors.add(new ImportError(roleName, Type.ROLE));
-                continue;
-            }
-            profileService.addRoleToProfile(profileId, role.getId(), role.getName());
-        }
         for (final String groupPath : exportedProfileMapping.getGroups()) {
             SGroup group = null;
             try {
@@ -253,6 +201,16 @@ public class ProfilesImporter {
                 continue;
             }
             profileService.addGroupToProfile(profileId, group.getId(), group.getName(), group.getParentPath());
+        }
+        for (final String roleName : exportedProfileMapping.getRoles()) {
+            SRole role = null;
+            try {
+                role = identityService.getRoleByName(roleName);
+            } catch (final SRoleNotFoundException e) {
+                errors.add(new ImportError(roleName, Type.ROLE));
+                continue;
+            }
+            profileService.addRoleToProfile(profileId, role.getId(), role.getName());
         }
 
         for (final Pair<String, String> membership : exportedProfileMapping.getMemberships()) {
@@ -304,16 +262,16 @@ public class ProfilesImporter {
 
     }
 
-    SProfileEntry createProfileEntry(final ExportedParentProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
-        return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(exportedProfileEntry.getName(), profileId)
-                .setDescription(exportedProfileEntry.getDescription()).setIndex(exportedProfileEntry.getIndex()).setPage(exportedProfileEntry.getPage())
-                .setParentId(parentId).setType(exportedProfileEntry.getType()).done();
+    protected SProfileEntry createProfileEntry(final ExportedParentProfileEntry parentEntry, final long profileId, final long parentId) {
+        return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentEntry.getName(), profileId)
+                .setDescription(parentEntry.getDescription()).setIndex(parentEntry.getIndex()).setPage(parentEntry.getPage())
+                .setParentId(parentId).setType(parentEntry.getType()).setCustom(new Boolean(parentEntry.isCustom())).done();
     }
 
-    SProfileEntry createProfileEntry(final ExportedProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
-        return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(exportedProfileEntry.getName(), profileId)
-                .setDescription(exportedProfileEntry.getDescription()).setIndex(exportedProfileEntry.getIndex()).setPage(exportedProfileEntry.getPage())
-                .setParentId(parentId).setType(exportedProfileEntry.getType()).done();
+    protected SProfileEntry createProfileEntry(final ExportedProfileEntry childEntry, final long profileId, final long parentId) {
+        return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childEntry.getName(), profileId)
+                .setDescription(childEntry.getDescription()).setIndex(childEntry.getIndex()).setPage(childEntry.getPage())
+                .setParentId(parentId).setType(childEntry.getType()).setCustom(new Boolean(childEntry.isCustom())).done();
     }
 
     public static List<String> toWarnings(final List<ImportStatus> importProfiles) {

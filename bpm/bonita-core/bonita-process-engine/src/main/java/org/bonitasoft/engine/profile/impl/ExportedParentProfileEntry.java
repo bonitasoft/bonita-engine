@@ -13,7 +13,11 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportError.Type;
 
 /**
  * @author Zhao Na
@@ -63,4 +67,37 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
         return true;
     }
 
+    public List<ImportError> getErrors() {
+        final List<ImportError> errors = new ArrayList<ImportError>();
+        if (hasError()) {
+            errors.add(getError());
+        }
+        final List<ExportedProfileEntry> childProfileEntries = getChildProfileEntries();
+        if (childProfileEntries != null) {
+            for (final ExportedProfileEntry childEntry : childProfileEntries) {
+                if (childEntry.hasError()) {
+                    errors.add(childEntry.getError());
+                }
+            }
+        }
+        if (errors.isEmpty()) {
+            return null;
+        }
+        return errors;
+    }
+
+    public boolean hasErrors() {
+        if (getErrors() == null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public ImportError getError() {
+        if (getName() == null) {
+            return new ImportError(getName(), Type.PAGE);
+        }
+        return null;
+    }
 }

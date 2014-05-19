@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportError.Type;
+
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
@@ -97,6 +100,7 @@ public class ExportedProfileEntry {
         result = prime * result + (getName() == null ? 0 : getName().hashCode());
         result = prime * result + (getType() == null ? 0 : getType().hashCode());
         result = prime * result + (getPage() == null ? 0 : getPage().hashCode());
+        result = prime * result + (!isCustom() ? 0 : getPage().hashCode());
         result = prime * result + (getParentName() == null ? 0 : getParentName().hashCode());
         result = prime * result + (int) (getIndex() ^ (getIndex() >>> 32));
         return result;
@@ -147,6 +151,9 @@ public class ExportedProfileEntry {
         } else if (!getPage().equals(other.getPage())) {
             return false;
         }
+        if (isCustom() != other.isCustom()) {
+            return false;
+        }
         if (getIndex() != other.getIndex()) {
             return false;
         }
@@ -160,4 +167,25 @@ public class ExportedProfileEntry {
         return true;
     }
 
+    public boolean hasError()
+    {
+        if (getError() == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public ImportError getError() {
+        if (getName() == null)
+        {
+            return new ImportError(getName(), Type.PAGE);
+        }
+
+        if (getPage() == null || getPage().isEmpty()) {
+            return new ImportError(getName(), Type.PAGE);
+        }
+
+        return null;
+
+    }
 }
