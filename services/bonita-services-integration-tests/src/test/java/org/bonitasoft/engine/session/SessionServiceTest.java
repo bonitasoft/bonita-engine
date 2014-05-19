@@ -73,7 +73,7 @@ public class SessionServiceTest extends CommonServiceTest {
         final SSession session = createSession(username);
         assertNotNull(session);
         assertTrue(getSessionService().isValid(session.getId()));
-        Thread.sleep(session.getDuration());
+        Thread.sleep(session.getDuration() + 1);
         assertFalse(getSessionService().isValid(session.getId()));
     }
 

@@ -94,7 +94,7 @@ public class PlatformSessionServiceTest {
         assertNotNull(session);
         assertEquals(1000, session.getDuration());
         assertTrue(sessionService.isValid(session.getId()));
-        Thread.sleep(session.getDuration());
+        Thread.sleep(session.getDuration() + 1);
         assertFalse(sessionService.isValid(session.getId()));
     }
 
