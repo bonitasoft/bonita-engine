@@ -43,9 +43,11 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
+import org.bonitasoft.engine.connectors.TestConnector3;
 import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
+import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -371,8 +373,11 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployProcessWithActorAndTestConnector3(final ProcessDefinitionBuilderExt processDefinitionBuilderExt, final String actorName,
             final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user, "/org/bonitasoft/engine/connectors/TestConnector3.impl",
-                "TestConnector3.impl", TestConnector.class, "TestConnector3.jar");
+        final List<BarResource> connectorImplementations = Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/TestConnector3.impl",
+                "TestConnector3.impl"));
+        final List<BarResource> generateConnectorDependencies = Arrays.asList(buildBarResource(TestConnector3.class, "TestConnector3.jar"),
+                buildBarResource(VariableStorage.class, "VariableStorage.jar"));
+        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user, connectorImplementations, generateConnectorDependencies);
     }
 
     public ProcessDefinition deployProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
@@ -404,8 +409,6 @@ public class APITestSPUtil extends APITestUtil {
     public ProcessDefinition deployProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(
             final ProcessDefinitionBuilderExt processDefinitionBuilderExt, final String actorName, final User user, final Map<String, String> parameters)
             throws BonitaException, IOException {
-        // addResource(resources, VariableStorage.class, "VariableStorage.jar");
-
         return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, parameters,
                 "/org/bonitasoft/engine/connectors/TestConnectorThatThrowException.impl", "TestConnectorThatThrowException.impl",
                 TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
@@ -418,8 +421,12 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
             final String actorName, final User user, final Map<String, String> parameters) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, parameters,
-                "/org/bonitasoft/engine/connectors/TestConnector.impl", "TestConnector.impl", TestConnector.class, "TestConnector.jar");
+        final List<BarResource> connectorImplementations = Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/TestConnector.impl",
+                "TestConnector.impl"));
+        final List<BarResource> generateConnectorDependencies = Arrays.asList(buildBarResource(TestConnector.class, "TestConnector.jar"),
+                buildBarResource(VariableStorage.class, "VariableStorage.jar"));
+        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, connectorImplementations,
+                generateConnectorDependencies, parameters);
     }
 
     public ProcessDefinition deployProcessWithActorAndTestConnectorWithOutput(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
