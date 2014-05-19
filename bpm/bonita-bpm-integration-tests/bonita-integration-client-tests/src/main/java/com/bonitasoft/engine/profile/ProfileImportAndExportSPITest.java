@@ -27,6 +27,7 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
@@ -61,6 +62,50 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
 
         // then
         assertThat(xmlPrettyFormatExported.length()).as("should have samse size").isEqualTo(xmlPrettyFormatExpected.length());
+    }
+
+    @Test
+    public void exportImportProfile_with_groups() throws Exception {
+        final String profileName = "Test";
+
+        // given
+        createGroup("acme");
+        createGroup("finance", "/acme");
+        final Group groupAcme = getIdentityAPI().getGroupByPath("/acme");
+        final Group groupFinance = getIdentityAPI().getGroupByPath("/acme/finance");
+        assertThat(groupAcme).as("group acme").isNotNull();
+        assertThat(groupFinance).as("group finance").isNotNull();
+
+        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("Profile2groups.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
+
+        // when import
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(customProfileByteArray, ImportPolicy.REPLACE_DUPLICATES);
+        assertThat(importProfiles).hasSize(1);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error found is status: %s ", importProfiles).isEmpty();
+        }
+
+        // then
+        final SearchOptions options = new SearchOptionsBuilder(0, 1).filter(ProfileSearchDescriptor.NAME, profileName).done();
+        final SearchResult<Profile> searchProfiles = getProfileAPI().searchProfiles(options);
+
+        assertThat(searchProfiles.getResult()).hasSize(1);
+        final Profile importedProfile = searchProfiles.getResult().get(0);
+        assertThat(importedProfile.getName()).as("check imported name").isEqualTo(profileName);
+
+        // when export
+        final long[] ids = new long[1];
+        ids[0] = importedProfile.getId();
+        final byte[] exportProfilesWithIdsSpecified = getProfileAPI().exportProfilesWithIdsSpecified(ids);
+
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportProfilesWithIdsSpecified));
+
+        // then
+        assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExpected);
+
+        deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
     }
 
     @Test

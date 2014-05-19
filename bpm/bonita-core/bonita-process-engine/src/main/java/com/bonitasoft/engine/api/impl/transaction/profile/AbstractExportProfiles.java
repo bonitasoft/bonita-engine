@@ -42,6 +42,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
 public abstract class AbstractExportProfiles implements TransactionContentWithResult<String>, IProfileNameSpace
 {
 
+    private static final String GROUP_PATH_SEPARATOR = "/";
+
     private static final int NUMBER_OF_RESULTS = 100;
 
     private final static String USER_SUFFIX = "ForUser";
@@ -234,7 +236,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
 
             while (sProfileMembers.size() > 0) {
                 for (final SProfileMember sProfileMember : sProfileMembers) {
-                    groupsNode.addChild("group", getGroupName(sProfileMember.getGroupId()));
+                    groupsNode.addChild("group", getGroupUniquePath(sProfileMember.getGroupId()));
                 }
                 index++;
                 sProfileMembers = searchProfileMembers(index, profileId, GROUP_SUFFIX);
@@ -253,7 +255,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             while (sProfileMembers.size() > 0) {
                 for (final SProfileMember sProfileMember : sProfileMembers) {
                     final XMLNode memberShipNode = new XMLNode("membership");
-                    memberShipNode.addChild("group", getGroupName(sProfileMember.getGroupId()));
+                    memberShipNode.addChild("group", getGroupUniquePath(sProfileMember.getGroupId()));
                     memberShipNode.addChild("role", getRoleName(sProfileMember.getRoleId()));
                     memberShipsNode.addChild(memberShipNode);
                 }
@@ -298,9 +300,27 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return role.getName();
     }
 
-    private String getGroupName(final long groupId) throws SGroupNotFoundException {
+    /**
+     * 
+     * @param groupId
+     * @return unique full path of the group
+     *         ex: /acme/finance where /acme is parent group our finance
+     * @throws SGroupNotFoundException
+     */
+    private String getGroupUniquePath(final long groupId) throws SGroupNotFoundException {
         final SGroup group = identityService.getGroup(groupId);
-        return group.getName();
+        final StringBuilder builder = new StringBuilder();
+        if (group.getParentPath() == null) {
+            builder.append(GROUP_PATH_SEPARATOR);
+            builder.append(group.getName());
+
+        } else {
+            builder.append(group.getParentPath());
+            builder.append(GROUP_PATH_SEPARATOR);
+            builder.append(group.getName());
+        }
+        final String uniquePath = builder.toString();
+        return uniquePath;
     }
 
     protected ProfileService getProfileService() {

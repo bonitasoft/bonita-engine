@@ -195,11 +195,11 @@
 			<memberships>
 				<membership>
 					<role>role2</role>
-					<group>group1</group>
+					<group>/group1</group>
 				</membership>
 				<membership>
 					<role>role2</role>
-					<group>group2</group>
+					<group>/group2</group>
 				</membership>
 			</memberships>
 		</profileMapping>

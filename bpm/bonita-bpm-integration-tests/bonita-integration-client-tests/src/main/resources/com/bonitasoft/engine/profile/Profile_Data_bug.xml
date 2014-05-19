@@ -165,7 +165,7 @@
         <role>member</role>
       </roles>
       <groups>
-        <group>qa_group</group>
+        <group>/qa_group</group>
       </groups>
     </profileMapping>
   </profile>
@@ -198,7 +198,7 @@
       <memberships>
         <membership>
           <role>member</role>
-          <group>qa_group</group>
+          <group>/qa_group</group>
         </membership>
       </memberships>
     </profileMapping>
