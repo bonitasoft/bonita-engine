@@ -1440,7 +1440,7 @@ public class ModelConvertor {
         final Map<GroupField, Serializable> fields = creator.getFields();
         groupBuilder.setName((String) fields.get(GroupField.NAME));
         final String parentPath = (String) fields.get(GroupField.PARENT_PATH);
-        if (parentPath != null) {
+        if (parentPath != null && !parentPath.isEmpty()) {
             groupBuilder.setParentPath(parentPath);
         }
         final String displayName = (String) fields.get(GroupField.DISPLAY_NAME);

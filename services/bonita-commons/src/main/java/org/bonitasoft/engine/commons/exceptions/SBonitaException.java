@@ -31,7 +31,7 @@ public abstract class SBonitaException extends Exception {
 
     private final Object[] arguments;
 
-    private final Map<SExceptionContext, Serializable> context;
+    private final Map<SExceptionContext, Serializable> context = new TreeMap<SExceptionContext, Serializable>();
 
     /**
      * Default constructor
@@ -47,7 +47,6 @@ public abstract class SBonitaException extends Exception {
         super();
         exceptionId = this.getClass().getName();
         this.arguments = arguments;
-        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     /**
@@ -57,7 +56,6 @@ public abstract class SBonitaException extends Exception {
         super(message);
         exceptionId = this.getClass().getName();
         arguments = null;
-        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     /**
@@ -68,7 +66,6 @@ public abstract class SBonitaException extends Exception {
         super(message, cause);
         exceptionId = this.getClass().getName();
         arguments = null;
-        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     /**
@@ -86,7 +83,6 @@ public abstract class SBonitaException extends Exception {
         super(cause);
         exceptionId = this.getClass().getName();
         this.arguments = arguments;
-        context = new TreeMap<SExceptionContext, Serializable>();
     }
 
     /**

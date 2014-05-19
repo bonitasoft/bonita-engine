@@ -142,8 +142,10 @@ public class LoopTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask", "1.0");
         builder.addActor(delivery).addDescription("Delivery all day and night long");
-        final int loopMax = 3;
-        builder.addUserTask("step1", delivery).addLoop(false, condition, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
+        int loopMax = 3;
+        builder.addIntegerData("loopMax", new ExpressionBuilder().createConstantIntegerExpression(loopMax));
+
+        builder.addUserTask("step1", delivery).addLoop(false, condition, new ExpressionBuilder().createDataExpression("loopMax", Integer.class.getName()));
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
