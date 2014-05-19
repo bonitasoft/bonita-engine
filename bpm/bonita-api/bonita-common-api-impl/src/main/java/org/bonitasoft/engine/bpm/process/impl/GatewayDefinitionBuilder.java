@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.GatewayDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.GatewayDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

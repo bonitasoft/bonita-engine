@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.document.impl;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Baptiste Mesta

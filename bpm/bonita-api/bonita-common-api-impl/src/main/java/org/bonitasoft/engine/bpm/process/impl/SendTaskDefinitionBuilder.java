@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.SendTaskDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ThrowMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

@@ -39,11 +39,12 @@ import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

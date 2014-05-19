@@ -18,9 +18,9 @@ import java.util.Date;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;

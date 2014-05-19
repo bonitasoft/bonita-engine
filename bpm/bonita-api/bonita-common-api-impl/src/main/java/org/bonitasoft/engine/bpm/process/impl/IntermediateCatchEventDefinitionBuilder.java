@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.IntermediateCatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateCatchEventDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

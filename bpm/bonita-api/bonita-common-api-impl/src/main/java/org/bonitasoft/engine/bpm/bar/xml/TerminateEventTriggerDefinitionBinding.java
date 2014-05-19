@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.TerminateEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TerminateEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 
 /**

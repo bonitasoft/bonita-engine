@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ReceiveTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 

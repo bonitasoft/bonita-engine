@@ -17,7 +17,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;

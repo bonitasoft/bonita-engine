@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.flownode.impl.CatchMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.operation.Operation;
 
 /**

@@ -7,7 +7,7 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EndEventInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;

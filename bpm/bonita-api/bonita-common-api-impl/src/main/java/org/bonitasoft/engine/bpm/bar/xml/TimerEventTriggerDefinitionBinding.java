@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.flownode.impl.TimerEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TimerEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 

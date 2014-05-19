@@ -15,8 +15,8 @@ package org.bonitasoft.engine.bpm.comment.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Zhang Bole

@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.CallableElementType;
-import org.bonitasoft.engine.bpm.flownode.impl.CallActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CallActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 

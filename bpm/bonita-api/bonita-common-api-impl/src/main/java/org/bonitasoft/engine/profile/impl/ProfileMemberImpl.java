@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
-import org.bonitasoft.engine.bpm.BaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.profile.ProfileMember;
 
 /**

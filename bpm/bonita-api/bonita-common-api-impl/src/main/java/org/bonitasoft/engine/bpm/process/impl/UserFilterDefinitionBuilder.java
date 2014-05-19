@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 

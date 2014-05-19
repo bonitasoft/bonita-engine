@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.ReceiveTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;

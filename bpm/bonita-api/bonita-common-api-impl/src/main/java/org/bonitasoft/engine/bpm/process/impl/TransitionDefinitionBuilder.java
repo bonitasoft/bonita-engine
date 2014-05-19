@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.TransitionDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
