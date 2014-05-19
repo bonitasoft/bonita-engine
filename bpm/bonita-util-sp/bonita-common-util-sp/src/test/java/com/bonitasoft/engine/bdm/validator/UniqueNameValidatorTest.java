@@ -1,6 +1,5 @@
 package com.bonitasoft.engine.bdm.validator;
 
-import static com.bonitasoft.engine.bdm.validator.UniqueNameValidatorTest.FakeNamedElement.aNamedElement;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,13 +40,13 @@ public class UniqueNameValidatorTest {
         assertThat(status.getErrors()).hasSize(1);
     }
 
+    public NamedElement aNamedElement(String name) {
+        return new FakeNamedElement(name);
+    }
+    
     public static class FakeNamedElement implements NamedElement {
 
         private String name;
-
-        public static NamedElement aNamedElement(String name) {
-            return new FakeNamedElement(name);
-        }
 
         public FakeNamedElement(String name) {
             this.name = name;
