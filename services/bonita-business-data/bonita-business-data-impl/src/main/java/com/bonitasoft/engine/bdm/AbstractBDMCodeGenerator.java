@@ -24,6 +24,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -35,6 +36,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.hibernate.annotations.IndexColumn;
 
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
@@ -269,8 +271,11 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             JAnnotationUse relation = null;
             if (collection != null && collection) {
                 relation = addAnnotation(fieldVar, OneToMany.class);
-                // final JAnnotationUse joinColumn = addAnnotation(fieldVar, JoinColumn.class);
-                // joinColumn.param("nullable", nullable == null || nullable);
+                // add IndexColumn to add the list behaviour with EAGER
+                final JAnnotationUse index = addAnnotation(fieldVar, IndexColumn.class);
+                index.param("name", "IDX_" + fieldVar.name());
+                final JAnnotationUse joinColumn = addAnnotation(fieldVar, JoinColumn.class);
+                joinColumn.param("nullable", nullable == null || nullable);
             } else {
                 relation = addAnnotation(fieldVar, ManyToOne.class);
                 relation.param("optional", nullable == null || nullable);
