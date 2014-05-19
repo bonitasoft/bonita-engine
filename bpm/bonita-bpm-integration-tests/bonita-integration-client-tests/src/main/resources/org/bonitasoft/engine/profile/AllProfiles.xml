@@ -190,11 +190,11 @@
 			</users>
 			<memberships>
 				<membership>
-					<group>group1</group>
+					<group>/group1</group>
 					<role>role2</role>
 				</membership>
 				<membership>
-					<group>group2</group>
+					<group>/group2</group>
 					<role>role2</role>
 				</membership>
 			</memberships>
@@ -404,7 +404,7 @@
 		<profileMapping>
 			<memberships>
 				<membership>
-					<group>group3</group>
+					<group>/group3</group>
 					<role>role3</role>
 				</membership>
 			</memberships>
@@ -543,7 +543,7 @@
 		</profileEntries>
 		<profileMapping>
 			<groups>
-				<group>group1</group>
+				<group>/group1</group>
 			</groups>
 		</profileMapping>
 	</profile>
