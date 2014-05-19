@@ -28,6 +28,7 @@ import org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.TimeTracker;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,8 @@ public class ExpressionServiceImplTest {
     @Test
     public void evaluateInvalidExpressionFailsAtValidationStep() throws Exception {
         final SExpression expression = mock(SExpression.class);
-        expressionService = new ExpressionServiceImpl(expressionExecutorStrategyProvider, logger, true);
+        final TimeTracker timeTracker = mock(TimeTracker.class);
+        expressionService = new ExpressionServiceImpl(expressionExecutorStrategyProvider, logger, true, timeTracker);
         expressionService.evaluate(expression, new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
         verify(expressionExecutorStrategy, times(1)).validate(any(SExpression.class));
     }

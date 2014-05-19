@@ -6,6 +6,7 @@
 		<constructor-arg name="expressionService" ref="expressionService" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
 	</bean>
 
 </beans>

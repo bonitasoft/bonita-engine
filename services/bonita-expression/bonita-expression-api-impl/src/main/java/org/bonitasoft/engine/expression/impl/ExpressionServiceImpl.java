@@ -30,6 +30,8 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.TimeTracker;
+import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 
 /**
  * @author Zhao na
@@ -45,8 +47,10 @@ public class ExpressionServiceImpl implements ExpressionService {
 
     private boolean checkExpressionReturnType = false;
 
+    private final TimeTracker timeTracker;
+
     public ExpressionServiceImpl(final ExpressionExecutorStrategyProvider expressionExecutorStrategyProvider, final TechnicalLoggerService logger,
-            final boolean checkExpressionReturnType) {
+            final boolean checkExpressionReturnType, final TimeTracker timeTracker) {
         super();
         final List<ExpressionExecutorStrategy> expressionExecutors = expressionExecutorStrategyProvider.getExpressionExecutors();
         expressionExecutorsMap = new HashMap<ExpressionKind, ExpressionExecutorStrategy>(expressionExecutors.size());
@@ -55,6 +59,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             expressionExecutorsMap.put(expressionExecutorStrategy.getExpressionKind(), expressionExecutorStrategy);
         }
         this.logger = logger;
+        this.timeTracker = timeTracker;
     }
 
     @Override
@@ -74,7 +79,26 @@ public class ExpressionServiceImpl implements ExpressionService {
 
         final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expression.getExpressionKind());
         validateExpression(expressionExecutorStrategy, expression);
-        Object expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions, containerState);
+
+        Object expressionResult = null;
+        final long startTime = System.currentTimeMillis();
+        try {
+            expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions, containerState);
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("Expression: ");
+                desc.append(expression);
+                desc.append(" - ");
+                desc.append("dependencyValues: ");
+                desc.append(dependencyValues);
+                desc.append(" - ");
+                desc.append("strategy: ");
+                desc.append(expressionExecutorStrategy);
+                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, desc.toString(), (endTime - startTime));
+            }
+        }
         if (mustCheckExpressionReturnType()) {
             new ReturnTypeChecker().checkReturnType(expression, expressionResult, dependencyValues);
         }
@@ -119,7 +143,26 @@ public class ExpressionServiceImpl implements ExpressionService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
         final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expressionKind);
-        final List<Object> list = expressionExecutorStrategy.evaluate(expressions, dependencyValues, resolvedExpressions, containerState);
+
+        List<Object> list = null;
+        final long startTime = System.currentTimeMillis();
+        try {
+            list = expressionExecutorStrategy.evaluate(expressions, dependencyValues, resolvedExpressions, containerState);
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSIONS)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("Expressions: ");
+                desc.append(expressions);
+                desc.append(" - ");
+                desc.append("dependencyValues: ");
+                desc.append(dependencyValues);
+                desc.append(" - ");
+                desc.append("strategy: ");
+                desc.append(expressionExecutorStrategy);
+                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, desc.toString(), (endTime - startTime));
+            }
+        }
         if (list == null || list.size() != expressions.size()) {
             final String exceptionMessage = "Result list size " + (list == null ? 0 : list.size()) + " is different from expression list size "
                     + expressions.size();

@@ -40,6 +40,8 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.tracking.TimeTracker;
+import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 
 /**
  * @author Zhao Na
@@ -57,11 +59,14 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
 
     private final ClassLoaderService classLoaderService;
 
+    private final TimeTracker timeTracker;
+
     public ExpressionResolverServiceImpl(final ExpressionService expressionService, final ProcessDefinitionService processDefinitionService,
-            final ClassLoaderService classLoaderService) {
+            final ClassLoaderService classLoaderService, final TimeTracker timeTracker) {
         this.expressionService = expressionService;
         this.processDefinitionService = processDefinitionService;
         this.classLoaderService = classLoaderService;
+        this.timeTracker = timeTracker;
     }
 
     @Override
@@ -73,7 +78,21 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     @Override
     public Object evaluate(final SExpression expression, final SExpressionContext evaluationContext)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        return evaluateExpressionsFlatten(Collections.singletonList(expression), evaluationContext).get(0);
+        final long startTime = System.currentTimeMillis();
+        try {
+            return evaluateExpressionsFlatten(Collections.singletonList(expression), evaluationContext).get(0);
+        } finally {
+            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT)) {
+                final long endTime = System.currentTimeMillis();
+                final StringBuilder desc = new StringBuilder();
+                desc.append("Expression: ");
+                desc.append(expression);
+                desc.append(" - ");
+                desc.append("evaluationContext: ");
+                desc.append(evaluationContext);
+                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT, desc.toString(), (endTime - startTime));
+            }
+        }
     }
 
     private List<Object> evaluateExpressionsFlatten(final List<SExpression> expressions, final SExpressionContext evaluationContext)
