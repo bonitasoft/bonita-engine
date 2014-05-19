@@ -10,7 +10,7 @@ package com.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.parameter.impl.ParameterDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.DescriptionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.DesignProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
 
 /**

@@ -18,6 +18,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.util</groupId>
 			<artifactId>bonita-client-util</artifactId>
 			<version>${project.version}</version>
@@ -25,6 +30,11 @@
 		<dependency>
 			<groupId>com.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-common-api-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api-impl-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -51,7 +61,36 @@
 							<finalName>Bonita-BPM-Engine-${project.version}</finalName>
         					<stylesheetfile>stylesheet.css</stylesheetfile>
 							<includeDependencySources>true</includeDependencySources>
-							<excludePackageNames>com.bonitasoft.engine.bpm.breakpoint</excludePackageNames>
+							<!-- cannot use generic "*.impl" because the package "*.process.impl" contains builders to be published -->
+							<excludePackageNames>
+								*.internal,
+								*.breakpoint,org.bonitasoft.engine.api.impl,
+								*.tcp,
+								*.actor.impl,
+								*.xml,
+								*.businessdata.impl,
+								*.category.impl,
+								*.comment.impl,
+								*.connector.impl,
+								*.data.impl,
+								*.document.impl,
+								*.parameter.impl,
+								*.supervisor.impl,
+								*.userfilter.impl,
+								*.entitymember.impl,
+								*.identity.impl,
+								*.io,
+								*.job.impl,
+								*.command.impl,
+								*.platform.impl,
+								*.profile.impl,
+								*.session.impl,
+								*.theme.impl,
+								*.log.impl,
+								*.monitoring.impl,
+								*.page.impl,
+								*.reporting.impl
+							</excludePackageNames>
 						</configuration>
 						</execution>
 				</executions>
