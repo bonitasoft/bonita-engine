@@ -266,7 +266,7 @@ public class PageServiceImplTest {
         pageServiceImpl.start();
 
         // then
-        verify(pageServiceImpl, times(1)).addPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(2)).addPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
 
@@ -276,12 +276,22 @@ public class PageServiceImplTest {
     public void start_should_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentPage = new SPageImpl("groovy-example", "example", "example", System.currentTimeMillis(), -1, true, System.currentTimeMillis(),
+        final SPageImpl currentGroovyPage = new SPageImpl("custompage_groovyexample", "example", "example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
-        currentPage.setId(12);
-        doReturn(currentPage).when(pageServiceImpl).getPageByName("groovy-example");
+        final SPageImpl currentHtmlPage = new SPageImpl("custompage_htmlexample", "example", "example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+
+        currentGroovyPage.setId(12);
+        currentHtmlPage.setId(13);
+        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
+        doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
+
         doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
@@ -297,16 +307,24 @@ public class PageServiceImplTest {
     public void start_should_do_nothing_if_already_here_and_the_same() throws SBonitaException, IOException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
-        final SPageImpl currentGroovyPage = new SPageImpl("groovy-example", "example", "example", System.currentTimeMillis(), -1, true,
+        final SPageImpl currentGroovyPage = new SPageImpl("custompage_groovyexample", "example", "example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        final SPageImpl currentHtmlPage = new SPageImpl("custompage_htmlexample", "example", "example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
 
         currentGroovyPage.setId(12);
-        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("groovy-example");
+        currentHtmlPage.setId(13);
+        doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
+        doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
 
-        final InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
-        doReturn(IOUtil.getAllContentFrom(resourceAsStream)).when(pageServiceImpl).getPageContent(12);
+        final InputStream resourceGroovyAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
+        final InputStream resourceHtmlAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-html-page-example.zip");
+        doReturn(IOUtil.getAllContentFrom(resourceGroovyAsStream)).when(pageServiceImpl).getPageContent(12);
+        doReturn(IOUtil.getAllContentFrom(resourceHtmlAsStream)).when(pageServiceImpl).getPageContent(13);
         doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
         // when
         pageServiceImpl.start();

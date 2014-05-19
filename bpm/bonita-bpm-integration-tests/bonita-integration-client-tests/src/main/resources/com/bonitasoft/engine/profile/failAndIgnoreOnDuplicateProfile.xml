@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
-	<profile name="Plop" isDefault="true">
+	<profile name="Plop" isDefault="false">
 		<description>Plop profile</description>
 		<profileEntries>
 			<parentProfileEntry name="PlopEntry" isCustom="false">

@@ -45,6 +45,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
+import com.bonitasoft.engine.page.Page;
 
 public class ProfileImportAndExportSPITest extends AbstractProfileTest {
 
@@ -59,13 +60,66 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(getProfileAPI().exportAllProfiles()));
 
         // then
-        final Diff diff = new Diff(xmlPrettyFormatExported, xmlPrettyFormatExpected);
-        if (!diff.similar())
-        {
-            // nb: similar is regardless of order
-            assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExported);
+        assertThat(xmlPrettyFormatExported.length()).as("should have samse size").isEqualTo(xmlPrettyFormatExpected.length());
+    }
+
+    @Test
+    public void exportImportProfile_with_custom_page() throws Exception {
+        final String profileName = "custom profile";
+
+        // given
+        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("CustomPageProfile.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
+
+        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
+        assertThat(searchPages.getResult()).as("custom pages").hasSize(2);
+        final Page groovyExamplePage = getPageAPI().getPageByName("custompage_groovyexample");
+        final Page htmlExamplePage = getPageAPI().getPageByName("custompage_htmlexample");
+        assertThat(groovyExamplePage).as("custompage_groovyexample should exists").isNotNull();
+        assertThat(htmlExamplePage).as("custompage_htmlexample should exists").isNotNull();
+
+        // when import
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(customProfileByteArray, ImportPolicy.REPLACE_DUPLICATES);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error found is status: %s ", importProfiles).isEmpty();
         }
 
+        // then
+
+        final SearchOptions options = new SearchOptionsBuilder(0, 1).filter(ProfileSearchDescriptor.NAME, profileName).done();
+        final SearchResult<Profile> searchProfiles = getProfileAPI().searchProfiles(options);
+
+        assertThat(searchProfiles.getResult()).hasSize(1);
+        final Profile importedCustomProfile = searchProfiles.getResult().get(0);
+        assertThat(importedCustomProfile.getName()).as("check imported name").isEqualTo(profileName);
+
+        final long profileId = importedCustomProfile.getId();
+
+        final SearchResult<ProfileEntry> profileEntries = getProfileAPI().searchProfileEntries(
+                new SearchOptionsBuilder(0, 3).filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId).done());
+
+        final List<ProfileEntry> result = profileEntries.getResult();
+        assertThat(result).as("should have 3 entries: %s", result).hasSize(3);
+        int customPageCounter = 0;
+        for (final ProfileEntry profileEntry : result) {
+            if (profileEntry.getType().equals("link"))
+            {
+                assertThat(profileEntry.isCustom()).as("entry %s should be a custom page", profileEntry).isTrue();
+                customPageCounter++;
+            }
+        }
+        assertThat(customPageCounter).as("should have found 2 custom page").isEqualTo(2);
+
+        // when export
+        final long[] ids = new long[1];
+        ids[0] = profileId;
+        final byte[] exportProfilesWithIdsSpecified = getProfileAPI().exportProfilesWithIdsSpecified(ids);
+
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportProfilesWithIdsSpecified));
+
+        // then
+        assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExpected);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export specified profiles.", jira = "")
@@ -102,8 +156,10 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     public void importAndExport() throws BonitaException, IOException, SAXException {
         final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
-        final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(xmlContent, ImportPolicy.DELETE_EXISTING);
-        assertEquals(0, warningMsgs1.size());
+        final List<ImportStatus> importStatusList = getProfileAPI().importProfiles(xmlContent, ImportPolicy.DELETE_EXISTING);
+        for (final ImportStatus importStatus : importStatusList) {
+            assertThat(importStatus.getErrors()).as("error on import").isEmpty();
+        }
 
         // profilesHaveBeenImported(4);
 
@@ -155,6 +211,11 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
     @Test
     public void importAndExportWithMissingCustomPage() throws BonitaException, IOException, SAXException {
+        final ImportError groupImportError = new ImportError("unknown", Type.GROUP);
+        final ImportError pageImportError = new ImportError("unknown", Type.PAGE);
+        final ImportError roleImportError = new ImportError("unknown", Type.ROLE);
+
+        // given
         final String xmlAsText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<profiles:profiles xmlns:profiles=\"http://www.bonitasoft.org/ns/profile/6.1\">"
                 + "<profile isDefault=\"false\" name=\"ImportExportProfile\"> "
@@ -181,15 +242,14 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         final byte[] xmlContent = xmlAsText
                 .getBytes("UTF-8");
 
+        // when
         final List<ImportStatus> status = getProfileAPI().importProfiles(xmlContent, ImportPolicy.DELETE_EXISTING);
 
+        // then
         assertThat(status.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         final List<ImportError> errors = status.get(0).getErrors();
-        System.out.println(errors);
         assertThat(errors.size()).isEqualTo(3);
-        assertThat(errors.get(0)).isEqualTo(new ImportError("unknown", Type.PAGE));
-        assertThat(errors.get(1)).isEqualTo(new ImportError("unknown", Type.ROLE));
-        assertThat(errors.get(2)).isEqualTo(new ImportError("unknown", Type.GROUP));
+        assertThat(errors).as("should have 3 import errors").contains(groupImportError, pageImportError, roleImportError);;
 
     }
 
@@ -384,8 +444,10 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     @Test
     public void importProfilesDeleteExisting() throws BonitaException, IOException {
         final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("AllProfiles.xml");
-        final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream1), ImportPolicy.DELETE_EXISTING);
-        assertEquals(0, warningMsgs1.size());
+        final List<ImportStatus> importStatusList = getProfileAPI().importProfiles(IOUtils.toByteArray(xmlStream1), ImportPolicy.DELETE_EXISTING);
+        for (final ImportStatus importStatus : importStatusList) {
+            assertThat(importStatus.getErrors()).as("error on import").isEmpty();
+        }
 
         // check current status: profiles and its attributes
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -419,8 +481,10 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         }
 
         final InputStream xmlStream = ProfileImportAndExportSPITest.class.getResourceAsStream("deleteExistingProfile.xml");
-        final List<String> warningMsgs = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
-        assertEquals(0, warningMsgs.size());
+        final List<ImportStatus> importProfileStatus = getProfileAPI().importProfiles(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
+        for (final ImportStatus importStatus : importProfileStatus) {
+            assertThat(importStatus.getErrors()).as("error on import").isEmpty();
+        }
 
         // check profiles
         builder = new SearchOptionsBuilder(0, 10);

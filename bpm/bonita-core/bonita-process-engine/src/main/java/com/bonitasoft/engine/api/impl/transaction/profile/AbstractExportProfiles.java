@@ -173,11 +173,6 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             profileMappingNode.addChild(usersXmlNode);
         }
 
-        final XMLNode rolesXmlNode = getRolesXmlNode(profileId);
-        if (rolesXmlNode != null) {
-            profileMappingNode.addChild(rolesXmlNode);
-        }
-
         final XMLNode groupsXmlNode = getGroupsXmlNode(profileId);
         if (groupsXmlNode != null) {
             profileMappingNode.addChild(groupsXmlNode);
@@ -188,6 +183,10 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             profileMappingNode.addChild(membershipsXmlNode);
         }
 
+        final XMLNode rolesXmlNode = getRolesXmlNode(profileId);
+        if (rolesXmlNode != null) {
+            profileMappingNode.addChild(rolesXmlNode);
+        }
         return profileMappingNode;
     }
 
@@ -254,8 +253,8 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             while (sProfileMembers.size() > 0) {
                 for (final SProfileMember sProfileMember : sProfileMembers) {
                     final XMLNode memberShipNode = new XMLNode("membership");
-                    memberShipNode.addChild("role", getRoleName(sProfileMember.getRoleId()));
                     memberShipNode.addChild("group", getGroupName(sProfileMember.getGroupId()));
+                    memberShipNode.addChild("role", getRoleName(sProfileMember.getRoleId()));
                     memberShipsNode.addChild(memberShipNode);
                 }
                 index++;

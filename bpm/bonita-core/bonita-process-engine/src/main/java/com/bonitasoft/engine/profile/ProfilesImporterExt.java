@@ -19,9 +19,11 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 import com.bonitasoft.engine.page.PageService;
 
@@ -45,39 +47,78 @@ public class ProfilesImporterExt extends ProfilesImporter {
         this.pageService = pageService;
     }
 
-    protected ImportError checkChildProfileEntryForError(final ExportedProfileEntry childProfileEntry) {
-        final String page = childProfileEntry.getPage();
+    @Override
+    protected List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
+            final long profileId)
+            throws SProfileEntryCreationException {
+        final ArrayList<ImportError> errors = new ArrayList<ImportError>();
+        for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
+            if (parentProfileEntry.hasErrors()) {
+                errors.addAll(parentProfileEntry.getErrors());
+                continue;
+            }
+            final List<ImportError> checkParentProfileEntryForError = checkParentProfileEntryForCustomPageErrors(parentProfileEntry);
+            if (checkParentProfileEntryForError != null)
+            {
+                errors.addAll(checkParentProfileEntryForError);
+                continue;
+            }
+
+            final SProfileEntry parentEntry = profileService.createProfileEntry(createProfileEntry(parentProfileEntry, profileId, 0));
+            final long parentProfileEntryId = parentEntry.getId();
+            final List<ExportedProfileEntry> childrenProfileEntry = parentProfileEntry.getChildProfileEntries();
+            if (childrenProfileEntry != null && childrenProfileEntry.size() > 0) {
+                for (final ExportedProfileEntry childProfileEntry : childrenProfileEntry) {
+                    if (childProfileEntry.hasError()) {
+                        errors.add(childProfileEntry.getError());
+                        continue;
+                    }
+                    profileService.createProfileEntry(createProfileEntry(childProfileEntry, profileId, parentProfileEntryId));
+                }
+            }
+        }
+        return errors;
+    }
+
+    protected ImportError checkProfileEntryForCustomPageError(final ExportedProfileEntry profileEntry) {
+        if (profileEntry.hasError()) {
+            return profileEntry.getError();
+        }
+        final String page = profileEntry.getPage();
         if (page != null && !page.isEmpty()) { // there is a page
-            if (childProfileEntry.isCustom()) { // it's a custom page
+            if (profileEntry.isCustom()) { // it's a custom page
                 try {
-                    if (pageService.getPageByName(childProfileEntry.getPage()) == null) {
-                        return new ImportError(childProfileEntry.getPage(), Type.PAGE);
+                    if (pageService.getPageByName(profileEntry.getPage()) == null) {
+                        return new ImportError(profileEntry.getPage(), Type.PAGE);
                     }
                 } catch (final SBonitaReadException e) {
-                    return new ImportError(childProfileEntry.getPage(), Type.PAGE);
+                    return new ImportError(profileEntry.getPage(), Type.PAGE);
                 }
             }
         }
         return null;
     }
 
-    protected List<ImportError> checkParentProfileEntryForError(final ExportedParentProfileEntry parentProfileEntry) {
+    protected List<ImportError> checkParentProfileEntryForCustomPageErrors(final ExportedParentProfileEntry parentProfileEntry) {
+        if (parentProfileEntry.hasErrors()) {
+            return parentProfileEntry.getErrors();
+        }
         final List<ExportedProfileEntry> childProfileEntries = parentProfileEntry.getChildProfileEntries();
         if (childProfileEntries == null || childProfileEntries.isEmpty()) {// no children
-            final ImportError error = checkChildProfileEntryForError(parentProfileEntry);
+            final ImportError error = checkProfileEntryForCustomPageError(parentProfileEntry);
             if (error != null) {
                 return Arrays.asList(error);
             }
         } else {
             final ArrayList<ImportError> errors = new ArrayList<ImportError>();
             for (final ExportedProfileEntry childProfileEntry : childProfileEntries) {
-                final ImportError checkChildProfileEntryForError = checkChildProfileEntryForError(childProfileEntry);
-                if (checkChildProfileEntryForError != null) {
-                    errors.add(checkChildProfileEntryForError);
+                final ImportError customPageEntryError = checkProfileEntryForCustomPageError(childProfileEntry);
+                if (customPageEntryError != null) {
+                    errors.add(customPageEntryError);
                 }
             }
-            // we do not import the parent only if no child have an existing page
-            if (errors.size() == childProfileEntries.size()) {
+            if (!errors.isEmpty()) {
+                // one or more custom page is missing on children
                 return errors;
             }
         }
