@@ -285,7 +285,7 @@ public class ClusterTests extends CommonAPISPTest {
 
         Thread.sleep(6000);// wait 6 secondes (more than 5 ) then change using an other tenant that the system property did not change
 
-        loginWith("install", "install", otherTenantId);
+        loginOnTenantWith("install", "install", otherTenantId);
         System.out.println("[test] deploy process on an other tenant");
         final ProcessDefinition processDefinitionOnTheOtherTenant = deployProcessThatSetASystemPropertyOnTheNode(systemProperty);
         // check not executed on node 1
@@ -303,7 +303,7 @@ public class ClusterTests extends CommonAPISPTest {
         // wait that quartz launch its jobs
         Thread.sleep(3000);
         logout();
-        loginWith("install", "install", otherTenantId);
+        loginOnTenantWith("install", "install", otherTenantId);
 
         Thread.sleep(10000);
         // check executed on node 2 and/or 1 (because matching of events result in non deterministic target node)

@@ -10,7 +10,7 @@ package com.bonitasoft.engine.process;
 
 import org.bonitasoft.engine.session.APISession;
 
-import com.bonitasoft.engine.SPBPMTestUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
 
 /**
  * @author Baptiste Mesta
@@ -63,20 +63,20 @@ public abstract class ExecutionInSession {
         final APISession session;
         if (username != null) {
             if (tenantId > 0) {
-                session = SPBPMTestUtil.loginTenant(username, password, tenantId);
+                session = BPMTestSPUtil.loginOnTenant(username, password, tenantId);
             } else {
-                session = SPBPMTestUtil.loginDefaultTenant(username, password);
+                session = BPMTestSPUtil.loginOnDefaultTenant(username, password);
             }
         } else {
             if (tenantId > 0) {
-                session = SPBPMTestUtil.loginTenant(tenantId);
+                session = BPMTestSPUtil.loginOnTenantWithTechnicalLogger(tenantId);
             } else {
-                session = SPBPMTestUtil.loginDefaultTenant();
+                session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
             }
         }
         setSession(session);
         run();
-        SPBPMTestUtil.logoutTenant(session);
+        BPMTestSPUtil.logoutOnTenant(session);
     }
 
 }
