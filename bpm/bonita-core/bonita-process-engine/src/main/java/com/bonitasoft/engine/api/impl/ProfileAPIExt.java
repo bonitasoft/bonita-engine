@@ -85,7 +85,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public Profile createProfile(final ProfileCreator creator) throws CreationException, AlreadyExistsException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
         final Map<ProfileField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ProfileField.NAME);
         if (name == null || name.isEmpty()) {
@@ -186,7 +185,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Parser parser = tenantAccessor.getProfileParser();
-        PageService pageService = tenantAccessor.getPageService();
+        final PageService pageService = tenantAccessor.getPageService();
         final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
         return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
                 org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))

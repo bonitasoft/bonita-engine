@@ -10,22 +10,32 @@ package com.bonitasoft.engine.profile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
+import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
+import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Baptiste Mesta
@@ -124,4 +134,43 @@ public class ProfilesImporterExt extends ProfilesImporter {
         }
         return null;
     }
+
+    @Override
+    protected SProfile importTheProfile(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile)
+            throws ExecutionException,
+            SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException, SProfileCreationException {
+        if (checkProfileForRequiredFeatures(exportedProfile))
+        {
+            return super.importTheProfile(importerId, exportedProfile, existingProfile);
+        }
+        // some feature are missing
+        // skip status
+        return null;
+    }
+
+    /**
+     * 
+     * @param exportedProfile
+     * @return
+     *         true when needed features are present
+     *         false otherwise
+     */
+    private boolean checkProfileForRequiredFeatures(final ExportedProfile exportedProfile) {
+        final Set<String> featuresToCheck = new HashSet<String>();
+        if (!exportedProfile.isDefault()) {
+            featuresToCheck.add(Features.CUSTOM_PROFILES);
+        }
+        if (exportedProfile.hasCustomPages()) {
+            featuresToCheck.add(Features.CUSTOM_PAGE);
+        }
+        for (final String feature : featuresToCheck) {
+            try {
+                LicenseChecker.getInstance().checkLicenceAndFeature(feature);
+            } catch (final IllegalStateException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
