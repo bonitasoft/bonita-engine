@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.ReceiveTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskDefinitionImpl;
 
 /**
  * @author Julien Molinaro

@@ -30,7 +30,7 @@ import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.Problem.Level;
-import org.bonitasoft.engine.bpm.process.impl.ProblemImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;

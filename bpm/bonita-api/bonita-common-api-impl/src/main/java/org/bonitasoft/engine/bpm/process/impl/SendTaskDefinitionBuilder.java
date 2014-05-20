@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.SendTaskDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ThrowMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -31,11 +31,22 @@ public class SendTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         }
     }
 
+    /**
+     * Sets the target flow node.
+     * @param targetFlowNode expression representing the flow node that will receive the message.
+     * @return
+     */
     public SendTaskDefinitionBuilder setTargetFlowNode(final Expression targetFlowNode) {
         getActivity().setTargetFlowNode(targetFlowNode);
         return this;
     }
 
+    /**
+     * Adds a content to this message.
+     * @param displayName expression representing the content display name.
+     * @param messageContent expression representing the content value.
+     * @return
+     */
     public DataDefinitionBuilder addMessageContentExpression(final Expression displayName, final Expression messageContent) {
         final String dataName = displayName.getContent(); // FIXME evaluate the expression
         final String className = messageContent.getReturnType();
@@ -43,6 +54,17 @@ public class SendTaskDefinitionBuilder extends ActivityDefinitionBuilder {
                 dataName, className, messageContent);
     }
 
+    /**
+     * Adds a correlation on this send task.
+     * <p> 
+     * It's possible to define up to five correlations. If more then five correlations are defined, the process becomes invalid.
+     * <p>
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization. 
+     * 
+     * @param correlationKey expression representing the correlation key.
+     * @param value expression representing the correlation value.
+     * @return
+     */
     public SendTaskDefinitionBuilder addCorrelation(final Expression correlationKey, final Expression value) {
         final SendTaskDefinitionImpl sendTask = getActivity();
         sendTask.addCorrelation(correlationKey, value);

@@ -23,6 +23,12 @@ public class DocumentBuilder {
 
     private DocumentImpl document;
 
+    /**
+     * Create a new instance of {@link Document}. This method is the entry point of this builder: it must be called before any other method.
+     * @param documentName document name
+     * @param hasContent defines whether the document has content or not
+     * @return
+     */
     public DocumentBuilder createNewInstance(final String documentName, final boolean hasContent) {
         document = new DocumentImpl();
         document.setName(documentName);
@@ -34,16 +40,31 @@ public class DocumentBuilder {
         return document;
     }
 
+    /**
+     * Sets the document file name
+     * @param fileName file name
+     * @return
+     */
     public DocumentBuilder setFileName(final String fileName) {
         document.setFileName(fileName);
         return this;
     }
 
+    /**
+     * Sets the document URL
+     * @param documentUrl document URL
+     * @return
+     */
     public DocumentBuilder setURL(final String documentUrl) {
         document.setUrl(documentUrl);
         return this;
     }
 
+    /**
+     * Sets the document MIME type
+     * @param documentContentMimeType document MIME type
+     * @return
+     */
     public DocumentBuilder setContentMimeType(final String documentContentMimeType) {
         document.setContentMimeType(documentContentMimeType);
         return this;

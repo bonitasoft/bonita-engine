@@ -16,10 +16,11 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -114,21 +115,82 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
         return this;
     }
 
+    /**
+     * Sets the display description on this activity
+     * 
+     * @param displayDescription
+     *            expression representing the display description
+     * @return
+     */
     public ActivityDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
         activity.setDisplayDescription(displayDescription);
         return this;
     }
 
+    /**
+     * Sets the display name on this activity. When set, the display name will replace the name in the Bonita BPM Portal
+     * 
+     * @param displayName
+     *            expression representing the display name
+     * @return
+     */
     public ActivityDefinitionBuilder addDisplayName(final Expression displayName) {
         activity.setDisplayName(displayName);
         return this;
     }
 
+    /**
+     * Sets the display description after completion on this activity. This will be used to updated the display description when the activity completes its
+     * execution
+     * 
+     * @param displayDescriptionAfterCompletion
+     *            expression representing the new display description after the activity completion.
+     * @return
+     */
     public ActivityDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
         activity.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;
     }
 
+    /**
+     * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH. In the case of human tasks, operations
+     * are executed after calling the method {@link ProcessAPI#executeFlowNode(long)}
+     * 
+     * @param leftOperand
+     *            operation left operand
+     * @param type
+     *            operator type
+     * @param operator
+     *            operator
+     * @param rightOperand
+     *            expression representing the right operand
+     * @return
+     */
+    public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type, final String operator, final Expression rightOperand) {
+        activity.addOperation(new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
+                .setLeftOperand(leftOperand).done());
+        if (rightOperand == null) {
+            getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
+        }
+        return this;
+    }
+
+    /**
+     * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH. In the case of human tasks, operations
+     * are executed after calling the method {@link ProcessAPI#executeFlowNode(long)}
+     * 
+     * @param leftOperand
+     *            operation left operand
+     * @param type
+     *            operator type
+     * @param operator
+     *            operator
+     * @param operatorInputType
+     *            the input operator type. For instance, the parameter type in the case of a Java setter
+     * @param rightOperand
+     *            expression representing the right operand
+     * @return
+     */
     public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type, final String operator,
             final String operatorInputType, final Expression rightOperand) {
         final Operation operation = new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
@@ -136,20 +198,51 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
         return addOperation(operation);
     }
 
+    /**
+     * Adds the given operation on this activity
+     * 
+     * @param operation
+     *            operation to be added
+     * @return
+     */
     public ActivityDefinitionBuilder addOperation(final Operation operation) {
         activity.addOperation(operation);
-        if (operation.getRightOperand() == null && operation.getType() != OperatorType.DELETION) {
-            getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
-        }
+        checkRightOperand(operation);
         return this;
     }
 
+    private void checkRightOperand(final Operation operation) {
+        if (operation.getRightOperand() == null && operation.getType() != OperatorType.DELETION) {
+            getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
+        }
+    }
+
+    /**
+     * Defines this activity as a loop. The loop will finish when the condition is evaluated to false
+     * 
+     * @param testBefore
+     *            true if the condition must be check before execute the first iteration; false if the condition must be checked only after the first iteration
+     * @param condition
+     *            condition determining whether the activity must loop again
+     * @return
+     */
     public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition) {
         final StandardLoopCharacteristics loopCharacteristics = new StandardLoopCharacteristics(condition, testBefore);
         activity.setLoopCharacteristics(loopCharacteristics);
         return this;
     }
 
+    /**
+     * Defines this activity as a loop. The loop will finish when the condition is evaluated to false or when the max iterations number is reached
+     * 
+     * @param testBefore
+     *            true if the condition must be check before execute the first iteration; false if the condition must be checked only after the first iteration
+     * @param condition
+     *            condition determining whether the activity must loop again. The loop will finish when the condition is evaluated to false
+     * @param loopMax
+     *            expression representing the max iterations number. The expression must return an Integer
+     * @return
+     */
     public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition, final Expression loopMax) {
         final StandardLoopCharacteristics loopCharacteristics = new StandardLoopCharacteristics(condition, testBefore, loopMax);
         activity.setLoopCharacteristics(loopCharacteristics);
@@ -157,12 +250,12 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Add a boundary event
+     * Adds a boundary event
      *
      * @param name
      *            the name of the boundary event
      * @param interrupting
-     *            define whether the boundary event is interrupting or not
+     *            defines whether the boundary event is interrupting or not
      * @return
      * @since 6.0
      */
@@ -171,7 +264,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Add an interrupting boundary event
+     * Adds an interrupting boundary event
      *
      * @param name
      *            the name of the boundary event
@@ -182,10 +275,26 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
         return new BoundaryEventDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, true);
     }
 
+    /**
+     * Defines this activity as a multi-instance by suppling the cardinality
+     * 
+     * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created iteration by iteration; otherwise all instances will be created during the activity initialization.
+     * @param loopCardinality expression representing how many instances must be created. The expression return type must be Integer 
+     * @return
+     */
     public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential, final Expression loopCardinality) {
         return new MultiInstanceLoopCharacteristicsBuilder(getProcessBuilder(), activity, isSequential, loopCardinality);
     }
 
+    /**
+     * Defines this activity as a multi-instance by suppling a collection of elements. One instance will be created for each element in the collection.
+     * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created iteration by iteration; otherwise all instances will be created during the activity initialization.
+     * @param loopDataInput name of process data representing the collection of elements used to create the instances
+     * @return
+     * @see MultiInstanceLoopCharacteristicsBuilder#addLoopDataOutputRef(String)
+     * @see MultiInstanceLoopCharacteristicsBuilder#addDataInputItemRef(String)
+     * @see MultiInstanceLoopCharacteristicsBuilder#addDataOutputItemRef(String)
+     */
     public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential, final String loopDataInput) {
         return new MultiInstanceLoopCharacteristicsBuilder(getProcessBuilder(), activity, isSequential, loopDataInput);
     }

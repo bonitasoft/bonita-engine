@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ThrowEventDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ThrowSignalEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowSignalEventTriggerDefinitionImpl;
 
 
 /**

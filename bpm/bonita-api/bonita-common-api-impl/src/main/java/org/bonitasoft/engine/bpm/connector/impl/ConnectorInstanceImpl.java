@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.connector.impl;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Baptiste Mesta

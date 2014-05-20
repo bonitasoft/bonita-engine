@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.IntermediateThrowEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateThrowEventDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -33,14 +33,33 @@ public class IntermediateThrowEventDefinitionBuilder extends FlowElementContaine
         container.addIntermediateThrowEvent(event);
     }
 
+    /**
+     * Adds a message on this event
+     * @param messageName name of message to be sent
+     * @param targetProcess target process
+     * @param targetFlowNode target flow node
+     * @return
+     */
     public ThrowMessageEventTriggerBuilder addMessageEventTrigger(final String messageName, final Expression targetProcess, final Expression targetFlowNode) {
         return new ThrowMessageEventTriggerBuilder(getProcessBuilder(), getContainer(), event, messageName, targetProcess, targetFlowNode);
     }
 
+    /**
+     * Adds a message on this event
+     * @param messageName name of message to be sent
+     * @param targetProcess target process
+     * @return
+     */
     public ThrowMessageEventTriggerBuilder addMessageEventTrigger(final String messageName, final Expression targetProcess) {
         return new ThrowMessageEventTriggerBuilder(getProcessBuilder(), getContainer(), event, messageName, targetProcess);
     }
 
+
+    /**
+     * Adds a signal on this event
+     * @param signalName name of the signal to be thrown
+     * @return
+     */
     public ThrowSignalEventTriggerBuilder addSignalEventTrigger(final String signalName) {
         return new ThrowSignalEventTriggerBuilder(getProcessBuilder(), getContainer(), event, signalName);
     }
@@ -51,16 +70,38 @@ public class IntermediateThrowEventDefinitionBuilder extends FlowElementContaine
         return this;
     }
 
+    /**
+     * Sets the display description on this event
+     * 
+     * @param displayDescription
+     *            expression representing the display description
+     * @return
+     */
     public IntermediateThrowEventDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
         event.setDisplayDescription(displayDescription);
         return this;
     }
 
+    /**
+     * Sets the display name on this event
+     * 
+     * @param displayName
+     *            expression representing the display name
+     * @return
+     */
     public IntermediateThrowEventDefinitionBuilder addDisplayName(final Expression displayName) {
         event.setDisplayName(displayName);
         return this;
     }
 
+    /**
+     * Sets the display description after completion on this event. This will be used to updated the display description when the event completes its
+     * execution
+     * 
+     * @param displayDescriptionAfterCompletion
+     *            expression representing the new display description after the event completion.
+     * @return
+     */
     public IntermediateThrowEventDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
         event.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;

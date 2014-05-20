@@ -15,8 +15,8 @@ package org.bonitasoft.engine.bpm.document.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Zhang Bole
