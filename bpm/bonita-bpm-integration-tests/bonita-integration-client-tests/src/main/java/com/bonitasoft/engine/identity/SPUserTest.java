@@ -24,7 +24,7 @@ import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.SPBPMTestUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 
@@ -51,27 +51,27 @@ public class SPUserTest extends CommonAPISPTest {
 
     @Test(expected = LoginException.class)
     public void loginFailsDueToTenantDeactivation() throws BonitaException {
-        final long tenantId = SPBPMTestUtil.constructTenant("suomi", "iconName", "iconPath", "hannu", "malminkartano");
-        SPBPMTestUtil.deactivateTenant(tenantId);
+        final long tenantId = BPMTestSPUtil.constructTenant("suomi", "iconName", "iconPath", "hannu", "malminkartano");
+        BPMTestSPUtil.deactivateTenant(tenantId);
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         try {
             loginAPI.login(tenantId, "matti", "tervetuloa");
             fail("The login method should throw a TenantNotActivatedException due to tenant deactivation");
         } finally {
-            SPBPMTestUtil.activateTenant(tenantId);
-            SPBPMTestUtil.destroyTenant(tenantId);
+            BPMTestSPUtil.activateTenant(tenantId);
+            BPMTestSPUtil.destroyTenant(tenantId);
         }
     }
 
     @Test(expected = LoginException.class)
     public void loginFailsWithDeactivatedDefaultTenant() throws BonitaException {
-        SPBPMTestUtil.deactivateDefaultTenant();
+        BPMTestSPUtil.deactivateDefaultTenant();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         try {
             loginAPI.login("matti", "tervetuloa");
             fail("should be unable to login");
         } finally {
-            SPBPMTestUtil.activateDefaultTenant();
+            BPMTestSPUtil.activateDefaultTenant();
         }
     }
 
@@ -79,8 +79,8 @@ public class SPUserTest extends CommonAPISPTest {
     public void userLoginTenant() throws BonitaException, InterruptedException {
         final String userName = "matti";
         final String password = "tervetuloa";
-        final long tenantId = SPBPMTestUtil.constructTenant("suomi", "iconName", "iconPath", "revontuli", "paras");
-        SPBPMTestUtil.createUserOnTenant(userName, password, tenantId, "revontuli", "paras");
+        final long tenantId = BPMTestSPUtil.constructTenant("suomi", "iconName", "iconPath", "revontuli", "paras");
+        BPMTestSPUtil.createUserOnTenant(userName, password, tenantId, "revontuli", "paras");
 
         final Date now = new Date();
         Thread.sleep(300);
@@ -94,18 +94,18 @@ public class SPUserTest extends CommonAPISPTest {
         assertNotSame(password, user.getPassword());
         assertTrue(now.before(user.getLastConnection()));
 
-        SPBPMTestUtil.destroyTenant(tenantId);
+        BPMTestSPUtil.destroyTenant(tenantId);
     }
 
     @Test
     public void aSameUserNameCanBeUseInTwoTenants() throws BonitaException {
         final String userName = "install";
-        final long tenantId1 = SPBPMTestUtil.constructTenant("tenant1", "iconName", "iconPath", userName, "install");
-        final APISession session1 = SPBPMTestUtil.loginTenant(tenantId1);
+        final long tenantId1 = BPMTestSPUtil.constructTenant("tenant1", "iconName", "iconPath", userName, "install");
+        final APISession session1 = BPMTestSPUtil.loginOnTenantWithTechnicalLogger(tenantId1);
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
         final User user1 = identityAPI1.createUser(userName, "bpm");
 
-        final APISession session2 = SPBPMTestUtil.loginDefaultTenant();
+        final APISession session2 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
         final IdentityAPI identityAPI2 = TenantAPIAccessor.getIdentityAPI(session2);
         final User user2 = identityAPI2.createUser(userName, "bos");
 
@@ -114,9 +114,9 @@ public class SPUserTest extends CommonAPISPTest {
         identityAPI1.deleteUser(user1.getId());
         identityAPI2.deleteUser(user2.getId());
 
-        SPBPMTestUtil.logoutTenant(session1);
-        SPBPMTestUtil.destroyTenant(tenantId1);
-        SPBPMTestUtil.logoutTenant(session2);
+        BPMTestSPUtil.logoutOnTenant(session1);
+        BPMTestSPUtil.destroyTenant(tenantId1);
+        BPMTestSPUtil.logoutOnTenant(session2);
     }
 
 }

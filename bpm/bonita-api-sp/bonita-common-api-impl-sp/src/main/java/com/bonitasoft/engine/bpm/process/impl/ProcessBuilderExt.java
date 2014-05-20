@@ -8,8 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.process.impl.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.ProcessBuilder;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
 
 /**
@@ -21,6 +21,12 @@ public class ProcessBuilderExt extends ProcessBuilder {
         super(process, processDefinitionBuilder);
     }
 
+    /**
+     * Adds a parameter on this process.
+     * @param parameterName parameter name.
+     * @param type parameter type (complete class name)
+     * @return
+     */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder((ProcessDefinitionBuilderExt) getProcessBuilder(), process, parameterName, type);
     }

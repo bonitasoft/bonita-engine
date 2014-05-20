@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.parameter.impl;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 
