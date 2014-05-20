@@ -3,9 +3,9 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -30,7 +30,7 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
-    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = {
+    @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = {
         CascadeType.ALL
     })
     private Address address;

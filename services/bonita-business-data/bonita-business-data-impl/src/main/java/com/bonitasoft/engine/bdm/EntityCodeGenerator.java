@@ -10,19 +10,20 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.hibernate.annotations.IndexColumn;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Index;
@@ -48,9 +49,9 @@ import com.sun.codemodel.JVar;
 
 public class EntityCodeGenerator {
 
-    private CodeGenerator codeGenerator;
+    private final CodeGenerator codeGenerator;
 
-    public EntityCodeGenerator(CodeGenerator codeGenerator) {
+    public EntityCodeGenerator(final CodeGenerator codeGenerator) {
         this.codeGenerator = codeGenerator;
     }
 
@@ -204,29 +205,33 @@ public class EntityCodeGenerator {
         } else {
             fieldVar = codeGenerator.addField(entityClass, field.getName(), codeGenerator.toJavaClass(field));
         }
-        annotateField(field, fieldVar, entityClass);
+        annotateField(field, fieldVar);
         return fieldVar;
     }
 
-    private void annotateField(final Field field, JFieldVar fieldVar, JDefinedClass entityClass) {
+    private void annotateField(final Field field, final JFieldVar fieldVar) {
         if (field instanceof SimpleField) {
             annotateSimpleField((SimpleField) field, fieldVar);
         } else if (field instanceof RelationField) {
-            annotateRelationField((RelationField) field, fieldVar, entityClass);
+            annotateRelationField((RelationField) field, fieldVar);
         }
     }
 
-    private void annotateRelationField(final RelationField rfield, JFieldVar fieldVar, JDefinedClass entityClass) {
+    private void annotateRelationField(final RelationField rfield, final JFieldVar fieldVar) {
         JAnnotationUse relation = null;
         if (rfield.isCollection()) {
-            relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
-            // add IndexColumn to add the list behaviour with EAGER
-            final JAnnotationUse index = codeGenerator.addAnnotation(fieldVar, IndexColumn.class);
-            index.param("name", "IDX_" + fieldVar.name());
-            final JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
-            joinColumn.param("nullable", rfield.isNullable());
+            if (rfield.getType() == Type.AGGREGATION) {
+                relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
+            } else {
+                relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
+            }
+            codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         } else {
-            relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
+            if (rfield.getType() == Type.AGGREGATION) {
+                relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
+            } else {
+                relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
+            }
             relation.param("optional", rfield.isNullable());
         }
         relation.param("fetch", FetchType.EAGER);
@@ -236,7 +241,7 @@ public class EntityCodeGenerator {
         }
     }
 
-    private void annotateSimpleField(final SimpleField sfield, JFieldVar fieldVar) {
+    private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar) {
         if (sfield.isCollection()) {
             final JAnnotationUse collectionAnnotation = codeGenerator.addAnnotation(fieldVar, ElementCollection.class);
             collectionAnnotation.param("fetch", FetchType.EAGER);
