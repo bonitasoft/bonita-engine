@@ -3563,6 +3563,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 releaseLocks(tenantAccessor, lockService, locks, tenantAccessor.getTenantId());
             }
 
+        } catch (final SProcessInstanceHierarchicalDeletionException e) {
+            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final Exception e) {
             throw new DeletionException(e);
         }
