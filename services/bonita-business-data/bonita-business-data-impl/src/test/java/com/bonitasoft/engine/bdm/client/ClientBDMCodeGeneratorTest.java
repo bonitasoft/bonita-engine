@@ -300,6 +300,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         nameField.setName("description");
         nameField.setType(FieldType.TEXT);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        
         bdmCodeGenerator.addField(definedClass, nameField);
 
         final JFieldVar nameFieldVar = definedClass.fields().get("description");

@@ -31,10 +31,10 @@ public abstract class Field {
     private String name;
 
     @XmlAttribute
-    private Boolean nullable;
+    private Boolean nullable = true;
 
     @XmlAttribute
-    private Boolean collection;
+    private Boolean collection = false;
 
     public String getName() {
         return name;

@@ -240,53 +240,60 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
         JFieldVar fieldVar = null;
-        final Boolean collection = field.isCollection();
-        final Boolean nullable = field.isNullable();
-        if (collection != null && collection) {
+        if (field.isCollection()) {
             fieldVar = addListField(entityClass, field);
         } else {
             fieldVar = addField(entityClass, field.getName(), toJavaClass(field));
         }
-
-        if (field instanceof SimpleField) {
-            final SimpleField sfield = (SimpleField) field;
-            if (collection != null && collection) {
-                final JAnnotationUse collectionAnnotation = addAnnotation(fieldVar, ElementCollection.class);
-                collectionAnnotation.param("fetch", FetchType.EAGER);
-            }
-            final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
-            columnAnnotation.param("name", field.getName().toUpperCase());
-            columnAnnotation.param("nullable", nullable == null || nullable);
-
-            if (sfield.getType() == FieldType.DATE) {
-                final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
-                temporalAnnotation.param("value", TemporalType.TIMESTAMP);
-            } else if (FieldType.TEXT == sfield.getType()) {
-                addAnnotation(fieldVar, Lob.class);
-            } else if (FieldType.STRING == sfield.getType() && sfield.getLength() != null && sfield.getLength() > 0) {
-                columnAnnotation.param("length", sfield.getLength());
-            }
-        } else {
-            final RelationField rfield = (RelationField) field;
-            JAnnotationUse relation = null;
-            if (collection != null && collection) {
-                relation = addAnnotation(fieldVar, OneToMany.class);
-                // add IndexColumn to add the list behaviour with EAGER
-                final JAnnotationUse index = addAnnotation(fieldVar, IndexColumn.class);
-                index.param("name", "IDX_" + fieldVar.name());
-                final JAnnotationUse joinColumn = addAnnotation(fieldVar, JoinColumn.class);
-                joinColumn.param("nullable", nullable == null || nullable);
-            } else {
-                relation = addAnnotation(fieldVar, ManyToOne.class);
-                relation.param("optional", nullable == null || nullable);
-            }
-            relation.param("fetch", FetchType.EAGER);
-            if (rfield.getType() == Type.COMPOSITION) {
-                final JAnnotationArrayMember cascade = relation.paramArray("cascade");
-                cascade.param(CascadeType.ALL);
-            }
-        }
+        annotateField(field, fieldVar);
         return fieldVar;
+    }
+    
+    private void annotateField(final Field field, JFieldVar fieldVar) {
+        if (field instanceof SimpleField) {
+            annotateSimpleField((SimpleField) field, fieldVar);
+        } else if (field instanceof RelationField) {
+            annotateRelationField((RelationField) field, fieldVar);
+        }
+    }
+    
+    private void annotateRelationField(final RelationField rfield, JFieldVar fieldVar) {
+        JAnnotationUse relation = null;
+        if (rfield.isCollection()) {
+            relation = addAnnotation(fieldVar, OneToMany.class);
+            // add IndexColumn to add the list behaviour with EAGER
+            final JAnnotationUse index = addAnnotation(fieldVar, IndexColumn.class);
+            index.param("name", "IDX_" + fieldVar.name());
+            final JAnnotationUse joinColumn = addAnnotation(fieldVar, JoinColumn.class);
+            joinColumn.param("nullable", rfield.isNullable());
+        } else {
+            relation = addAnnotation(fieldVar, ManyToOne.class);
+            relation.param("optional", rfield.isNullable());
+        }
+        relation.param("fetch", FetchType.EAGER);
+        if (rfield.getType() == Type.COMPOSITION) {
+            final JAnnotationArrayMember cascade = relation.paramArray("cascade");
+            cascade.param(CascadeType.ALL);
+        }
+    }
+
+    private void annotateSimpleField(final SimpleField sfield, JFieldVar fieldVar) {
+        if (sfield.isCollection()) {
+            final JAnnotationUse collectionAnnotation = addAnnotation(fieldVar, ElementCollection.class);
+            collectionAnnotation.param("fetch", FetchType.EAGER);
+        }
+        final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
+        columnAnnotation.param("name", sfield.getName().toUpperCase());
+        columnAnnotation.param("nullable", sfield.isNullable());
+
+        if (sfield.getType() == FieldType.DATE) {
+            final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
+            temporalAnnotation.param("value", TemporalType.TIMESTAMP);
+        } else if (FieldType.TEXT == sfield.getType()) {
+            addAnnotation(fieldVar, Lob.class);
+        } else if (FieldType.STRING == sfield.getType() && sfield.getLength() != null && sfield.getLength() > 0) {
+            columnAnnotation.param("length", sfield.getLength());
+        }
     }
 
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
