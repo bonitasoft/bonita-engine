@@ -751,4 +751,73 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         deleteUser(otherUser);
     }
 
+    @Test
+    public void runProcessInstanceWithDefaultFlownode_should_pass_all_human_task() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+
+
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addDefaultTransition("step1", "step2").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro));
+        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", pi, pedro);
+        waitForUserTaskAndExecuteIt("step2", pi, pedro);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void runProcessInstanceWithDefaultFlownode_and_another_evaluated_to_false_transition_should_passto_step2() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).
+                addTransition("step1", "step3", new ExpressionBuilder().createConstantBooleanExpression(false)).addDefaultTransition("step1", "step2")
+                .getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro));
+        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", pi, pedro);
+        waitForUserTaskAndExecuteIt("step2", pi, pedro);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void runProcessInstanceWithDefaultFlownode_and_another_evaluated_to_true_transition_should_passto_step3() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).
+                addTransition("step1", "step3", new ExpressionBuilder().createConstantBooleanExpression(true)).addDefaultTransition("step1", "step2")
+                .getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro));
+        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", pi, pedro);
+        waitForUserTaskAndExecuteIt("step3", pi, pedro);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void runDeleteParentArchivedProcessInstanceAndElements_should_not_delete_process_instance_not_yet_archived() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).
+                addTransition("step1", "step2").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro));
+        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", pi, pedro);
+        long nbDeleted = getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);
+
+        // there is one archived process instance deleted because the former process_instance state has been archived
+        assertThat(nbDeleted).isEqualTo(1);
+        waitForUserTaskAndExecuteIt("step2", pi, pedro);
+        waitForProcessToFinish(pi);
+        disableAndDeleteProcess(processDefinition);
+    }
+
 }

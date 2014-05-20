@@ -84,9 +84,8 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
                 Integer intLoopMax;
 
                 if (loopMax != null) {
-                    final String containerType = loopActivity.getLogicalGroup(2) > 0 ? DataInstanceContainer.ACTIVITY_INSTANCE.name()
-                            : DataInstanceContainer.PROCESS_INSTANCE.name();
-                    intLoopMax = (Integer) expressionResolverService.evaluate(loopMax, new SExpressionContext(loopActivity.getId(), containerType,
+                    intLoopMax = (Integer) expressionResolverService.evaluate(loopMax, new SExpressionContext(loopActivity.getId(),
+                            DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                             processDefinitionId));
                     activityInstanceService.setLoopMax(loopActivity, intLoopMax);
                 }

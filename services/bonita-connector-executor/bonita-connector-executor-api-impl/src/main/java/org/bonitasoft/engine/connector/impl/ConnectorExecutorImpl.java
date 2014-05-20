@@ -106,7 +106,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
         final long startTime = System.currentTimeMillis();
         if (executorService == null) {
-            throw new SConnectorException("Unable to execute a connector, if the node is node started. Start it first");
+            throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
         final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
         final Future<Map<String, Object>> submit = executorService.submit(callable);
@@ -226,13 +226,24 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     @Override
     public void start() {
-        final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
-        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
-        final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
-        useExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler));
+        if (executorService == null) {
+            final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
+            final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
+            final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
+            setExecutor(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler));
+        }
     }
 
-    void useExecutor(final ExecutorService executorService) {
+    void setExecutor(final ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
+    // For unit tests
+    ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -253,11 +264,11 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     @Override
     public void pause() throws SBonitaException {
-        // nothing to do
+        stop();
     }
 
     @Override
     public void resume() throws SBonitaException {
-        // nothing to do
+        start();
     }
 }

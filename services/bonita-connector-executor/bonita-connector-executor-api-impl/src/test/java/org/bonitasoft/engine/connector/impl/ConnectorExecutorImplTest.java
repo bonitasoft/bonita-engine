@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.connector.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -47,19 +48,21 @@ public class ConnectorExecutorImplTest {
     @Mock
     private SConnector connector;
 
+    @Mock
+    private TimeTracker timeTracker;
+
     private ConnectorExecutorImpl connectorExecutorImpl;
 
     @Before
     public void before() {
+        connectorExecutorImpl = new ConnectorExecutorImpl(1, 1, loggerService, 1, 1, sessionAccessor, sessionService, timeTracker);
         doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
-        final TimeTracker timeTracker = mock(TimeTracker.class);
-        connectorExecutorImpl = new ConnectorExecutorImpl(0, 0, loggerService, 0, 0, sessionAccessor, sessionService, timeTracker);
-        connectorExecutorImpl.useExecutor(executorService);
     }
 
     @Test
     public void should_execute_submit_callable() throws Exception {
         // given
+        connectorExecutorImpl.setExecutor(executorService);
         Future<?> future = mock(Future.class);
         doReturn(future).when(executorService).submit(any(ExecuteConnectorCallable.class));
         doReturn(Collections.singletonMap("result", "resultValue")).when(future).get();
@@ -74,6 +77,7 @@ public class ConnectorExecutorImplTest {
     @Test(expected = SConnectorException.class)
     public void should_execute_throw_exception_when_not_started() throws Exception {
         // given
+        connectorExecutorImpl.setExecutor(executorService);
         connectorExecutorImpl.stop();
         // when
         connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"));
@@ -82,6 +86,7 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_disconnect_call_disconnect_on_connector() throws Exception {
         // when
+        connectorExecutorImpl.setExecutor(executorService);
         connectorExecutorImpl.disconnect(connector);
         // then
         verify(connector).disconnect();
@@ -90,6 +95,7 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_disconnect_rethrow_connector_exceptions() throws Exception {
         // given
+        connectorExecutorImpl.setExecutor(executorService);
         SConnectorException exception = new SConnectorException("myException");
         doThrow(exception).when(connector).disconnect();
         // when
@@ -105,6 +111,7 @@ public class ConnectorExecutorImplTest {
     @Test
     public void should_disconnectSilently_only_logException() throws Exception {
         // given
+        connectorExecutorImpl.setExecutor(executorService);
         SConnectorException exception = new SConnectorException("myException");
         doThrow(exception).when(connector).disconnect();
         // when
@@ -115,12 +122,43 @@ public class ConnectorExecutorImplTest {
     }
 
     @Test
-    public void should_stop_await_termination_of_thread_ppol() throws Exception {
+    public void should_stop_await_termination_of_thread_pool() throws Exception {
+        // Given
+        connectorExecutorImpl.setExecutor(executorService);
         // when
         connectorExecutorImpl.stop();
         // then
         verify(executorService).shutdown();
         verify(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
+    }
+
+    @Test
+    public void pause_should_await_termination_of_thread_pool() throws Exception {
+        // Given
+        connectorExecutorImpl.setExecutor(executorService);
+        // when
+        connectorExecutorImpl.stop();
+        // then
+        verify(executorService).shutdown();
+        verify(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
+    }
+
+    @Test
+    public void start_should_await_termination_of_thread_pool() {
+        // when
+        connectorExecutorImpl.start();
+
+        // then
+        assertNotNull("The executor service must be not null.", connectorExecutorImpl.getExecutorService());
+    }
+
+    @Test
+    public void resume_should_await_termination_of_thread_pool() throws Exception {
+        // when
+        connectorExecutorImpl.resume();
+
+        // then
+        assertNotNull("The executor service must be not null.", connectorExecutorImpl.getExecutorService());
     }
 
 }

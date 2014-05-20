@@ -903,24 +903,26 @@ public class IdentityAPIImpl implements IdentityAPI {
         final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class).createNewInstance();
         final Map<GroupField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<GroupField, Serializable> field : fields.entrySet()) {
+            final String value = (String) field.getValue();
             switch (field.getKey()) {
                 case NAME:
-                    groupUpdateBuilder.updateName((String) field.getValue());
+                    groupUpdateBuilder.updateName(value);
                     break;
                 case DISPLAY_NAME:
-                    groupUpdateBuilder.updateDisplayName((String) field.getValue());
+                    groupUpdateBuilder.updateDisplayName(value);
                     break;
                 case DESCRIPTION:
-                    groupUpdateBuilder.updateDescription((String) field.getValue());
+                    groupUpdateBuilder.updateDescription(value);
                     break;
                 case ICON_NAME:
-                    groupUpdateBuilder.updateIconName((String) field.getValue());
+                    groupUpdateBuilder.updateIconName(value);
                     break;
                 case ICON_PATH:
-                    groupUpdateBuilder.updateIconPath((String) field.getValue());
+                    groupUpdateBuilder.updateIconPath(value);
                     break;
                 case PARENT_PATH:
-                    groupUpdateBuilder.updateParentPath((String) field.getValue());
+                    final String parentPath = (value != null && value.isEmpty()) ? null : value;
+                    groupUpdateBuilder.updateParentPath(parentPath);
                     break;
                 default:
                     throw new UpdateException("Invalid field: " + field.getKey().name());
