@@ -17,49 +17,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
-
 import org.apache.commons.lang3.text.WordUtils;
-import org.hibernate.annotations.IndexColumn;
 
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
-import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
-import com.bonitasoft.engine.bdm.model.field.FieldType;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
-import com.sun.codemodel.JAnnotationArrayMember;
-import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -87,119 +60,14 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     public void buildJavaModelFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
+        EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
-            final JDefinedClass entity = addEntity(bo);
+            final JDefinedClass entity = entityCodeGenerator.addEntity(bo);
             addDAO(bo, entity);
         }
     }
 
     protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
-
-    public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
-        final String qualifiedName = bo.getQualifiedName();
-        validateClassNotExistsInRuntime(qualifiedName);
-
-        JDefinedClass entityClass = addClass(qualifiedName);
-        entityClass = addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
-        entityClass.javadoc().add(bo.getDescription());
-
-        final JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
-        entityAnnotation.param("name", entityClass.name());
-
-        addIndexAnnotations(bo, entityClass);
-        addUniqueConstraintAnnotations(bo, entityClass);
-        addQueriesAnnotation(bo, entityClass);
-
-        addFieldsAndMethods(bo, entityClass);
-
-        addDefaultConstructor(entityClass);
-        addCopyConstructor(entityClass, bo);
-
-        addEqualsMethod(entityClass);
-        addHashCodeMethod(entityClass);
-
-        return entityClass;
-    }
-
-    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass) throws JClassAlreadyExistsException {
-        addPersistenceIdFieldAndAccessors(entityClass);
-        addPersistenceVersionFieldAndAccessors(entityClass);
-
-        for (final Field field : bo.getFields()) {
-            final JFieldVar fieldVar = addField(entityClass, field);
-            addAccessors(entityClass, fieldVar);
-            addModifiers(entityClass, field);
-        }
-    }
-
-    private void addQueriesAnnotation(final BusinessObject bo, final JDefinedClass entityClass) {
-        final JAnnotationUse namedQueriesAnnotation = addAnnotation(entityClass, NamedQueries.class);
-        final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
-
-        // Add provided queries
-        for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
-            addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
-        }
-
-        // Add custom queries
-        for (final Query query : bo.getQueries()) {
-            addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
-        }
-    }
-
-    private void addUniqueConstraintAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
-        final JAnnotationUse tableAnnotation = addAnnotation(entityClass, Table.class);
-        tableAnnotation.param("name", entityClass.name().toUpperCase());
-
-        final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
-        if (!uniqueConstraints.isEmpty()) {
-            final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
-            for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
-                final JAnnotationUse uniqueConstraintAnnotatation = uniqueConstraintsArray.annotate(javax.persistence.UniqueConstraint.class);
-                uniqueConstraintAnnotatation.param("name", uniqueConstraint.getName().toUpperCase());
-                final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotatation.paramArray("columnNames");
-                for (final String fieldName : uniqueConstraint.getFieldNames()) {
-                    columnNamesParamArray.param(fieldName.toUpperCase());
-                }
-            }
-        }
-    }
-
-    private void addIndexAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
-        final List<Index> indexes = bo.getIndexes();
-        if (indexes != null && !indexes.isEmpty()) {
-            final JAnnotationUse hibTabAnnotation = addAnnotation(entityClass, org.hibernate.annotations.Table.class);
-            hibTabAnnotation.param("appliesTo", entityClass.name().toUpperCase());
-            final JAnnotationArrayMember indexesArray = hibTabAnnotation.paramArray("indexes");
-            for (final Index index : indexes) {
-                final JAnnotationUse indexAnnotation = indexesArray.annotate(org.hibernate.annotations.Index.class);
-                indexAnnotation.param("name", index.getName().toUpperCase());
-                final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
-                for (final String fieldName : index.getFieldNames()) {
-                    columnParamArray.param(fieldName.toUpperCase());
-                }
-            }
-        }
-    }
-
-    private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray, final String name, final String content) {
-        final JAnnotationUse nameQueryAnnotation = valueArray.annotate(NamedQuery.class);
-        nameQueryAnnotation.param("name", entityClass.name() + "." + name);
-        nameQueryAnnotation.param("query", content);
-    }
-
-    private void validateClassNotExistsInRuntime(final String qualifiedName) {
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        boolean alreadyInRuntime = true;
-        try {
-            contextClassLoader.loadClass(qualifiedName);
-        } catch (final ClassNotFoundException e) {
-            alreadyInRuntime = false;
-        }
-        if (alreadyInRuntime) {
-            throw new IllegalArgumentException("Class " + qualifiedName + " already exists in target runtime environment.");
-        }
-    }
 
     protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
         final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
@@ -222,90 +90,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             } else {
                 copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
             }
-        }
-    }
-
-    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
-        final JFieldVar idFieldVar = addField(entityClass, Field.PERSISTENCE_ID, toJavaClass(FieldType.LONG));
-        addAnnotation(idFieldVar, Id.class);
-        addAnnotation(idFieldVar, GeneratedValue.class);
-        addAccessors(entityClass, idFieldVar);
-    }
-
-    public void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
-        final JFieldVar versionField = addField(entityClass, Field.PERSISTENCE_VERSION, toJavaClass(FieldType.LONG));
-        addAnnotation(versionField, Version.class);
-        addAccessors(entityClass, versionField);
-    }
-
-    public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
-        JFieldVar fieldVar = null;
-        if (field.isCollection()) {
-            fieldVar = addListField(entityClass, field);
-        } else {
-            fieldVar = addField(entityClass, field.getName(), toJavaClass(field));
-        }
-        annotateField(field, fieldVar);
-        return fieldVar;
-    }
-    
-    private void annotateField(final Field field, JFieldVar fieldVar) {
-        if (field instanceof SimpleField) {
-            annotateSimpleField((SimpleField) field, fieldVar);
-        } else if (field instanceof RelationField) {
-            annotateRelationField((RelationField) field, fieldVar);
-        }
-    }
-    
-    private void annotateRelationField(final RelationField rfield, JFieldVar fieldVar) {
-        JAnnotationUse relation = null;
-        if (rfield.isCollection()) {
-            relation = addAnnotation(fieldVar, OneToMany.class);
-            // add IndexColumn to add the list behaviour with EAGER
-            final JAnnotationUse index = addAnnotation(fieldVar, IndexColumn.class);
-            index.param("name", "IDX_" + fieldVar.name());
-            final JAnnotationUse joinColumn = addAnnotation(fieldVar, JoinColumn.class);
-            joinColumn.param("nullable", rfield.isNullable());
-        } else {
-            relation = addAnnotation(fieldVar, ManyToOne.class);
-            relation.param("optional", rfield.isNullable());
-        }
-        relation.param("fetch", FetchType.EAGER);
-        if (rfield.getType() == Type.COMPOSITION) {
-            final JAnnotationArrayMember cascade = relation.paramArray("cascade");
-            cascade.param(CascadeType.ALL);
-        }
-    }
-
-    private void annotateSimpleField(final SimpleField sfield, JFieldVar fieldVar) {
-        if (sfield.isCollection()) {
-            final JAnnotationUse collectionAnnotation = addAnnotation(fieldVar, ElementCollection.class);
-            collectionAnnotation.param("fetch", FetchType.EAGER);
-        }
-        final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
-        columnAnnotation.param("name", sfield.getName().toUpperCase());
-        columnAnnotation.param("nullable", sfield.isNullable());
-
-        if (sfield.getType() == FieldType.DATE) {
-            final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
-            temporalAnnotation.param("value", TemporalType.TIMESTAMP);
-        } else if (FieldType.TEXT == sfield.getType()) {
-            addAnnotation(fieldVar, Lob.class);
-        } else if (FieldType.STRING == sfield.getType() && sfield.getLength() != null && sfield.getLength() > 0) {
-            columnAnnotation.param("length", sfield.getLength());
-        }
-    }
-
-    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
-        addSetter(entityClass, fieldVar);
-        addGetter(entityClass, fieldVar);
-    }
-
-    protected void addModifiers(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
-        final Boolean collection = field.isCollection();
-        if (collection != null && collection) {
-            addAddMethod(entityClass, field);
-            addRemoveMethod(entityClass, field);
         }
     }
 
@@ -338,7 +122,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return daoInterface;
     }
 
-    public JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) throws ClassNotFoundException {
+    protected JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) throws ClassNotFoundException {
         final String methodName = query.getName();
         final JMethod queryMethod = createQueryMethod(entity, targetClass, methodName, query.getReturnType());
         for (final QueryParameter param : query.getQueryParameters()) {
@@ -363,7 +147,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return addMethodSignature(targetClass, name, returnType);
     }
 
-    public String toDaoInterfaceClassname(final BusinessObject bo) {
+    private String toDaoInterfaceClassname(final BusinessObject bo) {
         return bo.getQualifiedName() + DAO_SUFFIX;
     }
 

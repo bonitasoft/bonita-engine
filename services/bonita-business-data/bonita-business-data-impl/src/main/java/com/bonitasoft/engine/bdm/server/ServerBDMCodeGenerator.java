@@ -74,6 +74,7 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     }
 
+    // TODO unused ?
     protected JFieldVar addConstructor(final JDefinedClass implClass) {
         final JClass serviceClass = getModel().ref("com.bonitasoft.engine.business.data.BusinessDataRepository");
         JFieldVar service = addField(implClass, "businessDataRepository", serviceClass);
