@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -132,17 +131,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new SBusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
         }
         em.detach(entity);
-        return copy(entity);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T extends Entity> T copy(final T entity) {
-        try {
-            final Constructor<? extends Entity> constructor = entity.getClass().getConstructor(entity.getClass());
-            return (T) constructor.newInstance(entity);
-        } catch (final Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+        return entity;
     }
 
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
@@ -221,14 +210,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return copyList;
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
         if (ClassUtils.isPrimitiveOrWrapper(resultClass)) {
             return entity;
         } else {
             em.detach(entity);
-            final Entity e = (Entity) entity;
-            return (T) copy(e);
+            return entity;
         }
     }
 
