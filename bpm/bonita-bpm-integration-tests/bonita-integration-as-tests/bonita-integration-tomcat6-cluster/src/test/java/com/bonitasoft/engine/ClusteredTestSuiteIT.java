@@ -34,7 +34,7 @@ public class ClusteredTestSuiteIT {
         PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        SPBPMTestUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
+        BPMTestSPUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
         platformLoginAPI.logout(platformSession);
         changeToNode1();
     }
@@ -49,7 +49,7 @@ public class ClusteredTestSuiteIT {
         platformAPI.stopNode();
         platformLoginAPI.logout(platformSession);
         System.err.println("=================== ClusteredTestSuiteIT.afterClass()");
-        SPBPMTestUtil.destroyPlatformAndTenants();
+        BPMTestSPUtil.destroyPlatformAndTenants();
         new APITestSPUtil().deletePlatformStructure();
     }
 

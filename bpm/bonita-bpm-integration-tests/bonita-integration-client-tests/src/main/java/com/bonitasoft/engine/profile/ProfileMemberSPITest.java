@@ -40,7 +40,7 @@ public class ProfileMemberSPITest extends AbstractProfileTest {
 
         platformLoginAPI.logout(platformSession);
 
-        loginWith("default_tenant2", "default_password2", tenant2Id);
+        loginOnTenantWith("default_tenant2", "default_password2", tenant2Id);
 
         final User userTenant2 = createUser("userName_tenant2", "UserPwd_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2");
         getProfileAPI().createProfileMember(Long.valueOf(1), userTenant2.getId(), null, null);
@@ -67,7 +67,7 @@ public class ProfileMemberSPITest extends AbstractProfileTest {
         getIdentityAPI().deleteUser(user1.getId());
 
         logout();
-        loginWith("default_tenant2", "default_password2", tenant2Id);
+        loginOnTenantWith("default_tenant2", "default_password2", tenant2Id);
         getIdentityAPI().deleteUser(userTenant2.getId());
 
         platformSession = platformLoginAPI.login("platformAdmin", "platform");

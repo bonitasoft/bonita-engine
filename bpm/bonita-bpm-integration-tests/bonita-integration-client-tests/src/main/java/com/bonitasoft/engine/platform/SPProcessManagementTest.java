@@ -39,7 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.SPBPMTestUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
@@ -57,7 +57,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
 
     private void logoutThenloginAs(final String userName, final String password, final long tenantId) throws BonitaException {
         logout();
-        loginWith(userName, password, tenantId);
+        loginOnTenantWith(userName, password, tenantId);
     }
 
     @Test
@@ -131,11 +131,11 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent2);
         logout();
 
-        final long tenant1 = SPBPMTestUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
-        loginWith("hamme", "saari", tenant1);
+        final long tenant1 = BPMTestSPUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
+        loginOnTenantWith("hamme", "saari", tenant1);
         ClientEventUtil.deployCommand(getSession());
         final User user1 = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD, tenant1);
+        loginOnTenantWith(USERNAME, PASSWORD, tenant1);
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForUserTask("step1", processInstance1);
@@ -158,7 +158,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         login();
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-        SPBPMTestUtil.destroyTenant(tenant1);
+        BPMTestSPUtil.destroyTenant(tenant1);
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,6 +14,10 @@ import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.bonitasoft.engine.connector.ConnectorExecutionTimeOutTest;
+import com.bonitasoft.engine.connector.ConnectorImplementationLocalSPTest;
+import com.bonitasoft.engine.tenant.TenantLocalIT;
+import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
 
 @RunWith(BonitaSuiteRunner.class)
@@ -25,10 +29,9 @@ import com.bonitasoft.engine.theme.ThemeTest;
         ConnectorExecutionTimeOutTest.class,
         ConnectorImplementationLocalSPTest.class,
         ThemeTest.class,
-        TenantPauseLocalTestSP.class,
-        TenantMaintenanceLocalTestSP.class,
+        TenantMaintenanceLocalIT.class,
         PageAPILocalIT.class,
-        TenantLocalTestSpITest.class 
+        TenantLocalIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
