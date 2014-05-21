@@ -180,13 +180,18 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Parser parser = tenantAccessor.getProfileParser();
         final PageService pageService = tenantAccessor.getPageService();
         final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
+        for (final ExportedProfile profile : profiles) {
+            if (!profile.isDefault()) {
+                LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
+            }
+        }
+
         return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
                 org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
                 .importProfiles(SessionInfos.getUserIdFromSession());

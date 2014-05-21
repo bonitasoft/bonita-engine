@@ -40,6 +40,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -106,6 +107,42 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExpected);
 
         deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
+    }
+
+    @Test
+    public void importProfile_with_teamwork_level() throws Exception {
+        // given
+        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("Profiles_teamwork.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(profileByteArray));
+
+        // when import
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(profileByteArray, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        assertThat(importProfiles).as("should have 1 imported profiles").hasSize(1);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error found in status: %s ", importStatus).isEmpty();
+            assertThat(importStatus.getStatus()).isEqualTo(Status.REPLACED);
+        }
+
+        // when export
+
+        final long[] profileIds = new long[1];
+        profileIds[0] = adminProfileId;
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(getProfileAPI().exportProfilesWithIdsSpecified(profileIds)));
+
+        // then
+        assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
+
+    }
+
+    private void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
+        final List<?> allDifferences = diff.getAllDifferences();
+        assertThat(allDifferences).as("should have no differences").isEmpty();
     }
 
     @Test
