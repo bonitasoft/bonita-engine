@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte

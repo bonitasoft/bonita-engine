@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.SendTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;

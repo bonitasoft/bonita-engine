@@ -15,7 +15,7 @@ package org.bonitasoft.engine.profile.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.profile.Profile;
 
 /**

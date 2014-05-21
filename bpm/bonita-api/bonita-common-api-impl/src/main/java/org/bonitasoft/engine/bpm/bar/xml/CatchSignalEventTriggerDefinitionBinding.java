@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import org.bonitasoft.engine.bpm.flownode.impl.CatchSignalEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchSignalEventTriggerDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte
