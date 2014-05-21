@@ -57,9 +57,11 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
                 "testSetConnectorImplementationCleansOldDependencies", "1.0");
         processDefinitionBuilderExt.addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER);
 
-        final ProcessDefinition processDefinition = deployProcessWithConnector(processDefinitionBuilderExt,
-                Arrays.asList(buildBarResource("/com/bonitasoft/engine/connectors/OldConnector.impl", "OldConnector.impl")),
-                Arrays.asList(buildBarResource(TestConnector.class, "TestConnector.jar"), buildBarResource(VariableStorage.class, "VariableStorage.jar")));
+        final ProcessDefinition processDefinition = deployProcessWithConnector(
+                processDefinitionBuilderExt,
+                Arrays.asList(getContentAndBuildBarResource("OldConnector.impl", APIAccessorConnector.class)),
+                Arrays.asList(generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
+                        generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar")));
 
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
@@ -82,7 +84,7 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         assertEquals(2, pair._2.size());
 
         // prepare zip byte array of connector implementation
-        final String implSourchFile = "/com/bonitasoft/engine/connectors/NewConnector.impl";
+        final String implSourchFile = "/com/bonitasoft/engine/connector/NewConnector.impl";
         final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
         final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
         getProcessAPI().setConnectorImplementation(processDefinition.getId(), connectorId, connectorVersion, connectorImplementationArchive);
