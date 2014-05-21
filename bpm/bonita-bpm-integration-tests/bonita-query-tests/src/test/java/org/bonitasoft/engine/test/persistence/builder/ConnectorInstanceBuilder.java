@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstance
 /**
  * @author Julien Reboul
  */
-public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnectorInstanceImpl> {
+public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnectorInstanceImpl, ConnectorInstanceBuilder> {
 
     private boolean withFailureInfo = false;
 
@@ -48,6 +48,11 @@ public class ConnectorInstanceBuilder extends PersistentObjectBuilder<SConnector
 
     public static ConnectorInstanceBuilder aConnectorInstance() {
         return new ConnectorInstanceBuilder();
+    }
+
+    @Override
+    ConnectorInstanceBuilder getThisBuilder() {
+        return this;
     }
 
 

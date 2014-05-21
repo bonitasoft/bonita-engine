@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.CatchErrorEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.BoundaryEventDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchEventDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.BoundaryEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
 
 /**
  * @author Elias Ricken de Medeiros

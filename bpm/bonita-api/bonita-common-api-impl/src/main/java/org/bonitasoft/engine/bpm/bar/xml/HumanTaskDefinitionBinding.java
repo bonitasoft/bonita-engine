@@ -15,8 +15,8 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 
 /**

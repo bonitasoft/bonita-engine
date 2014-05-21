@@ -1441,7 +1441,6 @@ public class APITestUtil {
         getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
 
-
     public void skipTasks(final ProcessInstance processInstance) throws UpdateException {
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         for (final ActivityInstance activityInstance : activityInstances) {
@@ -1793,6 +1792,7 @@ public class APITestUtil {
     public byte[] generateContent(final Document doc) {
         return doc.getName().getBytes();
     }
+
     /**
      * tell the engine to run BPMEventHandlingjob now
      * 
@@ -1802,6 +1802,6 @@ public class APITestUtil {
      */
     protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
         commandAPI.execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
-        }
+    }
 
 }

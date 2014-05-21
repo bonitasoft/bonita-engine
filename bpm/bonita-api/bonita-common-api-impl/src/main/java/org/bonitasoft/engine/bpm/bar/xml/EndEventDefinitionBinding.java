@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.EndEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.EndEventDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

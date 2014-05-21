@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import static org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY;
-import static org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY;
+import static org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory.*;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
 
@@ -22,10 +21,15 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWa
  * @author Emmanuel Duchastenier
  * @author Laurent Leseigneur
  */
-public class WaitingMessageEventBuilder extends PersistentObjectBuilder<SWaitingMessageEventImpl> {
+public class WaitingMessageEventBuilder extends PersistentObjectBuilder<SWaitingMessageEventImpl, WaitingMessageEventBuilder> {
 
     public static WaitingMessageEventBuilder aWaitingEvent() {
         return new WaitingMessageEventBuilder();
+    }
+
+    @Override
+    WaitingMessageEventBuilder getThisBuilder() {
+        return this;
     }
 
     private boolean inProgress;

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.MessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 
 /**

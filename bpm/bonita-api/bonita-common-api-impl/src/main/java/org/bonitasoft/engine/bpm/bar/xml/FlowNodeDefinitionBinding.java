@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

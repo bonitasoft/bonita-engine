@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import org.bonitasoft.engine.bpm.flownode.impl.CatchErrorEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchErrorEventTriggerDefinitionImpl;
 
 /**
  * @author Elias Ricken de Medeiros

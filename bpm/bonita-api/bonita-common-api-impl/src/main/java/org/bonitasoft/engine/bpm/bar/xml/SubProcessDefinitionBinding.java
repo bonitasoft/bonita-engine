@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
-import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte

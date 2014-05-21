@@ -4,12 +4,17 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 
 
-public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl> {
+public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl, ActorMemberBuilder> {
 
     private long actorId;
     private Long userId;
     private Long groupId;
     private Long roleId;
+
+    @Override
+    ActorMemberBuilder getThisBuilder() {
+        return this;
+    }
 
     public static ActorMemberBuilder anActorMember() {
         return new ActorMemberBuilder();

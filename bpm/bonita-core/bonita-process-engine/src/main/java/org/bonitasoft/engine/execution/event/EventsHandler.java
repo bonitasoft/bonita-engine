@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -106,8 +105,7 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final ProcessInstanceService processInstanceService, final TokenService tokenService,
-            final TechnicalLoggerService logger, final TransientDataService transientDataService) {
+            final ProcessInstanceService processInstanceService, final TokenService tokenService, final TechnicalLoggerService logger) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -118,7 +116,7 @@ public class EventsHandler {
         handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
-                bpmInstancesCreator, dataInstanceService, processDefinitionService, transientDataService));
+                bpmInstancesCreator, dataInstanceService, processDefinitionService));
         handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
