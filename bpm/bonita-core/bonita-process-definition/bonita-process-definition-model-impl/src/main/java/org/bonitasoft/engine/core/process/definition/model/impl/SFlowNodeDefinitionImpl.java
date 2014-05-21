@@ -155,6 +155,11 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     }
 
     @Override
+    public boolean hasConnectors() {
+        return connectors.size() > 0;
+    }
+
+    @Override
     // public SConnectorDefinition getConnectorDefinition(final long id) { // FIXME: Uncomment when generate id
     public SConnectorDefinition getConnectorDefinition(final String name) {
         return allConnectorsMap.get(name);
