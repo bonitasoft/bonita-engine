@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -652,7 +650,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt designProcessDefinition = buildProcessWithOutputConnectorAndParameter(delivery, inputName, connectorId,
                 connectorVersion, input1Expression, paraName);
 
-        final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(delivery, user, designProcessDefinition, paraMap);
+        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutputAndParameter(designProcessDefinition, delivery, user, paraMap);
         final long proDefId = processDefinition.getId();
         ProcessInstance processInstance = getProcessAPI().startProcess(proDefId);
         assertNotNull(waitForUserTask("step2", processInstance.getId()));
@@ -713,26 +711,6 @@ public class ProcessParameterTest extends CommonAPISPTest {
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addParameter(paraName, String.class.getCanonicalName());
         return designProcessDefinition;
-    }
-
-    private ProcessDefinition deployProcessWithTestConnectorAndParameter(final String actorName, final User user,
-            final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
-        if (parameters != null) {
-            businessArchive.setParameters(parameters);
-        }
-        final BusinessArchiveBuilder businessArchiveBuilder = businessArchive.setProcessDefinition(designProcessDefinition.done());
-        final List<BarResource> connectorImplementations = generateConnectorImplementations();
-        for (final BarResource barResource : connectorImplementations) {
-            businessArchiveBuilder.addConnectorImplementation(barResource);
-        }
-
-        final List<BarResource> generateConnectorDependencies = generateConnectorDependencies();
-        for (final BarResource barResource : generateConnectorDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     @Test
@@ -813,26 +791,6 @@ public class ProcessParameterTest extends CommonAPISPTest {
                 baos.close();
             }
         }
-    }
-
-    private List<BarResource> generateConnectorImplementations() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl");
-        return resources;
-    }
-
-    private List<BarResource> generateConnectorDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
-        return resources;
-    }
-
-    private void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        resources.add(new BarResource(name, byteArray));
     }
 
 }
