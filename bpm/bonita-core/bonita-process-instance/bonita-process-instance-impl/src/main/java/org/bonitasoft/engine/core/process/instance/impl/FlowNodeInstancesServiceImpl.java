@@ -176,51 +176,16 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     @Override
     public void updateDisplayName(final SFlowNodeInstance flowNodeInstance, final String displayName) throws SFlowNodeModificationException {
         if (displayName != null && !displayName.equals(flowNodeInstance.getDisplayName())) {
-            final String key = activityInstanceKeyProvider.getDisplayNameKey();
             final String event = ACTIVITYINSTANCE_DISPLAY_NAME;
-            updateOneField(flowNodeInstance, displayName, event, key, 75);
+            final String key = activityInstanceKeyProvider.getDisplayNameKey();
+            updateOneField(flowNodeInstance, displayName, event, key);
         }
     }
 
-    private String getTruncated(String value, int maxLengh, final SFlowNodeInstance flowNodeInstance, String key) {
-        if(value.length() > maxLengh) {
-            String truncatedValue = value.substring(0, maxLengh);
-            logTruncationWarning(value, truncatedValue, maxLengh, flowNodeInstance, key);
-            return truncatedValue;
-        }
-        return value;
-    }
-
-    private void logTruncationWarning(String value, String truncatedValue, int maxLengh, final SFlowNodeInstance flowNodeInstance, String key) {
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            StringBuilder stb = new StringBuilder();
-            stb.append("The field ");
-            stb.append(key);
-            stb.append(" is too long in the flow node instance [id: ");
-            stb.append(flowNodeInstance.getId());
-            stb.append(", name: ");
-            stb.append(flowNodeInstance.getName());
-            stb.append(", process instance id: ");
-            stb.append(flowNodeInstance.getParentProcessInstanceId());
-            stb.append(", root process instance id: ");
-            stb.append(flowNodeInstance.getRootProcessInstanceId());
-            stb.append("] and will be truncated to the max lengh (");
-            stb.append(maxLengh);
-            stb.append("). The truncated value is: '");
-            stb.append(truncatedValue);
-            stb.append("'. The original value was: '");
-            stb.append(value);
-            stb.append("'.");
-            String message = stb.toString();
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, message);
-        }
-    }
-
-    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey, int maxLengh)
+    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String displayDescription, final String event, final String lastUpdateKey)
             throws SFlowNodeModificationException {
-        String truncatedValue = getTruncated(attributeValue, maxLengh, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(attributeKey, truncatedValue);
+        descriptor.addField(lastUpdateKey, displayDescription);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(event).setObject(flowNodeInstance)
@@ -237,7 +202,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         if (displayDescription != null && !displayDescription.equals(flowNodeInstance.getDisplayDescription())) {
             final String event = ACTIVITYINSTANCE_DISPLAY_DESCRIPTION;
             final String key = activityInstanceKeyProvider.getDisplayDescriptionKey();
-            updateOneField(flowNodeInstance, displayDescription, event, key, 255);
+            updateOneField(flowNodeInstance, displayDescription, event, key);
         }
     }
 
