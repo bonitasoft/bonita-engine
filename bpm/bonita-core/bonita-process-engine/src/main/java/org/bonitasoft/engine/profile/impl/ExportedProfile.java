@@ -117,4 +117,15 @@ public class ExportedProfile {
         return true;
     }
 
+    public boolean hasCustomPages() {
+        if (parentProfileEntries != null) {
+            for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
+                if (parentProfileEntry.hasCustomPages()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
