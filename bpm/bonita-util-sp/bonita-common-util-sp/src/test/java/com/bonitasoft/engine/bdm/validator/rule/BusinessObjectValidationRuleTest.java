@@ -5,8 +5,11 @@
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -16,6 +19,8 @@ import org.junit.Test;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder;
+import com.bonitasoft.engine.bdm.model.builder.FieldBuilder;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -118,4 +123,12 @@ public class BusinessObjectValidationRuleTest {
         assertThat(validationStatus).isNotOk();
     }
 
+    @Test
+    public void should_validate_that_simple_name_contain_no_underscore() throws Exception {
+        BusinessObject businessObject = aBO("Name_withUnderscore").withField(aBooleanField("field")).build();
+        
+        ValidationStatus validationStatus = businessObjectValidationRule.validate(businessObject);
+        
+        assertThat(validationStatus).isNotOk();
+    }
 }
