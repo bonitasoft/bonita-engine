@@ -84,6 +84,9 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
     }
 
     private <T extends Serializable> T copyResult(final T result) throws SCommandExecutionException {
+        if (result == null) {
+            return null;
+        }
         if (ClassUtils.isPrimitiveOrWrapper(result.getClass())) {
             return result;
         } else if (result instanceof Entity) {
