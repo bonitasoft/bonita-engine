@@ -36,7 +36,17 @@ public class RelationFieldAnnotator {
             if (rfield.getType() == Type.AGGREGATION) {
                 relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
                 JAnnotationUse joinTable = codeGenerator.addAnnotation(fieldVar, JoinTable.class);
-                joinTable.param("name", getJoinTableName(entityClass.name(), rfield.getReference().getSimpleName()));
+                joinTable.param("name", getJoinTableName(entityClass.name(), rfield.getName()));
+                
+                JAnnotationArrayMember joinColumns = joinTable.paramArray("joinColumns");
+                final JAnnotationUse nameQueryAnnotation = joinColumns.annotate(JoinColumn.class);
+                nameQueryAnnotation.param("name",  getJoinColumnName(entityClass.name()));
+                
+                JAnnotationArrayMember inverseJoinColumns = joinTable.paramArray("inverseJoinColumns");
+                final JAnnotationUse a = inverseJoinColumns.annotate(JoinColumn.class);
+                a.param("name",  getJoinColumnName(rfield.getReference().getSimpleName()));
+                
+                
             } else {
                 relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
                 JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
