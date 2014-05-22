@@ -230,21 +230,17 @@ public class EntityCodeGenerator {
                 joinTable.param("name", getJoinTableName(entityClass.name(), rfield.getReference().getSimpleName()));
             } else {
                 relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
-                JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
-                joinColumn.param("name", getJoinColumnName(entityClass.name()));
+                JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
                 joinColumn.param("nullable", false);
             }
             codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         } else {
             if (rfield.getType() == Type.AGGREGATION) {
                 relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
-                JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
-                joinColumn.param("name", getJoinColumnName(rfield.getReference().getSimpleName()));
             } else {
                 relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
-                JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
-                joinColumn.param("name", getJoinColumnName(rfield.getReference().getSimpleName()));
             }
+            addJoinColumn(fieldVar, rfield.getName());
             relation.param("optional", rfield.isNullable());
         }
         relation.param("fetch", FetchType.EAGER);
@@ -252,6 +248,12 @@ public class EntityCodeGenerator {
             final JAnnotationArrayMember cascade = relation.paramArray("cascade");
             cascade.param(CascadeType.ALL);
         }
+    }
+
+    private JAnnotationUse addJoinColumn(final JFieldVar fieldVar, String columnName) {
+        JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
+        joinColumn.param("name", getJoinColumnName(columnName));
+        return joinColumn;
     }
 
     /**
