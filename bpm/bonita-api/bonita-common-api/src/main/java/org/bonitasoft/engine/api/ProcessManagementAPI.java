@@ -53,12 +53,14 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * This API deals with definition objects such as {@link ProcessDefinition}, {@link ProcessDeploymentInfo}, {@link Category}, ...
@@ -983,11 +985,12 @@ public interface ProcessManagementAPI {
     Map<String, byte[]> getProcessResources(long processDefinitionId, String filenamesPattern) throws RetrieveException;
 
     /**
-     * Returns the identifier of the latest version of the process definition.
+     * Returns the identifier of the most recently deployed process definition with the given name. This method does not take into consideration the process version,
+     * but only its deployment date.
      * 
      * @param processName
      *            the process definition name.
-     * @return the identifier of the latest version of the process definition.
+     * @return the identifier of the most recently deployed process definition with the given name.
      * @throws ProcessDefinitionNotFoundException
      *             if the identifier does not refer to an existing process definition.
      * @since 6.0

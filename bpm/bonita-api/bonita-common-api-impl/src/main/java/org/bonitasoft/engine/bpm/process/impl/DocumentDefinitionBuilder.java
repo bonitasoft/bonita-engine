@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.document.impl.DocumentDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
@@ -40,11 +40,21 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
         container.addDocumentDefinition(documentDefinitionImpl);
     }
 
+    /**
+     * Sets description on this document
+     * @param description description
+     * @return
+     */
     public DocumentDefinitionBuilder addDescription(final String description) {
         documentDefinitionImpl.setDescription(description);
         return this;
     }
 
+    /**
+     * Adds URL on this document
+     * @param url URL
+     * @return
+     */
     public DocumentDefinitionBuilder addUrl(final String url) {
         if (documentDefinitionImpl.getFile() == null) {
             documentDefinitionImpl.setUrl(url);
@@ -54,6 +64,11 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
         return this;
     }
 
+    /**
+     * Adds content file name on this document
+     * @param contentFilename content file name
+     * @return
+     */
     public DocumentDefinitionBuilder addContentFileName(final String contentFilename) {
         if (documentDefinitionImpl.getFileName() == null) {
             documentDefinitionImpl.setFileName(contentFilename);
@@ -63,6 +78,11 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
         return this;
     }
 
+    /**
+     * Adds a file on this document
+     * @param file the complete file name
+     * @return
+     */
     public DocumentDefinitionBuilder addFile(final String file) {
         if (documentDefinitionImpl.getUrl() == null) {
             documentDefinitionImpl.setFile(file);

@@ -46,11 +46,11 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
         getProfileService().deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
         if (exportedProfile.isDefault() || existingProfile.isDefault()) {
-            // do not update if it is a default profile
-            return existingProfile;
+            // only update LastUpdatedBy and LastUpdateDate
+            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, false));
         } else {
             getProfileService().deleteAllProfileEntriesOfProfile(existingProfile);
-            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId));
+            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, true));
         }
     }
 
@@ -59,10 +59,12 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
         return !exportedProfile.isDefault();
     }
 
-    EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId) {
+    EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId, final boolean updateAllProfile) {
         final SProfileUpdateBuilder updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
-        updateBuilder.setDescription(exportedProfile.getDescription());
         updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(importerId);
+        if (updateAllProfile) {
+            updateBuilder.setDescription(exportedProfile.getDescription());
+        }
         return updateBuilder.done();
     }
 

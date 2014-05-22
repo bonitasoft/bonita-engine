@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.data.impl.XMLDataDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -49,11 +49,21 @@ public class XMLDataDefinitionBuilder extends DataDefinitionBuilder {
         return xml;
     }
 
+    /**
+     * Sets the XML name space.
+     * @param nameSpace XML name space
+     * @return
+     */
     public XMLDataDefinitionBuilder setNamespace(final String nameSpace) {
         ((XMLDataDefinitionImpl) getDataDefinition()).setNamespace(nameSpace);
         return this;
     }
 
+    /**
+     * Sets the XML element.
+     * @param element XML element
+     * @return
+     */
     public XMLDataDefinitionBuilder setElement(final String element) {
         ((XMLDataDefinitionImpl) getDataDefinition()).setElement(element);
         return this;

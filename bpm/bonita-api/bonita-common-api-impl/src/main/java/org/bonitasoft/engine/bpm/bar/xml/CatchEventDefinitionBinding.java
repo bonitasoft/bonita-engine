@@ -20,8 +20,8 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchSignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchEventDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

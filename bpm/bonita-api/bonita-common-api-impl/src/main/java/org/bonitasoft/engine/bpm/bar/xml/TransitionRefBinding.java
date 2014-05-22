@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.TransitionDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

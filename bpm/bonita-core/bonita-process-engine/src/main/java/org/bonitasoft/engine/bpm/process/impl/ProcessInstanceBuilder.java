@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 
 /**
  * @author Emmanuel Duchastenier

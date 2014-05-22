@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.SendTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte

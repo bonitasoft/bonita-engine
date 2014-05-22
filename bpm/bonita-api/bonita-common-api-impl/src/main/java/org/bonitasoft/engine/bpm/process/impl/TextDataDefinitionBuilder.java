@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.data.impl.TextDataDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -50,6 +50,10 @@ public class TextDataDefinitionBuilder extends DataDefinitionBuilder {
         return text;
     }
 
+    /**
+     * Sets this data as long text (more than 255 characters).
+     * @return
+     */
     public TextDataDefinitionBuilder isLongText() {
         ((TextDataDefinitionImpl) getDataDefinition()).setLongText(true);
         return this;

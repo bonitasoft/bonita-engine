@@ -17,7 +17,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -50,6 +50,12 @@ public class ConnectorDefinitionBuilder extends FlowElementContainerBuilder {
         activity.addConnector(connectorDefinition);
     }
 
+    /**
+     * Adds a connector input
+     * @param name input name
+     * @param value expression representing the input value
+     * @return
+     */
     public ConnectorDefinitionBuilder addInput(final String name, final Expression value) {
         if (value == null) {
             processDefinitionBuilder.addError("The input " + name + " of connector " + connectorDefinition.getName() + " is null");
@@ -59,6 +65,11 @@ public class ConnectorDefinitionBuilder extends FlowElementContainerBuilder {
         return this;
     }
 
+    /**
+     * Adds a connector output operation
+     * @param operation operation to be executed at connector completion
+     * @return
+     */
     public ConnectorDefinitionBuilder addOutput(final Operation operation) {
         connectorDefinition.addOutput(operation);
         if (operation.getRightOperand() == null) {
@@ -67,21 +78,68 @@ public class ConnectorDefinitionBuilder extends FlowElementContainerBuilder {
         return this;
     }
 
+    /**
+     * Adds a connector output operation
+     * @param leftOperand
+     *            operation left operand
+     * @param type
+     *            operator type
+     * @param operator
+     *            operator
+     * @param rightOperand
+     *            expression representing the right operand
+     * @return
+     */
+    public ConnectorDefinitionBuilder addOutput(final LeftOperand leftOperand, final OperatorType type, final String operator,
+            final Expression rightOperand) {
+        connectorDefinition.addOutput(new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
+                .setLeftOperand(leftOperand).done());
+        checkRightOperand(rightOperand);
+        return this;
+    }
+
+    private void checkRightOperand(final Expression rightOperand) {
+        if (rightOperand == null) {
+            getProcessBuilder().addError("operation on connector " + connectorDefinition.getName() + " has no expression in left operand");
+        }
+    }
+
+    /**
+     * Adds a connector output operation
+     * @param leftOperand
+     *            operation left operand
+     * @param type
+     *            operator type
+     * @param operator
+     *            operator
+     * @param operatorInputType
+     *            the input operator type. For instance, the parameter type in the case of a Java setter
+     * @param rightOperand
+     *            expression representing the right operand
+     * @return
+     */
     public ConnectorDefinitionBuilder addOutput(final LeftOperand leftOperand, final OperatorType type, final String operator, final String operatorInputType,
             final Expression rightOperand) {
         connectorDefinition.addOutput(new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
                 .setOperatorInputType(operatorInputType).setLeftOperand(leftOperand).done());
-        if (rightOperand == null) {
-            getProcessBuilder().addError("operation on connector " + connectorDefinition.getName() + " has no expression in left operand");
-        }
+        checkRightOperand(rightOperand);
         return this;
     }
 
+    /**
+     * Makes connector to ignore errors during its execution
+     * @return
+     */
     public ConnectorDefinitionBuilder ignoreError() {
         connectorDefinition.setFailAction(FailAction.IGNORE);
         return this;
     }
 
+    /**
+     * Makes connector to throw an BPMN Error Event when it fails
+     * @param errorCode error code to be thrown
+     * @return
+     */
     public ConnectorDefinitionBuilder throwErrorEventWhenFailed(final String errorCode) {
         connectorDefinition.setFailAction(FailAction.ERROR_EVENT);
         connectorDefinition.setErrorCode(errorCode);
