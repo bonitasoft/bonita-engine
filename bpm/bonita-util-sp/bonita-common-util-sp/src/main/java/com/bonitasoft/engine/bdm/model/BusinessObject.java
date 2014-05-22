@@ -172,7 +172,16 @@ public class BusinessObject {
     private boolean isACompositionField(Field field) {
         return field instanceof RelationField && Type.COMPOSITION == ((RelationField) field).getType();
     }
-
+    
+    public String getSimpleName() {
+        String simpleName = qualifiedName;
+        if (simpleName != null && simpleName.indexOf(".") != -1) {
+            final String[] split = simpleName.split("\\.");
+            simpleName = split[split.length - 1];
+        }
+        return simpleName;
+    }
+    
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(description).append(fields).append(indexes).append(qualifiedName).append(queries).append(uniqueConstraints)

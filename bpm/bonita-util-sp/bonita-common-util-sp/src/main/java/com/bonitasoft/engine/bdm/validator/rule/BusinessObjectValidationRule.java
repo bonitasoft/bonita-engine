@@ -44,7 +44,7 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
             status.addError("A Business Object must have a qualified name");
             return status;
         }
-        String simpleName = getSimpleName(qualifiedName);
+        String simpleName = bo.getSimpleName();
         if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
             status.addError(qualifiedName + " is not a valid Java qualified name");
             return status;
@@ -89,15 +89,6 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
                 }
             }
         }
-    }
-
-    private String getSimpleName(final String qualifiedName) {
-        String simpleName = qualifiedName;
-        if (simpleName.indexOf(".") != -1) {
-            final String[] split = simpleName.split("\\.");
-            simpleName = split[split.length - 1];
-        }
-        return simpleName;
     }
 
     private Field getField(final BusinessObject bo, final String name) {
