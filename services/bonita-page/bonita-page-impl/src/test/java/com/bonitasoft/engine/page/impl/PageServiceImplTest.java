@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -24,11 +25,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -291,6 +294,60 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(0)).addPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(1)).updatePage(eq(12l), any(EntityUpdateDescriptor.class));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(12l), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void getPageContent_should_add_properties_in_the_zip() throws SBonitaException, IOException {
+        // given: a zip without properties
+        final SPageImpl page = new SPageImpl("mypage", "mypage description", "mypage display name", System.currentTimeMillis(), -1, false,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        page.setId(12);
+        final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
+        doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
+                new SelectByIdDescriptor<SPageContent>("getPageContent",
+                        SPageContent.class, 12));
+        doReturn(page).when(pageServiceImpl).getPage(12);
+        // when
+        byte[] result = pageServiceImpl.getPageContent(12);
+        // then
+        Map<String, byte[]> unzip = IOUtil.unzip(result);
+        assertThat(unzip.size()).isEqualTo(2);
+        Properties pageProperties = new Properties();
+        pageProperties.load(new ByteArrayInputStream(unzip.get("page.properties")));
+
+        assertThat(pageProperties.get("name")).isEqualTo("mypage");
+        assertThat(pageProperties.get("displayName")).isEqualTo("mypage display name");
+        assertThat(pageProperties.get("description")).isEqualTo("mypage description");
+    }
+
+    @Test
+    public void getPageContent_should_update_properties_in_the_zip_if_exists() throws SBonitaException, IOException {
+        // given: a zip with outdated properties
+        final SPageImpl page = new SPageImpl("mypageUpdated", "mypageUpdated description", "mypageUpdated display name", System.currentTimeMillis(), -1, false,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        page.setId(12);
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
+                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
+                new SelectByIdDescriptor<SPageContent>("getPageContent",
+                        SPageContent.class, 12));
+        doReturn(page).when(pageServiceImpl).getPage(12);
+        // when
+        byte[] result = pageServiceImpl.getPageContent(12);
+        // then
+        Map<String, byte[]> unzip = IOUtil.unzip(result);
+        assertThat(unzip.size()).isEqualTo(2);
+        Properties pageProperties = new Properties();
+        pageProperties.load(new ByteArrayInputStream(unzip.get("page.properties")));
+
+        assertThat(pageProperties.get("name")).isEqualTo("mypageUpdated");
+        assertThat(pageProperties.get("displayName")).isEqualTo("mypageUpdated display name");
+        assertThat(pageProperties.get("description")).isEqualTo("mypageUpdated description");
     }
 
     @Test

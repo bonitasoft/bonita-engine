@@ -326,12 +326,26 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         check();
+        SPage page = getPage(pageId);
         final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
                 SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
-        return pageContent.getContent();
+        byte[] content = pageContent.getContent();
+        try {
+            Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
+            Properties pageProperties = new Properties();
+            pageProperties.put(PROPERTIES_NAME, page.getName());
+            pageProperties.put(PROPERTIES_DISPLAY_NAME, page.getDisplayName());
+            pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
+            contentAsMap.put("page.properties", IOUtil.getPropertyAsString(pageProperties).getBytes());
+
+            return IOUtil.zip(contentAsMap);
+        } catch (IOException e) {
+            throw new SBonitaReadException("the page is not a valid zip file", e);
+        }
+
     }
 
     @Override
@@ -466,7 +480,7 @@ public class PageServiceImpl implements PageService {
             pageProperties.load(new ByteArrayInputStream(zipEntryContent));
 
             // provided pages name?
-            final SPage pageByName = getPageByName(pageProperties.getProperty("name"));
+            final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
             if (pageByName == null) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
                 addPage(getProvidedPage(pageProperties, zipName), providedPageContent);
@@ -516,7 +530,8 @@ public class PageServiceImpl implements PageService {
      */
     private SPage getProvidedPage(final Properties pageProperties, final String zipName) {
         final long now = System.currentTimeMillis();
-        return new SPageImpl(pageProperties.getProperty("name"), pageProperties.getProperty("description"), pageProperties.getProperty("displayName"), now, -1,
+        return new SPageImpl(pageProperties.getProperty(PROPERTIES_NAME), pageProperties.getProperty(PROPERTIES_DESCRIPTION),
+                pageProperties.getProperty(PROPERTIES_DISPLAY_NAME), now, -1,
                 true, now, -1, zipName);
     }
 

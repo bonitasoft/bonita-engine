@@ -26,6 +26,12 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface PageService extends TenantLifecycleService {
 
+    static String PROPERTIES_DISPLAY_NAME = "displayName";
+
+    static String PROPERTIES_DESCRIPTION = "description";
+
+    static String PROPERTIES_NAME = "name";
+
     String PAGE = "PAGE";
 
     SPage addPage(SPage page, byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException;
