@@ -25,7 +25,7 @@ import com.bonitasoft.engine.operation.OperationTest;
 import com.bonitasoft.engine.page.PageAPIIT;
 import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.process.ProcessTests;
-import com.bonitasoft.engine.profile.ProfileTests;
+import com.bonitasoft.engine.profile.ProfileAllSPITest;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
 import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
@@ -42,7 +42,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
         MultiInstanceTest.class,
         ProcessTests.class,
         SupervisedTests.class,
-        ProfileTests.class,
+        ProfileAllSPITest.class,
         RemoteConnectorExecutionTestSP.class,
         MonitoringAPITest.class,
         SearchEntitiesTests.class,

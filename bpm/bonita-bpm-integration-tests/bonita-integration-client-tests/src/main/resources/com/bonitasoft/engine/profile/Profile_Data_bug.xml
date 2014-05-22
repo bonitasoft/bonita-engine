@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?><profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+  <profile isDefault="false" name="Administrator">
+    <description>The administrator can install an app, manage the organization, and handle some errors (for example, by replaying a task).</description>
+    <profileEntries>
+      <parentProfileEntry isCustom="false" name="Apps management">
+        <parentName>NULL</parentName>
+        <index>0</index>
+        <description>BPM</description>
+        <type>folder</type>
+        <childrenEntries>
+          <profileEntry isCustom="false" name="Tasks">
+            <parentName>Apps management</parentName>
+            <index>0</index>
+            <description>All tasks</description>
+            <type>link</type>
+            <page>tasklistingadmin</page>
+          </profileEntry>
+		  <profileEntry isCustom="false" name="Tasks">
+            <parentName>Apps management</parentName>
+            <index>6</index>
+            <description>All tasks</description>
+            <type>link</type>
+            <page>tasklistingadmin</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Cases">
+            <parentName>Apps management</parentName>
+            <index>2</index>
+            <description>All cases</description>
+            <type>link</type>
+            <page>caselistingadmin</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Apps">
+            <parentName>Apps management</parentName>
+            <index>4</index>
+            <description>All processes</description>
+            <type>link</type>
+            <page>processlistingadmin</page>
+          </profileEntry>
+        </childrenEntries>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Organization">
+        <parentName>NULL</parentName>
+        <index>2</index>
+        <description>Organization</description>
+        <type>folder</type>
+        <childrenEntries>
+          <profileEntry isCustom="false" name="Users">
+            <parentName>Organization</parentName>
+            <index>0</index>
+            <description>All users</description>
+            <type>link</type>
+            <page>userlistingadmin</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Groups">
+            <parentName>Organization</parentName>
+            <index>2</index>
+            <description>All groups</description>
+            <type>link</type>
+            <page>grouplistingadmin</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Roles">
+            <parentName>Organization</parentName>
+            <index>4</index>
+            <description>All roles</description>
+            <type>link</type>
+            <page>rolelistingadmin</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Import / Export">
+            <parentName>Organization</parentName>
+            <index>6</index>
+            <description>Import / Export an final organization</description>
+            <type>link</type>
+            <page>importexportorganization</page>
+          </profileEntry>
+        </childrenEntries>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Analytics">
+        <parentName>NULL</parentName>
+        <index>4</index>
+        <description>Monitoring</description>
+        <type>link</type>
+        <page>reportlistingadminext</page>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Configuration">
+        <parentName>NULL</parentName>
+        <index>6</index>
+        <description>Portal</description>
+        <type>folder</type>
+        <childrenEntries>
+          <profileEntry isCustom="false" name="Profiles">
+            <parentName>Configuration</parentName>
+            <index>0</index>
+            <description>All profiles</description>
+            <type>link</type>
+            <page>profilelisting</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Look &amp; Feel">
+            <parentName>Configuration</parentName>
+            <index>2</index>
+            <description>LooknFeel</description>
+            <type>link</type>
+            <page>thememoredetailsadminext</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="Custom Pages">
+            <parentName>Configuration</parentName>
+            <index>4</index>
+            <description>All custom pages</description>
+            <type>link</type>
+            <page>pagelisting</page>
+          </profileEntry>
+        </childrenEntries>
+      </parentProfileEntry>
+    </profileEntries>
+    <profileMapping>
+      <users>
+        <user>charles.admin</user>
+      </users>
+    </profileMapping>
+  </profile>
+  <profile isDefault="false" name="ImportExportProfile">
+    <description>ImportExportProfileDescription</description>
+    <profileEntries>
+      <parentProfileEntry isCustom="false" name="menu1">
+        <parentName>NULL</parentName>
+        <index>0</index>
+        <description/>
+        <type>link</type>
+        <page>reportlistingadminext</page>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="menu2">
+        <parentName>NULL</parentName>
+        <index>2</index>
+        <description/>
+        <type>folder</type>
+        <childrenEntries>
+          <profileEntry isCustom="false" name="">
+            <parentName>menu2</parentName>
+            <index>0</index>
+            <type>link</type>
+            <page>tasklistinguser</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="">
+            <parentName>menu2</parentName>
+            <index>2</index>
+            <type>link</type>
+            <page>caselistinguser</page>
+          </profileEntry>
+          <profileEntry isCustom="false" name="">
+            <parentName>menu2</parentName>
+            <index>4</index>
+            <type>link</type>
+            <page>processlistinguser</page>
+          </profileEntry>
+        </childrenEntries>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="true" name="menu3">
+        <parentName>NULL</parentName>
+        <index>4</index>
+        <type>link</type>
+        <page>custompage_MyCustomPage</page>
+      </parentProfileEntry>
+    </profileEntries>
+    <profileMapping>
+      <roles>
+        <role>member</role>
+      </roles>
+      <groups>
+        <group>/qa_group</group>
+      </groups>
+    </profileMapping>
+  </profile>
+  <profile isDefault="true" name="Process manager">
+    <description>The Process manager can supervise designated apps, and manage cases and tasks of those apps.</description>
+    <profileEntries>
+      <parentProfileEntry isCustom="false" name="Tasks">
+        <parentName>NULL</parentName>
+        <index>0</index>
+        <description>My tasks</description>
+        <type>link</type>
+        <page>tasklistingpm</page>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Cases">
+        <parentName>NULL</parentName>
+        <index>2</index>
+        <description>My cases</description>
+        <type>link</type>
+        <page>caselistingpm</page>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Apps">
+        <parentName>NULL</parentName>
+        <index>4</index>
+        <description>My processes</description>
+        <type>link</type>
+        <page>processlistingpm</page>
+      </parentProfileEntry>
+    </profileEntries>
+    <profileMapping>
+      <memberships>
+        <membership>
+          <role>member</role>
+          <group>/qa_group</group>
+        </membership>
+      </memberships>
+    </profileMapping>
+  </profile>
+  <profile isDefault="true" name="User">
+    <description>The user can view and perform tasks and can start a new case of an app.</description>
+    <profileEntries>
+      <parentProfileEntry isCustom="false" name="Tasks">
+        <parentName>NULL</parentName>
+        <index>0</index>
+        <description>Manage tasks</description>
+        <type>link</type>
+        <page>tasklistinguser</page>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Cases">
+        <parentName>NULL</parentName>
+        <index>2</index>
+        <description>Manage cases</description>
+        <type>link</type>
+        <page>caselistinguser</page>
+      </parentProfileEntry>
+      <parentProfileEntry isCustom="false" name="Apps">
+        <parentName>NULL</parentName>
+        <index>4</index>
+        <description>Manage apps</description>
+        <type>link</type>
+        <page>processlistinguser</page>
+      </parentProfileEntry>
+    </profileEntries>
+    <profileMapping>
+      <roles>
+        <role>member</role>
+      </roles>
+    </profileMapping>
+  </profile>
+</profiles:profiles>
