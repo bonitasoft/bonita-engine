@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
+import static org.apache.commons.lang3.StringUtils.left;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -205,25 +209,30 @@ public class EntityCodeGenerator {
         } else {
             fieldVar = codeGenerator.addField(entityClass, field.getName(), codeGenerator.toJavaClass(field));
         }
-        annotateField(field, fieldVar);
+        annotateField(entityClass, field, fieldVar);
         return fieldVar;
     }
 
-    private void annotateField(final Field field, final JFieldVar fieldVar) {
+    private void annotateField(JDefinedClass entityClass, final Field field, final JFieldVar fieldVar) {
         if (field instanceof SimpleField) {
             annotateSimpleField((SimpleField) field, fieldVar);
         } else if (field instanceof RelationField) {
-            annotateRelationField((RelationField) field, fieldVar);
+            annotateRelationField(entityClass, (RelationField) field, fieldVar);
         }
     }
 
-    private void annotateRelationField(final RelationField rfield, final JFieldVar fieldVar) {
+    private void annotateRelationField(JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
         JAnnotationUse relation = null;
         if (rfield.isCollection()) {
             if (rfield.getType() == Type.AGGREGATION) {
                 relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
+                JAnnotationUse joinTable = codeGenerator.addAnnotation(fieldVar, JoinTable.class);
+                joinTable.param("name", getJoinTableName(entityClass.name(), rfield.getReference().getSimpleName()));
             } else {
                 relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
+                JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
+                joinColumn.param("name", entityClass.name().toUpperCase() + "_PID");
+                joinColumn.param("nullable", false);
             }
             codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         } else {
@@ -239,6 +248,16 @@ public class EntityCodeGenerator {
             final JAnnotationArrayMember cascade = relation.paramArray("cascade");
             cascade.param(CascadeType.ALL);
         }
+    }
+
+    /**
+     * Split names to 14 chars max to avoid joinTable names longer than 30 char (oracle restriction).
+     * protected for testing
+     */
+    protected String getJoinTableName(String entityName, String relatedEntityName) {
+        String name = left(entityName.toUpperCase(), 14);
+        String refName = left(relatedEntityName.toUpperCase(), 14);
+        return name + "_" + refName;
     }
 
     private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar) {
