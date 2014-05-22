@@ -277,4 +277,11 @@ public class EntityCodeGeneratorTest {
         
         assertThat(joinTableName).isEqualTo("SOMELONGNAMELO_ANOTHERLONGNAM");
     }
+
+    @Test
+    public void getJoinColumnName_should_truncate_names_longer_thab_26_chars() throws Exception {
+        String joinColumnName = entityCodeGenerator.getJoinColumnName("someLongNameLongerThantwentySix");
+        
+        assertThat(joinColumnName).isEqualTo("SOMELONGNAMELONGERTHANTWEN_PID");
+    }
 }

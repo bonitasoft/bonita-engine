@@ -2,6 +2,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -30,6 +31,7 @@ public class Employee
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "ADDRESS_PID")
     private Address address;
 
     public Employee() {

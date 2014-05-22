@@ -3,6 +3,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -33,6 +34,7 @@ public class Employee
     @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = {
         CascadeType.ALL
     })
+    @JoinColumn(name = "ADDRESS_PID")
     private Address address;
 
     public Employee() {

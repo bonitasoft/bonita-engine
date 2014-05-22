@@ -231,15 +231,19 @@ public class EntityCodeGenerator {
             } else {
                 relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
                 JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
-                joinColumn.param("name", entityClass.name().toUpperCase() + "_PID");
+                joinColumn.param("name", getJoinColumnName(entityClass.name()));
                 joinColumn.param("nullable", false);
             }
             codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         } else {
             if (rfield.getType() == Type.AGGREGATION) {
                 relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
+                JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
+                joinColumn.param("name", getJoinColumnName(rfield.getReference().getSimpleName()));
             } else {
                 relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
+                JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
+                joinColumn.param("name", getJoinColumnName(rfield.getReference().getSimpleName()));
             }
             relation.param("optional", rfield.isNullable());
         }
@@ -250,6 +254,14 @@ public class EntityCodeGenerator {
         }
     }
 
+    /**
+     * Split names to 26 char to avoid joinColumn names longer than 30 char 
+     * protected for testing
+     */
+    protected String getJoinColumnName(String entityName) {
+        return left(entityName.toUpperCase(), 26) + "_PID";
+    }
+    
     /**
      * Split names to 14 chars max to avoid joinTable names longer than 30 char (oracle restriction).
      * protected for testing
