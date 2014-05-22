@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.BusinessDataDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
@@ -23,15 +23,34 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
         super.createNewInstance(name, version);
         return this;
     }
-
+    
+    /**
+     * Adds a parameter on this process.
+     * @param parameterName parameter name.
+     * @param type parameter type (complete class name)
+     * @return
+     */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);
     }
 
+    /**
+     * Sets the process string index at the given position.
+     * @param index position to be set. Valid values are between 1 and 5 (inclusive)
+     * @param label label to be displayed for this position
+     * @param initialValue expression representing the initial index value
+     */
     public void setStringIndex(final int index, final String label, final Expression initialValue) {
         process.setStringIndex(index, label, initialValue);
     }
 
+    /**
+     * Adds a Business Data on this process.
+     * @param name Business Data name
+     * @param className complete name of class defining the Business Data Type
+     * @param defaultValue expression representing the default value
+     * @return
+     */
     public BusinessDataDefinitionBuilder addBusinessData(final String name, final String className, final Expression defaultValue) {
         return new BusinessDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
     }

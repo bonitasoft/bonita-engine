@@ -13,14 +13,14 @@
             <index>0</index>
             <description>Groovy class example of custom page source structure (in English).</description>
             <type>link</type>
-            <page>custompage_groovyexample</page>
+            <page>custompage_page1</page>
           </profileEntry>
           <profileEntry isCustom="true" name="HTML example page">
             <parentName>custom pages</parentName>
             <index>2</index>
             <description>HTML and Javascript example of custom page source structure (in English).</description>
             <type>link</type>
-            <page>custompage_htmlexample</page>
+            <page>custompage_page2</page>
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>

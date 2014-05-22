@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine;
+package com.bonitasoft.engine.connector;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,11 +14,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -36,7 +33,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.connector.ConnectorExecutionTest;
 import com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -65,7 +61,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
                 .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(5000));
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorLongToExecute(designProcessDefinition, ACTOR_NAME, user);
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -95,14 +91,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addShortTextData("value", null);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        final List<BarResource> resources = new ArrayList<BarResource>();
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/connector-with-custom-type.bak", "connector-with-custom-type.jar");
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchiveBuilder.addConnectorImplementation(resources.get(0));
-        businessArchiveBuilder.addClasspathResource(resources.get(1));
-        businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithCustomType(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = this.waitForUserTask("step1", process);
         final Map<String, Expression> params = Collections.emptyMap();

@@ -299,7 +299,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
                 "testIconPath", "myTenantAdmin", "theirPassword"));
         platformAPI.activateTenant(tenantId);
         logoutPlatform(session);
-        loginWith("myTenantAdmin", "theirPassword", tenantId);
+        loginOnTenantWith("myTenantAdmin", "theirPassword", tenantId);
         try {
             final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).done();
             final SearchResult<Report> searchReports = getReportingAPI().searchReports(searchOptions);

@@ -17,6 +17,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -25,9 +27,12 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
@@ -48,6 +53,8 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.page.Page;
+import com.bonitasoft.engine.page.PageCreator;
+import com.bonitasoft.engine.page.PageNotFoundException;
 
 public class ProfileImportAndExportSPITest extends AbstractProfileTest {
 
@@ -153,13 +160,8 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
                 .getResourceAsStream("CustomPageProfile.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
-
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
-        assertThat(searchPages.getResult()).as("custom pages").hasSize(2);
-        final Page groovyExamplePage = getPageAPI().getPageByName("custompage_groovyexample");
-        final Page htmlExamplePage = getPageAPI().getPageByName("custompage_htmlexample");
-        assertThat(groovyExamplePage).as("custompage_groovyexample should exists").isNotNull();
-        assertThat(htmlExamplePage).as("custompage_htmlexample should exists").isNotNull();
+        checkOrCreateCustomPage("custompage_page1");
+        checkOrCreateCustomPage("custompage_page2");
 
         // when import
         final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(customProfileByteArray, ImportPolicy.REPLACE_DUPLICATES);
@@ -204,6 +206,17 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExpected);
     }
 
+    private void checkOrCreateCustomPage(final String pageName) throws AlreadyExistsException, CreationException, BonitaException, IOException {
+        Page customPage = null;
+        try {
+            customPage = getPageAPI().getPageByName(pageName);
+        } catch (final PageNotFoundException p) {
+            customPage = getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDescription("description").setDisplayName("display name"),
+                    IOUtil.zip(Collections.singletonMap("index.html", "return \"\";".getBytes())));
+        }
+        assertThat(customPage).as("custompage %s should exists", pageName).isNotNull();
+    }
+
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export specified profiles.", jira = "")
     @Test
     public void exportProfilesSpecified() throws Exception {
@@ -211,13 +224,8 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
                 .getResourceAsStream("AdministratorProfile.xml"))));
 
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
-        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
-        assertEquals(1, profiles.size());
-        final Profile profile1 = profiles.get(0);
         final long[] profilesIds = new long[1];
-        profilesIds[0] = profile1.getId();
+        profilesIds[0] = adminProfileId;// profile1.getId();
 
         // when
         final String xmlPrettyFormatExported = XmlStringPrettyFormatter
@@ -231,6 +239,32 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
             assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExported);
         }
 
+    }
+
+    @Test
+    public void importDefaultProfileShouldUpdateLastModifyFields() throws Exception {
+        final byte[] byteArray = IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("AdministratorProfile_new_description.xml"));
+
+        // given
+        final Date now = new Date(System.currentTimeMillis());
+        final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
+
+        // when
+        logout();
+        loginWith("userName1", "User1Pwd");
+        getProfileAPI().importProfiles(byteArray, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        final Profile profileAfter = getProfileAPI().getProfile(adminProfileId);
+        assertThat(profileAfter.getLastUpdateDate()).as("should have update LastUpdateDate").isAfter(now);
+        assertThat(profileAfter.getLastUpdateDate()).as("should have update LastUpdateDate").isAfter(profileBefore.getLastUpdateDate());
+
+        assertThat(profileAfter.getDescription()).as("should not change description").isNotEqualTo("new description");
+        assertThat(profileAfter.getDescription()).as("should not change description").isEqualTo("Administrator profile");
+
+        assertThat(profileAfter.getLastUpdatedBy()).as("should change LastUpdatedBy").isNotEqualTo(profileBefore.getLastUpdatedBy());
+        assertThat(profileAfter.getLastUpdatedBy()).as("should change LastUpdatedBy").isEqualTo(user1.getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
