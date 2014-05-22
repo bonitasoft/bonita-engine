@@ -79,7 +79,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             throws SOperationExecutionException {
         SDataInstance dataInstance;
         try {
-            dataInstance = transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
+            dataInstance = retrieve(sLeftOperand, containerId, containerType);
             EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField("value", newValue);
             logger.log(
@@ -96,21 +96,31 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             transientDataService.updateDataInstance(dataInstance, descriptor);
         } catch (SDataInstanceException e) {
             throw new SOperationExecutionException("Unable to update the transient data", e);
+        } catch (SBonitaReadException e) {
+            throw new SOperationExecutionException("Unable to update the transient data", e);
         }
     }
 
     @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+        Long containerId = expressionContext.getContainerId();
+        String containerType = expressionContext.getContainerType();
+        return retrieve(sLeftOperand, containerId, containerType);
+    }
+
+    private SDataInstance retrieve(final SLeftOperand sLeftOperand, final Long containerId, final String containerType)
+            throws SBonitaReadException {
         try {
             // if not found reevaluate
-            return transientDataService.getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType());
+            return transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
         } catch (SDataInstanceNotFoundException e) {
             try {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING, "The value of the transient data " + sLeftOperand.getName() + "  " + expressionContext);
-                reevaluateTransientData(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType(),
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "The value of the transient data " + sLeftOperand.getName() + "  " + containerId + " "
+                        + containerType);
+                reevaluateTransientData(sLeftOperand.getName(), containerId, containerType,
                         flownodeInstanceService, processDefinitionService,
                         bpmInstancesCreator);
-                return transientDataService.getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType());
+                return transientDataService.getDataInstance(sLeftOperand.getName(), containerId, containerType);
             } catch (SDataInstanceException e1) {
                 throw new SBonitaReadException("Unable to read the transient data", e);
             }

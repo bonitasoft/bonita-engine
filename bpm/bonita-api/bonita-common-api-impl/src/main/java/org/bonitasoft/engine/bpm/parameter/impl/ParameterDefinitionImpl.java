@@ -4,7 +4,7 @@
  */
 package org.bonitasoft.engine.bpm.parameter.impl;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 
 /**

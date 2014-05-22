@@ -53,7 +53,7 @@ public class JavaMethodInvoker {
     private Method getMethod(final Class<?> dataType, final String operator, final String className) throws NoSuchMethodException, ClassNotFoundException {
         if (className != null) {
             try {
-                return dataType.getDeclaredMethod(operator, getClass(className));
+                return dataType.getDeclaredMethod(operator, getClassOrPrimitiveClass(className));
             } catch (final NoSuchMethodException e) {
                 if (autoboxableTypes.containsKey(className)) {
                     return dataType.getDeclaredMethod(operator, autoboxableTypes.get(className));
@@ -69,13 +69,6 @@ public class JavaMethodInvoker {
             return primitiveTypes.get(type);
         }
         return Thread.currentThread().getContextClassLoader().loadClass(type);
-    }
-
-    protected Class<?> getClass(final String type) throws ClassNotFoundException {
-        if (primitiveTypes.containsKey(type)) {
-            return primitiveTypes.get(type);
-        }
-        return Class.forName(type);
     }
 
     public Object invokeJavaMethod(final String typeOfValueToSet, final Object valueToSetObjectWith, final Object objectToInvokeJavaMethodOn,

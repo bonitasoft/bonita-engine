@@ -28,9 +28,9 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.TransitionDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 
 /**

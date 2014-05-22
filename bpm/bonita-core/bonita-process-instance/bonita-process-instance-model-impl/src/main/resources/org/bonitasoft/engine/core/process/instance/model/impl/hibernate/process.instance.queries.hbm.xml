@@ -1238,14 +1238,16 @@
 
 	<query name="getNumberOfChildInstancesOfProcessInstance">
 		SELECT COUNT(p)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-		WHERE p.containerId = :containerId
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
+		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
 	
 	<query name="getChildInstanceIdsOfProcessInstance">
 		SELECT p.id
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-		WHERE p.containerId = :containerId
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
+		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
 	
 	<query name="getNumberOfSProcessInstanceSupervisedBy">

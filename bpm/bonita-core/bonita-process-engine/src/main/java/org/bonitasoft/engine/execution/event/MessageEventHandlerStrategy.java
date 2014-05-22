@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,7 +20,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -87,17 +86,14 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final ProcessDefinitionService processDefinitionService;
 
-    private final TransientDataService transientDataService;
-
     public MessageEventHandlerStrategy(final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService, final TransientDataService transientDataService) {
+            final ProcessDefinitionService processDefinitionService) {
         super(eventInstanceService);
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.dataInstanceService = dataInstanceService;
         this.processDefinitionService = processDefinitionService;
-        this.transientDataService = transientDataService;
     }
 
     @Override

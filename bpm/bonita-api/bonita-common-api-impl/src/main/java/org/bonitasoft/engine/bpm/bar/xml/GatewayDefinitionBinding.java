@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
-import org.bonitasoft.engine.bpm.flownode.impl.GatewayDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.GatewayDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

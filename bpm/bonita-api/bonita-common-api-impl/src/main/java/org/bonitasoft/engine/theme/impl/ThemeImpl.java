@@ -16,7 +16,7 @@ package org.bonitasoft.engine.theme.impl;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.BaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.theme.Theme;
 import org.bonitasoft.engine.theme.ThemeType;
 

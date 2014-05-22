@@ -36,4 +36,19 @@ public class ProcessInstanceRepository extends TestRepository {
         namedQuery.setParameter("humanTaskInstanceId", activityInstanceId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
+
+    public long countChildrenInstanceIdsOfProcessInstance(long processInstanceId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getNumberOfChildInstancesOfProcessInstance");
+        namedQuery.setParameter("processInstanceId", processInstanceId);
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getChildInstanceIdsOfProcessInstance");
+        namedQuery.setParameter("processInstanceId", processInstanceId);
+        return namedQuery.list();
+    }
 }

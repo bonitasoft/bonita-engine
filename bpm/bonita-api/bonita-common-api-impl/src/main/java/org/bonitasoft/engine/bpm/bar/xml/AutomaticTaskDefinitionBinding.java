@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import org.bonitasoft.engine.bpm.flownode.impl.AutomaticTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.AutomaticTaskDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

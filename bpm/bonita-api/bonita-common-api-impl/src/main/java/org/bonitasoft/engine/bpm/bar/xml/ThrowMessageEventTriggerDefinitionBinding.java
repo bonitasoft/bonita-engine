@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.data.DataDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.ThrowMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

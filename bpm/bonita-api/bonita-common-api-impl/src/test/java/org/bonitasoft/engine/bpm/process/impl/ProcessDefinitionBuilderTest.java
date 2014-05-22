@@ -2,6 +2,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.junit.Test;

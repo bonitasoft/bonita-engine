@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
     <artifactId>bonita-process-engine</artifactId>
@@ -325,6 +325,12 @@
 			<groupId>org.bonitasoft.engine.data.definition</groupId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>com.google.guava</groupId>
+        	<artifactId>guava</artifactId>
+        	<version>16.0.1</version>
+        	<scope>test</scope>
         </dependency>
     </dependencies>
 

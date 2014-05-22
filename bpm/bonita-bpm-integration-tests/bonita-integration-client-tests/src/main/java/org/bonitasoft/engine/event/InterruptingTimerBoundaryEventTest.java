@@ -12,7 +12,7 @@ import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;

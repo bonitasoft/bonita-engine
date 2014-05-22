@@ -23,7 +23,7 @@ import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.impl.DesignProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

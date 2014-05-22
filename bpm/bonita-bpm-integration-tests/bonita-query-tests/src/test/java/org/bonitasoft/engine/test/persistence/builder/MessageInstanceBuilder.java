@@ -19,10 +19,15 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMe
  * @author Emmanuel Duchastenier
  * @author Laurent Leseigneur
  */
-public class MessageInstanceBuilder extends PersistentObjectBuilder<SMessageInstanceImpl> {
+public class MessageInstanceBuilder extends PersistentObjectBuilder<SMessageInstanceImpl, MessageInstanceBuilder> {
 
     public static MessageInstanceBuilder aMessageInstance() {
         return new MessageInstanceBuilder();
+    }
+
+    @Override
+    MessageInstanceBuilder getThisBuilder() {
+        return this;
     }
 
     private boolean handled;

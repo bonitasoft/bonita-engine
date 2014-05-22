@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -58,16 +59,20 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
@@ -471,7 +476,7 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Execute an activity that is in an unstable state.
+     * Executes a flow node that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
      * 
      * @param flownodeInstanceId
@@ -483,7 +488,7 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
-     * Start an flow node that is is a non stable state on behalf of a given user
+     * Executes a flow node that is in a stable state on behalf of a given user
      * Will make the flow node go in the next stable state and then continue the execution of the process
      * If userId equals 0, the logged-in user is declared as the executer of the flow node.
      * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
@@ -1675,6 +1680,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the children instances (sub process or call activity) of a process instance. The returned list is paginated.
+     * It does not return the process instance of the given id (itself).
      * 
      * @param processInstanceId
      *            The identifier of the process definition.
