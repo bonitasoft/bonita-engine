@@ -143,4 +143,25 @@ public interface PageAPI {
      */
     void deletePages(final List<Long> pageIds) throws DeletionException;
 
+    /**
+     * 
+     * create a page using the given content
+     * 
+     * the content must contain a page.properties file that contains informations on the page:
+     * 
+     * name, displayName and description
+     * 
+     * @param contentName
+     *            name of the zip file containing the page
+     * @param content
+     *            content of the zip file containing the page
+     * @return
+     *         the created page
+     * @throws AlreadyExistsException
+     *             if a page with the same name already exists
+     * @throws CreationException
+     * @since 6.3.1
+     */
+    Page createPage(String contentName, byte[] content) throws AlreadyExistsException, CreationException;
+
 }

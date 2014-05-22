@@ -1,9 +1,12 @@
 package com.bonitasoft.engine.api.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -11,6 +14,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -100,12 +104,33 @@ public class PageAPIExt implements PageAPI {
         final long userId = getUserIdFromSessionInfos();
         final SPage sPage = constructPage(pageCreator, userId);
 
-        checkPageAlreadyExists((String) pageCreator.getFields().get(PageCreator.PageField.NAME));
         try {
             final SPage addPage = pageService.addPage(sPage, content);
             return convertToPage(addPage);
-        } catch (final SBonitaException sBonitaException) {
-            throw new CreationException(sBonitaException);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException("A page already exists with the name " + pageCreator.getName());
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
+        }
+    }
+
+    @Override
+    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException {
+        byte[] zipEntryContent;
+        try {
+            zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
+
+            Properties pageProperties = new Properties();
+            pageProperties.load(new ByteArrayInputStream(zipEntryContent));
+            String name = pageProperties.getProperty(PageService.PROPERTIES_NAME);
+            String displayName = pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME);
+            String description = pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION);
+            PageCreator pageCreator = new PageCreator(name, contentName);
+            pageCreator.setDescription(description);
+            pageCreator.setDisplayName(displayName);
+            return createPage(pageCreator, content);
+        } catch (IOException e) {
+            throw new CreationException("Error while reading zip file", e);
         }
     }
 
@@ -153,19 +178,6 @@ public class PageAPIExt implements PageAPI {
             return TenantServiceSingleton.getInstance(tenantId);
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
-        }
-    }
-
-    protected void checkPageAlreadyExists(final String name) throws AlreadyExistsException {
-        final PageService pageService = getTenantAccessor().getPageService();
-        // Check if the problem is primary key duplication:
-        try {
-            final SPage sPage = pageService.getPageByName(name);
-            if (sPage != null) {
-                throw new AlreadyExistsException("A page already exists with the name " + name);
-            }
-        } catch (final SBonitaException e) {
-            // ignore it
         }
     }
 

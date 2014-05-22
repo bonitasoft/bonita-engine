@@ -26,11 +26,13 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface PageService extends TenantLifecycleService {
 
-    static String PROPERTIES_DISPLAY_NAME = "displayName";
+    String PROPERTIES_FILE_NAME = "page.properties";
 
-    static String PROPERTIES_DESCRIPTION = "description";
+    String PROPERTIES_DISPLAY_NAME = "displayName";
 
-    static String PROPERTIES_NAME = "name";
+    String PROPERTIES_DESCRIPTION = "description";
+
+    String PROPERTIES_NAME = "name";
 
     String PAGE = "PAGE";
 

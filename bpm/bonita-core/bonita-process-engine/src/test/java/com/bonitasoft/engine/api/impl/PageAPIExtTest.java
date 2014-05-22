@@ -1,20 +1,28 @@
 package com.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -276,14 +284,53 @@ public class PageAPIExtTest {
     @Test(expected = AlreadyExistsException.class)
     public void testCheckPageAlreadyExists() throws Exception {
         // given
-        doReturn(sPage).when(pageService).getPageByName("name");
+        PageCreator pageCreator = new PageCreator("name", "content.zip");
+        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
+        doReturn(sPage).when(pageAPIExt).constructPage(pageCreator, userId);
+        doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+        final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
+        doThrow(SObjectAlreadyExistsException.class).when(pageService).addPage(sPage, content);
 
         // when
-        pageAPIExt.checkPageAlreadyExists("name");
+        pageAPIExt.createPage(pageCreator, content);
 
         // then
         // AlreadyExistsException
 
     }
 
+    @Test
+    public void testCreatePageWithZipOnly() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
+                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        Page mock = mock(Page.class);
+        PageCreator pageCreator = new PageCreator("mypage", "content.zip");
+        pageCreator.setDescription("mypage description");
+        pageCreator.setDisplayName("mypage display name");
+
+        doReturn(mock).when(pageAPIExt).createPage(eq(pageCreator), eq(content));
+
+        // when
+        Page createPage = pageAPIExt.createPage("content.zip", content);
+
+        // then
+        assertThat(createPage).isEqualTo(mock);
+
+    }
+
+    @Test(expected = CreationException.class)
+    public void testCreatePageWithZipOnlyNotHavingProperties() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()));
+
+        // when
+        pageAPIExt.createPage("content.zip", content);
+
+        // then: exception
+
+    }
 }
