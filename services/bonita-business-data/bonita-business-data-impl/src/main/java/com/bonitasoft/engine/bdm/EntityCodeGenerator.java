@@ -40,6 +40,9 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 
+/**
+ * @author Colin PUY
+ */
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;

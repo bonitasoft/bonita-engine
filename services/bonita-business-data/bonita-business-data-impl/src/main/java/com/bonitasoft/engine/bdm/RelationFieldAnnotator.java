@@ -30,43 +30,60 @@ public class RelationFieldAnnotator {
         this.codeGenerator = codeGenerator;
     }
 
-    public void annotateRelationField(JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
+    public void annotateRelationField(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
         JAnnotationUse relation = null;
-        if (rfield.isCollection()) {
-            if (rfield.getType() == Type.AGGREGATION) {
-                relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
-                JAnnotationUse joinTable = codeGenerator.addAnnotation(fieldVar, JoinTable.class);
-                joinTable.param("name", getJoinTableName(entityClass.name(), rfield.getName()));
-                
-                JAnnotationArrayMember joinColumns = joinTable.paramArray("joinColumns");
-                final JAnnotationUse nameQueryAnnotation = joinColumns.annotate(JoinColumn.class);
-                nameQueryAnnotation.param("name",  getJoinColumnName(entityClass.name()));
-                
-                JAnnotationArrayMember inverseJoinColumns = joinTable.paramArray("inverseJoinColumns");
-                final JAnnotationUse a = inverseJoinColumns.annotate(JoinColumn.class);
-                a.param("name",  getJoinColumnName(rfield.getReference().getSimpleName()));
-                
-                
-            } else {
-                relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
-                JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
-                joinColumn.param("nullable", false);
-            }
-            codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
+        if (field.isCollection()) {
+            relation = annotateMultipleReference(entityClass, field, fieldVar);
         } else {
-            if (rfield.getType() == Type.AGGREGATION) {
-                relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
-            } else {
-                relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
-            }
-            addJoinColumn(fieldVar, rfield.getName());
-            relation.param("optional", rfield.isNullable());
+            relation = annotateSingleReference(field, fieldVar);
         }
+
         relation.param("fetch", FetchType.EAGER);
-        if (rfield.getType() == Type.COMPOSITION) {
+
+        if (field.getType() == Type.COMPOSITION) {
             final JAnnotationArrayMember cascade = relation.paramArray("cascade");
             cascade.param(CascadeType.ALL);
         }
+    }
+
+    private JAnnotationUse annotateSingleReference(final RelationField field, final JFieldVar fieldVar) {
+        JAnnotationUse relation;
+        if (field.getType() == Type.AGGREGATION) {
+            relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
+        } else {
+            relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
+        }
+        addJoinColumn(fieldVar, field.getName());
+        relation.param("optional", field.isNullable());
+        return relation;
+    }
+
+    private JAnnotationUse annotateMultipleReference(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+        JAnnotationUse relation;
+        if (field.getType() == Type.AGGREGATION) {
+            relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
+            addJoinTable(entityClass, field, fieldVar);
+
+        } else {
+            relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
+            JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
+            joinColumn.param("nullable", false);
+        }
+        codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
+        return relation;
+    }
+
+    private void addJoinTable(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+        JAnnotationUse joinTable = codeGenerator.addAnnotation(fieldVar, JoinTable.class);
+        joinTable.param("name", getJoinTableName(entityClass.name(), field.getName()));
+
+        JAnnotationArrayMember joinColumns = joinTable.paramArray("joinColumns");
+        final JAnnotationUse nameQueryAnnotation = joinColumns.annotate(JoinColumn.class);
+        nameQueryAnnotation.param("name", getJoinColumnName(entityClass.name()));
+
+        JAnnotationArrayMember inverseJoinColumns = joinTable.paramArray("inverseJoinColumns");
+        final JAnnotationUse a = inverseJoinColumns.annotate(JoinColumn.class);
+        a.param("name", getJoinColumnName(field.getReference().getSimpleName()));
     }
 
     private JAnnotationUse addJoinColumn(final JFieldVar fieldVar, String columnName) {
