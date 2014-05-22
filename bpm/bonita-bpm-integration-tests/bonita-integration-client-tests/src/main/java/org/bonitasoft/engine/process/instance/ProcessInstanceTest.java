@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -406,20 +407,26 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void getProcessInstances() throws Exception {
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_ASC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_ASC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_ASC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.DEFAULT);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_DESC);
-        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_ASC);
-    }
-
-    private void getProcessInstancesOrderByProcessInstanceCriterion(final ProcessInstanceCriterion processInstanceCriterion) throws Exception {
         final List<ProcessDefinition> processDefinitions = createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(3, pedro);
         final List<ProcessInstance> processInstances = startNbProcess(processDefinitions);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_ASC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.CREATION_DATE_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.LAST_UPDATE_ASC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_ASC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.NAME_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.DEFAULT, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_DESC, processInstances);
+        getProcessInstancesOrderByProcessInstanceCriterion(ProcessInstanceCriterion.STATE_ASC, processInstances);
+        // Clean up
+        disableAndDeleteProcess(processDefinitions);
+
+        // We check that there are no resident process instances in DB:
+        assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
+    }
+
+    private void getProcessInstancesOrderByProcessInstanceCriterion(final ProcessInstanceCriterion processInstanceCriterion,
+            final List<ProcessInstance> processInstances) throws Exception {
 
         // We asked for creation date descending order:
         final List<ProcessInstance> resultProcessInstances = getProcessAPI().getProcessInstances(0, 10, processInstanceCriterion);
@@ -506,11 +513,6 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 break;
         }
 
-        // Clean up
-        disableAndDeleteProcess(processDefinitions);
-
-        // We check that there are no resident process instances in DB:
-        assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
     }
 
     @Test
@@ -800,4 +802,24 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         disableAndDeleteProcess(processDefinition);
     }
+
+    @Test
+    public void runDeleteParentArchivedProcessInstanceAndElements_should_not_delete_process_instance_not_yet_archived() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).
+                addTransition("step1", "step2").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+                Lists.newArrayList(pedro));
+        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", pi, pedro);
+        long nbDeleted = getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);
+
+        // there is one archived process instance deleted because the former process_instance state has been archived
+        assertThat(nbDeleted).isEqualTo(1);
+        waitForUserTaskAndExecuteIt("step2", pi, pedro);
+        waitForProcessToFinish(pi);
+        disableAndDeleteProcess(processDefinition);
+    }
+
 }

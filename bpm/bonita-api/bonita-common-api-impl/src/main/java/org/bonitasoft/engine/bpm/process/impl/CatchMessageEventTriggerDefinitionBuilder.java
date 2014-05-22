@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.CatchEventDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -34,11 +34,30 @@ public class CatchMessageEventTriggerDefinitionBuilder extends FlowElementContai
         event.addMessageEventTrigger(messageTrigger);
     }
 
+    /**
+     * Adds the given operation on this message event. Operations added here can be used to initialize process data from message content.
+     * 
+     * @param operation
+     *            operation to be added
+     * @return
+     */
     public CatchMessageEventTriggerDefinitionBuilder addOperation(final Operation operation) {
         messageTrigger.addOperation(operation);
         return this;
     }
 
+    /**
+     * Adds a correlation on this message event.
+     * <p> 
+     * It's possible to define up to five correlations. If more then five correlations are defined, the
+     * process becomes invalid.
+     * <p>
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization 
+     * 
+     * @param correlationKey expression representing the correlation key
+     * @param value expression representing the correlation value
+     * @return
+     */
     public CatchMessageEventTriggerDefinitionBuilder addCorrelation(final Expression correlationKey, final Expression value) {
         messageTrigger.addCorrelation(correlationKey, value);
         if (messageTrigger.getCorrelations().size() > 5) {

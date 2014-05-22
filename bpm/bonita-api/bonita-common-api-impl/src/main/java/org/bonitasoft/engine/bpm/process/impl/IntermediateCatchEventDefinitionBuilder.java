@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.IntermediateCatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateCatchEventDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -34,14 +34,30 @@ public class IntermediateCatchEventDefinitionBuilder extends FlowElementContaine
         container.addIntermediateCatchEvent(event);
     }
 
+    /**
+     * Adds a timer trigger on this event
+     * @param timerType timer type
+     * @param timerValue expression representing the timer value
+     * @return
+     */    
     public TimerEventTriggerDefinitionBuilder addTimerEventTriggerDefinition(final TimerType timerType, final Expression timerValue) {
         return new TimerEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), event, timerType, timerValue);
     }
 
+    /**
+     * Adds a message trigger on this event
+     * @param messageName name of the message to be caught
+     * @return
+     */
     public CatchMessageEventTriggerDefinitionBuilder addMessageEventTrigger(final String messageName) {
         return new CatchMessageEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), event, messageName);
     }
 
+    /**
+     * Adds a signal trigger on this event
+     * @param signalName name of the signal to be caught
+     * @return
+     */
     public CatchSignalEventTriggerDefinitionBuilder addSignalEventTrigger(final String signalName) {
         return new CatchSignalEventTriggerDefinitionBuilder(getProcessBuilder(), getContainer(), event, signalName);
     }
@@ -52,16 +68,38 @@ public class IntermediateCatchEventDefinitionBuilder extends FlowElementContaine
         return this;
     }
 
+    /**
+     * Sets the display description on this event
+     * 
+     * @param displayDescription
+     *            expression representing the display description
+     * @return
+     */
     public IntermediateCatchEventDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
         event.setDisplayDescription(displayDescription);
         return this;
     }
 
+    /**
+     * Sets the display name on this event
+     * 
+     * @param displayName
+     *            expression representing the display name
+     * @return
+     */
     public IntermediateCatchEventDefinitionBuilder addDisplayName(final Expression displayName) {
         event.setDisplayName(displayName);
         return this;
     }
 
+    /**
+     * Sets the display description after completion on this event. This will be used to updated the display description when the event completes its
+     * execution
+     * 
+     * @param displayDescriptionAfterCompletion
+     *            expression representing the new display description after the event completion.
+     * @return
+     */
     public IntermediateCatchEventDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
         event.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
         return this;

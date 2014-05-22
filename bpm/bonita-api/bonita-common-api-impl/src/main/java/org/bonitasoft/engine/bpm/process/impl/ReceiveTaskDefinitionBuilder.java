@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ReceiveTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -29,6 +29,18 @@ public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         super(process, processDefinitionBuilder, new ReceiveTaskDefinitionImpl(name, messageName));
     }
 
+    /**
+     * Adds a correlation on this receive task.
+     * <p> 
+     * It's possible to define up to five correlations. If more then five correlations are defined, the
+     * process becomes invalid.
+     * <p>
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization 
+     * 
+     * @param correlationKey expression representing the correlation key
+     * @param value expression representing the correlation value
+     * @return
+     */
     public ReceiveTaskDefinitionBuilder addCorrelation(final Expression correlationKey, final Expression value) {
         final ReceiveTaskDefinitionImpl receiveTask = getActivity();
         receiveTask.addCorrelation(correlationKey, value);
@@ -38,6 +50,13 @@ public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         return this;
     }
 
+    /**
+     * Adds the given operation on this message event. Operations added here can be used to initialize process data from message content.
+     * 
+     * @param operation
+     *            operation to be added
+     * @return
+     */
     public void addMessageOperation(final Operation operation) {
         getActivity().addMessageOperation(operation);
     }

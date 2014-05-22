@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.UserTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
@@ -34,15 +34,32 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         return new UserTaskDefinitionImpl(name, actorName);
     }
 
+    /**
+     * Adds a user filter on this user task.
+     * @param name filter name in this task.
+     * @param userFilterId user filter identifier.
+     * @param version user filter version.
+     * @return
+     */
     public UserFilterDefinitionBuilder addUserFilter(final String name, final String userFilterId, final String version) {
         return new UserFilterDefinitionBuilder(getProcessBuilder(), getContainer(), name, userFilterId, version, (HumanTaskDefinitionImpl) getActivity());
     }
 
+    /**
+     * Sets the expected duration for this human task.
+     * @param time how long (in milliseconds) this task is expected to take.
+     * @return
+     */
     public UserTaskDefinitionBuilder addExpectedDuration(final long time) {
         ((UserTaskDefinitionImpl) getActivity()).setExpectedDuration(time);
         return this;
     }
 
+    /**
+     * Sets the task priority.
+     * @param priority task priority.
+     * @return
+     */
     public UserTaskDefinitionBuilder addPriority(final String priority) {
         ((UserTaskDefinitionImpl) getActivity()).setPriority(priority);
         return this;

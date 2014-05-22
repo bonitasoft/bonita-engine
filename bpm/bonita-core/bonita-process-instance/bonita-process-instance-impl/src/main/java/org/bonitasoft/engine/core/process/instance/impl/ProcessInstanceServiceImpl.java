@@ -460,15 +460,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private boolean hasConnectors(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) {
-        boolean hasConnectors = false;
         if (processDefinition != null) {
             final SActivityDefinition activityDefinition = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
                     flowNodeInstance.getFlowNodeDefinitionId());
             if (activityDefinition != null) {
-                hasConnectors = activityDefinition.getConnectors().size() > 0;
+                return activityDefinition.hasConnectors();
             }
         }
-        return hasConnectors;
+        return false;
     }
 
     private void deleteDataInstancesIfNecessary(final SProcessInstance processInstance, final SProcessDefinition processDefinition)

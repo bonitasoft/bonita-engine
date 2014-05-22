@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

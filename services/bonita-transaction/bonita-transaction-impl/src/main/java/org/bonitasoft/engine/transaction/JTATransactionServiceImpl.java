@@ -119,7 +119,6 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     @Override
     public void complete() throws STransactionCommitException, STransactionRollbackException {
-
         // Depending of the txManager status we either commit or rollback.
         try {
             final Transaction tx = txManager.getTransaction();

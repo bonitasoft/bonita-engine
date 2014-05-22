@@ -15,10 +15,10 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.ThrowMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -97,6 +97,10 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
         return this;
     }
 
+    /**
+     * Marks this data as transient
+     * @return
+     */
     public DataDefinitionBuilder isTransient() {
         dataDefinition.setTransientData(true);
         return this;

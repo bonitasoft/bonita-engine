@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.actor.impl;
 
-import org.bonitasoft.engine.bpm.DescriptionElementImpl;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
+import org.bonitasoft.engine.bpm.internal.DescriptionElementImpl;
 
 /**
  * @author Matthieu Chaffotte

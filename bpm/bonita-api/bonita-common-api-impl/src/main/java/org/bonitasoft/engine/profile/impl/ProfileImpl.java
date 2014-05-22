@@ -15,7 +15,7 @@ package org.bonitasoft.engine.profile.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.profile.Profile;
 
 /**
@@ -28,8 +28,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
     private boolean isDefault;
 
     private String description;
-
-    private String iconPath;
 
     private Date creationDate;
 
@@ -61,13 +59,15 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
         this.description = description;
     }
 
-    @Override
-    public String getIconPath() {
-        return iconPath;
+    @Deprecated
+    public void setIconPath(final String iconPath) {
+        // nothing to do
     }
 
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
+    @Deprecated
+    @Override
+    public String getIconPath() {
+        return null;
     }
 
     @Override
@@ -112,7 +112,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
         int result = super.hashCode();
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
@@ -143,13 +142,6 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
                 return false;
             }
         } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
             return false;
         }
         if (creationDate == null) {

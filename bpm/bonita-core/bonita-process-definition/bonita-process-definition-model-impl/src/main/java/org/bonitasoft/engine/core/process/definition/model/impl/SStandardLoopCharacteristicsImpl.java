@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SStandardLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;

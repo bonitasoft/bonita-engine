@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import org.bonitasoft.engine.bpm.flownode.impl.IntermediateThrowEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateThrowEventDefinitionImpl;
 
 /**
  * @author Elias Ricken de Medeiros

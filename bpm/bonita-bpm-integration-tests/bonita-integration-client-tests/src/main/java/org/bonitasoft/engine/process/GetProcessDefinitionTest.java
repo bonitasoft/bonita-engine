@@ -749,7 +749,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         businessArchiveBuilder.addConnectorImplementation(getResource("/org/bonitasoft/engine/connectors/TestConnectorThatThrowException.impl",
                 "TestConnectorThatThrowException.impl"));
-        businessArchiveBuilder.addClasspathResource(buildBarResource(TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar"));
+        businessArchiveBuilder.addClasspathResource(generateJarAndBuildBarResource(TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar"));
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, user.getId());

@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.CatchErrorEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.CatchEventDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchErrorEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 
 
 /**

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -77,6 +79,7 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
+import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -562,6 +565,99 @@ public class APITestUtil {
         addMappingOfActorsForRoleAndGroup(actorName, role.getId(), group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final long userId)
+            throws BonitaException {
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        getProcessAPI().addUserToActor(actorName, processDefinition, userId);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
+    }
+
+    public ProcessDefinition deployProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+        return deployAndEnableProcess(businessArchiveBuilder.done());
+    }
+
+    public ProcessDefinition deployProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String name,
+            final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
+        return deployProcessWithConnector(processDefinitionBuilder, Arrays.asList(getContentAndBuildBarResource(name, clazz)),
+                Arrays.asList(generateJarAndBuildBarResource(clazz, jarName)));
+    }
+
+    public ProcessDefinition deployProcessWithActorAndConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
+            final User user, final String name, final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
+        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
+                Arrays.asList(getContentAndBuildBarResource(name, clazz)), Arrays.asList(generateJarAndBuildBarResource(clazz, jarName)), null);
+    }
+
+    public ProcessDefinition deployProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+            final Map<String, String> parameters) throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+        if (parameters != null) {
+            businessArchiveBuilder.setParameters(parameters);
+        }
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
+    }
+
+    public ProcessDefinition deployProcessWithActorAndConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+            final List<BarResource> userFilters) throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                connectorImplementations, generateConnectorDependencies, userFilters);
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
+    }
+
+    public ProcessDefinition deployProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final Map<String, String> parameters, final String name, final Class<? extends AbstractConnector> clazz,
+            final String jarName) throws BonitaException, IOException {
+        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
+                Arrays.asList(getContentAndBuildBarResource(name, clazz)), Arrays.asList(generateJarAndBuildBarResource(clazz, jarName)), parameters);
+    }
+
+    public ProcessDefinition buildBusinessArchiveWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
+            final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
+            throws BonitaException {
+        return deployProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+                generateFilterDependencies, userFilters);
+    }
+
+    private BusinessArchiveBuilder buildBusinessArchiveWithConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies, final List<BarResource> userFilters)
+            throws InvalidProcessDefinitionException {
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                processDefinitionBuilder.done());
+        for (final BarResource barResource : connectorImplementations) {
+            businessArchiveBuilder.addConnectorImplementation(barResource);
+        }
+
+        for (final BarResource barResource : generateConnectorDependencies) {
+            businessArchiveBuilder.addClasspathResource(barResource);
+        }
+
+        for (final BarResource barResource : userFilters) {
+            businessArchiveBuilder.addUserFilters(barResource);
+        }
+        return businessArchiveBuilder;
+    }
+
+    public BarResource getContentAndBuildBarResource(final String name, final Class<? extends Connector> clazz) throws IOException {
+        final InputStream stream = clazz.getResourceAsStream(name);
+        assertNotNull(stream);
+        final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
+        return new BarResource(name, byteArray);
+    }
+
+    public BarResource generateJarAndBuildBarResource(final Class<?> clazz, final String name) throws IOException {
+        final byte[] data = IOUtil.generateJar(clazz);
+        return new BarResource(name, data);
     }
 
     public void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
@@ -1441,7 +1537,6 @@ public class APITestUtil {
         getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
 
-
     public void skipTasks(final ProcessInstance processInstance) throws UpdateException {
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         for (final ActivityInstance activityInstance : activityInstances) {
@@ -1727,23 +1822,6 @@ public class APITestUtil {
         return stb.toString().getBytes();
     }
 
-    public void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
-        resources.add(buildBarResource(clazz, name));
-    }
-
-    public BarResource buildBarResource(final Class<?> clazz, final String name) throws IOException {
-        final byte[] data = IOUtil.generateJar(clazz);
-        return new BarResource(name, data);
-    }
-
-    public void addConnectorToBusinessArchive(final BusinessArchiveBuilder businessArchiveBuilder, final Class<? extends Connector> clazz) throws IOException {
-        final String fileBaseName = clazz.getSimpleName();
-        final String connectorImplResource = "/" + clazz.getName().replaceAll("\\.", "/") + ".impl";
-        final byte[] descByteArray = IOUtil.getAllContentFrom(clazz.getResourceAsStream(connectorImplResource));
-        businessArchiveBuilder.addConnectorImplementation(new BarResource(fileBaseName + ".impl", descByteArray));
-        businessArchiveBuilder.addClasspathResource(buildBarResource(clazz, fileBaseName + ".jar"));
-    }
-
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
@@ -1793,6 +1871,7 @@ public class APITestUtil {
     public byte[] generateContent(final Document doc) {
         return doc.getName().getBytes();
     }
+
     /**
      * tell the engine to run BPMEventHandlingjob now
      * 
@@ -1802,6 +1881,6 @@ public class APITestUtil {
      */
     protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
         commandAPI.execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
-        }
+    }
 
 }

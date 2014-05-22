@@ -82,7 +82,7 @@ public class UserFilterTest extends CommonAPITest {
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilter");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -107,7 +107,7 @@ public class UserFilterTest extends CommonAPITest {
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterWithClassNotFound");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterWithClassNotFound");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -128,7 +128,7 @@ public class UserFilterTest extends CommonAPITest {
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0").addInput("exception",
                 new ExpressionBuilder().createConstantStringExpression("runtime"));
         processWithRuntime.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionWithRuntime = deployProcessWithTestFilter(ACTOR_NAME, john, processWithRuntime,
+        final ProcessDefinition processDefinitionWithRuntime = deployProcessWithTestFilter(processWithRuntime, ACTOR_NAME, john,
                 "TestFilterThatThrowException");
         final ProcessDefinitionBuilder processWithException = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterNormalException", "1.0");
         processWithException.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
@@ -137,7 +137,7 @@ public class UserFilterTest extends CommonAPITest {
         addUserTask2.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowException", "1.0").addInput("exception",
                 new ExpressionBuilder().createConstantStringExpression("normal"));
         processWithException.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionWithException = deployProcessWithTestFilter(ACTOR_NAME, john, processWithException,
+        final ProcessDefinition processDefinitionWithException = deployProcessWithTestFilter(processWithException, ACTOR_NAME, john,
                 "TestFilterThatThrowException");
         final ProcessDefinitionBuilder processWithNoClassDef = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterNoClassDef", "1.0");
         processWithNoClassDef.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
@@ -146,7 +146,7 @@ public class UserFilterTest extends CommonAPITest {
         addUserTask3.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterThatThrowNoClassDef", "1.0").addInput("exception",
                 new ExpressionBuilder().createConstantStringExpression("normal"));
         processWithNoClassDef.addTransition("step1", "step2");
-        final ProcessDefinition processDefinitionNoClassDef = deployProcessWithTestFilter(ACTOR_NAME, john, processWithNoClassDef,
+        final ProcessDefinition processDefinitionNoClassDef = deployProcessWithTestFilter(processWithNoClassDef, ACTOR_NAME, john,
                 "TestFilterThatThrowNoClassDef");
 
         final ProcessInstance processInstanceException = getProcessAPI().startProcess(processDefinitionWithException.getId());
@@ -172,7 +172,7 @@ public class UserFilterTest extends CommonAPITest {
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterWithAutoAssign");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterWithAutoAssign");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -192,7 +192,7 @@ public class UserFilterTest extends CommonAPITest {
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterUsingActorName", "1.0").addInput("userIds", null);
         designProcessDefinition.addTransition("step1", "step2");
-        deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterUsingActorName");
+        deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterUsingActorName");
     }
 
     @Test
@@ -207,7 +207,7 @@ public class UserFilterTest extends CommonAPITest {
                         + "l]", Map.class.getName()));
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, designProcessDefinition, "TestFilterUsingActorName");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterUsingActorName");
 
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -236,7 +236,7 @@ public class UserFilterTest extends CommonAPITest {
                 new ExpressionBuilder().createConstantLongExpression(group.getId()));
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, processBuilder, "GroupUserFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(processBuilder, ACTOR_NAME, john, "GroupUserFilter");
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
@@ -319,7 +319,7 @@ public class UserFilterTest extends CommonAPITest {
                 new ExpressionBuilder().createConstantLongExpression(group.getId()));
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, john, processBuilder, "GroupUserFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(processBuilder, ACTOR_NAME, john, "GroupUserFilter");
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());

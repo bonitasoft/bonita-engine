@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,8 +17,11 @@ import org.bonitasoft.engine.connector.AbstractConnector;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class TestConnector extends AbstractConnector {
+
+    public static final String INPUT1 = "input1";
 
     @Override
     public void validateInputParameters() {
@@ -27,8 +30,8 @@ public class TestConnector extends AbstractConnector {
 
     @Override
     protected void executeBusinessLogic() {
-        final String input1Value = (String) getInputParameter("input1");
-        VariableStorage.getInstance().setVariable("input1", input1Value);
+        final String input1Value = (String) getInputParameter(INPUT1);
+        VariableStorage.getInstance().setVariable(INPUT1, input1Value);
     }
 
 }
