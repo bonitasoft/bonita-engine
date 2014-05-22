@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.breakpoint.impl;
 
-import org.bonitasoft.engine.bpm.BaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 

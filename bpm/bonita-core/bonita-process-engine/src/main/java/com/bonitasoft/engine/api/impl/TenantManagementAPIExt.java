@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -94,91 +95,100 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         resolveDependenciesForAllProcesses();
     }
 
-    protected void resolveDependenciesForAllProcesses() {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+    private void resolveDependenciesForAllProcesses() {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         tenantAccessor.getDependencyResolver().resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
     private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {
         final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
 
         final long tenantId = getTenantId();
-        STenant tenant;
         try {
-            tenant = platformService.getTenant(tenantId);
+            final STenant tenant = platformService.getTenant(tenantId);
+
+            if (shouldBePaused && !STenant.ACTIVATED.equals(tenant.getStatus()) || !shouldBePaused && !STenant.PAUSED.equals(tenant.getStatus())) {
+                throw new UpdateException("Can't " + (shouldBePaused ? "pause" : "resume") + " a tenant in state " + tenant.getStatus());
+            }
+
+            final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+            final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
+            if (shouldBePaused) {
+                descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.PAUSED);
+                pauseServicesForTenant(platformServiceAccessor, tenantId);
+            } else {
+                descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.ACTIVATED);
+                resumeServicesForTenant(platformServiceAccessor, tenantId);
+            }
+            updateTenant(platformService, descriptor, tenant);
         } catch (final STenantNotFoundException e) {
             throw new UpdateException("Tenant does not exist", e);
         }
-        if (shouldBePaused && !STenant.ACTIVATED.equals(tenant.getStatus()) || !shouldBePaused && !STenant.PAUSED.equals(tenant.getStatus())) {
-            throw new UpdateException("Can't " + (shouldBePaused ? "pause" : "resume") + " a tenant in state " + tenant.getStatus());
-        }
-
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
-        if (shouldBePaused) {
-            descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.PAUSED);
-            pauseServicesForTenant(platformServiceAccessor, broadcastService, tenantId);
-        } else {
-            descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.ACTIVATED);
-            resumeServicesForTenant(platformServiceAccessor, broadcastService, tenantId);
-        }
-        updateTenant(platformService, descriptor, tenant);
     }
 
-    protected void pauseServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final BroadcastService broadcastService, final long tenantId)
+    protected void pauseServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
             throws UpdateException {
-
         // clustered services
-        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        final SessionService sessionService = platformServiceAccessor.getSessionService();
         try {
-            schedulerService.pauseJobs(tenantId);
-            sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
+            pauseScheduler(platformServiceAccessor, tenantId);
+            deleteSessionsOfTenantExceptTechnicalUser(platformServiceAccessor, tenantId);
+
+            // on all nodes
+            setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new PauseServiceStrategy());
         } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }
-
-        // on all nodes
-        final SetServiceState pauseService = getPauseService(tenantId);
-        final Map<String, TaskResult<Void>> result = broadcastService.execute(pauseService, tenantId);
-        handleResult(result);
     }
 
-    protected SetServiceState getPauseService(final long tenantId) {
-        return new SetServiceState(tenantId, new PauseServiceStrategy());
+    private void deleteSessionsOfTenantExceptTechnicalUser(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) {
+        final SessionService sessionService = platformServiceAccessor.getSessionService();
+        sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
-    protected SetServiceState getResumeService(final long tenantId) {
-        return new SetServiceState(tenantId, new ResumeServiceStrategy());
-    }
-
-    private void resumeServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final BroadcastService broadcastService, final long tenantId)
+    private void resumeServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
             throws UpdateException {
         // clustered services
-        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         try {
-            schedulerService.resumeJobs(tenantId);
+            resumeScheduler(platformServiceAccessor, tenantId);
+
+            // on all nodes
+            setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new ResumeServiceStrategy());
+
+            restartHandlersOfTenant(platformServiceAccessor, tenantId);
+        } catch (final RestartException e) {
+            throw new UpdateException("Unable to resume all elements of the work service.", e);
         } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);
         }
-        // on all nodes
-        final SetServiceState resumeService = getResumeService(tenantId);
-        final Map<String, TaskResult<Void>> result = broadcastService.execute(resumeService, tenantId);
-        handleResult(result);
+    }
 
+    private void restartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
         final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-        try {
-            final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
-            for (final TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
-                tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
-            }
-        } catch (final RestartException e) {
-            throw new UpdateException("Unable to resume all elements of the work service.", e);
+        final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
+        for (final TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
+            tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
         }
+    }
 
+    // In Protected for unit tests
+    protected void setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(final PlatformServiceAccessor platformServiceAccessor, final long tenantId,
+            final ServiceStrategy serviceStrategy) throws UpdateException {
+        final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
+        final SetServiceState setServiceState = new SetServiceState(tenantId, serviceStrategy);
+        final Map<String, TaskResult<Void>> result = broadcastService.execute(setServiceState, tenantId);
+        handleResult(result);
+    }
+
+    private void pauseScheduler(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws SSchedulerException {
+        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        schedulerService.pauseJobs(tenantId);
+    }
+
+    private void resumeScheduler(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws SSchedulerException {
+        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        schedulerService.resumeJobs(tenantId);
     }
 
     private void handleResult(final Map<String, TaskResult<Void>> result) throws UpdateException {
@@ -186,7 +196,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             if (entry.getValue().isError()) {
                 throw new UpdateException("There is at least one exception on the node " + entry.getKey(), entry.getValue().getThrowable());
             }
-            if (entry.getValue().isError()) {
+            if (entry.getValue().isTimeout()) {
                 throw new UpdateException("There is at least one timeout after " + entry.getValue().getTimeout() + " " + entry.getValue().getTimeunit()
                         + " on the node " + entry.getKey());
             }

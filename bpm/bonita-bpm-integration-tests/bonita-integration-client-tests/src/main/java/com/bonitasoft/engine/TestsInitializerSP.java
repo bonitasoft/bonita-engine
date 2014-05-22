@@ -45,7 +45,7 @@ public class TestsInitializerSP extends TestsInitializer {
 
     @Override
     protected void deleteTenantAndPlatform() throws BonitaException {
-        SPBPMTestUtil.destroyPlatformAndTenants();
+        BPMTestSPUtil.destroyPlatformAndTenants();
         testUtil.deletePlatformStructure();
     }
 
@@ -65,7 +65,7 @@ public class TestsInitializerSP extends TestsInitializer {
         }
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
 
-        SPBPMTestUtil.createEnvironmentWithDefaultTenant();
+        BPMTestSPUtil.createEnvironmentWithDefaultTenant();
     }
 
     @Override
