@@ -17,7 +17,7 @@ import org.bonitasoft.engine.operation.OperationTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandTest;
 import org.bonitasoft.engine.process.ProcessTests;
 import org.bonitasoft.engine.process.task.ManualTasksTest;
-import org.bonitasoft.engine.profile.ProfileTests;
+import org.bonitasoft.engine.profile.ProfileAllITest;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
 import org.bonitasoft.engine.supervisor.SupervisorTests;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RemoteConnectorExecutionTest.class,
         PlatformCommandTest.class,
         ProcessTests.class,
-        ProfileTests.class,
+        ProfileAllITest.class,
         SearchEntitiesTests.class,
         EventTests.class,
         IdentityTests.class,

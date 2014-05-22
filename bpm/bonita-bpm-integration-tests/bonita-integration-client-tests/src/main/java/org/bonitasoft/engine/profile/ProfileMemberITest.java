@@ -23,7 +23,7 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
-public class ProfileMemberTest extends AbstractProfileTest {
+public class ProfileMemberITest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Group" }, story = "Create and delete group to profile.", jira = "")
     @Test

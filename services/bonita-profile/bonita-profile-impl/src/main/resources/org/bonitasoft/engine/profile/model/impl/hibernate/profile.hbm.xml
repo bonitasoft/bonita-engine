@@ -14,7 +14,6 @@
 		<property name="isDefault" column="isDefault" />
 		<property name="name" column="name" />
 		<property name="description" column="description" />
-		<property name="iconPath" column="iconPath" />
 		<property name="creationDate" column="creationDate" />
 		<property name="createdBy" column="createdBy" />
 		<property name="lastUpdateDate" column="lastUpdateDate" />

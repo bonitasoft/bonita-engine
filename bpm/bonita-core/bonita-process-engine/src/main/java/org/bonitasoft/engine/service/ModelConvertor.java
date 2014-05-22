@@ -1859,7 +1859,6 @@ public class ModelConvertor {
         profileImpl.setId(sProfile.getId());
         profileImpl.setDefault(sProfile.isDefault());
         profileImpl.setDescription(sProfile.getDescription());
-        profileImpl.setIconPath(sProfile.getIconPath());
         profileImpl.setCreationDate(new Date(sProfile.getCreationDate()));
         profileImpl.setCreatedBy(sProfile.getCreatedBy());
         profileImpl.setLastUpdateDate(new Date(sProfile.getLastUpdateDate()));

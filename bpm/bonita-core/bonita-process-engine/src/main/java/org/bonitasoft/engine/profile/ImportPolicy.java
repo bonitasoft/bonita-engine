@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,30 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile.builder;
-
-import org.bonitasoft.engine.profile.model.SProfile;
+package org.bonitasoft.engine.profile;
 
 /**
+ * @author Zhao Na
  * @author Matthieu Chaffotte
- * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
-public interface SProfileBuilder {
+public enum ImportPolicy {
 
-    SProfileBuilder setId(long id);
-
-    SProfileBuilder setDefault(boolean isDefault);
-
-    SProfileBuilder setDescription(String description);
-
-    SProfileBuilder setCreationDate(long creationDate);
-
-    SProfileBuilder setCreatedBy(long createdBy);
-
-    SProfileBuilder setLastUpdateDate(long lastUpdateDate);
-
-    SProfileBuilder setLastUpdatedBy(long lastUpdatedBy);
-
-    SProfile done();
+    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES; // , MERGE_DUPLICATES (Merge should retain existing IDs)
 
 }
