@@ -28,6 +28,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -52,6 +55,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.Pair;
 import org.w3c.dom.Document;
 
 /**
@@ -493,6 +497,42 @@ public class IOUtil {
         }
     }
 
+    public static byte[] zip(final Pair<String, byte[]>... files) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
+            for (final Entry<String, byte[]> file : files) {
+                zos.putNextEntry(new ZipEntry(file.getKey()));
+                zos.write(file.getValue());
+                zos.closeEntry();
+            }
+            return baos.toByteArray();
+        } finally {
+            zos.close();
+        }
+    }
+
+    public static final Map<String, byte[]> unzip(final byte[] zipFile) throws IOException {
+        final ByteArrayInputStream bais = new ByteArrayInputStream(zipFile);
+        final ZipInputStream zipInputstream = new ZipInputStream(bais);
+        ZipEntry zipEntry = null;
+        Map<String, byte[]> files = new HashMap<String, byte[]>();
+        try {
+            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                int bytesRead;
+                final byte[] buffer = new byte[BUFFER_SIZE];
+                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+                files.put(zipEntry.getName(), byteArrayOutputStream.toByteArray());
+            }
+        } finally {
+            zipInputstream.close();
+        }
+        return files;
+    }
+
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
         final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
         ZipEntry zipEntry = null;
@@ -595,7 +635,7 @@ public class IOUtil {
         throw new IOException("Entry " + entryName + " does not exists in the zip file");
     }
 
-    public static byte[] toByteArray(Document document) throws IOException, TransformerException {
+    public static byte[] toByteArray(final Document document) throws IOException, TransformerException {
         if (document == null) {
             throw new IllegalArgumentException("Document should not be null.");
         }
@@ -614,7 +654,7 @@ public class IOUtil {
         }
     }
 
-    public static byte[] addJarEntry(byte[] jarToUpdate, String entryName, byte[] entryContent) throws IOException {
+    public static byte[] addJarEntry(final byte[] jarToUpdate, final String entryName, final byte[] entryContent) throws IOException {
         ByteArrayOutputStream out = null;
         ByteArrayInputStream bais = null;
         JarOutputStream jos = null;
@@ -656,6 +696,12 @@ public class IOUtil {
                 jis.close();
             }
         }
+    }
+
+    public static String getPropertyAsString(final Properties prop) {
+        StringWriter writer = new StringWriter();
+        prop.list(new PrintWriter(writer));
+        return writer.getBuffer().toString();
     }
 
 }
