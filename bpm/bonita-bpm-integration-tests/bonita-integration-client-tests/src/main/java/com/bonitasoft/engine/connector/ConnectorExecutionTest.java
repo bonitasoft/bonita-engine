@@ -13,25 +13,12 @@ import static org.junit.Assert.assertNotNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connectors.TestConnector;
-import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
-import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
-import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
-import org.bonitasoft.engine.connectors.TestExternalConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
@@ -42,7 +29,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
  * @author Baptiste Mesta
@@ -84,114 +70,6 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         johnUserId = user.getId();
         logout();
         loginWith(JOHN, "bpm");
-    }
-
-    protected ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final User user,
-            final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition.done());
-        final List<BarResource> connectorImplementations = generateDefaultConnectorImplementations();
-        for (final BarResource barResource : connectorImplementations) {
-            businessArchiveBuilder.addConnectorImplementation(barResource);
-        }
-
-        final List<BarResource> generateConnectorDependencies = generateDefaultConnectorDependencies();
-        for (final BarResource barResource : generateConnectorDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
-    }
-
-    protected void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        resources.add(new BarResource(name, byteArray));
-    }
-
-    private List<BarResource> generateDefaultConnectorImplementations() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(3);
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector.impl", "TestConnector.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector3.impl", "TestConnector3.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorLongToExecute.impl", "TestConnectorLongToExecute.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorEngineExecutionContext.impl", "TestConnectorEngineExecutionContext.impl");
-        return resources;
-    }
-
-    protected ProcessDefinition deployProcessWithExternalTestConnectorAndActor(final ProcessDefinitionBuilderExt processDefBuilder, final String delivery,
-            final User user) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = addExternalTestConnector(processDefBuilder);
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), delivery, user);
-    }
-
-    private BusinessArchiveBuilder addExternalTestConnector(final ProcessDefinitionBuilderExt processDefBuilder) throws InvalidProcessDefinitionException,
-            IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefBuilder.done());
-        addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestExternalConnector.impl", "TestExternalConnector.impl",
-                TestExternalConnector.class, "TestExternalConnector.jar");
-        return businessArchiveBuilder;
-    }
-
-    private void addConnectorImplemWithDependency(final BusinessArchiveBuilder businessArchiveBuilder, final String implemPath, final String implemName,
-            final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        businessArchiveBuilder
-                .addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
-        businessArchiveBuilder.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
-    }
-
-    private List<BarResource> generateDefaultConnectorDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(2);
-        addResource(resources, TestConnector.class, "TestConnector.jar");
-        addResource(resources, TestConnector.class, "TestConnector3.jar");
-        addResource(resources, TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
-        addResource(resources, TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
-        return resources;
-    }
-
-    protected ProcessDefinition deployProcessWithTestConnectorAndActor(final ProcessDefinitionBuilderExt designProcessDefinition, final String actor,
-            final User user) throws BonitaException, IOException {
-        return deployProcessWithTestConnectorAndParameter(actor, user, designProcessDefinition, null);
-    }
-
-    protected List<BarResource> generateConnectorImplementations() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(2);
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector.impl", "TestConnector.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl");
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorThatThrowException.impl", "TestConnectorThatThrowException.impl");
-        return resources;
-    }
-
-    protected List<BarResource> generateConnectorDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(2);
-        addResource(resources, TestConnector.class, "TestConnector.jar");
-        addResource(resources, TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
-        addResource(resources, VariableStorage.class, "VariableStorage.jar");
-        addResource(resources, TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
-        return resources;
-    }
-
-    protected ProcessDefinition deployProcessWithTestConnectorAndParameter(final String actorName, final User user,
-            final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
-        if (parameters != null) {
-            businessArchive.setParameters(parameters);
-        }
-        final BusinessArchiveBuilder businessArchiveBuilder = businessArchive.setProcessDefinition(designProcessDefinition.done());
-        final List<BarResource> connectorImplementations = generateConnectorImplementations();
-        for (final BarResource barResource : connectorImplementations) {
-            businessArchiveBuilder.addConnectorImplementation(barResource);
-        }
-
-        final List<BarResource> generateConnectorDependencies = generateConnectorDependencies();
-        for (final BarResource barResource : generateConnectorDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {
