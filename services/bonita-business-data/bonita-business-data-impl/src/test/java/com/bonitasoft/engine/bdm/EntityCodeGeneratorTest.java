@@ -270,18 +270,4 @@ public class EntityCodeGeneratorTest {
         }
         return annotation;
     }
-
-    @Test
-    public void getJoinTableName_should_truncate_names_longer_than_14_chars() throws Exception {
-        String joinTableName = entityCodeGenerator.getJoinTableName("someLongNameLongerThanFourteen", "anotherLongNameLongerThanFourteen");
-        
-        assertThat(joinTableName).isEqualTo("SOMELONGNAMELO_ANOTHERLONGNAM");
-    }
-
-    @Test
-    public void getJoinColumnName_should_truncate_names_longer_thab_26_chars() throws Exception {
-        String joinColumnName = entityCodeGenerator.getJoinColumnName("someLongNameLongerThantwentySix");
-        
-        assertThat(joinColumnName).isEqualTo("SOMELONGNAMELONGERTHANTWEN_PID");
-    }
 }
