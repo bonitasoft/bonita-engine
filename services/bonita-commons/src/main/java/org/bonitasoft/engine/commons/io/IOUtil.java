@@ -608,10 +608,6 @@ public class IOUtil {
         return temp;
     }
 
-    /**
-     * @param string
-     * @throws IOException
-     */
     public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {
         final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -633,6 +629,10 @@ public class IOUtil {
             byteArrayOutputStream.close();
         }
         throw new IOException("Entry " + entryName + " does not exists in the zip file");
+    }
+
+    public static byte[] getZipEntryContent(final String entryName, final byte[] zipFile) throws IOException {
+        return getZipEntryContent(entryName, new ByteArrayInputStream(zipFile));
     }
 
     public static byte[] toByteArray(final Document document) throws IOException, TransformerException {
