@@ -3,8 +3,6 @@ package org.bonitasoft.engine.core.operation.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -20,7 +18,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.assertj.core.data.MapEntry;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
@@ -117,6 +117,20 @@ public class OperationServiceImplTest {
 
     private OperationServiceImpl operationServiceImpl;
 
+    private SLeftOperandImpl buildLeftOperand(final String type, final String dataName) {
+        final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
+        leftOperand.setType(type);
+        leftOperand.setName(dataName);
+        return leftOperand;
+    }
+
+    private SOperation buildOperation(final String type, final String dataName, final SOperatorType operatorType) {
+        final SOperationImpl sOperationImpl = new SOperationImpl();
+        sOperationImpl.setLeftOperand(buildLeftOperand(type, dataName));
+        sOperationImpl.setType(operatorType);
+        return sOperationImpl;
+    }
+
     @Before
     public void before() throws SOperationExecutionException {
         doReturn("type1").when(leftOperandHandler1).getType();
@@ -144,25 +158,27 @@ public class OperationServiceImplTest {
     @Test
     public void should_UpdateLeftOperands_call_leftOperandHandlers() throws Exception {
         // given
-        final SOperation op1 = createOperation("type1", "data1", SOperatorType.ASSIGNMENT);
-        final SOperation op2 = createOperation("type2", "data2", SOperatorType.XPATH_UPDATE_QUERY);
-        final HashMap<String, Object> inputValues = new HashMap<String, Object>();
+        final Map<String, Object> inputValues = new HashMap<String, Object>();
         inputValues.put("data1", "value1");
         inputValues.put("data2", "value2");
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
+        final Map<SLeftOperand, Boolean> updates = new HashMap<SLeftOperand, Boolean>();
+        updates.put(buildLeftOperand("type1", "data1"), true);
+        updates.put(buildLeftOperand("type2", "data2"), false);
+
         // when
-        operationServiceImpl.updateLeftOperands(Arrays.asList(op1, op2), 123, "containerType", expressionContext);
+        operationServiceImpl.updateLeftOperands(updates, 123, "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler1, times(1)).update(argThat(new MatchLeftOperandName("data1")), eq("value1"), eq(123l), eq("containerType"));
-        verify(leftOperandHandler2, times(1)).update(argThat(new MatchLeftOperandName("data2")), eq("value2"), eq(123l), eq("containerType"));
+        verify(leftOperandHandler1).update(argThat(new MatchLeftOperandName("data1")), eq("value1"), eq(123l), eq("containerType"));
+        verify(leftOperandHandler2).delete(argThat(new MatchLeftOperandName("data2")), eq(123l), eq("containerType"));
     }
 
     @Test
     public void should_retrieveLeftOperandsAndPutItInExpressionContextIfNotIn_call_leftOperandHandlers() throws Exception {
         // given
-        final SOperation op1 = createOperation("type3", "data1", SOperatorType.JAVA_METHOD);
-        final SOperation op2 = createOperation("type2", "data2", SOperatorType.XPATH_UPDATE_QUERY);
+        final SOperation op1 = buildOperation("type3", "data1", SOperatorType.JAVA_METHOD);
+        final SOperation op2 = buildOperation("type2", "data2", SOperatorType.XPATH_UPDATE_QUERY);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", new HashMap<String, Object>());
         doReturn("value1").when(leftOperandHandler3).retrieve(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class));
         doReturn("value2").when(leftOperandHandler2).retrieve(argThat(new MatchLeftOperandName("data2")), any(SExpressionContext.class));
@@ -180,9 +196,9 @@ public class OperationServiceImplTest {
     @Test
     public void should_executeOperator_call_OperationStrategies() throws Exception {
         // given
-        final SOperation op1 = createOperation("type1", "data1", SOperatorType.ASSIGNMENT);
-        final SOperation op2 = createOperation("type2", "data2", SOperatorType.XPATH_UPDATE_QUERY);
-        final HashMap<String, Object> inputValues = new HashMap<String, Object>();
+        final SOperation op1 = buildOperation("type1", "data1", SOperatorType.ASSIGNMENT);
+        final SOperation op2 = buildOperation("type2", "data2", SOperatorType.XPATH_UPDATE_QUERY);
+        final Map<String, Object> inputValues = new HashMap<String, Object>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
         doReturn("value1").when(operationExecutorStrategy1).computeNewValueForLeftOperand(op1, null, expressionContext);
         doReturn("value2").when(operationExecutorStrategy2).computeNewValueForLeftOperand(op2, null, expressionContext);
@@ -199,7 +215,7 @@ public class OperationServiceImplTest {
     public void shouldNotRetrieveLeftOperandOnAssignementOperation() throws Exception {
         // given
         final String myDataName = "myDataName";
-        final SOperation op1 = createOperation("type1", myDataName, SOperatorType.ASSIGNMENT);
+        final SOperation op1 = buildOperation("type1", myDataName, SOperatorType.ASSIGNMENT);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", new HashMap<String, Object>(0));
         // doReturn(null).when(leftOperandHandler1).retrieve(argThat(new MatchLeftOperandName(myDataName)), any(SExpressionContext.class));
 
@@ -213,7 +229,7 @@ public class OperationServiceImplTest {
     @Test
     public void shouldNotPutInContextWhenLeftOperandRetrievesNullValue() throws Exception {
         // given
-        final SOperation op1 = createOperation("type2", "data1", SOperatorType.XPATH_UPDATE_QUERY);
+        final SOperation op1 = buildOperation("type2", "data1", SOperatorType.XPATH_UPDATE_QUERY);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", new HashMap<String, Object>());
         doReturn(null).when(leftOperandHandler2).retrieve(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class));
         // when
@@ -226,7 +242,7 @@ public class OperationServiceImplTest {
     @Test
     public void should_retrieveLeftOperandsAndPutItInExpressionContextIfNotIn_do_not_override_value_in_map() throws Exception {
         // given
-        final SOperation op1 = createOperation("type2", "data1", SOperatorType.XPATH_UPDATE_QUERY);
+        final SOperation op1 = buildOperation("type2", "data1", SOperatorType.XPATH_UPDATE_QUERY);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
                 "originalValue"));
         when(leftOperandHandler2.retrieve(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class))).thenReturn("newIgnoredValue");
@@ -242,7 +258,7 @@ public class OperationServiceImplTest {
     @Test
     public void executeShouldExecuteBatchMode() throws Exception {
         // given
-        final SOperation op1 = createOperation("type1", "data1", SOperatorType.ASSIGNMENT);
+        final SOperation op1 = buildOperation("type1", "data1", SOperatorType.ASSIGNMENT);
         final List<SOperation> operations = new ArrayList<SOperation>();
         operations.add(op1);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
@@ -250,19 +266,20 @@ public class OperationServiceImplTest {
         final OperationServiceImpl spy = spy(operationServiceImpl);
         final InOrder inOrder = inOrder(spy);
         doReturn(true).when(spy).useBatchMode(operations);
+
         // when
         spy.execute(operations, 123L, "containerType", expressionContext);
 
         // then
         inOrder.verify(spy).retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, 123L, "containerType", expressionContext);
         inOrder.verify(spy).executeOperators(operations, expressionContext);
-        inOrder.verify(spy).updateLeftOperands(operations, 123L, "containerType", expressionContext);
+        // inOrder.verify(spy).updateLeftOperands(operations, 123L, "containerType", expressionContext);
         verify(spy, never()).executeOperatorsAndUpdateLeftOperand(operations, expressionContext, 123L, "containerType");
     }
 
     @Test
     public void executeShouldNotExecuteBatchMode() throws Exception {
-        final SOperation operation = createOperation("type1", "data1", SOperatorType.ASSIGNMENT);
+        final SOperation operation = buildOperation("type1", "data1", SOperatorType.ASSIGNMENT);
         final List<SOperation> operations = new ArrayList<SOperation>();
         operations.add(operation);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
@@ -273,27 +290,17 @@ public class OperationServiceImplTest {
         spy.execute(operations, 123L, "process", expressionContext);
 
         verify(spy, never()).executeOperators(anyListOf(SOperation.class), any(SExpressionContext.class));
-        verify(spy, never()).updateLeftOperands(anyListOf(SOperation.class), anyLong(), anyString(), any(SExpressionContext.class));
+        // verify(spy, never()).updateLeftOperands(anyListOf(SOperation.class), anyLong(), anyString(), any(SExpressionContext.class));
         final InOrder inOrder = inOrder(spy);
         inOrder.verify(spy).retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, 123L, "process", expressionContext);
         inOrder.verify(spy).executeOperatorsAndUpdateLeftOperand(operations, expressionContext, 123L, "process");
     }
 
-    private SOperation createOperation(final String type, final String dataName, final SOperatorType operatorType) {
-        final SOperationImpl sOperationImpl = new SOperationImpl();
-        final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
-        leftOperand.setType(type);
-        leftOperand.setName(dataName);
-        sOperationImpl.setLeftOperand(leftOperand);
-        sOperationImpl.setType(operatorType);
-        return sOperationImpl;
-    }
-
     @Test
     public void useBatchModeShouldBeUsedWithLeftOperandsWhichSupportBatch() throws Exception {
         final List<SOperation> operations = new ArrayList<SOperation>();
-        operations.add(createOperation("type1", "data1", SOperatorType.ASSIGNMENT));
-        operations.add(createOperation("type1", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type1", "data1", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type1", "data2", SOperatorType.ASSIGNMENT));
 
         final boolean useBatchMode = operationServiceImpl.useBatchMode(operations);
         assertThat(useBatchMode).isTrue();
@@ -302,8 +309,8 @@ public class OperationServiceImplTest {
     @Test
     public void useBatchModeShouldBeUsedWithALeftOperandWhichSupportBatchAndAnotherOneNot() throws Exception {
         final List<SOperation> operations = new ArrayList<SOperation>();
-        operations.add(createOperation("type4", "data1", SOperatorType.ASSIGNMENT));
-        operations.add(createOperation("type1", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data1", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type1", "data2", SOperatorType.ASSIGNMENT));
 
         final boolean useBatchMode = operationServiceImpl.useBatchMode(operations);
         assertThat(useBatchMode).isTrue();
@@ -312,8 +319,8 @@ public class OperationServiceImplTest {
     @Test
     public void useBatchModeShouldNotBeUsedWithLeftOperandsWhichNotSupportBatch() throws Exception {
         final List<SOperation> operations = new ArrayList<SOperation>();
-        operations.add(createOperation("type4", "data1", SOperatorType.ASSIGNMENT));
-        operations.add(createOperation("type4", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data1", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data2", SOperatorType.ASSIGNMENT));
 
         final boolean useBatchMode = operationServiceImpl.useBatchMode(operations);
         assertThat(useBatchMode).isFalse();
@@ -322,8 +329,8 @@ public class OperationServiceImplTest {
     @Test
     public void useBatchModeShouldBeUsedWithALeftOperandWhichNotSupportBatchButUsedOnTheSameVariable() throws Exception {
         final List<SOperation> operations = new ArrayList<SOperation>();
-        operations.add(createOperation("type4", "data2", SOperatorType.ASSIGNMENT));
-        operations.add(createOperation("type4", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data2", SOperatorType.ASSIGNMENT));
 
         final boolean useBatchMode = operationServiceImpl.useBatchMode(operations);
         assertThat(useBatchMode).isTrue();
@@ -332,12 +339,100 @@ public class OperationServiceImplTest {
     @Test
     public void useBatchModeShouldNotBeUsedWithALeftOperandWhichNotSupportBatchOnSeveralVariables() throws Exception {
         final List<SOperation> operations = new ArrayList<SOperation>();
-        operations.add(createOperation("type4", "data2", SOperatorType.ASSIGNMENT));
-        operations.add(createOperation("type4", "data2", SOperatorType.ASSIGNMENT));
-        operations.add(createOperation("type4", "data3", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data2", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type4", "data3", SOperatorType.ASSIGNMENT));
 
         final boolean useBatchMode = operationServiceImpl.useBatchMode(operations);
         assertThat(useBatchMode).isFalse();
+    }
+
+    @Test
+    public void executeOperatorsShouldReturnASingleUpdateForTheSameDataOfTheSameOperator() throws Exception {
+        // given
+        final List<SOperation> operations = new ArrayList<SOperation>();
+        operations.add(buildOperation("type1", "data1", SOperatorType.JAVA_METHOD));
+        operations.add(buildOperation("type1", "data1", SOperatorType.JAVA_METHOD));
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+                "givenValue"));
+        final OperationServiceImpl spy = spy(operationServiceImpl);
+
+        // when
+        final Map<SLeftOperand, Boolean> updates = spy.executeOperators(operations, expressionContext);
+
+        // then
+        assertThat(updates).hasSize(1).containsExactly(MapEntry.entry(buildLeftOperand("type1", "data1"), true));
+    }
+
+    @Test
+    public void executeOperatorsShouldReturnATwoUpdatesForTheDifferentDataOfTheSameOperator() throws Exception {
+        // given
+        final List<SOperation> operations = new ArrayList<SOperation>();
+        operations.add(buildOperation("type1", "data2", SOperatorType.JAVA_METHOD));
+        operations.add(buildOperation("type1", "data1", SOperatorType.JAVA_METHOD));
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+                "givenValue"));
+        final OperationServiceImpl spy = spy(operationServiceImpl);
+
+        // when
+        final Map<SLeftOperand, Boolean> updates = spy.executeOperators(operations, expressionContext);
+
+        // then
+        assertThat(updates).containsExactly(MapEntry.entry(buildLeftOperand("type1", "data2"), true), MapEntry.entry(buildLeftOperand("type1", "data1"), true));
+    }
+
+    @Test
+    public void executeOperatorsShouldReturnASingleUpdateForTheSameDataOfDifferentOperators() throws Exception {
+        // given
+        final List<SOperation> operations = new ArrayList<SOperation>();
+        operations.add(buildOperation("type1", "data1", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type1", "data1", SOperatorType.JAVA_METHOD));
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+                "givenValue"));
+        final OperationServiceImpl spy = spy(operationServiceImpl);
+        doReturn(true).when(spy).useBatchMode(operations);
+
+        // when
+        final Map<SLeftOperand, Boolean> updates = spy.executeOperators(operations, expressionContext);
+
+        // then
+        assertThat(updates).hasSize(1).containsExactly(MapEntry.entry(buildLeftOperand("type1", "data1"), true));
+    }
+
+    @Test
+    public void executeOperatorsShouldReturnASingleDeletionForTheSameDataOfDifferentOperators() throws Exception {
+        // given
+        final List<SOperation> operations = new ArrayList<SOperation>();
+        operations.add(buildOperation("type1", "data1", SOperatorType.ASSIGNMENT));
+        operations.add(buildOperation("type1", "data1", SOperatorType.DELETION));
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+                "givenValue"));
+        final OperationServiceImpl spy = spy(operationServiceImpl);
+        doReturn(true).when(spy).useBatchMode(operations);
+
+        // when
+        final Map<SLeftOperand, Boolean> updates = spy.executeOperators(operations, expressionContext);
+
+        // then
+        assertThat(updates).hasSize(1).containsExactly(MapEntry.entry(buildLeftOperand("type1", "data1"), false));
+    }
+
+    @Test
+    public void executeOperatorsShouldReturnASingleDeletionForTheSameDataOfSeveralOperators() throws Exception {
+        // given
+        final List<SOperation> operations = new ArrayList<SOperation>();
+        operations.add(buildOperation("type1", "data1", SOperatorType.DELETION));
+        operations.add(buildOperation("type1", "data1", SOperatorType.ASSIGNMENT));
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+                "givenValue"));
+        final OperationServiceImpl spy = spy(operationServiceImpl);
+        doReturn(true).when(spy).useBatchMode(operations);
+
+        // when
+        final Map<SLeftOperand, Boolean> updates = spy.executeOperators(operations, expressionContext);
+
+        // then
+        assertThat(updates).hasSize(1).containsExactly(MapEntry.entry(buildLeftOperand("type1", "data1"), false));
     }
 
 }
