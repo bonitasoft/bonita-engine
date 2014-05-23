@@ -576,7 +576,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         BarResource barResource = getResource("/com/bonitasoft/engine/business/data/BusinessDataUpdateConnector.impl", "BusinessDataUpdateConnector.impl");
         businessArchiveBuilder.addConnectorImplementation(barResource);
 
-        barResource = buildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
+        barResource = generateJarAndBuildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
         businessArchiveBuilder.addClasspathResource(barResource);
 
         return deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, matti);

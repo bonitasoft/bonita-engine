@@ -18,8 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 
 public class SPRoleTest extends CommonAPISPTest {
@@ -54,7 +54,7 @@ public class SPRoleTest extends CommonAPISPTest {
         identityAPI2.deleteRole(role2.getId());
 
         BPMTestSPUtil.logoutOnTenant(session1);
-        BPMTestSPUtil.destroyTenant(tenantId1);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenantId1);
         BPMTestSPUtil.logoutOnTenant(session2);
     }
 

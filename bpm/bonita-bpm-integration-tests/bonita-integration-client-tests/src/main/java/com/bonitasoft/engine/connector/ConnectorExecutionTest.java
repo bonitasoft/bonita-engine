@@ -18,13 +18,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connectors.TestExternalConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
@@ -35,7 +29,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
  * @author Baptiste Mesta
@@ -77,28 +70,6 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         johnUserId = user.getId();
         logout();
         loginWith(JOHN, "bpm");
-    }
-
-    protected ProcessDefinition deployProcessWithExternalTestConnectorAndActor(final ProcessDefinitionBuilderExt processDefBuilder, final String delivery,
-            final User user) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = addExternalTestConnector(processDefBuilder);
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), delivery, user);
-    }
-
-    private BusinessArchiveBuilder addExternalTestConnector(final ProcessDefinitionBuilderExt processDefBuilder) throws InvalidProcessDefinitionException,
-            IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefBuilder.done());
-        addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestExternalConnector.impl", "TestExternalConnector.impl",
-                TestExternalConnector.class, "TestExternalConnector.jar");
-        return businessArchiveBuilder;
-    }
-
-    private void addConnectorImplemWithDependency(final BusinessArchiveBuilder businessArchiveBuilder, final String implemPath, final String implemName,
-            final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        businessArchiveBuilder
-                .addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
-        businessArchiveBuilder.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
 
     protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {

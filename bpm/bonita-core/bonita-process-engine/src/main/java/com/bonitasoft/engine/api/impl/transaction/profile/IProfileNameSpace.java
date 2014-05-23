@@ -1,0 +1,17 @@
+package com.bonitasoft.engine.api.impl.transaction.profile;
+
+public interface IProfileNameSpace {
+
+    String PROFILE_MAPPING_TAG_NAME = "profileMappings";
+
+    String PROFILE_MAPPING_NAMESPACE = "http://www.bonitasoft.org/ns/profilemapping/6.0";
+
+    String PROFILE_MAPPING_NAMESPACE_PREFIX = "profilemappings";
+
+    String PROFILES_NAMESPACE_PREFIX = "profiles";
+
+    String PROFILES_NAMESPACE = "http://www.bonitasoft.org/ns/profile/6.1";
+
+    String PROFILES_TAG_NAME = "profiles";
+
+}

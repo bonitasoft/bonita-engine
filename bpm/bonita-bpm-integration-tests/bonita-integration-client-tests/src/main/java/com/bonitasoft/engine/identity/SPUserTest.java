@@ -23,8 +23,8 @@ import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 
@@ -59,7 +59,7 @@ public class SPUserTest extends CommonAPISPTest {
             fail("The login method should throw a TenantNotActivatedException due to tenant deactivation");
         } finally {
             BPMTestSPUtil.activateTenant(tenantId);
-            BPMTestSPUtil.destroyTenant(tenantId);
+            BPMTestSPUtil.deactivateAndDeleteTenant(tenantId);
         }
     }
 
@@ -94,7 +94,7 @@ public class SPUserTest extends CommonAPISPTest {
         assertNotSame(password, user.getPassword());
         assertTrue(now.before(user.getLastConnection()));
 
-        BPMTestSPUtil.destroyTenant(tenantId);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenantId);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class SPUserTest extends CommonAPISPTest {
         identityAPI2.deleteUser(user2.getId());
 
         BPMTestSPUtil.logoutOnTenant(session1);
-        BPMTestSPUtil.destroyTenant(tenantId1);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenantId1);
         BPMTestSPUtil.logoutOnTenant(session2);
     }
 
