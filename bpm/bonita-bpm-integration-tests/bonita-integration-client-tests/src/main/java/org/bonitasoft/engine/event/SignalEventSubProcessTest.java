@@ -69,17 +69,16 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser("john", "bpm");
-        logout();
-        loginWith("john", "bpm");
-
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final boolean withIntermediateThrowEvent, final boolean withData)
@@ -87,7 +86,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         final ProcessDefinitionBuilder builder = buildParentProcessDefinition(withIntermediateThrowEvent, withData);
         buildSubProcessDefinition(builder, withData);
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
     }
 
     private ProcessDefinitionBuilder buildParentProcessDefinition(final boolean withIntermediateThrowEvent, final boolean withData)
@@ -145,7 +144,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         builder.addTransition("callActivity", "step2");
         builder.addTransition("step2", PARENT_END);
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
     }
 
     @Test

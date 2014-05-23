@@ -34,12 +34,12 @@ public class StartEventTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(user);
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser("john", "bpm");
 
     }
@@ -58,7 +58,7 @@ public class StartEventTest extends CommonAPITest {
                 .addUserTask("step1WithTimer", ACTOR_NAME).addTransition("startEventWithTimer", "step1WithTimer");
         processDefinitionBuilder.addStartEvent("startEventWithMessage").addMessageEventTrigger("message").addUserTask("step1WithMessage", ACTOR_NAME)
                 .addTransition("startEventWithMessage", "step1WithMessage");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
         HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");

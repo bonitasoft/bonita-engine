@@ -54,14 +54,14 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser("pedro", "secreto");
     }
 
     @After
     public void after() throws Exception {
         deleteUser(user);
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -109,7 +109,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
             longBuilder.append(longTextValue);
         }
         builder.addLongTextData("longTextData", new ExpressionBuilder().createConstantStringExpression(longBuilder.toString()));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         assertEquals(shortTextValue, getProcessAPI().getProcessDataInstance("shortTextData", processInstance.getId()).getValue());
@@ -222,7 +222,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = processDefinitionBuilder.addActor(delivery).addDescription("Delivery all day and night long")
                 .addUserTask("step1", delivery).getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -235,7 +235,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(delivery)
                 .addDescription("Delivery all day and night long").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1))
                 .addUserTask("step1", delivery).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, delivery, user);
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -264,7 +264,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(delivery)
                 .addDescription("Delivery all day and night long").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1))
                 .addUserTask("step1", delivery).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -304,7 +304,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
                 .addDescription("Delivery all day and night long").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1))
                 .addUserTask("step1", delivery).getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -365,7 +365,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     }
 
     private void assertDataOnActivityIs(final String actorName, final DesignProcessDefinition processDef, final int expectedNumber) throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, actorName, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -406,7 +406,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
             throw new Exception("This test does not support data type different from (boolean, integer)");
         }
         final DesignProcessDefinition processDef = addUserTask.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, delivery, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep = waitForStep("step1", processInstance);
         final long activityInstanceId = waitForStep.getStepId();
@@ -424,7 +424,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final String updatedValue = "afterUpdate";
 
         final DesignProcessDefinition designProcessDefinition = createProcessWithActorAndHumanTaskAndInitStringDataNotTransient();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -441,7 +441,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     @Test
     public void updateActivityInstanceVariable() throws Exception {
         final DesignProcessDefinition processDef = createProcessWithActorAndHumanTaskAndInitStringDataNotTransient();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -462,7 +462,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     public void cannotUpdateAnActivityInstanceVariable() throws Exception {
         final DesignProcessDefinition processDef = createProcessWithActorAndHumanTaskAndInitStringDataNotTransient();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -500,7 +500,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(delivery)
                 .addDescription("Delivery all day and night long").addUserTask("step1", delivery)
                 .addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1)).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -546,7 +546,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         final List<DataDefinition> dataDefList = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 5);
         assertEquals(2, dataDefList.size());
 
@@ -579,7 +579,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
             processDefinitionBuilder.addShortTextData(strDataName + i, strDefaultExp);
         }
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         List<DataDefinition> processDataDefinitions = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 5);
         assertEquals(5, processDataDefinitions.size());
         assertThat(processDataDefinitions.get(0), nameIs("luckyNum"));
@@ -617,7 +617,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         processDefinitionBuilder.addUserTask("step1", actorName).addData("myData", String.class.getName(), scriptExpression);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), "step1", 0, 10);
         assertEquals(1, dataDefList.size());
         assertEquals(2, dataDefList.get(0).getDefaultValueExpression().getDependencies().size());
@@ -644,7 +644,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         final int i = getProcessAPI().getNumberOfProcessDataDefinitions(processDefinition.getId());
         assertEquals(2, i);
 
@@ -674,7 +674,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
 
         final int number = getProcessAPI().getNumberOfActivityDataDefinitions(processDefinition.getId(), taskName);
         assertEquals(2, number);
@@ -702,7 +702,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         try {
             getProcessAPI().getProcessDataDefinitions(processDefinition.getId() + 1, 0, 5);
         } finally {
@@ -733,7 +733,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         try {
             getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName + "qwer", 0, 5);
         } finally {
@@ -764,7 +764,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
 
         final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
         assertEquals(2, dataDefList.size());
@@ -806,7 +806,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         }
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         List<DataDefinition> processDataDefinitions = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
         assertEquals(5, processDataDefinitions.size());
         assertThat(processDataDefinitions.get(0), nameIs("luckyNum"));
@@ -865,7 +865,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addBooleanData("booleanData", null);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2", dataExpr).addDefaultTransition("step1", "step3");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
 
         // Start first process, and wait the first step
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
@@ -923,7 +923,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         processDefinitionBuilder.addUserTask("step2", "actor").addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("step2"));
         processDefinitionBuilder.addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("process"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(user.getId(), 2);
@@ -989,7 +989,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         builder.addTransition(startName, userTaskName);
         builder.addTransition(userTaskName, endName);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         return processDefinition;
     }
 }

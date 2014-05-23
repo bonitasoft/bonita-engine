@@ -86,12 +86,12 @@ public class OrganizationTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" }, jira = "")
@@ -521,7 +521,7 @@ public class OrganizationTest extends CommonAPITest {
         // Create process that is mapped to user of organization
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("deleteAllHuman", "1.1").addActor(ACTOR_NAME, true).addUserTask("human", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, persistedUser1);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, persistedUser1);
         final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(), "human");
         assignAndExecuteStep(startProcessUntilStep.getActivityInstance(), persistedUser1.getId());
         waitForProcessToFinish(startProcessUntilStep.getProcessInstance());
@@ -577,7 +577,7 @@ public class OrganizationTest extends CommonAPITest {
         // Create process that is mapped to user of organization
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("deleteAllHuman", "1.1").addActor(ACTOR_NAME, true).addUserTask("human", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, persistedUser1);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, persistedUser1);
         final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(), "human");
 
         // delete organization and do check

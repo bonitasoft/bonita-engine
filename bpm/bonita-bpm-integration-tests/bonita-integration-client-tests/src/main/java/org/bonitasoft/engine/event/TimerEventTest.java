@@ -41,12 +41,12 @@ public class TimerEventTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(user.getId());
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser(USERNAME, PASSWORD);
         logoutThenloginAs(USERNAME, PASSWORD);
     }
@@ -215,7 +215,7 @@ public class TimerEventTest extends CommonAPITest {
                 .addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, ACTOR_NAME)
                 .addEndEvent("endEvent").addTransition("startEvent", step1Name).addTransition(step1Name, "intermediateCatchEvent")
                 .addTransition("intermediateCatchEvent", step2Name).addTransition(step2Name, "endEvent").getProcess();
-        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;
@@ -229,7 +229,7 @@ public class TimerEventTest extends CommonAPITest {
                 .addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(stepName, delivery).addEndEvent("endEvent")
                 .addTransition("startEvent", stepName).addTransition(stepName, "endEvent").getProcess();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, delivery, user);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;
