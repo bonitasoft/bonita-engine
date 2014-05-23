@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -632,6 +633,12 @@ public class IdentityAPIImpl implements IdentityAPI {
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
+    }
+    
+    @Override
+    public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, int startIndex, int maxResults) {
+        // TODO Auto-generated method stub
+        return Collections.emptyList();
     }
 
     @Override
