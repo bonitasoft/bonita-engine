@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.util.List;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
@@ -55,14 +51,18 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantIsPausedException;
 import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Yanyan Liu
@@ -147,7 +147,7 @@ public class TenantIT {
 
     }
 
-    @Test(expected = TenantIsPausedException.class)
+    @Test(expected = TenantStatusException.class)
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
     public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
@@ -179,7 +179,7 @@ public class TenantIT {
         try {
             loginAPI.login(tenantId, "john", "bpm");
             fail("Should not be able to login using other user than technical");
-        } catch (final TenantIsPausedException e) {
+        } catch (final TenantStatusException e) {
             // ok, can't login with user that is not technical
         }
         // login with normal user: not working
