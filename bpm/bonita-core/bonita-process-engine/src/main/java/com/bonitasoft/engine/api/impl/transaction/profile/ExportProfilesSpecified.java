@@ -13,6 +13,7 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.xml.XMLNode;
 import org.bonitasoft.engine.xml.XMLWriter;
@@ -33,16 +34,26 @@ public class ExportProfilesSpecified extends AbstractExportProfiles {
 
     @Override
     protected XMLNode getProfilesXmlNode() throws SBonitaException {
-        String NS_PREFIX = "profiles";
-        String NAME_SPACE = "http://www.bonitasoft.org/ns/profile/6.0";
-        final XMLNode profilesNode = new XMLNode(NS_PREFIX + ":proFiles");
-        profilesNode.addAttribute("xmlns:" + NS_PREFIX, NAME_SPACE);
+        final StringBuilder stringBuilderNode = new StringBuilder();
+        stringBuilderNode.append(PROFILES_NAMESPACE_PREFIX);
+        stringBuilderNode.append(":");
+        stringBuilderNode.append(PROFILES_TAG_NAME);
+        final XMLNode profilesNode = new XMLNode(stringBuilderNode.toString());
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("xmlns:");
+        stringBuilder.append(PROFILES_NAMESPACE_PREFIX);
+        profilesNode.addAttribute(stringBuilder.toString(), PROFILES_NAMESPACE);
 
-        List<SProfile> sProfiles = getProfileService().getProfiles(profileIds);
+        final List<SProfile> sProfiles = getProfiles();
         for (final SProfile sProfile : sProfiles) {
             profilesNode.addChild(getProfileXmlNode(sProfile));
         }
         return profilesNode;
+    }
+
+    private List<SProfile> getProfiles() throws SProfileNotFoundException {
+        final List<SProfile> sProfiles = getProfileService().getProfiles(profileIds);
+        return sProfiles;
     }
 
 }

@@ -37,7 +37,7 @@ import com.bonitasoft.engine.api.ProfileAPI;
  * @author Celine Souchet
  */
 @SuppressWarnings("javadoc")
-public class ProfileTest extends AbstractProfileTest {
+public class ProfileSPITest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.", jira = "")
     @Test
@@ -64,7 +64,7 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Create", "Delete", "Profile", "Custom" }, story = "Create and delete custom profile.", jira = "ENGINE-1532")
     @Test
     public void createAndDeleteCustomProfile() throws BonitaException {
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "iconPath");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
 
         final Profile getProfileResult = getProfileAPI().getProfile(createdProfile.getId());
         assertEquals(createdProfile.getId(), getProfileResult.getId());
@@ -118,7 +118,7 @@ public class ProfileTest extends AbstractProfileTest {
         assertNotEquals(profile1.getLastUpdatedBy(), profile2.getLastUpdatedBy());
         assertNotEquals(profile1.getName(), profile2.getName());
         assertEquals(profile1.getDescription(), profile2.getDescription());
-        assertEquals(profile1.getIconPath(), profile2.getIconPath());
+        // assertEquals(profile1.getIconPath(), profile2.getIconPath());
         assertEquals("name", profile2.getName());
 
         // Clean up
@@ -140,24 +140,22 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")
     @Test(expected = CreationException.class)
     public void createProfileWithWrongParameter() throws Exception {
-        getProfileAPI().createProfile(null, null, null);
+        getProfileAPI().createProfile(null, null);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile.", jira = "ENGINE-1532")
     @Test
     public void updateCustomProfile() throws BonitaException {
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
 
         // Update custom profile
         final ProfileUpdater updateDescriptor = new ProfileUpdater();
         updateDescriptor.description("Updated description");
         updateDescriptor.name("Updated Name");
-        updateDescriptor.iconPath("Updated iconPath");
         getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
         final Profile upDateProfileResult = getProfileAPI().getProfile(createdProfile.getId());
         assertEquals("Updated Name", upDateProfileResult.getName());
         assertEquals("Updated description", upDateProfileResult.getDescription());
-        assertEquals("Updated iconPath", upDateProfileResult.getIconPath());
         assertEquals(createdProfile.isDefault(), upDateProfileResult.isDefault());
         assertNotEquals(createdProfile.getLastUpdateDate(), upDateProfileResult.getLastUpdateDate());
 
@@ -173,7 +171,7 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom", "Same", "Name" }, story = "Update name of custom profile with same value.", jira = "ENGINE-2011")
     @Test
     public void updateSameCustomProfileWithSameName() throws BonitaException {
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
 
         // Update custom profile
         final ProfileUpdater updateDescriptor = new ProfileUpdater();
@@ -189,8 +187,8 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile fails.", jira = "ENGINE-2011")
     @Test(expected = AlreadyExistsException.class)
     public void cantUpdateProfileWithExistingName() throws BonitaException {
-        final Profile profile1 = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
-        final Profile profile2 = getProfileAPI().createProfile("Profile2", "Description profile2", "IconPath profile2");
+        final Profile profile1 = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile profile2 = getProfileAPI().createProfile("Profile2", "Description profile2");
 
         // Update custom profile
         final ProfileUpdater updateDescriptor = new ProfileUpdater();
@@ -216,7 +214,6 @@ public class ProfileTest extends AbstractProfileTest {
         final ProfileUpdater updateDescriptor = new ProfileUpdater();
         updateDescriptor.description("Updated description");
         updateDescriptor.name("Updated Name");
-        updateDescriptor.iconPath("Updated iconPath");
         getProfileAPI().updateProfile(profiles.get(0).getId(), updateDescriptor);
     }
 

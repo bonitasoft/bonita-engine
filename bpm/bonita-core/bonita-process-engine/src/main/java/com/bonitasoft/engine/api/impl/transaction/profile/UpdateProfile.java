@@ -75,9 +75,6 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
                 case DESCRIPTION:
                     updateBuilder.setDescription((String) field.getValue());
                     break;
-                case ICON_PATH:
-                    updateBuilder.setIconPath((String) field.getValue());
-                    break;
                 default:
                     throw new IllegalStateException();
             }

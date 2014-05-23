@@ -61,6 +61,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -70,6 +71,7 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
+import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -1429,12 +1431,12 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addTransition("step1", "step2");
 
         final List<BarResource> connectorImplementations = Arrays.asList(
-                buildBarResource("/org/bonitasoft/engine/connectors/TestConnector.impl", "TestConnector.impl"),
-                buildBarResource("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl"));
-        final List<BarResource> generateConnectorDependencies = Arrays.asList(buildBarResource(TestConnector.class, "TestConnector.jar"),
-                buildBarResource(TestConnectorWithOutput.class, "TestConnectorWithOutput.jar"));
-        final ProcessDefinition processDefinition = deployProcessWithActorAndConnector(designProcessDefinition, ACTOR_NAME, user, connectorImplementations,
-                generateConnectorDependencies);
+                getContentAndBuildBarResource("TestConnector.impl", TestConnector.class),
+                getContentAndBuildBarResource("TestConnectorWithOutput.impl", TestConnectorWithOutput.class));
+        final List<BarResource> generateConnectorDependencies = Arrays.asList(generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
+                generateJarAndBuildBarResource(TestConnectorWithOutput.class, "TestConnectorWithOutput.jar"));
+        final ProcessDefinition processDefinition = deployProcessWithActorAndConnectorAndParameter(designProcessDefinition, ACTOR_NAME, user,
+                connectorImplementations, generateConnectorDependencies, null);
         final long processDefinitionId = processDefinition.getId();
 
         // common check
@@ -1512,4 +1514,49 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Tenants", "Process instance", "Delete" }, story = "Execute connector on completed process instance.", jira = "BS-8607")
+    @Test
+    public void should_be_able_to_delete_process_instance_when_process_definition_is_on_2_tenants_with_different_implementations_of_connector()
+            throws Exception {
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
+                PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addConnector("connecteur", "org.bonitasoft.connector.testConnector", "1.0",
+                ConnectorEvent.ON_FINISH);
+
+        // Deploy the first process on the default tenant
+        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector(designProcessDefinition, ACTOR_NAME, user);
+        for (int i = 0; i < 10; i++) {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            waitForUserTaskAndExecuteIt("step0", processInstance, user);
+        }
+        for (int i = 0; i < 10; i++) {
+            getProcessAPI().startProcess(processDefinition.getId());
+        }
+
+        // Create the second tenant, and login on
+        final long tenant2Id = BPMTestSPUtil.createAndActivateTenantWithDefaultTechnicalLogger("Tenant 2");
+
+        loginOnTenantWithTechnicalLogger(tenant2Id);
+        final User userForTenant2 = createUser(USERNAME, PASSWORD);
+        loginOnTenantWith(USERNAME, PASSWORD, tenant2Id);
+        final ProcessDefinition processDefinition2 = deployProcessWithActorAndTestConnector2(designProcessDefinition, ACTOR_NAME, userForTenant2);
+        for (int i = 0; i < 10; i++) {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition2.getId());
+            waitForUserTaskAndExecuteIt("step0", processInstance, userForTenant2);
+        }
+        for (int i = 0; i < 10; i++) {
+            getProcessAPI().startProcess(processDefinition2.getId());
+        }
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
+
+        waitForUserTask("step0", processInstance2.getId());
+        getProcessAPI().deleteProcessInstances(processDefinition2.getId());
+
+        // Clean up
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenant2Id);
+
+        login();
+        disableAndDeleteProcess(processDefinition);
+    }
 }
