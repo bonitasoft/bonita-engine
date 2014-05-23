@@ -32,6 +32,13 @@ public interface LeftOperandHandler {
     String getType();
 
     /**
+     * Checks whether the handler supports batch update after executing all operations
+     *
+     * @return true if the handler supports batch update after executing all operations; false otherwise
+     */
+    boolean supportBatchUpdate();
+
+    /**
      * @param sLeftOperand
      * @param inputValues
      *            contains value(s) given by the strategy to update the left operand with
@@ -40,7 +47,7 @@ public interface LeftOperandHandler {
      * @throws SOperationExecutionException
      */
     // TODO batch method
-    void update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
+    Object update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
 
     void delete(SLeftOperand sLeftOperand, long containerId, String containerType) throws SOperationExecutionException;
 

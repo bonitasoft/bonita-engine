@@ -45,9 +45,10 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         updateDataInstance(leftOperand, containerId, containerType, newValue);
+        return newValue;
     }
 
     protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceException {
@@ -106,6 +107,11 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
 
     protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceException {
         return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return true;
     }
 
 }

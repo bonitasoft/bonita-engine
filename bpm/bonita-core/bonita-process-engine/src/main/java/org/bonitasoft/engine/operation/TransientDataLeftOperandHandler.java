@@ -75,7 +75,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         SDataInstance dataInstance;
         try {
@@ -94,6 +94,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
                             + " is being updated, be carefull if the application server is restarted this new value will be lost and the data will be reset to its initial value. "
                             + "We advise you to change the design of your process. If you understand the risks and want to hide this warning, change the logging level of this class to error.");
             transientDataService.updateDataInstance(dataInstance, descriptor);
+            return newValue;
         } catch (final SDataInstanceException e) {
             throw new SOperationExecutionException("Unable to update the transient data", e);
         } catch (final SBonitaReadException e) {
@@ -153,8 +154,8 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             if (theTransientData == null) {
                 throw new SBonitaReadException(
                         "Transient data was not found and we were unable to reevaluate it because it was not found in the definition, name=<" + name
-                                + "> process definition=<" + processDefinition.getName() + "," + processDefinition.getVersion() + "> flow node=<"
-                        + flowNode.getName() + ">");
+                        + "> process definition=<" + processDefinition.getName() + "," + processDefinition.getVersion() + "> flow node=<"
+                                + flowNode.getName() + ">");
             }
             bpmInstancesCreator.createDataInstances(Arrays.asList(theTransientData), containerId, DataInstanceContainer.ACTIVITY_INSTANCE,
                     new SExpressionContext(containerId, containerType, processDefinitionId));
@@ -175,6 +176,11 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
     private static void throwBonitaReadException(final String name, final Exception e) throws SBonitaReadException {
         throw new SBonitaReadException("Transient data was not found and we were unable to reevaluate it, name=<" + name + ">", e);
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return true;
     }
 
 }

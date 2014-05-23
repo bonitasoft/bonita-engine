@@ -33,9 +33,10 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         // nothing to do, the value is already changed in the context
+        return newValue;
     }
 
     @Override
@@ -46,6 +47,11 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
         return expressionContext.getInputValues().get(sLeftOperand.getName());
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return true;
     }
 
 }

@@ -61,7 +61,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         final boolean isDocumentWithContent = newValue instanceof DocumentValue;
         if (!isDocumentWithContent && newValue != null) {
@@ -118,6 +118,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
                     }
                 }
             }
+            return newValue;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
@@ -151,6 +152,11 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
     @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
         return null;
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return true;
     }
 
 }

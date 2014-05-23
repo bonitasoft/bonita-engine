@@ -15,8 +15,10 @@ package org.bonitasoft.engine.core.operation.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -84,12 +86,71 @@ public class OperationServiceImpl implements OperationService {
         // TODO implement batch retrieve in leftOperandHandlers
         retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
 
-        // execute operation and put it in context again
-        executeOperators(operations, expressionContext);
+        if (useBatchMode(operations)) {
+            // execute operation and put it in context again
+            executeOperators(operations, expressionContext);
+            // update data
+            // TODO implement batch update in leftOperandHandlers
+            updateLeftOperands(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
+        } else {
+            executeOperatorsAndUpdateLeftOperand(operations, expressionContext, leftOperandContainerId, leftOperandContainerType);
+        }
+    }
 
-        // update data
-        // TODO implement batch update in leftOperandHandlers
-        updateLeftOperands(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
+    boolean useBatchMode(final List<SOperation> operations) throws SOperationExecutionException {
+        int countNoBatch = 0;
+        final Set<String> dataNames = new HashSet<String>();
+        for (final SOperation operation : operations) {
+            final SLeftOperand leftOperand = operation.getLeftOperand();
+            final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand);
+            if (!leftOperandHandler.supportBatchUpdate()) {
+                countNoBatch++;
+                dataNames.add(leftOperand.getName());
+            }
+        }
+        return countNoBatch <= 1 || dataNames.size() <= 1;
+    }
+
+    void executeOperatorsAndUpdateLeftOperand(final List<SOperation> operations, final SExpressionContext expressionContext, final long leftOperandContainerId,
+            final String leftOperandContainerType) throws SOperationExecutionException {
+        for (int i = 0; i < operations.size(); i++) {
+            final SOperation operation = operations.get(i);
+            if (operation.getType() != SOperatorType.DELETION) {
+                final Object rightOperandValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
+                final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
+                final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext);
+                expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
+                logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
+            }
+            updateLeftOperand(operation, leftOperandContainerId, leftOperandContainerType, expressionContext);
+        }
+    }
+
+    void updateLeftOperand(final SOperation operation, final long leftOperandContainerId, final String leftOperandContainerType,
+            final SExpressionContext expressionContext) throws SOperationExecutionException {
+        final SLeftOperand leftOperand = operation.getLeftOperand();
+        final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand);
+        if (operation.getType() == SOperatorType.DELETION) {
+            leftOperandHandler.delete(leftOperand, leftOperandContainerId, leftOperandContainerType);
+            expressionContext.getInputValues().remove(leftOperand.getName());
+        } else {
+            final Object updatedValue = leftOperandHandler.update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()),
+                    leftOperandContainerId, leftOperandContainerType);
+            expressionContext.getInputValues().put(leftOperand.getName(), updatedValue);
+
+        }
+    }
+
+    void executeOperators(final List<SOperation> operations, final SExpressionContext expressionContext) throws SOperationExecutionException {
+        for (final SOperation operation : operations) {
+            if (operation.getType() != SOperatorType.DELETION) {
+                final Object rightOperandValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
+                final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
+                final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext);
+                expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
+                logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
+            }
+        }
     }
 
     void updateLeftOperands(final List<SOperation> operations, final long leftOperandContainerId, final String leftOperandContainerType,
@@ -102,18 +163,6 @@ public class OperationServiceImpl implements OperationService {
             } else {
                 leftOperandHandler.update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()), leftOperandContainerId,
                         leftOperandContainerType);
-            }
-        }
-    }
-
-    void executeOperators(final List<SOperation> operations, final SExpressionContext expressionContext) throws SOperationExecutionException {
-        for (final SOperation operation : operations) {
-            if (operation.getType() != SOperatorType.DELETION) {
-                final Object rightOperandValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
-                final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
-                final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext);
-                expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
-                logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
             }
         }
     }
