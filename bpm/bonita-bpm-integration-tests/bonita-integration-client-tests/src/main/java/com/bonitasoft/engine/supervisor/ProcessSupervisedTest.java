@@ -2,6 +2,7 @@ package com.bonitasoft.engine.supervisor;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -10,6 +11,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -28,7 +30,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -36,51 +37,52 @@ import com.bonitasoft.engine.api.ProcessAPI;
 
 public class ProcessSupervisedTest extends CommonAPISPTest {
 
-    private User user;
+    private List<User> users;
 
-    private ProcessDefinition processDefinition;
+    private List<ProcessSupervisor> processSupervisors;
 
-    private ProcessSupervisor processSupervisor;
+    private List<ProcessDefinition> processDefinitions;
 
-    protected ProcessDefinition failingProcessDefinition;
-
-    String failingTaskName = "failedStep";
+    private final String failingTaskName = "failedStep";
 
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
 
-        user = createUser(USERNAME, PASSWORD);
+        users = new ArrayList<User>();
+        users.add(createUser(USERNAME, PASSWORD));
+
+        processDefinitions = new ArrayList<ProcessDefinition>();
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("receiveMessageProcess");
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME).addSendTask("sendTask", "messageName",
                 targetProcessExpression);
         processBuilder.addShortTextData("Application", null);
         processBuilder.addTransition("userTask1", "sendTask");
-        processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        processDefinitions.add(deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, users.get(0)));
 
-        processSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
+        processSupervisors = new ArrayList<ProcessSupervisor>();
+        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(0).getId(), users.get(0).getId()));
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processwithIntegerData", "1.0");
         processDefinitionBuilder.addAutomaticTask(failingTaskName).addIntegerData("intdata",
                 new ExpressionBuilder().createExpression("d", "d", Integer.class.getName(), ExpressionType.TYPE_CONSTANT));
-        failingProcessDefinition = deployAndEnableProcess(processDefinitionBuilder.done());
+        processDefinitions.add(deployAndEnableProcess(processDefinitionBuilder.done()));
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        getProcessAPI().deleteSupervisor(processSupervisor.getSupervisorId());
-        disableAndDeleteProcess(processDefinition);
-        disableAndDeleteProcess(failingProcessDefinition);
-        getIdentityAPI().deleteUser(user.getId());
-       logoutOnTenant();
+        deleteSupervisors(processSupervisors);
+        disableAndDeleteProcess(processDefinitions);
+        deleteUsers(users);
+        logoutOnTenant();
     }
 
     @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    @Ignore
     public void searchArchivedFlowNodeInstancesSupervisedBy() throws Exception {
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
+        final User user = users.get(0);
         waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
         waitForProcessToFinish(processInstance);
 
@@ -95,11 +97,57 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
         assertEquals("userTask1", result.get(1).getName());
     }
 
+    @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8694", keywords = { "Call activity",
+            "Sub-Process", "Manager", "searchArchivedFlowNodeInstancesSupervisedBy" })
+    @Test
+    public void searchArchivedFlowNodeInstancesSupervisedBy_should_return_1_flownode_when_is_on_subprocess_and_searchs_by_subprocess_manager() throws Exception {
+        final User subProcessPM = users.get(0);
+        final long subProcessPMId = subProcessPM.getId();
+        final User parentProcessPM = createUser(USERNAME + 2, PASSWORD);
+        final long parentProcessPMId = parentProcessPM.getId();
+        users.add(parentProcessPM);
+
+        // Create Sub-process and its supervisor
+        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("Target process", PROCESS_VERSION);
+        targetProcessDefBuilder.addActor(ACTOR_NAME);
+        targetProcessDefBuilder.addUserTask("stepOfSubProcess", ACTOR_NAME);
+        processDefinitions.add(deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, subProcessPM));
+        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(2).getId(), subProcessPMId));
+
+        // Create parent process and its supervisor
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("Target process");
+        final ProcessDefinitionBuilder parentProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("Process parent", PROCESS_VERSION);
+        parentProcessDefBuilder.addActor(ACTOR_NAME);
+        parentProcessDefBuilder.addStartEvent("start").addCallActivity("callActivity", targetProcessNameExpr, null).addUserTask("step1", ACTOR_NAME)
+                .addEndEvent("end");
+        parentProcessDefBuilder.addTransition("start", "callActivity").addTransition("callActivity", "step1").addTransition("step1", "end");
+        processDefinitions.add(deployAndEnableProcessWithActor(parentProcessDefBuilder.done(), ACTOR_NAME, parentProcessPM));
+        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(3).getId(), parentProcessPMId));
+
+        // Start the parent process and execute the task of the sub process
+        getProcessAPI().startProcess(processDefinitions.get(3).getId());
+        final HumanTaskInstance stepOfSubProcess = waitForUserTaskAndExecuteIt("stepOfSubProcess", parentProcessPM);
+        waitForProcessToFinish(stepOfSubProcess.getParentProcessInstanceId());
+
+        // Then
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
+        final SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedByParentProcessPM = getProcessAPI()
+                .searchArchivedFlowNodeInstancesSupervisedBy(parentProcessPMId, builder.done());
+        assertEquals(0, searchArchivedFlowNodeInstancesSupervisedByParentProcessPM.getCount());
+
+        final SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedBySubProcessPM = getProcessAPI()
+                .searchArchivedFlowNodeInstancesSupervisedBy(subProcessPMId, builder.done());
+        assertEquals(1, searchArchivedFlowNodeInstancesSupervisedBySubProcessPM.getCount());
+        final List<ArchivedFlowNodeInstance> result = searchArchivedFlowNodeInstancesSupervisedBySubProcessPM.getResult();
+        assertEquals("stepOfSubProcess", result.get(0).getName());
+    }
+
     @Cover(classes = { ProcessAPI.class, FlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    @Ignore
     public void searchFlowNodeInstancesSupervisedByShouldFind1PendingFlowNodeAndThenFinishesItAndFindNoFlowNode() throws Exception {
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final User user = users.get(0);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
 
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ActivityInstanceSearchDescriptor.NAME, Order.ASC);
@@ -122,10 +170,9 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class, FlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    @Ignore
     public void searchFlowNodeInstancesSupervisedByShouldFindOneFailedFlowNode() throws Exception {
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(failingProcessDefinition.getId());
+        final User user = users.get(0);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
         final ActivityInstance failedTask = waitForTaskToFail(processInstance);
         assertEquals(failingTaskName, failedTask.getName());
 
@@ -136,7 +183,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
                 user.getId(), builder.done());
         assertEquals(0, searchFlowNodeInstancesSupervisedBy.getCount());
 
-        ProcessSupervisor failedProcessSupervisor = getProcessAPI().createProcessSupervisorForUser(failingProcessDefinition.getId(), user.getId());
+        ProcessSupervisor failedProcessSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(1).getId(), user.getId());
 
         searchFlowNodeInstancesSupervisedBy = getProcessAPI().searchFlowNodeInstancesSupervisedBy(
                 user.getId(), builder.done());
@@ -149,9 +196,9 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    @Ignore
     public void searchArchivedActivityInstancesSupervisedByShouldFind2Activities() throws Exception {
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final User user = users.get(0);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
         waitForProcessToFinish(processInstance);
 
@@ -168,7 +215,9 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })
     @Test
-    public void searchArchivedProcessInstancesSupervisedByShouldFind2Activities() throws Exception {
+    public void searchArchivedProcessInstancesSupervisedByShouldFind1Process() throws Exception {
+        final User user = users.get(0);
+        final ProcessDefinition processDefinition = processDefinitions.get(0);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
         waitForProcessToFinish(processInstance);
