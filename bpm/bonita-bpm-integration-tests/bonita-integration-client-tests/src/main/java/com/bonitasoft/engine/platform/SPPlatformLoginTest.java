@@ -75,7 +75,7 @@ public class SPPlatformLoginTest {
     };
 
     @Test(expected = PlatformLoginException.class)
-    public void wrongLogin() throws Exception {
+    public void wrongloginOnDefaultTenantWithDefaultTechnicalLogger() throws Exception {
         try {
             platformLoginAPI.logout(session);
             platformLoginAPI.login("titi", "toto");

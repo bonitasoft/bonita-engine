@@ -30,7 +30,7 @@ public class ProfileMemberSPITest extends AbstractProfileTest {
     @Ignore("Problem with assumption that default values pre-exist")
     @Test
     public void multitenancyOnSearchUserProfileMembers() throws BonitaException {
-        logout();
+       logoutOnTenant();
 
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
@@ -44,8 +44,8 @@ public class ProfileMemberSPITest extends AbstractProfileTest {
 
         final User userTenant2 = createUser("userName_tenant2", "UserPwd_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2");
         getProfileAPI().createProfileMember(Long.valueOf(1), userTenant2.getId(), null, null);
-        logout();
-        login();
+       logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         // Create UserProfile1
         final ProfileMember addProfileMemberResult = getProfileAPI().createProfileMember(Long.valueOf(1), user1.getId(), null, null);
@@ -66,7 +66,7 @@ public class ProfileMemberSPITest extends AbstractProfileTest {
         assertEquals(0, searchedProfileMember.getResult().size());
         getIdentityAPI().deleteUser(user1.getId());
 
-        logout();
+       logoutOnTenant();
         loginOnTenantWith("default_tenant2", "default_password2", tenant2Id);
         getIdentityAPI().deleteUser(userTenant2.getId());
 
@@ -75,7 +75,7 @@ public class ProfileMemberSPITest extends AbstractProfileTest {
         platformAPI.deactiveTenant(tenant2Id);
         platformAPI.deleteTenant(tenant2Id);
 
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
 }

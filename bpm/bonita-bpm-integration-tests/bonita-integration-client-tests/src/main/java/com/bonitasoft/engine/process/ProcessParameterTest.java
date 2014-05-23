@@ -67,12 +67,12 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
@@ -200,7 +200,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         params.put(parameterName, paramValue);
         businessArchive.setParameters(params);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(aTask, processInstance.getId());
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
@@ -650,7 +650,8 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt designProcessDefinition = buildProcessWithOutputConnectorAndParameter(delivery, inputName, connectorId,
                 connectorVersion, input1Expression, paraName);
 
-        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutputAndParameter(designProcessDefinition, delivery, user, paraMap);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorWithOutputAndParameter(designProcessDefinition, delivery,
+                user, paraMap);
         final long proDefId = processDefinition.getId();
         ProcessInstance processInstance = getProcessAPI().startProcess(proDefId);
         assertNotNull(waitForUserTask("step2", processInstance.getId()));
@@ -731,7 +732,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         parameters.put("booleanValue", "true");
         parameters.put("doubleValue", "1.1");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActorAndParameters(processBuilder.done(), actor, jack, parameters);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndParameters(processBuilder.done(), actor, jack, parameters);
 
         final Expression integerParameter = new ExpressionBuilder().createParameterExpression("integerExpression", "integerValue", Integer.class.getName());
         final Expression isIntegerValueInteger = new ExpressionBuilder().createGroovyScriptExpression("testIntegerValueToBeInteger",

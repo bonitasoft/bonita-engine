@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.supervisor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -48,16 +48,16 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         user = createUser(USERNAME, PASSWORD);
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("receiveMessageProcess");
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME).addSendTask("sendTask", "messageName",
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME).addSendTask("sendTask", "messageName",
                 targetProcessExpression);
         processBuilder.addShortTextData("Application", null);
         processBuilder.addTransition("userTask1", "sendTask");
-        processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, user);
+        processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         processSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
 
@@ -73,7 +73,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(failingProcessDefinition);
         getIdentityAPI().deleteUser(user.getId());
-        logout();
+       logoutOnTenant();
     }
 
     @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })

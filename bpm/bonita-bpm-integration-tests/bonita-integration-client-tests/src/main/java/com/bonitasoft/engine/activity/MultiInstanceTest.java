@@ -40,17 +40,17 @@ public class MultiInstanceTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(JOHN, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(JOHN);
         VariableStorage.clearAll();
-        logout();
+       logoutOnTenant();
     }
 
     @Test
@@ -68,7 +68,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
                                 ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ", Boolean.class.getName(),
                                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskWithChildrenInParallel(loopMax, 1, processInstance);
         disableAndDeleteProcess(processDefinition);

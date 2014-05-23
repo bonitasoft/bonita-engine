@@ -48,6 +48,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.bonitasoft.engine.APITestSPUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.TestsInitializerSP;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LoginAPI;
@@ -183,18 +184,18 @@ public class TenantIT {
             // ok, can't login with user that is not technical
         }
         // login with normal user: not working
-        APISession loginWithTechnical = loginAPI.login(tenantId, userName, password);
+        APISession loginOnDefaultTenantWithTechnical = loginAPI.login(tenantId, userName, password);
         // ok to login with technical user
-        TenantAPIAccessor.getTenantManagementAPI(loginWithTechnical).resume();
-        loginAPI.logout(loginWithTechnical);
+        TenantAPIAccessor.getTenantManagementAPI(loginOnDefaultTenantWithTechnical).resume();
+        loginAPI.logout(loginOnDefaultTenantWithTechnical);
         // can now login with normal user
         final APISession login = loginAPI.login(tenantId, "john", "bpm");
         loginAPI.logout(login);
 
         // delete the user
-        loginWithTechnical = loginAPI.login(tenantId, userName, password);
-        TenantAPIAccessor.getIdentityAPI(loginWithTechnical).deleteUser(john.getId());
-        loginAPI.logout(loginWithTechnical);
+        loginOnDefaultTenantWithTechnical = loginAPI.login(tenantId, userName, password);
+        TenantAPIAccessor.getIdentityAPI(loginOnDefaultTenantWithTechnical).deleteUser(john.getId());
+        loginAPI.logout(loginOnDefaultTenantWithTechnical);
     }
 
     @Test
@@ -218,7 +219,7 @@ public class TenantIT {
             org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
         } finally {
             tenantManagementAPI.resume();
-            apiTestSPUtil.logoutTenant(apiTestSPUtil.getSession());
+            BPMTestSPUtil.logoutOnTenant(apiTestSPUtil.getSession());
         }
     }
 

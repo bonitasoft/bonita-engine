@@ -47,12 +47,12 @@ public class ProcessResolutionTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })

@@ -35,22 +35,22 @@ public class ManualTasksTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         deleteUser(JOHN);
         VariableStorage.clearAll();
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         createUser(JOHN, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
     private ProcessDefinition deployProcessWithUserTask(final User user1) throws Exception {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor("myActor");
         processBuilder.addUserTask("Request", "myActor");
-        return deployAndEnableWithActor(processBuilder.done(), "myActor", user1);
+        return deployAndEnableProcessWithActor(processBuilder.done(), "myActor", user1);
     }
 
     @Test(expected = UpdateException.class)
@@ -60,8 +60,8 @@ public class ManualTasksTest extends CommonAPISPTest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance task = waitForUserTask("Request", startProcess.getId());
         final long taskId = task.getId();
-        login();
-        loginWith("login1", "password");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWith("login1", "password");
         getProcessAPI().assignUserTask(taskId, user.getId());
 
         final ManualTaskCreator taskCreator = buildManualTaskCreator(taskId, "subtask", user.getId(), "desk", new Date(), TaskPriority.NORMAL);

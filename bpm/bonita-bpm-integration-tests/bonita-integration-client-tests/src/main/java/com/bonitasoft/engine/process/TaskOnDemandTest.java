@@ -46,7 +46,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
     @Before
     public void setUp() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser("john", PASSWORD);
         jack = createUser("jack", PASSWORD);
     }
@@ -55,17 +55,17 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     public void tearDown() throws Exception {
         deleteUser(john.getId());
         deleteUser(jack.getId());
-        logout();
+       logoutOnTenant();
     }
 
     @Test
     public void createManualTaskOnManualTask() throws Exception {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        processBuilder.addActor(ACTOR_NAME).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
-        logout();
-        loginWith(john.getUserName(), PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
@@ -98,11 +98,11 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Test
     public void executeManualTaskWithChildManualTask() throws Exception {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemandAndChildTask", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        processBuilder.addActor(ACTOR_NAME).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
-        logout();
-        loginWith(john.getUserName(), PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         final ProcessInstance pInstance = getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
@@ -144,8 +144,8 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     public void createUserTaskOnParent() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
 
-        logout();
-        loginWith(john.getUserName(), PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
@@ -196,8 +196,8 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     public void deleteManualTask() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
 
-        logout();
-        loginWith(john.getUserName(), PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
@@ -224,8 +224,8 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Test(expected = DeletionException.class)
     public void deleteNotManualTask() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
-        logout();
-        loginWith(john.getUserName(), PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
         final HumanTaskInstance parentTask = pendingTasks.get(0);
@@ -247,19 +247,19 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
     private ProcessDefinition deployAndEnableSimpleProcess() throws BonitaException, InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         return processDefinition;
     }
 
     @Test
     public void checkAssignedDateOfASubTask() throws Exception {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        processBuilder.addActor(ACTOR_NAME).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
-        logout();
-        loginWith(john.getUserName(), PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 1, john);
