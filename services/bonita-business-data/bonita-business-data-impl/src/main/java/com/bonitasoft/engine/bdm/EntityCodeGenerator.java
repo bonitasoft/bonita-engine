@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
@@ -205,7 +213,7 @@ public class EntityCodeGenerator {
         return fieldVar;
     }
 
-    private void annotateField(JDefinedClass entityClass, final Field field, final JFieldVar fieldVar) {
+    private void annotateField(final JDefinedClass entityClass, final Field field, final JFieldVar fieldVar) {
         if (field instanceof SimpleField) {
             annotateSimpleField((SimpleField) field, fieldVar);
         } else if (field instanceof RelationField) {
@@ -213,7 +221,7 @@ public class EntityCodeGenerator {
         }
     }
 
-    private void annotateRelationField(JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
+    private void annotateRelationField(final JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
         new RelationFieldAnnotator(codeGenerator).annotateRelationField(entityClass, rfield, fieldVar);
     }
 

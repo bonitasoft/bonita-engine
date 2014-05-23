@@ -31,9 +31,7 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
-    @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = {
-        CascadeType.ALL
-    })
+    @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "ADDRESS_PID")
     private Address address;
 

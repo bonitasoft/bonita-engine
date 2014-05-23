@@ -34,9 +34,7 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
-    @OneToMany(fetch = FetchType.EAGER, cascade = {
-        CascadeType.ALL
-    })
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
     private List<Address> addresses = new ArrayList<Address>(10);

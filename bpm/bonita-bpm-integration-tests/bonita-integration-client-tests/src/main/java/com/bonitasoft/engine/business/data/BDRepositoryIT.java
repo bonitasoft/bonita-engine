@@ -89,7 +89,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         addressBO.addField(city);
 
         final RelationField address = new RelationField();
-        address.setType(Type.COMPOSITION);
+        address.setType(Type.AGGREGATION);
         address.setName("addresses");
         address.setCollection(Boolean.TRUE);
         address.setNullable(Boolean.TRUE);
@@ -243,13 +243,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
-                .addAutomaticTask("step1")
-                .addOperation(
-                        new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setFirstName", String.class.getName(),
-                                new ExpressionBuilder().createConstantStringExpression(newEmployeeFirstName)))
-                .addOperation(
-                        new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setLastName", String.class.getName(),
-                                new ExpressionBuilder().createConstantStringExpression(newEmployeeLastName)));
+        .addAutomaticTask("step1")
+        .addOperation(
+                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setFirstName", String.class.getName(),
+                        new ExpressionBuilder().createConstantStringExpression(newEmployeeFirstName)))
+                        .addOperation(
+                                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setLastName", String.class.getName(),
+                                        new ExpressionBuilder().createConstantStringExpression(newEmployeeLastName)));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -354,11 +354,11 @@ public class BDRepositoryIT extends CommonAPISPTest {
     @Test
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException {
         final Expression stringExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression(
-                        "alive",
-                        "import "
-                                + EMPLOYEE_QUALIF_CLASSNAME
-                                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return \"Employee [firstName=\" + e.firstName + \", lastName=\" + e.lastName + \"]\"",
+        .createGroovyScriptExpression(
+                "alive",
+                "import "
+                        + EMPLOYEE_QUALIF_CLASSNAME
+                        + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return \"Employee [firstName=\" + e.firstName + \", lastName=\" + e.lastName + \"]\"",
                         String.class.getName());
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(stringExpression, new HashMap<String, Serializable>());
@@ -458,18 +458,23 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final String firstName = "FlofFlof";
         final String lastName = "Boudin";
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; import org.bonita.pojo.Address; Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'"
-                + "; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; e.addToAddresses(a); return e;",
-                EMPLOYEE_QUALIF_CLASSNAME);
+                + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName
+                + "'; e.addToAddresses(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", "org.bonita.pojo.Address"));
+        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import org.bonita.pojo.Address; Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; return a;",
+                "org.bonita.pojo.Address");
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "shouldBeAbleToRunDAOCallThroughGroovy", "6.3.1");
         final String employeeDAOName = "employeeDAO";
         final String bizDataName = "myEmployee";
-        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", "org.bonita.pojo.Address", null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("step1").addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName),
-                OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -563,13 +568,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder
-                .addUserTask(taskName, ACTOR_NAME)
-                .addConnector("updateBusinessData", "com.bonitasoft.connector.BusinessDataUpdateConnector", "1.0", ConnectorEvent.ON_ENTER)
-                .addInput("bizData", getEmployeeExpression)
-                .addOutput(
-                        new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployee", "setLastName", String.class.getName(),
-                                new ExpressionBuilder().createGroovyScriptExpression("retrieve modified lastname from connector", "output1.getLastName()",
-                                        String.class.getName(), new ExpressionBuilder().createBusinessDataExpression("output1", EMPLOYEE_QUALIF_CLASSNAME))));
+        .addUserTask(taskName, ACTOR_NAME)
+        .addConnector("updateBusinessData", "com.bonitasoft.connector.BusinessDataUpdateConnector", "1.0", ConnectorEvent.ON_ENTER)
+        .addInput("bizData", getEmployeeExpression)
+        .addOutput(
+                new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployee", "setLastName", String.class.getName(),
+                        new ExpressionBuilder().createGroovyScriptExpression("retrieve modified lastname from connector", "output1.getLastName()",
+                                String.class.getName(), new ExpressionBuilder().createBusinessDataExpression("output1", EMPLOYEE_QUALIF_CLASSNAME))));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefinitionBuilder.done());

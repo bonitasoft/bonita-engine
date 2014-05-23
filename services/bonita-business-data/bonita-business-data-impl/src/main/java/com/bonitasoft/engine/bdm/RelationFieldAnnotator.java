@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
 import static org.apache.commons.lang3.StringUtils.left;
@@ -24,13 +32,13 @@ import com.sun.codemodel.JFieldVar;
  */
 public class RelationFieldAnnotator {
 
-    private CodeGenerator codeGenerator;
+    private final CodeGenerator codeGenerator;
 
-    public RelationFieldAnnotator(CodeGenerator codeGenerator) {
+    public RelationFieldAnnotator(final CodeGenerator codeGenerator) {
         this.codeGenerator = codeGenerator;
     }
 
-    public void annotateRelationField(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+    public void annotateRelationField(final JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
         JAnnotationUse relation = null;
         if (field.isCollection()) {
             relation = annotateMultipleReference(entityClass, field, fieldVar);
@@ -41,8 +49,7 @@ public class RelationFieldAnnotator {
         relation.param("fetch", FetchType.EAGER);
 
         if (field.getType() == Type.COMPOSITION) {
-            final JAnnotationArrayMember cascade = relation.paramArray("cascade");
-            cascade.param(CascadeType.ALL);
+            relation.param("cascade", CascadeType.ALL);
         }
     }
 
@@ -58,7 +65,7 @@ public class RelationFieldAnnotator {
         return relation;
     }
 
-    private JAnnotationUse annotateMultipleReference(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+    private JAnnotationUse annotateMultipleReference(final JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
         JAnnotationUse relation;
         if (field.getType() == Type.AGGREGATION) {
             relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
@@ -66,28 +73,28 @@ public class RelationFieldAnnotator {
 
         } else {
             relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
-            JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
+            final JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
             joinColumn.param("nullable", false);
         }
         codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         return relation;
     }
 
-    private void addJoinTable(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
-        JAnnotationUse joinTable = codeGenerator.addAnnotation(fieldVar, JoinTable.class);
+    private void addJoinTable(final JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
+        final JAnnotationUse joinTable = codeGenerator.addAnnotation(fieldVar, JoinTable.class);
         joinTable.param("name", getJoinTableName(entityClass.name(), field.getName()));
 
-        JAnnotationArrayMember joinColumns = joinTable.paramArray("joinColumns");
+        final JAnnotationArrayMember joinColumns = joinTable.paramArray("joinColumns");
         final JAnnotationUse nameQueryAnnotation = joinColumns.annotate(JoinColumn.class);
         nameQueryAnnotation.param("name", getJoinColumnName(entityClass.name()));
 
-        JAnnotationArrayMember inverseJoinColumns = joinTable.paramArray("inverseJoinColumns");
+        final JAnnotationArrayMember inverseJoinColumns = joinTable.paramArray("inverseJoinColumns");
         final JAnnotationUse a = inverseJoinColumns.annotate(JoinColumn.class);
         a.param("name", getJoinColumnName(field.getReference().getSimpleName()));
     }
 
-    private JAnnotationUse addJoinColumn(final JFieldVar fieldVar, String columnName) {
-        JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
+    private JAnnotationUse addJoinColumn(final JFieldVar fieldVar, final String columnName) {
+        final JAnnotationUse joinColumn = codeGenerator.addAnnotation(fieldVar, JoinColumn.class);
         joinColumn.param("name", getJoinColumnName(columnName));
         return joinColumn;
     }
@@ -96,7 +103,7 @@ public class RelationFieldAnnotator {
      * Split names to 26 char to avoid joinColumn names longer than 30 char
      * protected for testing
      */
-    protected String getJoinColumnName(String entityName) {
+    protected String getJoinColumnName(final String entityName) {
         return left(entityName.toUpperCase(), 26) + "_PID";
     }
 
@@ -104,9 +111,9 @@ public class RelationFieldAnnotator {
      * Split names to 14 chars max to avoid joinTable names longer than 30 char (oracle restriction).
      * protected for testing
      */
-    protected String getJoinTableName(String entityName, String relatedEntityName) {
-        String name = left(entityName.toUpperCase(), 14);
-        String refName = left(relatedEntityName.toUpperCase(), 14);
+    protected String getJoinTableName(final String entityName, final String relatedEntityName) {
+        final String name = left(entityName.toUpperCase(), 14);
+        final String refName = left(relatedEntityName.toUpperCase(), 14);
         return name + "_" + refName;
     }
 }

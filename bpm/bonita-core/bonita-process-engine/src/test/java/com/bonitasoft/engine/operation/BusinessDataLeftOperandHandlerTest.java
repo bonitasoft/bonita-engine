@@ -323,4 +323,9 @@ public class BusinessDataLeftOperandHandlerTest {
         leftOperandHandler.delete(leftOperand, 45, "process");
     }
 
+    @Test
+    public void handlerDoesNotSupportBatchUpdate() throws Exception {
+        assertThat(leftOperandHandler.supportBatchUpdate()).isFalse();
+    }
+
 }
