@@ -16,6 +16,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.work.BonitaExecutorService;
+
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
@@ -32,7 +34,7 @@ import com.hazelcast.core.MultiMap;
  * 
  * @author Baptiste Mesta
  */
-public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements MembershipListener {
+public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements MembershipListener, BonitaExecutorService {
 
     private final BlockingQueue<Runnable> workQueue;
 
@@ -84,5 +86,11 @@ public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements M
             workQueue.add(runnable);
         }
         executingWorks.unlock(memberUUID);
+    }
+
+    @Override
+    public void clearQueue() {
+        workQueue.clear();
+        executingWorks.clear();
     }
 }

@@ -15,6 +15,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.work.BonitaExecutorService;
+
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.Cluster;
@@ -35,7 +39,7 @@ import com.hazelcast.core.MembershipListener;
  * @author Baptiste Mesta
  * @author Laurent Vaills
  */
-public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor implements MembershipListener {
+public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor implements MembershipListener, BonitaExecutorService {
 
     private final BlockingQueue<Runnable> workQueue;
 
@@ -43,10 +47,13 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
 
     private final HazelcastInstance hazelcastInstance;
 
+    private TechnicalLoggerService logger;
+
     public ClusteredThreadPoolExecutorLocalQueue(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
             final ThreadFactory threadFactory, final RejectedExecutionHandler handler, final HazelcastInstance hazelcastInstance,
-            final BlockingQueue<Runnable> queue) {
+            final BlockingQueue<Runnable> queue, TechnicalLoggerService logger) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, queue, threadFactory, handler);
+        this.logger = logger;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -55,6 +62,7 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         cluster.addMembershipListener(this);
         workQueue = queue;
         executingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(cluster.getLocalMember()));
+        allowCoreThreadTimeOut(true);
         // Do we have to check is the queue is empty or not ? If not, what to do ?
     }
 
@@ -81,18 +89,6 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
     }
 
     @Override
-    public void shutdown() {
-        workQueue.clear();
-        super.shutdown();
-        executingRunnable.clear();
-    }
-
-    @Override
-    public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
-        return super.awaitTermination(timeout, unit);
-    }
-
-    @Override
     protected void beforeExecute(final Thread t, final Runnable r) {
         executingRunnable.offer(r);
     }
@@ -110,18 +106,40 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
     public void memberRemoved(final MembershipEvent membershipEvent) {
         final Member member = membershipEvent.getMember();
         final ILock lock = hazelcastInstance.getLock("WorkLock@" + member.getUuid());
+        if (logger.isLoggable(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO)) {
+            logger.log(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO, "[" + hazelcastInstance.getCluster().getLocalMember().getUuid()
+                    + "] Detected Member " + member.getUuid() + " is shutting down.");
+        }
         lock.lock();
         try {
             // Transfer the member's queues into my own queues
             final IQueue<Runnable> memberExecutingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(member));
+            if (logger.isLoggable(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO)) {
+                logger.log(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO, "["
+                        + hazelcastInstance.getCluster().getLocalMember().getUuid() + "] adding " + memberExecutingRunnable.size() + " from executingRunnable");
+            }
             executingRunnable.addAll(memberExecutingRunnable);
             memberExecutingRunnable.clear(); // No way to drop completely the queue ?
 
             final IQueue<Runnable> memberWorkQueue = hazelcastInstance.getQueue(memberWorkQueueName(member));
+            if (logger.isLoggable(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO)) {
+                logger.log(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO, "["
+                        + hazelcastInstance.getCluster().getLocalMember().getUuid() + "] adding " + memberWorkQueue.size() + " from workQueue");
+            }
             workQueue.addAll(memberWorkQueue);
             memberWorkQueue.clear(); // No way to drop completely the queue ?
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public void clearQueue() {
+        if(logger.isLoggable(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO)){
+            logger.log(ClusteredThreadPoolExecutorLocalQueue.class, TechnicalLogSeverity.INFO, "Clearing Queue From ClusteredThreadPoolExecutorLocalQueue "
+                    + hazelcastInstance.getCluster().getLocalMember().getUuid());
+        }
+        workQueue.clear();
+        executingRunnable.clear();
     }
 }

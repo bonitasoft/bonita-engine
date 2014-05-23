@@ -8,17 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.work;
 
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.work.BonitaExecutorService;
 import org.bonitasoft.engine.work.BonitaExecutorServiceFactory;
 import org.bonitasoft.engine.work.WorkerThreadFactory;
 
@@ -61,12 +59,12 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     }
 
     @Override
-    public Pair<ExecutorService, Queue<Runnable>> createExecutorService() {
+    public BonitaExecutorService createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         final BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
-        return Pair.<ExecutorService, Queue<Runnable>> of(new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
-                TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue), queue);
+        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
+                TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue, logger);
     }
 
     private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {

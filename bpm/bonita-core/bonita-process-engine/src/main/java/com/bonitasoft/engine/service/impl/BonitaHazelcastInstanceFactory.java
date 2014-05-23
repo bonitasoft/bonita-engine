@@ -106,7 +106,6 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
 
     @Override
     public void stop() throws SBonitaException {
-        // Do nothing it's spring that shutdown hazelcast...
     }
 
     public void destroy() {

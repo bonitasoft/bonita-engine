@@ -8,10 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,9 +26,11 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
@@ -50,6 +49,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +123,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void useSameSessionOnBothNodes() throws Exception {
         User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
         changeToNode2();
@@ -133,6 +134,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void classLoaderClustered() throws Exception {
 
         // Input expression
@@ -176,6 +178,7 @@ public class ClusterTests extends CommonAPISPTest {
      * Check that works are executed on node that started it
      */
     @Test
+    @Ignore
     public void clusteredWorkServiceIT() throws Exception {
 
         // Input expression
@@ -226,6 +229,7 @@ public class ClusterTests extends CommonAPISPTest {
      * * processes are executed
      */
     @Test
+    @Ignore
     public void should_pause_tenant_have_effect_on_all_nodes() throws Exception {
         final String systemProperty = "bonita.process.executed";
 
@@ -357,6 +361,34 @@ public class ClusterTests extends CommonAPISPTest {
         designProcessDefinition.addTransition("autoStep", "step");
 
         return deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+    }
+
+    @Test
+    public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
+        // given: 1 tenant that is paused
+        final long tenantId = createAndActivateTenant("MyTenant_");
+
+        loginWith(USERNAME, PASSWORD);
+
+        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
+        DesignProcessDefinition dpd = pdb.done();
+        ProcessDefinition pd = deployAndEnableProcess(dpd);
+        ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
+
+        logout();
+        // when: we stop and start the node
+        stopPlatform();
+        changeToNode2();
+        loginWith(USERNAME, PASSWORD);
+        // then: work service is not runnning
+        waitForProcessToFinishAndBeArchived(pi);
+
+        // cleanup
+        disableAndDeleteProcess(pd);
+        logout();
+        changeToNode1();
+        startPlatform();
     }
 
 }
