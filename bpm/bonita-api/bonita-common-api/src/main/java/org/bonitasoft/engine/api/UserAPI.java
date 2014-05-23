@@ -377,7 +377,7 @@ public interface UserAPI {
     List<User> getUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion);
     
     /**
-     * Retrieves the list of user identifiers having the chosen custom user information with the given value.
+     * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
      * 
      * @param infoName
      *            The custom user information name
