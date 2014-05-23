@@ -32,12 +32,12 @@ public class EndEventTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(user);
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser("john", "bpm");
     }
 
@@ -113,7 +113,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         waitForProcessToFinish(startProcess);
@@ -130,7 +130,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "stop");
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
@@ -152,7 +152,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "step3");
         builder.addTransition("step3", "stop");
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
@@ -175,7 +175,7 @@ public class EndEventTest extends CommonAPITest {
             builder.addUserTask("step" + i, ACTOR_NAME);
             builder.addTransition("step" + i, "stop");
         }
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         checkNbOfHumanTasks(14);
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
@@ -208,7 +208,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
 
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         for (int i = 0; i < 3; i++) {

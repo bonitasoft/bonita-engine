@@ -3,20 +3,17 @@ package org.bonitasoft.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class MultiThreadCallsTest extends CommonAPITest {
 
-    private final APITestUtil apiTestUtil = new APITestUtil();
-
     class CallAPIMethodsThread extends Thread {
 
         private Exception exception;
+
+        private final APITestUtil apiTestUtil = new APITestUtil();
 
         public CallAPIMethodsThread() {
         }
@@ -25,11 +22,10 @@ public class MultiThreadCallsTest extends CommonAPITest {
         public void run() {
             super.run();
             try {
-                final APISession session = apiTestUtil.loginDefaultTenant();
-                final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-                identityAPI.getNumberOfUsers();
-                identityAPI.getNumberOfGroups();
-                apiTestUtil.logoutTenant(session);
+                apiTestUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+                apiTestUtil.getIdentityAPI().getNumberOfUsers();
+                apiTestUtil.getIdentityAPI().getNumberOfGroups();
+                apiTestUtil.logoutOnTenant();
             } catch (final Exception e) {
                 exception = e;
                 e.printStackTrace();
@@ -46,7 +42,6 @@ public class MultiThreadCallsTest extends CommonAPITest {
             }
             return "";
         }
-
     }
 
     @Test

@@ -60,7 +60,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
                 new ExpressionBuilder().createGroovyScriptExpression("script", "throw new java.lang.RuntimeException()", Long.class.getName()));
         processDefinitionBuilder.addAutomaticTask("timerStep");
         processDefinitionBuilder.addTransition("timer", "timerStep");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
@@ -264,7 +264,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         processDefinitionBuilder.addTransition("Boundary timer", "exceptionStep");
         processDefinitionBuilder.addTransition("exceptionStep", "end");
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
     }
 
 }

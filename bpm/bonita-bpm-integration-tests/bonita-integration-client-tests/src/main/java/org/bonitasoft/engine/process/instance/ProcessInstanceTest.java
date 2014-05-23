@@ -55,6 +55,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Assert;
@@ -124,9 +125,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Test
     public void deleteProcessInstance() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final ProcessInstance process1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance process2 = getProcessAPI().startProcess(processDefinition.getId());
@@ -157,9 +158,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Test
     public void deleteProcessInstances() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
@@ -184,9 +185,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Deprecated
     public void oldDeleteProcessInstances() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
@@ -219,7 +220,8 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     }
 
     private void getArchivedProcessInstances() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(false, false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
 
@@ -254,7 +256,8 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     private void getArchivedProcessInstances(final ProcessInstanceCriterion asc, final int asc1, final int asc2, final int asc3,
             final ProcessInstanceCriterion desc, final int desc1, final int desc2, final int desc3) throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(false, false));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -295,7 +298,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     }
 
     private void getNumberOfArchivedProcessInstances() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1"),
                 Arrays.asList(false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
         long numberOfProcessInstancesBefore;
@@ -317,9 +320,10 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void getNoChildrenInstanceIdsFromProcessInstance() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         final List<Long> ids = getProcessAPI().getChildrenInstanceIdsOfProcessInstance(pi0.getId(), 0, 10, ProcessInstanceCriterion.DEFAULT);
@@ -330,22 +334,22 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Test
     public void getSingleChildInstanceOfProcessInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("SubProcessInAInstance", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addAutomaticTask("step2")
+        builder.addActor(ACTOR_NAME).addAutomaticTask("step1").addAutomaticTask("step2")
                 .addUserTask("userSubTask", ACTOR_NAME).addTransition("step1", "userSubTask").addTransition("userSubTask", "step2");
 
-        final ProcessDefinition subProcess = deployAndEnableWithActor(builder.done(), ACTOR_NAME, pedro);
+        final ProcessDefinition subProcess = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, pedro);
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(subProcess.getName());
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(subProcess.getVersion());
 
         final ProcessDefinitionBuilder builderProc = new ProcessDefinitionBuilder().createNewInstance("executeInstanceSequentialWithSubProcess", "1.1");
-        builderProc.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addStartEvent("start")
+        builderProc.addActor(ACTOR_NAME).addStartEvent("start")
                 .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         builderProc.addAutomaticTask("step3").addEndEvent("end").addTransition("start", "callActivity").addTransition("callActivity", "step3")
                 .addUserTask("userTask", ACTOR_NAME).addTransition("step3", "userTask").addTransition("userTask", "end");
 
         DesignProcessDefinition processDefinition = builderProc.done();
-        final ProcessDefinition mainProcess = deployAndEnableWithActor(processDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition mainProcess = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, pedro);
         final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
         HumanTaskInstance userTask = waitForUserTask("userSubTask");
 
@@ -356,9 +360,10 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void getChildrenInstanceIdsOfUnknownProcessInstance() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final List<Long> childrenInstanceIds = getProcessAPI().getChildrenInstanceIdsOfProcessInstance(processInstance.getId() + 1, 0, 10,
@@ -369,9 +374,10 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void getProcessInstanceIdFromActivityInstanceId() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
 
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
@@ -384,9 +390,10 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void getNumberOfProcessInstances() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final long initialProcessInstanceNb = getProcessAPI().getNumberOfProcessInstances();
 
@@ -523,7 +530,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final User user = createUser(creator);
 
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder1.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder1.addActor(ACTOR_NAME);
 
         // 1 instance of process def:
         final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME)
@@ -553,7 +560,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void isInvolvedInProcessInstanceWithInvalidUser() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
         final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
 
@@ -573,9 +580,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Test
     public void setProcessInstanceState() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("step1", processInstance);
 
@@ -597,9 +604,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Cover(classes = { ProcessAPI.class, ProcessInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Process Instance", "start", "2 times" }, jira = "ENGINE-1094")
     @Test
     public void startProcess2Times() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
-                Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, pedro);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("initTask1"), Arrays.asList(true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, pedro);
 
         // Start process instance first time, and complete it
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -627,7 +634,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         processBuilder.addDoubleData("D", new ExpressionBuilder().createConstantDoubleExpression(3.14));
         processBuilder.addData("bigD", BigDecimal.class.getName(), null);
         processBuilder.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
         try {
             final Map<String, Serializable> variables = new HashMap<String, Serializable>();
@@ -674,11 +681,11 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addIntegerData(dataName, new ExpressionBuilder().createConstantIntegerExpression(1)).addUserTask("step1", ACTOR_NAME)
                 .addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, ACTOR_NAME, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, ACTOR_NAME, pedro);
 
         try {
             // create Operation keyed map
-            final Operation integerOperation = buildIntegerOperation(dataName, 2);
+            final Operation integerOperation = BuildTestUtil.buildIntegerOperation(dataName, 2);
             final List<Operation> operations = new ArrayList<Operation>();
             final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
             contexts.put("page", "1");
@@ -730,11 +737,11 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addIntegerData(dataName, new ExpressionBuilder().createConstantIntegerExpression(1)).addUserTask("step1", ACTOR_NAME)
                 .addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro, otherUser));
 
         // create Operation keyed map
-        final Operation integerOperation = buildIntegerOperation(dataName, 2);
+        final Operation integerOperation = BuildTestUtil.buildIntegerOperation(dataName, 2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(),
                 Collections.singletonList(integerOperation), Collections.<String, Serializable> singletonMap("page", "1"));
@@ -757,10 +764,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     public void runProcessInstanceWithDefaultFlownode_should_pass_all_human_task() throws Exception {
         logoutThenloginAs("pedro", "secreto");
 
-
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addDefaultTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
         ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
@@ -777,7 +783,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).
                 addTransition("step1", "step3", new ExpressionBuilder().createConstantBooleanExpression(false)).addDefaultTransition("step1", "step2")
                 .getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
         ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
@@ -794,7 +800,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).
                 addTransition("step1", "step3", new ExpressionBuilder().createConstantBooleanExpression(true)).addDefaultTransition("step1", "step2")
                 .getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
         ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
@@ -809,7 +815,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).
                 addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
         ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);

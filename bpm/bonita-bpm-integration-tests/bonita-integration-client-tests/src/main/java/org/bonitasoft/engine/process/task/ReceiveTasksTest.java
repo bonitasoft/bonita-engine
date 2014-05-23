@@ -83,7 +83,7 @@ public class ReceiveTasksTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -92,7 +92,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         if (user != null) {
             getIdentityAPI().deleteUser(user.getId());
         }
-        logout();
+        logoutOnTenant();
     }
 
     /*

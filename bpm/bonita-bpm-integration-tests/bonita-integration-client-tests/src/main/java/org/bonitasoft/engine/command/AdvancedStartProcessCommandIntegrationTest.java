@@ -68,10 +68,10 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser(USERNAME, "bpm");
-        logout();
-        loginWith(USERNAME, "bpm");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
@@ -79,7 +79,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
         processDeployer.clean();
         deleteUser(USERNAME);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -254,7 +254,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
             @Override
             public ProcessDefinition deploy(DesignProcessDefinition design) throws BonitaException {
-                return deployAndEnableWithActor(design, "actor", john);
+                return deployAndEnableProcessWithActor(design, "actor", john);
             }
 
             @Override

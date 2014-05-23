@@ -37,12 +37,12 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
 
     @Before
     public void setUp() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void tearDown() throws BonitaException {
-        logout();
+       logoutOnTenant();
     }
 
     @Test

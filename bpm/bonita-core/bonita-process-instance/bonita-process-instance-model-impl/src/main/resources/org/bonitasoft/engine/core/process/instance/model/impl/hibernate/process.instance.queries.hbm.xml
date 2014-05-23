@@ -658,13 +658,10 @@
 	<query name="getNumberOfSHumanTaskInstanceSupervisedBy">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE a.deleted = FALSE
-		AND a.rootContainerId = p.id
-		AND p.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE (supervisor.userId = :supervisorId)
+		AND a.logicalGroup1 =  supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
@@ -683,13 +680,10 @@
 	<query name="searchSHumanTaskInstanceSupervisedBy">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE a.deleted = FALSE
-		AND a.rootContainerId = p.id
-		AND p.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE (supervisor.userId = :supervisorId)
+		AND a.logicalGroup1 =  supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
@@ -709,15 +703,11 @@
 	<query name="searchSHumanTaskInstancePendingSupervisedBy">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE a.deleted = FALSE
 		AND a.stateExecuting = FALSE
-		AND a.rootContainerId = p.id
-		AND p.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE (supervisor.userId = :userId)
+		AND a.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
@@ -737,15 +727,11 @@
 	<query name="getNumberOfSHumanTaskInstancePendingSupervisedBy">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-		     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor 
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE a.deleted = FALSE
 		AND a.stateExecuting = FALSE
-		AND a.rootContainerId = p.id
-		AND p.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE (supervisor.userId = :userId)
+		AND a.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
@@ -942,60 +928,54 @@
 		WHERE f.deleted = FALSE
 	</query>
 	
-	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">
-		SELECT count(DISTINCT f)
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
-			     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-			WHERE f.deleted = FALSE
-			AND f.rootContainerId = p.id
-			AND p.processDefinitionId IN (
-				SELECT supervisor.processDefId
-				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-				WHERE (supervisor.userId = :supervisorId)
-				OR (supervisor.id IN (
-						SELECT supervisor.id
-						FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-						org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
-						WHERE um.userId = :supervisorId
-						AND (
-							(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-							OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-							OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
-						)
-					)
-				)
-			)
-	</query>
-	
 	<query name="searchSFlowNodeInstance">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.deleted = FALSE
 	</query>
 	
-	<query name="searchSFlowNodeInstanceSupervisedBy">
-		SELECT DISTINCT f
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
-			     org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-			WHERE f.deleted = FALSE
-			AND f.rootContainerId = p.id
-			AND p.processDefinitionId IN (
-				SELECT supervisor.processDefId
-				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-				WHERE (supervisor.userId = :supervisorId)
-				OR (supervisor.id IN (
-						SELECT supervisor.id
-						FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-						org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
-						WHERE um.userId = :supervisorId
-						AND (
-							(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-							OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-							OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
-						)
+	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">
+		SELECT count(DISTINCT f)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+		WHERE f.deleted = FALSE
+		AND f.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+					WHERE um.userId = :supervisorId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
 					)
 				)
 			)
+		)
+	</query>
+	
+	<query name="searchSFlowNodeInstanceSupervisedBy">
+		SELECT DISTINCT f
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+		WHERE f.deleted = FALSE
+		AND f.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+					WHERE um.userId = :supervisorId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)
+		)
 	</query>
 
 	<query name="getNumberOfSAutomaticTaskInstance">
@@ -1253,16 +1233,14 @@
 	<query name="getNumberOfSProcessInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT p.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE p.stateId != 6
-		AND p.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE (supervisor.userId = :userId)
+		AND p.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-					org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+						 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -1277,16 +1255,14 @@
 	<query name="searchSProcessInstanceSupervisedBy">
 		SELECT DISTINCT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE p.stateId != 6
-		AND p.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE (supervisor.userId = :userId)
+		AND p.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-					org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+						 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)

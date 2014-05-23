@@ -46,24 +46,22 @@ import org.junit.Test;
  */
 public class ProcessWithExpressionTestLocal extends CommonAPITest {
 
-    private static final String JOHN = "john";
-
     private User user;
 
     private ProcessDefinition processDefinition;
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
-        logout();
+        deleteUser(USERNAME);
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        user = createUser(JOHN, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        user = createUser(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     private ProcessDefinition deployEmptyProcess() throws BonitaException {
@@ -149,7 +147,7 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
         builder.addActor("actor");
         builder.addUserTask("step1", "actor")
         .addData("tData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("The default value")).isTransient();
-        processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
+        processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance step1 = waitForUserTask("step1");
 
