@@ -32,6 +32,8 @@ public class ParentProfileEntryBinding extends ElementBinding {
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         parentProfileEntryBuilder = new ExportedParentProfileEntryBuilder(attributes.get("name"));
+        String isCustom = attributes.get("isCustom");
+        parentProfileEntryBuilder.setCustom(Boolean.valueOf(isCustom));
     }
 
     @Override
@@ -49,6 +51,7 @@ public class ParentProfileEntryBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setChildObject(final String name, final Object value) {
         if ("childrenEntries".equals(name)) {

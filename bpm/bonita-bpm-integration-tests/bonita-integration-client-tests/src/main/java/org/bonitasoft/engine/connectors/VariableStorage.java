@@ -59,6 +59,10 @@ public final class VariableStorage implements Serializable {
         return variables.get(name);
     }
 
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
+
     public static void clearAll() {
         VariableStorageHolder.INSTANCE.clear();
         for (final Entry<Long, VariableStorage> entry : VariableStorageHolder.instances.entrySet()) {

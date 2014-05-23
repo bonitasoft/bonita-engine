@@ -455,4 +455,18 @@ public interface ProfileService {
      */
     List<SProfileEntry> searchProfileEntries(QueryOptions queryOptions) throws SBonitaSearchException;
 
+    /**
+     * @param profile
+     * @throws SProfileMemberDeletionException
+     * @since 6.3.1
+     */
+    void deleteAllProfileMembersOfProfile(SProfile profile) throws SProfileMemberDeletionException;
+
+    /**
+     * @param profile
+     * @throws SProfileEntryDeletionException
+     * @since 6.3.1
+     */
+    void deleteAllProfileEntriesOfProfile(SProfile profile) throws SProfileEntryDeletionException;
+
 }

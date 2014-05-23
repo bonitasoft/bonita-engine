@@ -28,8 +28,6 @@ public class ExportedProfile {
 
     private String description;
 
-    private String iconPath;
-
     private List<ExportedParentProfileEntry> parentProfileEntries;
 
     private ExportedProfileMapping profileMapping;
@@ -55,14 +53,6 @@ public class ExportedProfile {
 
     public void setDescription(final String description) {
         this.description = description;
-    }
-
-    public String getIconPath() {
-        return iconPath;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
     }
 
     public List<ExportedParentProfileEntry> getParentProfileEntries() {
@@ -92,7 +82,6 @@ public class ExportedProfile {
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         return result;
     }
 
@@ -116,13 +105,6 @@ public class ExportedProfile {
                 return false;
             }
         } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
             return false;
         }
         if (name == null) {
