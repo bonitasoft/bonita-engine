@@ -15,7 +15,7 @@ package org.bonitasoft.engine.profile.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
@@ -49,7 +49,7 @@ public class MembershipBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return new BEntry<String, String>(group, role);
+        return new Pair<String, String>(group, role);
     }
 
     @Override

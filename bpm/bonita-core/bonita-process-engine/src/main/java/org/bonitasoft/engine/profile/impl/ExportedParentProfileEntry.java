@@ -13,25 +13,17 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportError.Type;
 
 /**
  * @author Zhao Na
  * @author Celine Souchet
  */
-public class ExportedParentProfileEntry {
-
-    private final String name;
-
-    private String description;
-
-    private String type;
-
-    private String parentName;
-
-    private long index;
-
-    private String page;
+public class ExportedParentProfileEntry extends ExportedProfileEntry {
 
     private List<ExportedProfileEntry> childProfileEntries;
 
@@ -39,45 +31,12 @@ public class ExportedParentProfileEntry {
         return childProfileEntries;
     }
 
-    public void setChildProfileEntries(List<ExportedProfileEntry> childProfileEntries) {
+    public void setChildProfileEntries(final List<ExportedProfileEntry> childProfileEntries) {
         this.childProfileEntries = childProfileEntries;
     }
 
     public ExportedParentProfileEntry(final String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        result = prime * result + (page == null ? 0 : page.hashCode());
-        result = prime * result + (parentName == null ? 0 : parentName.hashCode());
-        result = prime * result + (int) (index ^ (index >>> 32));
-        return result;
-    }
-
-    public String getParentName() {
-        return parentName;
-    }
-
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
+        super(name);
     }
 
     @Override
@@ -90,64 +49,55 @@ public class ExportedParentProfileEntry {
         }
         if (getClass() != obj.getClass()) {
             return false;
+
         }
-        final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
-        if (description == null) {
-            if (other.description != null) {
+        if (!compareExportedProfileEntry(obj)) {
+            return false;
+        } else {
+            final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
+            if (getChildProfileEntries() == null) {
+                if (other.getChildProfileEntries() != null) {
+                    return false;
+                }
+            } else if (!getChildProfileEntries().equals(other.getChildProfileEntries())) {
                 return false;
             }
-        } else if (!description.equals(other.description)) {
-            return false;
         }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
+
+        return true;
+    }
+
+    public List<ImportError> getErrors() {
+        final List<ImportError> errors = new ArrayList<ImportError>();
+        if (hasError()) {
+            errors.add(getError());
+        }
+        final List<ExportedProfileEntry> childProfileEntries = getChildProfileEntries();
+        if (childProfileEntries != null) {
+            for (final ExportedProfileEntry childEntry : childProfileEntries) {
+                if (childEntry.hasError()) {
+                    errors.add(childEntry.getError());
+                }
             }
-        } else if (!type.equals(other.type)) {
-            return false;
         }
-        if (page == null) {
-            if (other.page != null) {
-                return false;
-            }
-        } else if (!page.equals(other.page)) {
-            return false;
+        if (errors.isEmpty()) {
+            return null;
         }
-        if (index != other.index) {
-            return false;
-        }
-        if (parentName == null) {
-            if (other.parentName != null) {
-                return false;
-            }
-        } else if (!parentName.equals(other.parentName)) {
+        return errors;
+    }
+
+    public boolean hasErrors() {
+        if (getErrors() == null) {
             return false;
         }
         return true;
     }
 
-    public String getType() {
-        return type;
+    @Override
+    public ImportError getError() {
+        if (getName() == null) {
+            return new ImportError(getName(), Type.PAGE);
+        }
+        return null;
     }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public long getIndex() {
-        return index;
-    }
-
-    public void setIndex(long index) {
-        this.index = index;
-    }
-
-    public String getPage() {
-        return page;
-    }
-
-    public void setPage(String page) {
-        this.page = page;
-    }
-
 }

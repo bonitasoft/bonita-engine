@@ -4,7 +4,6 @@ CREATE TABLE profile (
   isDefault BOOLEAN NOT NULL,
   name VARCHAR(50) NOT NULL,
   description TEXT,
-  iconPath VARCHAR(50),
   creationDate INT8 NOT NULL,
   createdBy INT8 NOT NULL,
   lastUpdateDate INT8 NOT NULL,
