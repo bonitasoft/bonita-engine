@@ -5762,6 +5762,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(sbe);
         }
     }
+    
+    @Override
+    public List<Long> getUserIdsForActor(long processDefinitionId, String actorName, int startIndex, int maxResults) {
+        // TODO Auto-generated method stub
+        return Collections.emptyList();
+    }
 
     @Override
     public SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, final SearchOptions searchOptions) {
