@@ -74,7 +74,7 @@ public class SPPlatformTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        session = apiTestSpUtil.loginPlatform();
+        session = apiTestSpUtil.loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         createTenants(); // create tenants in before class because this actions takes a lot of time
     }
@@ -84,7 +84,7 @@ public class SPPlatformTest {
         platformAPI.deleteTenant(tenantId1);
         platformAPI.deleteTenant(tenantId2);
         platformAPI.deleteTenant(tenantId3);
-        apiTestSpUtil.logoutPlatform(session);
+        apiTestSpUtil.logoutOnPlatform(session);
     }
 
     private static void createTenants() throws Exception {
@@ -241,7 +241,7 @@ public class SPPlatformTest {
             platformAPI.createTenant(new TenantCreator("test", "test create tenant", "testIconName", "testIconPath", "name", "123"));
             fail("can't get platform api with null session");
         } finally {
-            session = apiTestSpUtil.loginPlatform();
+            session = apiTestSpUtil.loginOnPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         }
     }

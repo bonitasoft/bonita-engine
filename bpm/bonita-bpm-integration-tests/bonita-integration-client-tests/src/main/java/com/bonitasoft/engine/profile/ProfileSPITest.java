@@ -103,8 +103,8 @@ public class ProfileSPITest extends AbstractProfileTest {
         assertEquals(1, profiles.size());
         final Profile profile1 = profiles.get(0);
 
-        logout();
-        loginWith("userName1", "User1Pwd");
+       logoutOnTenant();
+        loginOnDefaultTenantWith("userName1", "User1Pwd");
         final ProfileCreator profileCreator = new ProfileCreator(profile1);
         profileCreator.setName("name");
         final Profile profile2 = getProfileAPI().createProfile(profileCreator);

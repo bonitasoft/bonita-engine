@@ -73,7 +73,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         createUsers();
 
@@ -126,7 +126,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
 
-        logout();
+       logoutOnTenant();
     }
 
 }

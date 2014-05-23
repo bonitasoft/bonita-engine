@@ -25,6 +25,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
@@ -57,11 +58,11 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
                 "testSetConnectorImplementationCleansOldDependencies", "1.0");
         processDefinitionBuilderExt.addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER);
 
-        final ProcessDefinition processDefinition = deployProcessWithConnector(
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithConnector(
                 processDefinitionBuilderExt,
-                Arrays.asList(getContentAndBuildBarResource("OldConnector.impl", APIAccessorConnector.class)),
-                Arrays.asList(generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
-                        generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar")));
+                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("OldConnector.impl", APIAccessorConnector.class)),
+                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
+                        BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar")));
 
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
