@@ -38,8 +38,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
@@ -158,7 +158,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         login();
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-        BPMTestSPUtil.destroyTenant(tenant1);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenant1);
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,

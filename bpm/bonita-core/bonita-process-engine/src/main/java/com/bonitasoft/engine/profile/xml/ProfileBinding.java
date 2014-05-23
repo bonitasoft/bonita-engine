@@ -43,8 +43,6 @@ public class ProfileBinding extends org.bonitasoft.engine.profile.xml.ProfileBin
         if (profileBuilder != null) {
             if ("description".equals(name)) {
                 profileBuilder.setDescription(value);
-            } else if ("iconPath".equals(name)) {
-                profileBuilder.setIconPath(value);
             }
         }
     }

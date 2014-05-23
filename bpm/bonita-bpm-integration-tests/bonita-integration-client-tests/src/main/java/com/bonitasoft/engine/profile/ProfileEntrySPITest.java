@@ -39,7 +39,7 @@ import org.junit.Test;
  * @author Julien Mege
  * @author Celine Souchet
  */
-public class ProfileEntryTest extends AbstractProfileTest {
+public class ProfileEntrySPITest extends AbstractProfileTest {
 
     private static final String ENTRY_DESCRIPTION = "entry description";
 
@@ -147,7 +147,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void createProfileEntryWithoutIndex() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -184,7 +184,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void createProfileEntryNico() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final long profileId = createdProfile.getId();
 
         // Create Folder Profile Entry
@@ -289,7 +289,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         final String profileEntryName = "entry1";
 
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final long profileId = createdProfile.getId();
 
         // Create Folder Profile Entry
@@ -373,7 +373,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryIndexOnDelete() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final Long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -411,7 +411,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void deleteProfileEntryAndChildren() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final Long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -446,7 +446,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryIndexOnInsert() throws BonitaException {
         // Create Profile Entry 1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -483,7 +483,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryIndexOnUpdate() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry Menu1

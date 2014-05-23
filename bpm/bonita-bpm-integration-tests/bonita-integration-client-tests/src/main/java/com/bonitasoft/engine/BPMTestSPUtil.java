@@ -143,15 +143,10 @@ public class BPMTestSPUtil {
         final long tenantId = platformAPI.createTenant(tenantCreator);
         platformAPI.activateTenant(tenantId);
         logoutOnPlatform(session);
+        final APISession apiSession = loginOnTenantWithTechnicalLogger(tenantId);
+        ClientEventUtil.deployCommand(apiSession);
+        logoutOnTenant(apiSession);
         return tenantId;
-    }
-
-    public static void destroyTenant(final long tenantId) throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.deactiveTenant(tenantId);
-        platformAPI.deleteTenant(tenantId);
-        logoutOnPlatform(session);
     }
 
     public static void logoutOnTenant(final APISession session) throws BonitaException {
@@ -286,6 +281,9 @@ public class BPMTestSPUtil {
     }
 
     public static void deactivateAndDeleteTenant(final long tenantId) throws BonitaException {
+        final APISession apiSession = loginOnTenantWithTechnicalLogger(tenantId);
+        ClientEventUtil.undeployCommand(apiSession);
+        logoutOnTenant(apiSession);
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.deactiveTenant(tenantId);
