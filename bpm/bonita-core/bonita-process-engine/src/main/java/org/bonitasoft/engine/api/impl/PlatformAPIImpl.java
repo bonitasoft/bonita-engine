@@ -454,14 +454,14 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (nodeConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
-            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
-                serviceWithLifecycle.stop();
-            }
             final List<STenant> tenantIds = getTenants(platformAccessor);
             for (final STenant tenant : tenantIds) {
                 // stop the tenant services:
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
+            }
+            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
+                serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {

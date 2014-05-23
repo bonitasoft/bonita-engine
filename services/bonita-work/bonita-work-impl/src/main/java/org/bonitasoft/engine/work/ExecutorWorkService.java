@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -38,8 +35,6 @@ public class ExecutorWorkService implements WorkService {
 
     private final TransactionService transactionService;
 
-    private ExecutorService executor;
-
     private final WorkSynchronizationFactory workSynchronizationFactory;
 
     private final ThreadLocal<AbstractWorkSynchronization> synchronizations = new ThreadLocal<AbstractWorkSynchronization>();
@@ -50,7 +45,7 @@ public class ExecutorWorkService implements WorkService {
 
     private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
 
-    private Queue<Runnable> queue;
+    private BonitaExecutorService executor;
 
     public ExecutorWorkService(final TransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
             final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory) {
@@ -121,29 +116,24 @@ public class ExecutorWorkService implements WorkService {
             stopWithException();
         } catch (SWorkException e) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void start() {
         if (isStopped()) {
-            final Pair<ExecutorService, Queue<Runnable>> createExecutorService = bonitaExecutorServiceFactory.createExecutorService();
-            executor = createExecutorService.getLeft();
-            queue = createExecutorService.getRight();
+            executor = bonitaExecutorServiceFactory.createExecutorService();
         }
     }
 
     @Override
     public void pause() throws SWorkException {
-        stopWithException();
-    }
-
-    private void stopWithException() throws SWorkException {
         if (isStopped()) {
             return;
         }
         executor.shutdown();
-        queue.clear();
+        executor.clearQueue();
         try {
             if (!executor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
                 throw new SWorkException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
@@ -152,7 +142,21 @@ public class ExecutorWorkService implements WorkService {
             throw new SWorkException("Interrupted while pausing the work service", e);
         }
         executor = null;
-        queue = null;
+    }
+
+    private void stopWithException() throws SWorkException {
+        if (isStopped()) {
+            return;
+        }
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
+                throw new SWorkException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
+            }
+        } catch (final InterruptedException e) {
+            throw new SWorkException("Interrupted while pausing the work service", e);
+        }
+        executor = null;
     }
 
     @Override

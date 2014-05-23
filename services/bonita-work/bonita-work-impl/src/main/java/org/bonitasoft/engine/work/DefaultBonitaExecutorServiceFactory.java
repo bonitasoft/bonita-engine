@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.commons.Pair;
 
 /**
  * Use ThreadPoolExecutor as ExecutorService
@@ -62,13 +59,12 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     }
 
     @Override
-    public Pair<ExecutorService, Queue<Runnable>> createExecutorService() {
+    public BonitaExecutorService createExecutorService() {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
-        return Pair.of((ExecutorService) new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue,
-                threadFactory, handler),
-                (Queue<Runnable>) workQueue);
+        return new BonitaThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue,
+                threadFactory, handler);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
