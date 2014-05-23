@@ -39,8 +39,6 @@ public class ProfileBinding extends ElementBinding {
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {
             profileBuilder.setDescription(value);
-        } else if ("iconPath".equals(name)) {
-            profileBuilder.setIconPath(value);
         }
     }
 

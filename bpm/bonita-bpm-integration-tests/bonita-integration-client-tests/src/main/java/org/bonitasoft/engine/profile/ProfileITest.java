@@ -29,7 +29,7 @@ import org.junit.Test;
  * @author Julien Mege
  * @author Celine Souchet
  */
-public class ProfileTest extends AbstractProfileTest {
+public class ProfileITest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.", jira = "")
     @Test

@@ -27,8 +27,6 @@ public interface SProfile extends PersistentObject {
 
     String getDescription();
 
-    String getIconPath();
-
     long getCreationDate();
 
     long getCreatedBy();
