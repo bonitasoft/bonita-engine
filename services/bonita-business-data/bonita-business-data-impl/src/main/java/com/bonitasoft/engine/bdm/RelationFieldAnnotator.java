@@ -73,6 +73,7 @@ public class RelationFieldAnnotator {
 
         } else {
             relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
+            relation.param("orphanRemoval", true);
             final JAnnotationUse joinColumn = addJoinColumn(fieldVar, entityClass.name());
             joinColumn.param("nullable", false);
         }
