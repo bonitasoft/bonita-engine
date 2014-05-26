@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
+ * Bonitasoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -104,9 +104,6 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
         return new DataDefinitionBuilder(getProcessBuilder(), getContainer(), activity, name, className, defaultValue);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ConnectorDefinitionBuilder addConnector(final String name, final String connectorId, final String version, final ConnectorEvent activationEvent) {
         return new ConnectorDefinitionBuilder(getProcessBuilder(), getContainer(), name, connectorId, version, activationEvent, activity);
@@ -196,12 +193,9 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      */
     public ActivityDefinitionBuilder addOperation(final LeftOperand leftOperand, final OperatorType type, final String operator,
             final String operatorInputType, final Expression rightOperand) {
-        activity.addOperation(new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
-                .setOperatorInputType(operatorInputType).setLeftOperand(leftOperand).done());
-        if (rightOperand == null) {
-            getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
-        }
-        return this;
+        final Operation operation = new OperationBuilder().createNewInstance().setRightOperand(rightOperand).setType(type).setOperator(operator)
+                .setOperatorInputType(operatorInputType).setLeftOperand(leftOperand).done();
+        return addOperation(operation);
     }
 
     /**
@@ -218,7 +212,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     private void checkRightOperand(final Operation operation) {
-        if (operation.getRightOperand() == null) {
+        if (operation.getRightOperand() == null && operation.getType() != OperatorType.DELETION) {
             getProcessBuilder().addError("operation on activity " + activity.getName() + " has no expression in right operand");
         }
     }
@@ -257,7 +251,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Adds a boundary event
-     * 
+     *
      * @param name
      *            the name of the boundary event
      * @param interrupting
@@ -271,7 +265,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Adds an interrupting boundary event
-     * 
+     *
      * @param name
      *            the name of the boundary event
      * @return

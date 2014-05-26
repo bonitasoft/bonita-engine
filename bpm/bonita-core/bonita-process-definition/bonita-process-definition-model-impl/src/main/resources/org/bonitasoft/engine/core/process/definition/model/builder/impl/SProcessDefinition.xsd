@@ -679,7 +679,7 @@
 
 	<xs:complexType name="SOperation">
 		<xs:all>
-			<xs:element name="rightOperand" type="definition:SExpression" minOccurs="1" />
+			<xs:element name="rightOperand" type="definition:SExpression" minOccurs="0" />
 			<xs:element name="leftOperand" type="definition:SLeftOperand" minOccurs="1" />
 		</xs:all>
 		<xs:attribute name="operator" />

@@ -425,7 +425,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-            "User Performed Task" }, jira = "ENGINE-715")
+    "User Performed Task" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserPerformedTask() throws Exception {
         // create user
@@ -583,7 +583,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-            "User Started Process" }, jira = "ENGINE-715")
+    "User Started Process" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserStartedProcess() throws Exception {
         // create user
@@ -712,7 +712,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class, ArchivedProcessInstancesSearchDescriptor.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Archived",
-            "Process Instances" }, jira = "ENGINE-998")
+    "Process Instances" }, jira = "ENGINE-998")
     @Test
     public void searchArchivedProcessInstances() throws Exception {
         final User user1 = createUser("john1", "bpm");
@@ -911,7 +911,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedProcessInstances",
-            "Apostrophe" }, jira = "ENGINE-366, ENGINE-589")
+    "Apostrophe" }, jira = "ENGINE-366, ENGINE-589")
     @Test
     public void searchArchivedProcessInstancesWithApostrophe() throws Exception {
         // Create process
@@ -1126,8 +1126,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         return simpleProcess;
     }
 
-    private ProcessDefinition deployProcessWithHumanTask(final String userTaskName) throws BonitaException,
-            InvalidProcessDefinitionException {
+    private ProcessDefinition deployProcessWithHumanTask(final String userTaskName) throws BonitaException, InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("myProc", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(userTaskName, ACTOR_NAME);
@@ -1183,15 +1182,15 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance procInst = getProcessAPI().startProcess(simpleProcess.getId());
 
         // execute it until the end
-        long processInstanceId = procInst.getId();
+        final long processInstanceId = procInst.getId();
         waitForUserTaskAndExecuteIt("step1", processInstanceId, user.getId());
         waitForProcessToFinish(processInstanceId);
 
         // search archived process instances: all states must be retrieved
-        SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(processInstanceId);
+        final SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(processInstanceId);
 
         assertEquals(3, searchResult.getCount());
-        List<ArchivedProcessInstance> archivedProcesses = searchResult.getResult();
+        final List<ArchivedProcessInstance> archivedProcesses = searchResult.getResult();
         assertEquals(ProcessInstanceState.INITIALIZING.getId(), archivedProcesses.get(0).getStateId());
         assertEquals(ProcessInstanceState.STARTED.getId(), archivedProcesses.get(1).getStateId());
         assertEquals(ProcessInstanceState.COMPLETED.getId(), archivedProcesses.get(2).getStateId());
@@ -1200,13 +1199,12 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(simpleProcess.getId());
     }
 
-    private SearchResult<ArchivedProcessInstance> searchAchivedProcessInstancesInAllStates(long processInstanceId) throws SearchException {
-        SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
+    private SearchResult<ArchivedProcessInstance> searchAchivedProcessInstancesInAllStates(final long processInstanceId) throws SearchException {
+        final SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
         optionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
         optionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.CALLER_ID, -1L);
         optionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
-        SearchResult<ArchivedProcessInstance> searchResult = getProcessAPI().searchArchivedProcessInstancesInAllStates(optionsBuilder.done());
-        return searchResult;
+        return getProcessAPI().searchArchivedProcessInstancesInAllStates(optionsBuilder.done());
     }
 
 }

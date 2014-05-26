@@ -37,8 +37,8 @@ public class ClassReflector {
     static {
         methods = new HashMap<String, Method>();
     }
-    
-    private final static Object MUTEX = new Object();
+
+    private static final Object MUTEX = new Object();
 
     public static Collection<Method> getAccessibleGetters(final Class<?> clazz) {
         final Collection<Method> methods = new HashSet<Method>();
@@ -130,7 +130,8 @@ public class ClassReflector {
         return methods.get(key);
     }
 
-    private static void putIfAbsent(final Class<?> clazz, final String methodName, final String key, final Class<?>... parameterTypes) throws NoSuchMethodException {
+    private static void putIfAbsent(final Class<?> clazz, final String methodName, final String key, final Class<?>... parameterTypes)
+            throws NoSuchMethodException {
         if (!methods.containsKey(key)) {
             synchronized (MUTEX) {
                 // ensure that key was not put before between check and lock
@@ -156,13 +157,13 @@ public class ClassReflector {
             synchronized (MUTEX) {
                 // ensure that key was not put before between check and lock
                 if (!methods.containsKey(key)) {
-                    Method method = getFirstMethodWithName(clazz, methodName);
+                    final Method method = getFirstMethodWithName(clazz, methodName);
                     methods.put(key, method);
                 }
             }
         }
     }
-    
+
     public static Method getFirstMethodWithName(final Class<?> clazz, final String methodName) {
         Method selectedMethod = null;
         for (final Method method : clazz.getMethods()) {

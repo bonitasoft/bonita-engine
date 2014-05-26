@@ -47,29 +47,27 @@ public class StartEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start" }, story = "Execute process with several start event.", jira = "ENGINE-1592, ENGINE-1593")
     @Test
     public void executeSeveralStartEventsInSameProcessDefinition() throws Exception {
-        int timerValue = 10000;
+        final int timerValue = 10000;
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerValue);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("startEvent").addUserTask("step1", ACTOR_NAME).addTransition("startEvent", "step1");
         processDefinitionBuilder.addStartEvent("startEventWithSignal").addSignalEventTrigger("signalName").addUserTask("step1WithSignal", ACTOR_NAME)
-                .addTransition("startEventWithSignal", "step1WithSignal");
+        .addTransition("startEventWithSignal", "step1WithSignal");
         processDefinitionBuilder.addStartEvent("startEventWithTimer").addTimerEventTriggerDefinition(TimerType.DURATION, timerExpression)
-                .addUserTask("step1WithTimer", ACTOR_NAME).addTransition("startEventWithTimer", "step1WithTimer");
+        .addUserTask("step1WithTimer", ACTOR_NAME).addTransition("startEventWithTimer", "step1WithTimer");
         processDefinitionBuilder.addStartEvent("startEventWithMessage").addMessageEventTrigger("message").addUserTask("step1WithMessage", ACTOR_NAME)
-                .addTransition("startEventWithMessage", "step1WithMessage");
+        .addTransition("startEventWithMessage", "step1WithMessage");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
-        HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");
+        final HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10)
-                .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
+        .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
 
-        List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(),
-                searchOptionsBuilder.done())
-                .getResult();
-        long rootContainerId = waitForUserTaskStep1.getRootContainerId();
+        List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
+        final long rootContainerId = waitForUserTaskStep1.getRootContainerId();
 
         assertNotNull("searchPendingTasksForUser give a null result for userId:" + user.getId() + " search options:" + searchOptionsBuilder.done(),
                 humanTaskInstances);
@@ -78,11 +76,12 @@ public class StartEventTest extends CommonAPITest {
         // then we have 2 tasks
         assertTrue(humanTaskInstances.size() > 0);
 
-        for (HumanTaskInstance humanTaskInstance : humanTaskInstances) {
-            if (humanTaskInstance.getRootContainerId() == rootContainerId)
+        for (final HumanTaskInstance humanTaskInstance : humanTaskInstances) {
+            if (humanTaskInstance.getRootContainerId() == rootContainerId) {
                 // even if step1WithTimer is fired
                 // the start event should be the first one
                 assertEquals("step1", humanTaskInstance.getName());
+            }
         }
 
         // Verify that the start without trigger, and the start with a timer are started

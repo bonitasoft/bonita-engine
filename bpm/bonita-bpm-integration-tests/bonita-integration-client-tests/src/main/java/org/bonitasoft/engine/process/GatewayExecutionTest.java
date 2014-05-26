@@ -1056,8 +1056,7 @@ public class GatewayExecutionTest extends CommonAPITest {
     }
 
     @Test
-    public void tooManyTokens() throws Exception
-    {
+    public void tooManyTokens() throws Exception {
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         processDefinitionBuilder = processDefinitionBuilder.createNewInstance("tooManyTokens", PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);

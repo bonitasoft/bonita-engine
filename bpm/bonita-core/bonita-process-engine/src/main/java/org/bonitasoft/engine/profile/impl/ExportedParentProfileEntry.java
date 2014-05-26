@@ -54,32 +54,32 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
         if (!compareExportedProfileEntry(obj)) {
             return false;
         } else {
-            final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
+        final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
             if (getChildProfileEntries() == null) {
                 if (other.getChildProfileEntries() != null) {
-                    return false;
-                }
-            } else if (!getChildProfileEntries().equals(other.getChildProfileEntries())) {
                 return false;
             }
+            } else if (!getChildProfileEntries().equals(other.getChildProfileEntries())) {
+            return false;
         }
+            }
 
         return true;
-    }
+        }
 
     public List<ImportError> getErrors() {
         final List<ImportError> errors = new ArrayList<ImportError>();
         if (hasError()) {
             errors.add(getError());
-        }
+            }
         final List<ExportedProfileEntry> childProfileEntries = getChildProfileEntries();
         if (childProfileEntries != null) {
             for (final ExportedProfileEntry childEntry : childProfileEntries) {
                 if (childEntry.hasError()) {
                     errors.add(childEntry.getError());
-                }
-            }
         }
+        }
+            }
         if (errors.isEmpty()) {
             return null;
         }
@@ -89,7 +89,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
     public boolean hasErrors() {
         if (getErrors() == null) {
             return false;
-        }
+    }
         return true;
     }
 
@@ -97,7 +97,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
     public ImportError getError() {
         if (getName() == null) {
             return new ImportError(getName(), Type.PAGE);
-        }
+    }
         return null;
     }
 }

@@ -10,9 +10,9 @@ import org.junit.Test;
 
 public abstract class TransactionServiceTest {
 
-    protected abstract TransactionService getTxService() throws Exception;
-
     TransactionService txService;
+
+    protected abstract TransactionService getTxService() throws Exception;
 
     @Before
     public void before() throws Exception {
@@ -23,7 +23,7 @@ public abstract class TransactionServiceTest {
     public void afterTest() {
         try {
             txService.complete();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // Do nothing
         }
     }
@@ -72,17 +72,17 @@ public abstract class TransactionServiceTest {
 
     @Test
     public void getNumberOfActiveTransactionsWith2TransactionsOpen() throws Exception {
-        CountDownLatch lock1 = new CountDownLatch(1);
-        CountDownLatch lock2 = new CountDownLatch(1);
+        final CountDownLatch lock1 = new CountDownLatch(1);
+        final CountDownLatch lock2 = new CountDownLatch(1);
 
-        CountDownLatch startSignal = new CountDownLatch(2);
+        final CountDownLatch startSignal = new CountDownLatch(2);
 
-        TransactionWorker txWorker1 = new TransactionWorker(lock1, txService, startSignal);
-        TransactionWorker txWorker2 = new TransactionWorker(lock2, txService, startSignal);
+        final TransactionWorker txWorker1 = new TransactionWorker(lock1, txService, startSignal);
+        final TransactionWorker txWorker2 = new TransactionWorker(lock2, txService, startSignal);
 
-        Thread t1 = new Thread(txWorker1);
+        final Thread t1 = new Thread(txWorker1);
         t1.setName("txWorker1");
-        Thread t2 = new Thread(txWorker2);
+        final Thread t2 = new Thread(txWorker2);
         t2.setName("txWorker2");
 
         t1.start();
@@ -121,14 +121,14 @@ public abstract class TransactionServiceTest {
                 startSignal.countDown();
                 // Wait until the caller tells us to
                 lock.await();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new RuntimeException(e);
             } finally {
                 try {
                     transactionService.complete();
-                } catch (STransactionCommitException e) {
+                } catch (final STransactionCommitException e) {
                     e.printStackTrace();
-                } catch (STransactionRollbackException e) {
+                } catch (final STransactionRollbackException e) {
                     e.printStackTrace();
                 }
             }
