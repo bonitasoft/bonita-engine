@@ -20,18 +20,24 @@ import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -50,6 +56,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ProcessAPIImplTest {
 
     final long tenantId = 1;
+
+    private static final long ACTOR_ID = 100;
+
+    private static final long PROCESS_DEFINITION_ID = 110;
+
+    private static final String ACTOR_NAME = "employee";
 
     @Mock
     private TenantServiceAccessor tenantAccessor;
@@ -225,4 +237,43 @@ public class ProcessAPIImplTest {
         when(jobParam.getValue()).thenReturn(Integer.MAX_VALUE);
         return jobParam;
     }
+
+    @Test
+    public void getUserIdsForActor_returns_result_of_actor_mapping_service() throws Exception {
+        // given
+        SActor actor = mock(SActor.class);
+        when(actor.getId()).thenReturn(ACTOR_ID);
+
+        ActorMappingService actorMappingService = mock(ActorMappingService.class);
+        when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        when(actorMappingService.getPossibleUserIdsOfActorId(ACTOR_ID, 0, 10)).thenReturn(Arrays.asList(1L, 10L));
+        when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenReturn(actor);
+
+        // when
+        List<Long> userIdsForActor = processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
+
+        // then
+        assertThat(userIdsForActor).containsExactly(1L, 10L);
+    }
+
+    @Test
+    public void getUserIdsForActor_throws_RetrieveException_when_actorMappingService_throws_SBonitaException() throws Exception {
+        // given
+        SActor actor = mock(SActor.class);
+        when(actor.getId()).thenReturn(ACTOR_ID);
+
+        ActorMappingService actorMappingService = mock(ActorMappingService.class);
+        when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenThrow(new SActorNotFoundException(""));
+
+        // when
+        try {
+            processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
+            fail("Exception expected");
+        } catch (RetrieveException e) {
+            // then ok
+        }
+
+    }
+
 }
