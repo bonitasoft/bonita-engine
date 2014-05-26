@@ -189,7 +189,7 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     protected void loginOnTenantWithTechnicalLogger(final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenantWithTechnicalLogger(tenantId));
+        setSession(BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId));
         setAPIs();
     }
 
@@ -381,9 +381,8 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorLongToExecute(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user) throws BonitaException, IOException {
-        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
-                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnectorLongToExecute.impl", TestConnectorLongToExecute.class)),
-                Collections.<BarResource> emptyList(), null);
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, null, "TestConnectorLongToExecute.impl",
+                TestConnectorLongToExecute.class, "TestConnectorLongToExecute.jar");
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder,
