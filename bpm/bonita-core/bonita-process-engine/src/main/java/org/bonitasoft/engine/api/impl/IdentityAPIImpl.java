@@ -1503,12 +1503,12 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private CustomUserInfoAPI createCustomUserInfoAPI() {
-        return new CustomUserInfoAPI(getTenantAccessor().getIdentityService());
+    private CustomUserInfoAPIDelegate createCustomUserInfoAPI() {
+        return new CustomUserInfoAPIDelegate(getTenantAccessor().getIdentityService());
     }
 
-    private CustomUserInfoDefinitionAPI createCustomUserInfoDefinitionAPI() {
-        return new CustomUserInfoDefinitionAPI(getTenantAccessor().getIdentityService());
+    private CustomUserInfoDefinitionAPIDelegate createCustomUserInfoDefinitionAPI() {
+        return new CustomUserInfoDefinitionAPIDelegate(getTenantAccessor().getIdentityService());
     }
 
     private SCustomUserInfoValueAPI createCustomUserInfoValueAPI() {

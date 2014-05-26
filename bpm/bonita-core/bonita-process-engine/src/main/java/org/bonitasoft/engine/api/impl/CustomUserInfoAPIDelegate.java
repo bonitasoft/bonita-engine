@@ -34,13 +34,13 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserInfoAPI {
+public class CustomUserInfoAPIDelegate {
 
     private IdentityService service;
 
     private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
-    public CustomUserInfoAPI(IdentityService service) {
+    public CustomUserInfoAPIDelegate(IdentityService service) {
         this.service = service;
     }
 

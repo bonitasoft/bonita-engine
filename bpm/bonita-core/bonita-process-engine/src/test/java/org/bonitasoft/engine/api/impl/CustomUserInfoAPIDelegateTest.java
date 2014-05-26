@@ -24,16 +24,16 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Vincent Elcrin
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CustomUserInfoAPITest {
+public class CustomUserInfoAPIDelegateTest {
 
-    private CustomUserInfoAPI api;
+    private CustomUserInfoAPIDelegate api;
 
     @Mock
     private IdentityService service;
 
     @Before
     public void setUp() {
-        api = new CustomUserInfoAPI(service);
+        api = new CustomUserInfoAPIDelegate(service);
     }
 
     @Test
