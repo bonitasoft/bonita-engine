@@ -20,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -229,6 +230,7 @@ public class EntityCodeGenerator {
         if (sfield.isCollection()) {
             final JAnnotationUse collectionAnnotation = codeGenerator.addAnnotation(fieldVar, ElementCollection.class);
             collectionAnnotation.param("fetch", FetchType.EAGER);
+            codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         }
         final JAnnotationUse columnAnnotation = codeGenerator.addAnnotation(fieldVar, Column.class);
         columnAnnotation.param("name", sfield.getName().toUpperCase());

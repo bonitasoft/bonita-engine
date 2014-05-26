@@ -262,8 +262,33 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(model);
         bdmCodeGenerator.generate(destDir);
-        
+
         assertFilesAreEqual("Employee.java", "EmployeeListAggregation.test");
+    }
+
+    @Test
+    public void addList() throws Exception {
+        final BusinessObjectModel model = build();
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator.generate(destDir);
+
+        assertFilesAreEqual("Forecast.java", "ForecastList.test");
+    }
+
+    private BusinessObjectModel build() {
+        final SimpleField field = new SimpleField();
+        field.setName("temperatures");
+        field.setType(FieldType.DOUBLE);
+        field.setCollection(Boolean.TRUE);
+
+        final BusinessObject forecastBO = new BusinessObject();
+        forecastBO.setQualifiedName("Forecast");
+        forecastBO.addField(field);
+
+        final BusinessObjectModel model = new BusinessObjectModel();
+        model.addBusinessObject(forecastBO);
+        return model;
     }
 
     private BusinessObjectModel build(final boolean composition, final boolean collection) {
@@ -311,7 +336,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-        
+
         assertThat(file).hasContentEqualTo(expected);
     }
 
