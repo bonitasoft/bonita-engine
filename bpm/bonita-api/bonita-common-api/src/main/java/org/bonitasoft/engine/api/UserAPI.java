@@ -387,7 +387,7 @@ public interface UserAPI {
      *            The start index (the first valid value is zero)
      * @param maxResults
      *            The max number of user identifiers to be retrieved
-     * @return the list of user identifiers having the chosen custom user information with the given value.
+     * @return the list of user identifiers containing the chosen custom user information with the given value.
      * @since 6.3.2
      */
     List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, int startIndex, int maxResults);
