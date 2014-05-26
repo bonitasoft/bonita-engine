@@ -10,7 +10,7 @@ package com.bonitasoft.engine.bdm.validator.rule;
 
 /**
  * Tests the validity of Query parameters
- *
+ * 
  * @author Emmanuel Duchastenier
  */
 import java.util.Arrays;
@@ -19,25 +19,19 @@ import java.util.List;
 import javax.lang.model.SourceVersion;
 
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
-import com.bonitasoft.engine.bdm.QueryParameter;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class QueryParameterValidationRule implements ValidationRule {
+public class QueryParameterValidationRule extends ValidationRule<QueryParameter> {
 
     public static final List<String> FORBIDDEN_PARAMETER_NAMES = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof QueryParameter;
+    public QueryParameterValidationRule() {
+        super(QueryParameter.class);
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(QueryParameterValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
-        final QueryParameter parameter = (QueryParameter) modelElement;
+    public ValidationStatus validate(final QueryParameter parameter) {
         final ValidationStatus status = new ValidationStatus();
         final String name = parameter.getName();
         if (name == null || name.isEmpty()) {
