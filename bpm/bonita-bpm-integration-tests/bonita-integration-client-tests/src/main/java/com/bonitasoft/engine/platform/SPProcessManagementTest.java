@@ -132,7 +132,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent2);
         logoutOnTenant();
 
-        final long tenant1 = BPMTestSPUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
+        final long tenant1 = BPMTestSPUtil.createAndActivateTenant("suomenlinna", null, null, "hamme", "saari");
         loginOnTenantWith("hamme", "saari", tenant1);
         ClientEventUtil.deployCommand(getSession());
         final User user1 = createUser(USERNAME, PASSWORD);
@@ -159,7 +159,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-        BPMTestSPUtil.deactivateAndDeleteTenant(tenant1);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenant1, "hamme", "saari");
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,
