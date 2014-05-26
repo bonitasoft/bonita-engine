@@ -59,6 +59,7 @@ public class RelationFieldAnnotator {
             relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
         } else {
             relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
+            relation.param("orphanRemoval", true);
         }
         addJoinColumn(fieldVar, field.getName());
         relation.param("optional", field.isNullable());
