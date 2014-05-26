@@ -144,6 +144,26 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
 
     }
 
+    // for manual testing in dev mode with teamwork licence only
+    // @Test
+    public void importProfile_with_teamwork_level_customProfile() throws Exception {
+        // given
+        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+                .getResourceAsStream("Profiles_teamwork_customProfile.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(profileByteArray));
+
+        // when import
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(profileByteArray, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        assertThat(importProfiles).as("should have 1 imported profiles").hasSize(1);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error found in status: %s ", importStatus).isEmpty();
+            // Status is Status.ADDED in whith efficency licence
+            assertThat(importStatus.getStatus()).isEqualTo(Status.SKIPPED);
+        }
+    }
+
     private void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);

@@ -186,12 +186,9 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final Parser parser = tenantAccessor.getProfileParser();
         final PageService pageService = tenantAccessor.getPageService();
         final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
-        for (final ExportedProfile profile : profiles) {
-            if (!profile.isDefault()) {
-                LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
-            }
-        }
-
+       
+        // licence and feature check moved 
+        // at profile level in ProfilesImporterExt
         return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
                 org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
                 .importProfiles(SessionInfos.getUserIdFromSession());
