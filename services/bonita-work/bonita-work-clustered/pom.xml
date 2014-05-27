@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.work</groupId>
 		<artifactId>bonita-work</artifactId>
-		<version>6.3.1.dummy</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-work-clustered</artifactId>
