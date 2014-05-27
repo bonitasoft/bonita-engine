@@ -578,8 +578,10 @@ public interface IdentityService {
      * @param customUserInfoValueId
      *            The identifier of the custom user info value
      * @return the profileMetadataValue
-     * @throws SCustomUserInfoValueNotFoundException if no custom user info value is found for the given id
-     * @throws SCustomUserInfoValueReadException if an exception occurs while trying to get the custom user info value
+     * @throws SCustomUserInfoValueNotFoundException
+     *             if no custom user info value is found for the given id
+     * @throws SCustomUserInfoValueReadException
+     *             if an exception occurs while trying to get the custom user info value
      */
     SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException;
 
@@ -589,10 +591,13 @@ public interface IdentityService {
      * @param name
      *            The name custom user info definition name
      * @return the custom user info definition identified by the given name
-     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
-     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     * @throws SCustomUserInfoDefinitionNotFoundException
+     *             if there is no custom user info definition for the given name
+     * @throws SCustomUserInfoDefinitionReadException
+     *             if an exception occurs when trying to retrieve the custom user info definition
      */
-    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException, SCustomUserInfoDefinitionReadException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException,
+            SCustomUserInfoDefinitionReadException;
 
     /**
      * Verify if there is a custom user info for the given name
@@ -600,8 +605,10 @@ public interface IdentityService {
      * @param name
      *            The name custom user info definition name
      * @return the custom user info definition identified by the given name
-     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
-     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     * @throws SCustomUserInfoDefinitionNotFoundException
+     *             if there is no custom user info definition for the given name
+     * @throws SCustomUserInfoDefinitionReadException
+     *             if an exception occurs when trying to retrieve the custom user info definition
      */
     boolean hasCustomUserInfoDefinition(String name) throws SCustomUserInfoDefinitionReadException;
 
@@ -615,7 +622,7 @@ public interface IdentityService {
 
     /**
      * Get total number of custom user info value
-     *
+     * 
      * @param options
      *            The QueryOptions object containing some query conditions
      * @return the total number of custom user info value
@@ -654,8 +661,19 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int maxResults) throws SIdentityException;
-    
-    
+
+    /**
+     * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
+     * @param userInfoName The user information name.
+     * @param userInfoValue The user information value.
+     * @param fromIndex The index of the first record to be retrieved. First record has index 0.
+     * @param maxResults The max results to be retrieved. 
+     * @return the list of user identifiers containing the chosen custom user information with the given value.
+     * @throws SIdentityException
+     * @since 6.3.2
+     */
+    List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, int fromIndex, int maxResults) throws SIdentityException;
+
     /**
      * Search custom user info values according to specific query options
      * 
@@ -782,10 +800,13 @@ public interface IdentityService {
      * 
      * @param customUserInfo
      *            SCustomUserInfoDefinition object
-     * @throws SCustomUserInfoDefinitionAlreadyExistsException TODO
-     * @throws SCustomUserInfoDefinitionCreationException TODO
+     * @throws SCustomUserInfoDefinitionAlreadyExistsException
+     *             TODO
+     * @throws SCustomUserInfoDefinitionCreationException
+     *             TODO
      */
-    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException;
+    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException,
+            SCustomUserInfoDefinitionCreationException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor
@@ -801,7 +822,6 @@ public interface IdentityService {
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
      * 
-     *
      * @param customUserInfo
      *            A profileMetadataValue object
      * @throws SIdentityException
