@@ -227,7 +227,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(model);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "Employee.test");
+        assertFilesAreEqual("Employee.java", "Employee.java");
     }
 
     @Test
@@ -238,7 +238,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.test");
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.java");
     }
 
     @Test
@@ -250,7 +250,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListComposition.test");
+        assertFilesAreEqual("Employee.java", "EmployeeListComposition.java");
     }
 
     @Test
@@ -261,7 +261,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.test");
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.java");
     }
 
     @Test
@@ -272,7 +272,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.test");
+        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.java");
     }
 
     @Test
@@ -282,7 +282,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(model);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Forecast.java", "ForecastList.test");
+        assertFilesAreEqual("Forecast.java", "ForecastList.java");
     }
 
     private BusinessObject skillBO() {
