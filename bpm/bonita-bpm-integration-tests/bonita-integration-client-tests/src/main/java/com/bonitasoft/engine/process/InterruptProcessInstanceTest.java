@@ -26,14 +26,14 @@ public class InterruptProcessInstanceTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         pedro = createUser("pedro", "secreto");
     }
 
     @After
     public void afterTest() throws Exception {
         deleteUser(pedro);
-        logout();
+       logoutOnTenant();
     }
 
     protected ProcessDefinition deployProcessWith2UserTasksAnd1AutoTask(final String actorName, final String taskName1, final String taskName2,
@@ -52,7 +52,7 @@ public class InterruptProcessInstanceTest extends CommonAPISPTest {
         processDefinitionBuilder.addTransition("start", taskName2);
         processDefinitionBuilder.addTransition(taskName2, "end2");
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, pedro);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, pedro);
     }
 
     protected ProcessDefinition deployProcessWith2AutomaticTasks(final String taskName1, final String taskName2) throws BonitaException {

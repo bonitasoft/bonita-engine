@@ -14,41 +14,49 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.Query;
-import com.bonitasoft.engine.bdm.QueryParameter;
-import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.IndexValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.QueryValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.SimpleFieldValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.UniqueConstraintValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.composition.CyclicCompositionValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.composition.UniquenessCompositionValidationRule;
 
 /**
  * @author Romain Bioteau
  */
 public class BusinessObjectModelValidator {
 
-    private final List<ValidationRule> rules = new ArrayList<ValidationRule>();
+    private final List<ValidationRule<?>> rules = new ArrayList<ValidationRule<?>>();
 
     public BusinessObjectModelValidator() {
         rules.add(new BusinessObjectModelValidationRule());
         rules.add(new BusinessObjectValidationRule());
         rules.add(new FieldValidationRule());
+        rules.add(new SimpleFieldValidationRule());
         rules.add(new UniqueConstraintValidationRule());
+        rules.add(new IndexValidationRule());
         rules.add(new QueryValidationRule());
         rules.add(new QueryParameterValidationRule());
+        rules.add(new UniquenessCompositionValidationRule());
+        rules.add(new CyclicCompositionValidationRule());
     }
 
     public ValidationStatus validate(final BusinessObjectModel bom) {
         final Set<Object> objectsToValidate = buildModelTree(bom);
         final ValidationStatus status = new ValidationStatus();
         for (final Object modelElement : objectsToValidate) {
-            for (final ValidationRule rule : rules) {
+            for (final ValidationRule<?> rule : rules) {
                 if (rule.appliesTo(modelElement)) {
                     status.addValidationStatus(rule.checkRule(modelElement));
                 }
@@ -80,7 +88,7 @@ public class BusinessObjectModelValidator {
         return objectsToValidate;
     }
 
-    public List<ValidationRule> getRules() {
+    public List<ValidationRule<?>> getRules() {
         return Collections.unmodifiableList(rules);
     }
 

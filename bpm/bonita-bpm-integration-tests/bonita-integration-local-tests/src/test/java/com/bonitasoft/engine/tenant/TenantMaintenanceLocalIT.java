@@ -65,7 +65,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         
         getTenantManagementAPI().pause();
         assertTrue(workService.isStopped());
-        logout();
+       logoutOnTenant();
 
         // when: we stop and start the node
         stopAndStartPlatform();
