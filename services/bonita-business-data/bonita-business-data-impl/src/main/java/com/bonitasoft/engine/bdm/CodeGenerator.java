@@ -98,6 +98,10 @@ public class CodeGenerator {
         return definedClass.field(JMod.PRIVATE, type, fieldName);
     }
 
+    public JFieldVar addField(final JDefinedClass definedClass, final Field field) {
+        return addField(definedClass, field.getName(), toJavaClass(field));
+    }
+
     public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final JClass type) {
         validateFieldName(fieldName);
         if (type == null) {

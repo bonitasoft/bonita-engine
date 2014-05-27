@@ -29,31 +29,31 @@ public abstract class FieldBuilder {
 
     protected final Field field;
 
-    private FieldBuilder(Field field) {
+    private FieldBuilder(final Field field) {
         this.field = field;
     }
 
-    public static Field aBooleanField(String name) {
+    public static Field aBooleanField(final String name) {
         return aSimpleField().withName(name).ofType(BOOLEAN).build();
     }
 
-    public static SimpleFieldBuilder aStringField(String name) {
+    public static SimpleFieldBuilder aStringField(final String name) {
         return aSimpleField().withName(name).ofType(STRING);
     }
 
-    public static SimpleFieldBuilder aDateField(String name) {
+    public static SimpleFieldBuilder aDateField(final String name) {
         return aSimpleField().withName(name).ofType(DATE);
     }
 
-    public static SimpleFieldBuilder aDoubleField(String name) {
+    public static SimpleFieldBuilder aDoubleField(final String name) {
         return aSimpleField().withName(name).ofType(DOUBLE);
     }
 
-    public static SimpleFieldBuilder anIntegerField(String name) {
+    public static SimpleFieldBuilder anIntegerField(final String name) {
         return aSimpleField().withName(name).ofType(INTEGER);
     }
 
-    public static SimpleFieldBuilder aTextField(String name) {
+    public static SimpleFieldBuilder aTextField(final String name) {
         return aSimpleField().withName(name).ofType(TEXT);
     }
 
@@ -61,46 +61,60 @@ public abstract class FieldBuilder {
         return new SimpleFieldBuilder();
     }
 
-    public static Field anAggregationField(String name, BusinessObject reference) {
+    public static RelationFieldBuilder aRelationField() {
+        return new RelationFieldBuilder();
+    }
+
+    public static Field anAggregationField(final String name, final BusinessObject reference) {
         RelationField relationField = aRelationField(name, reference);
         relationField.setType(Type.AGGREGATION);
         return relationField;
     }
-    
-    public static Field aCompositionField(String name, BusinessObject reference) {
+
+    public static Field aCompositionField(final String name, final BusinessObject reference) {
         RelationField relationField = aRelationField(name, reference);
         relationField.setType(Type.COMPOSITION);
         return relationField;
     }
-    
-    private static RelationField aRelationField(String name, BusinessObject reference) {
+
+    private static RelationField aRelationField(final String name, final BusinessObject reference) {
         RelationField relationField = new RelationField();
         relationField.setName(name);
         relationField.setReference(reference);
         return relationField;
     }
 
-    public FieldBuilder withName(String name) {
+    public FieldBuilder withName(final String name) {
         field.setName(name);
         return this;
     }
-    
+
     public FieldBuilder nullable() {
         field.setNullable(true);
         return this;
     }
-    
+
     public FieldBuilder notNullable() {
         field.setNullable(false);
         return this;
     }
-    
+
+    public FieldBuilder multiple() {
+        field.setCollection(true);
+        return this;
+    }
+
+    public FieldBuilder multiple(final boolean collection) {
+        field.setCollection(collection);
+        return this;
+    }
+
     public Field build() {
         return field;
     }
 
     /**
-     * SimpleFieldBuilder 
+     * SimpleFieldBuilder
      */
     public static class SimpleFieldBuilder extends FieldBuilder {
 
@@ -108,21 +122,56 @@ public abstract class FieldBuilder {
             super(new SimpleField());
         }
 
-        public SimpleFieldBuilder ofType(FieldType type) {
+        public SimpleFieldBuilder ofType(final FieldType type) {
             ((SimpleField) field).setType(type);
             return this;
         }
 
-        public SimpleFieldBuilder withName(String name) {
+        @Override
+        public SimpleFieldBuilder withName(final String name) {
             return (SimpleFieldBuilder) super.withName(name);
         }
-        
+
+        @Override
         public SimpleFieldBuilder nullable() {
             return (SimpleFieldBuilder) super.nullable();
         }
 
+        @Override
         public SimpleFieldBuilder notNullable() {
             return (SimpleFieldBuilder) super.notNullable();
+        }
+    }
+
+    public static class RelationFieldBuilder extends FieldBuilder {
+
+        public RelationFieldBuilder() {
+            super(new RelationField());
+        }
+
+        public RelationFieldBuilder ofType(final Type type) {
+            ((RelationField) field).setType(type);
+            return this;
+        }
+
+        @Override
+        public RelationFieldBuilder withName(final String name) {
+            return (RelationFieldBuilder) super.withName(name);
+        }
+
+        @Override
+        public RelationFieldBuilder multiple() {
+            return (RelationFieldBuilder) super.multiple();
+        }
+
+        @Override
+        public RelationFieldBuilder multiple(final boolean collection) {
+            return (RelationFieldBuilder) super.multiple(collection);
+        }
+
+        @Override
+        public RelationField build() {
+            return (RelationField) super.build();
         }
     }
 }

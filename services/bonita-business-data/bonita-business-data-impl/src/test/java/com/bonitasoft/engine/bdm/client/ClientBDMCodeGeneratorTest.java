@@ -1,5 +1,9 @@
 package com.bonitasoft.engine.bdm.client;
 
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aRelationField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -11,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -22,8 +27,10 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
+import com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
@@ -238,9 +245,26 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithComposition() throws Exception {
-        final BusinessObjectModel model = build(true, true);
+        System.out.println("coucou");
+        final BusinessObject addressBO = addressBO();
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        final RelationField address = addressRelation(Type.COMPOSITION, true);
+        address.setReference(addressBO);
+
+        final RelationField address2 = aRelationField().ofType(Type.COMPOSITION).withName("skills").multiple(true).build();
+        address2.setFetchType(FetchType.LAZY);
+        BusinessObjectBuilder bo = aBO("Skill").withField(aStringField("skill").build());
+        address2.setReference(bo.build());
+
+        final BusinessObject employeeBO = employeeBO();
+        employeeBO.addField(address);
+        employeeBO.addField(address2);
+
+        BusinessObjectModel bom = aBOM().withBOs(employeeBO, addressBO, bo.build()).build();
+
+        //        aBomWithRelations();
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeListComposition.test");
@@ -291,45 +315,29 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         return model;
     }
 
-    private BusinessObjectModel build(final boolean composition, final boolean collection) {
-        final SimpleField street = new SimpleField();
-        street.setName("street");
-        street.setType(FieldType.STRING);
-        final SimpleField city = new SimpleField();
-        city.setName("city");
-        city.setType(FieldType.STRING);
-        final BusinessObject addressBO = new BusinessObject();
-        addressBO.setQualifiedName("Address");
-        addressBO.addField(street);
-        addressBO.addField(city);
+    private BusinessObjectModel build(boolean composition, boolean collection) {
+        BusinessObject addressBO = addressBO();
 
-        final SimpleField field = new SimpleField();
-        field.setName("firstName");
-        field.setType(FieldType.STRING);
-        final RelationField address = new RelationField();
-        if (composition) {
-            address.setType(Type.COMPOSITION);
-        } else {
-            address.setType(Type.AGGREGATION);
-        }
-        if (collection) {
-            address.setName("addresses");
-            address.setCollection(Boolean.TRUE);
-        } else {
-            address.setName("address");
-            address.setCollection(Boolean.FALSE);
-        }
+        RelationField address = aRelationField().ofType(composition ? Type.COMPOSITION : Type.AGGREGATION)
+                .withName(collection ? "addresses" : "address").multiple(collection).build();
         address.setReference(addressBO);
 
-        final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("Employee");
-        employeeBO.addField(field);
+        BusinessObject employeeBO = employeeBO();
         employeeBO.addField(address);
 
-        final BusinessObjectModel model = new BusinessObjectModel();
-        model.addBusinessObject(employeeBO);
-        model.addBusinessObject(addressBO);
-        return model;
+        return aBOM().withBOs(employeeBO, addressBO).build();
+    }
+
+    private RelationField addressRelation(final Type type, final boolean collection) {
+        return aRelationField().ofType(type).withName("addresses").multiple(collection).build();
+    }
+
+    private BusinessObject employeeBO() {
+        return aBO("Employee").withField(aStringField("firstName").build()).build();
+    }
+
+    private BusinessObject addressBO() {
+        return aBO("Address").withField(aStringField("street").build()).withField(aStringField("city").build()).build();
     }
 
     private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws URISyntaxException, IOException {
@@ -337,6 +345,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
 
+        System.out.println(IOUtils.toString(file.toURI()));
         assertThat(file).hasContentEqualTo(expected);
     }
 

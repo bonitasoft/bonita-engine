@@ -46,7 +46,11 @@ public class RelationFieldAnnotator {
             relation = annotateSingleReference(field, fieldVar);
         }
 
-        relation.param("fetch", FetchType.EAGER);
+        if (field.isLazy()) {
+            relation.param("fetch", FetchType.LAZY);
+        } else {
+            relation.param("fetch", FetchType.EAGER);
+        }
 
         if (field.getType() == Type.COMPOSITION) {
             relation.param("cascade", CascadeType.ALL);

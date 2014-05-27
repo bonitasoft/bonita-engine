@@ -20,7 +20,7 @@ import javax.persistence.Version;
 @javax.persistence.Entity(name = "Employee")
 @Table(name = "EMPLOYEE")
 @NamedQueries({
-    @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nJOIN FETCH e.addresses\nWHERE e.persistenceId= :persistenceId\n"),
+    @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nJOIN FETCH e.addresses\nJOIN FETCH e.skills\nWHERE e.persistenceId= :persistenceId\n"),
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
@@ -38,6 +38,10 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
     private List<Address> addresses = new ArrayList<Address>(10);
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
+    @OrderColumn
+    private List<Skill> skills = new ArrayList<Skill>(10);
 
     public Employee() {
     }
@@ -49,6 +53,10 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity
         this.addresses = new ArrayList<Address>();
         for (Address i: employee.getAddresses()) {
             this.addresses.add(new Address(i));
+        }
+        this.skills = new ArrayList<Skill>();
+        for (Skill i: employee.getSkills()) {
+            this.skills.add(new Skill(i));
         }
     }
 
@@ -90,6 +98,22 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity
 
     public void removeFromAddresses(Address removeFrom) {
         addresses.remove(removeFrom);
+    }
+
+    public void setSkills(List<Skill> skills) {
+        this.skills = skills;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void addToSkills(Skill addTo) {
+        skills.add(addTo);
+    }
+
+    public void removeFromSkills(Skill removeFrom) {
+        skills.remove(removeFrom);
     }
 
     @Override
@@ -140,6 +164,15 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity
                 return false;
             }
         }
+        if (skills == null) {
+            if (other.skills!= null) {
+                return false;
+            }
+        } else {
+            if (!skills.equals(other.skills)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -167,6 +200,11 @@ public class Employee implements com.bonitasoft.engine.bdm.Entity
             addressesCode = addresses.hashCode();
         }
         result = ((prime*result)+ addressesCode);
+        int skillsCode = 0;
+        if (skills!= null) {
+            skillsCode = skills.hashCode();
+        }
+        result = ((prime*result)+ skillsCode);
         return result;
     }
 
