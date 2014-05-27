@@ -127,10 +127,8 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         deleteUsers(user1, user2, user3, user4, user5);
         deleteGroups(group1, group2, group3);
         deleteRoles(role1, role2, role3);
-
         cleanAllProfiles();
-
-        logout();
+        logoutOnTenant();
     }
 
     protected void cleanAllProfiles() throws IOException, CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
@@ -140,8 +138,6 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
-
-       logoutOnTenant();
     }
 
 }
