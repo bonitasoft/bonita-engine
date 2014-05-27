@@ -23,8 +23,8 @@ import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 
@@ -51,7 +51,7 @@ public class SPUserTest extends CommonAPISPTest {
 
     @Test(expected = LoginException.class)
     public void loginFailsDueToTenantDeactivation() throws BonitaException {
-        final long tenantId = BPMTestSPUtil.constructTenant("suomi", "iconName", "iconPath", "hannu", "malminkartano");
+        final long tenantId = BPMTestSPUtil.createAndActivateTenant("suomi", "iconName", "iconPath", "hannu", "malminkartano");
         BPMTestSPUtil.deactivateTenant(tenantId);
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         try {
@@ -59,7 +59,7 @@ public class SPUserTest extends CommonAPISPTest {
             fail("The login method should throw a TenantNotActivatedException due to tenant deactivation");
         } finally {
             BPMTestSPUtil.activateTenant(tenantId);
-            BPMTestSPUtil.destroyTenant(tenantId);
+            BPMTestSPUtil.deactivateAndDeleteTenant(tenantId, "hannu", "malminkartano");
         }
     }
 
@@ -79,7 +79,7 @@ public class SPUserTest extends CommonAPISPTest {
     public void userLoginTenant() throws BonitaException, InterruptedException {
         final String userName = "matti";
         final String password = "tervetuloa";
-        final long tenantId = BPMTestSPUtil.constructTenant("suomi", "iconName", "iconPath", "revontuli", "paras");
+        final long tenantId = BPMTestSPUtil.createAndActivateTenant("suomi", "iconName", "iconPath", "revontuli", "paras");
         BPMTestSPUtil.createUserOnTenant(userName, password, tenantId, "revontuli", "paras");
 
         final Date now = new Date();
@@ -94,28 +94,27 @@ public class SPUserTest extends CommonAPISPTest {
         assertNotSame(password, user.getPassword());
         assertTrue(now.before(user.getLastConnection()));
 
-        BPMTestSPUtil.destroyTenant(tenantId);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenantId, "revontuli", "paras");
     }
 
     @Test
     public void aSameUserNameCanBeUseInTwoTenants() throws BonitaException {
-        final String userName = "install";
-        final long tenantId1 = BPMTestSPUtil.constructTenant("tenant1", "iconName", "iconPath", userName, "install");
-        final APISession session1 = BPMTestSPUtil.loginOnTenantWithTechnicalLogger(tenantId1);
+        final long tenantId1 = BPMTestSPUtil.createAndActivateTenantWithDefaultTechnicalLogger("tenant1");
+        final APISession session1 = BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId1);
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
-        final User user1 = identityAPI1.createUser(userName, "bpm");
+        final User user1 = identityAPI1.createUser(USERNAME, "bpm");
 
         final APISession session2 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
         final IdentityAPI identityAPI2 = TenantAPIAccessor.getIdentityAPI(session2);
-        final User user2 = identityAPI2.createUser(userName, "bos");
+        final User user2 = identityAPI2.createUser(USERNAME, "bos");
 
-        assertEquals(userName, user2.getUserName());
+        assertEquals(USERNAME, user2.getUserName());
         assertEquals(user1.getUserName(), user2.getUserName());
         identityAPI1.deleteUser(user1.getId());
         identityAPI2.deleteUser(user2.getId());
 
         BPMTestSPUtil.logoutOnTenant(session1);
-        BPMTestSPUtil.destroyTenant(tenantId1);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenantId1);
         BPMTestSPUtil.logoutOnTenant(session2);
     }
 

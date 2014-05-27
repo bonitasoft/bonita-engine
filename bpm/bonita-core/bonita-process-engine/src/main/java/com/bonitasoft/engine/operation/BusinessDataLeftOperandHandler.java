@@ -54,7 +54,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         checkIsValidBusinessData(newValue);
         final Entity newBusinessDataValue = (Entity) newValue;
@@ -66,7 +66,9 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                 if (!businessData.getPersistenceId().equals(refBusinessDataInstance.getDataId())) {
                     refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
                 }
+                return businessData;
             }
+            return newValue;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
@@ -150,6 +152,11 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
     private void throwBonitaReadException(final String businessDataName, final Exception e) throws SBonitaReadException {
         throw new SBonitaReadException("Unable to retrieve the context for business data " + businessDataName, e);
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return false;
     }
 
 }

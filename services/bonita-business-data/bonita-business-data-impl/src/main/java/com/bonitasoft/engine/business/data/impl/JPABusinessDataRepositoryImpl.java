@@ -123,12 +123,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     @Override
     public <T extends Entity> T findById(final Class<T> entityClass, final Long primaryKey) throws SBusinessDataNotFoundException {
         if (primaryKey == null) {
-            throw new SBusinessDataNotFoundException("Impossible to get data with a null identifier");
+            throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with a null identifier");
         }
         final EntityManager em = getEntityManager();
         final T entity = em.find(entityClass, primaryKey);
         if (entity == null) {
-            throw new SBusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
+            throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with id: " + primaryKey);
         }
         em.detach(entity);
         return entity;

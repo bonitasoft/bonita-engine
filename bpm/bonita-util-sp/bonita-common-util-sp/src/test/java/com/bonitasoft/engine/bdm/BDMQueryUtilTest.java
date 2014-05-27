@@ -162,6 +162,24 @@ public class BDMQueryUtilTest {
     }
 
     @Test
+    public void should_getAllProvidedQueriesNameForBusinessObject_not_return_query_for_RelationFields() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final SimpleField field = new SimpleField();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+
+        final RelationField f2 = new RelationField();
+        f2.setName("name2");
+        f2.setType(Type.COMPOSITION);
+        f2.setReference(bo);
+        bo.addField(f2);
+
+        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).containsExactly("findByName", "find");
+    }
+
+    @Test
     public void createSelectAllQueryShouldGenerateOrderByPersistenceId() throws Exception {
         // when:
         final String queryContent = BDMQueryUtil.createSelectAllQueryContent("MyBizObject");

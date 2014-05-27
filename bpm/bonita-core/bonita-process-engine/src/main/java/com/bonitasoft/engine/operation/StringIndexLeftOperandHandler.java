@@ -42,7 +42,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         final String name = sLeftOperand.getName();
         Integer index;
@@ -84,6 +84,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
                     throw new SOperationExecutionException("name of left operand for string index operation must be 1,2,3,4 or 5");
             }
             processInstanceService.updateProcess(processInstance, updateBuilder.done());
+            return newValue;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
@@ -103,6 +104,11 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     public Map<String, Object> retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
         // don't retrieve it, not useful
         return null;
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return true;
     }
 
 }

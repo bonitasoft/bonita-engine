@@ -23,6 +23,7 @@ import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;
+import com.bonitasoft.engine.bdm.validator.rule.IndexValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.QueryValidationRule;
 import com.bonitasoft.engine.bdm.validator.rule.SimpleFieldValidationRule;
@@ -44,6 +45,7 @@ public class BusinessObjectModelValidator {
         rules.add(new FieldValidationRule());
         rules.add(new SimpleFieldValidationRule());
         rules.add(new UniqueConstraintValidationRule());
+        rules.add(new IndexValidationRule());
         rules.add(new QueryValidationRule());
         rules.add(new QueryParameterValidationRule());
         rules.add(new UniquenessCompositionValidationRule());

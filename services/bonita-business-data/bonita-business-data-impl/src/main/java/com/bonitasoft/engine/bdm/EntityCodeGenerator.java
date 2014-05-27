@@ -1,9 +1,16 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -11,12 +18,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -32,7 +35,6 @@ import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
@@ -47,6 +49,9 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 
+/**
+ * @author Colin PUY
+ */
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;
@@ -205,46 +210,27 @@ public class EntityCodeGenerator {
         } else {
             fieldVar = codeGenerator.addField(entityClass, field.getName(), codeGenerator.toJavaClass(field));
         }
-        annotateField(field, fieldVar);
+        annotateField(entityClass, field, fieldVar);
         return fieldVar;
     }
 
-    private void annotateField(final Field field, final JFieldVar fieldVar) {
+    private void annotateField(final JDefinedClass entityClass, final Field field, final JFieldVar fieldVar) {
         if (field instanceof SimpleField) {
             annotateSimpleField((SimpleField) field, fieldVar);
         } else if (field instanceof RelationField) {
-            annotateRelationField((RelationField) field, fieldVar);
+            annotateRelationField(entityClass, (RelationField) field, fieldVar);
         }
     }
 
-    private void annotateRelationField(final RelationField rfield, final JFieldVar fieldVar) {
-        JAnnotationUse relation = null;
-        if (rfield.isCollection()) {
-            if (rfield.getType() == Type.AGGREGATION) {
-                relation = codeGenerator.addAnnotation(fieldVar, ManyToMany.class);
-            } else {
-                relation = codeGenerator.addAnnotation(fieldVar, OneToMany.class);
-            }
-            codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
-        } else {
-            if (rfield.getType() == Type.AGGREGATION) {
-                relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
-            } else {
-                relation = codeGenerator.addAnnotation(fieldVar, OneToOne.class);
-            }
-            relation.param("optional", rfield.isNullable());
-        }
-        relation.param("fetch", FetchType.EAGER);
-        if (rfield.getType() == Type.COMPOSITION) {
-            final JAnnotationArrayMember cascade = relation.paramArray("cascade");
-            cascade.param(CascadeType.ALL);
-        }
+    private void annotateRelationField(final JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
+        new RelationFieldAnnotator(codeGenerator).annotateRelationField(entityClass, rfield, fieldVar);
     }
 
     private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar) {
         if (sfield.isCollection()) {
             final JAnnotationUse collectionAnnotation = codeGenerator.addAnnotation(fieldVar, ElementCollection.class);
             collectionAnnotation.param("fetch", FetchType.EAGER);
+            codeGenerator.addAnnotation(fieldVar, OrderColumn.class);
         }
         final JAnnotationUse columnAnnotation = codeGenerator.addAnnotation(fieldVar, Column.class);
         columnAnnotation.param("name", sfield.getName().toUpperCase());

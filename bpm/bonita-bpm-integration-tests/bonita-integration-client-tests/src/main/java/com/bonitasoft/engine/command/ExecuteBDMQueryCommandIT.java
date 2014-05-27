@@ -109,18 +109,18 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         businessUser = createUser(USERNAME, PASSWORD);
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
         getTenantManagementAPI().pause();
         getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         loadClientJars();
 
@@ -144,15 +144,15 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
         deleteUser(businessUser.getId());
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -245,7 +245,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());

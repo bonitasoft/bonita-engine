@@ -33,13 +33,14 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
@@ -47,32 +48,32 @@ public class SPProcessManagementTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     private void logoutThenloginAs(final String userName, final String password, final long tenantId) throws BonitaException {
-        logout();
+        logoutOnTenant();
         loginOnTenantWith(userName, password, tenantId);
     }
 
     @Test
     public void getProcessesListOnMultipleTenants() throws Exception {
-        logout();
+        logoutOnTenant();
         final String tenantName = "myTestTenant";
 
-        PlatformSession platformSession = loginPlatform();
+        PlatformSession platformSession = loginOnPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final long tenantId = platformAPI.createTenant(new TenantCreator(tenantName, "default", "defaultIconName", "defaultIconPath", "default_tenant_name",
                 "default_tenant_password"));
         platformAPI.activateTenant(tenantId);
-        logoutPlatform(platformSession);
+        logoutOnPlatform(platformSession);
 
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
         List<Long> ids = createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(10);
@@ -106,37 +107,37 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         getProcessAPI().deleteProcesses(ids);
         assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
 
-        logout();
-        platformSession = loginPlatform();
+        logoutOnTenant();
+        platformSession = loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         platformAPI.deactiveTenant(tenantId);
         platformAPI.deleteTenant(tenantId);
-        logoutPlatform(platformSession);
+        logoutOnPlatform(platformSession);
 
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
     public void searchCommentsInTenants() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         DesignProcessDefinition designProcessDefinition;
-        designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", processInstance);
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent2);
-        logout();
+        logoutOnTenant();
 
-        final long tenant1 = BPMTestSPUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
+        final long tenant1 = BPMTestSPUtil.createAndActivateTenant("suomenlinna", null, null, "hamme", "saari");
         loginOnTenantWith("hamme", "saari", tenant1);
         ClientEventUtil.deployCommand(getSession());
         final User user1 = createUser(USERNAME, PASSWORD);
         loginOnTenantWith(USERNAME, PASSWORD, tenant1);
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForUserTask("step1", processInstance1);
         final String commentContent11 = "commentContent11";
@@ -154,11 +155,11 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition1);
         deleteUser(user1);
         ClientEventUtil.undeployCommand(getSession());
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-        BPMTestSPUtil.destroyTenant(tenant1);
+        BPMTestSPUtil.deactivateAndDeleteTenant(tenant1, "hamme", "saari");
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,
@@ -169,8 +170,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
             if (i >= 0 && i < 10) {
                 processName += "0";
             }
-            final DesignProcessDefinition processDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION + i,
-                    Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+            final DesignProcessDefinition processDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION
+                    + i, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
             ids.add(getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done()).getId());
         }
         return ids;

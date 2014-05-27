@@ -44,15 +44,38 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
             status.addError("A Business Object must have a qualified name");
             return status;
         }
-        if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(getSimpleName(qualifiedName))) {
+        String simpleName = bo.getSimpleName();
+        if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
             status.addError(qualifiedName + " is not a valid Java qualified name");
             return status;
         }
+        
+        if (simpleName.contains("_")) {
+            status.addError("_ is a forbidden character in business object's name");
+        }
+        
         if (bo.getFields().isEmpty()) {
             status.addError(qualifiedName + " must have at least one field declared");
         }
-        final Set<String> constraintNames = new HashSet<String>();
+        
+        validateConstraints(bo, status);
+        validateQueries(bo, status);
+        return status;
+    }
+
+    private void validateQueries(final BusinessObject bo, final ValidationStatus status) {
         final Set<String> queryNames = BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo);
+        for (final Query q : bo.getQueries()) {
+            if (queryNames.contains(q.getName())) {
+                status.addError("The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName());
+            } else {
+                queryNames.add(q.getName());
+            }
+        }
+    }
+
+    private void validateConstraints(final BusinessObject bo, final ValidationStatus status) {
+        final Set<String> constraintNames = new HashSet<String>();
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
             if (constraintNames.contains(uc.getName())) {
                 status.addError("The constraint named \"" + uc.getName() + "\" already exists for " + bo.getQualifiedName());
@@ -66,25 +89,6 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
                 }
             }
         }
-
-        for (final Query q : bo.getQueries()) {
-            if (queryNames.contains(q.getName())) {
-                status.addError("The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName());
-            } else {
-                queryNames.add(q.getName());
-            }
-        }
-
-        return status;
-    }
-
-    private String getSimpleName(final String qualifiedName) {
-        String simpleName = qualifiedName;
-        if (simpleName.indexOf(".") != -1) {
-            final String[] split = simpleName.split("\\.");
-            simpleName = split[split.length - 1];
-        }
-        return simpleName;
     }
 
     private Field getField(final BusinessObject bo, final String name) {

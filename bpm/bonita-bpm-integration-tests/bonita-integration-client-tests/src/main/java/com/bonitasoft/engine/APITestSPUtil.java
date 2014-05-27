@@ -8,10 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,30 +20,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
-import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnector3;
 import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
+import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
+import org.bonitasoft.engine.connectors.TestExternalConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -54,12 +46,14 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +72,7 @@ import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.connector.APIAccessorConnector;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.monitoring.MonitoringException;
 import com.bonitasoft.engine.reporting.Report;
@@ -183,23 +177,24 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    public void loginWith(final String userName, final String password) throws BonitaException {
+    public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
         setSession(BPMTestSPUtil.loginOnDefaultTenant(userName, password));
         setAPIs();
     }
 
     @Override
-    public void login() throws BonitaException {
+    public void loginOnDefaultTenantWithDefaultTechnicalLogger() throws BonitaException {
         setSession(BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger());
         setAPIs();
     }
 
     protected void loginOnTenantWithTechnicalLogger(final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenantWithTechnicalLogger(tenantId));
+        setSession(BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId));
         setAPIs();
     }
 
-    private void setAPIs() throws BonitaException {
+    @Override
+    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
@@ -222,7 +217,7 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    public void logout() throws BonitaException {
+    public void logoutOnTenant() throws BonitaException {
         BPMTestSPUtil.logoutOnTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
@@ -239,11 +234,11 @@ public class APITestSPUtil extends APITestUtil {
 
     public void stopAndStartPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
             StartNodeException {
-        final PlatformSession loginPlatform = loginPlatform();
+        final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         platformAPI.stopNode();
         platformAPI.startNode();
-        logoutPlatform(loginPlatform);
+        logoutOnPlatform(loginPlatform);
     }
 
     public long createAndActivateTenant(final String uniqueName) throws BonitaException {
@@ -267,12 +262,6 @@ public class APITestSPUtil extends APITestUtil {
         }
 
         return count == minimalFrequency;
-    }
-
-    protected void deleteSupervisor(final Serializable id) throws BonitaException {
-        final Map<String, Serializable> deleteParameters = new HashMap<String, Serializable>();
-        deleteParameters.put(SUPERVISOR_ID_KEY, id);
-        getCommandAPI().execute("deleteSupervisor", deleteParameters);
     }
 
     protected ManualTaskCreator buildManualTaskCreator(final long parentTaskId, final String taskName, final long assignTo, final String description,
@@ -362,145 +351,110 @@ public class APITestSPUtil extends APITestUtil {
         return (HumanTaskInstance) waitForUserTask;
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final long userId)
-            throws BonitaException {
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        getProcessAPI().addUserToActor(actorName, processDefinition, userId);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
-    }
-
-    public ProcessDefinition deployProcessWithActorAndTestConnector3(final ProcessDefinitionBuilderExt processDefinitionBuilderExt, final String actorName,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector3(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user) throws BonitaException, IOException {
-        final List<BarResource> connectorImplementations = Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/TestConnector3.impl",
-                "TestConnector3.impl"));
-        final List<BarResource> generateConnectorDependencies = Arrays.asList(buildBarResource(TestConnector3.class, "TestConnector3.jar"),
-                buildBarResource(VariableStorage.class, "VariableStorage.jar"));
-        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user, connectorImplementations, generateConnectorDependencies);
+        final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnector3.impl",
+                TestConnector3.class));
+        final List<BarResource> generateConnectorDependencies = Arrays.asList(
+                BuildTestUtil.generateJarAndBuildBarResource(TestConnector3.class, "TestConnector3.jar"),
+                BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, connectorImplementations,
+                generateConnectorDependencies, null);
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user,
-                "/org/bonitasoft/engine/connectors/TestConnectorEngineExecutionContext.impl", "TestConnectorEngineExecutionContext.impl",
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
                 TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorWithCustomType(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorWithCustomType(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user,
-                Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl")),
-                Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/connector-with-custom-type.bak", "connector-with-custom-type.jar")));
+        final byte[] byteArray = IOUtil.getAllContentFrom(TestConnector.class
+                .getResourceAsStream("/org/bonitasoft/engine/connectors/connector-with-custom-type.bak"));
+        final BarResource barResource = new BarResource("connector-with-custom-type.jar", byteArray);
+
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
+                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnectorWithCustomType.impl", TestConnector.class)),
+                Arrays.asList(barResource), null);
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorLongToExecute(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorLongToExecute(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user,
-                Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/TestConnectorLongToExecute.impl",
-                        "TestConnectorLongToExecute.impl")), Collections.<BarResource> emptyList());
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, null, "TestConnectorLongToExecute.impl",
+                TestConnectorLongToExecute.class, "TestConnectorLongToExecute.jar");
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actor, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(processDefinitionBuilderExt, actor, user, null);
+        return deployAndEnableProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(processDefinitionBuilder, actor, user, null);
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(
-            final ProcessDefinitionBuilderExt processDefinitionBuilderExt, final String actorName, final User user, final Map<String, String> parameters)
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(
+            final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user, final Map<String, String> parameters)
             throws BonitaException, IOException {
-        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, parameters,
-                "/org/bonitasoft/engine/connectors/TestConnectorThatThrowException.impl", "TestConnectorThatThrowException.impl",
-                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters,
+                "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnector(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actor, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndTestConnectorAndParameter(processDefinitionBuilderExt, actor, user, null);
+        return deployAndEnableProcessWithActorAndTestConnectorAndParameter(processDefinitionBuilder, actor, user, null);
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user, final Map<String, String> parameters) throws BonitaException, IOException {
-        final List<BarResource> connectorImplementations = Arrays.asList(buildBarResource("/org/bonitasoft/engine/connectors/TestConnector.impl",
-                "TestConnector.impl"));
-        final List<BarResource> generateConnectorDependencies = Arrays.asList(buildBarResource(TestConnector.class, "TestConnector.jar"),
-                buildBarResource(VariableStorage.class, "VariableStorage.jar"));
-        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, connectorImplementations,
+        return deployAndEnableProcessWithActorAndTestConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters,
+                "TestConnector.impl", "TestConnector.jar");
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector2(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actor, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndTestConnectorAndParameter(processDefinitionBuilder, actor, user, null);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorAndParameter2(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final Map<String, String> parameters) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndTestConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters, "TestConnector2.impl",
+                "TestConnector2.jar");
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final Map<String, String> parameters, final String name, final String jarName)
+            throws IOException, BonitaException {
+        final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, TestConnector.class));
+        final List<BarResource> generateConnectorDependencies = Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, jarName),
+                BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, connectorImplementations,
                 generateConnectorDependencies, parameters);
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorWithOutput(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorWithOutput(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actor, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(processDefinitionBuilderExt, actor, user, null);
+        return deployAndEnableProcessWithActorAndTestConnectorWithOutputAndParameter(processDefinitionBuilder, actor, user, null);
     }
 
-    public ProcessDefinition deployProcessWithActorAndTestConnectorWithOutputAndParameter(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorWithOutputAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user, final Map<String, String> parameters) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, parameters,
-                "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl", TestConnectorWithOutput.class,
-                "TestConnectorWithOutput.jar");
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters, "TestConnectorWithOutput.impl",
+                TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
     }
 
-    public ProcessDefinition deployProcessWithActorAndConnector(final ProcessDefinitionBuilderExt processDefinitionBuilderExt, final String actorName,
-            final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = buildBusinessArchiveWithConnector(processDefinitionBuilderExt, connectorImplementations,
-                generateConnectorDependencies);
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
+    public ProcessDefinition deployAndEnableProcessWithActorAndAPIAccessorConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actor, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndAPIAccessorConnectorAndParameter(processDefinitionBuilder, actor, user, null);
     }
 
-    public ProcessDefinition deployProcessWithConnector(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
-            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies)
-            throws InvalidBusinessArchiveFormatException, BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = buildBusinessArchiveWithConnector(processDefinitionBuilderExt, connectorImplementations,
-                generateConnectorDependencies);
-        return deployAndEnableProcess(businessArchiveBuilder.done());
-
+    public ProcessDefinition deployAndEnableProcessWithActorAndAPIAccessorConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final Map<String, String> parameters) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters, "APIAccessorConnector.impl",
+                APIAccessorConnector.class, "APIAccessorConnector.jar");
     }
 
-    private ProcessDefinition deployProcessWithActorAndConnector(final ProcessDefinitionBuilderExt processDefinitionBuilderExt, final String actorName,
-            final User user, final String path, final String name, final Class<? extends AbstractConnector> clazz,
-            final String jarName) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnector(processDefinitionBuilderExt, actorName, user, Arrays.asList(buildBarResource(path, name)),
-                Arrays.asList(buildBarResource(clazz, jarName)));
-    }
-
-    public ProcessDefinition deployProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
-            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
-            final Map<String, String> parameters) throws BonitaException {
-        final BusinessArchiveBuilder businessArchiveBuilder = buildBusinessArchiveWithConnector(processDefinitionBuilderExt, connectorImplementations,
-                generateConnectorDependencies);
-        if (parameters != null) {
-            businessArchiveBuilder.setParameters(parameters);
-        }
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
-    }
-
-    private ProcessDefinition deployProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
-            final String actorName, final User user, final Map<String, String> parameters, final String path, final String name,
-            final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
-        return deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilderExt, actorName, user, Arrays.asList(buildBarResource(path, name)),
-                Arrays.asList(buildBarResource(clazz, jarName)), parameters);
-    }
-
-    private BusinessArchiveBuilder buildBusinessArchiveWithConnector(final ProcessDefinitionBuilderExt processDefinitionBuilderExt,
-            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws InvalidProcessDefinitionException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefinitionBuilderExt.done());
-        for (final BarResource barResource : connectorImplementations) {
-            businessArchiveBuilder.addConnectorImplementation(barResource);
-        }
-
-        for (final BarResource barResource : generateConnectorDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-        return businessArchiveBuilder;
-    }
-
-    public BarResource buildBarResource(final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        return new BarResource(name, byteArray);
+    public ProcessDefinition deployAndEnableProcessWithExternalTestConnectorAndActor(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestExternalConnector.impl",
+                TestExternalConnector.class,
+                "TestExternalConnector.jar");
     }
 }

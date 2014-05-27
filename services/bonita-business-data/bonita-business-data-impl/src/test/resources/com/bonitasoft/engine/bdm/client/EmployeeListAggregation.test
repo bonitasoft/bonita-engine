@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -33,6 +35,11 @@ public class Employee
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "EMPLOYEE_ADDRESSES", joinColumns = {
+        @JoinColumn(name = "EMPLOYEE_PID")
+    }, inverseJoinColumns = {
+        @JoinColumn(name = "ADDRESS_PID")
+    })
     @OrderColumn
     private List<Address> addresses = new ArrayList<Address>(10);
 

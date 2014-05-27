@@ -182,7 +182,11 @@ public class BDMQueryUtil {
             queryNames.add(createQueryNameForUniqueConstraint(uc));
         }
         for (final Field f : businessObject.getFields()) {
-            queryNames.add(createQueryNameForField(f));
+            if (f instanceof SimpleField) {
+                if (f.isCollection() == null || !f.isCollection()) {
+                    queryNames.add(createQueryNameForField(f));
+                }
+            }
         }
         queryNames.add(createSelectAllQueryName());
         return queryNames;
