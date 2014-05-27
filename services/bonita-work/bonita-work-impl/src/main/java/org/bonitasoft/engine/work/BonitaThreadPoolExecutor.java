@@ -16,30 +16,84 @@
  */
 package org.bonitasoft.engine.work;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+
 /**
  * @author Julien Reboul
+ * @author Baptiste Mesta
  * 
  */
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
 
-    public BonitaThreadPoolExecutor(int corePoolSize,
-            int maximumPoolSize,
-            long keepAliveTime,
-            TimeUnit unit,
-            BlockingQueue<Runnable> workQueue,
-            ThreadFactory threadFactory,
-            RejectedExecutionHandler handler) {
+    private final BlockingQueue<Runnable> workQueue;
+
+    private final TechnicalLoggerService logger;
+
+    public BonitaThreadPoolExecutor(final int corePoolSize,
+            final int maximumPoolSize,
+            final long keepAliveTime,
+            final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue,
+            final ThreadFactory threadFactory,
+            final RejectedExecutionHandler handler, final TechnicalLoggerService logger) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+        this.workQueue = workQueue;
+        this.logger = logger;
     }
 
     @Override
-    public void clearQueue() {
+    public void clearAllQueues() {
+        workQueue.clear();
     }
 
+    @Override
+    public Future<?> submit(final Runnable task) {
+        // only submit if not shutdown
+        if (!isShutdown()) {
+            execute(task);
+        }
+        return null;
+    }
+
+    @Override
+    public <T> Future<T> submit(final Callable<T> task) {
+        throw new UnsupportedOperationException("Use submit(Runnable)");
+    }
+
+    @Override
+    public <T> Future<T> submit(final Runnable task, final T result) {
+        throw new UnsupportedOperationException("Use submit(Runnable)");
+    }
+
+    @Override
+    public List<Runnable> shutdownNow() {
+        throw new UnsupportedOperationException("Use stop instead");
+    }
+
+    @Override
+    public void shutdown() {
+        throw new UnsupportedOperationException("Use stop instead");
+    }
+
+    @Override
+    public void shutdownAndEmptyQueue() {
+        super.shutdown();
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Clearing queue of work, had " + workQueue.size() + " elements");
+        workQueue.clear();
+    }
+
+    @Override
+    public void notifyNodeStopped(final String nodeName) {
+        // nothing to do
+    }
 }

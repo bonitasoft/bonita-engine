@@ -31,7 +31,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class ExecutorWorkService implements WorkService {
 
-    private static final int TIMEOUT = Integer.valueOf(System.getProperty("bonita.work.termination.timeout", "15"));
+    private final Object getSynchroLock = new Object();
 
     private final TransactionService transactionService;
 
@@ -47,20 +47,33 @@ public class ExecutorWorkService implements WorkService {
 
     private BonitaExecutorService executor;
 
+    private final int workTerminationTimeout;
+
+    /**
+     * 
+     * @param transactionService
+     * @param workSynchronizationFactory
+     * @param loggerService
+     * @param sessionAccessor
+     * @param bonitaExecutorServiceFactory
+     * @param workTerminationTimeout
+     *            time in secondes to wait for works to finish
+     */
     public ExecutorWorkService(final TransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
-            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory) {
+            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
+            final int workTerminationTimeout) {
         this.transactionService = transactionService;
         this.workSynchronizationFactory = workSynchronizationFactory;
         this.loggerService = loggerService;
         this.sessionAccessor = sessionAccessor;
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
+        this.workTerminationTimeout = workTerminationTimeout;
     }
 
     @Override
     public void registerWork(final BonitaWork work) throws SWorkRegisterException {
         if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + ", but the work service is stopped.");
+            logExecutorStateWarn(work);
             return;
         }
         final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
@@ -69,14 +82,17 @@ public class ExecutorWorkService implements WorkService {
         }
     }
 
+    private void logExecutorStateWarn(final BonitaWork work) {
+        loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                + ", but the work service is stopped.");
+    }
+
     @Override
     public void executeWork(final BonitaWork work) throws SWorkRegisterException {
         if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + ", but the work service is stopped.");
+            logExecutorStateWarn(work);
             return;
         }
-
         try {
             work.setTenantId(sessionAccessor.getTenantId());
         } catch (STenantIdNotSetException e) {
@@ -85,82 +101,89 @@ public class ExecutorWorkService implements WorkService {
         executor.submit(work);
     }
 
-    private synchronized AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws SWorkRegisterException {
-        if (executor == null || executor.isShutdown()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Tried to register work " + work.getDescription()
-                    + " but the work service is shutdown. work will be restarted with the node");
-            return null;
-        }
-        AbstractWorkSynchronization synchro = synchronizations.get();
-        if (synchro == null || synchro.isExecuted()) {
-            synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor);
-            try {
-                transactionService.registerBonitaSynchronization(synchro);
-            } catch (final STransactionNotFoundException e) {
-                throw new SWorkRegisterException(e.getMessage(), e);
+    private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws SWorkRegisterException {
+        synchronized (getSynchroLock) {
+            AbstractWorkSynchronization synchro = synchronizations.get();
+            if (synchro == null || synchro.isExecuted()) {
+                synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor);
+                try {
+                    transactionService.registerBonitaSynchronization(synchro);
+                } catch (final STransactionNotFoundException e) {
+                    throw new SWorkRegisterException(e.getMessage(), e);
+                }
+                synchronizations.set(synchro);
             }
-            synchronizations.set(synchro);
+            return synchro;
         }
-        return synchro;
     }
 
     @Override
     public boolean isStopped() {
-        return executor == null || executor.isShutdown();
+        // the executor must handle elements when it's shutting down
+        return executor == null;
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         // we don't throw exception just stop it and log if something happens
         try {
-            stopWithException();
+            if (isStopped()) {
+                return;
+            }
+            shutdownExecutor();
+            awaitTermination();
         } catch (SWorkException e) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
-            throw new RuntimeException(e);
+            if (e.getCause() != null) {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage(), e.getCause());
+            } else {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+            }
         }
     }
 
     @Override
-    public void start() {
+    public synchronized void start() {
         if (isStopped()) {
             executor = bonitaExecutorServiceFactory.createExecutorService();
         }
     }
 
     @Override
-    public void pause() throws SWorkException {
+    public synchronized void pause() throws SWorkException {
         if (isStopped()) {
             return;
         }
-        executor.shutdown();
-        executor.clearQueue();
-        try {
-            if (!executor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                throw new SWorkException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
-            }
-        } catch (final InterruptedException e) {
-            throw new SWorkException("Interrupted while pausing the work service", e);
-        }
-        executor = null;
-    }
-
-    private void stopWithException() throws SWorkException {
-        if (isStopped()) {
-            return;
-        }
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                throw new SWorkException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
-            }
-        } catch (final InterruptedException e) {
-            throw new SWorkException("Interrupted while pausing the work service", e);
-        }
-        executor = null;
+        shutdownExecutor();
+        // completely clear the queue because it's a global pause
+        executor.clearAllQueues();
+        awaitTermination();
     }
 
     @Override
-    public void resume() {
+    public synchronized void resume() {
         start();
+    }
+
+    private void awaitTermination() throws SWorkException {
+        try {
+            if (!executor.awaitTermination(workTerminationTimeout, TimeUnit.SECONDS)) {
+                throw new SWorkException("Waited termination of all work " + workTerminationTimeout + "s but all tasks were not finished");
+            }
+        } catch (final InterruptedException e) {
+            throw new SWorkException("Interrupted while stopping the work service", e);
+        }
+        executor = null;
+    }
+
+    private void shutdownExecutor() {
+        executor.shutdownAndEmptyQueue();
+        loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Stopped executor service");
+    }
+
+    @Override
+    public void notifyNodeStopped(final String nodeName) {
+        if (!isStopped()) {
+            executor.notifyNodeStopped(nodeName);
+        }
     }
 }

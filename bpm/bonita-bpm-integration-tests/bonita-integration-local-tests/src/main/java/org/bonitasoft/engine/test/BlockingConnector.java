@@ -16,11 +16,12 @@ public class BlockingConnector extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() {
         try {
-            System.out.println("Try aqcuire");
+            System.out.println("Try aqcuire in connector");
             semaphore.tryAcquire(15, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         semaphore.release();
+        System.out.println("semaphore in connector released");
     }
 }

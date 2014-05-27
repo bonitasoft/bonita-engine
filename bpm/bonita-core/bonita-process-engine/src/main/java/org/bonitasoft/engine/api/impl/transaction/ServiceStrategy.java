@@ -27,4 +27,6 @@ public interface ServiceStrategy extends Serializable {
 
     void changeState(LifecycleService service) throws SBonitaException;
 
+    boolean shouldRefreshClassLoaders();
+
 }
