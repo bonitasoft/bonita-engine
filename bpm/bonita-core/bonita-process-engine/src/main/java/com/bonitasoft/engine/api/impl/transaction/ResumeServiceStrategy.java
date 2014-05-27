@@ -29,4 +29,9 @@ public class ResumeServiceStrategy implements ServiceStrategy {
         service.resume();
     }
 
+    @Override
+    public boolean shouldRefreshClassLoaders() {
+        return true;
+    }
+
 }

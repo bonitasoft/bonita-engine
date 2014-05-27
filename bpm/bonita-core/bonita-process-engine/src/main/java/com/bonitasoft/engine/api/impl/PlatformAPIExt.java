@@ -75,6 +75,7 @@ import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
 import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -90,6 +91,7 @@ import com.bonitasoft.engine.platform.TenantUpdater;
 import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -709,6 +711,21 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     public void startNode() throws StartNodeException {
         LicenseChecker.getInstance().checkLicence();
         super.startNode();
+    }
+
+    @Override
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public void stopNode() throws StopNodeException {
+        super.stopNode();
+        try {
+            final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            BroadcastService broadcastService = platformAccessor.getBroadcastService();
+            broadcastService.submit(new NotifyNodeStoppedTask());
+        } catch (Exception e) {
+            throw new StopNodeException(e);
+        }
+
     }
 
     public void stopNode(final String message) throws StopNodeException {

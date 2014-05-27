@@ -8,7 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -49,7 +52,6 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +125,6 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
     public void useSameSessionOnBothNodes() throws Exception {
         User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
         changeToNode2();
@@ -134,7 +135,6 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
     public void classLoaderClustered() throws Exception {
 
         // Input expression
@@ -178,7 +178,6 @@ public class ClusterTests extends CommonAPISPTest {
      * Check that works are executed on node that started it
      */
     @Test
-    @Ignore
     public void clusteredWorkServiceIT() throws Exception {
 
         // Input expression
@@ -229,7 +228,6 @@ public class ClusterTests extends CommonAPISPTest {
      * * processes are executed
      */
     @Test
-    @Ignore
     public void should_pause_tenant_have_effect_on_all_nodes() throws Exception {
         final String systemProperty = "bonita.process.executed";
 
@@ -365,7 +363,7 @@ public class ClusterTests extends CommonAPISPTest {
 
     @Test
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
-        // given: 1 tenant that is paused
+        // given: 2 node with 1 node having running processes
         final long tenantId = createAndActivateTenant("MyTenant_");
 
         loginWith(USERNAME, PASSWORD);
@@ -377,11 +375,11 @@ public class ClusterTests extends CommonAPISPTest {
         ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
 
         logout();
-        // when: we stop and start the node
+        // when: we stop node 1
         stopPlatform();
         changeToNode2();
         loginWith(USERNAME, PASSWORD);
-        // then: work service is not runnning
+        // then: node2 should finish the work
         waitForProcessToFinishAndBeArchived(pi);
 
         // cleanup
@@ -389,6 +387,7 @@ public class ClusterTests extends CommonAPISPTest {
         logout();
         changeToNode1();
         startPlatform();
+        loginWith(USERNAME, PASSWORD);
     }
 
 }

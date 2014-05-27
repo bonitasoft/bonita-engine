@@ -24,6 +24,7 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IQueue;
 
 /**
  * Factory that use a hazelcast executor
@@ -60,28 +61,39 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
 
     @Override
     public BonitaExecutorService createExecutorService() {
-        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
+        final BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance, tenantId);
+        final Cluster cluster = hazelcastInstance.getCluster();
+        final BlockingQueue<Runnable> executingRunnable = createExecutingWorkQueue(hazelcastInstance, cluster);
+        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(executingRunnable);
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
-        final BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
         return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
-                TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue, logger);
+                TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue, executingRunnable, logger, tenantId);
     }
 
-    private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
+    private IQueue<Runnable> createExecutingWorkQueue(final HazelcastInstance hazelcastInstance, final Cluster cluster) {
+        return hazelcastInstance.getQueue(ClusteredThreadPoolExecutorLocalQueue.memberExecutingWorkQueueName(cluster.getLocalMember(), tenantId));
+    }
+
+    private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance, final long tenantId) {
         final Cluster cluster = hazelcastInstance.getCluster();
-        return hazelcastInstance.getQueue(ClusteredThreadPoolExecutorLocalQueue.memberWorkQueueName(cluster.getLocalMember()));
+        return hazelcastInstance.<Runnable> getQueue(ClusteredThreadPoolExecutorLocalQueue.memberWorkQueueName(cluster.getLocalMember(), tenantId));
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
 
-        public QueueRejectedExecutionHandler() {
+        private final BlockingQueue<Runnable> queue;
+
+        public QueueRejectedExecutionHandler(final BlockingQueue<Runnable> queue) {
+            this.queue = queue;
         }
 
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (executor.isShutdown()) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Tried to run work " + task
-                        + " but the work service is shutdown. work will be restarted with the node");
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to run work " + task
+                        + " but the work service is shutdown. readded it to the queue so other nodes can take it");
+                // add to executing jobs queue
+                queue.add(task);
             } else {
                 throw new RejectedExecutionException(
                         "Unable to run the task "
