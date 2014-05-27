@@ -271,8 +271,8 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
 
         // when
-        logout();
-        loginWith("userName1", "User1Pwd");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName1", "User1Pwd");
         getProfileAPI().importProfiles(byteArray, ImportPolicy.REPLACE_DUPLICATES);
 
         // then
