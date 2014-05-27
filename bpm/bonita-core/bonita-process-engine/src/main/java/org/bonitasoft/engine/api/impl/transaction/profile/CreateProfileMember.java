@@ -41,8 +41,10 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
 
     private SProfileMember sProfileMember;
 
+    private final long updatedById;
+
     public CreateProfileMember(final ProfileService profileService, final IdentityService identityService, final long profileId, final Long userId,
-            final Long groupId, final Long roleId, final MemberType memberType) {
+            final Long groupId, final Long roleId, final MemberType memberType, final long updatedById) {
         super();
         this.profileService = profileService;
         this.identityService = identityService;
@@ -51,6 +53,7 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         this.groupId = groupId;
         this.roleId = roleId;
         this.memberType = memberType;
+        this.updatedById = updatedById;
     }
 
     @Override
@@ -63,7 +66,6 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         }
         if (groupId != null && groupId > 0) {
             group = identityService.getGroup(groupId);
-
         }
         if (roleId != null && roleId > 0) {
             role = identityService.getRole(roleId);
@@ -72,19 +74,17 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
             case USER:
                 sProfileMember = profileService.addUserToProfile(profileId, userId, user.getUserName(), user.getLastName(), user.getUserName());
                 break;
-
             case GROUP:
                 sProfileMember = profileService.addGroupToProfile(profileId, groupId, group.getName(), group.getParentPath());
                 break;
-
             case ROLE:
                 sProfileMember = profileService.addRoleToProfile(profileId, roleId, role.getName());
                 break;
-
             default:
                 sProfileMember = profileService.addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
                 break;
         }
+        profileService.updateProfileMetaData(profileId, updatedById);
     }
 
     @Override

@@ -215,10 +215,10 @@ public interface ProfileService {
      * @param userName
      * @return sProfileMember
      * @throws SProfileMemberCreationException
-     *             TODO
      * @since 6.0
      */
-    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileMemberCreationException;
+    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName)
+            throws SProfileMemberCreationException;
 
     /**
      * Add a group to exist profile
@@ -468,5 +468,24 @@ public interface ProfileService {
      * @since 6.3.1
      */
     void deleteAllProfileEntriesOfProfile(SProfile profile) throws SProfileEntryDeletionException;
+
+    /**
+     * 
+     * @param profileId
+     * @param updatedById
+     * @throws SProfileUpdateException
+     * @throws SProfileNotFoundException
+     * @since 6.3.1
+     */
+    void updateProfileMetaData(final long profileId, final long updatedById) throws SProfileUpdateException, SProfileNotFoundException;
+
+    /**
+     * 
+     * @param profileMemberId
+     * @return
+     * @throws SProfileMemberNotFoundException
+     * @since 6.3.1
+     */
+    SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException;
 
 }

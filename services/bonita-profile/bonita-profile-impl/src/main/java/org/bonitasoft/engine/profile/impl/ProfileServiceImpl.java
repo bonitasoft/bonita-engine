@@ -41,6 +41,8 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.builder.impl.SProfileLogBuilderImpl;
 import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilderImpl;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
@@ -460,7 +462,8 @@ public class ProfileServiceImpl implements ProfileService {
         logAfterMethod("deleteProfileMember");
     }
 
-    private SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException {
+    @Override
+    public SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException {
         final SelectByIdDescriptor<SProfileMember> selectByIdDescriptor = SelectDescriptorBuilder.getProfileMemberWithoutDisplayName(profileMemberId);
         try {
             final SProfileMember profileMember = persistenceService.selectById(selectByIdDescriptor);
@@ -719,6 +722,20 @@ public class ProfileServiceImpl implements ProfileService {
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
         logBuilder.setActionType(actionType);
+    }
+
+    @Override
+    public void updateProfileMetaData(final long profileId, final long updatedById) throws SProfileUpdateException, SProfileNotFoundException {
+        final SProfileUpdateBuilder updateBuilder;
+        updateBuilder = getUpdateBuilder();
+        updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(updatedById);
+        updateProfile(getProfile(profileId), updateBuilder.done());
+    }
+
+    private SProfileUpdateBuilder getUpdateBuilder() {
+        final SProfileUpdateBuilder updateBuilder;
+        updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
+        return updateBuilder;
     }
 
 }

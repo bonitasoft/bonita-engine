@@ -459,7 +459,7 @@ public class ProfileServiceImplForProfileTest {
      * @throws SProfileDeletionException
      */
     @Test
-    public final void deleteProfileByObject() throws SBonitaReadException, SRecorderException, SProfileDeletionException, SProfileEntryDeletionException,
+    public final void deleteProfileByObject() throws Exception,
             SProfileMemberDeletionException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
@@ -486,7 +486,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public final void deleteNoProfileByObject() throws SProfileDeletionException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+    public final void deleteNoProfileByObject() throws Exception {
         profileServiceImpl.deleteProfile(null);
     }
 
@@ -505,7 +505,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test
-    public final void deleteProfileByObjectWithNoEntry() throws SProfileDeletionException, SRecorderException, SBonitaReadException,
+    public final void deleteProfileByObjectWithNoEntry() throws Exception,
             SProfileEntryDeletionException, SProfileMemberDeletionException {
         final List<SProfile> sProfiles = new ArrayList<SProfile>(3);
         final SProfile sProfile = mock(SProfile.class);
@@ -529,7 +529,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test
-    public final void deleteProfileByObjectWithNoMember() throws SProfileDeletionException, SRecorderException, SBonitaReadException,
+    public final void deleteProfileByObjectWithNoMember() throws Exception,
             SProfileEntryDeletionException, SProfileMemberDeletionException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();

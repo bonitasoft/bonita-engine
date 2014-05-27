@@ -242,9 +242,11 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
+        final long updatedById = getUserIdFromSession();
 
         final MemberType memberType = getMemberType(userId, groupId, roleId);
-        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId, memberType);
+        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
+                memberType, updatedById);
         try {
             checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
         } catch (final SBonitaException e1) {
@@ -252,10 +254,14 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
         try {
             createProfileMember.execute();
-            return ModelConvertor.toProfileMember(createProfileMember.getResult());
+            return  convertToProfileMember(createProfileMember);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
+    }
+
+    protected ProfileMember convertToProfileMember(final CreateProfileMember createProfileMember) {
+        return ModelConvertor.toProfileMember(createProfileMember.getResult());
     }
 
     @Override
@@ -342,15 +348,21 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public void deleteProfileMember(final Long profilMemberId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-
+    public void deleteProfileMember(final Long profileMemberId) throws DeletionException {
+        final ProfileService profileService = getTenantAccessor().getProfileService();
+        final long updatedById = getUserIdFromSession();
         try {
-            profileService.deleteProfileMember(profilMemberId);
+            final SProfileMember profileMember = profileService.getProfileMemberWithoutDisplayName(profileMemberId);
+            profileService.deleteProfileMember(profileMember.getId());
+            profileService.updateProfileMetaData(profileMember.getProfileId(), updatedById);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
+    }
+
+    protected long getUserIdFromSession() {
+        final long updatedById = SessionInfos.getUserIdFromSession();
+        return updatedById;
     }
 
 }
