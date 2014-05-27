@@ -67,7 +67,7 @@ public class TenantLocalIT extends CommonAPISPTest {
                 EXPECTED_PAGE_SEARCH_RESULT_COUNT);
 
         // clean up
-        logout();
+       logoutOnTenant();
     }
 
 }

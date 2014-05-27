@@ -8,32 +8,23 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class UniqueConstraintValidationRule implements ValidationRule {
+public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstraint> {
 
     private static final int MAX_CONSTRAINTNAME_LENGTH = 25;
 
     private final SQLNameValidator sqlNameValidator;
 
     public UniqueConstraintValidationRule() {
+        super(UniqueConstraint.class);
         sqlNameValidator = new SQLNameValidator(MAX_CONSTRAINTNAME_LENGTH);
     }
 
     @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof UniqueConstraint;
-    }
-
-    @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(UniqueConstraintValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
-        final UniqueConstraint uc = (UniqueConstraint) modelElement;
+    public ValidationStatus validate(final UniqueConstraint uc) {
         final ValidationStatus status = new ValidationStatus();
         final String name = uc.getName();
         if (name == null || name.isEmpty()) {

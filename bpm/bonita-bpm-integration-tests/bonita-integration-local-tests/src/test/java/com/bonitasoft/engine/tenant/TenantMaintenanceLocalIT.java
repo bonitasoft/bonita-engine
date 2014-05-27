@@ -40,7 +40,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         assertFalse(workService.isStopped());
         getTenantManagementAPI().pause();
         assertTrue(workService.isStopped());
-        logout();
+       logoutOnTenant();
 
         // when: we stop and start the node
         stopAndStartPlatform();
@@ -52,7 +52,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         // cleanup
         loginOnTenantWithTechnicalLogger(tenantId);
         getTenantManagementAPI().resume();
-        logout();
+       logoutOnTenant();
     }
 
     protected TenantServiceAccessor getTenantAccessor(final long tenantId) {

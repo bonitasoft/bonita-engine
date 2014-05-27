@@ -7,8 +7,8 @@
 		</encoder>
 	</appender>
 
-	<logger name="org.bonitasoft" level="INFO" />
-	<logger name="com.bonitasoft" level="INFO" />
+	<logger name="org.bonitasoft" level="DEBUG" />
+	<logger name="com.bonitasoft" level="DEBUG" />
 
 
 	<root level="WARN">

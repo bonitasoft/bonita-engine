@@ -35,7 +35,7 @@
     
     <util:map id="jpa-model-configuration" scope="prototype" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object">
 	    <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
-		<entry key="hibernate.show_sql" value="true" />
+		<entry key="hibernate.show_sql" value="false" />
 		<entry key="hibernate.format_sql" value="true" />
 	    <entry key="hibernate.connection.datasource" value-ref="notManagedBizDataSource" />
 	</util:map>

@@ -43,18 +43,18 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         donaBenta = createUser("donabenta", "bpm");
-        logout();
-        loginWith("donabenta", "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith("donabenta", "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
-        login();
+       logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(donaBenta.getId());
-        logout();
+       logoutOnTenant();
     }
 
     private ProcessDefinition deployProcessWithBoundaryEvent(final long timerValue, final boolean withData) throws BonitaException,
@@ -81,7 +81,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
         processDefinitionBuilder.addTransition("Boundary timer", "exceptionStep");
         processDefinitionBuilder.addTransition("exceptionStep", "end");
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
     }
 
     @Test

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -48,14 +50,16 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bdm.BusinessObject;
 import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.FieldType;
-import com.bonitasoft.engine.bdm.Query;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 
@@ -74,17 +78,35 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
-        final Field firstName = new Field();
+        final SimpleField street = new SimpleField();
+        street.setName("street");
+        street.setType(FieldType.STRING);
+        final SimpleField city = new SimpleField();
+        city.setName("city");
+        city.setType(FieldType.STRING);
+        final BusinessObject addressBO = new BusinessObject();
+        addressBO.setQualifiedName("org.bonita.pojo.Address");
+        addressBO.addField(street);
+        addressBO.addField(city);
+
+        final RelationField address = new RelationField();
+        address.setType(Type.AGGREGATION);
+        address.setName("addresses");
+        address.setCollection(Boolean.TRUE);
+        address.setNullable(Boolean.TRUE);
+        address.setReference(addressBO);
+
+        final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
         firstName.setLength(Integer.valueOf(10));
 
-        final Field lastName = new Field();
+        final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         lastName.setNullable(Boolean.FALSE);
 
-        final Field phoneNumbers = new Field();
+        final SimpleField phoneNumbers = new SimpleField();
         phoneNumbers.setName("phoneNumbers");
         phoneNumbers.setType(FieldType.STRING);
         phoneNumbers.setLength(Integer.valueOf(10));
@@ -95,6 +117,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.addField(firstName);
         employee.addField(lastName);
         employee.addField(phoneNumbers);
+        employee.addField(address);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
@@ -107,7 +130,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
 
+        final Query findByFirstNameFetchAddresses = employee.addQuery("findByFirstNameFetchAddresses",
+                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", List.class.getName());
+        findByFirstNameFetchAddresses.addQueryParameter("firstName", String.class.getName());
+
         employee.addQuery("countEmployee", "SELECT COUNT(e) FROM Employee e", Long.class.getName());
+
+        employee.addIndex("IDX_LSTNM", "lastName");
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName("org.bonitasoft.pojo.Person");
@@ -120,13 +149,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         model.addBusinessObject(person);
+        model.addBusinessObject(addressBO);
         return model;
     }
 
     @Before
     public void setUp() throws Exception {
         clientFolder = com.bonitasoft.engine.io.IOUtils.createTempDirectory("bdr_it_client");
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         matti = createUser("matti", "bpm");
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
@@ -147,7 +177,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         }
 
         deleteUser(matti);
-        logout();
+       logoutOnTenant();
     }
 
     @Test
@@ -190,46 +220,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private byte[] buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
-        final Field field = new Field();
+        final SimpleField field = new SimpleField();
         field.setName("aField");
         field.setType(FieldType.STRING);
         bo.addField(field);
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(model);
-        return zip;
-    }
-
-    @Test
-    public void deployABDRAndCreateABusinessData() throws Exception {
-
-        assertThat(getTenantManagementAPI().getBusinessDataModelVersion()).isNotEmpty();
-
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
-
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
-        processDefinitionBuilder.addActor(ACTOR_NAME);
-        final String bizDataName = "myEmployee";
-        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName),
-                OperatorType.ASSIGNMENT, null, null, employeeExpression);
-
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-
-        final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
-        String employeeToString = getEmployeeToString(bizDataName, instance.getId());
-        assertThat(employeeToString).isNull();
-
-        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
-        getProcessAPI().executeFlowNode(userTask.getId());
-
-        employeeToString = getEmployeeToString(bizDataName, instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Doe]");
-
-        disableAndDeleteProcess(definition.getId());
+        return converter.zip(model);
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
@@ -256,7 +254,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
 
         waitForUserTask("step2", processInstanceId);
@@ -295,7 +293,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance.getId());
@@ -325,7 +323,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addDisplayDescription(scriptExpression);
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         waitForUserTask("step1", instance.getId());
@@ -390,7 +388,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         try {
             getProcessAPI().startProcess(definition.getId());
         } finally {
@@ -409,7 +407,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         try {
             getProcessAPI().startProcess(definition.getId());
         } finally {
@@ -443,7 +441,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         getTenantManagementAPI().pause();
         getTenantManagementAPI().uninstallBusinessDataModel();
         getTenantManagementAPI().resume();
@@ -454,6 +452,50 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
 
         getTenantManagementAPI().getClientBDMZip();
+    }
+
+    @Test
+    public void shouldBeAbleToRunDAOCallThroughGroovy() throws Exception {
+        final String firstName = "FlofFlof";
+        final String lastName = "Boudin";
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName
+                + "'; e.addToAddresses(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", "org.bonita.pojo.Address"));
+        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import org.bonita.pojo.Address; Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; return a;",
+                "org.bonita.pojo.Address");
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "shouldBeAbleToRunDAOCallThroughGroovy", "6.3.1");
+        final String employeeDAOName = "employeeDAO";
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", "org.bonita.pojo.Address", null);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+
+        waitForUserTask("step2", processInstanceId);
+
+        // Let's check we can retrieve firstName using DAO call:
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(1);
+        final String getLastNameWithDAOExpression = "retrieveEmployeeByFirstName";
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, employeeDAOName + ".findByFirstName('" + firstName
+                        + "', 0, 10).get(0).getAddresses().get(0).city", String.class.getName(),
+                        new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIF_CLASSNAME + "DAO")), null);
+        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        final String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
+        assertThat(returnedLastName).isEqualTo("Grenoble");
+
+        disableAndDeleteProcess(definition.getId());
     }
 
     @Test
@@ -506,7 +548,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, matti);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
@@ -540,10 +582,10 @@ public class BDRepositoryIT extends CommonAPISPTest {
         BarResource barResource = getResource("/com/bonitasoft/engine/business/data/BusinessDataUpdateConnector.impl", "BusinessDataUpdateConnector.impl");
         businessArchiveBuilder.addConnectorImplementation(barResource);
 
-        barResource = generateJarAndBuildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
+        barResource = BuildTestUtil.generateJarAndBuildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
         businessArchiveBuilder.addClasspathResource(barResource);
 
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, matti);
+        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, matti);
     }
 
     private BarResource getResource(final String path, final String name) throws IOException {
@@ -571,6 +613,39 @@ public class BDRepositoryIT extends CommonAPISPTest {
             System.err.println(eee.getMessage());
             return null;
         }
+    }
+
+    @Test
+    public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
+        final String businessDataName = "employee";
+        processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().deleteBusinessDataOperation(businessDataName));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+
+        final HumanTaskInstance userTask = waitForUserTask("step1", processInstanceId);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
+                Collections.<String, Serializable> emptyMap());
+
+        Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        assertThat(result.get("countEmployee")).isEqualTo(1L);
+
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForUserTask("step2", processInstanceId);
+        result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        assertThat(result.get("countEmployee")).isEqualTo(0L);
+
+        disableAndDeleteProcess(definition.getId());
     }
 
 }

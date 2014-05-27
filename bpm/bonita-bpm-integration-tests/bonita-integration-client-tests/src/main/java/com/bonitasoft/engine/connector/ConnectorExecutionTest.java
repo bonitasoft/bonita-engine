@@ -60,16 +60,16 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         VariableStorage.clearAll();
         deleteUser(JOHN);
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser(JOHN, "bpm");
         johnUserId = user.getId();
-        logout();
-        loginWith(JOHN, "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
     protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {
