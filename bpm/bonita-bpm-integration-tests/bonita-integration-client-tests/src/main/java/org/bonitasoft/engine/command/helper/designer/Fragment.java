@@ -13,24 +13,24 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
  */
 public abstract class Fragment {
 
-    private Map<String, Transition> transitions = new HashMap<String, Transition>();
+    private final Map<String, Transition> transitions = new HashMap<String, Transition>();
 
-    public Fragment when(String step, Transition transition) {
+    public Fragment when(final String step, final Transition transition) {
         transitions.put(step, transition);
         return this;
     }
 
-    public void bind(List<Fragment> sources, ProcessDefinitionBuilder builder) {
-        for (Fragment source : sources) {
+    public void bind(final List<Fragment> sources, final ProcessDefinitionBuilder builder) {
+        for (final Fragment source : sources) {
             Transition transition = transitions.get(source.getName());
-            if(transition == null) {
+            if (transition == null) {
                 transition = new Transition();
             }
             bind(source.getName(), transition, builder);
         }
     }
 
-    abstract public void bind(String source, Transition transition, ProcessDefinitionBuilder builder);
+    public abstract void bind(String source, Transition transition, ProcessDefinitionBuilder builder);
 
     public abstract void build(ProcessDefinitionBuilder builder);
 

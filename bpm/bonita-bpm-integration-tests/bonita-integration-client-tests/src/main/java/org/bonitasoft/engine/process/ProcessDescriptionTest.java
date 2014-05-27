@@ -27,12 +27,12 @@ public class ProcessDescriptionTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ProcessDescriptionTest extends CommonAPITest {
         processBuilder.addTransition("start", "gateway");
         processBuilder.addTransition("gateway", "userTask");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(getBusinessArchive(processBuilder), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(getBusinessArchive(processBuilder), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals("processDescription", processInstance.getDescription());
 

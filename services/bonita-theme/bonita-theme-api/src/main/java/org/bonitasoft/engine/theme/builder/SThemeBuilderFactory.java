@@ -21,17 +21,17 @@ import org.bonitasoft.engine.theme.model.SThemeType;
  */
 public interface SThemeBuilderFactory {
 
-    public static final String ID = "id";
+    String ID = "id";
 
-    public static final String CONTENT = "content";
+    String CONTENT = "content";
 
-    public static final String CSS_CONTENT = "cssContent";
+    String CSS_CONTENT = "cssContent";
 
-    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    String LAST_UPDATE_DATE = "lastUpdateDate";
 
-    public static final String TYPE = "type";
+    String TYPE = "type";
 
-    public static final String IS_DEFAULT = "isDefault";
+    String IS_DEFAULT = "isDefault";
 
     SThemeBuilder createNewInstance(STheme theme);
 

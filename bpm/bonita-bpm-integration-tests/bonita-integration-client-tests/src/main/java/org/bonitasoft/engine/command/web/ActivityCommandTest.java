@@ -60,6 +60,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -77,16 +78,16 @@ public class ActivityCommandTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         businessUser = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
         deleteUser(businessUser.getId());
-        logout();
+        logoutOnTenant();
     }
 
     @Cover(classes = { ProcessAPI.class, ActivityInstance.class, DataInstance.class }, concept = BPMNConcept.DATA, keywords = { "Data", "Transient", "Update",
@@ -96,7 +97,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final String updatedValue = "afterUpdate";
 
         final BusinessArchive businessArchive = buildBusinessArchiveWithDataTransientAndConnector();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, businessUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance.getId(), getSession().getUserId()).getId();
 
@@ -117,7 +118,7 @@ public class ActivityCommandTest extends CommonAPITest {
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate with custom jar.", jira = "ENGINE-928")
     @Test
     public void executeActionsAndTerminateWithCustomJarInOperation() throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // process is deployed here with a custom jar
         // wait for first task and assign it
@@ -137,7 +138,7 @@ public class ActivityCommandTest extends CommonAPITest {
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate.", jira = "")
     @Test
     public void executeActionsAndTerminate() throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
         final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance.getId(), getSession().getUserId()).getId();
@@ -161,7 +162,7 @@ public class ActivityCommandTest extends CommonAPITest {
     @Test
     public void executeActionsAndTerminateFor() throws Exception {
         final User john = createUser("john", PASSWORD);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
         final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
@@ -222,6 +223,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
         return builder.done();
     }
@@ -254,7 +256,7 @@ public class ActivityCommandTest extends CommonAPITest {
     private void executeActionsAndTerminate(final String dataName, final boolean isTransient, final long taskId, final Map<String, Serializable> fieldValues,
             final Expression rightOperand)
             throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
-        final Operation operation = buildOperation(dataName, isTransient, OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Operation operation = BuildTestUtil.buildOperation(dataName, isTransient, OperatorType.ASSIGNMENT, "=", rightOperand);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();

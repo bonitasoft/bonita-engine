@@ -625,7 +625,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final STenantCreationException e) {
             throw e;
         } catch (final Exception e) {
-            throw new STenantCreationException("Unable to create tenant " + tenantName, e);
+            throw new STenantCreationException("Unable to create default tenant", e);
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }

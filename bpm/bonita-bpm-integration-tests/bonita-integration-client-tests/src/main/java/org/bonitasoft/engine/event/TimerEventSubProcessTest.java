@@ -52,17 +52,16 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser("john", "bpm");
-        logout();
-        loginWith("john", "bpm");
-
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployAndEnableProcessWithTimerEventSubProcess(final long timerDuration) throws BonitaException {
@@ -81,7 +80,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         subProcessBuilder.addTransition("timerStart", "subStep");
         subProcessBuilder.addTransition("subStep", "endSubProcess");
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, "mainActor", john);
+        return deployAndEnableProcessWithActor(processDefinition, "mainActor", john);
     }
 
     private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String targetVersion)
@@ -98,7 +97,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         builder.addTransition("callActivity", "step2");
         builder.addTransition("step2", "end");
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, "mainActor", john);
+        return deployAndEnableProcessWithActor(processDefinition, "mainActor", john);
     }
 
     private ProcessDefinition deployAndEnableProcessWithTimerEventSubProcessAndData(final long timerDuration) throws BonitaException {
@@ -122,7 +121,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         subProcessBuilder.addTransition("timerStart", "subStep");
         subProcessBuilder.addTransition("subStep", "endSubProcess");
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, "mainActor", john);
+        return deployAndEnableProcessWithActor(processDefinition, "mainActor", john);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")

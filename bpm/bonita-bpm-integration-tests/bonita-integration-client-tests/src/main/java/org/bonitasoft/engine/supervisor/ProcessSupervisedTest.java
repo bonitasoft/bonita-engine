@@ -64,7 +64,7 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -103,18 +103,18 @@ public class ProcessSupervisedTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");
 
-        logout();
-        loginWith("matti", PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith("matti", PASSWORD);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("step1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
-        definition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        definition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         processDefinitions = new ArrayList<ProcessDefinition>();
         processDefinitions.add(definition);
 
@@ -157,7 +157,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         getIdentityAPI().deleteUser(matti.getId());
         getIdentityAPI().deleteGroup(group.getId());
         getIdentityAPI().deleteRole(role.getId());
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -189,7 +189,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>(1);
         fieldValues.put("field_fieldId1", "Excel");
         final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
-        final Operation operation = buildOperation("Application", false, OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Operation operation = BuildTestUtil.buildOperation("Application", false, OperatorType.ASSIGNMENT, "=", rightOperand);
         final List<Operation> operationsMap = new ArrayList<Operation>(1);
         operationsMap.add(operation);
         final Map<String, Serializable> executeParameters = new HashMap<String, Serializable>(2);
@@ -220,7 +220,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
             final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process" + i, "1." + i);
             processBuilder.addActor(actorName).addDescription("actor description" + i);
             final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", actorName).getProcess();
-            final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, john);
+            final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, actorName, john);
             processDefinitions.add(processDefinition1);
             proDefIds.add(processDefinition1.getId());
         }
@@ -291,12 +291,12 @@ public class ProcessSupervisedTest extends CommonAPITest {
         getProcessAPI().addProcessComment(processInstance3.getId(), "commentContent2");
         getProcessAPI().addProcessComment(processInstance3.getId(), "commentContent3");
 
-        loginWith("john", "bpm");
+        loginOnDefaultTenantWith("john", "bpm");
         final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "2.0");
         processBuilder2.addDescription("definition2 description");
         processBuilder2.addActor(ACTOR_NAME).addUserTask("temporize", ACTOR_NAME);
         final DesignProcessDefinition designprocessDefinition2 = processBuilder2.done();
-        final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, ACTOR_NAME, matti);
+        final ProcessDefinition definition2 = deployAndEnableProcessWithActor(designprocessDefinition2, ACTOR_NAME, matti);
         processDefinitions.add(definition2);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
@@ -354,7 +354,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstances.get(2).getId(), 0, 10);
         final long activityInstanceId = activities.get(0).getId();
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
         final SearchResult<HumanTaskInstance> result = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(3, result.getCount());
@@ -370,15 +370,15 @@ public class ProcessSupervisedTest extends CommonAPITest {
     public void searchUncategorizedProcessDefinitionsSupervisedBy() throws Exception {
         // create process1
         final String processName1 = "processDefinition1";
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName1, "1.1",
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName1, "1.1",
                 Arrays.asList("step1_1", "step1_2"), Arrays.asList(true, true));
-        processDefinitions.add(deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, matti));
+        processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, matti));
 
         // create process2
         final String processName2 = "processDefinition2";
-        final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName2, "1.2",
+        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName2, "1.2",
                 Arrays.asList("step2_1", "step2_2"), Arrays.asList(true, true));
-        processDefinitions.add(deployAndEnableWithActor(designProcessDefinition2, ACTOR_NAME, matti));
+        processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, matti));
 
         // create supervisor
         supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(1).getId(), john.getId()));
@@ -422,7 +422,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
         final ProcessInstance instance = processInstances.get(2);
 
         // prepare search options
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         final SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(matti.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(3, result.getCount());
@@ -442,10 +442,10 @@ public class ProcessSupervisedTest extends CommonAPITest {
         processInstances.add(processInstance);
         final HumanTaskInstance pendingTask = waitForUserTask("step1", processInstance);
 
-        logout();
-        loginWith("john", PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith("john", PASSWORD);
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinitionId, 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinitionId, 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());

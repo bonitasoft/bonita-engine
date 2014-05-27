@@ -27,24 +27,22 @@ import org.junit.Test;
 
 public class SignalEventTest extends CommonAPITest {
 
-    private static final String ACTOR_NAME = "User";
-
     private User john = null;
 
     @Before
     public void setUp() throws Exception {
-        login();
-        john = createUser("john", "bpm");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
     }
 
     @After
     public void tearDown() throws Exception {
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         if (john != null) {
             getIdentityAPI().deleteUser(john.getId());
         }
-        logout();
+        logoutOnTenant();
     }
 
     @Cover(classes = { EventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal Event", "Start event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to a start event of an other process.", jira = "")
@@ -64,11 +62,11 @@ public class SignalEventTest extends CommonAPITest {
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
-        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
-        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableWithActor(endSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableProcessWithActor(endSignalArchive, ACTOR_NAME, john);
 
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
@@ -109,11 +107,11 @@ public class SignalEventTest extends CommonAPITest {
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
-        final ProcessDefinition startSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition startSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, john);
         final ProcessDefinition endSignal = deployAndEnableProcess(endSignalArchive);
 
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final ProcessInstance instance = getProcessAPI().startProcess(startSignal.getId());
         waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
 
@@ -142,11 +140,11 @@ public class SignalEventTest extends CommonAPITest {
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
-        final ProcessDefinition startSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition startSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, john);
         final ProcessDefinition endSignal = deployAndEnableProcess(endSignalArchive);
 
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         getProcessAPI().startProcess(endSignal.getId());
         waitForUserTask("Task1");
@@ -157,15 +155,14 @@ public class SignalEventTest extends CommonAPITest {
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "throw event", "send signal", "start event" }, jira = "ENGINE-455")
     @Test
     public void sendSignalViaAPIToStartSignalEvent() throws Exception {
-
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
         final DesignProcessDefinition startSignalDef = builder.done();
 
-        final ProcessDefinition startSignal = deployAndEnableWithActor(startSignalDef, ACTOR_NAME, john);
-        logout();
-        loginWith("john", "bpm");
+        final ProcessDefinition startSignal = deployAndEnableProcessWithActor(startSignalDef, ACTOR_NAME, john);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         getProcessAPI().sendSignal("GO");
         waitForUserTask("Task1");
@@ -180,9 +177,9 @@ public class SignalEventTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addIntermediateCatchEvent("OnSignal").addSignalEventTrigger("GO")
                 .addUserTask("Task1", ACTOR_NAME).addTransition("Start", "OnSignal").addTransition("OnSignal", "Task1");
-        final ProcessDefinition intermediateSignal = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
-        logout();
-        loginWith("john", "bpm");
+        final ProcessDefinition intermediateSignal = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessInstance instance = getProcessAPI().startProcess(intermediateSignal.getId());
         waitForEvent(instance, "OnSignal", TestStates.getWaitingState());

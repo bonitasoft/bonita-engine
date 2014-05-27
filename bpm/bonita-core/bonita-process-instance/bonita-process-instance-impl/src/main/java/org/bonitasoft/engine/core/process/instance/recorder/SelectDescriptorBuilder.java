@@ -75,14 +75,14 @@ public class SelectDescriptorBuilder {
 
     public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SFlowNodeInstance.class, "name", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SFlowNodeInstance.class, "id", OrderByType.ASC);
         return new SelectListDescriptor<SFlowNodeInstance>("getFlowNodesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<SAFlowNodeInstance> getArchivedFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex,
             final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAFlowNodeInstance.class, "name", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAFlowNodeInstance.class, "id", OrderByType.ASC);
         return new SelectListDescriptor<SAFlowNodeInstance>("getArchivedFlowNodesFromProcessInstance", parameters, SAFlowNodeInstance.class, queryOptions);
     }
 

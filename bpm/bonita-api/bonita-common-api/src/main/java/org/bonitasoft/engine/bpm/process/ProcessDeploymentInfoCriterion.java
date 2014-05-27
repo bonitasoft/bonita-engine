@@ -81,8 +81,7 @@ public enum ProcessDeploymentInfoCriterion {
 
     private final Order order;
 
-    ProcessDeploymentInfoCriterion(final String field, final Order order)
-    {
+    ProcessDeploymentInfoCriterion(final String field, final Order order) {
         this.field = field;
         this.order = order;
     }
@@ -98,4 +97,5 @@ public enum ProcessDeploymentInfoCriterion {
     public Sort getSort() {
         return new Sort(order, field);
     }
+
 }

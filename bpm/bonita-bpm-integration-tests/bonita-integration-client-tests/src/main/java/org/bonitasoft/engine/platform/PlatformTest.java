@@ -15,7 +15,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.PlatformTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.AfterClass;
@@ -37,17 +37,15 @@ public class PlatformTest {
 
     private static PlatformSession session;
 
-    private static APITestUtil apiTestUtil = new APITestUtil();
-
     @BeforeClass
     public static void beforeClass() throws BonitaException {
-        session = apiTestUtil.loginPlatform();
+        session = new PlatformTestUtil().loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        apiTestUtil.logoutPlatform(session);
+        new PlatformTestUtil().logoutOnPlatform(session);
     }
 
     @Before
