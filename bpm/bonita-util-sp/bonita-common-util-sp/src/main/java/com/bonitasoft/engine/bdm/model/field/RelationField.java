@@ -30,7 +30,7 @@ public class RelationField extends Field {
     }
     
     public enum FetchType {
-        EAGER
+        EAGER, LAZY
     }
 
     @XmlAttribute(required = true)
