@@ -30,18 +30,18 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        donaBenta = createUser("donabenta", "bpm");
-        logout();
-        loginWith("donabenta", "bpm");
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        donaBenta = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
-        login();
+        logoutOnTenant();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(donaBenta.getId());
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployProcessWithBoundaryEvent(final String signalName) throws BonitaException {
@@ -57,7 +57,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         processDefinitionBuilder.addTransition("start", "step1");
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition("waitSignal", "exceptionStep");
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
     }
 
     @Test
@@ -176,7 +176,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         calledProcess.addEndEvent("end");
         calledProcess.addTransition("start", "calledStep");
         calledProcess.addTransition("calledStep", "end");
-        return deployAndEnableWithActor(calledProcess.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(calledProcess.done(), actorName, donaBenta);
     }
 
     protected ProcessDefinition deployAndEnableProcessWithBoundarySignalEventOnCallActivity(final String signalName, final String actorName)
@@ -194,7 +194,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition("step2", "end");
         processDefinitionBuilder.addTransition("signal", "exceptionStep");
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
     }
 
     private ProcessDefinition deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(final int loopCardinality, final boolean isSequential)
@@ -212,7 +212,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         processBuilder.addUserTask("step2", actorName).addUserTask("exceptionStep", actorName).addEndEvent("end").addTransition("start", "step1")
                 .addTransition("step1", "step2").addTransition("step2", "end").addTransition("signal", "exceptionStep");
 
-        return deployAndEnableWithActor(processBuilder.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(processBuilder.done(), actorName, donaBenta);
     }
 
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
@@ -335,7 +335,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         processBuilder.addUserTask("step2", actorName).addUserTask("exceptionStep", actorName).addEndEvent("end").addTransition("start", "step1")
                 .addTransition("step1", "step2").addTransition("step2", "end").addTransition("signal", "exceptionStep");
 
-        return deployAndEnableWithActor(processBuilder.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(processBuilder.done(), actorName, donaBenta);
     }
 
     @Cover(classes = { SignalEventTriggerDefinition.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",

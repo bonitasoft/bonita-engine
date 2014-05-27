@@ -43,23 +43,21 @@ import org.junit.Test;
  */
 public class LoopTest extends CommonAPITest {
 
-    private static final String JOHN = "john";
-
     private User john;
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser(JOHN, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
+        deleteUser(USERNAME);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -72,7 +70,7 @@ public class LoopTest extends CommonAPITest {
         builder.addActor(delivery).addDescription("Delivery all day and night long");
         builder.addUserTask("step1", delivery).addLoop(true, condition);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(instance));
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
@@ -95,7 +93,7 @@ public class LoopTest extends CommonAPITest {
         builder.addActor(delivery).addDescription("Delivery all day and night long");
         builder.addUserTask("step1", delivery).addLoop(false, condition);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
@@ -122,7 +120,7 @@ public class LoopTest extends CommonAPITest {
         builder.addUserTask(activityName, actorName).addLoop(false, new ExpressionBuilder().createConstantBooleanExpression(true));
         builder.addTransition("dummy", activityName);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), actorName, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), actorName, john);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
             final ActivityInstance userTask = waitForUserTask(activityName, processInstance);
@@ -147,7 +145,7 @@ public class LoopTest extends CommonAPITest {
 
         builder.addUserTask("step1", delivery).addLoop(false, condition, new ExpressionBuilder().createDataExpression("loopMax", Integer.class.getName()));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < loopMax; i++) {
@@ -175,7 +173,7 @@ public class LoopTest extends CommonAPITest {
         final int loopMax = 3;
         builder.addUserTask("step1", delivery).addLoop(false, condition);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < loopMax; i++) {
@@ -212,7 +210,7 @@ public class LoopTest extends CommonAPITest {
                 new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingData1", "myData + 1",
                         Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("myData", Integer.class.getName()))));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < loopMax; i++) {
@@ -264,7 +262,7 @@ public class LoopTest extends CommonAPITest {
         builder.addTransition(loopName, "terminate");
         builder.addTransition(parallelTaskName, "terminate");
 
-        return deployAndEnableWithActor(builder.done(), delivery, john);
+        return  deployAndEnableProcessWithActor(builder.done(), delivery, john);
     }
 
 }

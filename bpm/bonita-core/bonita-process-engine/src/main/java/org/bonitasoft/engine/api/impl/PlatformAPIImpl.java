@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
-import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.CommandDescriptor;
@@ -86,7 +84,9 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -666,7 +666,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         return targetDir;
     }
 
-    @SuppressWarnings("unchecked")
     protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
         final Parser parser = tenantServiceAccessor.getProfileParser();
         final ProfileService profileService = tenantServiceAccessor.getProfileService();
@@ -683,20 +682,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             inputStream.close();
         }
-
-        StringReader reader = new StringReader(xmlContent);
-        List<ExportedProfile> profiles;
-        try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            profiles = (List<ExportedProfile>) parser.getObjectFromXML(reader);
-            // importer -1 because we create the tenant
-            final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, -1);
-            importProfiles.execute();
-        } finally {
-            reader.close();
-        }
+        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
+        new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {

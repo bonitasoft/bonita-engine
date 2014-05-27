@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.operation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
@@ -39,6 +41,11 @@ public class DocumentLeftOperandHandlerTest {
     @Test(expected = SOperationExecutionException.class)
     public void deleteThrowsAnExceptionNotYetSupported() throws Exception {
         handler.delete(createLeftOperand("myData"), 45l, "container");
+    }
+
+    @Test
+    public void handlerSupportsBatchUpdate() throws Exception {
+        assertThat(handler.supportBatchUpdate()).isTrue();
     }
 
 }

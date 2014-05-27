@@ -4,7 +4,6 @@ CREATE TABLE profile (
   isDefault BIT NOT NULL,
   name NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
-  iconPath NVARCHAR(50),
   creationDate NUMERIC(19, 0) NOT NULL,
   createdBy NUMERIC(19, 0) NOT NULL,
   lastUpdateDate NUMERIC(19, 0) NOT NULL,

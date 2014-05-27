@@ -34,12 +34,12 @@ public class ActorCommandTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Command", "User id", "Team" }, story = "Get actors ids for user id including team.", jira = "")
@@ -51,7 +51,7 @@ public class ActorCommandTest extends CommonAPITest {
         final User d1 = createUser(userName, manager.getId());
         final User d2 = createUser("coder2", manager.getId());
         final User x3 = createUser("useless", "bpm");
-        loginWith(userName, "bpm");
+        loginOnDefaultTenantWith(userName, "bpm");
 
         final String actor11 = "killer";
         final String actor12 = "Slayer";

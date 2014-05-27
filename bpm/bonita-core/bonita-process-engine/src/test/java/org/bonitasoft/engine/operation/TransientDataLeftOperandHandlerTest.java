@@ -168,4 +168,9 @@ public class TransientDataLeftOperandHandlerTest {
         transientDataLeftOperandHandler.delete(createLeftOperand("myData"), 45l, "container");
     }
 
+    @Test
+    public void handlerSupportsBatchUpdate() throws Exception {
+        assertThat(transientDataLeftOperandHandler.supportBatchUpdate()).isTrue();
+    }
+
 }

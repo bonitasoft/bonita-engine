@@ -10,10 +10,8 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -85,7 +83,7 @@ public abstract class CommonAPITest extends APITestUtil {
      * @throws BonitaException
      */
     private List<String> clean() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         final List<String> messages = new ArrayList<String>();
         messages.addAll(checkNoCommands());
@@ -102,7 +100,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkNoComments());
         messages.addAll(checkNoArchivedComments());
 
-        logout();
+        logoutOnTenant();
         return messages;
     }
 
@@ -119,26 +117,11 @@ public abstract class CommonAPITest extends APITestUtil {
         resources.add(barResource);
     }
 
-    public void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
-            final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
-        bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
-    }
-
-    protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final User user, final ProcessDefinitionBuilder designProcessDefinition,
+    protected ProcessDefinition deployProcessWithTestFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user,
             final String filterName) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition.done());
-        final List<BarResource> impl = generateFilterImplementations(filterName);
-        for (final BarResource barResource : impl) {
-            businessArchiveBuilder.addUserFilters(barResource);
-        }
+        final List<BarResource> userFilters = generateFilterImplementations(filterName);
         final List<BarResource> generateFilterDependencies = generateFilterDependencies();
-        for (final BarResource barResource : generateFilterDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
+        return deployAndEnableProcessWithActorAndUserFilter(processDefinitionBuilder, actorName, user, generateFilterDependencies, userFilters);
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {

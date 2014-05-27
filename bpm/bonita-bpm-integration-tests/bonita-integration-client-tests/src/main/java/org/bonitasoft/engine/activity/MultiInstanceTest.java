@@ -79,12 +79,12 @@ public class MultiInstanceTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         jenny = createUser(JENNY, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
     @After
@@ -93,18 +93,18 @@ public class MultiInstanceTest extends CommonAPITest {
         deleteUser(JACK);
         deleteUser(JENNY);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Test
     public void executeAMultiInstanceUserTaskWhichCreate0Task() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceUserTaskWhichCreate0Task",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addAutomaticTask("autostep").addUserTask("step1", ACTOR_NAME)
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(0));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue(waitForProcessToFinishAndBeArchived(instance));
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
@@ -121,10 +121,10 @@ public class MultiInstanceTest extends CommonAPITest {
     @Test
     public void executeAMultiInstanceUserTask() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceUserTask", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(2));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         checkNbPendingTaskOf(1, john);
@@ -142,10 +142,10 @@ public class MultiInstanceTest extends CommonAPITest {
     @Test
     public void searchMultiInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceUserTask", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(1));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance userTask = waitForUserTask("step1", processInstance.getId());
@@ -181,7 +181,7 @@ public class MultiInstanceTest extends CommonAPITest {
     @Test
     public void executeAMultiInstanceWithMaxIteration() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceWithMaxIteration", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
         final int loopMax = 3;
@@ -191,7 +191,7 @@ public class MultiInstanceTest extends CommonAPITest {
                         new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
                         new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         checkPendingTaskSequentially(loopMax, processInstance, true);
@@ -211,8 +211,8 @@ public class MultiInstanceTest extends CommonAPITest {
         final String anotherActor = "anotherActor";
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceWithMaxIteration", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        builder.addActor(anotherActor).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
+        builder.addActor(anotherActor);
 
         final String loopDataInputName = "loopDataInput_";
         String loopDataOutputName = "loopDataOutput_";
@@ -241,7 +241,8 @@ public class MultiInstanceTest extends CommonAPITest {
                 .addLoopDataOutputRef(loopDataOutputName);
         builder.addUserTask("lastTask", anotherActor);
         builder.addTransition("step1", "lastTask");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), Arrays.asList(ACTOR_NAME, anotherActor), Arrays.asList(john, jack));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), Arrays.asList(ACTOR_NAME, anotherActor),
+                Arrays.asList(john, jack));
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         final DataInstance processDataInstance2 = getProcessAPI().getProcessDataInstance(loopDataInputName, process.getId());
         final List<?> value = (List<?>) processDataInstance2.getValue();
@@ -305,7 +306,7 @@ public class MultiInstanceTest extends CommonAPITest {
     public void executeAMultiInstanceParallelWithLoopCardinalityUsingGroovyAndData() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceParallelWithMaxIteration",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
         final int loopMax = 3;
@@ -315,7 +316,7 @@ public class MultiInstanceTest extends CommonAPITest {
                         Integer.class.getName(), new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
                         new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         checkPendingTaskInParallel(loopMax, loopMax, processInstance);
@@ -326,7 +327,7 @@ public class MultiInstanceTest extends CommonAPITest {
     public void executeAMultiInstanceParallelWithLoopCardinalityMoreThan20() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceParallelWithMaxIteration",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(16));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(14));
         final int loopMax = 30;
@@ -336,7 +337,7 @@ public class MultiInstanceTest extends CommonAPITest {
                         Integer.class.getName(), new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
                         new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         checkPendingTaskInParallel(loopMax, loopMax, processInstance);
@@ -347,7 +348,7 @@ public class MultiInstanceTest extends CommonAPITest {
     public void executeAMultiInstanceParallelWithCompletionCondition() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceParallelWithCompletionCondition",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         final int loopMax = 3;
         builder.addUserTask("step1", ACTOR_NAME)
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3))
@@ -356,7 +357,7 @@ public class MultiInstanceTest extends CommonAPITest {
                                 ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " >= 2 ", Boolean.class.getName(),
                                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskInParallel(loopMax, 2, processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -366,7 +367,7 @@ public class MultiInstanceTest extends CommonAPITest {
     public void remainingInstancesAreAbortedAfterCompletionCondition() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("remainingInstancesAreAbortedAfterCompletionCondition",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         final int loopMax = 3;
         builder.addUserTask("step1", ACTOR_NAME)
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax))
@@ -375,7 +376,7 @@ public class MultiInstanceTest extends CommonAPITest {
                                 ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ", Boolean.class.getName(),
                                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskInParallel(loopMax, 1, processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -391,7 +392,7 @@ public class MultiInstanceTest extends CommonAPITest {
     public void executeAMultiInstanceSequentialWithCompletionCondition() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceSequentialWithCompletionCondition",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME)
                 .addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(20))
                 .addCompletionCondition(
@@ -399,7 +400,7 @@ public class MultiInstanceTest extends CommonAPITest {
                                 ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " >= 15 ", Boolean.class.getName(),
                                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(15, processInstance, true);
         disableAndDeleteProcess(processDefinition);
@@ -408,7 +409,7 @@ public class MultiInstanceTest extends CommonAPITest {
     @Test
     public void abortAMultiInstanceSequential() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addStartEvent("Start").addEndEvent("End").addTerminateEventTrigger();
         builder.addUserTask("Step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(20))
                 .addCompletionCondition(new ExpressionBuilder().createConstantBooleanExpression(false));
@@ -416,7 +417,7 @@ public class MultiInstanceTest extends CommonAPITest {
         builder.addTransition("Start", "Gateway").addTransition("Gateway", "Step1").addTransition("Step1", "End").addTransition("Gateway", "Step2")
                 .addTransition("Step2", "End");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("Step1");
         waitForUserTaskAndExecuteIt("Step2", processInstance, john);
@@ -445,7 +446,7 @@ public class MultiInstanceTest extends CommonAPITest {
                                 Boolean.class.getName()));
         builder.addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2").addTransition("step2", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(3, processInstance, true);
         disableAndDeleteProcess(processDefinition);
@@ -469,7 +470,7 @@ public class MultiInstanceTest extends CommonAPITest {
                                 Boolean.class.getName()));
         builder.addAutomaticTask("step2").addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 4, john).waitUntil());
@@ -618,11 +619,11 @@ public class MultiInstanceTest extends CommonAPITest {
         final int numberOfExecutedActivities = loopMax + 1;
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequential", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builder.addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2").addTransition("step2", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(numberOfExecutedActivities, processInstance, true);
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
@@ -641,11 +642,11 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequentialAuto",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addAutomaticTask("step1").addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builder.addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2").addTransition("step2", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkNbPendingTaskOf(1, john);
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
@@ -669,11 +670,11 @@ public class MultiInstanceTest extends CommonAPITest {
         final int numberOfTaskToComplete = 3;
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequential", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builder.addAutomaticTask("step2").addAutomaticTask("step3").addTransition("step1", "step2").addTransition("step2", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskInParallel(numberOfTask, numberOfTaskToComplete, processInstance);
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
@@ -692,11 +693,11 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequentialAuto",
                 PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builder.addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2").addTransition("step2", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkNbPendingTaskOf(1, john);
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
@@ -731,7 +732,7 @@ public class MultiInstanceTest extends CommonAPITest {
         listUsers.add(jenny);
         listActors.add(ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), listActors, listUsers);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), listActors, listUsers);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkNbPendingTaskOf(3, john);
         checkNbPendingTaskOf(3, jack);
@@ -780,7 +781,7 @@ public class MultiInstanceTest extends CommonAPITest {
         listUsers.add(jenny);
         listActors.add(ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), listActors, listUsers);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), listActors, listUsers);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Execute task of multi-instance for John
@@ -817,21 +818,21 @@ public class MultiInstanceTest extends CommonAPITest {
 
         // Sub-process definition
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("SubProcessInAMultiInstance", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addAutomaticTask("step2").addTransition("step1", "step2");
+        builder.addActor(ACTOR_NAME).addAutomaticTask("step1").addAutomaticTask("step2").addTransition("step1", "step2");
 
-        final ProcessDefinition subProcess = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition subProcess = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(subProcess.getName());
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(subProcess.getVersion());
 
         final ProcessDefinitionBuilder builderProc = new ProcessDefinitionBuilder().createNewInstance("executeMultiInstanceSequentialWithSubProcess", "1.1");
-        builderProc.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addStartEvent("start")
+        builderProc.addActor(ACTOR_NAME).addStartEvent("start")
                 .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builderProc.addAutomaticTask("step3").addEndEvent("end").addTransition("start", "callActivity").addTransition("callActivity", "step3")
                 .addTransition("step3", "end");
 
-        final ProcessDefinition mainProcess = deployAndEnableWithActor(builderProc.done(), ACTOR_NAME, john);
+        final ProcessDefinition mainProcess = deployAndEnableProcessWithActor(builderProc.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
 
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
@@ -842,7 +843,7 @@ public class MultiInstanceTest extends CommonAPITest {
     private void withMultiInstanceAttribute(final String condition, final ExpressionConstants expressionConstant, final int numberOfExecutedActivities)
             throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask" + condition, PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
         builder.addUserTask("step1", ACTOR_NAME)
@@ -854,7 +855,7 @@ public class MultiInstanceTest extends CommonAPITest {
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("testWithMultiInstanceAttribute2", expressionConstant.getEngineConstantName()
                                 + condition, Boolean.class.getName(), new ExpressionBuilder().createEngineConstant(expressionConstant)));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(numberOfExecutedActivities, processInstance, true);
         disableAndDeleteProcess(processDefinition);
@@ -863,7 +864,7 @@ public class MultiInstanceTest extends CommonAPITest {
     private void withParallelMultiInstanceAttribute(final String condition, final ExpressionConstants expressionConstant, final int numberOfExecutedActivities,
             final int numberOfTaskToComplete) throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeParallelUserTask" + condition, PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addActor(ACTOR_NAME);
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
         builder.addUserTask("step1", ACTOR_NAME)
@@ -875,7 +876,7 @@ public class MultiInstanceTest extends CommonAPITest {
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("testWithMultiInstanceAttribute2", expressionConstant.getEngineConstantName()
                                 + condition, Boolean.class.getName(), new ExpressionBuilder().createEngineConstant(expressionConstant)));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskInParallel(numberOfExecutedActivities, numberOfTaskToComplete, processInstance);
         disableAndDeleteProcess(processDefinition);

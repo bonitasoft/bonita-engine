@@ -16,7 +16,7 @@ package org.bonitasoft.engine.profile.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.commons.Pair;
 
 /**
  * @author Zhao Na
@@ -30,13 +30,13 @@ public class ExportedProfileMapping {
 
     private List<String> roles;
 
-    private List<BEntry<String, String>> memberships;
+    private List<Pair<String, String>> memberships;
 
     public ExportedProfileMapping() {
         users = new ArrayList<String>();
         groups = new ArrayList<String>();
         roles = new ArrayList<String>();
-        memberships = new ArrayList<BEntry<String, String>>();
+        memberships = new ArrayList<Pair<String, String>>();
     }
 
     public List<String> getUsers() {
@@ -63,11 +63,11 @@ public class ExportedProfileMapping {
         this.roles = roles;
     }
 
-    public List<BEntry<String, String>> getMemberships() {
+    public List<Pair<String, String>> getMemberships() {
         return memberships;
     }
 
-    public void setMemberships(final List<BEntry<String, String>> memberships) {
+    public void setMemberships(final List<Pair<String, String>> memberships) {
         this.memberships = memberships;
     }
 

@@ -30,6 +30,8 @@ public class ProfileEntryBinding extends ElementBinding {
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         profileEntryBuilder = new ExportedProfileEntryBuilder(attributes.get("name"));
+        String isCustom = attributes.get("isCustom");
+        profileEntryBuilder.setCustom(Boolean.valueOf(isCustom));
     }
 
     @Override

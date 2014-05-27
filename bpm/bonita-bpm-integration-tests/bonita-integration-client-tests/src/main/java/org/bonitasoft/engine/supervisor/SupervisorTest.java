@@ -53,7 +53,7 @@ public class SupervisorTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         createUsers();
         createGroups();
@@ -73,7 +73,7 @@ public class SupervisorTest extends CommonAPITest {
         deleteUsers(users);
         deleteRoles(roles);
         deleteGroups(groups);
-        logout();
+        logoutOnTenant();
     }
 
     private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, InvalidBusinessArchiveFormatException,

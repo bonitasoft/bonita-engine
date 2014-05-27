@@ -223,7 +223,8 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private void deleteAllProfileMembersOfProfile(final SProfile profile) throws SProfileMemberDeletionException {
+    @Override
+    public void deleteAllProfileMembersOfProfile(final SProfile profile) throws SProfileMemberDeletionException {
         try {
             List<SProfileMember> sProfileMembers;
             do {
@@ -237,7 +238,8 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private void deleteAllProfileEntriesOfProfile(final SProfile profile) throws SProfileEntryDeletionException {
+    @Override
+    public void deleteAllProfileEntriesOfProfile(final SProfile profile) throws SProfileEntryDeletionException {
         try {
             List<SProfileEntry> entries;
             do {
