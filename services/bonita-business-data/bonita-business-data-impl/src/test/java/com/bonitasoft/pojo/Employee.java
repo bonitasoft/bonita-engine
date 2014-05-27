@@ -3,9 +3,14 @@ package com.bonitasoft.pojo;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Version;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n")
+})
 public class Employee implements com.bonitasoft.engine.bdm.Entity {
 
     private static final long serialVersionUID = -506130279298072307L;

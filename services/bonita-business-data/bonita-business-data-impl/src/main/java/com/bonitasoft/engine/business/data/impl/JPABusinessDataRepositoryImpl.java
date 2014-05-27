@@ -31,6 +31,7 @@ import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -126,7 +127,19 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with a null identifier");
         }
         final EntityManager em = getEntityManager();
-        final T entity = em.find(entityClass, primaryKey);
+
+        final TypedQuery<T> query = em.createNamedQuery(entityClass.getSimpleName() + ".findByPersistenceId", entityClass);
+        if (query.getParameters().size() != 1 && query.getParameter(Field.PERSISTENCE_ID) == null) {
+            throw new IllegalArgumentException("findByPersistenceId named query should have only one parameter named " + Field.PERSISTENCE_ID);
+        }
+        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(Field.PERSISTENCE_ID, primaryKey);
+        T entity = null;
+        try {
+            entity = find(entityClass, query, parameters);
+        } catch (NonUniqueResultException e) {
+            throw new IllegalStateException(e);
+        }
         if (entity == null) {
             throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with id: " + primaryKey);
         }
