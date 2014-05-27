@@ -114,7 +114,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return createProfile(creator);
     }
 
-    @Override
     public Profile createProfile(final String name, final String description) throws CreationException {
         final ProfileCreator creator = new ProfileCreator(name);
         creator.setDescription(description);
@@ -179,7 +178,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return new byte[] {};
     }
 
-    @Override
     public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
