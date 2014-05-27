@@ -50,6 +50,11 @@ public abstract class AbstractUserFilter implements UserFilter {
         }
     }
     
+    @SuppressWarnings("unchecked")
+    protected <T> T getOptinalInputParameter(String paramName) {
+        return (T) inputParameters.get(paramName);
+    }
+    
     protected String getStringInputParameter(final String paramName) {
         return (String) getInputParameter(paramName);
     }

@@ -357,7 +357,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
     }
     
     @Test
-    public void getUserIdsWithCustomUserInfo_should_return_value_returned_by_persistence_service() throws Exception {
+    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfo_when_no_partial_match() throws Exception {
         //given
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("userInfoName", DEFAULT_NAME);
@@ -367,8 +367,25 @@ public class IdentityServiceImplForCustomUserInfoTest {
         given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
         
         //when
-        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", 0, 10);
+        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
 
+        //then
+        assertThat(userIds).containsExactly(10L, 20L);
+    }
+    
+    @Test
+    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfoContains_when_partial_match() throws Exception {
+        //given
+        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("userInfoName", DEFAULT_NAME);
+        parameters.put("userInfoValue", "Java");
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfoContains", parameters, SUser.class, Long.class,
+                new QueryOptions(0, 10));
+        given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
+        
+        //when
+        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", true, 0, 10);
+        
         //then
         assertThat(userIds).containsExactly(10L, 20L);
     }
@@ -379,7 +396,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
         given(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>>any())).willThrow(new SBonitaReadException(""));
         
         //when
-        identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", 0, 10);
+        identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
     }
 
 }

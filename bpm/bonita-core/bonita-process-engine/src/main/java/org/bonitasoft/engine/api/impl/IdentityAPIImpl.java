@@ -635,11 +635,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
     
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, int startIndex, int maxResults) {
+    public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            return identityService.getUserIdsWithCustomUserInfo(infoName, infoValue, startIndex, maxResults);
+            return identityService.getUserIdsWithCustomUserInfo(infoName, infoValue, usePartialMatch, startIndex, maxResults);
         } catch (SBonitaException e) {
             throw new RetrieveException(e);
         }

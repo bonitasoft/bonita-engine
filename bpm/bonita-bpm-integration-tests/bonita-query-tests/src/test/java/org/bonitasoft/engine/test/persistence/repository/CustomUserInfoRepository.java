@@ -18,20 +18,24 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class CustomUserInfoRepository extends TestRepository {
 
     public CustomUserInfoRepository(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
-    
-    public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue) {
+
+    public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean partialMatch) {
         getSessionWithTenantFilter();
-        Query namedQuery = getNamedQuery("getUserIdsWithCustomUserInfo");
+        Query namedQuery;
+        if (partialMatch) {
+            namedQuery = getNamedQuery("getUserIdsWithCustomUserInfoContains");
+            userInfoValue = "%" + userInfoValue + "%";
+        } else {
+            namedQuery = getNamedQuery("getUserIdsWithCustomUserInfo");
+        }
         namedQuery.setParameter("userInfoName", userInfoName);
         namedQuery.setParameter("userInfoValue", userInfoValue);
         return namedQuery.list();

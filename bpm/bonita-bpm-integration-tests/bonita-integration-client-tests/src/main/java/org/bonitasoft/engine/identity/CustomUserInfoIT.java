@@ -214,10 +214,14 @@ public class CustomUserInfoIT extends CommonAPITest {
         getIdentityAPI().setCustomUserInfoValue(info.getId(), user2.getId(), "C++");
         
         //when
-        List<Long> userIds = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "C++", 0, 10);
+        List<Long> userIdsExactMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "C++", false, 0, 10);
+        List<Long> userIdsExactMatchNoResults = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", false, 0, 10);
+        List<Long> userIdsPartialMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", true, 0, 10);
 
         //then
-        assertThat(userIds).containsExactly(user2.getId());
+        assertThat(userIdsExactMatch).containsExactly(user2.getId());
+        assertThat(userIdsExactMatchNoResults).isEmpty();
+        assertThat(userIdsPartialMatch).containsExactly(user.getId());
         
         //clean
         deleteUser(user2);

@@ -984,14 +984,21 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, int fromIndex, int maxResults) throws SIdentityException {
+    public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException {
         final String methodName = "getUserIdsWithCustomUserInfo";
         logBeforeMethod(methodName);
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("userInfoName", userInfoName);
         parameters.put("userInfoValue", userInfoValue);
         try {
-            final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfo", parameters, SUser.class, Long.class,
+            String queryName;
+            if (usePartialMatch) {
+                queryName = "getUserIdsWithCustomUserInfoContains";
+                userInfoValue = "%" + userInfoValue + "%";
+            } else {
+                queryName = "getUserIdsWithCustomUserInfo";
+            }
+            final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, SUser.class, Long.class,
                     new QueryOptions(fromIndex, maxResults));
             return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {

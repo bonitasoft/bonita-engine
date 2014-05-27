@@ -383,6 +383,8 @@ public interface UserAPI {
      *            The custom user information name
      * @param infoValue
      *            The custom user information value
+     * @param usePartialMatch
+     *            Defines whether the custom user information value should use a partial match.
      * @param startIndex
      *            The start index (the first valid value is zero)
      * @param maxResults
@@ -390,6 +392,6 @@ public interface UserAPI {
      * @return the list of user identifiers containing the chosen custom user information with the given value.
      * @since 6.3.2
      */
-    List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, int startIndex, int maxResults);
+    List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults);
 
 }
