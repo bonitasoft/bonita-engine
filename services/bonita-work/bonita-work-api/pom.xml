@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-work</artifactId>
 		<groupId>org.bonitasoft.engine.work</groupId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.1.dummy</version>
 	</parent>
 
 	<artifactId>bonita-work-api</artifactId>

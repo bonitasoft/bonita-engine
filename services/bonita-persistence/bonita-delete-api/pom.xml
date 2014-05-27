@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.persistence</groupId>
 		<artifactId>bonita-persistence</artifactId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.1.dummy</version>
 	</parent>
 	<artifactId>bonita-delete-api</artifactId>
 	<name>Delete Service</name>

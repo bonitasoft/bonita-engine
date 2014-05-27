@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.1.dummy</version>
 	</parent>
 
 	<artifactId>bonita-synchro-repository</artifactId>
