@@ -25,6 +25,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
@@ -57,9 +58,11 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
                 "testSetConnectorImplementationCleansOldDependencies", "1.0");
         processDefinitionBuilderExt.addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER);
 
-        final ProcessDefinition processDefinition = deployProcessWithConnector(processDefinitionBuilderExt,
-                Arrays.asList(buildBarResource("/com/bonitasoft/engine/connectors/OldConnector.impl", "OldConnector.impl")),
-                Arrays.asList(buildBarResource(TestConnector.class, "TestConnector.jar"), buildBarResource(VariableStorage.class, "VariableStorage.jar")));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithConnector(
+                processDefinitionBuilderExt,
+                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("OldConnector.impl", APIAccessorConnector.class)),
+                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
+                        BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar")));
 
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
@@ -82,7 +85,7 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         assertEquals(2, pair._2.size());
 
         // prepare zip byte array of connector implementation
-        final String implSourchFile = "/com/bonitasoft/engine/connectors/NewConnector.impl";
+        final String implSourchFile = "/com/bonitasoft/engine/connector/NewConnector.impl";
         final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
         final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
         getProcessAPI().setConnectorImplementation(processDefinition.getId(), connectorId, connectorVersion, connectorImplementationArchive);

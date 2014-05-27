@@ -61,6 +61,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -112,22 +113,22 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         businessUser = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
         disableAndDeleteProcess(processDefinition);
         deleteUser(businessUser.getId());
-        logout();
+       logoutOnTenant();
     }
 
     private void createAndDeployProcess() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
@@ -141,7 +142,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final Expression defaultExpression = new ExpressionBuilder().createConstantStringExpression("defaultString");
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addShortTextData(dataName, defaultExpression);
         designProcessDefinition.addBooleanData(dataName2, new ExpressionBuilder().createConstantBooleanExpression(false));
         designProcessDefinition.addShortTextData(dataName3, defaultExpression);
@@ -159,7 +160,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final String userTaskName = "Étape1";
         final ProcessDefinitionBuilder builder = deployProcessWithIntegerData(myDdataName, ACTOR_NAME, userTaskName);
 
-        processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, businessUser);
+        processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         final String fieldName = "field_entier";
@@ -240,7 +241,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
             final ArrayList<Operation> operations = new ArrayList<Operation>();
             final HashMap<String, Serializable> contexts = new HashMap<String, Serializable>();
             contexts.put("page", "1");
-            final Operation integerOperation = buildIntegerOperation(dataName, 2);
+            final Operation integerOperation = BuildTestUtil.buildIntegerOperation(dataName, 2);
             operations.add(integerOperation);
             parameters.put(CONNECTORS_LIST_KEY, connectors);
             parameters.put("PROCESS_DEFINITION_ID_KEY", processDefinition.getId());
@@ -412,7 +413,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
                 new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
         parentProcessDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         parentProcessDefinitionBuilder.addTransition("callActivity", "step1");
-        final ProcessDefinition parentProcessDefinition = deployAndEnableWithActor(parentProcessDefinitionBuilder.done(), ACTOR_NAME, businessUser);
+        final ProcessDefinition parentProcessDefinition = deployAndEnableProcessWithActor(parentProcessDefinitionBuilder.done(), ACTOR_NAME, businessUser);
 
         // Sub process
         final ProcessDefinitionBuilder subProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("TargetProcess", PROCESS_VERSION);
@@ -611,7 +612,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestExternalConnector.impl", "TestExternalConnector.impl",
                 TestExternalConnector.class, "TestExternalConnector.jar");
 
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
+        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
     }
 
     private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
@@ -637,7 +638,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
-        processDefinition = deployAndEnableWithActor(builder.done(), "myActor", businessUser);
+        processDefinition = deployAndEnableProcessWithActor(builder.done(), "myActor", businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
         final ActivityInstance userTaskInstance = waitForUserTask("Request", processInstance);

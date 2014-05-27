@@ -13,7 +13,7 @@ import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.activity.MultiInstanceTest;
+import com.bonitasoft.engine.activity.ActivityTests;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
@@ -39,7 +39,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
-        MultiInstanceTest.class,
+        ActivityTests.class,
         ProcessTests.class,
         SupervisedTests.class,
         ProfileAllSPITest.class,

@@ -12,7 +12,7 @@ import java.io.File;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 
 /**

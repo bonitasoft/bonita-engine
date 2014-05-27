@@ -22,7 +22,6 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JType;
 
 /**
  * @author Romain Bioteau
@@ -87,7 +86,7 @@ public class CodeGeneratorTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldAddField_ThrowAnIllegalArgumentExcpetionForNullJType() throws Exception {
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
-        codeGenerator.addField(definedClass, "name", (JType) null);
+        codeGenerator.addField(definedClass, "name", (JClass) null);
     }
 
     @Test
@@ -205,7 +204,7 @@ public class CodeGeneratorTest {
         codeGenerator.addGetter(definedClass, skillField);
         codeGenerator.addSetter(definedClass, skillField);
 
-        File destDir = createTempDirectory("generatedPojo");
+        final File destDir = createTempDirectory("generatedPojo");
         try {
             codeGenerator.generate(destDir);
             final File rootFolder = new File(destDir, "org" + File.separatorChar + "bonitasoft");
@@ -216,7 +215,7 @@ public class CodeGeneratorTest {
     }
 
     protected File createTempDirectory(final String tmpDirName) throws IOException {
-        File destDir = File.createTempFile(tmpDirName, null);
+        final File destDir = File.createTempFile(tmpDirName, null);
         destDir.delete();
         destDir.mkdirs();
         return destDir;
@@ -225,7 +224,7 @@ public class CodeGeneratorTest {
     @Test
     public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() throws Exception {
         System.err
-                .println("***************** PLEASE Implement test com.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
+        .println("***************** PLEASE Implement test com.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
     }
 
 }

@@ -123,7 +123,7 @@ public class BPMTestSPUtil {
         logoutOnPlatform(session);
     }
 
-    public static long constructTenant(final String tenantName, final String iconName, final String iconPath, final String techinalUsername,
+    public static long createAndActivateTenant(final String tenantName, final String iconName, final String iconPath, final String techinalUsername,
             final String password) throws BonitaException {
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
@@ -143,15 +143,10 @@ public class BPMTestSPUtil {
         final long tenantId = platformAPI.createTenant(tenantCreator);
         platformAPI.activateTenant(tenantId);
         logoutOnPlatform(session);
+        final APISession apiSession = loginOnTenantWithDefaultTechnicalLogger(tenantId);
+        ClientEventUtil.deployCommand(apiSession);
+        logoutOnTenant(apiSession);
         return tenantId;
-    }
-
-    public static void destroyTenant(final long tenantId) throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.deactiveTenant(tenantId);
-        platformAPI.deleteTenant(tenantId);
-        logoutOnPlatform(session);
     }
 
     public static void logoutOnTenant(final APISession session) throws BonitaException {
@@ -237,7 +232,7 @@ public class BPMTestSPUtil {
         return loginAPI.login(tenantId, userName, password);
     }
 
-    public static APISession loginOnTenantWithTechnicalLogger(final long tenantId) throws BonitaException {
+    public static APISession loginOnTenantWithDefaultTechnicalLogger(final long tenantId) throws BonitaException {
         return loginOnTenant(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD, tenantId);
     }
 
@@ -286,6 +281,20 @@ public class BPMTestSPUtil {
     }
 
     public static void deactivateAndDeleteTenant(final long tenantId) throws BonitaException {
+        final APISession apiSession = loginOnTenantWithDefaultTechnicalLogger(tenantId);
+        ClientEventUtil.undeployCommand(apiSession);
+        logoutOnTenant(apiSession);
+        final PlatformSession session = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        platformAPI.deactiveTenant(tenantId);
+        platformAPI.deleteTenant(tenantId);
+        logoutOnPlatform(session);
+    }
+
+    public static void deactivateAndDeleteTenant(final long tenantId, final String techinalUsername, final String techinalPassword) throws BonitaException {
+        final APISession apiSession = loginOnTenant(techinalUsername, techinalPassword, tenantId);
+        ClientEventUtil.undeployCommand(apiSession);
+        logoutOnTenant(apiSession);
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.deactiveTenant(tenantId);

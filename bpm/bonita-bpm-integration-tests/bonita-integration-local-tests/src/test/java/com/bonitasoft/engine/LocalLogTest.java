@@ -9,21 +9,13 @@
 package com.bonitasoft.engine;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -37,18 +29,17 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.connector.APIAccessorConnector;
 
 public class LocalLogTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     // run this test in local test suite only, otherwise it's necessary to use a command to set the system property on the server side
@@ -111,7 +102,7 @@ public class LocalLogTest extends CommonAPISPTest {
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndAPIAccessorConnector(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
@@ -131,42 +122,5 @@ public class LocalLogTest extends CommonAPISPTest {
 
         deleteUser(USERNAME);
         disableAndDeleteProcess(processDefinition);
-    }
-
-    private ProcessDefinition deployProcessWithDefaultTestConnector(final String actorName, final User user,
-            final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition.done());
-        final List<BarResource> connectorImplementations = generateDefaultConnectorImplementations();
-        for (final BarResource barResource : connectorImplementations) {
-            businessArchiveBuilder.addConnectorImplementation(barResource);
-        }
-
-        final List<BarResource> generateConnectorDependencies = generateDefaultConnectorDependencies();
-        for (final BarResource barResource : generateConnectorDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), actorName, user);
-    }
-
-    private List<BarResource> generateDefaultConnectorImplementations() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, "/com/bonitasoft/engine/connector/APIAccessorConnector.impl", "APIAccessorConnector.impl");
-        return resources;
-    }
-
-    private List<BarResource> generateDefaultConnectorDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, APIAccessorConnector.class, "APIAccessorConnector.jar");
-        return resources;
-    }
-
-    private void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final InputStream stream = APIAccessorConnector.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        resources.add(new BarResource(name, byteArray));
     }
 }

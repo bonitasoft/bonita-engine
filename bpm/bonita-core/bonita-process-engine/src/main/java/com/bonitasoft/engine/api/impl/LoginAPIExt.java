@@ -23,7 +23,7 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.LoginAPI;
-import com.bonitasoft.engine.api.TenantIsPausedException;
+import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -37,7 +37,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final String userName, final String password) throws LoginException, TenantIsPausedException {
+    public APISession login(final String userName, final String password) throws LoginException, TenantStatusException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started : " + LicenseChecker.getInstance().getErrorMessage());
         }
@@ -45,7 +45,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
             return loginInternal(userName, password, null);
         } catch (final LoginException e) {
             throw e;
-        } catch (final TenantIsPausedException e) {
+        } catch (final TenantStatusException e) {
             throw e;
         } catch (final Exception e) {
             throw new LoginException(e);
@@ -55,7 +55,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final long tenantId, final String userName, final String password) throws LoginException, TenantIsPausedException {
+    public APISession login(final long tenantId, final String userName, final String password) throws LoginException, TenantStatusException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started !!");
         }
@@ -63,7 +63,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
             return loginInternal(userName, password, tenantId);
         } catch (final LoginException e) {
             throw e;
-        } catch (final TenantIsPausedException e) {
+        } catch (final TenantStatusException e) {
             throw e;
         } catch (final Exception e) {
             throw new LoginException(e);
@@ -71,7 +71,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     }
 
     @Override
-    public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException {
+    public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException, TenantStatusException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started !!");
         }
@@ -83,7 +83,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
             return loginInternal(tenantId, credentials);
         } catch (final LoginException e) {
             throw e;
-        } catch (final TenantIsPausedException e) {
+        } catch (final TenantStatusException e) {
             throw e;
         } catch (Exception e) {
             throw new LoginException(e);
@@ -103,7 +103,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
                 final String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(sTenant.getId()).getProperty("userName");
 
                 if (!technicalUserName.equals(userName)) {
-                    throw new TenantIsPausedException("Tenant with ID " + sTenant.getId()
+                    throw new TenantStatusException("Tenant with ID " + sTenant.getId()
                             + " is in pause, unable to login with other user than the technical user.");
                 }
             }

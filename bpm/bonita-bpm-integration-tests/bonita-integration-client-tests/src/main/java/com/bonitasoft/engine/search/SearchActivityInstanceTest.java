@@ -32,6 +32,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.junit.After;
 import org.junit.Before;
@@ -46,12 +47,12 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
@@ -59,9 +60,9 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
         final User user = createUser(USERNAME, PASSWORD);
 
         // define first process definition containing one userTask.
-        final DesignProcessDefinition designProcessDef1 = createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("userTask"),
+        final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("userTask"),
                 Arrays.asList(true));
-        final ProcessDefinition processDef1 = deployAndEnableWithActor(designProcessDef1, ACTOR_NAME, user);
+        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, ACTOR_NAME, user);
         // start twice and get 2 processInstances for processDef1
         getProcessAPI().startProcess(processDef1.getId());
         final ProcessInstance pi12 = getProcessAPI().startProcess(processDef1.getId());
@@ -80,7 +81,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
         definitionBuilder.addTransition("userTask", "end");
         final DesignProcessDefinition designProcessDef2 = definitionBuilder.done();
 
-        final ProcessDefinition processDef2 = deployAndEnableWithActor(designProcessDef2, ACTOR_NAME, user);
+        final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(designProcessDef2, ACTOR_NAME, user);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("definitionId", processDef2.getId());

@@ -26,6 +26,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -51,18 +52,18 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(user);
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser("jane", "bpm");
     }
 
     @Test
     public void searchOpenProcessInstancesFromStringIndex1AndUpdateIt() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -96,7 +97,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
     @Test
     public void searchOpenProcessInstancesFromStringIndex2AndUpdateIt() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -130,7 +131,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
     @Test
     public void searchOpenProcessInstancesFromStringIndex3AndUpdateIt() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -164,7 +165,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
     @Test
     public void searchOpenProcessInstancesFromStringIndex4AndUpdateIt() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -198,7 +199,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
     @Test
     public void searchOpenProcessInstancesFromStringIndex5AndUpdateIt() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -242,39 +243,39 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final String delivery = "delivery";
         final DesignProcessDefinition designProcessDefinition1 = createProcessDefinition("3", delivery, true, "value1", "value2", "value3", "value4", "value5")
                 .done();
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, delivery, user1);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, delivery, user1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForUserTask("step1", processInstance1.getId());
-        logout();
+       logoutOnTenant();
 
-        loginWith("john1", "bpm");
+        loginOnDefaultTenantWith("john1", "bpm");
         final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", delivery, true, "value2", "value4", "value1", "value5", "value3")
                 .done();
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, delivery, user2);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, delivery, user2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForUserTask("step1", processInstance2.getId());
-        logout();
+       logoutOnTenant();
 
-        loginWith("john3", "bpm");
+        loginOnDefaultTenantWith("john3", "bpm");
         final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", delivery, true, "value4", "value3", "value5", "value2", "value1")
                 .done();
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, delivery, user3);
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, delivery, user3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
         waitForUserTask("step1", processInstance3.getId());
-        logout();
+       logoutOnTenant();
 
-        loginWith("john2", "bpm");
+        loginOnDefaultTenantWith("john2", "bpm");
         final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", delivery, true, "value5", "value1", "value4", "value3", "value2")
                 .done();
-        final ProcessDefinition processDefinition4 = deployAndEnableWithActor(designProcessDefinition4, delivery, user4);
+        final ProcessDefinition processDefinition4 = deployAndEnableProcessWithActor(designProcessDefinition4, delivery, user4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
         waitForUserTask("step1", processInstance4.getId());
-        logout();
+       logoutOnTenant();
 
-        loginWith("john4", "bpm");
+        loginOnDefaultTenantWith("john4", "bpm");
         final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", delivery, true, "value3", "value5", "value2", "value1", "value4")
                 .done();
-        final ProcessDefinition processDefinition5 = deployAndEnableWithActor(designProcessDefinition5, delivery, user1);
+        final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, delivery, user1);
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition5.getId());
         waitForUserTask("step1", processInstance5.getId());
 
@@ -311,33 +312,33 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForProcessToFinish(processInstance1);
-        logout();
+       logoutOnTenant();
 
-        loginWith("john1", "bpm");
+        loginOnDefaultTenantWith("john1", "bpm");
         final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", delivery, false, "value2", "value4", "value1", "value5", "value3")
                 .done();
         final ProcessDefinition processDefinition2 = deployAndEnableProcess(designProcessDefinition2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForProcessToFinish(processInstance2);
-        logout();
+       logoutOnTenant();
 
-        loginWith("john3", "bpm");
+        loginOnDefaultTenantWith("john3", "bpm");
         final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", delivery, false, "value4", "value3", "value5", "value2", "value1")
                 .done();
         final ProcessDefinition processDefinition3 = deployAndEnableProcess(designProcessDefinition3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
         waitForProcessToFinish(processInstance3);
-        logout();
+       logoutOnTenant();
 
-        loginWith("john2", "bpm");
+        loginOnDefaultTenantWith("john2", "bpm");
         final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", delivery, false, "value5", "value1", "value4", "value3", "value2")
                 .done();
         final ProcessDefinition processDefinition4 = deployAndEnableProcess(designProcessDefinition4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
         waitForProcessToFinish(processInstance4);
-        logout();
+       logoutOnTenant();
 
-        loginWith("john4", "bpm");
+        loginOnDefaultTenantWith("john4", "bpm");
         final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", delivery, false, "value3", "value5", "value2", "value1", "value4")
                 .done();
         final ProcessDefinition processDefinition5 = deployAndEnableProcess(designProcessDefinition5);

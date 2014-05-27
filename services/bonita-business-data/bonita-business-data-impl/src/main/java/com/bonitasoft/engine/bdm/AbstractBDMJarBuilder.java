@@ -24,6 +24,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.xml.sax.SAXException;
 
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;

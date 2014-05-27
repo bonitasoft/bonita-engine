@@ -80,7 +80,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         createUsers();
 
@@ -140,6 +140,8 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
+
+       logoutOnTenant();
     }
 
 }
