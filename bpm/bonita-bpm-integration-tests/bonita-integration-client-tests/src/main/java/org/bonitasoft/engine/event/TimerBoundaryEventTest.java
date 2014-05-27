@@ -56,7 +56,7 @@ public class TimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
         processDefinitionBuilder.addTransition(interruptTimerName, interruptExceptionTaskName);
         processDefinitionBuilder.addTransition(nonInterruptTimerName, nonInterruptExceptionTaskName);
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
     }
     
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",

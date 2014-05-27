@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -157,60 +157,77 @@ public class SWaitingMessageEventImpl extends SWaitingEventImpl implements SWait
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((correlation1 == null) ? 0 : correlation1.hashCode());
-        result = prime * result + ((correlation2 == null) ? 0 : correlation2.hashCode());
-        result = prime * result + ((correlation3 == null) ? 0 : correlation3.hashCode());
-        result = prime * result + ((correlation4 == null) ? 0 : correlation4.hashCode());
-        result = prime * result + ((correlation5 == null) ? 0 : correlation5.hashCode());
+        result = prime * result + (correlation1 == null ? 0 : correlation1.hashCode());
+        result = prime * result + (correlation2 == null ? 0 : correlation2.hashCode());
+        result = prime * result + (correlation3 == null ? 0 : correlation3.hashCode());
+        result = prime * result + (correlation4 == null ? 0 : correlation4.hashCode());
+        result = prime * result + (correlation5 == null ? 0 : correlation5.hashCode());
         result = prime * result + (locked ? 1231 : 1237);
-        result = prime * result + ((messageName == null) ? 0 : messageName.hashCode());
+        result = prime * result + (messageName == null ? 0 : messageName.hashCode());
         result = prime * result + progress;
         return result;
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SWaitingMessageEventImpl other = (SWaitingMessageEventImpl) obj;
+        }
+        final SWaitingMessageEventImpl other = (SWaitingMessageEventImpl) obj;
         if (correlation1 == null) {
-            if (other.correlation1 != null)
+            if (other.correlation1 != null) {
                 return false;
-        } else if (!correlation1.equals(other.correlation1))
+            }
+        } else if (!correlation1.equals(other.correlation1)) {
             return false;
+        }
         if (correlation2 == null) {
-            if (other.correlation2 != null)
+            if (other.correlation2 != null) {
                 return false;
-        } else if (!correlation2.equals(other.correlation2))
+            }
+        } else if (!correlation2.equals(other.correlation2)) {
             return false;
+        }
         if (correlation3 == null) {
-            if (other.correlation3 != null)
+            if (other.correlation3 != null) {
                 return false;
-        } else if (!correlation3.equals(other.correlation3))
+            }
+        } else if (!correlation3.equals(other.correlation3)) {
             return false;
+        }
         if (correlation4 == null) {
-            if (other.correlation4 != null)
+            if (other.correlation4 != null) {
                 return false;
-        } else if (!correlation4.equals(other.correlation4))
+            }
+        } else if (!correlation4.equals(other.correlation4)) {
             return false;
+        }
         if (correlation5 == null) {
-            if (other.correlation5 != null)
+            if (other.correlation5 != null) {
                 return false;
-        } else if (!correlation5.equals(other.correlation5))
+            }
+        } else if (!correlation5.equals(other.correlation5)) {
             return false;
-        if (locked != other.locked)
+        }
+        if (locked != other.locked) {
             return false;
+        }
         if (messageName == null) {
-            if (other.messageName != null)
+            if (other.messageName != null) {
                 return false;
-        } else if (!messageName.equals(other.messageName))
+            }
+        } else if (!messageName.equals(other.messageName)) {
             return false;
-        if (progress != other.progress)
+        }
+        if (progress != other.progress) {
             return false;
+        }
         return true;
     }
 

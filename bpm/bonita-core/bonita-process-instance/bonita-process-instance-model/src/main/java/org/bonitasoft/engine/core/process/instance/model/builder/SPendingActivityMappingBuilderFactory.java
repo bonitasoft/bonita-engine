@@ -19,11 +19,11 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
  */
 public interface SPendingActivityMappingBuilderFactory {
 
-    static final String ACTOR_ID = "actorId";
+    String ACTOR_ID = "actorId";
 
-    static final String ACTIVITY_ID = "activityId";
+    String ACTIVITY_ID = "activityId";
 
-    static final String USER_ID = "userId";
+    String USER_ID = "userId";
 
     SPendingActivityMappingBuilder createNewInstanceForUser(final long activityId, final long userId);
 

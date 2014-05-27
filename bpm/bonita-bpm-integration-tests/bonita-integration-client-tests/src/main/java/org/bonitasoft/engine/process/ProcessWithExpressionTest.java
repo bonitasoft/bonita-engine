@@ -58,15 +58,15 @@ public class ProcessWithExpressionTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(USERNAME);
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", processInstance);
@@ -142,7 +142,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
 
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -191,7 +191,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         final DesignProcessDefinition done = pBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
         builder.addClasspathResource(myLibrary);
-        return deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
     }
 
     private BarResource getMyLibrary() throws IOException {
@@ -562,7 +562,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
                 new ExpressionBuilder().createGroovyScriptExpression("script", "throw new Exception()", String.class.getName()));
         processBuilder.addUserTask("aTask", ACTOR_NAME);
         processBuilder.addActor(ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("aTask", processInstance);
         waitForTaskToFail(processInstance);
@@ -577,7 +577,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
                 XPathReturnType.STRING, "<root><element name='Alexander Corvinus' /></root>"));
         processBuilder.addUserTask("aDummyTask", ACTOR_NAME);
         processBuilder.addActor(ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("aDummyTask", processInstance);
 
@@ -604,7 +604,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         designProcessDefinition.addDefaultTransition("step1", "default");
 
         // Start process
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
         getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(2000);
 
@@ -648,7 +648,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
                                 new ExpressionBuilder().createDataExpression("adress", "org.bonitasoft.custom.Address")));
         designProcessDefinition.addAutomaticTask("start").addTransition("start", "step1");
         builder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         final ActivityInstance userTask = waitForUserTask("step1", processInstance1);
         assertEquals("name1", userTask.getDisplayName());
@@ -667,7 +667,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
                                 new ExpressionBuilder().createDataExpression("adress", "org.bonitasoft.custom.Address")));
         designProcessDefinition2.addAutomaticTask("start").addTransition("start", "step1");
         builder2.setProcessDefinition(designProcessDefinition2.done());
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(builder2.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(builder2.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         final ActivityInstance userTask2 = waitForUserTask("step1", processInstance2);
         assertEquals("name1", userTask2.getDisplayName());

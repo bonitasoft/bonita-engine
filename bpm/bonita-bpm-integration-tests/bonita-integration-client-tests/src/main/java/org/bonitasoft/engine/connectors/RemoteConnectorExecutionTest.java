@@ -80,6 +80,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Ignore;
@@ -135,7 +136,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
         processDefinitionBuilder.addShortTextData(dataName, dataDefaultValue);
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step0", ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
@@ -264,7 +265,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(builder.done());
 
-        return deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, johnUser);
+        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, johnUser);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multiple", "On activity" }, story = "Test multiple connectors on one activity.", jira = "")
@@ -277,7 +278,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
         processDefinitionBuilder.addShortTextData(dataName, dataDefaultValue);
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         final String inputName = CONNECTOR_INPUT_NAME;
         processDefinitionBuilder.addUserTask("step0", ACTOR_NAME);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = processDefinitionBuilder.addAutomaticTask("step1");
@@ -318,7 +319,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Test
     public void redeployProcessWithNoConnectorImplem() throws Exception {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        processDefBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addUserTask("step0", ACTOR_NAME);
 
         final ProcessDefinition processDefinition1 = deployProcessWithExternalTestConnector(processDefBuilder, ACTOR_NAME, johnUser);
@@ -328,7 +329,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition1);
 
         // redeploy same process:
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, johnUser);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, johnUser);
         connectorImplems = getProcessAPI().getConnectorImplementations(processDefinition2.getId(), 0, 100, null);
         assertEquals(0, connectorImplems.size());
 
@@ -395,7 +396,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Test
     public void executeConnectorInJar() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
 
         final List<BarResource> resources = new ArrayList<BarResource>();
@@ -405,7 +406,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         businessArchiveBuilder.addConnectorImplementation(resources.get(0));
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, johnUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, johnUser);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         waitForProcessToFinish(process);
         disableAndDeleteProcess(processDefinition);
@@ -422,18 +423,20 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final String connectorId = "org.bonitasoft.connector.testConnector";
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("valueOfInput");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1").addConnector("myConnector", connectorId, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, input1Expression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final List<BarResource> connectorImplementations = Arrays.asList(getContentAndBuildBarResource("TestConnector.impl", TestConnector.class),
-                getContentAndBuildBarResource("TestConnectorWithOutput.impl", TestConnectorWithOutput.class),
-                getContentAndBuildBarResource("TestConnector3.impl", TestConnector3.class));
-        final List<BarResource> generateConnectorDependencies = Arrays.asList(generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
-                generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
-        final ProcessDefinition processDefinition = deployProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, ACTOR_NAME, johnUser,
+        final List<BarResource> connectorImplementations = Arrays.asList(
+                BuildTestUtil.getContentAndBuildBarResource("TestConnector.impl", TestConnector.class),
+                BuildTestUtil.getContentAndBuildBarResource("TestConnectorWithOutput.impl", TestConnectorWithOutput.class),
+                BuildTestUtil.getContentAndBuildBarResource("TestConnector3.impl", TestConnector3.class));
+        final List<BarResource> generateConnectorDependencies = Arrays.asList(
+                BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, "TestConnector.jar"),
+                BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, ACTOR_NAME, johnUser,
                 connectorImplementations, generateConnectorDependencies, null);
         final long processDefinitionId = processDefinition.getId();
         assertEquals(3, getProcessAPI().getNumberOfConnectorImplementations(processDefinitionId));
@@ -467,7 +470,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final Expression groovyExpression = new ExpressionBuilder().createGroovyScriptExpression("generateLongOutput", "'a'*1000", String.class.getName());
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
@@ -521,7 +524,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionFailPolicyOnTaskInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
@@ -547,7 +550,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionIgnorePolicyOnTaskInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
@@ -573,7 +576,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionFailPolicyOnProcessInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = processDefinitionBuilder.addConnector("testConnectorThatThrowException",
@@ -599,7 +602,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1inputfail", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
@@ -625,7 +628,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnAutomaticTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final AutomaticTaskDefinitionBuilder taskBuilder = processDefinitionBuilder.addAutomaticTask("step1inputfail");
         final ConnectorDefinitionBuilder addConnector = taskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
@@ -651,7 +654,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnReceiveTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final ReceiveTaskDefinitionBuilder taskBuilder = processDefinitionBuilder.addReceiveTask("step1inputfail", "m1");
         final ConnectorDefinitionBuilder addConnector = taskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
@@ -677,7 +680,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnSendTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final SendTaskDefinitionBuilder taskBuilder = processDefinitionBuilder.addSendTask("step1inputfail", "m1",
                 new ExpressionBuilder().createConstantStringExpression("p2"));
@@ -704,7 +707,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskOutput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1inputfail", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER);
@@ -731,7 +734,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void ignoreErrorConnectorOnBoundaryWhenInputFail() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
@@ -753,7 +756,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionIgnorePolicyOnTaskOutput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER);
@@ -776,7 +779,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionFailPolicyOnTaskOutput() throws Exception {
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantStringExpression("NaN");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("result", dataDefaultValue);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER);
@@ -923,7 +926,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
             final boolean withUserTask, final boolean onEnter) throws BonitaException, IOException {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
 
         // Add a task
@@ -990,7 +993,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector;
@@ -1027,7 +1030,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorThatThrowExceptionErrorEventPolicyNotCatchOnTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector;
@@ -1051,7 +1054,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // create the process with connector throwing error
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector;
@@ -1068,7 +1071,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         boundaryEvent.addErrorEventTrigger("error");
         processDefinitionBuilder.addUserTask("errorTask", ACTOR_NAME);
         processDefinitionBuilder.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition callingProcess = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, johnUser);
+        final ProcessDefinition callingProcess = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, johnUser);
         // start parent
         final ProcessInstance startProcess = getProcessAPI().startProcess(callingProcess.getId());
 
@@ -1112,7 +1115,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Test
     public void searchArchivedConnectorInstance() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addConnector("myConnectorOnProcess", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createConstantStringExpression("value1"));
         processDefinitionBuilder.addAutomaticTask("step1").addConnector("myConnectorOnStep", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
@@ -1180,7 +1183,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         builder.addClasspathResource(getResource("/org/bonitasoft/engine/connectors/connector-in-jar.jar.bak", "connector-in-jar.jar"));
         builder.addClasspathResource(getResource("/org.bonitasoft.dfgdfg.bak", "org.bonitasoft.dfgdfg.jar"));
         final BusinessArchive businessArchive = builder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, johnUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, johnUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -1196,7 +1199,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
         // process with data "Mett"
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, johnUser);
 
@@ -1250,7 +1253,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final Expression rightSideOperation = new ExpressionBuilder().createJavaMethodCallExpression("getOutPut", "size", Integer.class.getName(),
                 connectorOutPutExpr);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addIntegerData(dataName, null);// data to store the list size
         processDefinitionBuilder.addUserTask(userTaskName, ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnectorWithConnectedResource", "1.0", ConnectorEvent.ON_ENTER)
@@ -1267,7 +1270,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final User jack = createUser("jack", "bpm");
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addLongData(dataName, null);
 
         // expression to get the connector output
@@ -1324,7 +1327,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 Long.class.getName());
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addLongData(dataName, null);// data to store the connector output
         processDefinitionBuilder.addUserTask(step1, ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", ConnectorEvent.ON_FINISH)
@@ -1339,7 +1342,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void executeConnectorWithInputExpressionUsingAPI() throws Exception {
         String definitionId = "connectorThatUseAPI";
         String definitionVersion = "1.0";
-        byte[] connectorImplementationFile = getConnectorImplementationFile(definitionId, definitionVersion, "impl1", "1.0",
+        byte[] connectorImplementationFile = BuildTestUtil.buildConnectorImplementationFile(definitionId, definitionVersion, "impl1", "1.0",
                 TestConnectorWithOutput.class.getName());
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithConnector", "1.12");
@@ -1366,7 +1369,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         barBuilder.addConnectorImplementation(new BarResource("connector.impl", connectorImplementationFile));
         barBuilder.addClasspathResource(new BarResource("connector.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
         barBuilder.setProcessDefinition(builder.done());
-        ProcessDefinition processDefinition = deployAndEnableWithActor(barBuilder.done(), ACTOR_NAME, johnUser);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(barBuilder.done(), ACTOR_NAME, johnUser);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", processInstance);
         DataInstance numberOfUser = getProcessAPI().getProcessDataInstance("numberOfUser", processInstance.getId());

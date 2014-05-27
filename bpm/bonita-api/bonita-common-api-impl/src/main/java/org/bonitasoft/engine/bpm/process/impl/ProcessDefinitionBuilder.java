@@ -17,7 +17,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -46,10 +48,13 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperatorType;
 
 /**
  * Builder to define a process.
- * 
+ *
  * @author Baptiste Mesta
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
@@ -71,7 +76,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Initiates the building of a new {@link DesignProcessDefinition} with the given name and version. This method is the entry point of this builder. It must
      * be called before any other method. The <code>DesignProcessDefinition</code> building will be completed when the method {@link #done()} or
      * {@link #getProcess()} is called.
-     * 
+     *
      * @param name
      *            the process name
      * @param version
@@ -90,7 +95,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Validates the process consistency and return it
-     * 
+     *
      * @return the process being build
      * @throws InvalidProcessDefinitionException
      *             when the process definition is inconsistent. The exception contains causes
@@ -194,6 +199,20 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             }
             if (activity instanceof SendTaskDefinition && ((SendTaskDefinition) activity).getMessageTrigger().getTargetProcess() == null) {
                 addError("The send task " + activity.getName() + " hasn't target");
+            }
+            final List<Operation> operations = activity.getOperations();
+
+            final Map<String, Boolean> leftOperandUpdates = new HashMap<String, Boolean>();
+            for (final Operation operation : operations) {
+                final LeftOperand leftOperand = operation.getLeftOperand();
+                final Boolean update = leftOperandUpdates.get(leftOperand.getName());
+                final Boolean updateOperator = operation.getType() != OperatorType.DELETION;
+                if (update == null) {
+                    leftOperandUpdates.put(leftOperand.getName(), updateOperator);
+                } else if (update && !updateOperator) {
+                    addError("In activity " + activity.getName() + ". It is not possible to modify and delete the leftOperand " + leftOperand.getName()
+                            + " through the same activty");
+                }
             }
         }
     }
@@ -386,7 +405,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Sets the process display name. When set, It is used to replace the name in the Bonita BPM Portal
-     * 
+     *
      * @param name
      *            display name
      * @return
@@ -398,7 +417,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Sets the process display description
-     * 
+     *
      * @param description
      *            display description
      * @return
@@ -582,7 +601,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Adds an actor on this process
-     * 
+     *
      * @param actorName
      *            actor name
      * @see #addActor(String, boolean)
@@ -593,7 +612,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Adds an actor on this process
-     * 
+     *
      * @param name
      *            actor name
      * @param initiator
@@ -606,7 +625,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Adds an actor initiator on this process. The actor initiator is the one that will start the process.
-     * 
+     *
      * @param actorName
      * @return
      */
@@ -621,7 +640,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Validates the process consistency and return it
-     * 
+     *
      * @return
      *         the process being build
      * @throws InvalidProcessDefinitionException

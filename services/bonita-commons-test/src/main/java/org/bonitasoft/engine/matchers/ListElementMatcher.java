@@ -30,8 +30,20 @@ public class ListElementMatcher extends BaseMatcher<List<?>> {
     private Object[] longs;
 
     private enum TYPE {
-        NAME(String.class, "getName"), ID(long.class, "getId"), VERSION(String.class, "getVersion"), DESCRIPTION(String.class, "getDescription"), USERNAME(
-                String.class, "getUserName"), MANAGER(long.class, "getManagerUserId"), STATE(String.class, "getState");
+        NAME(String.class,
+             "getName"),
+        ID(long.class,
+           "getId"),
+        VERSION(String.class,
+                "getVersion"),
+        DESCRIPTION(String.class,
+                    "getDescription"),
+        USERNAME(String.class,
+                 "getUserName"),
+        MANAGER(long.class,
+                "getManagerUserId"),
+        STATE(String.class,
+              "getState");
 
         private final Class<?> clazz;
 
@@ -107,7 +119,7 @@ public class ListElementMatcher extends BaseMatcher<List<?>> {
             for (int i = 0; i < expected.length; i++) {
                 final Object invoke = m.invoke(list.get(i), null);
                 match &= expected[i] == null && invoke == null || expected[i].equals(invoke);
-                if (match == false) {
+                if (!match) {
                     return false;
                 }
             }

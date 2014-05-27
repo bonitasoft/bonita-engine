@@ -58,12 +58,12 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
 
     @Before
     public void before() throws Exception {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        logout();
+        logoutOnTenant();
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Command", "Updated variable value", "Process definition" }, story = "Get updated variable values for process definition.", jira = "")
@@ -82,7 +82,7 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
         // a data in step1 with same name 'data1' is also defined with value 11:
         taskDefBuilder.addIntegerData(dataName1, new ExpressionBuilder().createConstantIntegerExpression(11));
         final DesignProcessDefinition processDef = taskDefBuilder.addUserTask("step2", actorName).addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, actorName, user);
         try {
             final long processDefinitionId = processDefinition.getId();
             final ProcessInstance pi = getProcessAPI().startProcess(processDefinitionId);

@@ -44,13 +44,13 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         super();
         this.content = content;
         this.isDefault = isDefault;
-        this.lastUpdateDate = lastUpdatedDate;
+        lastUpdateDate = lastUpdatedDate;
         this.type = type;
     }
 
     public SThemeImpl(final STheme theme) {
         this(theme.getContent(), theme.isDefault(), theme.getType(), theme.getLastUpdateDate());
-        this.cssContent = theme.getCssContent();
+        cssContent = theme.getCssContent();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         return content;
     }
 
-    public void setContent(byte[] content) {
+    public void setContent(final byte[] content) {
         this.content = content;
     }
 
@@ -67,7 +67,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         return cssContent;
     }
 
-    public void setCssContent(byte[] cssContent) {
+    public void setCssContent(final byte[] cssContent) {
         this.cssContent = cssContent;
     }
 
@@ -76,7 +76,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         return isDefault;
     }
 
-    public void setDefault(boolean isDefault) {
+    public void setDefault(final boolean isDefault) {
         this.isDefault = isDefault;
     }
 
@@ -85,7 +85,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(long lastUpdateDate) {
+    public void setLastUpdateDate(final long lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 
@@ -94,7 +94,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         return type;
     }
 
-    public void setType(SThemeType type) {
+    public void setType(final SThemeType type) {
         this.type = type;
     }
 
@@ -102,7 +102,7 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + Arrays.hashCode(content);
@@ -112,13 +112,16 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        SThemeImpl other = (SThemeImpl) obj;
+        }
+        final SThemeImpl other = (SThemeImpl) obj;
         if (!super.equals(obj)) {
             return false;
         }

@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
@@ -69,26 +68,26 @@ public class LoginAPITest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        session = loginPlatform();
+        session = loginOnPlatform();
         platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
     }
 
     @After
     public void after() throws BonitaException {
-        logoutPlatform(session);
+        logoutOnPlatform(session);
     }
 
     @Test(expected = SessionNotFoundException.class)
     public void testSessionNotFoundExceptionIsThrownAfterSessionDeletion() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         // login to create a session
-        login();
         final long sessionId = getSession().getId();
 
         // delete the session created by the login
         deleteSession(sessionId);
 
         // will throw SessionNotFoundException
-        logout();
+        logoutOnTenant();
     }
 
     private void deleteSession(final long sessionId) throws IOException, AlreadyExistsException, CreationException, CreationException,
@@ -97,6 +96,7 @@ public class LoginAPITest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/session-commands.jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         platformCommandAPI.addDependency(COMMAND_DEPENDENCY_NAME, byteArray);
         platformCommandAPI.register(COMMAND_NAME, "Delete a session", "org.bonitasoft.engine.command.DeleteSessionCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -128,16 +128,16 @@ public class LoginAPITest extends CommonAPITest {
     @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with wrong password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         final String userName = "Truc";
-        createUserOnDefaultTenant(userName, "goodPassword");
+        createUser(userName, "goodPassword");
         try {
             final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
             loginTenant.login(userName, "WrongPassword");
             fail("Should not be reached");
         } finally {
-            final APISession session = loginDefaultTenant();
-            final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-            identityAPI.deleteUser(userName);
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            getIdentityAPI().deleteUser(userName);
         }
     }
 
@@ -150,87 +150,77 @@ public class LoginAPITest extends CommonAPITest {
 
     @Test
     public void userLoginDefaultTenant() throws BonitaException, InterruptedException {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         final String userName = "matti";
         final String password = "tervetuloa";
-        createUserOnDefaultTenant(userName, password);
+        createUser(userName, password);
 
         final Date now = new Date();
         Thread.sleep(300);
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        final APISession apiSession = loginAPI.login(userName, password);
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
-        final User user = identityAPI.getUserByUserName(userName);
-        identityAPI.deleteUser(userName);
+        loginOnDefaultTenantWith(userName, password);
+        final User user = getIdentityAPI().getUserByUserName(userName);
+        getIdentityAPI().deleteUser(userName);
 
         assertEquals(userName, user.getUserName());
         assertNotSame(password, user.getPassword());
         assertTrue(now.before(user.getLastConnection()));
+        logoutOnTenant();
     }
 
     @Test
-    public void loginWithExistingUserAndCheckId() throws BonitaException {
-        final APISession session = loginDefaultTenant();
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+    public void loginOnDefaultTenantWithExistingUserAndCheckId() throws BonitaException {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         final String userName = "corvinus";
         final String password = "underworld";
-        final User user = createUserOnDefaultTenant(userName, password);
+        final User user = createUser(userName, password);
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         final APISession login = loginTenant.login(userName, password);
         assertTrue("userId should be valuated", user.getId() != -1);
         assertEquals(user.getId(), login.getUserId());
 
-        identityAPI.deleteUser(user.getId());
-        logoutTenant(session);
+        getIdentityAPI().deleteUser(user.getId());
+        logoutOnTenant();
     }
 
     @Test
-    public void loginWithNonTechnicalUser() throws BonitaException {
-        final String username = "install";
-        final String pwd = "install";
-        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
-        APISession session = loginTenant.login(username, pwd);
-        IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-        final User user = createUserOnDefaultTenant("matti", "kieli");
-        loginTenant.logout(session);
+    public void loginOnDefaultTenantWithNonTechnicalUser() throws BonitaException {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final User user = createUser("matti", "kieli");
+        logoutOnTenant();
 
-        session = loginTenant.login("matti", "kieli");
-        assertTrue("Should be logged in as a NON-Technical user", !session.isTechnicalUser());
-        loginTenant.logout(session);
+        loginOnDefaultTenantWith("matti", "kieli");
+        assertTrue("Should be logged in as a NON-Technical user", !getSession().isTechnicalUser());
+        logoutOnTenant();
 
-        session = loginTenant.login(username, pwd);
-        identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-        identityAPI.deleteUser(user.getId());
-        loginTenant.logout(session);
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        getIdentityAPI().deleteUser(user.getId());
+        logoutOnTenant();
     }
 
     @Test
-    public void loginWithTechnicalUser() throws BonitaException {
-        final String username = "install";
-        final String pwd = "install";
-        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
-        final APISession session = loginTenant.login(username, pwd);
-        assertTrue("Should be logged in as Technical user", session.isTechnicalUser());
-        loginTenant.logout(session);
+    public void loginOnDefaultTenantWithTechnicalUser() throws BonitaException {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        assertTrue("Should be logged in as Technical user", getSession().isTechnicalUser());
+        logoutOnTenant();
     }
 
     @Cover(jira = "ENGINE-1653", classes = { User.class, LoginAPI.class }, concept = BPMNConcept.NONE, keywords = { "disable user", "login" })
     @Test(expected = LoginException.class)
     public void unableToLoginWhenTheUserIsDisable() throws BonitaException {
-        final APISession session = loginDefaultTenant();
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         final String userName = "matti";
         final String password = "bpm";
-        final User user = identityAPI.createUser(userName, password);
+        final User user = getIdentityAPI().createUser(userName, password);
         final UserUpdater updater = new UserUpdater();
         updater.setEnabled(false);
-        identityAPI.updateUser(user.getId(), updater);
+        getIdentityAPI().updateUser(user.getId(), updater);
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         try {
             loginTenant.login(userName, password);
             fail("It is not possible to login when the user is disable.");
         } finally {
-            identityAPI.deleteUser(user.getId());
-            logoutTenant(session);
+            getIdentityAPI().deleteUser(user.getId());
+            logoutOnTenant();
         }
     }
 

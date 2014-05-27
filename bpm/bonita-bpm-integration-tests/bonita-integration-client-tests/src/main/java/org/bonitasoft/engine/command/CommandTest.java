@@ -31,12 +31,12 @@ public class CommandTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -68,6 +68,7 @@ public class CommandTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("intReturn", "Retrieving the integer value", "org.bonitasoft.engine.command.IntergerCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -83,6 +84,7 @@ public class CommandTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("except", "Throws ParameterizationException", "org.bonitasoft.engine.command.ParameterizationExceptionCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -100,6 +102,7 @@ public class CommandTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("except", "Throws ExecutionExceptionCommand", "org.bonitasoft.engine.command.ExecutionExceptionCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -368,6 +371,7 @@ public class CommandTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         getCommandAPI().addDependency("commands", byteArray);
         final CommandDescriptor command = getCommandAPI()
                 .register("intReturn", "Retrieving the integer value", "org.bonitasoft.engine.command.IntergerCommand");
@@ -389,6 +393,7 @@ public class CommandTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/npe-command-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         getCommandAPI().addDependency("commands", byteArray);
         getCommandAPI().register("NPEReturns", "Throws a NPE", "org.bonitasoft.engine.command.NPECommand");
         try {

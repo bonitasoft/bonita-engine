@@ -36,7 +36,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         cebolinha = createUser("cebolinha", "bpm");
         cascao = createUser("cascao", "bpm");
     }
@@ -45,7 +45,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
     public void afterTest() throws BonitaException {
         deleteUser(cebolinha.getId());
         deleteUser(cascao.getId());
-        logout();
+       logoutOnTenant();
     }
 
     @Test
@@ -58,7 +58,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         builder.addData("address", "org.bonitasoft.engine.process.Employee", expression);
 
         final BusinessArchive businessArchive = addClasspathRessource(builder).done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, "actor", cascao);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, "actor", cascao);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         assertNotNull(getProcessAPI().getProcessDataInstance("address", processInstance.getId()).getValue());
@@ -82,7 +82,8 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         targetProcessDefinitionBuilder.addUserTask("tStep1", ACTOR_NAME).addData("data", Employee.class.getName(), defaultValueForEmployeeOnTStep1);
         targetProcessDefinitionBuilder.addEndEvent("tEnd");
         targetProcessDefinitionBuilder.addTransition("tStart", "tStep1").addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(), ACTOR_NAME,
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(),
+                ACTOR_NAME,
                 cebolinha);
 
         // Build main process
@@ -96,7 +97,8 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
                 .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
         callingProcessDefinitionBuilder.addEndEvent("end");
         callingProcessDefinitionBuilder.addTransition("start", "step1").addTransition("step1", "callActivity").addTransition("callActivity", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(), ACTOR_NAME,
+        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(),
+                ACTOR_NAME,
                 cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
@@ -132,7 +134,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         targetProcessDefinitionBuilder.addData(dataName, dataType, null);
         targetProcessDefinitionBuilder.addEndEvent("tEnd").addTerminateEventTrigger();
         targetProcessDefinitionBuilder.addTransition("tStart", "tStep1").addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(),
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(),
                 ACTOR_NAME + 2, cebolinha);
 
         // Build main process
@@ -145,11 +147,12 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         final CallActivityBuilder callActivity = callingProcessDefinitionBuilder.addCallActivity("callActivity", targetProcessNameExpr,
                 targetProcessVersionExpr);
         final Expression rightOperand = new ExpressionBuilder().createDataExpression(dataName, dataType);
-        callActivity.addDataInputOperation(buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
-        callActivity.addDataOutputOperation(buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
+        callActivity.addDataInputOperation(BuildTestUtil.buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
+        callActivity.addDataOutputOperation(BuildTestUtil.buildOperation(dataName, false, OperatorType.ASSIGNMENT, "=", rightOperand));
         callingProcessDefinitionBuilder.addEndEvent("end");
         callingProcessDefinitionBuilder.addTransition("start", "callActivity").addTransition("callActivity", "Step1").addTransition("Step1", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(), ACTOR_NAME,
+        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(),
+                ACTOR_NAME,
                 cebolinha);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 

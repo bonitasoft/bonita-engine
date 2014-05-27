@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -100,7 +100,7 @@ public class ExportedUserImpl implements ExportedUser {
     private String professionalWebsite;
 
     private long id;
-    
+
     private List<ExportedCustomUserInfoValue> customUserInfoValues = new ArrayList<ExportedCustomUserInfoValue>();
 
     public ExportedUserImpl() {
@@ -336,7 +336,7 @@ public class ExportedUserImpl implements ExportedUser {
     public long getCreatedBy() {
         return createdBy;
     }
-    
+
     @Override
     public List<ExportedCustomUserInfoValue> getCustomUserInfoValues() {
         return Collections.unmodifiableList(customUserInfoValues);
@@ -519,14 +519,13 @@ public class ExportedUserImpl implements ExportedUser {
         setProfessionalWebsite(professionalData.getWebsite());
         setProfessionalZipCode(professionalData.getZipCode());
     }
-    
-    
-    public void setCustomUserInfoValues(List<ExportedCustomUserInfoValue> customUserInfoValues) {
+
+    public void setCustomUserInfoValues(final List<ExportedCustomUserInfoValue> customUserInfoValues) {
         this.customUserInfoValues = customUserInfoValues;
     }
 
-    public void addCustomUserInfoValues(ExportedCustomUserInfoValue customUserInfoValue) {
-        this.customUserInfoValues.add(customUserInfoValue);
+    public void addCustomUserInfoValues(final ExportedCustomUserInfoValue customUserInfoValue) {
+        customUserInfoValues.add(customUserInfoValue);
     }
 
     @Override
@@ -538,237 +537,313 @@ public class ExportedUserImpl implements ExportedUser {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = prime * result + ((customUserInfoValues == null) ? 0 : customUserInfoValues.hashCode());
+        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
+        result = prime * result + (customUserInfoValues == null ? 0 : customUserInfoValues.hashCode());
         result = prime * result + (enabled ? 1231 : 1237);
-        result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
-        result = prime * result + ((iconName == null) ? 0 : iconName.hashCode());
-        result = prime * result + ((iconPath == null) ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((jobTitle == null) ? 0 : jobTitle.hashCode());
-        result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
-        result = prime * result + (int) (managerUserId ^ (managerUserId >>> 32));
-        result = prime * result + ((managerUserName == null) ? 0 : managerUserName.hashCode());
-        result = prime * result + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + (firstName == null ? 0 : firstName.hashCode());
+        result = prime * result + (iconName == null ? 0 : iconName.hashCode());
+        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
+        result = prime * result + (int) (id ^ id >>> 32);
+        result = prime * result + (jobTitle == null ? 0 : jobTitle.hashCode());
+        result = prime * result + (lastName == null ? 0 : lastName.hashCode());
+        result = prime * result + (int) (managerUserId ^ managerUserId >>> 32);
+        result = prime * result + (managerUserName == null ? 0 : managerUserName.hashCode());
+        result = prime * result + (password == null ? 0 : password.hashCode());
         result = prime * result + (passwordEncrypted ? 1231 : 1237);
-        result = prime * result + ((personalAddress == null) ? 0 : personalAddress.hashCode());
-        result = prime * result + ((personalBuilding == null) ? 0 : personalBuilding.hashCode());
-        result = prime * result + ((personalCity == null) ? 0 : personalCity.hashCode());
-        result = prime * result + ((personalCountry == null) ? 0 : personalCountry.hashCode());
-        result = prime * result + ((personalEmail == null) ? 0 : personalEmail.hashCode());
-        result = prime * result + ((personalFaxNumber == null) ? 0 : personalFaxNumber.hashCode());
-        result = prime * result + ((personalMobileNumber == null) ? 0 : personalMobileNumber.hashCode());
-        result = prime * result + ((personalPhoneNumber == null) ? 0 : personalPhoneNumber.hashCode());
-        result = prime * result + ((personalRoom == null) ? 0 : personalRoom.hashCode());
-        result = prime * result + ((personalState == null) ? 0 : personalState.hashCode());
-        result = prime * result + ((personalWebsite == null) ? 0 : personalWebsite.hashCode());
-        result = prime * result + ((personalZipCode == null) ? 0 : personalZipCode.hashCode());
-        result = prime * result + ((professionalAddress == null) ? 0 : professionalAddress.hashCode());
-        result = prime * result + ((professionalBuilding == null) ? 0 : professionalBuilding.hashCode());
-        result = prime * result + ((professionalCity == null) ? 0 : professionalCity.hashCode());
-        result = prime * result + ((professionalCountry == null) ? 0 : professionalCountry.hashCode());
-        result = prime * result + ((professionalEmail == null) ? 0 : professionalEmail.hashCode());
-        result = prime * result + ((professionalFaxNumber == null) ? 0 : professionalFaxNumber.hashCode());
-        result = prime * result + ((professionalMobileNumber == null) ? 0 : professionalMobileNumber.hashCode());
-        result = prime * result + ((professionalPhoneNumber == null) ? 0 : professionalPhoneNumber.hashCode());
-        result = prime * result + ((professionalRoom == null) ? 0 : professionalRoom.hashCode());
-        result = prime * result + ((professionalState == null) ? 0 : professionalState.hashCode());
-        result = prime * result + ((professionalWebsite == null) ? 0 : professionalWebsite.hashCode());
-        result = prime * result + ((professionalZipCode == null) ? 0 : professionalZipCode.hashCode());
-        result = prime * result + ((title == null) ? 0 : title.hashCode());
-        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        result = prime * result + (personalAddress == null ? 0 : personalAddress.hashCode());
+        result = prime * result + (personalBuilding == null ? 0 : personalBuilding.hashCode());
+        result = prime * result + (personalCity == null ? 0 : personalCity.hashCode());
+        result = prime * result + (personalCountry == null ? 0 : personalCountry.hashCode());
+        result = prime * result + (personalEmail == null ? 0 : personalEmail.hashCode());
+        result = prime * result + (personalFaxNumber == null ? 0 : personalFaxNumber.hashCode());
+        result = prime * result + (personalMobileNumber == null ? 0 : personalMobileNumber.hashCode());
+        result = prime * result + (personalPhoneNumber == null ? 0 : personalPhoneNumber.hashCode());
+        result = prime * result + (personalRoom == null ? 0 : personalRoom.hashCode());
+        result = prime * result + (personalState == null ? 0 : personalState.hashCode());
+        result = prime * result + (personalWebsite == null ? 0 : personalWebsite.hashCode());
+        result = prime * result + (personalZipCode == null ? 0 : personalZipCode.hashCode());
+        result = prime * result + (professionalAddress == null ? 0 : professionalAddress.hashCode());
+        result = prime * result + (professionalBuilding == null ? 0 : professionalBuilding.hashCode());
+        result = prime * result + (professionalCity == null ? 0 : professionalCity.hashCode());
+        result = prime * result + (professionalCountry == null ? 0 : professionalCountry.hashCode());
+        result = prime * result + (professionalEmail == null ? 0 : professionalEmail.hashCode());
+        result = prime * result + (professionalFaxNumber == null ? 0 : professionalFaxNumber.hashCode());
+        result = prime * result + (professionalMobileNumber == null ? 0 : professionalMobileNumber.hashCode());
+        result = prime * result + (professionalPhoneNumber == null ? 0 : professionalPhoneNumber.hashCode());
+        result = prime * result + (professionalRoom == null ? 0 : professionalRoom.hashCode());
+        result = prime * result + (professionalState == null ? 0 : professionalState.hashCode());
+        result = prime * result + (professionalWebsite == null ? 0 : professionalWebsite.hashCode());
+        result = prime * result + (professionalZipCode == null ? 0 : professionalZipCode.hashCode());
+        result = prime * result + (title == null ? 0 : title.hashCode());
+        result = prime * result + (userName == null ? 0 : userName.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        ExportedUserImpl other = (ExportedUserImpl) obj;
-        if (createdBy != other.createdBy)
+        }
+        final ExportedUserImpl other = (ExportedUserImpl) obj;
+        if (createdBy != other.createdBy) {
             return false;
+        }
         if (customUserInfoValues == null) {
-            if (other.customUserInfoValues != null)
+            if (other.customUserInfoValues != null) {
                 return false;
-        } else if (!customUserInfoValues.equals(other.customUserInfoValues))
+            }
+        } else if (!customUserInfoValues.equals(other.customUserInfoValues)) {
             return false;
-        if (enabled != other.enabled)
+        }
+        if (enabled != other.enabled) {
             return false;
+        }
         if (firstName == null) {
-            if (other.firstName != null)
+            if (other.firstName != null) {
                 return false;
-        } else if (!firstName.equals(other.firstName))
+            }
+        } else if (!firstName.equals(other.firstName)) {
             return false;
+        }
         if (iconName == null) {
-            if (other.iconName != null)
+            if (other.iconName != null) {
                 return false;
-        } else if (!iconName.equals(other.iconName))
+            }
+        } else if (!iconName.equals(other.iconName)) {
             return false;
+        }
         if (iconPath == null) {
-            if (other.iconPath != null)
+            if (other.iconPath != null) {
                 return false;
-        } else if (!iconPath.equals(other.iconPath))
+            }
+        } else if (!iconPath.equals(other.iconPath)) {
             return false;
-        if (id != other.id)
+        }
+        if (id != other.id) {
             return false;
+        }
         if (jobTitle == null) {
-            if (other.jobTitle != null)
+            if (other.jobTitle != null) {
                 return false;
-        } else if (!jobTitle.equals(other.jobTitle))
+            }
+        } else if (!jobTitle.equals(other.jobTitle)) {
             return false;
+        }
         if (lastName == null) {
-            if (other.lastName != null)
+            if (other.lastName != null) {
                 return false;
-        } else if (!lastName.equals(other.lastName))
+            }
+        } else if (!lastName.equals(other.lastName)) {
             return false;
-        if (managerUserId != other.managerUserId)
+        }
+        if (managerUserId != other.managerUserId) {
             return false;
+        }
         if (managerUserName == null) {
-            if (other.managerUserName != null)
+            if (other.managerUserName != null) {
                 return false;
-        } else if (!managerUserName.equals(other.managerUserName))
+            }
+        } else if (!managerUserName.equals(other.managerUserName)) {
             return false;
+        }
         if (password == null) {
-            if (other.password != null)
+            if (other.password != null) {
                 return false;
-        } else if (!password.equals(other.password))
+            }
+        } else if (!password.equals(other.password)) {
             return false;
-        if (passwordEncrypted != other.passwordEncrypted)
+        }
+        if (passwordEncrypted != other.passwordEncrypted) {
             return false;
+        }
         if (personalAddress == null) {
-            if (other.personalAddress != null)
+            if (other.personalAddress != null) {
                 return false;
-        } else if (!personalAddress.equals(other.personalAddress))
+            }
+        } else if (!personalAddress.equals(other.personalAddress)) {
             return false;
+        }
         if (personalBuilding == null) {
-            if (other.personalBuilding != null)
+            if (other.personalBuilding != null) {
                 return false;
-        } else if (!personalBuilding.equals(other.personalBuilding))
+            }
+        } else if (!personalBuilding.equals(other.personalBuilding)) {
             return false;
+        }
         if (personalCity == null) {
-            if (other.personalCity != null)
+            if (other.personalCity != null) {
                 return false;
-        } else if (!personalCity.equals(other.personalCity))
+            }
+        } else if (!personalCity.equals(other.personalCity)) {
             return false;
+        }
         if (personalCountry == null) {
-            if (other.personalCountry != null)
+            if (other.personalCountry != null) {
                 return false;
-        } else if (!personalCountry.equals(other.personalCountry))
+            }
+        } else if (!personalCountry.equals(other.personalCountry)) {
             return false;
+        }
         if (personalEmail == null) {
-            if (other.personalEmail != null)
+            if (other.personalEmail != null) {
                 return false;
-        } else if (!personalEmail.equals(other.personalEmail))
+            }
+        } else if (!personalEmail.equals(other.personalEmail)) {
             return false;
+        }
         if (personalFaxNumber == null) {
-            if (other.personalFaxNumber != null)
+            if (other.personalFaxNumber != null) {
                 return false;
-        } else if (!personalFaxNumber.equals(other.personalFaxNumber))
+            }
+        } else if (!personalFaxNumber.equals(other.personalFaxNumber)) {
             return false;
+        }
         if (personalMobileNumber == null) {
-            if (other.personalMobileNumber != null)
+            if (other.personalMobileNumber != null) {
                 return false;
-        } else if (!personalMobileNumber.equals(other.personalMobileNumber))
+            }
+        } else if (!personalMobileNumber.equals(other.personalMobileNumber)) {
             return false;
+        }
         if (personalPhoneNumber == null) {
-            if (other.personalPhoneNumber != null)
+            if (other.personalPhoneNumber != null) {
                 return false;
-        } else if (!personalPhoneNumber.equals(other.personalPhoneNumber))
+            }
+        } else if (!personalPhoneNumber.equals(other.personalPhoneNumber)) {
             return false;
+        }
         if (personalRoom == null) {
-            if (other.personalRoom != null)
+            if (other.personalRoom != null) {
                 return false;
-        } else if (!personalRoom.equals(other.personalRoom))
+            }
+        } else if (!personalRoom.equals(other.personalRoom)) {
             return false;
+        }
         if (personalState == null) {
-            if (other.personalState != null)
+            if (other.personalState != null) {
                 return false;
-        } else if (!personalState.equals(other.personalState))
+            }
+        } else if (!personalState.equals(other.personalState)) {
             return false;
+        }
         if (personalWebsite == null) {
-            if (other.personalWebsite != null)
+            if (other.personalWebsite != null) {
                 return false;
-        } else if (!personalWebsite.equals(other.personalWebsite))
+            }
+        } else if (!personalWebsite.equals(other.personalWebsite)) {
             return false;
+        }
         if (personalZipCode == null) {
-            if (other.personalZipCode != null)
+            if (other.personalZipCode != null) {
                 return false;
-        } else if (!personalZipCode.equals(other.personalZipCode))
+            }
+        } else if (!personalZipCode.equals(other.personalZipCode)) {
             return false;
+        }
         if (professionalAddress == null) {
-            if (other.professionalAddress != null)
+            if (other.professionalAddress != null) {
                 return false;
-        } else if (!professionalAddress.equals(other.professionalAddress))
+            }
+        } else if (!professionalAddress.equals(other.professionalAddress)) {
             return false;
+        }
         if (professionalBuilding == null) {
-            if (other.professionalBuilding != null)
+            if (other.professionalBuilding != null) {
                 return false;
-        } else if (!professionalBuilding.equals(other.professionalBuilding))
+            }
+        } else if (!professionalBuilding.equals(other.professionalBuilding)) {
             return false;
+        }
         if (professionalCity == null) {
-            if (other.professionalCity != null)
+            if (other.professionalCity != null) {
                 return false;
-        } else if (!professionalCity.equals(other.professionalCity))
+            }
+        } else if (!professionalCity.equals(other.professionalCity)) {
             return false;
+        }
         if (professionalCountry == null) {
-            if (other.professionalCountry != null)
+            if (other.professionalCountry != null) {
                 return false;
-        } else if (!professionalCountry.equals(other.professionalCountry))
+            }
+        } else if (!professionalCountry.equals(other.professionalCountry)) {
             return false;
+        }
         if (professionalEmail == null) {
-            if (other.professionalEmail != null)
+            if (other.professionalEmail != null) {
                 return false;
-        } else if (!professionalEmail.equals(other.professionalEmail))
+            }
+        } else if (!professionalEmail.equals(other.professionalEmail)) {
             return false;
+        }
         if (professionalFaxNumber == null) {
-            if (other.professionalFaxNumber != null)
+            if (other.professionalFaxNumber != null) {
                 return false;
-        } else if (!professionalFaxNumber.equals(other.professionalFaxNumber))
+            }
+        } else if (!professionalFaxNumber.equals(other.professionalFaxNumber)) {
             return false;
+        }
         if (professionalMobileNumber == null) {
-            if (other.professionalMobileNumber != null)
+            if (other.professionalMobileNumber != null) {
                 return false;
-        } else if (!professionalMobileNumber.equals(other.professionalMobileNumber))
+            }
+        } else if (!professionalMobileNumber.equals(other.professionalMobileNumber)) {
             return false;
+        }
         if (professionalPhoneNumber == null) {
-            if (other.professionalPhoneNumber != null)
+            if (other.professionalPhoneNumber != null) {
                 return false;
-        } else if (!professionalPhoneNumber.equals(other.professionalPhoneNumber))
+            }
+        } else if (!professionalPhoneNumber.equals(other.professionalPhoneNumber)) {
             return false;
+        }
         if (professionalRoom == null) {
-            if (other.professionalRoom != null)
+            if (other.professionalRoom != null) {
                 return false;
-        } else if (!professionalRoom.equals(other.professionalRoom))
+            }
+        } else if (!professionalRoom.equals(other.professionalRoom)) {
             return false;
+        }
         if (professionalState == null) {
-            if (other.professionalState != null)
+            if (other.professionalState != null) {
                 return false;
-        } else if (!professionalState.equals(other.professionalState))
+            }
+        } else if (!professionalState.equals(other.professionalState)) {
             return false;
+        }
         if (professionalWebsite == null) {
-            if (other.professionalWebsite != null)
+            if (other.professionalWebsite != null) {
                 return false;
-        } else if (!professionalWebsite.equals(other.professionalWebsite))
+            }
+        } else if (!professionalWebsite.equals(other.professionalWebsite)) {
             return false;
+        }
         if (professionalZipCode == null) {
-            if (other.professionalZipCode != null)
+            if (other.professionalZipCode != null) {
                 return false;
-        } else if (!professionalZipCode.equals(other.professionalZipCode))
+            }
+        } else if (!professionalZipCode.equals(other.professionalZipCode)) {
             return false;
+        }
         if (title == null) {
-            if (other.title != null)
+            if (other.title != null) {
                 return false;
-        } else if (!title.equals(other.title))
+            }
+        } else if (!title.equals(other.title)) {
             return false;
+        }
         if (userName == null) {
-            if (other.userName != null)
+            if (other.userName != null) {
                 return false;
-        } else if (!userName.equals(other.userName))
+            }
+        } else if (!userName.equals(other.userName)) {
             return false;
+        }
         return true;
     }
 

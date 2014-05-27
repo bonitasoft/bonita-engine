@@ -20,24 +20,14 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  */
 public class SHandlerExecutionException extends SBonitaException {
 
-    /**
-     * @param e
-     */
+    private static final long serialVersionUID = 297807701528986021L;
+
     public SHandlerExecutionException(final SBonitaException e) {
         super(e);
     }
 
-    /**
-     * @param string
-     * @param e
-     */
     public SHandlerExecutionException(final String message, final SBonitaException cause) {
         super(message, cause);
     }
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 297807701528986021L;
 
 }

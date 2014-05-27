@@ -45,27 +45,33 @@ public class Sort implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((field == null) ? 0 : field.hashCode());
-        result = prime * result + ((order == null) ? 0 : order.hashCode());
+        result = prime * result + (field == null ? 0 : field.hashCode());
+        result = prime * result + (order == null ? 0 : order.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        Sort other = (Sort) obj;
+        }
+        final Sort other = (Sort) obj;
         if (field == null) {
-            if (other.field != null)
+            if (other.field != null) {
                 return false;
-        } else if (!field.equals(other.field))
+            }
+        } else if (!field.equals(other.field)) {
             return false;
-        if (order != other.order)
+        }
+        if (order != other.order) {
             return false;
+        }
         return true;
     }
 
