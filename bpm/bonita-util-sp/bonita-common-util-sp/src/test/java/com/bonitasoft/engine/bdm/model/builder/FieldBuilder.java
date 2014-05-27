@@ -14,11 +14,13 @@ import static com.bonitasoft.engine.bdm.model.field.FieldType.DOUBLE;
 import static com.bonitasoft.engine.bdm.model.field.FieldType.INTEGER;
 import static com.bonitasoft.engine.bdm.model.field.FieldType.STRING;
 import static com.bonitasoft.engine.bdm.model.field.FieldType.TEXT;
+import static com.bonitasoft.engine.bdm.model.field.RelationField.FetchType.LAZY;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
@@ -154,6 +156,26 @@ public abstract class FieldBuilder {
             return this;
         }
 
+        public RelationFieldBuilder composition() {
+            ((RelationField) field).setType(Type.COMPOSITION);
+            return this;
+        }
+
+        public RelationFieldBuilder aggregation() {
+            ((RelationField) field).setType(Type.AGGREGATION);
+            return this;
+        }
+
+        public RelationFieldBuilder lazy() {
+            ((RelationField) field).setFetchType(LAZY);
+            return this;
+        }
+
+        public RelationFieldBuilder fetchType(FetchType fetchType) {
+            ((RelationField) field).setFetchType(fetchType);
+            return this;
+        }
+
         @Override
         public RelationFieldBuilder withName(final String name) {
             return (RelationFieldBuilder) super.withName(name);
@@ -167,6 +189,11 @@ public abstract class FieldBuilder {
         @Override
         public RelationFieldBuilder multiple(final boolean collection) {
             return (RelationFieldBuilder) super.multiple(collection);
+        }
+
+        public RelationFieldBuilder referencing(BusinessObject bo) {
+            ((RelationField) field).setReference(bo);
+            return this;
         }
 
         @Override

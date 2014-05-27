@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -27,11 +26,9 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
-import com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder;
+import com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
@@ -235,9 +232,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addSimpleReferenceWithComposition() throws Exception {
-        final BusinessObjectModel model = build(true, false);
+        RelationField aggregation = aRelationField().withName("address").composition().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.test");
@@ -245,24 +243,9 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithComposition() throws Exception {
-        System.out.println("coucou");
-        final BusinessObject addressBO = addressBO();
-
-        final RelationField address = addressRelation(Type.COMPOSITION, true);
-        address.setReference(addressBO);
-
-        final RelationField address2 = aRelationField().ofType(Type.COMPOSITION).withName("skills").multiple(true).build();
-        address2.setFetchType(FetchType.LAZY);
-        BusinessObjectBuilder bo = aBO("Skill").withField(aStringField("skill").build());
-        address2.setReference(bo.build());
-
-        final BusinessObject employeeBO = employeeBO();
-        employeeBO.addField(address);
-        employeeBO.addField(address2);
-
-        BusinessObjectModel bom = aBOM().withBOs(employeeBO, addressBO, bo.build()).build();
-
-        //        aBomWithRelations();
+        final RelationField eager = aRelationField().withName("addresses").composition().multiple().referencing(addressBO()).build();
+        final RelationField lazy = aRelationField().withName("skills").composition().multiple().lazy().referencing(skillBO()).build();
+        BusinessObjectModel bom = employeeWithRelations(eager, lazy);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
@@ -272,9 +255,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addSimpleReferenceWithAggregation() throws Exception {
-        final BusinessObjectModel model = build(false, false);
+        RelationField aggregation = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.test");
@@ -282,9 +266,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithAggregation() throws Exception {
-        final BusinessObjectModel model = build(false, true);
+        RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeListAggregation.test");
@@ -298,6 +283,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("Forecast.java", "ForecastList.test");
+    }
+
+    private BusinessObject skillBO() {
+        return aBO("Skill").withField(aStringField("skill").build()).build();
     }
 
     private BusinessObjectModel build() {
@@ -315,21 +304,14 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         return model;
     }
 
-    private BusinessObjectModel build(boolean composition, boolean collection) {
-        BusinessObject addressBO = addressBO();
-
-        RelationField address = aRelationField().ofType(composition ? Type.COMPOSITION : Type.AGGREGATION)
-                .withName(collection ? "addresses" : "address").multiple(collection).build();
-        address.setReference(addressBO);
-
+    private BusinessObjectModel employeeWithRelations(RelationField... field) {
         BusinessObject employeeBO = employeeBO();
-        employeeBO.addField(address);
-
-        return aBOM().withBOs(employeeBO, addressBO).build();
-    }
-
-    private RelationField addressRelation(final Type type, final boolean collection) {
-        return aRelationField().ofType(type).withName("addresses").multiple(collection).build();
+        BusinessObjectModelBuilder aBom = aBOM().withBO(employeeBO);
+        for (RelationField relationField : field) {
+            employeeBO.addField(relationField);
+            aBom = aBom.withBO(relationField.getReference());
+        }
+        return aBom.build();
     }
 
     private BusinessObject employeeBO() {
@@ -345,7 +327,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
 
-        System.out.println(IOUtils.toString(file.toURI()));
         assertThat(file).hasContentEqualTo(expected);
     }
 
