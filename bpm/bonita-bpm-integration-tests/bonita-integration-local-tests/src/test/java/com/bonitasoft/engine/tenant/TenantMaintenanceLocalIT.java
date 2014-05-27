@@ -39,7 +39,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
     
     @Before
     public void before() throws Exception{
-        login();
+        loginOnPlatform();
         USER = createUser(USERNAME, PASSWORD);
     }
     
@@ -59,7 +59,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         DesignProcessDefinition dpd = pdb.done();
         ProcessDefinition pd = deployAndEnableProcess(dpd);
         getProcessAPI().startProcess(pd.getId());
-        logout();
+        logoutOnTenant();
 
         loginOnTenantWithTechnicalLogger(tenantId);
         
@@ -80,7 +80,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         logoutThenloginAs(USERNAME, PASSWORD);
         disableAndDeleteProcess(pd);
         deleteUser(USER);
-        logout();
+        logoutOnTenant();
     }
 
     protected TenantServiceAccessor getTenantAccessor(final long tenantId) {
