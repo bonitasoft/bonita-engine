@@ -8,7 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.BonitaTestRunner;
@@ -36,13 +37,13 @@ import com.bonitasoft.engine.TestsInitializerSP;
 public class TenantMaintenanceLocalIT extends CommonAPISPTest {
 
     protected User USER;
-    
+
     @Before
-    public void before() throws Exception{
-        login();
+    public void before() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         USER = createUser(USERNAME, PASSWORD);
     }
-    
+
     @Test
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
         // given: 1 tenant that is paused
@@ -59,13 +60,13 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         DesignProcessDefinition dpd = pdb.done();
         ProcessDefinition pd = deployAndEnableProcess(dpd);
         getProcessAPI().startProcess(pd.getId());
-        logout();
+        logoutOnTenant();
 
         loginOnTenantWithTechnicalLogger(tenantId);
-        
+
         getTenantManagementAPI().pause();
         assertTrue(workService.isStopped());
-       logoutOnTenant();
+        logoutOnTenant();
 
         // when: we stop and start the node
         stopAndStartPlatform();
@@ -80,7 +81,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         logoutThenloginAs(USERNAME, PASSWORD);
         disableAndDeleteProcess(pd);
         deleteUser(USER);
-        logout();
+        logoutOnTenant();
     }
 
     protected TenantServiceAccessor getTenantAccessor(final long tenantId) {
