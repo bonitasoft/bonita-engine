@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **
+ ** 
  * @since 6.0
  */
 package org.bonitasoft.engine.api.impl;
@@ -254,7 +254,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
         try {
             createProfileMember.execute();
-            return  convertToProfileMember(createProfileMember);
+            return convertToProfileMember(createProfileMember);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
@@ -327,13 +327,13 @@ public class ProfileAPIImpl implements ProfileAPI {
 
     public MemberType getMemberType(final Long userId, final Long groupId, final Long roleId) throws CreationException {
         MemberType memberType = null;
-        if (userId != null) {
+        if (isPositiveLong(userId)) {
             memberType = MemberType.USER;
-        } else if (groupId != null && roleId == null) {
+        } else if (isPositiveLong(groupId) && !isPositiveLong(roleId)) {
             memberType = MemberType.GROUP;
-        } else if (roleId != null && groupId == null) {
+        } else if (isPositiveLong(roleId) && !isPositiveLong(groupId)) {
             memberType = MemberType.ROLE;
-        } else if (roleId != null && groupId != null) {
+        } else if (isPositiveLong(roleId) && isPositiveLong(groupId)) {
             memberType = MemberType.MEMBERSHIP;
         } else {
             final StringBuilder stb = new StringBuilder("Parameters map must contain at least one of entries: ");
@@ -345,6 +345,10 @@ public class ProfileAPIImpl implements ProfileAPI {
             throw new CreationException(stb.toString());
         }
         return memberType;
+    }
+
+    private boolean isPositiveLong(final Long value) {
+        return (value != null && value > 0);
     }
 
     @Override

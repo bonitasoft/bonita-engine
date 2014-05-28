@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
@@ -28,6 +29,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProfileAPIImplTest {
+
+    private static final long USER_ID = 1L;
+
+    private static final long GROUP_ID = 1L;
+
+    private static final long ROLE_ID = 1L;
 
     @Spy
     private ProfileAPIImpl profileAPIImpl;
@@ -111,4 +118,35 @@ public class ProfileAPIImplTest {
         verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
 
     }
+
+    @Test
+    public void memberType_User() throws Exception {
+        assertThat(profileAPIImpl.getMemberType(USER_ID, null, null)).isEqualTo(MemberType.USER);
+        assertThat(profileAPIImpl.getMemberType(USER_ID, -1L, null)).isEqualTo(MemberType.USER);
+        assertThat(profileAPIImpl.getMemberType(USER_ID, -1L, -1L)).isEqualTo(MemberType.USER);
+
+    }
+
+    @Test
+    public void memberType_Group() throws Exception {
+        assertThat(profileAPIImpl.getMemberType(null, GROUP_ID, null)).isEqualTo(MemberType.GROUP);
+        assertThat(profileAPIImpl.getMemberType(-1L, GROUP_ID, null)).isEqualTo(MemberType.GROUP);
+        assertThat(profileAPIImpl.getMemberType(null, GROUP_ID, -1L)).isEqualTo(MemberType.GROUP);
+    }
+
+    @Test
+    public void memberType_Role() throws Exception {
+        assertThat(profileAPIImpl.getMemberType(null, null, ROLE_ID)).isEqualTo(MemberType.ROLE);
+        assertThat(profileAPIImpl.getMemberType(-1L, null, ROLE_ID)).isEqualTo(MemberType.ROLE);
+        assertThat(profileAPIImpl.getMemberType(null, -1L, ROLE_ID)).isEqualTo(MemberType.ROLE);
+
+    }
+
+    @Test
+    public void memberType_MemberShip() throws Exception {
+        assertThat(profileAPIImpl.getMemberType(null, GROUP_ID, ROLE_ID)).isEqualTo(MemberType.MEMBERSHIP);
+        assertThat(profileAPIImpl.getMemberType(-1L, GROUP_ID, ROLE_ID)).isEqualTo(MemberType.MEMBERSHIP);
+
+    }
+
 }
