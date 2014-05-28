@@ -24,7 +24,6 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
 
 /**
  * Factory that use a hazelcast executor
@@ -70,13 +69,18 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
                 TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue, executingRunnable, logger, tenantId);
     }
 
-    private IQueue<Runnable> createExecutingWorkQueue(final HazelcastInstance hazelcastInstance, final Cluster cluster) {
-        return hazelcastInstance.getQueue(ClusteredThreadPoolExecutorLocalQueue.memberExecutingWorkQueueName(cluster.getLocalMember(), tenantId));
+    private BlockingQueue<Runnable> createExecutingWorkQueue(final HazelcastInstance hazelcastInstance, final Cluster cluster) {
+        return new DelegatingQueue(hazelcastInstance.<Runnable> getQueue(ClusteredThreadPoolExecutorLocalQueue.memberExecutingWorkQueueName(
+                cluster.getLocalMember(),
+                tenantId)));
     }
 
     private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance, final long tenantId) {
         final Cluster cluster = hazelcastInstance.getCluster();
-        return hazelcastInstance.<Runnable> getQueue(ClusteredThreadPoolExecutorLocalQueue.memberWorkQueueName(cluster.getLocalMember(), tenantId));
+        BlockingQueue<Runnable> queue = new DelegatingQueue(hazelcastInstance.<Runnable> getQueue(ClusteredThreadPoolExecutorLocalQueue.memberWorkQueueName(
+                cluster.getLocalMember(),
+                tenantId)));
+        return queue;
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
