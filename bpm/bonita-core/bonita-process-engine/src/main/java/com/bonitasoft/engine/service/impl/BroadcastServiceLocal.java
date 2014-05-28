@@ -44,4 +44,13 @@ public class BroadcastServiceLocal implements BroadcastService {
         return execute(callable);
     }
 
+    @Override
+    public void submit(final Callable<?> callable) {
+        try {
+            callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

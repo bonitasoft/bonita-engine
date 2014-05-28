@@ -29,9 +29,11 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
@@ -357,6 +359,35 @@ public class ClusterTests extends CommonAPISPTest {
         designProcessDefinition.addTransition("autoStep", "step");
 
         return deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+    }
+
+    @Test
+    public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
+        // given: 2 node with 1 node having running processes
+        final long tenantId = createAndActivateTenant("MyTenant_");
+
+        loginWith(USERNAME, PASSWORD);
+
+        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
+        DesignProcessDefinition dpd = pdb.done();
+        ProcessDefinition pd = deployAndEnableProcess(dpd);
+        ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
+
+        logout();
+        // when: we stop node 1
+        stopPlatform();
+        changeToNode2();
+        loginWith(USERNAME, PASSWORD);
+        // then: node2 should finish the work
+        waitForProcessToFinishAndBeArchived(pi);
+
+        // cleanup
+        disableAndDeleteProcess(pd);
+        logout();
+        changeToNode1();
+        startPlatform();
+        loginWith(USERNAME, PASSWORD);
     }
 
 }

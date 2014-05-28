@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -230,6 +232,22 @@ public class APITestSPUtil extends APITestUtil {
         setCommandAPI(null);
         setTenantManagementAPI(null);
         logAPI = null;
+    }
+
+    public void stopPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
+            StartNodeException {
+        final PlatformSession loginPlatform = loginPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        platformAPI.stopNode();
+        logoutPlatform(loginPlatform);
+    }
+
+    public void startPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
+            StartNodeException {
+        final PlatformSession loginPlatform = loginPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        platformAPI.startNode();
+        logoutPlatform(loginPlatform);
     }
 
     public void stopAndStartPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
