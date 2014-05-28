@@ -50,7 +50,9 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     private SProfileEntry insertedProfileEntry = null;
 
-    public UpdateProfileEntryIndexOnInsert(final ProfileService profileService, final SProfileEntry profileEntry) {
+    private long updatedById;
+
+    public UpdateProfileEntryIndexOnInsert(final ProfileService profileService, final SProfileEntry profileEntry, long updatedById) {
         super();
         this.profileService = profileService;
         insertedProfileEntry = profileEntry;
@@ -70,13 +72,14 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
                 // for every element of the set we update the index
                 try {
                     updateProfileEntryIndex(profileEntry, i);
-                } catch (SProfileEntryUpdateException e) {
+                } catch (final SProfileEntryUpdateException e) {
                     throw new SProfileEntryUpdateException(e);
                 }
                 i++;
             }
             loopIndex++;
         } while (!profileEntryList.isEmpty());
+        profileService.updateProfileMetaData(insertedProfileEntry.getProfileId(), updatedById);
     }
 
     private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final long fromIndex) throws SBonitaSearchException {
@@ -98,7 +101,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
     }
 
     private void updateProfileEntryIndex(final SProfileEntry profileEntry, final long position) throws SProfileEntryUpdateException {
-        long indexToSet = 2L * position;
+        final long indexToSet = 2L * position;
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.INDEX, indexToSet);
         profileService.updateProfileEntry(profileEntry, entityUpdateDescriptor);

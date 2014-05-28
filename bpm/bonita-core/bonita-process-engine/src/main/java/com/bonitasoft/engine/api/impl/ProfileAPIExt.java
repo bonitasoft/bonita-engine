@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
-import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -97,7 +96,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             throw new AlreadyExistsException("A profile with name \"" + name + "\" already exists");
         } catch (final SProfileNotFoundException sProfileNotFoundException) {
             try {
-                final SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, false, SessionInfos.getUserIdFromSession()));
+                final SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, false, getUserIdFromSession()));
                 return SPModelConvertor.toProfile(profile);
             } catch (final SProfileCreationException e) {
                 throw new CreationException(e);
@@ -186,12 +185,12 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final Parser parser = tenantAccessor.getProfileParser();
         final PageService pageService = tenantAccessor.getPageService();
         final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
-       
-        // licence and feature check moved 
+
+        // licence and feature check moved
         // at profile level in ProfilesImporterExt
         return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
                 org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
-                .importProfiles(SessionInfos.getUserIdFromSession());
+                .importProfiles(getUserIdFromSession());
 
     }
 
@@ -225,7 +224,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         final UpdateProfile updateProfile = new UpdateProfile(profileService, id,
-                updateDescriptor, SessionInfos.getUserIdFromSession());
+                updateDescriptor, getUserIdFromSession());
         try {
             updateProfile.execute();
             return SPModelConvertor.toProfile(updateProfile.getResult());
@@ -249,13 +248,16 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         SProfileEntry sProfileEntry;
+        final long userIdFromSession = getUserIdFromSession();
         try {
             sProfileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
+            profileService.updateProfileMetaData(sProfileEntry.getProfileId(), userIdFromSession);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
 
-        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
+        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry,
+                userIdFromSession);
         try {
             updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
@@ -283,7 +285,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            new DeleteProfileEntry(profileService, id).execute();
+            new DeleteProfileEntry(profileService, id, getUserIdFromSession()).execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -298,7 +300,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         SProfileEntry sProfileEntry;
 
-        final UpdateProfileEntry updateProfileEntry = new UpdateProfileEntry(profileService, id, updateDescriptor);
+        final long updatedById = getUserIdFromSession();
+        final UpdateProfileEntry updateProfileEntry = new UpdateProfileEntry(profileService, id, updateDescriptor, updatedById);
         try {
             updateProfileEntry.execute();
             sProfileEntry = updateProfileEntry.getResult();
@@ -308,7 +311,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         final Map<ProfileEntryUpdateField, Serializable> fields = updateDescriptor.getFields();
         if (fields.get(ProfileEntryUpdateField.INDEX) != null) {
-            final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
+            final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry,
+                    updatedById);
             try {
                 updateProfileEntryIndexTransaction.execute();
             } catch (final SBonitaException e) {
@@ -323,7 +327,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             throw new UpdateException(e.getCause());
         }
         return updatedSProfileEntry;
-
     }
 
 }

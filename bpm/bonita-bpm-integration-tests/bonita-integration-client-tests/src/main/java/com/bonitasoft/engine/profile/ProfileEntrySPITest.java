@@ -25,6 +25,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
@@ -39,7 +40,7 @@ import org.junit.Test;
  * @author Julien Mege
  * @author Celine Souchet
  */
-public class ProfileEntrySPITest extends AbstractProfileTest {
+public class ProfileEntrySPITest extends AbstractProfileSPTest {
 
     private static final String ENTRY_DESCRIPTION = "entry description";
 
@@ -673,6 +674,71 @@ public class ProfileEntrySPITest extends AbstractProfileTest {
 
         // clean up data
         cleanProfilesEntriesIndexTest(profileEntries);
+    }
+
+    @Test
+    public void create_profileEntry_updates_profile_metaData() throws BonitaException {
+        // given
+        final long profileId = adminProfileId;
+        final Profile profileBefore = getProfileAPI().getProfile(profileId);
+
+        // when
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName1", "User1Pwd");
+        createProfileEntry(profileId);
+
+        // then
+        final Profile profileAfterInsert = getProfileAPI().getProfile(profileId);
+        checkMetaData(profileBefore, profileAfterInsert, user1);
+    }
+
+    @Test
+    public void update_profileEntry_updates_profile_metaData() throws BonitaException {
+        // given
+        final ProfileEntry createdProfileEntry = createProfileEntry(adminProfileId);
+        final Profile profileAfterInsert = getProfileAPI().getProfile(adminProfileId);
+
+        // when updating profile entry
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName2", "User2Pwd");
+        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
+        updateDescriptor.name("UpdatedProfileEntry");
+        getProfileAPI().updateProfileEntry(createdProfileEntry.getId(), updateDescriptor);
+
+        // then
+        final Profile profileAfterUpdate = getProfileAPI().getProfile(adminProfileId);
+        checkMetaData(profileAfterInsert, profileAfterUpdate, user2);
+
+    }
+
+    @Test
+    public void delete_profileEntry_updates_profile_metaData() throws BonitaException {
+        // given
+        final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
+        final ProfileEntry createProfileEntry = createProfileEntry(adminProfileId);
+
+        // when
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName3", "User3Pwd");
+        getProfileAPI().deleteProfileEntry(createProfileEntry.getId());
+
+        // then
+        final Profile profileAfterDelete = getProfileAPI().getProfile(adminProfileId);
+        checkMetaData(profileBefore, profileAfterDelete, user3);
+
+    }
+
+    private void checkMetaData(final Profile profileBefore, final Profile profileAfter, final User user) {
+        assertThat(profileAfter.getLastUpdateDate()).as("lastUpdateDate should be modified").isAfter(profileBefore.getLastUpdateDate());
+        // assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified").isNotEqualTo(profileBefore.getLastUpdatedBy());
+        // assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified").isEqualTo(user.getId());
+
+    }
+
+    private ProfileEntry createProfileEntry(final long profileId) throws CreationException {
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder").setParentId(1L).setPage("MyPage");
+        return getProfileAPI().createProfileEntry(profileEntryCreator);
     }
 
 }

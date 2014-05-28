@@ -40,12 +40,15 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
 
     private SProfileEntry sProfileEntry = null;
 
+    private final long updatedById;
+
     public UpdateProfileEntry(final ProfileService profileService, final Long profileEntryId,
-            final ProfileEntryUpdater updateDescriptor) {
+            final ProfileEntryUpdater updateDescriptor, final long updatedById) {
         super();
         this.profileService = profileService;
         this.profileEntryId = profileEntryId;
         this.updateDescriptor = updateDescriptor;
+        this.updatedById = updatedById;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         }
 
         profileService.updateProfileEntry(sProfileEntry, profileEntryUpdateDescriptor);
+        profileService.updateProfileMetaData(sProfileEntry.getProfileId(), updatedById);
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
     }
 
@@ -68,8 +72,8 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         return sProfileEntry;
     }
 
-    private EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
-        final SProfileEntryUpdateBuilder updateBuilder = BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance();
+    protected EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
+        final SProfileEntryUpdateBuilder updateBuilder = getUpdateBuilder();
         final Map<ProfileEntryUpdateField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<ProfileEntryUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
@@ -99,6 +103,10 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
             }
         }
         return updateBuilder.done();
+    }
+
+    protected SProfileEntryUpdateBuilder getUpdateBuilder() {
+        return BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance();
     }
 
 }

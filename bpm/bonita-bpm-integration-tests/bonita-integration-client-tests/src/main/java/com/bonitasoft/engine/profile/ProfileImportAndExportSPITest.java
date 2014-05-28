@@ -56,13 +56,13 @@ import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageNotFoundException;
 
-public class ProfileImportAndExportSPITest extends AbstractProfileTest {
+public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
     public void exportAllProfiles() throws Exception {
         // given
-        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("AllProfiles.xml"))));
 
         // when
@@ -84,7 +84,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         assertThat(groupAcme).as("group acme").isNotNull();
         assertThat(groupFinance).as("group finance").isNotNull();
 
-        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("Profile2groups.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
 
@@ -119,7 +119,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     @Test
     public void importProfile_with_teamwork_level() throws Exception {
         // given
-        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("Profiles_teamwork.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(profileByteArray));
 
@@ -148,7 +148,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     // @Test
     public void importProfile_with_teamwork_level_customProfile() throws Exception {
         // given
-        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("Profiles_teamwork_customProfile.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(profileByteArray));
 
@@ -177,7 +177,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         final String profileName = "custom profile";
 
         // given
-        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("CustomPageProfile.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
         checkOrCreateCustomPage("custompage_page1");
@@ -241,7 +241,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     @Test
     public void exportProfilesSpecified() throws Exception {
         // given
-        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("AdministratorProfile.xml"))));
 
         final long[] profilesIds = new long[1];
@@ -263,7 +263,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
 
     @Test
     public void importDefaultProfileShouldUpdateLastModifyFields() throws Exception {
-        final byte[] byteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] byteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("AdministratorProfile_new_description.xml"));
 
         // given

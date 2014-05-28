@@ -38,7 +38,7 @@ import com.bonitasoft.engine.CommonAPISPTest;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractProfileTest extends CommonAPISPTest {
+public abstract class AbstractProfileSPTest extends CommonAPISPTest {
 
     protected static final String IMPORT_PROFILES_CMD = "importProfilesCommand";
 
@@ -94,7 +94,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         role3 = createRole("role3");
 
         // Restoring up default profiles before tests:
-        final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("AllProfiles.xml");
+        final InputStream xmlStream = AbstractProfileSPTest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
@@ -133,7 +133,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
 
     protected void cleanAllProfiles() throws IOException, CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
         // Clean profiles
-        final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("CleanProfiles.xml");
+        final InputStream xmlStream = AbstractProfileSPTest.class.getResourceAsStream("CleanProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
