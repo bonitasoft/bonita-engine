@@ -21,6 +21,9 @@
 <!--                 <value>EXECUTE_CONNECTOR_INPUT_EXPRESSIONS</value> -->
 <!--                 <value>EXECUTE_CONNECTOR_DISCONNECT</value> -->
 <!--                 <value>EXECUTE_CONNECTOR_WORK</value> -->
+<!--                 <value>EVALUATE_EXPRESSION_INCLUDING_CONTEXT</value> -->
+<!--                 <value>EVALUATE_EXPRESSION</value> -->
+<!--                 <value>EVALUATE_EXPRESSIONS</value> -->
             </list>
         </constructor-arg>
     </bean>
