@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,34 +14,34 @@
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 /**
- * @author Vincent Elcrin
+ * @author Celine Souchet
+ * 
  */
-public class SSubProcessDefinitionImplTest {
+public class SUserTaskDefinitionImplTest {
 
-    SSubProcessDefinitionImpl subProcessTriggeredByEvent = new SSubProcessDefinitionImpl(1L, "name", true);
-
-    SSubProcessDefinitionImpl subProcess = new SSubProcessDefinitionImpl(1L, "name", false);
-
+    /**
+     * Test method for {@link org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl#isExclusive()}.
+     */
     @Test
-    public void isStartable_return_false_if_sub_process_is_triggered_by_event() {
-        assertFalse(subProcessTriggeredByEvent.isStartable());
+    public void not_exclusive_if_not_gateway() {
+        final SUserTaskDefinitionImpl sUserTaskDefinitionImpl = new SUserTaskDefinitionImpl(5, "name", "actorName");
+
+        assertFalse(sUserTaskDefinitionImpl.isExclusive());
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl#isParalleleOrInclusive()}.
+     */
     @Test
-    public void isStartable_return_false_if_sub_process_has_incoming_transitions() {
-        subProcess.addIncomingTransition(new STransitionDefinitionImpl("incoming"));
+    public void not_parallelOrInclusive_if_not_gateway() {
+        final SUserTaskDefinitionImpl sUserTaskDefinitionImpl = new SUserTaskDefinitionImpl(5, "name", "actorName");
 
-        assertFalse(subProcess.isStartable());
-    }
+        assertFalse(sUserTaskDefinitionImpl.isParalleleOrInclusive());
 
-    @Test
-    public void isStartable_return_true_if_sub_process_has_no_incoming_transitions_and_is_not_triggered_by_event() {
-        assertTrue(subProcess.isStartable());
     }
 
 }

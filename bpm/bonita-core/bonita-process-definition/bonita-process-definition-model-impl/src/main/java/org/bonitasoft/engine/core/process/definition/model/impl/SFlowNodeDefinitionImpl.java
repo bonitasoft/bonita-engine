@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -369,5 +370,30 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     @Override
     public boolean isStartable() {
         return !hasIncomingTransitions();
+    }
+
+    @Override
+    public boolean isParalleleOrInclusive() {
+        return false;
+    }
+
+    @Override
+    public boolean isExclusive() {
+        return false;
+    }
+
+    @Override
+    public boolean isBoundaryEvent() {
+        return SFlowNodeType.BOUNDARY_EVENT.equals(getType());
+    }
+
+    @Override
+    public boolean isInterrupting() {
+        return false;
+    }
+
+    @Override
+    public boolean isEventSubProcess() {
+        return false;
     }
 }
