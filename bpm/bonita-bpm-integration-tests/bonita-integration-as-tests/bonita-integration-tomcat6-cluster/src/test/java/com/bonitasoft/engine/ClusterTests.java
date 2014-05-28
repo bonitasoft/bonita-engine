@@ -366,7 +366,7 @@ public class ClusterTests extends CommonAPISPTest {
         // given: 2 node with 1 node having running processes
         final long tenantId = createAndActivateTenant("MyTenant_");
 
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
         pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
@@ -374,20 +374,20 @@ public class ClusterTests extends CommonAPISPTest {
         ProcessDefinition pd = deployAndEnableProcess(dpd);
         ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
 
-        logout();
+        logoutOnTenant();
         // when: we stop node 1
         stopPlatform();
         changeToNode2();
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         // then: node2 should finish the work
         waitForProcessToFinishAndBeArchived(pi);
 
         // cleanup
         disableAndDeleteProcess(pd);
-        logout();
+        logoutOnTenant();
         changeToNode1();
         startPlatform();
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
 }
