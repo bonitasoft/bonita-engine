@@ -27,6 +27,7 @@ public interface WorkService extends TenantLifecycleService {
 
     /**
      * This operation MUST be called with an active transaction. If no active transaction is found, a SWorkRegisterException is thrown
+     * 
      * @param work
      * @throws SWorkRegisterException
      * @since 6.0
@@ -46,5 +47,10 @@ public interface WorkService extends TenantLifecycleService {
      * @since 6.3
      */
     boolean isStopped();
+
+    /**
+     * @since 6.3.1
+     */
+    void notifyNodeStopped(String nodeName);
 
 }
