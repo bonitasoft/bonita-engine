@@ -5,6 +5,7 @@
 		<constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="checkExpressionReturnType" value="true" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
 	</bean>
 
 	<bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider">
