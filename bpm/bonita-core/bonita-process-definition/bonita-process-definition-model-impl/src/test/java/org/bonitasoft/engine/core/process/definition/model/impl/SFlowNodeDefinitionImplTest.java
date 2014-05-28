@@ -1,18 +1,15 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
  **/
 
 package org.bonitasoft.engine.core.process.definition.model.impl;
@@ -21,24 +18,29 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by Vincent Elcrin
- * Date: 18/12/13
- * Time: 14:57
+ * @author Vincent Elcrin
+ * @author Celine Souchet
  */
 public class SFlowNodeDefinitionImplTest {
 
-    SFlowNodeDefinitionImpl flowNode = new SFlowNodeDefinitionImpl(1L, "name") {
+    private SFlowNodeDefinitionImpl flowNode;
 
-        private static final long serialVersionUID = -1297746953646018494L;
+    @Before
+    public void before() {
+        flowNode = new SFlowNodeDefinitionImpl(1L, "name") {
 
-        @Override
-        public SFlowNodeType getType() {
-            return null;
-        }
-    };
+            private static final long serialVersionUID = -1297746953646018494L;
+
+            @Override
+            public SFlowNodeType getType() {
+                return null;
+            }
+        };
+    }
 
     @Test
     public void isStartable_return_false_if_flow_node_has_incoming_transitions() {
@@ -50,6 +52,28 @@ public class SFlowNodeDefinitionImplTest {
     @Test
     public void isStartable_return_true_if_flow_node_has_no_incoming_transitions() {
         assertTrue(flowNode.isStartable());
+    }
+
+    @Test
+    public void is_not_interrupting_if_not_catch_event() {
+        assertFalse(flowNode.isInterrupting());
+    }
+
+    @Test
+    public void hasIncommingTransitions_return_true_if_flownode_hasIncommingTransitions() {
+        flowNode.addIncomingTransition(new STransitionDefinitionImpl("incoming"));
+
+        assertTrue(flowNode.hasIncomingTransitions());
+    }
+
+    @Test
+    public void hasIncommingTransitions_return_false_if_flownode_doesnt_have_IncommingTransitions() {
+        assertFalse(flowNode.hasIncomingTransitions());
+    }
+
+    @Test
+    public void isEventSubProcess_return_false_if_is_not_sub_process() {
+        assertFalse(flowNode.isEventSubProcess());
     }
 
 }
