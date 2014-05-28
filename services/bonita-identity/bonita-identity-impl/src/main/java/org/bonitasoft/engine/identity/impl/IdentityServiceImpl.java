@@ -987,9 +987,6 @@ public class IdentityServiceImpl implements IdentityService {
     public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException {
         final String methodName = "getUserIdsWithCustomUserInfo";
         logBeforeMethod(methodName);
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("userInfoName", userInfoName);
-        parameters.put("userInfoValue", userInfoValue);
         try {
             String queryName;
             if (usePartialMatch) {
@@ -998,6 +995,9 @@ public class IdentityServiceImpl implements IdentityService {
             } else {
                 queryName = "getUserIdsWithCustomUserInfo";
             }
+            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            parameters.put("userInfoName", userInfoName);
+            parameters.put("userInfoValue", userInfoValue);
             final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, SUser.class, Long.class,
                     new QueryOptions(fromIndex, maxResults));
             return persistenceService.selectList(descriptor);
