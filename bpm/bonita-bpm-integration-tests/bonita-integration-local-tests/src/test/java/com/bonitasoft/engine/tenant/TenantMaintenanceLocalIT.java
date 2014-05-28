@@ -39,7 +39,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
     
     @Before
     public void before() throws Exception{
-        loginOnPlatform();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         USER = createUser(USERNAME, PASSWORD);
     }
     
