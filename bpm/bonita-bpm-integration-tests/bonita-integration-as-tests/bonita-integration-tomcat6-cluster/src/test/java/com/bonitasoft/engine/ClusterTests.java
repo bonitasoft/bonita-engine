@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantIsPausedException;
+import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantCreator;
 
@@ -271,7 +271,7 @@ public class ClusterTests extends CommonAPISPTest {
             System.out.println("[test] try to call getNumberOfProcess with tech user on node 1");
             getProcessAPI().getNumberOfProcessInstances();
             fail("should not be able to acces this method in pause");
-        } catch (TenantIsPausedException e) {
+        } catch (TenantStatusException e) {
             // ok
         }
         changeToNode2();
@@ -280,7 +280,7 @@ public class ClusterTests extends CommonAPISPTest {
             System.out.println("[test] try to call getNumberOfProcess with tech user on node 2");
             getProcessAPI().getNumberOfProcessInstances();
             fail("should not be able to acces this method in pause");
-        } catch (TenantIsPausedException e) {
+        } catch (TenantStatusException e) {
             // ok
         }
         logoutOnTenant();
