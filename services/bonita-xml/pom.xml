@@ -15,11 +15,7 @@
 	<name>Bonita XML Tools</name>
 
 	<modules>
-		<module>bonita-xml-parse-api</module>
-		<module>bonita-xml-parse-sax</module>
-		<module>bonita-xml-write-api</module>
-		<module>bonita-xml-write-dom</module>
-		<module>bonita-xml-validate-api</module>
-		<module>bonita-xml-validate-sax</module>
+		<module>bonita-xml-api</module>
+		<module>bonita-xml-impl</module>
 	</modules>
 </project>

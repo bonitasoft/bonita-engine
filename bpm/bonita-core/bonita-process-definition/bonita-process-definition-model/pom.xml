@@ -49,18 +49,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>bonita-xml-parse-api</artifactId>
+			<artifactId>bonita-xml-api</artifactId>
 			<groupId>org.bonitasoft.engine.xml</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>bonita-xml-validate-api</artifactId>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-write-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

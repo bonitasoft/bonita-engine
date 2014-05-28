@@ -8,19 +8,25 @@
 		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-xml-write-dom</artifactId>
+	<artifactId>bonita-xml-impl</artifactId>
 
-	<name>Bonita XML Write: DOM</name>
+	<name>Bonita XML impl</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-write-api</artifactId>
+			<artifactId>bonita-xml-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-technical-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

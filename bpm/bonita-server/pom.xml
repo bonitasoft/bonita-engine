@@ -559,17 +559,7 @@
 		<!-- XML -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-parse-sax</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-validate-sax</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-write-dom</artifactId>
+			<artifactId>bonita-xml-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -828,12 +818,8 @@
 									<include>org.bonitasoft.engine.work:bonita-work-api</include>
 									<include>org.bonitasoft.engine.work:bonita-work-impl</include>
 									<!-- XML -->
-									<include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-validate-api</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-validate-sax</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-write-api</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-write-dom</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-api</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-impl</include>
 									<!-- Web Commands -->
 									<include>org.bonitasoft.engine.external:bonita-web-commands</include>
 									<!-- Web Profile -->

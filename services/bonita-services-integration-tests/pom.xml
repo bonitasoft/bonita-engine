@@ -442,13 +442,7 @@
 		<!-- XML -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-parse-sax</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-validate-sax</artifactId>
+			<artifactId>bonita-xml-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
