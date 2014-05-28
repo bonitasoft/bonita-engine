@@ -22,6 +22,7 @@ import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
@@ -247,7 +248,7 @@ public class BDMQueryUtil {
         builder.append(SELECT).append(var).append("\n");
         builder.append(FROM).append(simpleName).append(' ').append(var).append("\n");
         for (Field f : businessObject.getFields()) {
-            if (f instanceof RelationField) {
+            if (f instanceof RelationField && ((RelationField) f).getFetchType() == FetchType.LAZY) {
                 builder.append(JOIN_FETCH).append(var).append('.').append(f.getName()).append("\n");
             }
         }

@@ -16,6 +16,7 @@ import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 
 /**
@@ -205,11 +206,13 @@ public class BDMQueryUtilTest {
         final RelationField addressesField = new RelationField();
         addressesField.setName("addresses");
         addressesField.setType(Type.AGGREGATION);
+        addressesField.setFetchType(FetchType.LAZY);
         addressesField.setCollection(true);
         businessObject.addField(addressesField);
 
         final RelationField skillField = new RelationField();
         skillField.setName("skills");
+        skillField.setFetchType(FetchType.EAGER);
         skillField.setType(Type.COMPOSITION);
         skillField.setCollection(false);
         businessObject.addField(skillField);
@@ -219,7 +222,7 @@ public class BDMQueryUtilTest {
         // then:
         assertThat(query.getName()).isEqualTo("findByPersistenceId");
         assertThat(query.getReturnType()).isEqualTo(businessObject.getQualifiedName());
-        assertThat(query.getContent()).contains("JOIN FETCH e.addresses").contains("JOIN FETCH e.skills");
-        assertThat(query.getQueryParameters()).extracting("name","className").containsExactly(tuple("persistenceId",Long.class.getName()));
+        assertThat(query.getContent()).contains("JOIN FETCH e.addresses").doesNotContain("JOIN FETCH e.skills");
+        assertThat(query.getQueryParameters()).extracting("name", "className").containsExactly(tuple("persistenceId", Long.class.getName()));
     }
 }
