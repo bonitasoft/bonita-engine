@@ -23,10 +23,12 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.impl.ConnectorDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.DocumentBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -134,6 +136,29 @@ public class BuildTestUtil {
         builder.addAutomaticTask("step");
         builder.addEndEvent("end").addErrorEventTrigger("errorCode");
         builder.addTransition("start", "step").addTransition("step", "end");
+        return builder;
+    }
+
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedGroovyScript(final String processName)
+            throws InvalidExpressionException {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        builder.addStartEvent("start");
+        builder.addAutomaticTask("activityThatFail").addData("data", String.class.getName(),
+                new ExpressionBuilder().createGroovyScriptExpression("script", "throw new java.lang.RuntimeException()", String.class.getName()));
+        builder.addEndEvent("end");
+        builder.addTransition("start", "activityThatFail").addTransition("activityThatFail", "end");
+        return builder;
+    }
+
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedConnector(final String processName)
+            throws InvalidExpressionException {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        builder.addStartEvent("start");
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addAutomaticTask("AutomaticStep").addConnector("testConnectorThatThrowException",
+                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER).throwErrorEventWhenFailed("errorCode");
+        connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
+        builder.addEndEvent("end");
+        builder.addTransition("start", "AutomaticStep").addTransition("AutomaticStep", "end");
         return builder;
     }
 
