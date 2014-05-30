@@ -75,6 +75,10 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -94,14 +98,21 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final SessionService sessionService;
+
+    private final ReadSessionAccessor sessionAccessor;
+
     public ProfileServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ReadSessionAccessor sessionAccessor,
+            final SessionService sessionService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -725,11 +736,26 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateProfileMetaData(final long profileId, final long updatedById) throws SProfileUpdateException, SProfileNotFoundException {
-        final SProfileUpdateBuilder updateBuilder;
-        updateBuilder = getUpdateBuilder();
-        updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(updatedById);
-        updateProfile(getProfile(profileId), updateBuilder.done());
+    public void updateProfileMetaData(final long profileId) throws SProfileUpdateException {
+        final SProfileUpdateBuilder updateBuilder = getUpdateBuilder();
+        long userId;
+        try {
+            userId = getSessionUserId();
+            updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(userId);
+            updateProfile(getProfile(profileId), updateBuilder.done());
+        } catch (final SSessionNotFoundException e) {
+            throw new SProfileUpdateException(e);
+        } catch (final SessionIdNotSetException e) {
+            throw new SProfileUpdateException(e);
+        } catch (final SProfileNotFoundException e) {
+            throw new SProfileUpdateException(e);
+        }
+
+    }
+
+    private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
+        final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
+        return userId;
     }
 
     private SProfileUpdateBuilder getUpdateBuilder() {

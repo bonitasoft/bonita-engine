@@ -471,21 +471,20 @@ public interface ProfileService {
 
     /**
      * 
-     * @param profileId
-     * @param updatedById
-     * @throws SProfileUpdateException
-     * @throws SProfileNotFoundException
-     * @since 6.3.1
-     */
-    void updateProfileMetaData(final long profileId, final long updatedById) throws SProfileUpdateException, SProfileNotFoundException;
-
-    /**
-     * 
      * @param profileMemberId
      * @return
      * @throws SProfileMemberNotFoundException
      * @since 6.3.1
      */
     SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException;
+
+    /**
+     * updates profile metaData fields lastUpdateDate and lastUpdatedBy for a given profile
+     * 
+     * @param profileId
+     * @throws SProfileUpdateException
+     *             when given profileId is not found
+     */
+    void updateProfileMetaData(final long profileId) throws SProfileUpdateException;
 
 }

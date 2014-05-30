@@ -103,12 +103,12 @@ public class CreateProfileMemberTest {
 
         // given
         createProfileMember = spy(new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
-                memberType, updatedById));
+                memberType));
 
         // when
         createProfileMember.execute();
 
         // then
-        verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
+        verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 }

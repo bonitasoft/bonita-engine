@@ -41,10 +41,8 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
 
     private SProfileMember sProfileMember;
 
-    private final long updatedById;
-
     public CreateProfileMember(final ProfileService profileService, final IdentityService identityService, final long profileId, final Long userId,
-            final Long groupId, final Long roleId, final MemberType memberType, final long updatedById) {
+            final Long groupId, final Long roleId, final MemberType memberType) {
         super();
         this.profileService = profileService;
         this.identityService = identityService;
@@ -53,7 +51,7 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         this.groupId = groupId;
         this.roleId = roleId;
         this.memberType = memberType;
-        this.updatedById = updatedById;
+
     }
 
     @Override
@@ -84,7 +82,7 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
                 sProfileMember = profileService.addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
                 break;
         }
-        profileService.updateProfileMetaData(profileId, updatedById);
+        profileService.updateProfileMetaData(profileId);
     }
 
     @Override

@@ -97,7 +97,7 @@ public class ProfileAPIImplTest {
         profileAPIImpl.deleteProfileMember(1L);
 
         // then
-        verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
+        verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ProfileAPIImplTest {
         profileAPIImpl.createProfileMember(profileId, userId, groupId, roleId);
 
         // then
-        verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
+        verify(profileService, times(1)).updateProfileMetaData(anyLong());
 
     }
 

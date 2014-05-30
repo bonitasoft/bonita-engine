@@ -242,11 +242,9 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final long updatedById = getUserIdFromSession();
-
         final MemberType memberType = getMemberType(userId, groupId, roleId);
         final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
-                memberType, updatedById);
+                memberType);
         try {
             checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
         } catch (final SBonitaException e1) {
@@ -354,11 +352,10 @@ public class ProfileAPIImpl implements ProfileAPI {
     @Override
     public void deleteProfileMember(final Long profileMemberId) throws DeletionException {
         final ProfileService profileService = getTenantAccessor().getProfileService();
-        final long updatedById = getUserIdFromSession();
         try {
             final SProfileMember profileMember = profileService.getProfileMemberWithoutDisplayName(profileMemberId);
             profileService.deleteProfileMember(profileMember.getId());
-            profileService.updateProfileMetaData(profileMember.getProfileId(), updatedById);
+            profileService.updateProfileMetaData(profileMember.getProfileId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
