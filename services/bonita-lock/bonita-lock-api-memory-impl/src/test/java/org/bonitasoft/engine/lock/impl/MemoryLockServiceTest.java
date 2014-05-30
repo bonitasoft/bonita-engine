@@ -1,11 +1,8 @@
 package org.bonitasoft.engine.lock.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -90,8 +87,8 @@ public class MemoryLockServiceTest {
         public void run() {
             try {
                 System.out.println(name2 + " wait to acquire the lock");
-                semaphore.acquire();
                 System.out.println(name2 + " will lock");
+                semaphore.acquire();
                 lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS, tenantId);
                 System.out.println(name2 + " lock obtained, wait to unlock");
                 semaphore.acquire();
@@ -178,27 +175,28 @@ public class MemoryLockServiceTest {
         t1.start();
         t2.start();
         t3.start();
-        // t1 take the lock
+        // state : S1 ∈ T, S2 ∈ T, S3 ∈ T, S1 <- T1, S2 <- T2, S3 <- T3, BL free
         s1.release();
         Thread.sleep(5);
-        // t2 is locked
+        // t1 take the lock | state : S1 ∈ T1, S2 ∈ T, S3 ∈ T, S1 <- T1, S2 <- T2, S3 <- T3, BL ∈ T1
         s2.release();
         Thread.sleep(5);
-        // t1 unlock
+        // t2 is locked | state : S1 ∈ T1, S2 ∈ T2, S3 ∈ T, S1 <- T1, S3 <- T3, BL ∈ T1, BL <- T2
         s1.release();
-        Thread.sleep(5);
-        // t3 try acquire
-        s3.release();
-        Thread.sleep(5);
-        // t2 have the lock
+        Thread.sleep(20);
+        // t1 unlock & t2 have the lock | state : S1, S2 ∈ T2, S3 ∈ T, S3 <- T3, BL ∈ T2
         assertTrue(t2.isLockObtained());
+        s3.release();
+        Thread.sleep(20);
+        // t3 try acquire | state : S1, S2 ∈ T2, S3 ∈ T3, BL ∈ T2, BL <- T3
         // t3 should not be able to lock
         assertFalse(t3.isLockObtained());
         s2.release();
-        Thread.sleep(5);
-        // now it should be able to have it
+        Thread.sleep(20);
+        // now it should be able to have it | state : S1, S2, S3 ∈ T3, BL ∈ T3
         assertTrue(t3.isLockObtained());
         s3.release();
+        // state : S1, S2, S3, BL
     }
 
     @Test
