@@ -9,7 +9,9 @@
 package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -101,15 +103,20 @@ public class EntityCodeGenerator {
         final JAnnotationUse namedQueriesAnnotation = codeGenerator.addAnnotation(entityClass, NamedQueries.class);
         final JAnnotationArrayMember valueArray = namedQueriesAnnotation.paramArray("value");
 
-        // Add provided queries
-        for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
-            addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
-        }
-
         // Add custom queries
+        Set<String> addedQueries = new HashSet<String>();
         for (final Query query : bo.getQueries()) {
             addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
+            addedQueries.add(query.getName());
         }
+
+        // Add provided queries if not override
+        for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            if (!addedQueries.contains(providedQuery.getName())) {
+                addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
+            }
+        }
+
     }
 
     private void addUniqueConstraintAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
