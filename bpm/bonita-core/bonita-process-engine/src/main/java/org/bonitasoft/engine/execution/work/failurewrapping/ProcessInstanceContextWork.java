@@ -69,6 +69,11 @@ public class ProcessInstanceContextWork extends TxInHandleFailureWrappingWork {
     }
 
     @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + ": processInstanceId = " + processInstanceId;
+    }
+
+    @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
         if (rootProcessInstanceId < 0) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);

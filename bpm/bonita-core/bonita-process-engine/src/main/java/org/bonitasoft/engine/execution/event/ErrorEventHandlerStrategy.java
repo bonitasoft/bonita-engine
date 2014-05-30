@@ -139,7 +139,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SErrorEventTriggerDefinition errorTrigger = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
         final SWaitingErrorEvent waitingErrorEvent = getWaitingErrorEvent(processDefinition.getProcessContainer(), parentProcessInstanceId, errorTrigger,
                 sThrowEventInstance, sFlowNodeInstance);
-
         if (waitingErrorEvent != null) {
             eventsHandler.triggerCatchEvent(waitingErrorEvent, sThrowEventInstance.getId());
             hasActionToExecute = true;
@@ -234,8 +233,9 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         }
         if (canHandleError) {
             return getEventInstanceService().getBoundaryWaitingErrorEvent(flowNodeInstance.getId(), catchingErrorCode);
+        } else {
+            return null;
         }
-        return null;
     }
 
     private SWaitingErrorEvent getWaitingErrorEventSubProcess(final SFlowElementContainerDefinition container, final long parentProcessInstanceId,

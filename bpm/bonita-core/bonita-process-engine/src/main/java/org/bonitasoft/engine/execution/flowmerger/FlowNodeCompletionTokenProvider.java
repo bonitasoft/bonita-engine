@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.flowmerger;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -24,11 +23,10 @@ import org.bonitasoft.engine.execution.TokenProvider;
 
 /**
  * @author Elias Ricken de Medeiros
- * @author Celine Souchet
  */
 public class FlowNodeCompletionTokenProvider implements TokenProvider {
 
-    private final SFlowNodeDefinition sFlowNodeDefinition;
+    private final SFlowNodeWrapper flowNodeWrapper;
 
     private final TokenService tokenService;
 
@@ -40,12 +38,11 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
 
     private TokenInfo tokenInfo = null;
 
-    public FlowNodeCompletionTokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
-            final SFlowNodeDefinition sFlowNodeDefinition,
+    public FlowNodeCompletionTokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance, final SFlowNodeWrapper flowNodeWrapper,
             final FlowNodeTransitionsWrapper transitionsDescriptor, TokenService tokenService) {
         this.child = child;
         this.processInstance = sProcessInstance;
-        this.sFlowNodeDefinition = sFlowNodeDefinition;
+        this.flowNodeWrapper = flowNodeWrapper;
         this.transitionsDescriptor = transitionsDescriptor;
         this.tokenService = tokenService;
     }
@@ -61,15 +58,15 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
 
     private TokenInfo calculateTokenInfo() throws SObjectReadException, SObjectNotFoundException {
         // not in the definition: no merge no split no implicit end
-        if (sFlowNodeDefinition == null || transitionsDescriptor.isLastFlowNode()) {
+        if (flowNodeWrapper.isNull() || transitionsDescriptor.isLastFlowNode()) {
             return new TokenInfo();
         }
 
-        if (sFlowNodeDefinition.isBoundaryEvent() && sFlowNodeDefinition.isInterrupting()) {
+        if (flowNodeWrapper.isBoundaryEvent() && flowNodeWrapper.isInterrupting()) {
             return tansmitAllTokenInfo();
         }
 
-        if (sFlowNodeDefinition.isExclusive() || transitionsDescriptor.isSimpleMerge() || isNonInterruptingBoundaryEvent()) {
+        if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge() || isNonInterruptingBoundaryEvent()) {
             // always transmit token
             return transmitOnlyTokenRefId();
         }
@@ -81,14 +78,14 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
         }
 
         if (transitionsDescriptor.isManyToMany()) {
-            if (sFlowNodeDefinition.isParalleleOrInclusive()) {
+            if (flowNodeWrapper.isParalleleOrInclusive()) {
                 return new TokenInfo(child.getId(), getParentTokenRefId());
             }
             return new TokenInfo(child.getId(), child.getTokenRefId());
         }
 
         if (transitionsDescriptor.isManyToOne()) {
-            if (sFlowNodeDefinition.isParalleleOrInclusive()) {
+            if (flowNodeWrapper.isParalleleOrInclusive()) {
                 Long parentTokenRefId = getParentTokenRefId();
                 return new TokenInfo(parentTokenRefId);
             }
@@ -99,7 +96,7 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
     }
 
     private boolean isNonInterruptingBoundaryEvent() {
-        return sFlowNodeDefinition.isBoundaryEvent() && !sFlowNodeDefinition.isInterrupting();
+        return flowNodeWrapper.isBoundaryEvent() && !flowNodeWrapper.isInterrupting();
     }
 
     private Long getParentTokenRefId() throws SObjectReadException, SObjectNotFoundException {

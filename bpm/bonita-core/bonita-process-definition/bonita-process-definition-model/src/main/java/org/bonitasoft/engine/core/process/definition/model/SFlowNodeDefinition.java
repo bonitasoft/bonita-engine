@@ -91,14 +91,4 @@ public interface SFlowNodeDefinition extends SNamedElement {
 
     boolean isStartable();
 
-    boolean isParalleleOrInclusive();
-
-    boolean isExclusive();
-
-    boolean isInterrupting();
-
-    boolean isBoundaryEvent();
-
-    boolean isEventSubProcess();
-
 }

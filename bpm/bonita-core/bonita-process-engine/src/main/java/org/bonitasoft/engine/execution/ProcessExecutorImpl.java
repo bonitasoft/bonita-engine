@@ -108,6 +108,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.flowmerger.FlowMerger;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeCompletionTokenProvider;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
+import org.bonitasoft.engine.execution.flowmerger.SFlowNodeWrapper;
 import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -304,24 +305,24 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return chosenTransitions;
     }
 
-    private STransitionDefinition getDefaultTransitionIfExists(final SProcessDefinition sDefinition,
-            final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
-        final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
-        if (defaultTransition == null) {
-            throwSActivityExecutionException(sDefinition, flowNodeInstance);
-        }
-        return defaultTransition;
-    }
+	private STransitionDefinition getDefaultTransitionIfExists(final SProcessDefinition sDefinition,
+			final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+		final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
+		if (defaultTransition == null) {
+		    throwSActivityExecutionException(sDefinition, flowNodeInstance);
+		}
+		return defaultTransition;
+	}
 
-    private void throwSActivityExecutionException(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SActivityExecutionException {
-        SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                + ", but no outgoing transition had a valid condition.");
-        exception.setProcessDefinitionNameOnContext(sDefinition.getName());
-        exception.setProcessDefinitionVersionOnContext(sDefinition.getVersion());
-        exception.setProcessInstanceIdOnContext(flowNodeInstance.getParentProcessInstanceId());
-        throw exception;
-    }
+	private void throwSActivityExecutionException(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
+			throws SActivityExecutionException {
+		SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
+		        + ", but no outgoing transition had a valid condition.");
+		exception.setProcessDefinitionNameOnContext(sDefinition.getName());
+		exception.setProcessDefinitionVersionOnContext(sDefinition.getVersion());
+		exception.setProcessInstanceIdOnContext(flowNodeInstance.getParentProcessInstanceId());
+		throw exception;
+	}
 
     List<STransitionDefinition> evaluateTransitionsInclusively(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
             final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
@@ -748,11 +749,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SProcessInstance sProcessInstance) throws SBonitaException {
         // token we merged
         final int numberOfTokenToMerge = getNumberOfTokenToMerge(child);
-        final SFlowNodeDefinition sFlowNodeDefinition = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
-        final FlowNodeTransitionsWrapper transitionsDescriptor = buildTransitionsWrapper(sFlowNodeDefinition, sProcessDefinition, child);
-        final TokenProvider tokenProvider = new FlowNodeCompletionTokenProvider(child, sProcessInstance, sFlowNodeDefinition, transitionsDescriptor,
-                tokenService);
-        final FlowMerger merger = new FlowMerger(sFlowNodeDefinition, transitionsDescriptor, tokenProvider);
+        final SFlowNodeDefinition flowNode = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
+        final SFlowNodeWrapper flowNodeWrapper = new SFlowNodeWrapper(flowNode);
+        final FlowNodeTransitionsWrapper transitionsDescriptor = buildTransitionsWrapper(flowNode, sProcessDefinition, child);
+        final TokenProvider tokenProvider = new FlowNodeCompletionTokenProvider(child, sProcessInstance, flowNodeWrapper, transitionsDescriptor, tokenService);
+        final FlowMerger merger = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
 
         archiveInvalidTransitions(child, transitionsDescriptor);
 

@@ -793,7 +793,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
+    private void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
         final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
                 processInstance, getProcessAPI(), state);
         assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
@@ -818,7 +818,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     @Deprecated
     public void waitForProcessToFinish(final ProcessInstance processInstance, final String state) throws Exception {
-        waitForProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, state);
+        waitForProcessToFinish(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, state);
     }
 
     @Deprecated

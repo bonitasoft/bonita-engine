@@ -65,7 +65,8 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId));
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                processDefinitionId));
         this.flowNodeDefinitionId = flowNodeDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
     }
@@ -151,9 +152,9 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, sFlowNodeInstance);
-        // if (!hasActionToExecute) {
-        setConnectorAndContainerToFailed(context, exception);
-        // }
+        if (!hasActionToExecute) {
+            setConnectorAndContainerToFailed(context, exception);
+        }
     }
 
     @Override

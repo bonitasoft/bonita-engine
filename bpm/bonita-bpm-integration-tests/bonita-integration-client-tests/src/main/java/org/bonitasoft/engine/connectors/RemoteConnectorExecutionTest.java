@@ -15,7 +15,6 @@ package org.bonitasoft.engine.connectors;
 
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -1063,7 +1062,6 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         addConnector.addInput("kind", new ExpressionBuilder().createConstantStringExpression("normal"));
         addConnector.throwErrorEventWhenFailed("error");
         final ProcessDefinition calledProcess = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, johnUser);
-
         // create parent process with call activity and boundary
         processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("parentProcess", "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -1075,20 +1073,10 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         processDefinitionBuilder.addTransition("errorBoundary", "errorTask");
         final ProcessDefinition callingProcess = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, johnUser);
         // start parent
-        final ProcessInstance processInstance = getProcessAPI().startProcess(callingProcess.getId());
+        final ProcessInstance startProcess = getProcessAPI().startProcess(callingProcess.getId());
 
         // the connector must trigger this exception step of the calling process
-        final ActivityInstance errorTask = waitForUserTask("errorTask", processInstance);
-
-        // Search the process instance target
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
-        searchOptionsBuilder.filter("name", "processWithConnector");
-        final List<ProcessInstance> targetProcessInstances = getProcessAPI().searchProcessInstances(searchOptionsBuilder.done()).getResult();
-        assertFalse(targetProcessInstances.isEmpty());
-
-        assignAndExecuteStep(errorTask, johnUser.getId());
-        waitForProcessToFinish(processInstance);
-        waitForProcessToBeInState(targetProcessInstances.get(0), ProcessInstanceState.ABORTED);
+        waitForUserTask("errorTask", startProcess);
 
         // clean up
         disableAndDeleteProcess(callingProcess);

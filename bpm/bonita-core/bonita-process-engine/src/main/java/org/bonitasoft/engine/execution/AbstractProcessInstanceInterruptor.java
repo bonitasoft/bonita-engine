@@ -38,146 +38,147 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
  */
 public abstract class AbstractProcessInstanceInterruptor {
 
-    private final TechnicalLoggerService logger;
 
-    public AbstractProcessInstanceInterruptor(final TechnicalLoggerService technicalLoggerService) {
-        super();
-        logger = technicalLoggerService;
-    }
+	private final TechnicalLoggerService logger;
+
+	public AbstractProcessInstanceInterruptor(final TechnicalLoggerService technicalLoggerService) {
+		super();
+		logger = technicalLoggerService;
+	}
 
     public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long userId)
             throws SProcessInstanceNotFoundException, SBonitaException {
-        setProcessStateCategory(processInstanceId, stateCategory);
-        final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory);
-        if (stableChildrenIds != null) {
-            for (final Long childId : stableChildrenIds) {
-                resumeChildExecution(childId, processInstanceId, userId);
-            }
-        }
-    }
+		setProcessStateCategory(processInstanceId, stateCategory);
+		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory);
+		if (stableChildrenIds != null) {
+			for (final Long childId : stableChildrenIds) {
+				resumeChildExecution(childId, processInstanceId, userId);
+			}
+		}
+	}
 
-    public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long userId, final long exceptionChildId)
+	public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long userId, final long exceptionChildId)
             throws SProcessInstanceNotFoundException, SBonitaException {
-        setProcessStateCategory(processInstanceId, stateCategory);
-        final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, exceptionChildId);
-        if (stableChildrenIds != null) {
-            for (final Long childId : stableChildrenIds) {
-                resumeChildExecution(childId, processInstanceId, userId);
-            }
-        }
-    }
+		setProcessStateCategory(processInstanceId, stateCategory);
+		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, exceptionChildId);
+		if (stableChildrenIds != null) {
+			for (final Long childId : stableChildrenIds) {
+				resumeChildExecution(childId, processInstanceId, userId);
+			}
+		}
+	}
 
-    public void interruptChildrenOnly(final long processInstanceId, final SStateCategory stateCategory, final long userId, final long interruptorChildId)
-            throws SBonitaException {
-        final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, interruptorChildId);
-        if (stableChildrenIds != null) {
-            for (final Long childId : stableChildrenIds) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Resume child in stateCategory " + stateCategory + " id = " + childId);
-                }
-                resumeChildExecution(childId, processInstanceId, userId);
-            }
-        }
-    }
+	public void interruptChildrenOnly(final long processInstanceId, final SStateCategory stateCategory, final long userId, final long interruptorChildId)
+			throws SBonitaException {
+		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, interruptorChildId);
+		if (stableChildrenIds != null) {
+			for (final Long childId : stableChildrenIds) {
+				if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+					logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Resume child in stateCategory " + stateCategory + " id = " + childId);
+				}
+				resumeChildExecution(childId, processInstanceId, userId);
+			}
+		}
+	}
 
     protected abstract void setProcessStateCategory(long processInstanceId, SStateCategory stateCategory) throws SProcessInstanceNotFoundException,
             SBonitaException;
 
-    protected abstract void resumeChildExecution(long childId, long processInstanceId, long userId) throws SBonitaException;
+	protected abstract void resumeChildExecution(long childId, long processInstanceId, long userId) throws SBonitaException;
 
-    private List<Long> interruptChildrenFlowNodeInstances(final long processInstanceId, final SStateCategory stateCategory) throws SBonitaException {
-        final List<Long> allChildrenToResume = new ArrayList<Long>();
-        List<SFlowNodeInstance> children;
-        long count = 0;
-        do {
-            children = getChildren(processInstanceId);
-            count = getNumberOfChildren(processInstanceId);
+	private List<Long> interruptChildrenFlowNodeInstances(final long processInstanceId, final SStateCategory stateCategory) throws SBonitaException {
+		final List<Long> allChildrenToResume = new ArrayList<Long>();
+		List<SFlowNodeInstance> children;
+		long count = 0;
+		do {
+			children = getChildren(processInstanceId);
+			count = getNumberOfChildren(processInstanceId);
 
-            final List<Long> childrenToResume = interruptFlowNodeInstances(children, stateCategory);
-            allChildrenToResume.addAll(childrenToResume);
-        } while (count > children.size());
+			final List<Long> childrenToResume = interruptFlowNodeInstances(children, stateCategory);
+			allChildrenToResume.addAll(childrenToResume);
+		} while (count > children.size());
 
-        return allChildrenToResume;
-    }
+		return allChildrenToResume;
+	}
 
-    private List<Long> interruptChildrenFlowNodeInstances(final long processInstanceId, final SStateCategory stateCategory, final long exceptionChildId)
-            throws SBonitaException {
-        final List<Long> allChildrenToResume = new ArrayList<Long>();
-        List<SFlowNodeInstance> children;
-        long count = 0;
-        do {
-            children = getChildrenExcept(processInstanceId, exceptionChildId);
-            count = getNumberOfChildrenExcept(processInstanceId, exceptionChildId);
+	private List<Long> interruptChildrenFlowNodeInstances(final long processInstanceId, final SStateCategory stateCategory, final long exceptionChildId)
+			throws SBonitaException {
+		final List<Long> allChildrenToResume = new ArrayList<Long>();
+		List<SFlowNodeInstance> children;
+		long count = 0;
+		do {
+			children = getChildrenExcept(processInstanceId, exceptionChildId);
+			count = getNumberOfChildrenExcept(processInstanceId, exceptionChildId);
 
-            final List<Long> childrenToResume = interruptFlowNodeInstances(children, stateCategory);
-            allChildrenToResume.addAll(childrenToResume);
-        } while (count > children.size());
+			final List<Long> childrenToResume = interruptFlowNodeInstances(children, stateCategory);
+			allChildrenToResume.addAll(childrenToResume);
+		} while (count > children.size());
 
-        return allChildrenToResume;
-    }
+		return allChildrenToResume;
+	}
 
-    protected abstract List<SFlowNodeInstance> getChildren(final long processInstanceId) throws SBonitaException;
+	protected abstract List<SFlowNodeInstance> getChildren(final long processInstanceId) throws SBonitaException;
 
-    protected abstract long getNumberOfChildren(final long processInstanceId) throws SBonitaSearchException;
+	protected abstract long getNumberOfChildren(final long processInstanceId) throws SBonitaSearchException;
 
-    protected abstract List<SFlowNodeInstance> getChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaException;
+	protected abstract List<SFlowNodeInstance> getChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaException;
 
-    protected abstract long getNumberOfChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaSearchException;
+	protected abstract long getNumberOfChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaSearchException;
 
-    private List<Long> interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory) throws SBonitaException {
-        final List<Long> childrenToResume = new ArrayList<Long>();
-        for (final SFlowNodeInstance child : children) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                        "Put element in " + stateCategory + ", id= " + child.getId() + " name = " + child.getName() + " state = " + child.getStateName());
-            }
-            setChildStateCategory(child.getId(), stateCategory);
-            if (child.mustExecuteOnAbortOrCancelProcess()) {
-                childrenToResume.add(child.getId());
-            }
-        }
-        return childrenToResume;
-    }
+	private List<Long> interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory) throws SBonitaException {
+		final List<Long> childrenToResume = new ArrayList<Long>();
+		for (final SFlowNodeInstance child : children) {
+			if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+				logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+						"Put element in " + stateCategory + ", id= " + child.getId() + " name = " + child.getName() + " state = " + child.getStateName());
+			}
+			setChildStateCategory(child.getId(), stateCategory);
+			if (child.mustExecuteOnAbortOrCancelProcess()) {
+				childrenToResume.add(child.getId());
+			}
+		}
+		return childrenToResume;
+	}
 
-    protected abstract void setChildStateCategory(long flowNodeInstanceId, SStateCategory stateCategory) throws SBonitaException;
+	protected abstract void setChildStateCategory(long flowNodeInstanceId, SStateCategory stateCategory) throws SBonitaException;
 
-    protected QueryOptions getQueryOptions(final long processInstanceId) {
-        final int numberOfResults = 100;
+	protected QueryOptions getQueryOptions(final long processInstanceId) {
+		final int numberOfResults = 100;
 
-        final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
-        orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC));
+		final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
+		orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC));
 
-        final List<FilterOption> filterOptions = getFilterOptions(processInstanceId);
-        return new QueryOptions(0, numberOfResults, orderByOptions, filterOptions, null);
-    }
+		final List<FilterOption> filterOptions = getFilterOptions(processInstanceId);
+		return new QueryOptions(0, numberOfResults, orderByOptions, filterOptions, null);
+	}
 
-    protected QueryOptions getQueryOptions(final long processInstanceId, final long childExceptionId) {
-        final int numberOfResults = 100;
+	protected QueryOptions getQueryOptions(final long processInstanceId, final long childExceptionId) {
+		final int numberOfResults = 100;
 
-        final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
-        orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC));
+		final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
+		orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC));
 
-        final List<FilterOption> filterOptions = getFilterOptions(processInstanceId, childExceptionId);
-        return new QueryOptions(0, numberOfResults, orderByOptions, filterOptions, null);
-    }
+		final List<FilterOption> filterOptions = getFilterOptions(processInstanceId, childExceptionId);
+		return new QueryOptions(0, numberOfResults, orderByOptions, filterOptions, null);
+	}
 
-    protected List<FilterOption> getFilterOptions(final long processInstanceId) {
-        final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        final List<FilterOption> filterOptions = new ArrayList<FilterOption>(3);
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-        return filterOptions;
-    }
+	protected List<FilterOption> getFilterOptions(final long processInstanceId) {
+	    final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+		final List<FilterOption> filterOptions = new ArrayList<FilterOption>(3);
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+		return filterOptions;
+	}
 
-    protected List<FilterOption> getFilterOptions(final long processInstanceId, final long childExceptionId) {
-        final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        final List<FilterOption> filterOptions = new ArrayList<FilterOption>(3);
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getIdKey(), childExceptionId, FilterOperationType.DIFFERENT));
-        return filterOptions;
-    }
+	protected List<FilterOption> getFilterOptions(final long processInstanceId, final long childExceptionId) {
+	    final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+		final List<FilterOption> filterOptions = new ArrayList<FilterOption>(3);
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getIdKey(), childExceptionId, FilterOperationType.DIFFERENT));
+		return filterOptions;
+	}
 
 }
