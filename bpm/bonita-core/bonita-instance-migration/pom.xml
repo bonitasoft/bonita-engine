@@ -11,6 +11,5 @@
 	<modules>
 		<module>bonita-instance-migration-api</module>
 		<module>bonita-instance-migration-impl</module>
-		<module>bonita-instance-migration-impl-hibernate</module>
 	</modules>
 </project>
