@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -34,6 +33,8 @@ import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -826,6 +827,60 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         waitForUserTaskAndExecuteIt("step2", pi, pedro);
         waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
+    }
+
+    /**
+     * BS-8850 [Regression] STransactionCommitException using variable 'loopCounter' in task loop condition
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void runProcessWithLoopAndLoopCounter_Should_EndNormally() throws Exception {
+        // given: 1 tenant that is paused
+        logoutThenloginAs("pedro", "secreto");
+
+        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        pdb.addActor(ACTOR_NAME).addManualTask("step1", ACTOR_NAME).addLoop(false,
+                new ExpressionBuilder().createGroovyScriptExpression("counterLoopLessThan3", "return loopCounter<3", "java.lang.Boolean"));
+        DesignProcessDefinition dpd = pdb.done();
+        ProcessDefinition pd = deployAndEnableProcessWithActor(dpd, ACTOR_NAME, pedro);
+        ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
+        waitForUserTaskAndExecuteIt("step1", pi.getId(), pedro);
+        waitForUserTaskAndExecuteIt("step1", pi.getId(), pedro);
+        waitForUserTaskAndExecuteIt("step1", pi.getId(), pedro);
+        waitForProcessToFinish(pi.getId());
+
+        disableAndDeleteProcess(pd);
+    }
+
+    /**
+     * BS-8674 [Regression] STransactionCommitException using variable 'loopCounter' in task loop condition
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void runProcessAndDeleteProcessInstance_should_DeleteArchivedTask() throws Exception {
+        logoutThenloginAs("pedro", "secreto");
+
+        // Parent Process
+        ProcessDefinitionBuilder parentProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Parent Process", "1.0");
+        parentProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("start").addEndEvent("end")
+                .addAutomaticTask("task1").addManualTask("step1", ACTOR_NAME);
+        parentProcessDefinitionBuilder.addTransition("start", "task1").addTransition("task1", "step1").addTransition("step1", "end");
+
+        DesignProcessDefinition parentDesignProcessDefinition = parentProcessDefinitionBuilder.done();
+        ProcessDefinition parentProcessDefinition = deployAndEnableProcessWithActor(parentDesignProcessDefinition, ACTOR_NAME, pedro);
+
+        ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcessDefinition.getId());
+
+        waitForUserTask("step1", parentProcessInstance);
+
+        getProcessAPI().deleteProcessInstance(parentProcessInstance.getId());
+        List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(parentProcessInstance.getId(), 0, 100,
+                ActivityInstanceCriterion.DEFAULT);
+        assertThat(archivedActivityInstances).isEmpty();
+
+        disableAndDeleteProcess(parentProcessDefinition);
     }
 
 }
