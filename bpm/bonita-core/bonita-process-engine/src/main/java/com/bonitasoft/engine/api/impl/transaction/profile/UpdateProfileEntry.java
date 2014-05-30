@@ -40,15 +40,12 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
 
     private SProfileEntry sProfileEntry = null;
 
-    private final long updatedById;
-
     public UpdateProfileEntry(final ProfileService profileService, final Long profileEntryId,
-            final ProfileEntryUpdater updateDescriptor, final long updatedById) {
+            final ProfileEntryUpdater updateDescriptor) {
         super();
         this.profileService = profileService;
         this.profileEntryId = profileEntryId;
         this.updateDescriptor = updateDescriptor;
-        this.updatedById = updatedById;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         }
 
         profileService.updateProfileEntry(sProfileEntry, profileEntryUpdateDescriptor);
-        profileService.updateProfileMetaData(sProfileEntry.getProfileId(), updatedById);
+        profileService.updateProfileMetaData(sProfileEntry.getProfileId());
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
     }
 

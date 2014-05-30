@@ -41,9 +41,7 @@ public class DeleteProfileEntry implements TransactionContent {
 
     private SProfileEntry sDeletedProfileEntry;
 
-    private long updatedById;
-
-    public DeleteProfileEntry(final ProfileService profileService, final long profileEntryId, long updatedById) {
+    public DeleteProfileEntry(final ProfileService profileService, final long profileEntryId) {
         super();
         this.profileService = profileService;
         this.profileEntryId = profileEntryId;
@@ -56,7 +54,7 @@ public class DeleteProfileEntry implements TransactionContent {
             deleteProfileEntryChildren();
             profileService.deleteProfileEntry(profileEntryId);
             updateProfileEntriesIndexOnDelete();
-            profileService.updateProfileMetaData(sDeletedProfileEntry.getProfileId(), updatedById);
+            profileService.updateProfileMetaData(sDeletedProfileEntry.getProfileId());
         }
     }
 

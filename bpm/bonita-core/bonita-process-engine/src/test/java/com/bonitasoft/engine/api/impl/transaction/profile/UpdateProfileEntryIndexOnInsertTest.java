@@ -46,7 +46,7 @@ public class UpdateProfileEntryIndexOnInsertTest {
     @Test
     public void should_updateProfileEntryIndex_update_profileMetaData() throws Exception {
 
-        final UpdateProfileEntryIndexOnInsert updateProfileEntry = spy(new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry, 1l));
+        final UpdateProfileEntryIndexOnInsert updateProfileEntry = spy(new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry));
 
         final Answer<List<SProfileEntry>> answer = new Answer<List<SProfileEntry>>() {
 
@@ -71,7 +71,7 @@ public class UpdateProfileEntryIndexOnInsertTest {
         updateProfileEntry.execute();
 
         // then
-        verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
+        verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 
 }

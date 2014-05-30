@@ -52,7 +52,7 @@ public class UpdateProfileEntryTest {
     public void should_updateProfileEntry_update_profileMetaData() throws Exception {
         final Long profileEntryId = 1L;
         final long updatedById = 0;
-        final UpdateProfileEntry updateProfileEntry = spy(new UpdateProfileEntry(profileService, profileEntryId, updateDescriptor, updatedById));
+        final UpdateProfileEntry updateProfileEntry = spy(new UpdateProfileEntry(profileService, profileEntryId, updateDescriptor));
 
         doReturn(profileEntryUpdateBuilder).when(updateProfileEntry).getUpdateBuilder();
         doReturn(entityUpdateDescriptor).when(updateProfileEntry).getProfileEntryUpdateDescriptor();
@@ -61,6 +61,6 @@ public class UpdateProfileEntryTest {
         updateProfileEntry.execute();
 
         // then
-        verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
+        verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 }

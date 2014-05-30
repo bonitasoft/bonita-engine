@@ -35,13 +35,13 @@ public class DeleteProfileEntryTest {
         final long profileEntryId = 1l;
 
         // given
-        final DeleteProfileEntry deleteProfileEntry = spy(new DeleteProfileEntry(profileService, profileEntryId, 1l));
+        final DeleteProfileEntry deleteProfileEntry = spy(new DeleteProfileEntry(profileService, profileEntryId));
 
         // when
         deleteProfileEntry.execute();
 
         // then
-        verify(profileService, times(1)).updateProfileMetaData(anyLong(), anyLong());
+        verify(profileService, times(1)).updateProfileMetaData(anyLong());
 
     }
 }

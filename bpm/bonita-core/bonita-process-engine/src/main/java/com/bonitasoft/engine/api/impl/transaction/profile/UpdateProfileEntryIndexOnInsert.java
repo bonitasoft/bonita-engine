@@ -50,9 +50,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     private SProfileEntry insertedProfileEntry = null;
 
-    private long updatedById;
-
-    public UpdateProfileEntryIndexOnInsert(final ProfileService profileService, final SProfileEntry profileEntry, long updatedById) {
+    public UpdateProfileEntryIndexOnInsert(final ProfileService profileService, final SProfileEntry profileEntry) {
         super();
         this.profileService = profileService;
         insertedProfileEntry = profileEntry;
@@ -79,7 +77,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
             }
             loopIndex++;
         } while (!profileEntryList.isEmpty());
-        profileService.updateProfileMetaData(insertedProfileEntry.getProfileId(), updatedById);
+        profileService.updateProfileMetaData(insertedProfileEntry.getProfileId());
     }
 
     private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final long fromIndex) throws SBonitaSearchException {
