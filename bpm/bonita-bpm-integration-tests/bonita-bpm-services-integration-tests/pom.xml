@@ -528,7 +528,7 @@
 		<!-- Process Migration -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-instance-migration-impl</artifactId>
+			<artifactId>bonita-instance-migration-impl-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

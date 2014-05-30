@@ -2,11 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>bonita-instance-migration</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
+		<artifactId>bonita-core</artifactId>
 		<version>6.3.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>bonita-instance-migration-impl</artifactId>
+	
+	<artifactId>bonita-instance-migration-impl-sp</artifactId>
 
 	<dependencies>
 		<dependency>
