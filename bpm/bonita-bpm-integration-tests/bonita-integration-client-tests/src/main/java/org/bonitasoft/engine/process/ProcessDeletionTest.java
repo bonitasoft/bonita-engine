@@ -188,7 +188,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that archived flow nodes were not deleted.
         taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT);
-        assertEquals(3, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Deprecated
@@ -215,7 +215,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start P3, the call activities will start instances of P2 a and P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance);
+        final ActivityInstance simpleTask = waitForUserTask(simpleStepName);
         final long simpleProcessInstanceId = simpleTask.getParentProcessInstanceId();
 
         // execute simple task: p1 will finish
@@ -316,12 +316,12 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that the archived instances of p1 were not deleted
         archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
-        assertEquals(3, archivedProcessInstanceList.size());
+        assertEquals(0, archivedProcessInstanceList.size());
 
-        // check that archived flow node were not deleted.
+        // check that archived flow node were deleted since their parent process instance has been deleted
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 10,
                 ActivityInstanceCriterion.DEFAULT);
-        assertEquals(8, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Test
@@ -531,7 +531,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that all archived process instance related to this process were deleted
         final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10);
-        assertEquals(1, archivedProcessInstanceList.size());
+        assertEquals(0, archivedProcessInstanceList.size());
     }
 
     @Test

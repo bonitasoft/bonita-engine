@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Collections.singletonMap;
+import static java.util.Collections.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -3517,7 +3517,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
+                    processInstanceService.deleteProcessInstance(processInstanceId);
                     return null;
                 }
             });
