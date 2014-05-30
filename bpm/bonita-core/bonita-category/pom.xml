@@ -17,8 +17,5 @@
 	<modules>
 		<module>bonita-category-api</module>
 		<module>bonita-category-api-impl</module>
-		<module>bonita-category-model</module>
-		<module>bonita-category-model-impl</module>
-		<module>bonita-category-model-impl-hibernate</module>
 	</modules>
 </project>
