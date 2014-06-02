@@ -78,9 +78,6 @@ public class ProcessInstanceServiceImplTest {
     @Mock
     private Recorder mock;
 
-    @Mock
-    private ArchiveService archiveService;
-
     @Before
     public void setUp() throws SBonitaException {
 
@@ -88,7 +85,7 @@ public class ProcessInstanceServiceImplTest {
                 mock(ReadPersistenceService.class), mock(EventService.class),
                 mock(ActivityInstanceService.class), mock(TechnicalLoggerService.class),
                 eventService, mock(DataInstanceService.class),
-                archiveService, mock(TransitionService.class), mock(ProcessDefinitionService.class), mock(ConnectorInstanceService.class),
+                mock(ArchiveService.class), mock(TransitionService.class), mock(ProcessDefinitionService.class), mock(ConnectorInstanceService.class),
                 classLoaderService, mock(ProcessDocumentService.class), mock(SCommentService.class), mock(TokenService.class)));
 
         doCallRealMethod().when(mockedProcessInstanceService).deleteParentProcessInstanceAndElements(anyList());
@@ -199,12 +196,11 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void testDeleteProcessInstance_delete_archived_activity() throws Exception {
         SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = mock(ClassLoader.class);
         when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
-        when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(mock(ReadPersistenceService.class));
         processInstanceService.deleteProcessInstance(sProcessInstance);
         verify(processInstanceService, times(1)).deleteProcessInstanceElements(sProcessInstance);
-        verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
         verify(processInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());
+        
     }
 }

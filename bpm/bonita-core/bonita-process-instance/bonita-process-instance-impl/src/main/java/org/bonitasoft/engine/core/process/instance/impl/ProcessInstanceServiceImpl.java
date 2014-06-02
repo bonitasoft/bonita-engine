@@ -318,8 +318,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             connectorInstanceService.deleteArchivedConnectorInstances(processInstanceId, SConnectorInstance.PROCESS_TYPE);
             transitionService.deleteArchivedTransitionsOfProcessInstance(processInstanceId);
             commentService.deleteArchivedComments(processInstanceId);
-            deleteArchivedChildrenProcessInstanceElements(processInstanceId, processDefinitionId);
-            deleteArchivedProcessInstancesOfProcessInstance(processInstanceId);
+            deleteArchivedChidrenProcessInstanceElements(processInstanceId, processDefinitionId);
         } catch (final SBonitaException e) {
             throw new SProcessInstanceModificationException(e);
         } finally {
@@ -327,7 +326,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void deleteArchivedChildrenProcessInstanceElements(final long processInstanceId, final long processDefinitionId) throws SBonitaException {
+    private void deleteArchivedChidrenProcessInstanceElements(final long processInstanceId, final long processDefinitionId) throws SBonitaException {
         List<Long> childrenProcessInstanceIds = null;
         do {
             // from index always will be zero because elements will be deleted
@@ -396,7 +395,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteProcessInstanceElements(sProcessInstance);
-            deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
+            deleteArchivedFlowNodeInstances(sProcessInstance.getId());
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
