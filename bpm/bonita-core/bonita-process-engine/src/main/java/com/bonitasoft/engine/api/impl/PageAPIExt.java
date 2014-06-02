@@ -250,14 +250,25 @@ public class PageAPIExt implements PageAPI {
         final SPageUpdateContentBuilder pageUpdateContentBuilder = getPageUpdateContentBuilder();
 
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
-        pageUpdateContentBuilder.updateContent(content);
 
         try {
+
+            final byte[] zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
+            final Properties pageProperties = new Properties();
+            pageProperties.load(new ByteArrayInputStream(zipEntryContent));
+            pageUpdateBuilder.updateName(pageProperties.getProperty(PageService.PROPERTIES_NAME));
+            pageUpdateBuilder.updateDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME));
+            pageUpdateBuilder.updateDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
+
+            pageUpdateContentBuilder.updateContent(content);
+
             pageService.updatePageContent(pageId, pageUpdateContentBuilder.done());
             pageService.updatePage(pageId, pageUpdateBuilder.done());
 
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
+        } catch (final IOException e) {
+            throw new UpdateException("Error while reading zip file", e);
         }
     }
 

@@ -101,6 +101,8 @@ public class PageServiceImpl implements PageService {
 
     private static final String METHOD_UPDATE_PAGE = "updatePage";
 
+    public static final String PAGE_TOKEN_PREFIX = "custompage_";
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -641,7 +643,5 @@ public class PageServiceImpl implements PageService {
     protected boolean isPageTokenValid(final String urlToken) {
         return urlToken.matches(PAGE_TOKEN_PREFIX + "\\p{Alnum}+");
     }
-
-    private static final String PAGE_TOKEN_PREFIX = "custompage_";
 
 }
