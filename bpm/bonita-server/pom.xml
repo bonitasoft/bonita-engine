@@ -460,17 +460,12 @@
     <!-- Platform Session -->
     <dependency>
       <groupId>org.bonitasoft.engine.platform.session</groupId>
-      <artifactId>bonita-platform-session-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.platform.session</groupId>
-      <artifactId>bonita-platform-session-api-impl</artifactId>
+      <artifactId>bonita-platform-session-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.bonitasoft.engine.platform.session</groupId>
-      <artifactId>bonita-platform-session-clustered-impl</artifactId>
+      <artifactId>bonita-platform-session-clustered</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -920,11 +915,9 @@
                   <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
                   <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
                   <!-- Platform Session -->
-                  <include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
-                  <include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
                   <include>org.bonitasoft.engine.platform.session:bonita-platform-session-api</include>
-                  <include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
-                  <include>com.bonitasoft.engine.platform.session:bonita-platform-session-clustered-impl</include>
+                  <include>org.bonitasoft.engine.platform.session:bonita-platform-session-impl</include>
+                  <include>com.bonitasoft.engine.platform.session:bonita-platform-session-clustered</include>
                   <!-- Process Comment -->
                   <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
                   <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>
