@@ -8,7 +8,7 @@
 		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-platform-api-impl</artifactId>
+	<artifactId>bonita-platform-impl</artifactId>
 
 	<name>Bonita Platform: Serivce Implementation</name>
 
@@ -55,12 +55,6 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.platform</groupId>
-            <artifactId>bonita-platform-model-impl</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 	</dependencies>
