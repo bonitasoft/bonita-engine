@@ -202,7 +202,7 @@ public class ProcessInstanceServiceImplTest {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
         when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(mock(ReadPersistenceService.class));
-        processInstanceService.deleteProcessInstance(sProcessInstance);
+        processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteProcessInstanceElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
         verify(processInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());

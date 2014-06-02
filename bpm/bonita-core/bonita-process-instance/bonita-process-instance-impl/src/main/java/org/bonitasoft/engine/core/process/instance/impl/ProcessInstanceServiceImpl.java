@@ -235,6 +235,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
         try {
             deleteProcessInstance(sProcessInstance);
+            deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
         } catch (final SProcessInstanceModificationException e) {
             try {
                 getProcessInstance(sProcessInstance.getId());
@@ -396,7 +397,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteProcessInstanceElements(sProcessInstance);
-            deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {

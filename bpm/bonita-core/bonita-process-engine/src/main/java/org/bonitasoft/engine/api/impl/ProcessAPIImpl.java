@@ -3517,7 +3517,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    processInstanceService.deleteProcessInstance(processInstanceId);
+                    processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
                     return null;
                 }
             });
