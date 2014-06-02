@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.ExecutorService;
-
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -25,6 +23,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public interface WorkSynchronizationFactory {
 
-    AbstractWorkSynchronization getWorkSynchronization(ExecutorService executorService, TechnicalLoggerService loggerService, SessionAccessor sessionAccessor);
+    AbstractWorkSynchronization getWorkSynchronization(BonitaExecutorService executorService, TechnicalLoggerService loggerService,
+            SessionAccessor sessionAccessor);
 
 }

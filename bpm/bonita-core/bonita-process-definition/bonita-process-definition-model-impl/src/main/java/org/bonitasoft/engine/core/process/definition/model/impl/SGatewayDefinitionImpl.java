@@ -56,4 +56,16 @@ public class SGatewayDefinitionImpl extends SFlowNodeDefinitionImpl implements S
         return SFlowNodeType.GATEWAY;
     }
 
+    @Override
+    public boolean isParalleleOrInclusive() {
+        final SGatewayType gatewayType = ((SGatewayDefinition) this).getGatewayType();
+        return SGatewayType.PARALLEL.equals(gatewayType) || SGatewayType.INCLUSIVE.equals(gatewayType);
+    }
+
+    @Override
+    public boolean isExclusive() {
+        final SGatewayType gatewayType = ((SGatewayDefinition) this).getGatewayType();
+        return SGatewayType.EXCLUSIVE.equals(gatewayType);
+    }
+
 }
