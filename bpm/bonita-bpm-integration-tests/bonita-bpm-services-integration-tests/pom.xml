@@ -416,13 +416,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-api-impl</artifactId>
+			<artifactId>bonita-platform-session-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
