@@ -99,19 +99,7 @@
 		<!-- platform-command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-model-impl</artifactId>
+			<artifactId>bonita-platform-command-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
