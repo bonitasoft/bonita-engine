@@ -249,19 +249,7 @@
 		<!-- Document -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
 			<artifactId>bonita-document-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
