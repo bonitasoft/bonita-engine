@@ -319,8 +319,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             connectorInstanceService.deleteArchivedConnectorInstances(processInstanceId, SConnectorInstance.PROCESS_TYPE);
             transitionService.deleteArchivedTransitionsOfProcessInstance(processInstanceId);
             commentService.deleteArchivedComments(processInstanceId);
-            deleteArchivedChildrenProcessInstanceElements(processInstanceId, processDefinitionId);
-            deleteArchivedProcessInstancesOfProcessInstance(processInstanceId);
+            deleteArchivedChidrenProcessInstanceElements(processInstanceId, processDefinitionId);
         } catch (final SBonitaException e) {
             throw new SProcessInstanceModificationException(e);
         } finally {
@@ -328,7 +327,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void deleteArchivedChildrenProcessInstanceElements(final long processInstanceId, final long processDefinitionId) throws SBonitaException {
+    private void deleteArchivedChidrenProcessInstanceElements(final long processInstanceId, final long processDefinitionId) throws SBonitaException {
         List<Long> childrenProcessInstanceIds = null;
         do {
             // from index always will be zero because elements will be deleted
@@ -340,7 +339,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    protected void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
+    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
             SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
         List<SAFlowNodeInstance> activityInstances;
         do {
@@ -426,7 +425,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    protected void deleteProcessInstanceElements(final SProcessInstance processInstance) throws SBonitaException {
+    private void deleteProcessInstanceElements(final SProcessInstance processInstance) throws SBonitaException {
         SProcessDefinition processDefinition = null;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
