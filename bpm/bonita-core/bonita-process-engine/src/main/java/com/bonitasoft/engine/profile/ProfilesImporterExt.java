@@ -163,6 +163,9 @@ public class ProfilesImporterExt extends ProfilesImporter {
         if (exportedProfile.hasCustomPages()) {
             featuresToCheck.add(Features.CUSTOM_PAGE);
         }
+        if ("Process manager".equals(exportedProfile.getName())) {
+            featuresToCheck.add(Features.WEB_PROFILE_PO);
+        }
         for (final String feature : featuresToCheck) {
             try {
                 LicenseChecker.getInstance().checkLicenceAndFeature(feature);
