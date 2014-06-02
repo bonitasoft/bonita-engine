@@ -12,7 +12,7 @@
 		
 		<property name="debugZeroResourceTransaction" value="false" />
 		<property name="warnAboutZeroResourceTransaction" value="false" />
-		<property name="defaultTransactionTimeout" value="30000000" />
+		<property name="defaultTransactionTimeout" value="1000" />
 	</bean>
 
 	<!-- create BTM transaction manager -->
