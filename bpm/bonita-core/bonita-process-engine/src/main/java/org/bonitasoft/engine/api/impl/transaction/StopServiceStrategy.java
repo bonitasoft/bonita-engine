@@ -33,4 +33,9 @@ public class StopServiceStrategy implements ServiceStrategy {
         service.stop();
     }
 
+    @Override
+    public boolean shouldRefreshClassLoaders() {
+        return false;
+    }
+
 }

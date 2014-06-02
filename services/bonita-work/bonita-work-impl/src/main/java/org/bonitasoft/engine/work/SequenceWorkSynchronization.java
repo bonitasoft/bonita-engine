@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.work;
 
 import java.util.Collection;
-import java.util.concurrent.ExecutorService;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -28,7 +27,8 @@ public class SequenceWorkSynchronization extends AbstractWorkSynchronization {
 
     private final TechnicalLoggerService loggerService;
 
-    public SequenceWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor) {
+    public SequenceWorkSynchronization(final BonitaExecutorService executorService, final TechnicalLoggerService loggerService,
+            final SessionAccessor sessionAccessor) {
         super(executorService, sessionAccessor);
         this.loggerService = loggerService;
     }

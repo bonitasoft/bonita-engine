@@ -94,7 +94,8 @@ public class EngineInitializer {
                     LOGGER.log(Level.INFO, "Platform is already initialized.", e);
                     // platform is already initialized.
                 }
-                // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to start
+                // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to
+                // start
                 LOGGER.log(Level.INFO, "Starting platform...");
                 startPlatform(platformAPI);
                 LOGGER.log(Level.INFO, "Platform started successfully");
@@ -156,6 +157,8 @@ public class EngineInitializer {
             }
         } catch (PlatformNotFoundException e) {
             LOGGER.log(Level.WARNING, "The platform cannot be stopped because it does not exist!");
+        } catch (Throwable e) {
+            LOGGER.log(Level.SEVERE, "Issue while stopping the platform", e);
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
