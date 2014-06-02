@@ -15,9 +15,7 @@
 	<name>Bonita Session</name>
 
 	<modules>
-		<module>bonita-session-model</module>
-		<module>bonita-session-model-impl</module>
 		<module>bonita-session-api</module>
-		<module>bonita-session-api-impl</module>
+		<module>bonita-session-impl</module>
 	</modules>
 </project>

@@ -514,13 +514,7 @@
 		<!-- Session -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session-model-impl</artifactId>
+			<artifactId>bonita-session-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
