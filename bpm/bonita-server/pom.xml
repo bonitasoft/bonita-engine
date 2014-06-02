@@ -267,11 +267,6 @@
       <artifactId>bonita-external-identity-mapping-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
-      <artifactId>bonita-external-identity-mapping-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Home Server -->
     <dependency>
@@ -299,11 +294,6 @@
     </dependency>
 
     <!-- Identity -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.identity</groupId>
-      <artifactId>bonita-identity-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.bonitasoft.engine.identity</groupId>
       <artifactId>bonita-identity-impl</artifactId>
@@ -832,15 +822,12 @@
                   <!-- External Identity Mapping -->
                   <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api</include>
                   <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl</include>
-                  <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl-hibernate</include>
                   <!-- Home Server -->
                   <include>org.bonitasoft.engine.core:bonita-home-server</include>
                   <!-- Incident -->
                   <include>org.bonitasoft.engine.incident:bonita-incident-api</include>
                   <include>org.bonitasoft.engine.incident:bonita-incident-log</include>
                   <!-- Identity -->
-                  <include>org.bonitasoft.engine.identity:bonita-identity-model</include>
-                  <include>org.bonitasoft.engine.identity:bonita-identity-model-impl</include>
                   <include>org.bonitasoft.engine.identity:bonita-identity-api</include>
                   <include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
                   <!-- Lock -->
