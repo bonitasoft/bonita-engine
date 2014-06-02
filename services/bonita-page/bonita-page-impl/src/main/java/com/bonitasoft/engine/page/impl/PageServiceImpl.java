@@ -71,6 +71,8 @@ import com.bonitasoft.engine.page.SPageLogBuilder;
 import com.bonitasoft.engine.page.SPageUpdateBuilder;
 import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import com.bonitasoft.engine.page.SPageWithContent;
+import com.bonitasoft.engine.page.impl.exception.SInvalidPageTokenException;
+import com.bonitasoft.engine.page.impl.exception.SInvalidPageZipContentException;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
@@ -78,6 +80,14 @@ import com.bonitasoft.manager.Manager;
  * @author Baptiste Mesta
  */
 public class PageServiceImpl implements PageService {
+
+    public static final String PAGE_PROPERTIES_CONTENT_IS_NOT_VALID = "page.properties content is not valid";
+
+    public static final String PAGE_CONTENT_DOES_NOT_CONTAINS_A_PAGE_PROPERTIES_FILE = "Page content does not contains a page.properties file";
+
+    public static final String PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE = "Page content does not contains a Index.groovy or index.html file";
+
+    public static final String PAGE_CONTENT_IS_NOT_A_VALID_ZIP_FILE = "Page content is not a valid zip file";
 
     private static final String QUERY_GET_PAGE_CONTENT = "getPageContent";
 
@@ -143,7 +153,9 @@ public class PageServiceImpl implements PageService {
                 throwAlreadyExistsException(pageByName.getName());
             }
 
-            checkContentIsValid(content);
+            if (!page.isProvided()) {
+                checkContentIsValid(content);
+            }
 
             recorder.recordInsert(insertContentRecord, insertContentEvent);
             page.setId(pageContent.getId());
@@ -326,23 +338,23 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         check();
-        SPage page = getPage(pageId);
+        final SPage page = getPage(pageId);
         final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
                 SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
-        byte[] content = pageContent.getContent();
+        final byte[] content = pageContent.getContent();
         try {
-            Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
-            Properties pageProperties = new Properties();
+            final Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
+            final Properties pageProperties = new Properties();
             pageProperties.put(PROPERTIES_NAME, page.getName());
             pageProperties.put(PROPERTIES_DISPLAY_NAME, page.getDisplayName());
             pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
             contentAsMap.put("page.properties", IOUtil.getPropertyAsString(pageProperties).getBytes());
 
             return IOUtil.zip(contentAsMap);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SBonitaReadException("the page is not a valid zip file", e);
         }
 
@@ -550,27 +562,34 @@ public class PageServiceImpl implements PageService {
         // nothing to do
     }
 
-    protected void checkPageContentIsValid(final EntityUpdateDescriptor entityUpdateDescriptor)
-            throws SBonitaReadException {
+    protected void checkPageContentIsValid(final EntityUpdateDescriptor entityUpdateDescriptor) throws SInvalidPageZipContentException,
+            SInvalidPageTokenException
+    {
         if (null == entityUpdateDescriptor) {
-            throw new SBonitaReadException("page content error");
+            throw new SInvalidPageZipContentException("page content error");
         }
         final Map<String, Object> fields = entityUpdateDescriptor.getFields();
         if (!fields.containsKey(SPageContentFields.PAGE_CONTENT)) {
-            throw new SBonitaReadException("page content error");
+            throw new SInvalidPageZipContentException("page content error");
         }
         checkContentIsValid((byte[]) fields.get(SPageContentFields.PAGE_CONTENT));
 
     }
 
-    protected boolean checkContentIsValid(final byte[] content) throws SBonitaReadException {
+    protected boolean checkContentIsValid(final byte[] content) throws SInvalidPageZipContentException, SInvalidPageTokenException {
         final InputStream resourceAsStream = new ByteArrayInputStream(content);
         final ZipInputStream zin = new ZipInputStream(new BufferedInputStream(resourceAsStream));
+        boolean contentIsValid = false;
         boolean zipIsValid = false;
         boolean zipContainsIndex = false;
+        boolean zipContainsPageProperties = false;
+        boolean pagePropertiesContentIsValid = false;
+        boolean pageNameIsValid = false;
+        boolean pageDisplayNameIsValid = false;
+
         ZipEntry entry;
         try {
-            while ((entry = zin.getNextEntry()) != null && !zipContainsIndex) {
+            while ((entry = zin.getNextEntry()) != null) {
                 zipIsValid = true;
                 if (entry.getName().equals("Index.groovy")) {
                     zipContainsIndex = true;
@@ -578,18 +597,51 @@ public class PageServiceImpl implements PageService {
                 if (entry.getName().equalsIgnoreCase("index.html")) {
                     zipContainsIndex = true;
                 }
+                if (entry.getName().equals("page.properties")) {
+                    zipContainsPageProperties = true;
+                    final byte[] zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
+                    final Properties pageProperties = new Properties();
+                    pageProperties.load(new ByteArrayInputStream(zipEntryContent));
+                    pagePropertiesContentIsValid = pageProperties.containsKey(PageService.PROPERTIES_NAME)
+                            && pageProperties.containsKey(PageService.PROPERTIES_DISPLAY_NAME)
+                            && pageProperties.containsKey(PageService.PROPERTIES_DESCRIPTION);
+                    if (pagePropertiesContentIsValid) {
+                        pageNameIsValid = isPageTokenValid(pageProperties.getProperty(PageService.PROPERTIES_NAME));
+                        pageDisplayNameIsValid = pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME) != null
+                                && pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME).length() > 0;
+                    }
+                    pagePropertiesContentIsValid = pageNameIsValid && pageDisplayNameIsValid;
+                }
             }
             zin.close();
+            if (!zipIsValid) {
+                throw new SInvalidPageZipContentException(PAGE_CONTENT_IS_NOT_A_VALID_ZIP_FILE);
+            }
+            if (!zipContainsIndex) {
+                throw new SInvalidPageZipContentException(PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE);
+            }
+            if (!zipContainsPageProperties) {
+                throw new SInvalidPageZipContentException(PAGE_CONTENT_DOES_NOT_CONTAINS_A_PAGE_PROPERTIES_FILE);
+            }
+            if (!pageNameIsValid) {
+                throw new SInvalidPageTokenException(PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+            }
+            if (!pagePropertiesContentIsValid) {
+                throw new SInvalidPageZipContentException(PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+            }
         } catch (final IOException e) {
-            zipIsValid = false;
+            throw new SInvalidPageZipContentException(PAGE_CONTENT_IS_NOT_A_VALID_ZIP_FILE);
         }
 
-        if (!zipIsValid) {
-            throw new SBonitaReadException("Page content is not a valid zip file");
-        }
-        if (!zipContainsIndex) {
-            throw new SBonitaReadException("Page content does not contains a Index.groovy or index.html file");
-        }
-        return zipIsValid;
+        contentIsValid = zipIsValid && zipContainsIndex && zipContainsPageProperties && pagePropertiesContentIsValid && pageNameIsValid
+                && pageDisplayNameIsValid;
+        return contentIsValid;
     }
+
+    protected boolean isPageTokenValid(final String urlToken) {
+        return urlToken.matches(PAGE_TOKEN_PREFIX + "\\p{Alnum}+");
+    }
+
+    private static final String PAGE_TOKEN_PREFIX = "custompage_";
+
 }

@@ -10,15 +10,16 @@ package com.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
@@ -529,13 +530,24 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     private byte[] getPageContent(final String fileNameToInclude) throws BonitaException {
-        final byte[] buffer;
         try {
-            buffer = IOUtil.zip(Collections.singletonMap(fileNameToInclude, "return \"\";".getBytes()));
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ZipOutputStream zos = new ZipOutputStream(baos);
+            zos.putNextEntry(new ZipEntry(fileNameToInclude));
+            zos.write("return \"\";".getBytes());
+
+            zos.putNextEntry(new ZipEntry("page.properties"));
+            final StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("name=custompage_pagename");
+            stringBuilder.append(System.currentTimeMillis());
+            stringBuilder.append("\ndisplayName=mypage display name\ndescription=mypage description\n");
+            zos.write(stringBuilder.toString().getBytes());
+
+            zos.closeEntry();
+            return baos.toByteArray();
         } catch (final IOException e) {
             throw new BonitaException(e);
         }
-        return buffer;
     }
 
 }

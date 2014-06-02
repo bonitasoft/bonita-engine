@@ -34,8 +34,8 @@ public class PageAPILocalIT extends CommonAPISPTest {
 
     @After
     public void after() throws BonitaException {
-        SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
-        for (Page page : searchPages.getResult()) {
+        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
+        for (final Page page : searchPages.getResult()) {
             if (!page.isProvided()) {
                 getPageAPI().deletePage(page.getId());
             }
@@ -52,7 +52,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
         // engine started
 
         // when
-        Page page = getPageAPI().getPageByName("groovy-example");
+        final Page page = getPageAPI().getPageByName("custompage_groovy-example");
 
         // then
         assertThat(page).isNotNull();

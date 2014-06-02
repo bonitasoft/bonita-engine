@@ -72,13 +72,18 @@ import org.mockito.stubbing.Answer;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageContent;
 import com.bonitasoft.engine.page.SPageLogBuilder;
+import com.bonitasoft.engine.page.impl.exception.SInvalidPageZipContentException;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageServiceImplTest {
 
+    private static final String PAGE_PROPERTIES = "page.properties";
+
     private static final String INDEX_HTML = "index.html";
+
+    private static final String INDEX_GROOVY = "Index.groovy";
 
     private static final String CONTENT_NAME = "content.zip";
 
@@ -310,12 +315,12 @@ public class PageServiceImplTest {
                         SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
-        byte[] result = pageServiceImpl.getPageContent(12);
+        final byte[] result = pageServiceImpl.getPageContent(12);
         // then
-        Map<String, byte[]> unzip = IOUtil.unzip(result);
+        final Map<String, byte[]> unzip = IOUtil.unzip(result);
         assertThat(unzip.size()).isEqualTo(2);
-        Properties pageProperties = new Properties();
-        pageProperties.load(new ByteArrayInputStream(unzip.get("page.properties")));
+        final Properties pageProperties = new Properties();
+        pageProperties.load(new ByteArrayInputStream(unzip.get(PAGE_PROPERTIES)));
 
         assertThat(pageProperties.get("name")).isEqualTo("mypage");
         assertThat(pageProperties.get("displayName")).isEqualTo("mypage display name");
@@ -332,18 +337,18 @@ public class PageServiceImplTest {
         page.setId(12);
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
                 new SelectByIdDescriptor<SPageContent>("getPageContent",
                         SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
-        byte[] result = pageServiceImpl.getPageContent(12);
+        final byte[] result = pageServiceImpl.getPageContent(12);
         // then
-        Map<String, byte[]> unzip = IOUtil.unzip(result);
+        final Map<String, byte[]> unzip = IOUtil.unzip(result);
         assertThat(unzip.size()).isEqualTo(2);
-        Properties pageProperties = new Properties();
-        pageProperties.load(new ByteArrayInputStream(unzip.get("page.properties")));
+        final Properties pageProperties = new Properties();
+        pageProperties.load(new ByteArrayInputStream(unzip.get(PAGE_PROPERTIES)));
 
         assertThat(pageProperties.get("name")).isEqualTo("mypageUpdated");
         assertThat(pageProperties.get("displayName")).isEqualTo("mypageUpdated display name");
@@ -486,7 +491,7 @@ public class PageServiceImplTest {
         // given
         final long pageId = 15;
         final Map<String, Object> fields = new HashMap<String, Object>();
-        final SPage sPage = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        final SPage sPage = new SPageImpl("page1", 123456, 45, false, CONTENT_NAME);
         sPage.setId(pageId);
         final byte[] content = "invalid content".getBytes();
         fields.put(SPageContentFields.PAGE_CONTENT, content);
@@ -502,23 +507,22 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void zipTestNotZip() throws Exception {
-        exception.expect(SBonitaReadException.class);
-        exception.expectMessage("Page content is not a valid zip file");
+    public void zipTest_not_a_zip() throws Exception {
+        exception.expect(SInvalidPageZipContentException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_IS_NOT_A_VALID_ZIP_FILE);
         // given
         final byte[] content = "badContent".getBytes();
 
         // when
         pageServiceImpl.checkContentIsValid(content);
 
-        // then
-        // exception
+        // then exception
     }
 
     @Test
-    public void zipTestBadContent() throws Exception {
-        exception.expect(SBonitaReadException.class);
-        exception.expectMessage("Page content does not contains a Index.groovy or index.html file");
+    public void zipTest_Bad_Content() throws Exception {
+        exception.expect(SInvalidPageZipContentException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE);
 
         // given
         final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
@@ -532,10 +536,87 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void zipTestGroovy() throws Exception {
+    public void zipTest_valid_Groovy() throws Exception {
 
         // given
-        final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+
+    }
+
+    @Test
+    public void zipTest_page_properties_no_description() throws Exception {
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\n".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+
+    }
+
+    @Test
+    public void zipTest_page_properties_invalid_name() throws Exception {
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+
+    }
+
+    @Test
+    public void zipTest_page_properties_no_name() throws Exception {
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "displayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+
+    }
+
+    @Test
+    public void zipTest_page_properties_invalid_display_name() throws Exception {
+        exception.expect(SInvalidPageZipContentException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=\ndescription=mypage description\n".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+
+    }
+
+    @Test
+    public void zipTest_page_properties_no_display_name() throws Exception {
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndescription=mypage description\n".getBytes()));
 
         // when then
         assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
@@ -545,10 +626,24 @@ public class PageServiceImplTest {
     @Test
     public void zipTestGroovyWithWrongName() throws Exception {
         exception.expect(SBonitaReadException.class);
-        exception.expectMessage("Page content does not contains a Index.groovy or index.html file");
+        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE);
 
         // given
-        final byte[] content = IOUtil.zip(Collections.singletonMap("index.groovy", "content of the groovy".getBytes()));
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("index.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        // when then
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isFalse();
+
+    }
+
+    @Test
+    public void zipTest_valid_Html() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_HTML, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage final display name\ndescription=final mypage description\n".getBytes()));
 
         // when then
         assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
@@ -556,10 +651,13 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void zipTestHtml() throws Exception {
+    public void zipTest_no_page_properties() throws Exception {
+        exception.expect(SInvalidPageZipContentException.class);
+        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_PAGE_PROPERTIES_FILE);
 
         // given
-        final byte[] content = IOUtil.zip(Collections.singletonMap(INDEX_HTML, "content of the html".getBytes()));
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair(INDEX_HTML, "content of the groovy".getBytes()));
 
         // when then
         assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
@@ -614,7 +712,9 @@ public class PageServiceImplTest {
 
         // given
         final Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put(SPageContentFields.PAGE_CONTENT, IOUtil.zip(Collections.singletonMap(INDEX_HTML, "content of the html".getBytes())));
+        fields.put(SPageContentFields.PAGE_CONTENT, IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes())));
+
         doReturn(fields).when(entityUpdateDescriptor).getFields();
 
         // when

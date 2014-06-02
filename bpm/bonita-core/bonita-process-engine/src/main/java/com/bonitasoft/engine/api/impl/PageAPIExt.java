@@ -115,21 +115,22 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException {
+    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException
+    {
         byte[] zipEntryContent;
         try {
             zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
 
-            Properties pageProperties = new Properties();
+            final Properties pageProperties = new Properties();
             pageProperties.load(new ByteArrayInputStream(zipEntryContent));
-            String name = pageProperties.getProperty(PageService.PROPERTIES_NAME);
-            String displayName = pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME);
-            String description = pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION);
-            PageCreator pageCreator = new PageCreator(name, contentName);
+            final String name = pageProperties.getProperty(PageService.PROPERTIES_NAME);
+            final String displayName = pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME);
+            final String description = pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION);
+            final PageCreator pageCreator = new PageCreator(name, contentName);
             pageCreator.setDescription(description);
             pageCreator.setDisplayName(displayName);
             return createPage(pageCreator, content);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new CreationException("Error while reading zip file", e);
         }
     }
@@ -152,7 +153,6 @@ public class PageAPIExt implements PageAPI {
         final PageService pageService = getTenantAccessor().getPageService();
         try {
             pageService.deletePage(pageId);
-
         } catch (final SBonitaException sBonitaException) {
             throw new DeletionException(sBonitaException);
         }
