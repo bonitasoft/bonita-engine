@@ -338,7 +338,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    protected void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
+    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
             SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
         List<SAFlowNodeInstance> activityInstances;
         do {
@@ -395,7 +395,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteProcessInstanceElements(sProcessInstance);
-            deleteArchivedFlowNodeInstances(sProcessInstance.getId());
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
@@ -425,7 +424,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    protected void deleteProcessInstanceElements(final SProcessInstance processInstance) throws SBonitaException {
+    private void deleteProcessInstanceElements(final SProcessInstance processInstance) throws SBonitaException {
         SProcessDefinition processDefinition = null;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());

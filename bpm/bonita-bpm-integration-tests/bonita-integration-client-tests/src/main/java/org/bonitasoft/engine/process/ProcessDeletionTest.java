@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +105,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
-        assertEquals(0, taskInstances.size());
+        assertEquals(33, taskInstances.size());
     }
 
     @Test
