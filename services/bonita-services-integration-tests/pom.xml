@@ -291,13 +291,7 @@
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-api-impl</artifactId>
+			<artifactId>bonita-platform-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -400,12 +400,7 @@
     <!-- Platform -->
     <dependency>
       <groupId>org.bonitasoft.engine.platform</groupId>
-      <artifactId>bonita-platform-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.platform</groupId>
-      <artifactId>bonita-platform-api-impl</artifactId>
+      <artifactId>bonita-platform-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -883,10 +878,8 @@
                   <include>org.bonitasoft.engine.persistence:bonita-persistence-hibernate</include>
                   <include>org.bonitasoft.engine.persistence:bonita-persistence-read</include>
                   <!-- Platform -->
-                  <include>org.bonitasoft.engine.platform:bonita-platform-model</include>
-                  <include>org.bonitasoft.engine.platform:bonita-platform-model-impl</include>
                   <include>org.bonitasoft.engine.platform:bonita-platform-api</include>
-                  <include>org.bonitasoft.engine.platform:bonita-platform-api-impl</include>
+                  <include>org.bonitasoft.engine.platform:bonita-platform-impl</include>
                   <!-- Platform Authentication -->
                   <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
                   <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
