@@ -201,12 +201,6 @@
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
 			<artifactId>bonita-identity-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

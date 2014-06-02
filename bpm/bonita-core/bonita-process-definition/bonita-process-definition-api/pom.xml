@@ -30,7 +30,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model</artifactId>
+			<artifactId>bonita-identity-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

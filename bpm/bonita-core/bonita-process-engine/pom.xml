@@ -292,7 +292,7 @@
         </dependency>
         <dependency>
         	<groupId>org.bonitasoft.engine.identity</groupId>
-        	<artifactId>bonita-identity-model-impl</artifactId>
+        	<artifactId>bonita-identity-impl</artifactId>
         	<version>${project.version}</version>
         	<scope>test</scope>
         </dependency>
