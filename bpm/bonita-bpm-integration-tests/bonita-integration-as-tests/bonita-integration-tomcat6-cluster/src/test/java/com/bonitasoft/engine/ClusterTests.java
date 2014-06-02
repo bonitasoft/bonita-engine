@@ -29,9 +29,11 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
@@ -57,7 +59,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantIsPausedException;
+import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantCreator;
 
@@ -269,7 +271,7 @@ public class ClusterTests extends CommonAPISPTest {
             System.out.println("[test] try to call getNumberOfProcess with tech user on node 1");
             getProcessAPI().getNumberOfProcessInstances();
             fail("should not be able to acces this method in pause");
-        } catch (TenantIsPausedException e) {
+        } catch (TenantStatusException e) {
             // ok
         }
         changeToNode2();
@@ -278,7 +280,7 @@ public class ClusterTests extends CommonAPISPTest {
             System.out.println("[test] try to call getNumberOfProcess with tech user on node 2");
             getProcessAPI().getNumberOfProcessInstances();
             fail("should not be able to acces this method in pause");
-        } catch (TenantIsPausedException e) {
+        } catch (TenantStatusException e) {
             // ok
         }
         logoutOnTenant();
@@ -357,6 +359,35 @@ public class ClusterTests extends CommonAPISPTest {
         designProcessDefinition.addTransition("autoStep", "step");
 
         return deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+    }
+
+    @Test
+    public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
+        // given: 2 node with 1 node having running processes
+        final long tenantId = createAndActivateTenant("MyTenant_");
+
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+
+        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
+        DesignProcessDefinition dpd = pdb.done();
+        ProcessDefinition pd = deployAndEnableProcess(dpd);
+        ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
+
+        logoutOnTenant();
+        // when: we stop node 1
+        stopPlatform();
+        changeToNode2();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        // then: node2 should finish the work
+        waitForProcessToFinishAndBeArchived(pi);
+
+        // cleanup
+        disableAndDeleteProcess(pd);
+        logoutOnTenant();
+        changeToNode1();
+        startPlatform();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
 }

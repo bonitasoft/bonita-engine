@@ -11,6 +11,7 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="bonitaExecutorServiceFactory"
 			ref="bonitaExecutorServiceFactory" />
+		<constructor-arg name="workTerminationTimeout" value="30" />
 	</bean>
 
 	<bean id="bonitaExecutorServiceFactory"
