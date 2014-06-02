@@ -587,17 +587,12 @@
     <!-- Session -->
     <dependency>
       <groupId>org.bonitasoft.engine.session</groupId>
-      <artifactId>bonita-session-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.session</groupId>
-      <artifactId>bonita-session-api-impl</artifactId>
+      <artifactId>bonita-session-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.bonitasoft.engine.session</groupId>
-      <artifactId>bonita-session-clustered-impl</artifactId>
+      <artifactId>bonita-session-clustered</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -976,11 +971,9 @@
                   <include>org.bonitasoft.engine.persistence:bonita-sequence-api</include>
                   <include>org.bonitasoft.engine.persistence:bonita-sequence-impl</include>
                   <!-- Session -->
-                  <include>org.bonitasoft.engine.session:bonita-session-model</include>
-                  <include>org.bonitasoft.engine.session:bonita-session-model-impl</include>
-                  <include>org.bonitasoft.engine.session:bonita-session-api-impl</include>
+                  <include>org.bonitasoft.engine.session:bonita-session-impl</include>
                   <include>org.bonitasoft.engine.session:bonita-session-api</include>
-                  <include>com.bonitasoft.engine.session:bonita-session-clustered-impl</include>
+                  <include>com.bonitasoft.engine.session:bonita-session-clustered</include>
                   <!-- Session Accessor -->
                   <include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-read</include>
                   <include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-threadlocal</include>

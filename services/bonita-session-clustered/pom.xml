@@ -9,12 +9,17 @@
 		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-session-clustered-impl</artifactId>
+	<artifactId>bonita-session-clustered</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session-api-impl</artifactId>
+			<artifactId>bonita-session-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.session</groupId>
+			<artifactId>bonita-session-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -42,12 +47,6 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session-model-impl</artifactId>
-			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
