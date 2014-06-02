@@ -164,17 +164,7 @@
 		<!-- Document -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
 			<artifactId>bonita-document-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -629,9 +619,6 @@
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
 									<!-- Document -->
-									<include>org.bonitasoft.engine.document:bonita-document-model</include>
-									<include>org.bonitasoft.engine.document:bonita-document-model-impl</include>
-									<include>org.bonitasoft.engine.document:bonita-document-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.document:bonita-document-api</include>
 									<include>org.bonitasoft.engine.document:bonita-document-impl</include>
 									<!-- Document Mapping -->
