@@ -339,7 +339,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
+    protected void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
             SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
         List<SAFlowNodeInstance> activityInstances;
         do {
@@ -425,7 +425,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void deleteProcessInstanceElements(final SProcessInstance processInstance) throws SBonitaException {
+    protected void deleteProcessInstanceElements(final SProcessInstance processInstance) throws SBonitaException {
         SProcessDefinition processDefinition = null;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
