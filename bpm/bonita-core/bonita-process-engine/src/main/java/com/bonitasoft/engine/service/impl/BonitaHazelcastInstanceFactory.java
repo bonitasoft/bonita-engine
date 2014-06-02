@@ -26,6 +26,7 @@ import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
 
 /**
  * @author Baptiste Mesta
@@ -106,12 +107,16 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
 
     @Override
     public void stop() throws SBonitaException {
-        // Do nothing it's spring that shutdown hazelcast...
     }
 
     public void destroy() {
-        final com.hazelcast.core.LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
-        lifecycleService.shutdown();
+        try {
+
+            final com.hazelcast.core.LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
+            lifecycleService.shutdown();
+        } catch (HazelcastInstanceNotActiveException e) {
+            // ignore it, it's already shutdown
+        }
     }
 
     @Override

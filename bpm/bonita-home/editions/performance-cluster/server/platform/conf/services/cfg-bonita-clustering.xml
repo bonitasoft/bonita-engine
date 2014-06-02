@@ -18,6 +18,12 @@
 						<property name="password" value="${bonita.cluster.group.password:bpm}" />
 					</bean>
 				</property>
+				<!-- Disable the hazelcast shutdown hook because we handle the shutdown ourself -->
+				<property name="properties">
+					<props>
+      					<prop key="hazelcast.shutdownhook.enabled">false</prop>
+    				</props>
+            	</property>
 				<property name="instanceName" value="bonita" />
 				<property name="networkConfig">
 					<bean class="com.hazelcast.config.NetworkConfig">

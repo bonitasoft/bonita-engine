@@ -232,6 +232,22 @@ public class APITestSPUtil extends APITestUtil {
         logAPI = null;
     }
 
+    public void stopPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
+            StartNodeException {
+        final PlatformSession loginPlatform = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        platformAPI.stopNode();
+        logoutOnPlatform(loginPlatform);
+    }
+
+    public void startPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
+            StartNodeException {
+        final PlatformSession loginPlatform = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        platformAPI.startNode();
+        logoutOnPlatform(loginPlatform);
+    }
+
     public void stopAndStartPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
             StartNodeException {
         final PlatformSession loginPlatform = loginOnPlatform();

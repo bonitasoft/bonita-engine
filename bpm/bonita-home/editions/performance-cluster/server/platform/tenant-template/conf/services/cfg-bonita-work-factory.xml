@@ -7,7 +7,8 @@
 		<constructor-arg name="tenantId" value="${tenantId}" />
 		<constructor-arg name="corePoolSize" value="20" />
 		<constructor-arg name="maximumPoolSize" value="20" />
-		<constructor-arg name="keepAliveTimeSeconds" value="60" />
+		<!-- small value because of the hazelcast bug on queue not interrupted -->
+		<constructor-arg name="keepAliveTimeSeconds" value="15" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 	</bean>
 

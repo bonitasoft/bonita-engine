@@ -94,11 +94,6 @@
       <artifactId>bonita-category-api-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.category</groupId>
-      <artifactId>bonita-category-model-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Classloader -->
     <dependency>
@@ -548,11 +543,6 @@
       <artifactId>bonita-process-instance-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine.core.process.instance</groupId>
-      <artifactId>bonita-process-instance-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Recorder -->
     <dependency>
@@ -816,9 +806,6 @@
                   <include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
                   <include>com.bonitasoft.engine.cache:bonita-cache-api-clustered-impl</include>
                   <!-- Category -->
-                  <include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
                   <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
                   <!-- Classloader -->
@@ -978,9 +965,7 @@
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
                   <!-- Process Instance -->
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
-                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
-                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
