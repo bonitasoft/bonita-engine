@@ -419,17 +419,7 @@
     <!-- Platform Command -->
     <dependency>
       <groupId>org.bonitasoft.engine.platform.command</groupId>
-      <artifactId>bonita-platform-command-api-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.platform.command</groupId>
-      <artifactId>bonita-platform-command-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.platform.command</groupId>
-      <artifactId>bonita-platform-command-model-impl-hibernate</artifactId>
+      <artifactId>bonita-platform-command-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -901,11 +891,8 @@
                   <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
                   <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
                   <!-- Platform Command -->
-                  <include>org.bonitasoft.engine.platform.command:bonita-platform-command-model</include>
-                  <include>org.bonitasoft.engine.platform.command:bonita-platform-command-model-impl</include>
-                  <include>org.bonitasoft.engine.platform.command:bonita-platform-command-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.platform.command:bonita-platform-command-api</include>
-                  <include>org.bonitasoft.engine.platform.command:bonita-platform-command-api-impl</include>
+                  <include>org.bonitasoft.engine.platform.command:bonita-platform-command-impl</include>
                   <!-- Platform Dependency -->
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl</include>
