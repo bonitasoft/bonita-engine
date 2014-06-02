@@ -90,7 +90,7 @@ public class IOUtil {
             stream = new JarInputStream(new ByteArrayInputStream(jarContent));
             JarEntry nextJarEntry = null;
             while ((nextJarEntry = stream.getNextJarEntry()) != null) {
-                String name = nextJarEntry.getName();
+                final String name = nextJarEntry.getName();
                 if (name.endsWith(".class")) {
                     classes.add(toQualifiedClassName(name));
                 }
@@ -315,7 +315,7 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        FileInputStream inputStream = new FileInputStream(file);
+        final FileInputStream inputStream = new FileInputStream(file);
         try {
             return read(inputStream);
         } finally {
@@ -489,12 +489,14 @@ public class IOUtil {
             for (final Entry<String, byte[]> file : files.entrySet()) {
                 zos.putNextEntry(new ZipEntry(file.getKey()));
                 zos.write(file.getValue());
+                zos.flush();
                 zos.closeEntry();
             }
-            return baos.toByteArray();
         } finally {
             zos.close();
+            baos.close();
         }
+        return baos.toByteArray();
     }
 
     public static byte[] zip(final Pair<String, byte[]>... files) throws IOException {
@@ -504,19 +506,21 @@ public class IOUtil {
             for (final Entry<String, byte[]> file : files) {
                 zos.putNextEntry(new ZipEntry(file.getKey()));
                 zos.write(file.getValue());
+                zos.flush();
                 zos.closeEntry();
             }
-            return baos.toByteArray();
         } finally {
             zos.close();
+            baos.close();
         }
+        return baos.toByteArray();
     }
 
     public static final Map<String, byte[]> unzip(final byte[] zipFile) throws IOException {
         final ByteArrayInputStream bais = new ByteArrayInputStream(zipFile);
         final ZipInputStream zipInputstream = new ZipInputStream(bais);
         ZipEntry zipEntry = null;
-        Map<String, byte[]> files = new HashMap<String, byte[]>();
+        final Map<String, byte[]> files = new HashMap<String, byte[]>();
         try {
             while ((zipEntry = zipInputstream.getNextEntry()) != null) {
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -639,7 +643,7 @@ public class IOUtil {
         if (document == null) {
             throw new IllegalArgumentException("Document should not be null.");
         }
-        Transformer tf = TransformerFactory.newInstance().newTransformer();
+        final Transformer tf = TransformerFactory.newInstance().newTransformer();
         tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         tf.setOutputProperty(OutputKeys.INDENT, "yes");
         ByteArrayOutputStream out = null;
@@ -659,7 +663,7 @@ public class IOUtil {
         ByteArrayInputStream bais = null;
         JarOutputStream jos = null;
         JarInputStream jis = null;
-        byte[] buffer = new byte[4096];
+        final byte[] buffer = new byte[4096];
         try {
             bais = new ByteArrayInputStream(jarToUpdate);
             jis = new JarInputStream(bais);
@@ -678,7 +682,7 @@ public class IOUtil {
                 }
                 jos.flush();
             }
-            JarEntry entry = new JarEntry(entryName);
+            final JarEntry entry = new JarEntry(entryName);
             jos.putNextEntry(entry);
             jos.write(entryContent);
             jos.closeEntry();
@@ -699,7 +703,7 @@ public class IOUtil {
     }
 
     public static String getPropertyAsString(final Properties prop) {
-        StringWriter writer = new StringWriter();
+        final StringWriter writer = new StringWriter();
         prop.list(new PrintWriter(writer));
         return writer.getBuffer().toString();
     }
