@@ -24,7 +24,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.check.CheckNbPendingTasksForUserUsingSearch;
 import org.junit.After;
 import org.junit.Before;
@@ -45,13 +45,13 @@ public class HiddenTaskTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessContainingTasksToHide",
-                "1.01beta", Arrays.asList("humanTask_1", "humanTask_2"), Arrays.asList(true, true), "actor", true, true);
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                "ProcessContainingTasksToHide", "1.01beta", Arrays.asList("humanTask_1", "humanTask_2"), Arrays.asList(true, true), "actor", true, true);
         user = createUser("common_user", "abc");
         user2 = createUser("uncommon_user", "abc");
-        processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", user);
+        processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", user);
         final long id = processDefinition.getId();
         getProcessAPI().startProcess(id);
 
@@ -66,7 +66,7 @@ public class HiddenTaskTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
         deleteUser(user.getId());
         deleteUser(user2.getId());
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -125,7 +125,7 @@ public class HiddenTaskTest extends CommonAPITest {
         final String actorName = "actor";
         definitionBuilder.addActor(actorName).addUserTask("humanTask_1", actorName).addUserTask("humanTask_2", actorName);
         final DesignProcessDefinition designProcessDef = definitionBuilder.done();
-        final ProcessDefinition processDef = deployAndEnableWithActor(designProcessDef, actorName, user);
+        final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDef, actorName, user);
 
         final long id = processDef.getId();
         final ProcessInstance procInstance = getProcessAPI().startProcess(id);
@@ -283,13 +283,13 @@ public class HiddenTaskTest extends CommonAPITest {
     }
 
     private void logoutLogin(final User user) throws BonitaException {
-        logout();
+        logoutOnTenant();
         if (user != null) {
-            loginWith(user.getUserName(), "abc");
+            loginOnDefaultTenantWith(user.getUserName(), "abc");
             checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, user.getId(),
                     new SearchOptionsBuilder(0, 100).done());
         } else {
-            login();
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
             checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, this.user.getId(), new SearchOptionsBuilder(0,
                     100).done());
         }

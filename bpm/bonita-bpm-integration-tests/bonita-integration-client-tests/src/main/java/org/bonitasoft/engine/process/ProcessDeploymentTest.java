@@ -19,6 +19,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -40,17 +41,18 @@ public class ProcessDeploymentTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
     public void deployProcessInDisabledState() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
 
         final User user = createUser(USERNAME, PASSWORD);
@@ -71,7 +73,8 @@ public class ProcessDeploymentTest extends CommonAPITest {
 
     @Test
     public void deployProcessFromFile() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final File tempFile = File.createTempFile("testbar", ".bar");
@@ -99,7 +102,7 @@ public class ProcessDeploymentTest extends CommonAPITest {
     @Test
     public void deployProcessWithUTF8Characteres() throws Exception {
         // Create process
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
                 Arrays.asList(false));
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
 
@@ -111,7 +114,7 @@ public class ProcessDeploymentTest extends CommonAPITest {
     @Test
     public void deployBigProcess() throws Exception {
         // Create process
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
                 Arrays.asList(false));
         final byte[] bigContent = new byte[1024 * 1024 * 5];
         new Random().nextBytes(bigContent);
@@ -128,11 +131,11 @@ public class ProcessDeploymentTest extends CommonAPITest {
     public void deployProcess2Times() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         // First process def with 2 instances:
-        final DesignProcessDefinition designProcessDef1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
+        final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
                 Arrays.asList(true));
-        final ProcessDefinition processDef1 = deployAndEnableWithActor(designProcessDef1, APITestUtil.ACTOR_NAME, user);
+        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, APITestUtil.ACTOR_NAME, user);
         try {
-            deployAndEnableWithActor(designProcessDef1, APITestUtil.ACTOR_NAME, user);
+            deployAndEnableProcessWithActor(designProcessDef1, APITestUtil.ACTOR_NAME, user);
         } finally {
             deleteUser(user);
             disableAndDeleteProcess(processDef1);

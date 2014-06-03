@@ -22,13 +22,13 @@ public class PlatformCommandTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        session = loginPlatform();
+        session = loginOnPlatform();
         platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
     }
 
     @After
     public void after() throws BonitaException {
-        logoutPlatform(session);
+        logoutOnPlatform(session);
     }
 
     //

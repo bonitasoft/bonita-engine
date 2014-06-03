@@ -44,6 +44,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -61,12 +62,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
     }
 
@@ -79,13 +80,13 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Test
     public void ensureADeployWorksAfterAChangeInDependencies() throws Exception {
         final User user = createUser("john", "bpm");
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process123", "1.0",
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process123", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user);
         getCommandAPI().addDependency("kikoo", new byte[] { 0, 2, 3 });
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(processDefinition1);
         getCommandAPI().removeDependency("kikoo");
@@ -95,9 +96,9 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Test
     public void startProcessWithCurrentUser() throws Exception {
         final User user = createUser("john", "bpm");
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // Check that the current getSession() user name is the one used to start the process:
         LOGGER.debug("current getSession() user name used to start the process: " + processInstance.getStartedBy());
@@ -112,9 +113,9 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Test
     public void startProcessFor() throws Exception {
         final User user = createUser("john", "bpm");
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         try {
@@ -155,17 +156,17 @@ public class ProcessExecutionTest extends CommonAPITest {
         builder.done();
     }
 
-    private User createUserAndLoginWith(final String userName) throws BonitaException {
+    private User createUserAndloginOnDefaultTenantWith(final String userName) throws BonitaException {
         final User user = createUser(userName, "bpm");
-        logout();
-        loginWith(userName, "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(userName, "bpm");
         return user;
     }
 
     @Test
     public void createAndExecuteProcessWithAutomaticSteps() throws Exception {
         final User user = createUser("john", "bpm");
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.1",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.1",
                 Arrays.asList("step1", "step2"), Arrays.asList(false, false));
 
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
@@ -184,7 +185,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Test
     public void executeProcessWithNoActivities() throws Exception {
         final User user = createUser("john", "bpm");
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.3",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.3",
                 Collections.<String> emptyList(), Collections.<Boolean> emptyList());
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -200,12 +201,13 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test
     public void checkStartAndEndDate() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
+                "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
-        final User user = createUserAndLoginWith("john");
+        final User user = createUserAndloginOnDefaultTenantWith("john");
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         long before = new Date().getTime();
@@ -232,12 +234,13 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test
     public void checkLastUpdateDateOfAnArchivedProcess() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
+                "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
-        final User user = createUserAndLoginWith("john");
+        final User user = createUserAndloginOnDefaultTenantWith("john");
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         long before = new Date().getTime();
@@ -266,12 +269,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test
     public void checkProcessIsArchived() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
-        final User user = createUserAndLoginWith("john");
+        final User user = createUserAndloginOnDefaultTenantWith("john");
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -299,9 +302,9 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive", "process" }, jira = "ENGINE-507", story = "get a archived process instance by id")
     public void getArchivedProcessInstanceById() throws Exception {
         final User john = createUser("john", "bpm");
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", processInstance);
         final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
@@ -320,12 +323,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test
     public void checkArchiveDate() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
-        final User user = createUserAndLoginWith("john");
+        final User user = createUserAndloginOnDefaultTenantWith("john");
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -352,12 +355,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test
     public void checkArchiveStartedBy() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
-        final User user = createUserAndLoginWith("john");
+        final User user = createUserAndloginOnDefaultTenantWith("john");
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -383,7 +386,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final String actorName = "actor";
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(processName, version).addActor(actorName)
                 .addAutomaticTask("auto1").addUserTask("task1", actorName).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         final long processDefId = processDefinition.getId();
         final ProcessInstance pi = getProcessAPI().startProcess(processDefId);
 
@@ -403,12 +406,12 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Test
     public void updateDueDateOfTask() throws Exception {
         final String johnName = "john";
-        final User user = createUserAndLoginWith(johnName);
+        final User user = createUserAndloginOnDefaultTenantWith(johnName);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processToUpdateDueDate", "1.0");
         builder.addActor("johnny");
         builder.addUserTask("step1", "johnny").addExpectedDuration(10000000l);
         final DesignProcessDefinition done = builder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(done, "johnny", user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(done, "johnny", user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
@@ -435,12 +438,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test
     public void executeTaskFor() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final String johnName = "john";
-        final User john = createUserAndLoginWith(johnName);
+        final User john = createUserAndloginOnDefaultTenantWith(johnName);
         final User jack = createUser("jack", PASSWORD);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         try {
@@ -486,7 +489,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.done()).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
-        final User user = createUserAndLoginWith("Tom");
+        final User user = createUserAndloginOnDefaultTenantWith("Tom");
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -521,7 +524,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
 
@@ -561,7 +564,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
         waitForUserTaskAndExecuteIt("step", processInstance, matti);
@@ -607,7 +610,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
         getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
@@ -629,7 +632,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
         getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
@@ -652,7 +655,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
 
@@ -681,7 +684,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
 
@@ -746,7 +749,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10);
@@ -771,7 +774,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final User matti = createUser("matti", "bpm");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
         getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");

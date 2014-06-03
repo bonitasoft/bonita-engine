@@ -122,6 +122,7 @@ public class TestsInitializer {
                 throw new IllegalStateException("variable 'bonita.home' must be set");
             }
             final File destDir = new File(TMP_BONITA_HOME);
+            System.out.println("Using BONITA_HOME: " + destDir.getAbsolutePath());
             FileUtils.deleteDirectory(destDir);
             FileUtils.copyDirectory(new File(bonitaHome), destDir);
             System.setProperty(BONITA_HOME, destDir.getAbsolutePath());

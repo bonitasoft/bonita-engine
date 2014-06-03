@@ -10,16 +10,15 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -46,7 +45,7 @@ public class ExecutorWorkServiceTest {
 
     private AbstractWorkSynchronization abstractWorkSynchronization;
 
-    private ExecutorService executorService;
+    private BonitaExecutorService executorService;
 
     private Queue<Runnable> queue;
 
@@ -59,18 +58,18 @@ public class ExecutorWorkServiceTest {
         sessionAccessor = mock(SessionAccessor.class);
         bonitaExecutorServiceFactory = mock(BonitaExecutorServiceFactory.class);
         abstractWorkSynchronization = mock(AbstractWorkSynchronization.class);
-        executorService = mock(ExecutorService.class);
+        executorService = mock(BonitaExecutorService.class);
         queue = mock(Queue.class);
 
-        doReturn(abstractWorkSynchronization).when(workSynchronizationFactory).getWorkSynchronization(any(ExecutorService.class),
+        doReturn(abstractWorkSynchronization).when(workSynchronizationFactory).getWorkSynchronization(any(BonitaExecutorService.class),
                 any(TechnicalLoggerService.class), any(SessionAccessor.class));
         doReturn(1L).when(sessionAccessor).getTenantId();
-        final Pair<ExecutorService, Queue<Runnable>> pair = new Pair<ExecutorService, Queue<Runnable>>(executorService, queue);
-        doReturn(pair).when(bonitaExecutorServiceFactory).createExecutorService();
+        doReturn(executorService).when(bonitaExecutorServiceFactory).createExecutorService();
         doReturn(false).when(executorService).isShutdown();
         doReturn(true).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
 
-        workService = spy(new ExecutorWorkService(transactionService, workSynchronizationFactory, loggerService, sessionAccessor, bonitaExecutorServiceFactory));
+        workService = spy(new ExecutorWorkService(transactionService, workSynchronizationFactory, loggerService, sessionAccessor, bonitaExecutorServiceFactory,
+                30));
     }
 
     @Test
@@ -96,13 +95,13 @@ public class ExecutorWorkServiceTest {
         workService.pause();
 
         // then
-        inOrder.verify(executorService).shutdown();
-        inOrder.verify(queue).clear();
+        inOrder.verify(executorService).shutdownAndEmptyQueue();
+        inOrder.verify(executorService).clearAllQueues();
         inOrder.verify(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
     }
 
     @Test
-    public void should_stop_shutdown_ThreadPool_and_clear_queue() throws InterruptedException {
+    public void should_stop_shutdown_ThreadPool_and_not_clear_queue() throws InterruptedException {
         final InOrder inOrder = inOrder(executorService, workService, queue);
         // given
         workService.start();
@@ -111,8 +110,8 @@ public class ExecutorWorkServiceTest {
         workService.stop();
 
         // then
-        inOrder.verify(executorService).shutdown();
-        inOrder.verify(queue).clear();
+        inOrder.verify(executorService).shutdownAndEmptyQueue();
+        inOrder.verify(queue, never()).clear();
         inOrder.verify(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
     }
 
@@ -126,7 +125,6 @@ public class ExecutorWorkServiceTest {
         workService.registerWork(createBonitaWork());
 
         // then
-        verify(loggerService, times(1)).log((Class<?>) any(), eq(TechnicalLogSeverity.WARNING), anyString());
         verify(abstractWorkSynchronization, times(0)).addWork(createBonitaWork());
 
     }
@@ -265,7 +263,7 @@ public class ExecutorWorkServiceTest {
         workService.stop();
 
         // then: will only be started one time
-        verify(executorService, times(1)).shutdown();
+        verify(executorService, times(1)).shutdownAndEmptyQueue();
     }
 
     @Test
@@ -324,7 +322,7 @@ public class ExecutorWorkServiceTest {
         workService.stop();
 
         // then: will only be started one time
-        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), contains("Interrupted"));
+        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), contains("Interrupted"), any(InterruptedException.class));
     }
 
 }

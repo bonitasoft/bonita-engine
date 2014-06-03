@@ -83,7 +83,7 @@ public abstract class CommonAPITest extends APITestUtil {
      * @throws BonitaException
      */
     private List<String> clean() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         final List<String> messages = new ArrayList<String>();
         messages.addAll(checkNoCommands());
@@ -100,7 +100,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkNoComments());
         messages.addAll(checkNoArchivedComments());
 
-        logout();
+        logoutOnTenant();
         return messages;
     }
 
@@ -121,7 +121,7 @@ public abstract class CommonAPITest extends APITestUtil {
             final String filterName) throws BonitaException, IOException {
         final List<BarResource> userFilters = generateFilterImplementations(filterName);
         final List<BarResource> generateFilterDependencies = generateFilterDependencies();
-        return buildBusinessArchiveWithActorAndUserFilter(processDefinitionBuilder, actorName, user, generateFilterDependencies, userFilters);
+        return deployAndEnableProcessWithActorAndUserFilter(processDefinitionBuilder, actorName, user, generateFilterDependencies, userFilters);
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {

@@ -33,8 +33,6 @@ public class SProfileImpl implements SProfile {
 
     private String description;
 
-    private String iconPath;
-
     private long creationDate;
 
     private long createdBy;
@@ -53,7 +51,6 @@ public class SProfileImpl implements SProfile {
         isDefault = profile.isDefault();
         name = profile.getName();
         description = profile.getDescription();
-        iconPath = profile.getIconPath();
         creationDate = profile.getCreationDate();
         createdBy = profile.getCreatedBy();
         lastUpdateDate = profile.getLastUpdateDate();
@@ -112,15 +109,6 @@ public class SProfileImpl implements SProfile {
     }
 
     @Override
-    public String getIconPath() {
-        return iconPath;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
-    }
-
-    @Override
     public long getCreationDate() {
         return creationDate;
     }
@@ -165,7 +153,6 @@ public class SProfileImpl implements SProfile {
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (int) (creationDate ^ creationDate >>> 32);
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
@@ -206,13 +193,6 @@ public class SProfileImpl implements SProfile {
                 return false;
             }
         } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
             return false;
         }
         if (creationDate != other.creationDate) {

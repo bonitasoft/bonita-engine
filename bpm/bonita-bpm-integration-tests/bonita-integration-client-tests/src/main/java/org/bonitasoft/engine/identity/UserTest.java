@@ -38,12 +38,12 @@ public class UserTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     /**
@@ -52,19 +52,19 @@ public class UserTest extends CommonAPITest {
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "Get exception when calling a platform method on node not started", jira = "ENGINE-1780")
     @Test(expected = NodeNotStartedException.class)
     public void unableToCallPlatformMethodOnStoppedNode() throws Exception {
-        logout();
-        PlatformSession session = loginPlatform();
+        logoutOnTenant();
+        PlatformSession session = loginOnPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.stopNode();
-        logoutPlatform(session);
+        logoutOnPlatform(session);
         try {
-            login();
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
         } finally {
-            session = loginPlatform();
+            session = loginOnPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.startNode();
-            logoutPlatform(session);
-            login();
+            logoutOnPlatform(session);
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
         }
     }
 
@@ -72,26 +72,26 @@ public class UserTest extends CommonAPITest {
     public void cannotCreateAUserWithAnEmptyPassword() throws BonitaException {
         final String userName = "matti";
         final String password = "";
-        createUserOnDefaultTenant(userName, password);
+        createUser(userName, password);
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithAnEmptyUserName() throws BonitaException {
         final String userName = "";
         final String password = "revontuli";
-        createUserOnDefaultTenant(userName, password);
+        createUser(userName, password);
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithANullPassword() throws BonitaException {
         final String userName = "matti";
-        createUserOnDefaultTenant(userName, null);
+        createUser(userName, null);
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithANullUserName() throws BonitaException {
         final String password = "revontuli";
-        createUserOnDefaultTenant(null, password);
+        createUser(null, password);
     }
 
     @Test

@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-
-import org.bonitasoft.engine.commons.Pair;
 
 /**
  * A factory to create executor service that will be given to the WorkService
@@ -25,6 +21,6 @@ import org.bonitasoft.engine.commons.Pair;
  */
 public interface BonitaExecutorServiceFactory {
 
-    Pair<ExecutorService, Queue<Runnable>> createExecutorService();
+    BonitaExecutorService createExecutorService();
 
 }

@@ -13,8 +13,9 @@ import org.junit.Test;
 
 public abstract class TransactionSynchronizationTest {
 
-    protected abstract TransactionService getTxService() throws Exception;
     TransactionService txService;
+
+    protected abstract TransactionService getTxService() throws Exception;
 
     @Before
     public void before() throws Exception {
@@ -72,13 +73,13 @@ public abstract class TransactionSynchronizationTest {
     private void testSynchronizationStatus(final boolean rollback, final TransactionState expectedStatus) throws Exception {
         txService.begin();
 
-        final SimpleSynchronization synchs[] = new SimpleSynchronization[] { new SimpleSynchronization(), new SimpleSynchronization() };
+        final SimpleSynchronization[] synchs = new SimpleSynchronization[] { new SimpleSynchronization(), new SimpleSynchronization() };
 
-        for (SimpleSynchronization sync : synchs) {
+        for (final SimpleSynchronization sync : synchs) {
             txService.registerBonitaSynchronization(sync);
         }
 
-        for (SimpleSynchronization sync : synchs) {
+        for (final SimpleSynchronization sync : synchs) {
             assertFalse(sync.isBeforeCompletion());
             assertFalse(sync.isAfterCompletion());
             assertEquals(TransactionState.NO_TRANSACTION, sync.getAfterCompletionStatus());
@@ -89,7 +90,7 @@ public abstract class TransactionSynchronizationTest {
         }
         txService.complete();
 
-        for (SimpleSynchronization sync : synchs) {
+        for (final SimpleSynchronization sync : synchs) {
             assertEquals(!rollback, sync.isBeforeCompletion());
             assertTrue(sync.isAfterCompletion());
             assertEquals(expectedStatus, sync.getAfterCompletionStatus());

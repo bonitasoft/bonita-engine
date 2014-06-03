@@ -64,10 +64,6 @@ public class EvaluateExpressionTest extends CommonAPITest {
 
     private static final String STEP1_NAME = "Request";
 
-    protected static final String USERNAME = "dwight";
-
-    protected static final String PASSWORD = "Schrute";
-
     private ProcessDefinition processDefinition = null;
 
     private ProcessInstance processInstance = null;
@@ -78,10 +74,10 @@ public class EvaluateExpressionTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addData("stringData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("Word"));
@@ -95,7 +91,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         processDefinitionBuilder.addUserTask(STEP1_NAME, ACTOR_NAME);
         processDefinitionBuilder.addUserTask(STEP2_NAME, ACTOR_NAME);
         processDefinitionBuilder.addTransition(STEP1_NAME, STEP2_NAME);
-        processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
+        processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
         processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final List<Expression> stringDependencies = new ArrayList<Expression>();
@@ -152,7 +148,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         // Clean up
         deleteUser(user);
         disableAndDeleteProcess(processDefinition);
-        logout();
+        logoutOnTenant();
     }
 
     private static ProcessDefinitionBuilder createProcessDefinitionBuilderWithHumanAndAutomaticSteps(final String processName, final String processVersion,
@@ -207,7 +203,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps("My_Process", "1.0", Arrays.asList("step1"),
                 Arrays.asList(isHuman)).addIntegerData(dataName, dataDefaultexp).addDescription("Delivery all day and night long").getProcess();
 
-        return deployAndEnableWithActor(processDef, "Actor1", user);
+        return deployAndEnableProcessWithActor(processDef, "Actor1", user);
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instantiation" }, story = "Evaluate an expression at process instantiation.", jira = "ENGINE-1160")
@@ -396,7 +392,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     public void evaluateComplexExpression() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
-        loginWith(userName, "bpm");
+        loginOnDefaultTenantWith(userName, "bpm");
         final String a = "a";
         final String b = "b";
         final String c = "c";
@@ -419,7 +415,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
                 Arrays.asList(true)).addIntegerData(a, defaultA).addIntegerData(b, defaultB).addIntegerData(c, defaultC)
                 .addDescription("Delivery all day and night long").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, "Actor1", manu);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", manu);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -437,7 +433,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     public void evaluateComplexExpressionOnProcessInstance() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
-        loginWith(userName, "bpm");
+        loginOnDefaultTenantWith(userName, "bpm");
         final String a = "a";
         final int a_value = 1;
         final Expression aExpr = new ExpressionBuilder().createDataExpression(a, Integer.class.getName());
@@ -454,7 +450,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps("My_Process", "1.0", Arrays.asList("step1"),
                 Arrays.asList(true)).addIntegerData(a, defaultA).addDescription("Delivery all day and night long").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, "Actor1", manu);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", manu);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -472,7 +468,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     public void evaluatePatternExpression() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "poele");
-        loginWith(userName, "poele");
+        loginOnDefaultTenantWith(userName, "poele");
         final String dataName = "birthYear";
         // get processInstance
         final ProcessDefinition processDefinition = createAndDeployProcessDefinitionAndInstance(dataName, 1977, true, manu);

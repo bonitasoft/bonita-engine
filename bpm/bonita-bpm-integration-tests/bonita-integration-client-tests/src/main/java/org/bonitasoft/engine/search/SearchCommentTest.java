@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -37,12 +37,12 @@ public class SearchCommentTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
@@ -52,9 +52,9 @@ public class SearchCommentTest extends CommonAPITest {
 
         // create a ProcessDefinition
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance activityInstance = waitForUserTask("userTask1", processInstance);
         final String commentContent1 = "commentContent1";
@@ -88,15 +88,15 @@ public class SearchCommentTest extends CommonAPITest {
         // create an user
         final User user = createUser(USERNAME, PASSWORD);
 
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         // create a ProcessDefinition
         final String activityName = "userTask1";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(activityName, ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         // create a ProcessInstance
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -128,7 +128,8 @@ public class SearchCommentTest extends CommonAPITest {
         }
 
         // make sure archiving of the process instance is finished
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 1, ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 1,
+                ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
         // search and check result ASC
         assertTrue("Expected 1 ARCHIVED process instances not found", new WaitUntil(500, 10000) {
 
@@ -155,10 +156,11 @@ public class SearchCommentTest extends CommonAPITest {
     @Test
     public void searchComments() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         DesignProcessDefinition designProcessDefinition;
-        designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+                Arrays.asList(true, true));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -224,9 +226,9 @@ public class SearchCommentTest extends CommonAPITest {
 
         // create a ProcessDefinition
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         // create a ProcessInstance
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -255,7 +257,8 @@ public class SearchCommentTest extends CommonAPITest {
         }
 
         // make sure archiving of the process instance is finished
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 10, ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 10,
+                ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
         // search and check result ASC
         assertTrue("Expected 1 ARCHIVED process instances not found", new WaitUntil(500, 10000) {
 
@@ -295,18 +298,18 @@ public class SearchCommentTest extends CommonAPITest {
         final long johnInitComments = resultInitJohn.getCount();
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
                 .getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, jack);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance2 = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
         waitForUserTaskAndAssigneIt("userTask1", instance1, jack);
         waitForUserTaskAndAssigneIt("userTask2", instance1, jack);
 
-        logout();
-        loginWith(jackUserName, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(jackUserName, PASSWORD);
 
         final String commentContent1 = "jack's comment Content1";
         final String commentContent2 = "jack's comment Content3";
@@ -315,8 +318,8 @@ public class SearchCommentTest extends CommonAPITest {
         getProcessAPI().addProcessComment(instance1.getId(), commentContent2);
         getProcessAPI().addProcessComment(instance1.getId(), commentContent3);
 
-        logout();
-        loginWith(johnUserName, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(johnUserName, PASSWORD);
         final String commentContent4 = "john's comment Content3";
         getProcessAPI().addProcessComment(instance2.getId(), commentContent4);
 
@@ -350,14 +353,14 @@ public class SearchCommentTest extends CommonAPITest {
         final User john = createUser(johnUserName, PASSWORD, steven.getId());
         final User jim = createUser("jim", PASSWORD, steven.getId());
 
-        logout();
-        loginWith(johnUserName, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(johnUserName, PASSWORD);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
                 .getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
 
         final ProcessInstance pi1 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
         waitForUserTaskAndAssigneIt("userTask1", pi1, john);
@@ -367,15 +370,15 @@ public class SearchCommentTest extends CommonAPITest {
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content2");
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content3");
 
-        logout();
-        loginWith(jackUserName, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(jackUserName, PASSWORD);
 
         final ProcessInstance pi2 = getProcessAPI().startProcess(jim.getId(), processDefinition.getId());
         final String commentContent4 = "Jack's comment Content4";
         getProcessAPI().addProcessComment(pi2.getId(), commentContent4);
 
-        logout();
-        loginWith(stevenUserName, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(stevenUserName, PASSWORD);
 
         final ProcessInstance pi3 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
         waitForUserTaskAndAssigneIt("userTask1", pi3, john);
@@ -386,8 +389,8 @@ public class SearchCommentTest extends CommonAPITest {
         final String commentContent6 = "Steven's comment Content6";
         getProcessAPI().addProcessComment(pi4.getId(), commentContent6);
 
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         final SearchOptionsBuilder builder3 = new SearchOptionsBuilder(0, 10);
         final SearchResult<Comment> searchResult3 = getProcessAPI().searchCommentsManagedBy(jack.getId(), builder3.done());

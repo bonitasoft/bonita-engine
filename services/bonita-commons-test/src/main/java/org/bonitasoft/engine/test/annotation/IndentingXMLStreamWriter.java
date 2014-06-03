@@ -20,7 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Indent the xml stream writer
- * 
+ *
  * @author Baptiste Mesta
  */
 public class IndentingXMLStreamWriter implements XMLStreamWriter {
@@ -218,9 +218,8 @@ public class IndentingXMLStreamWriter implements XMLStreamWriter {
 
     protected void beforeMarkup() {
         final int soFar = stack[depth];
-        if ((soFar & WROTE_DATA) == 0 // no data in this scope
-                && (depth > 0 || soFar != 0)) // not the first line
-        {
+        // no data in this scope and not the first line
+        if ((soFar & WROTE_DATA) == 0 && (depth > 0 || soFar != 0)) {
             try {
                 writeNewLine(depth);
                 if (depth > 0 && getIndent().length() > 0) {

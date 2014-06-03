@@ -14,13 +14,18 @@ public class BonitaClassLoaderTest {
     public void releaseShouldRemoveAllScopeFolderAndItsContent() {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
-        final File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest");
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.getPath(), BonitaClassLoader.class.getClassLoader());
+        final File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest" + System.currentTimeMillis());
 
+        // given
+        assertThat(tempDir).as("tempDir:%s should not exists before bonitaClassLoader init", tempDir.getAbsolutePath()).doesNotExist();
+        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.getPath(), BonitaClassLoader.class.getClassLoader());
+        assertThat(tempDir).as("bonitaClassLoader tempDir:%s should exists after bonitaClassLoader creation", tempDir.getAbsolutePath()).exists();
+
+        // when
         bonitaClassLoader.release();
 
-        assertThat(tempDir).doesNotExist();
-
+        // then
+        assertThat(tempDir).as("bonitaClassLoader tempDir:%s should not exists after bonitaClassLoader release", tempDir.getAbsolutePath()).doesNotExist();
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -71,23 +72,24 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void afterTest() throws Exception {
         VariableStorage.clearAll();
         deleteUser(USERNAME);
-        logout();
+        logoutOnTenant();
         cleanSession();
 
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
     }
 
     @Test(expected = InvalidSessionException.class)
     public void useAFakeSessionId() throws BonitaException {
-        final APISession session = loginDefaultTenant();
+        final LoginAPI loginAPI = getLoginAPI();
+        final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
         final FakeSession fakeSession = new FakeSession(session);
         fakeSession.setId(fakeSession.getId() + 1);
 
@@ -112,7 +114,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processDef.addActor("delivery");
 
         // Execute process
-        final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDef.done(), "delivery", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
@@ -151,7 +153,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processDef.addTransition("start", "step1");
         processDef.addTransition("step1", "end");
         processDef.addActor("delivery");
-        final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDef.done(), "delivery", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         final Callable<Long> getNumberOfComments = new Callable<Long>() {
 
@@ -204,7 +206,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processDef.addTransition("step1", "step2");
         processDef.addTransition("step2", "end");
         processDef.addActor("delivery");
-        final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDef.done(), "delivery", john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         final long taskId = waitForUserTask.getId();
@@ -241,7 +243,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7 };
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef.done())
                 .addClasspathResource(new BarResource("myDep", content)).done();
-        final ProcessDefinition definition = deployAndEnableWithActor(businessArchive, "delivery", john);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchive, "delivery", john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         List<Long> dependencyIds;
@@ -278,7 +280,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
             final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, (byte) (i >>> 24), (byte) (i >> 16 & 0xff), (byte) (i >> 8 & 0xff), (byte) (i & 0xff) };
             businessArchiveBuilder.addClasspathResource(new BarResource("myDep" + i, content));
         }
-        final ProcessDefinition definition = deployAndEnableWithActor(businessArchiveBuilder.done(), "delivery", john);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), "delivery", john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
@@ -358,7 +360,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processBuilder.addEndEvent("endEvent");
         processBuilder.addTransition("startEvent", userTaskName);
         processBuilder.addTransition(userTaskName, "endEvent");
-        return deployAndEnableWithActor(processBuilder.done(), actorName, john);
+        return deployAndEnableProcessWithActor(processBuilder.done(), actorName, john);
     }
 
     @Test
@@ -378,9 +380,10 @@ public class BPMLocalTest extends CommonAPILocalTest {
                 .createNewBusinessArchive()
                 .setProcessDefinition(builder1.done())
                 .addConnectorImplementation(
-                        new BarResource("blocking-connector.impl", getConnectorImplementationFile("blocking-connector", "1.0", "blocking-connector-impl",
+                        new BarResource("blocking-connector.impl", BuildTestUtil.buildConnectorImplementationFile("blocking-connector", "1.0",
+                                "blocking-connector-impl",
                                 "1.0", BlockingConnector.class.getName()))).done();
-        final ProcessDefinition p1 = deployAndEnableWithActor(businessArchive, "actor", john);
+        final ProcessDefinition p1 = deployAndEnableProcessWithActor(businessArchive, "actor", john);
 
         /*
          * process with blocking operation (executing work)
@@ -397,7 +400,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         builder2.addUserTask("ustep2", "actor");
         builder2.addTransition("step2", "ustep2");
 
-        final ProcessDefinition p2 = deployAndEnableWithActor(builder2.done(), "actor", john);
+        final ProcessDefinition p2 = deployAndEnableProcessWithActor(builder2.done(), "actor", john);
 
         /*
          * process with blocking transition (notify work)
@@ -412,7 +415,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         builder3.addUserTask("ustep2", "actor");
         builder3.addTransition("step2", "ustep2");
 
-        final ProcessDefinition p3 = deployAndEnableWithActor(builder3.done(), "actor", john);
+        final ProcessDefinition p3 = deployAndEnableProcessWithActor(builder3.done(), "actor", john);
 
         // Block all 3 tasks
         BlockingConnector.semaphore.acquire();
@@ -427,8 +430,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
         waitForUserTaskAndExecuteIt("step1", pi2, john);
         waitForUserTaskAndExecuteIt("step1", pi3, john);
         System.out.println("executed step1");
-        logout();
-        final PlatformSession loginPlatform = loginPlatform();
+        logoutOnTenant();
+        final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         // stop node and in the same time release the semaphores to unlock works
         final Thread thread = new Thread(new Runnable() {
@@ -457,8 +460,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
         System.out.println("start node");
         platformAPI.startNode();
         System.out.println("node started");
-        logoutPlatform(loginPlatform);
-        login();
+        logoutOnPlatform(loginPlatform);
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         // check we have all task ready
         waitForPendingTasks(john.getId(), 3);
         disableAndDeleteProcess(p1.getId());
@@ -483,12 +486,12 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "The platform version must be the same than the project version.", jira = "")
     @Test
     public void getPlatformVersion() throws BonitaException, IOException {
-        logout();
-        final PlatformSession platformSession = loginPlatform();
+        logoutOnTenant();
+        final PlatformSession platformSession = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final Platform platform = platformAPI.getPlatform();
-        logoutPlatform(platformSession);
-        loginWith(USERNAME, PASSWORD);
+        logoutOnPlatform(platformSession);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final String platformVersionToTest = getBonitaVersion();
 
         assertNotNull("can't find the platform", platform);

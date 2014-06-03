@@ -45,18 +45,18 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        donaBenta = createUser("donabenta", "bpm");
-        logout();
-        loginWith("donabenta", "bpm");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        donaBenta = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(donaBenta.getId());
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployAndEnableProcessWithEndThrowErrorEvent(final String processName, final String errorCode, final String actorName)
@@ -72,7 +72,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         calledProcess.addTransition("start", "calledStep2");
         calledProcess.addTransition("calledStep1", "endError");
         calledProcess.addTransition("calledStep2", "end");
-        return deployAndEnableWithActor(calledProcess.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(calledProcess.done(), actorName, donaBenta);
     }
 
     private ProcessDefinition deployAndEnableProcessWithBoundaryErrorEventOnCallActivity(final String processName, final String targetProcessName,
@@ -91,7 +91,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         processDefinitionBuilder.addTransition("error", "exceptionStep");
         processDefinitionBuilder.addTransition("exceptionStep", "end");
         processDefinitionBuilder.addTransition("step2", "end");
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
     }
 
     @Test

@@ -50,14 +50,14 @@ public class MembershipTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException, InterruptedException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         createTestedUserMemberships();
     }
 
     @After
     public void after() throws BonitaException {
         deleteTestedUserMemberships();
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -198,8 +198,8 @@ public class MembershipTest extends CommonAPITest {
         final User plop = createUser("plop", "bpm");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
-        logout();
-        loginWith(plop.getUserName(), "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(plop.getUserName(), "bpm");
         final Date beforeDate = new Date();
         Thread.sleep(10);
         final UserMembership userMembership = getIdentityAPI().addUserMembership(userM.getId(), groupM.getId(), roleM.getId());
@@ -405,8 +405,8 @@ public class MembershipTest extends CommonAPITest {
 
     private void createTestedUserMemberships() throws BonitaException, InterruptedException {
         user1 = createUser("userM1", "engine1");
-        logout();
-        loginWith(user1.getUserName(), "engine1");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(user1.getUserName(), "engine1");
         user2 = createUser("userM2", "engine2");
         user3 = createUser("userM3", "engine3");
         user4 = createUser("userM4", "engine4");
