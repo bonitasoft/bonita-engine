@@ -39,7 +39,10 @@ import org.bonitasoft.engine.xml.XMLWriter;
 /**
  * @author Celine Souchet
  */
-public abstract class AbstractExportProfiles implements TransactionContentWithResult<String> {
+public abstract class AbstractExportProfiles implements TransactionContentWithResult<String>, IProfileNameSpace
+{
+
+    private static final String GROUP_PATH_SEPARATOR = "/";
 
     private static final int NUMBER_OF_RESULTS = 100;
 
@@ -85,7 +88,6 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         profileNode.addAttribute("name", sProfile.getName());
         profileNode.addAttribute("isDefault", String.valueOf(sProfile.isDefault()));
         profileNode.addChild("description", sProfile.getDescription());
-        profileNode.addChild("iconPath", sProfile.getIconPath());
 
         final XMLNode profileEntriesXmlNode = getProfileEntriesXmlNode(sProfile.getId());
         if (profileEntriesXmlNode != null) {
@@ -121,6 +123,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         final XMLNode parentProfileEntryNode = new XMLNode("parentProfileEntry");
         final String parentProfileEntryName = parentEntry.getName();
         parentProfileEntryNode.addAttribute("name", parentProfileEntryName);
+        parentProfileEntryNode.addAttribute("isCustom", parentEntry.isCustom());
         parentProfileEntryNode.addChild("parentName", "NULL");
         parentProfileEntryNode.addChild("index", parentEntry.getIndex() + "");
         parentProfileEntryNode.addChild("description", parentEntry.getDescription());
@@ -155,6 +158,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
     private XMLNode getChildProfileEntryXmlNode(final SProfileEntry childProfileEntry, final String parentProfileEntryName) {
         final XMLNode childProfileEntryNode = new XMLNode("profileEntry");
         childProfileEntryNode.addAttribute("name", childProfileEntry.getName());
+        childProfileEntryNode.addAttribute("isCustom", childProfileEntry.isCustom());
         childProfileEntryNode.addChild("parentName", parentProfileEntryName);
         childProfileEntryNode.addChild("index", childProfileEntry.getIndex() + "");
         childProfileEntryNode.addChild("description", childProfileEntry.getDescription());
@@ -171,11 +175,6 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             profileMappingNode.addChild(usersXmlNode);
         }
 
-        final XMLNode rolesXmlNode = getRolesXmlNode(profileId);
-        if (rolesXmlNode != null) {
-            profileMappingNode.addChild(rolesXmlNode);
-        }
-
         final XMLNode groupsXmlNode = getGroupsXmlNode(profileId);
         if (groupsXmlNode != null) {
             profileMappingNode.addChild(groupsXmlNode);
@@ -186,6 +185,10 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             profileMappingNode.addChild(membershipsXmlNode);
         }
 
+        final XMLNode rolesXmlNode = getRolesXmlNode(profileId);
+        if (rolesXmlNode != null) {
+            profileMappingNode.addChild(rolesXmlNode);
+        }
         return profileMappingNode;
     }
 
@@ -233,7 +236,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
 
             while (sProfileMembers.size() > 0) {
                 for (final SProfileMember sProfileMember : sProfileMembers) {
-                    groupsNode.addChild("group", getGroupName(sProfileMember.getGroupId()));
+                    groupsNode.addChild("group", getGroupUniquePath(sProfileMember.getGroupId()));
                 }
                 index++;
                 sProfileMembers = searchProfileMembers(index, profileId, GROUP_SUFFIX);
@@ -252,8 +255,8 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
             while (sProfileMembers.size() > 0) {
                 for (final SProfileMember sProfileMember : sProfileMembers) {
                     final XMLNode memberShipNode = new XMLNode("membership");
+                    memberShipNode.addChild("group", getGroupUniquePath(sProfileMember.getGroupId()));
                     memberShipNode.addChild("role", getRoleName(sProfileMember.getRoleId()));
-                    memberShipNode.addChild("group", getGroupName(sProfileMember.getGroupId()));
                     memberShipsNode.addChild(memberShipNode);
                 }
                 index++;
@@ -297,9 +300,27 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return role.getName();
     }
 
-    private String getGroupName(final long groupId) throws SGroupNotFoundException {
+    /**
+     * 
+     * @param groupId
+     * @return unique full path of the group
+     *         ex: /acme/finance where /acme is parent group our finance
+     * @throws SGroupNotFoundException
+     */
+    private String getGroupUniquePath(final long groupId) throws SGroupNotFoundException {
         final SGroup group = identityService.getGroup(groupId);
-        return group.getName();
+        final StringBuilder builder = new StringBuilder();
+        if (group.getParentPath() == null) {
+            builder.append(GROUP_PATH_SEPARATOR);
+            builder.append(group.getName());
+
+        } else {
+            builder.append(group.getParentPath());
+            builder.append(GROUP_PATH_SEPARATOR);
+            builder.append(group.getName());
+        }
+        final String uniquePath = builder.toString();
+        return uniquePath;
     }
 
     protected ProfileService getProfileService() {

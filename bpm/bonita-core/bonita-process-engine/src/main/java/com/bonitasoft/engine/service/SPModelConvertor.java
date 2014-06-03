@@ -156,10 +156,6 @@ public final class SPModelConvertor extends ModelConvertor {
         if (description != null) {
             newSProfileBuilder.setDescription(description);
         }
-        final String iconPath = (String) fields.get(ProfileField.ICON_PATH);
-        if (iconPath != null) {
-            newSProfileBuilder.setIconPath(iconPath);
-        }
         return newSProfileBuilder.done();
     }
 

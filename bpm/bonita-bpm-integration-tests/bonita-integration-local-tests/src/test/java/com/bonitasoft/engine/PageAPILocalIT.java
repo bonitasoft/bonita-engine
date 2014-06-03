@@ -29,7 +29,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
@@ -40,7 +40,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
                 getPageAPI().deletePage(page.getId());
             }
         }
-        logout();
+       logoutOnTenant();
     }
 
     /*
@@ -52,11 +52,15 @@ public class PageAPILocalIT extends CommonAPISPTest {
         // engine started
 
         // when
-        final Page page = getPageAPI().getPageByName("custompage_groovy-example");
+        final Page pageGroovy = getPageAPI().getPageByName("custompage_groovyexample");
+        final Page pageHtml = getPageAPI().getPageByName("custompage_htmlexample");
 
         // then
-        assertThat(page).isNotNull();
-        assertThat(page.isProvided()).isTrue();
+        assertThat(pageGroovy).isNotNull();
+        assertThat(pageGroovy.isProvided()).isTrue();
+
+        assertThat(pageHtml).isNotNull();
+        assertThat(pageHtml.isProvided()).isTrue();
     }
 
 }

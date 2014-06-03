@@ -201,7 +201,9 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
-        check();
+        if (!active) {
+            return null;
+        }
         final SPage page = persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
                 (Object) pageName), SPage.class));
         return page;

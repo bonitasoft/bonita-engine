@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-integration-as-tests</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tomcat6-cluster</artifactId>
@@ -13,6 +13,7 @@
 
 
 	<properties>
+		<cluster.group>mycluster</cluster.group>
 		<bonita.home.classifier>performance-cluster</bonita.home.classifier>
 		<tomcat.version>6.0.37</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
@@ -198,7 +199,7 @@
 										<containerId>tomcat6x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
-											<!-- in order to identify on which node we are  -->
+											<!-- in order to identify on which node we are -->
 											<node.name>Node1</node.name>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
@@ -217,6 +218,13 @@
 										<home>${tomcat1.home}</home>
 										<properties>
 											<cargo.servlet.port>${provider1.port}</cargo.servlet.port>
+											<cargo.jvmargs>
+												-Dbonita.cluster.group.name=${cluster.group}
+											<!---Xdebug
+												-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001
+												-Xnoagent
+												-Djava.compiler=NONE-->
+											</cargo.jvmargs>
 										</properties>
 									</configuration>
 									<wait>false</wait>
@@ -233,7 +241,7 @@
 										<containerId>tomcat6x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
-											<!-- in order to identify on which node we are  -->
+											<!-- in order to identify on which node we are -->
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
@@ -279,6 +287,7 @@
 											Bitronix properties
 											<btm.root>${tomcat2.home}</btm.root>
 											<bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties</bitronix.tm.configuration>
+											<hazelcast.jmx>true</hazelcast.jmx>
 										</systemProperties>
 									</container>
 									<configuration>
@@ -286,6 +295,13 @@
 										<home>${tomcat2.home}</home>
 										<properties>
 											<cargo.servlet.port>${provider2.port}</cargo.servlet.port>
+											<cargo.jvmargs>
+												-Dbonita.cluster.group.name=${cluster.group}
+												<!-- -Xdebug
+												-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
+												-Xnoagent
+												-Djava.compiler=NONE -->
+											</cargo.jvmargs>
 										</properties>
 									</configuration>
 									<wait>false</wait>
@@ -402,34 +418,35 @@
 	</dependencies>
 
 	<build>
-	  <pluginManagement>
-	    <plugins>
-	      <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-	      <plugin>
-	        <groupId>org.eclipse.m2e</groupId>
-	        <artifactId>lifecycle-mapping</artifactId>
-	        <version>1.0.0</version>
-	        <configuration>
-	          <lifecycleMappingMetadata>
-	            <pluginExecutions>
-	              <pluginExecution>
-	                <pluginExecutionFilter>
-	                  <groupId>org.apache.maven.plugins</groupId>
-	                  <artifactId>maven-dependency-plugin</artifactId>
-	                  <versionRange>[2.7,)</versionRange>
-	                  <goals>
-	                    <goal>unpack</goal>
-	                  </goals>
-	                </pluginExecutionFilter>
-	                <action>
-	                  <ignore></ignore>
-	                </action>
-	              </pluginExecution>
-	            </pluginExecutions>
-	          </lifecycleMappingMetadata>
-	        </configuration>
-	      </plugin>
-	    </plugins>
-	  </pluginManagement>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+										<versionRange>[2.7,)</versionRange>
+										<goals>
+											<goal>unpack</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

@@ -13,10 +13,26 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public interface ValidationRule {
+public abstract class ValidationRule<T> {
 
-    boolean appliesTo(Object modelElement);
+    private Class<T> classToApply;
 
-    ValidationStatus checkRule(Object modelElement);
+    public ValidationRule(Class<T> classToApply) {
+        this.classToApply = classToApply;
+    }
+    
+    public boolean appliesTo(Object modelElement) {
+        return modelElement != null && classToApply.isAssignableFrom(modelElement.getClass());
+    }
+
+    protected abstract ValidationStatus validate(T modelElement);
+    
+    @SuppressWarnings("unchecked")
+    public ValidationStatus checkRule(Object modelElement) {
+        if (!appliesTo(modelElement)) {
+            throw new IllegalArgumentException(this.getClass().getName() + " doesn't handle validation for " + modelElement.getClass().getName());
+        }
+        return validate((T) modelElement);
+    }
 
 }

@@ -69,7 +69,7 @@ public class PageAPIIT extends CommonAPISPTest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
@@ -80,7 +80,7 @@ public class PageAPIIT extends CommonAPISPTest {
                 getPageAPI().deletePage(page.getId());
             }
         }
-        logout();
+       logoutOnTenant();
     }
 
     @Test
@@ -104,16 +104,16 @@ public class PageAPIIT extends CommonAPISPTest {
         final User john = createUser("john", "bpm");
         final User jack = createUser("jack", "bpm");
 
-        logout();
-        loginWith("john", "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
         final String pageName = generateUniquePageName();
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
         assertThat(page.getInstalledBy()).isEqualTo(john.getId());
         assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
-        logout();
-        loginWith("jack", "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith("jack", "bpm");
         // when
         final PageUpdater pageUpdater = new PageUpdater();
         final String newDescription = "new description";
@@ -137,8 +137,8 @@ public class PageAPIIT extends CommonAPISPTest {
         assertThat(returnedPage.getDescription()).as("description should be:" + newDescription).isEqualTo(newDescription);
         assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated").isAfter(page.getLastModificationDate());
 
-        logout();
-        login();
+       logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(john);
         deleteUser(jack);
 

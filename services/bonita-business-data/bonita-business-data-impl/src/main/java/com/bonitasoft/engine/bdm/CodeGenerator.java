@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.SourceVersion;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -45,6 +47,7 @@ import com.sun.tools.xjc.util.NullStream;
 
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class CodeGenerator {
 
@@ -95,7 +98,7 @@ public class CodeGenerator {
         return definedClass.field(JMod.PRIVATE, type, fieldName);
     }
 
-    public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final JType type) {
+    public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final JClass type) {
         validateFieldName(fieldName);
         if (type == null) {
             throw new IllegalArgumentException("Field type cannot be null");
@@ -122,7 +125,7 @@ public class CodeGenerator {
     }
 
     protected JFieldVar addListField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
-        final JClass fieldClass = getModel().ref(field.getType().getClazz());
+        final JClass fieldClass = toJavaClass(field);
         final JClass fieldListClass = narrowClass(List.class, fieldClass);
         final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
 
@@ -130,11 +133,21 @@ public class CodeGenerator {
 
         final JExpression newInstance = JExpr._new(arrayListFieldClazz).arg(JExpr.lit(10));
         listFieldVar.init(newInstance);
-
-        final JAnnotationUse collectionAnnotation = addAnnotation(listFieldVar, ElementCollection.class);
-        collectionAnnotation.param("fetch", FetchType.EAGER);
-
         return listFieldVar;
+    }
+
+    public JClass toJavaClass(final Field field) {
+        if (field instanceof SimpleField) {
+            final Class<?> fieldClass = ((SimpleField) field).getType().getClazz();
+            return getModel().ref(fieldClass);
+        } else {
+            final String qualifiedName = ((RelationField) field).getReference().getQualifiedName();
+            return getModel().ref(qualifiedName);
+        }
+    }
+
+    public JClass toJavaClass(final FieldType type) {
+        return getModel().ref(type.getClazz());
     }
 
     public void addDefaultConstructor(final JDefinedClass definedClass) {
@@ -168,8 +181,7 @@ public class CodeGenerator {
     }
 
     private JMethod addListMethod(final JDefinedClass definedClass, final Field field, final String listMethodName, final String parameterName) {
-        final JClass fieldClass = getModel().ref(field.getType().getClazz());
-
+        final JClass fieldClass = toJavaClass(field);
         final StringBuilder builder = new StringBuilder(parameterName);
         builder.append(WordUtils.capitalize(field.getName()));
 
@@ -193,24 +205,23 @@ public class CodeGenerator {
 
     public String getGetterName(final JFieldVar field) {
         final JType type = field.type();
-        final StringBuilder builder = new StringBuilder();
-        if (Boolean.class.getName().equals(type.fullName())) {
-            builder.append("is");
-        } else {
-            builder.append("get");
-        }
-        builder.append(WordUtils.capitalize(field.name()));
-        return builder.toString();
+        final boolean bool = Boolean.class.getName().equals(type.fullName());
+        return getGetterName(bool, field.name());
     }
 
     public String getGetterName(final Field field) {
+        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType());
+        return getGetterName(bool, field.getName());
+    }
+
+    private String getGetterName(final boolean bool, final String fieldName) {
         final StringBuilder builder = new StringBuilder();
-        if (FieldType.BOOLEAN.equals(field.getType())) {
+        if (bool) {
             builder.append("is");
         } else {
             builder.append("get");
         }
-        builder.append(WordUtils.capitalize(field.getName()));
+        builder.append(WordUtils.capitalize(fieldName));
         return builder.toString();
     }
 

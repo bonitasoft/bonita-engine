@@ -15,54 +15,67 @@ import java.util.Set;
 import javax.lang.model.SourceVersion;
 
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.Query;
-import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectValidationRule implements ValidationRule {
+public class BusinessObjectValidationRule extends ValidationRule<BusinessObject> {
 
     private static final int MAX_TABLENAME_LENGTH = 30;
 
     private final SQLNameValidator sqlNameValidator;
 
     public BusinessObjectValidationRule() {
+        super(BusinessObject.class);
         sqlNameValidator = new SQLNameValidator(MAX_TABLENAME_LENGTH);
     }
 
     @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof BusinessObject;
-    }
-
-    @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(BusinessObjectValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
-        final BusinessObject bo = (BusinessObject) modelElement;
-
+    public ValidationStatus validate(final BusinessObject bo) {
         final ValidationStatus status = new ValidationStatus();
         final String qualifiedName = bo.getQualifiedName();
         if (qualifiedName == null) {
             status.addError("A Business Object must have a qualified name");
             return status;
         }
-        if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(getSimpleName(qualifiedName))) {
+        String simpleName = bo.getSimpleName();
+        if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
             status.addError(qualifiedName + " is not a valid Java qualified name");
             return status;
         }
+        
+        if (simpleName.contains("_")) {
+            status.addError("_ is a forbidden character in business object's name");
+        }
+        
         if (bo.getFields().isEmpty()) {
             status.addError(qualifiedName + " must have at least one field declared");
         }
-        final Set<String> constraintNames = new HashSet<String>();
+        
+        validateConstraints(bo, status);
+        validateQueries(bo, status);
+        return status;
+    }
+
+    private void validateQueries(final BusinessObject bo, final ValidationStatus status) {
         final Set<String> queryNames = BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo);
+        for (final Query q : bo.getQueries()) {
+            if (queryNames.contains(q.getName())) {
+                status.addError("The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName());
+            } else {
+                queryNames.add(q.getName());
+            }
+        }
+    }
+
+    private void validateConstraints(final BusinessObject bo, final ValidationStatus status) {
+        final Set<String> constraintNames = new HashSet<String>();
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
             if (constraintNames.contains(uc.getName())) {
                 status.addError("The constraint named \"" + uc.getName() + "\" already exists for " + bo.getQualifiedName());
@@ -76,25 +89,6 @@ public class BusinessObjectValidationRule implements ValidationRule {
                 }
             }
         }
-
-        for (final Query q : bo.getQueries()) {
-            if (queryNames.contains(q.getName())) {
-                status.addError("The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName());
-            } else {
-                queryNames.add(q.getName());
-            }
-        }
-
-        return status;
-    }
-
-    private String getSimpleName(final String qualifiedName) {
-        String simpleName = qualifiedName;
-        if (simpleName.indexOf(".") != -1) {
-            final String[] split = simpleName.split("\\.");
-            simpleName = split[split.length - 1];
-        }
-        return simpleName;
     }
 
     private Field getField(final BusinessObject bo, final String name) {

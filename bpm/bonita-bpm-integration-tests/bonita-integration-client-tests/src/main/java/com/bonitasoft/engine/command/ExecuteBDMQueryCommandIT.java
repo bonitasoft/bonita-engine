@@ -29,13 +29,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.FieldType;
-import com.bonitasoft.engine.bdm.Query;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.business.data.ClassloaderRefresher;
 import com.bonitasoft.engine.io.IOUtils;
@@ -69,12 +69,12 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     private static File clientFolder;
 
     private BusinessObjectModel buildBOM() {
-        final Field firstName = new Field();
+        final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
         firstName.setLength(Integer.valueOf(10));
 
-        final Field lastName = new Field();
+        final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         lastName.setNullable(Boolean.FALSE);
@@ -109,18 +109,18 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         businessUser = createUser(USERNAME, PASSWORD);
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
         getTenantManagementAPI().pause();
         getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         loadClientJars();
 
@@ -144,15 +144,15 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
         deleteUser(businessUser.getId());
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -245,7 +245,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
