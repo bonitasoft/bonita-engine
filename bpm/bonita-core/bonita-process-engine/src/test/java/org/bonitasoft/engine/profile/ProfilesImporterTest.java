@@ -2,6 +2,7 @@ package org.bonitasoft.engine.profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
@@ -59,22 +60,20 @@ public class ProfilesImporterTest {
     @Mock
     private ProfileService profileService;
 
+    @Mock
+    EntityUpdateDescriptor entityUpdateDescriptor;
+
     private ProfilesImporter profilesImporter;
 
+    private ReplaceDuplicateImportStrategy replaceDuplicateImportStrategy;
+
     @Test
-    public void should_importProfiles_replace_profile() throws Exception {
+    public void should_importProfiles_replace_custom_profile() throws Exception {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
 
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
-        final ReplaceDuplicateImportStrategy replaceDuplicateImportStrategy = spy(new ReplaceDuplicateImportStrategy(profileService));
-        doReturn(mock(EntityUpdateDescriptor.class)).when(replaceDuplicateImportStrategy).getProfileUpdateDescriptor(any(ExportedProfile.class), anyLong());
-        // doReturn(doReturn(mock(SProfile.class)).when(replaceDuplicateImportStrategy).createSProfile(any(ExportedProfile.class), anyLong()));
+        addTwoProfileEntries(exportedProfile);
+        createReplaceDuplicateStrategy();
 
         createImporter(replaceDuplicateImportStrategy, exportedProfile);
 
@@ -88,6 +87,42 @@ public class ProfilesImporterTest {
         verify(profileService, times(1)).deleteAllProfileEntriesOfProfile(any(SProfile.class));
         verify(profilesImporter, times(1)).importProfileEntries(any(ProfileService.class), anyListOf(ExportedParentProfileEntry.class), anyLong());
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
+    }
+
+    @Test
+    public void should_importProfiles_replace_default_profile() throws Exception {
+        // given
+        final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
+
+        addTwoProfileEntries(exportedProfile);
+        createReplaceDuplicateStrategy();
+        createImporter(replaceDuplicateImportStrategy, exportedProfile);
+
+        doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
+
+        // when
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(-1);
+
+        // then: all entries and mappings are replaced
+        verify(profileService, times(1)).deleteAllProfileMembersOfProfile(any(SProfile.class));
+        verify(profileService, times(0)).deleteAllProfileEntriesOfProfile(any(SProfile.class));
+        verify(profilesImporter, times(0)).importProfileEntries(any(ProfileService.class), anyListOf(ExportedParentProfileEntry.class), anyLong());
+        assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
+    }
+
+    private void createReplaceDuplicateStrategy() {
+        replaceDuplicateImportStrategy = spy(new ReplaceDuplicateImportStrategy(profileService));
+        doReturn(entityUpdateDescriptor).when(replaceDuplicateImportStrategy).getProfileUpdateDescriptor(any(ExportedProfile.class), anyLong(),
+                anyBoolean());
+    }
+
+    private void addTwoProfileEntries(final ExportedProfile exportedProfile) {
+        exportedProfile.getParentProfileEntries().add(
+                createParent("p1", "page1", true));
+        exportedProfile.getParentProfileEntries().add(
+                createParent("p2",
+                        createChild("c1", "pagec1", true),
+                        createChild("c2", "pagec2", false)));
     }
 
     @Test(expected = ExecutionException.class)
@@ -107,13 +142,9 @@ public class ProfilesImporterTest {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
 
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
-        createImporter(new ReplaceDuplicateImportStrategy(profileService), exportedProfile);
+        addTwoProfileEntries(exportedProfile);
+        createReplaceDuplicateStrategy();
+        createImporter(replaceDuplicateImportStrategy, exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
         // when
         final List<ImportStatus> importProfiles = profilesImporter.importProfiles(-1);
@@ -130,14 +161,12 @@ public class ProfilesImporterTest {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
 
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
-        createImporter(new ReplaceDuplicateImportStrategy(profileService), exportedProfile);
+        addTwoProfileEntries(exportedProfile);
+        createReplaceDuplicateStrategy();
+        createImporter(replaceDuplicateImportStrategy, exportedProfile);
+
         final SProfile existingProfile = mock(SProfile.class);
+
         doReturn(true).when(existingProfile).isDefault();
         doReturn(existingProfile).when(profileService).getProfileByName(exportedProfile.getName());
         // when
@@ -151,38 +180,10 @@ public class ProfilesImporterTest {
     }
 
     @Test
-    public void should_importProfiles_whith_ReplaceDuplicate_do_not_update_existing_profile() throws Exception {
-        // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
-
-        createImporter(new ReplaceDuplicateImportStrategy(profileService), exportedProfile);
-        final SProfile existingProfile = mock(SProfile.class);
-        doReturn(true).when(existingProfile).isDefault();
-        doReturn(existingProfile).when(profileService).getProfileByName(exportedProfile.getName());
-        // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(-1);
-
-        // then
-        assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
-        verify(profileService, never()).updateProfile(any(SProfile.class), any(EntityUpdateDescriptor.class));
-    }
-
-    @Test
     public void should_importProfiles_whith_ReplaceDuplicate_do_not_insert_default_profile() throws Exception {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
+        addTwoProfileEntries(exportedProfile);
 
         final ReplaceDuplicateImportStrategy replaceDuplicateImportStrategy = spy(new ReplaceDuplicateImportStrategy(profileService));
         final SProfile existingProfile = mock(SProfile.class);
@@ -205,12 +206,7 @@ public class ProfilesImporterTest {
     public void should_importProfiles_add_profile() throws Exception {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("MineNotDefault", false);
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
+        addTwoProfileEntries(exportedProfile);
         createImporter(new ReplaceDuplicateImportStrategy(profileService), exportedProfile, new ExportedProfile("MineDefault", true));
         // profile do not exists
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("MineNotDefault");
@@ -227,12 +223,7 @@ public class ProfilesImporterTest {
     public void should_importProfiles_skip_profile_when_strategy_tells_it() throws Exception {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
+        addTwoProfileEntries(exportedProfile);
         createImporter(new IgnoreDuplicateImportStrategy(profileService), exportedProfile);
         // profile exists
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
@@ -272,12 +263,7 @@ public class ProfilesImporterTest {
         // given
         final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
 
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p1", "page1", true));
-        exportedProfile.getParentProfileEntries().add(
-                createParent("p2",
-                        createChild("c1", "pagec1", true),
-                        createChild("c2", "pagec2", false)));
+        addTwoProfileEntries(exportedProfile);
         createImporter(new IgnoreDuplicateImportStrategy(profileService), exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
         // when

@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -61,6 +62,10 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -89,8 +94,27 @@ public class ProfileServiceImplForProfileTest {
     @Mock
     private Recorder recorder;
 
+    @Mock
+    private SessionService sessionService;
+
+    @Mock
+    private ReadSessionAccessor readSessionAccessor;
+
+    @Mock
+    private SSession sSession;
+
+    @Mock
+    private SProfile sProfile;
+
     @InjectMocks
     private ProfileServiceImpl profileServiceImpl;
+
+    @Before
+    public void before() throws Exception {
+        doReturn(sSession).when(sessionService).getSession(anyLong());
+
+        doReturn(1l).when(readSessionAccessor).getSessionId();
+    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfiles(org.bonitasoft.engine.persistence.QueryOptions)}.
@@ -459,7 +483,7 @@ public class ProfileServiceImplForProfileTest {
      * @throws SProfileDeletionException
      */
     @Test
-    public final void deleteProfileByObject() throws SBonitaReadException, SRecorderException, SProfileDeletionException, SProfileEntryDeletionException,
+    public final void deleteProfileByObject() throws Exception,
             SProfileMemberDeletionException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
@@ -486,15 +510,13 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public final void deleteNoProfileByObject() throws SProfileDeletionException, SProfileEntryDeletionException, SProfileMemberDeletionException {
+    public final void deleteNoProfileByObject() throws Exception {
         profileServiceImpl.deleteProfile(null);
     }
 
     @Test(expected = SProfileDeletionException.class)
     public void deleteProfileByObjectThrowException() throws Exception {
-        final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
-
         doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
         doReturn(new ArrayList<SProfileEntry>()).when(persistenceService).selectList(SelectDescriptorBuilder.getEntriesOfProfile(3, 0, 1000));
         doReturn(new ArrayList<SProfileMember>()).when(persistenceService).selectList(SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3));
@@ -505,7 +527,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test
-    public final void deleteProfileByObjectWithNoEntry() throws SProfileDeletionException, SRecorderException, SBonitaReadException,
+    public final void deleteProfileByObjectWithNoEntry() throws Exception,
             SProfileEntryDeletionException, SProfileMemberDeletionException {
         final List<SProfile> sProfiles = new ArrayList<SProfile>(3);
         final SProfile sProfile = mock(SProfile.class);
@@ -529,9 +551,8 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test
-    public final void deleteProfileByObjectWithNoMember() throws SProfileDeletionException, SRecorderException, SBonitaReadException,
+    public final void deleteProfileByObjectWithNoMember() throws Exception,
             SProfileEntryDeletionException, SProfileMemberDeletionException {
-        final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
 
         final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
