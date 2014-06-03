@@ -54,6 +54,7 @@ public class DeleteProfileEntry implements TransactionContent {
             deleteProfileEntryChildren();
             profileService.deleteProfileEntry(profileEntryId);
             updateProfileEntriesIndexOnDelete();
+            profileService.updateProfileMetaData(sDeletedProfileEntry.getProfileId());
         }
     }
 
