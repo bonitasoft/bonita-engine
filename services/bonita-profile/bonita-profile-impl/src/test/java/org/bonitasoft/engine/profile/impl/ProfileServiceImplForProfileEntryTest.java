@@ -107,7 +107,7 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     private SProfileEntry createProfileEntry(final long id) {
-        SProfileEntryImpl entry = new SProfileEntryImpl();
+        final SProfileEntryImpl entry = new SProfileEntryImpl();
         entry.setId(id);
         return entry;
     }

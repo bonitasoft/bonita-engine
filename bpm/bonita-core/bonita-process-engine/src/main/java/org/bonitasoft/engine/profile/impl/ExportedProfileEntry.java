@@ -167,8 +167,7 @@ public class ExportedProfileEntry {
         return true;
     }
 
-    public boolean hasError()
-    {
+    public boolean hasError() {
         if (getError() == null) {
             return false;
         }
@@ -176,16 +175,13 @@ public class ExportedProfileEntry {
     }
 
     public ImportError getError() {
-        if (getName() == null)
-        {
+        if (getName() == null) {
             return new ImportError(getName(), Type.PAGE);
         }
-
         if (getPage() == null || getPage().isEmpty()) {
             return new ImportError(getName(), Type.PAGE);
         }
-
         return null;
-
     }
+
 }

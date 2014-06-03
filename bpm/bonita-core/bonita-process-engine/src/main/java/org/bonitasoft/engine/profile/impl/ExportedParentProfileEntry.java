@@ -100,4 +100,18 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
     }
         return null;
     }
+
+    public boolean hasCustomPages() {
+        if (isCustom()) {
+            return true;
+        }
+        if (getChildProfileEntries() != null) {
+            for (final ExportedProfileEntry exportedProfileEntry : getChildProfileEntries()) {
+                if (exportedProfileEntry.isCustom()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
