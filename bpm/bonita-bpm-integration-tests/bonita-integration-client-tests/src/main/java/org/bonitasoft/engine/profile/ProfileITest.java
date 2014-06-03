@@ -13,11 +13,16 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -64,6 +69,71 @@ public class ProfileITest extends AbstractProfileTest {
     @Test(expected = ProfileNotFoundException.class)
     public void getProfileWithWrongParameter() throws Exception {
         getProfileAPI().getProfile(855);
+    }
+
+    @Test
+    public void addUser_to_profile_updates_profile_metadata() throws Exception {
+        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        creator.setUserId(user3.getId());
+
+        shouldProfileMemberOperation_update_profile_metadata(creator);
+    }
+
+    @Test
+    public void addGroup_to_profile_updates_profile_metadata() throws Exception {
+        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        creator.setGroupId(group3.getId());
+
+        shouldProfileMemberOperation_update_profile_metadata(creator);
+    }
+
+    @Test
+    public void addRole_to_profile_updates_profile_metadata() throws Exception {
+        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        creator.setRoleId(role3.getId());
+
+        shouldProfileMemberOperation_update_profile_metadata(creator);
+    }
+
+    @Test
+    public void addRoleAndGroup_to_profile_updates_profile_metadata() throws Exception {
+        final ProfileMemberCreator creator = new ProfileMemberCreator(getProfileAPI().getProfile(adminProfileId).getId());
+        creator.setGroupId(group3.getId());
+        creator.setRoleId(role3.getId());
+
+        shouldProfileMemberOperation_update_profile_metadata(creator);
+    }
+
+    private void shouldProfileMemberOperation_update_profile_metadata(final ProfileMemberCreator creator) throws ProfileNotFoundException, BonitaException,
+            CreationException, AlreadyExistsException,
+            DeletionException, Exception {
+        // given
+        final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
+
+        // when
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName3", "User3Pwd");
+        final ProfileMember createProfileMember = getProfileAPI().createProfileMember(creator);
+
+        // then
+        final Profile profileAfter = getProfileAPI().getProfile(adminProfileId);
+        checkMetaData(profileBefore, profileAfter, user3);
+
+        // when
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName1", "User1Pwd");
+        getProfileAPI().deleteProfileMember(createProfileMember.getId());
+
+        // then
+        final Profile profileAfterDelete = getProfileAPI().getProfile(adminProfileId);
+        checkMetaData(profileAfter, profileAfterDelete, user1);
+    }
+
+    private void checkMetaData(final Profile profileBefore, final Profile profileAfter, final User user) {
+        assertThat(profileAfter.getLastUpdateDate()).as("lastUpdateDate should be modified").isAfter(profileBefore.getLastUpdateDate());
+        assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified").isNotEqualTo(profileBefore.getLastUpdatedBy());
+        assertThat(profileAfter.getLastUpdatedBy()).as("lastUpdatedBy should be modified").isEqualTo(user.getId());
+
     }
 
 }

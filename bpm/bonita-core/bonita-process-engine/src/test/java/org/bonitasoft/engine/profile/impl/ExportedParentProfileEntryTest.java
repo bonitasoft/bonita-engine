@@ -120,4 +120,40 @@ public class ExportedParentProfileEntryTest {
 
     }
 
+    @Test
+    public void should_hasCustomPage_beTrue() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        parentEntry.setCustom(true);
+
+        // when then
+        assertThat(parentEntry.hasCustomPages()).isTrue();
+
+    }
+
+    @Test
+    public void should_hasCustomPage_child_beTrue() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        parentEntry.setCustom(false);
+        final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
+        childEntry.setPage("page");
+        childEntry.setCustom(true);
+
+        parentEntry.setChildProfileEntries(Arrays.asList(childEntry));
+        // when then
+        assertThat(parentEntry.hasCustomPages()).isTrue();
+
+    }
+
+    @Test
+    public void should_hasCustomPage_beFalse() throws Exception {
+        // given
+        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        parentEntry.setCustom(false);
+
+        // when then
+        assertThat(parentEntry.hasCustomPages()).isFalse();
+
+    }
 }
