@@ -451,11 +451,6 @@
       <artifactId>bonita-process-comment-api-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.comment</groupId>
-      <artifactId>bonita-process-comment-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Process Definition -->
     <dependency>
@@ -873,8 +868,6 @@
                   <include>org.bonitasoft.engine.platform.session:bonita-platform-session-impl</include>
                   <include>com.bonitasoft.engine.platform.session:bonita-platform-session-clustered</include>
                   <!-- Process Comment -->
-                  <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
-                  <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>
                   <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api</include>
                   <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
                   <!-- Process Definition -->
