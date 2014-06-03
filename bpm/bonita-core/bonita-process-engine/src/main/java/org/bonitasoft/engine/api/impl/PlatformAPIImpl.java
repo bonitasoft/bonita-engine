@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -26,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.api.impl.transaction.GetTenantsCallable;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
@@ -68,8 +68,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -411,27 +409,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
+    protected List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
-        final List<STenant> tenantIds = transactionService.executeInTransaction(new Callable<List<STenant>>() {
-
-            @Override
-            public List<STenant> call() throws Exception {
-                List<STenant> tenants;
-                final int maxResults = 100;
-                int i = 0;
-                final List<STenant> tenantIds = new ArrayList<STenant>();
-                do {
-                    tenants = platformService.getTenants(new QueryOptions(i, maxResults, STenant.class, "id", OrderByType.ASC));
-                    i += maxResults;
-                    for (final STenant sTenant : tenants) {
-                        tenantIds.add(sTenant);
-                    }
-                } while (tenants.size() == maxResults);
-                return tenantIds;
-            }
-        });
+        final List<STenant> tenantIds = transactionService.executeInTransaction(new GetTenantsCallable(platformService));
         return tenantIds;
     }
 
@@ -456,14 +437,14 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (nodeConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
-            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
-                serviceWithLifecycle.stop();
-            }
             final List<STenant> tenantIds = getTenants(platformAccessor);
             for (final STenant tenant : tenantIds) {
                 // stop the tenant services:
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
+            }
+            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
+                serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {

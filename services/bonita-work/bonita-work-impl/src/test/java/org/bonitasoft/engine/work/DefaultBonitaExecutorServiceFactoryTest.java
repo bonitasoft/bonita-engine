@@ -1,12 +1,9 @@
 package org.bonitasoft.engine.work;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.junit.Test;
 
 public class DefaultBonitaExecutorServiceFactoryTest {
@@ -17,7 +14,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, tenantId, 1,
                 20, 15, 10);
 
-        Pair<ExecutorService, Queue<Runnable>> createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();
+        BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();
         Runnable r = new Runnable() {
 
             @Override
@@ -25,7 +22,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
             }
         };
 
-        String name = ((ThreadPoolExecutor) createExecutorService.getKey()).getThreadFactory().newThread(r).getName();
+        String name = ((ThreadPoolExecutor) createExecutorService).getThreadFactory().newThread(r).getName();
         assertThat(name).as("thread name should contains the tenantId").contains(Long.toString(tenantId));
     }
 }

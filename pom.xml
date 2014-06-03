@@ -10,7 +10,7 @@
 
 	<groupId>org.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine</artifactId>
-	<version>6.3.1-SNAPSHOT</version>
+	<version>6.3.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita BPM Engine</name>
@@ -51,7 +51,7 @@
 		<slf4j.version>1.6.1</slf4j.version>
 		<httpclient.version>4.2.5</httpclient.version>
 		<xstream.version>1.4.2</xstream.version>
-		<hibernate.version>4.2.12.Final</hibernate.version>
+		<hibernate.version>4.2.13.Final</hibernate.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<spring.version>3.1.2.RELEASE</spring.version>
