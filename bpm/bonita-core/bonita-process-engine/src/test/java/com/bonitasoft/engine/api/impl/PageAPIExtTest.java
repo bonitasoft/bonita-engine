@@ -226,7 +226,9 @@ public class PageAPIExtTest {
         doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
 
         // given
-        final byte[] content = "content".getBytes();
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
+                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
         final long pageId = 1;
 
         // when
@@ -284,7 +286,7 @@ public class PageAPIExtTest {
     @Test(expected = AlreadyExistsException.class)
     public void testCheckPageAlreadyExists() throws Exception {
         // given
-        PageCreator pageCreator = new PageCreator("name", "content.zip");
+        final PageCreator pageCreator = new PageCreator("name", "content.zip");
         doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
         doReturn(sPage).when(pageAPIExt).constructPage(pageCreator, userId);
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
@@ -306,15 +308,15 @@ public class PageAPIExtTest {
         final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
                 pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
-        Page mock = mock(Page.class);
-        PageCreator pageCreator = new PageCreator("mypage", "content.zip");
+        final Page mock = mock(Page.class);
+        final PageCreator pageCreator = new PageCreator("mypage", "content.zip");
         pageCreator.setDescription("mypage description");
         pageCreator.setDisplayName("mypage display name");
 
         doReturn(mock).when(pageAPIExt).createPage(eq(pageCreator), eq(content));
 
         // when
-        Page createPage = pageAPIExt.createPage("content.zip", content);
+        final Page createPage = pageAPIExt.createPage("content.zip", content);
 
         // then
         assertThat(createPage).isEqualTo(mock);
