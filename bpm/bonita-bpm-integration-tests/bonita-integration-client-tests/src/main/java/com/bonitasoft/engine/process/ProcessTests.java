@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,10 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         ProcessResolutionTest.class,
-        HiddenTaskTest.class,
-        ManualTasksTest.class,
         ProcessManagementTest.class,
-        TaskOnDemandTest.class,
         ProcessParameterTest.class,
         AbortProcessInstanceTest.class,
         CancelProcessInstanceTest.class

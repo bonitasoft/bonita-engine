@@ -34,12 +34,12 @@ public class LocalLogTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     // run this test in local test suite only, otherwise it's necessary to use a command to set the system property on the server side
@@ -102,7 +102,7 @@ public class LocalLogTest extends CommonAPISPTest {
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithActorAndAPIAccessorConnector(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndAPIAccessorConnector(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());

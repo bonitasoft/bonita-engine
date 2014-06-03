@@ -29,7 +29,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
@@ -40,7 +40,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
                 getPageAPI().deletePage(page.getId());
             }
         }
-        logout();
+       logoutOnTenant();
     }
 
     /*

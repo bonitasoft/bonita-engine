@@ -10,42 +10,31 @@ package com.bonitasoft.engine.bdm.validator.rule;
 
 import javax.lang.model.SourceVersion;
 
-import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
  */
-public class FieldValidationRule implements ValidationRule {
+public class FieldValidationRule extends ValidationRule<Field> {
 
     private static final int MAX_COLUMNAME_LENGTH = 50;
 
     private final SQLNameValidator sqlNameValidator;
 
     public FieldValidationRule() {
+        super(Field.class);
         sqlNameValidator = new SQLNameValidator(MAX_COLUMNAME_LENGTH);
     }
 
     @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof Field;
-    }
-
-    @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(FieldValidationRule.class.getName() + " doesn't handle validation for " + modelElement.getClass().getName());
-        }
-        final Field field = (Field) modelElement;
+    public ValidationStatus validate(final Field field) {
         final ValidationStatus status = new ValidationStatus();
         final String name = field.getName();
         if (name == null || !SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name) || isForbiddenIdentifier(name)) {
             status.addError(name + " is not a valid field identifier");
             return status;
-        }
-        if (field.getType() == null) {
-            status.addError(name + " must have a type declared");
         }
         return status;
     }

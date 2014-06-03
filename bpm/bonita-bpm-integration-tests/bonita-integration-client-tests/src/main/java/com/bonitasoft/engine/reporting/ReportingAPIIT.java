@@ -50,14 +50,14 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Before
     public void setUp() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         getIdentityAPI().createUser("matti", "bpm", "Matti", "Mäkelä");
     }
 
     @After
     public void tearDown() throws BonitaException {
         getIdentityAPI().deleteUser("matti");
-        logout();
+       logoutOnTenant();
     }
 
     @Test
@@ -292,13 +292,13 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Test
     public void createTenantDeploysDefaultReports() throws BonitaException {
-        logout();
-        PlatformSession session = loginPlatform();
+       logoutOnTenant();
+        PlatformSession session = loginOnPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         final long tenantId = platformAPI.createTenant(new TenantCreator("newTenant", "a test tenant to check default report creation", "testIconName",
                 "testIconPath", "myTenantAdmin", "theirPassword"));
         platformAPI.activateTenant(tenantId);
-        logoutPlatform(session);
+        logoutOnPlatform(session);
         loginOnTenantWith("myTenantAdmin", "theirPassword", tenantId);
         try {
             final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).done();
@@ -307,13 +307,13 @@ public class ReportingAPIIT extends CommonAPISPTest {
             assertEquals(4, searchReports.getCount());
         } finally {
             // cleanup:
-            logout();
-            session = loginPlatform();
+           logoutOnTenant();
+            session = loginOnPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.deactiveTenant(tenantId);
             platformAPI.deleteTenant(tenantId);
-            logoutPlatform(session);
-            login();
+            logoutOnPlatform(session);
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
         }
     }
 
@@ -425,11 +425,11 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
         final User john = createUser("john", "bpm");
 
-        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
-        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableWithActor(endSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableProcessWithActor(endSignalArchive, ACTOR_NAME, john);
 
-        logout();
-        loginWith("john", "bpm");
+       logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());

@@ -8,14 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
  * Occurs when we try to login with an other user than the technical user on a tenant that is paused.
  * 
+ * @deprecated use {@link TenantStatusException} instead
  * @author Emmanuel Duchastenier
  */
-public class TenantIsPausedException extends BonitaRuntimeException {
+@Deprecated
+public class TenantIsPausedException extends TenantStatusException {
 
     private static final long serialVersionUID = 1L;
 

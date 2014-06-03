@@ -34,12 +34,12 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Memory", "Usage" }, story = "Get current memory usage.", jira = "")

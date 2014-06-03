@@ -43,15 +43,15 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      * Connects the user in order to use API methods of a tenant.
      * 
      * @param tenantId
-     *            the tenant identifier
+     *        the tenant identifier
      * @param credentials
-     *            the credentials to login with. Can be username / password, SSO ticket, ... depending on the implementation.
+     *        the credentials to login with. Can be username / password, SSO ticket, ... depending on the implementation.
      * @return the session to use with other tenant API methods
      * @throws LoginException
-     *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
-     *             since 6.0
+     *         occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
+     * @since 6.0
      * @throws TenantIsPausedException
-     *             if the tenant is paused. No login is allowed for users other than the technical user.
+     *         if the tenant is paused. No login is allowed for users other than the technical user.
      */
     @NoSessionRequired
     APISession login(long tenantId, Map<String, Serializable> credentials) throws LoginException, TenantIsPausedException;
