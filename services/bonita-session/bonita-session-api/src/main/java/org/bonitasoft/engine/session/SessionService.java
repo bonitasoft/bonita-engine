@@ -22,11 +22,11 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public interface SessionService {
 
-    public static final String SYSTEM = "system";
+    String SYSTEM = "system";
 
     /**
      * Create a new session for the given user;
-     * 
+     *
      * @param tenantId
      * @param userName
      *            userName
@@ -41,7 +41,7 @@ public interface SessionService {
 
     /**
      * Delete a session having the given id
-     * 
+     *
      * @param sessionId
      *            the session's id
      * @throws SSessionNotFoundException
@@ -52,14 +52,14 @@ public interface SessionService {
 
     /**
      * Delete all invalid sessions
-     * 
+     *
      * @since 6.0
      */
     void cleanInvalidSessions();
 
     /**
      * Verify if a session is valid
-     * 
+     *
      * @param sessionId
      *            the session's id
      * @return true if the session is valid, false otherwise
@@ -71,7 +71,7 @@ public interface SessionService {
 
     /**
      * Retrieve a session by its id
-     * 
+     *
      * @param sessionId
      *            the session's id
      * @return the session associated to the given id
@@ -83,7 +83,7 @@ public interface SessionService {
 
     /**
      * Define how long, in milliseconds, the created sessions will be valid. This does not affect already created session
-     * 
+     *
      * @param duration
      * @since 6.0
      */
@@ -91,7 +91,7 @@ public interface SessionService {
 
     /**
      * Retrieve the default sessions's duration, in milliseconds.
-     * 
+     *
      * @return the default sessions's duration
      * @since 6.0
      */
@@ -99,7 +99,7 @@ public interface SessionService {
 
     /**
      * Retrieve the duration, in milliseconds, of new created session. If no duration was specified, the default duration will be used
-     * 
+     *
      * @return the duration of new created session.
      * @since 6.0
      */
@@ -107,7 +107,7 @@ public interface SessionService {
 
     /**
      * Update the expiration and the last update dates of the session.
-     * 
+     *
      * @param sessionId
      *            the session id
      * @throws SSessionException
@@ -122,16 +122,15 @@ public interface SessionService {
     void deleteSessions();
 
     /**
-     * 
      * Delete all sessions of a tenant
-     * 
+     *
      * @param tenantId
      */
     void deleteSessionsOfTenant(long tenantId);
 
     /**
      * Delete all sessions of a tenant except the one of the technical user
-     * 
+     *
      * @param tenantId
      */
     void deleteSessionsOfTenantExceptTechnicalUser(long tenantId);

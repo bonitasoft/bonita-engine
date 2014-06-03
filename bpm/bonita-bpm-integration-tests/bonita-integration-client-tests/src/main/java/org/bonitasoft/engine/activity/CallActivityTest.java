@@ -63,6 +63,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -87,7 +88,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         cebolinha = createUser("cebolinha", "bpm");
         cascao = createUser("cascao", "bpm");
     }
@@ -96,7 +97,7 @@ public class CallActivityTest extends CommonAPITest {
     public void afterTest() throws BonitaException {
         deleteUser(cebolinha.getId());
         deleteUser(cascao.getId());
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition getSimpleProcess(final String ACTOR_NAME, final String processName, final String processVersion, final boolean terminateEnd)
@@ -120,7 +121,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addTransition("tStart", "tStep1");
         processDefBuilder.addTransition("tStep1", "tEnd");
 
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         return targetProcessDefinition;
     }
@@ -155,7 +156,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
 
         return processDefinition;
     }
@@ -163,8 +164,10 @@ public class CallActivityTest extends CommonAPITest {
     private void addDataOutputOperationIfNeed(final boolean addOutputOperations, final CallActivityBuilder callActivityBuilder)
             throws InvalidExpressionException {
         if (addOutputOperations) {
-            final Operation setClientNumber = buildAssignOperation("cNumber", "clientNumber", ExpressionType.TYPE_VARIABLE, Integer.class.getName());
-            final Operation setProtocalNumber = buildAssignOperation("pNumber", "protocolNumber", ExpressionType.TYPE_VARIABLE, Integer.class.getName());
+            final Operation setClientNumber = BuildTestUtil.buildAssignOperation("cNumber", "clientNumber", ExpressionType.TYPE_VARIABLE,
+                    Integer.class.getName());
+            final Operation setProtocalNumber = BuildTestUtil.buildAssignOperation("pNumber", "protocolNumber", ExpressionType.TYPE_VARIABLE,
+                    Integer.class.getName());
             callActivityBuilder.addDataOutputOperation(setClientNumber);
             callActivityBuilder.addDataOutputOperation(setProtocalNumber);
         }
@@ -173,9 +176,9 @@ public class CallActivityTest extends CommonAPITest {
     private void addDataInputOperationsIfNeed(final boolean addInputOperations, final CallActivityBuilder callActivityBuilder)
             throws InvalidExpressionException {
         if (addInputOperations) {
-            final Operation setFirstName = buildAssignOperation("firstName", "fName", ExpressionType.TYPE_VARIABLE, String.class.getName());
-            final Operation setLastName = buildAssignOperation("lastName", "lName", ExpressionType.TYPE_VARIABLE, String.class.getName());
-            final Operation mapFromCallActivity = buildAssignOperation("calledProcessData", "callActivityData", ExpressionType.TYPE_VARIABLE,
+            final Operation setFirstName = BuildTestUtil.buildAssignOperation("firstName", "fName", ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation setLastName = BuildTestUtil.buildAssignOperation("lastName", "lName", ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation mapFromCallActivity = BuildTestUtil.buildAssignOperation("calledProcessData", "callActivityData", ExpressionType.TYPE_VARIABLE,
                     String.class.getName());
             callActivityBuilder.addDataInputOperation(setFirstName);
             callActivityBuilder.addDataInputOperation(setLastName);
@@ -258,20 +261,20 @@ public class CallActivityTest extends CommonAPITest {
             // Transitions
             mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send").addTransition("Gateway1", "Receive")
                     .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2").addTransition("Gateway2", "MainEnd");
-            mainProcessDefinition = deployAndEnableWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            mainProcessDefinition = deployAndEnableProcessWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
 
             // Receive process
             final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Receive", PROCESS_VERSION);
             receiveProcessDefinitionBuilder.addActor(ACTOR_NAME);
             receiveProcessDefinitionBuilder.addStartEvent("ReceiveStart").addEndEvent("ReceiveEnd");
             receiveProcessDefinitionBuilder.addUserTask("Read", ACTOR_NAME);
-            final Operation operation = buildAssignOperation("copymsg", "MSG", ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation operation = BuildTestUtil.buildAssignOperation("copymsg", "MSG", ExpressionType.TYPE_VARIABLE, String.class.getName());
             final IntermediateCatchEventDefinitionBuilder intermediateCatchEvent = receiveProcessDefinitionBuilder.addIntermediateCatchEvent("ReceiveMsg");
             intermediateCatchEvent.addMessageEventTrigger("ping").addOperation(operation);
             intermediateCatchEvent.addLongTextData("copymsg", null);
             // Transitions
             receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg").addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
-            receiveProcessDefinition = deployAndEnableWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            receiveProcessDefinition = deployAndEnableProcessWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
 
             // Send process
             final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Send", PROCESS_VERSION);
@@ -288,7 +291,7 @@ public class CallActivityTest extends CommonAPITest {
                     .addMessageContentExpression(displayName, messageContent);
             // Transitions
             sendProcessDefinitionBuilder.addTransition("SendStart", "Step1").addTransition("Step1", "SendMsgEnd");
-            sendProcessDefinition = deployAndEnableWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            sendProcessDefinition = deployAndEnableProcessWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
 
             assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
             final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
@@ -330,18 +333,18 @@ public class CallActivityTest extends CommonAPITest {
             // Transitions
             mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send").addTransition("Gateway1", "Receive")
                     .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2").addTransition("Gateway2", "MainEnd");
-            mainProcessDefinition = deployAndEnableWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            mainProcessDefinition = deployAndEnableProcessWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
             // Receive process
             final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Receive", PROCESS_VERSION);
             receiveProcessDefinitionBuilder.addActor(ACTOR_NAME);
             receiveProcessDefinitionBuilder.addStartEvent("ReceiveStart").addEndEvent("ReceiveEnd");
             receiveProcessDefinitionBuilder.addLongTextData("copymsg", null);
             receiveProcessDefinitionBuilder.addUserTask("Read", ACTOR_NAME);
-            final Operation operation = buildAssignOperation("copymsg", "MSG2", ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation operation = BuildTestUtil.buildAssignOperation("copymsg", "MSG2", ExpressionType.TYPE_VARIABLE, String.class.getName());
             receiveProcessDefinitionBuilder.addReceiveTask("ReceiveMsg", "ping2").addMessageOperation(operation);
             // Transitions
             receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg").addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
-            receiveProcessDefinition = deployAndEnableWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            receiveProcessDefinition = deployAndEnableProcessWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
             // Send process
             final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Send", PROCESS_VERSION);
             sendProcessDefinitionBuilder.addActor(ACTOR_NAME);
@@ -357,7 +360,7 @@ public class CallActivityTest extends CommonAPITest {
                     .addMessageContentExpression(displayName, messageContent);
             // Transitions
             sendProcessDefinitionBuilder.addTransition("SendStart", "Step1").addTransition("Step1", "SendMsgEnd");
-            sendProcessDefinition = deployAndEnableWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+            sendProcessDefinition = deployAndEnableProcessWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
             assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
 
             final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
@@ -401,7 +404,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
-        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        final ProcessDefinition callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
@@ -499,8 +502,8 @@ public class CallActivityTest extends CommonAPITest {
 
     private List<Operation> getStartOperations() throws InvalidExpressionException {
         final ArrayList<Operation> operations = new ArrayList<Operation>(2);
-        operations.add(buildAssignOperation("fName", "Fulano", ExpressionType.TYPE_CONSTANT, String.class.getName()));
-        operations.add(buildAssignOperation("lName", "de Tal", ExpressionType.TYPE_CONSTANT, String.class.getName()));
+        operations.add(BuildTestUtil.buildAssignOperation("fName", "Fulano", ExpressionType.TYPE_CONSTANT, String.class.getName()));
+        operations.add(BuildTestUtil.buildAssignOperation("lName", "de Tal", ExpressionType.TYPE_CONSTANT, String.class.getName()));
         return operations;
     }
 
@@ -792,7 +795,7 @@ public class CallActivityTest extends CommonAPITest {
             processDefBuilder.addTransition("start", "callActivity");
             processDefBuilder.addTransition("callActivity", "step1");
             processDefBuilder.addTransition("step1", "end");
-            callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+            callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
             checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
@@ -845,7 +848,7 @@ public class CallActivityTest extends CommonAPITest {
             processDefBuilder.addTransition("start", "callActivity");
             processDefBuilder.addTransition("callActivity", "step1");
             processDefBuilder.addTransition("step1", "end");
-            callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+            callingProcessDef = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
             checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
@@ -892,7 +895,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
-        deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
     }
 
     @Cover(classes = { CallActivityInstance.class, HumanTaskInstance.class, ArchivedProcessInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = {
@@ -910,7 +913,7 @@ public class CallActivityTest extends CommonAPITest {
             targetProcessDefBuilder.addEndEvent("tEnd");
             targetProcessDefBuilder.addTransition("tStart", "tStep1");
             targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-            targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
             // Build and start calling process
             final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
             final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
@@ -924,7 +927,7 @@ public class CallActivityTest extends CommonAPITest {
             processDefBuilder.addEndEvent("end");
             processDefBuilder.addTransition("start", "callActivity");
             processDefBuilder.addTransition("callActivity", "end");
-            callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+            callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
             // Execute step in the target process
             waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha);
@@ -955,7 +958,7 @@ public class CallActivityTest extends CommonAPITest {
         targetProcessDefBuilder.addEndEvent("tEnd");
         targetProcessDefBuilder.addTransition("tStart", "tStep1");
         targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         // Build and start calling process
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
@@ -969,7 +972,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
         final ActivityInstance userTask = waitForUserTask("tStep1", callingProcessInstance.getId());
@@ -996,7 +999,7 @@ public class CallActivityTest extends CommonAPITest {
             targetProcessDefBuilder.addEndEvent("tEnd");
             targetProcessDefBuilder.addTransition("tStart", "tStep1");
             targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-            targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
             // Build and start calling process
             final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
             final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
@@ -1007,7 +1010,7 @@ public class CallActivityTest extends CommonAPITest {
             processDefBuilder.addEndEvent("end");
             processDefBuilder.addTransition("start", "callActivity");
             processDefBuilder.addTransition("callActivity", "end");
-            callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+            callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
             final ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance);
             assertEquals(callingProcessInstance.getId(), getProcessAPI().getActivityDataInstance("rootProcId", activityInstance.getId()).getValue());
@@ -1029,7 +1032,7 @@ public class CallActivityTest extends CommonAPITest {
             targetProcessDefBuilder.addData("subProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("subDefault"));
             targetProcessDefBuilder.addAutomaticTask("tStep1").addOperation(
                     new OperationBuilder().createSetDataOperation("subProcessData", new ExpressionBuilder().createConstantStringExpression("subModified")));
-            targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+            targetProcessDefinition = deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
             // Build and start calling process
             final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
             final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
@@ -1059,7 +1062,7 @@ public class CallActivityTest extends CommonAPITest {
             bizArchive.addConnectorImplementation(new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(BPMRemoteTests.class
                     .getResourceAsStream("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl"))));
             bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
-            callingProcessDefinition = deployAndEnableWithActor(bizArchive.done(), ACTOR_NAME, cascao);
+            callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
             final ActivityInstance activityInstance = waitForUserTask("end", callingProcessInstance);
             assertEquals("parentDefault", getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", activityInstance.getId()).getValue());

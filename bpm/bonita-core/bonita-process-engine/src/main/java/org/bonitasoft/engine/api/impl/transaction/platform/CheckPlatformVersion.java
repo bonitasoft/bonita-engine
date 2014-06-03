@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2013, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -46,13 +46,12 @@ public class CheckPlatformVersion implements Callable<Boolean> {
     public Boolean call() throws SBonitaException {
         // the database version
         platform = platformService.getPlatform();
-        String dbVersion = platform.getVersion();
+        final String dbVersion = platform.getVersion();
         // the version in jars
         platformProperties = platformService.getSPlatformProperties();
-        String jarVersion = platformProperties.getPlatformVersion();
+        final String jarVersion = platformProperties.getPlatformVersion();
         // the version in bonita home
-        String bonitaHomeVersion;
-        bonitaHomeVersion = bonitaHomeServer.getVersion();
+        final String bonitaHomeVersion = bonitaHomeServer.getVersion();
         final String platformMinorVersion = format(dbVersion);
         final String propertiesMinorVersion = format(jarVersion);
         boolean same = platformMinorVersion.equals(propertiesMinorVersion);
@@ -71,7 +70,7 @@ public class CheckPlatformVersion implements Callable<Boolean> {
 
     private String format(final String version) {
         final String trimVersion = version.trim();
-        final int endIndex = trimVersion.indexOf(".", 2);
+        final int endIndex = trimVersion.indexOf('.', 2);
         if (endIndex == -1) {
             return trimVersion;
         }

@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-bpm-integration-tests</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-bpm-services-integration-tests</artifactId>
@@ -58,18 +58,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.category</groupId>
 			<artifactId>bonita-category-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

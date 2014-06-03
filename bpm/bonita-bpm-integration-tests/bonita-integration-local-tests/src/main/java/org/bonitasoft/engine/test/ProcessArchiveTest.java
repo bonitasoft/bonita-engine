@@ -40,14 +40,14 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(JOHN, "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
                 new ExpressionBuilder().createConstantStringExpression("updated a value"));
         processDefinitionBuilder.addShortTextData("activityData", new ExpressionBuilder().createConstantStringExpression("activityDataBalue")).getProcess();
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -162,7 +162,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0").addActor("actor")
                 .addAutomaticTask("step1").addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -188,14 +188,14 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final SCommentService commentService = tenantAccessor.getCommentService();
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -254,15 +254,15 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Test
     public void archivedFlowNodeInstance() throws Exception {
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
                 .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());
@@ -278,15 +278,15 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Test
     public void getArchivedFlowNodeInstance() throws Exception {
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
                 .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());

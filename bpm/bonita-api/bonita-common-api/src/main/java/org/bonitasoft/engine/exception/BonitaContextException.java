@@ -15,15 +15,14 @@ package org.bonitasoft.engine.exception;
 
 /**
  * Exception wrapper providing context on the exception.
- * 
+ *
  * @author Aurelien Pupier
  * @author Celine Souchet
- * 
  */
 public interface BonitaContextException {
 
-    public abstract String getUserName();
+    String getUserName();
 
-    public abstract void setUserName(String userName);
+    void setUserName(String userName);
 
 }

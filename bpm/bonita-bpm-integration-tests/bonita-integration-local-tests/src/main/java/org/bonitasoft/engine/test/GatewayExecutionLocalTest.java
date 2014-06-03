@@ -33,12 +33,12 @@ public class GatewayExecutionLocalTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(user);
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser(USERNAME, PASSWORD);
     }
 
@@ -53,12 +53,12 @@ public class GatewayExecutionLocalTest extends CommonAPITest {
                     .createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
             final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                     .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION)
-                    .addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
+                    .addActor(ACTOR_NAME).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
                     .addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
                     .addTransition("gateway1", "step2", scriptExpression).addDefaultTransition("gateway1", "step3")
                     .getProcess();
 
-            final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 

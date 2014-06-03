@@ -10,27 +10,24 @@
 
   <query name="getNumberOfSAFlowNodeInstanceSupervisedBy">
 	SELECT COUNT(DISTINCT aa.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa,
-		     org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
-		WHERE terminal = TRUE
-		AND aa.rootContainerId = ap.sourceObjectId
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
-			OR (
-				supervisor.id IN (
-					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-					WHERE um.userId = :supervisorId 
-					AND (
-						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-						OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
-					)
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa,
+		 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+	WHERE terminal = TRUE
+	AND aa.logicalGroup1 = supervisor.processDefId
+	AND (supervisor.userId = :supervisorId
+		OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, 
+					 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				WHERE um.userId = :supervisorId 
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
 				)
 			)
 		)
+	)
   </query>
 	
   <query name="searchSAFlowNodeInstance">
@@ -41,15 +38,11 @@
   <query name="searchSAFlowNodeInstanceSupervisedBy">
 	SELECT DISTINCT aa
 	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa,
-	     org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+		 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 	WHERE terminal = TRUE
-	AND aa.rootContainerId = ap.sourceObjectId
-	AND ap.processDefinitionId IN (
-		SELECT supervisor.processDefId
-		FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE supervisor.userId = :supervisorId
-		OR (
-			supervisor.id IN (
+	AND aa.logicalGroup1 = supervisor.processDefId
+	AND (supervisor.userId = :supervisorId
+		OR (supervisor.id IN (
 				SELECT supervisor.id
 				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
 				WHERE um.userId = :supervisorId 
@@ -60,27 +53,24 @@
 				)
 			)
 		)
-	 )
-    </query>
+	)
+  </query>
 	
 	<query name="searchSAActivityInstanceSupervisedBy">
 		SELECT DISTINCT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa,
-	     	 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
 		AND aa.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
 		)
-		AND aa.rootContainerId = ap.sourceObjectId
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
-			OR (
-				supervisor.id IN (
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, 
+					 	 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
 					WHERE um.userId = :supervisorId 
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -89,26 +79,24 @@
 					)
 				)
 			)
-		 )
+		)
   	</query>
   	
 	<query name="getNumberOfSAActivityInstanceSupervisedBy">
   		SELECT COUNT(DISTINCT aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa,
-	     	 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
 		AND aa.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)AND aa.rootContainerId = ap.sourceObjectId
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
-			OR (
-				supervisor.id IN (
+		)
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND (supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, 
+					 	 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
 					WHERE um.userId = :supervisorId 
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -117,7 +105,7 @@
 					)
 				)
 			)
-		 )
+		)
 	</query> 
   
 	<query name="getArchivedFlowNodeInstanceById">
@@ -183,20 +171,16 @@
 	
 	<query name="getNumberOfSAHumanTaskInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT aa.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa,
-		     org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa, 
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
 		AND aa.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2 
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
 		)
-		AND aa.rootContainerId = ap.sourceObjectId
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
-			OR (
-				supervisor.id IN (
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND(supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
 					WHERE um.userId = :supervisorId 
@@ -213,19 +197,15 @@
 	<query name="searchSAHumanTaskInstanceSupervisedBy">
 		SELECT DISTINCT aa 
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa,
-		     org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
 		AND aa.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2 
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
 			)
-		AND aa.rootContainerId = ap.sourceObjectId
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :supervisorId
-			OR (
-				supervisor.id IN (
+		AND aa.logicalGroup1 = supervisor.processDefId
+		AND(supervisor.userId = :supervisorId
+			OR (supervisor.id IN (
 					SELECT supervisor.id
 					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
 					WHERE um.userId = :supervisorId 
@@ -239,8 +219,6 @@
 		)
 	</query>
 	
-	
-
   	<query name="searchSAHumanTaskInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa
@@ -609,7 +587,7 @@
   	<query name="getNumberOfSAProcessInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT ap)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE ap.archiveDate = (
 			SELECT MAX(api.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
 			WHERE api.sourceObjectId = ap.sourceObjectId )
@@ -617,29 +595,27 @@
 			SELECT MAX(api.id) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
 			WHERE api.sourceObjectId = ap.sourceObjectId )
 		AND ap.stateId IN (6,7,3,4)
-		AND ap.processDefinitionId IN (
-			SELECT supervisor.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-			WHERE supervisor.userId = :userId
-				OR (
-					supervisor.id IN (
-						SELECT supervisor.id
-						FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-						WHERE um.userId = :userId 
-						AND (
-							(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-							OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-							OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
-						)
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, 
+				   	 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				WHERE um.userId = :userId 
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
 					)
 				)
+			)
 		)
   	</query>
 		
   	<query name="searchSAProcessInstanceSupervisedBy">
 		SELECT DISTINCT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE ap.archiveDate = (
 			SELECT MAX(api.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
 			WHERE api.sourceObjectId = ap.sourceObjectId )
@@ -647,22 +623,20 @@
 			SELECT MAX(api.id) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
 			WHERE api.sourceObjectId = ap.sourceObjectId )
 		AND ap.stateId IN (6,7,3,4)
-		AND ap.processDefinitionId IN (
-			SELECT supervisor2.processDefId
-			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor2
-			WHERE supervisor2.userId = :userId
-				OR (
-					supervisor2.id IN (
-						SELECT supervisor.id
-						FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-						WHERE um.userId = :userId 
-						AND (
-							(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-							OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-							OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
-						)
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, 
+				   	 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				WHERE um.userId = :userId 
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
 					)
 				)
+			)
 		)
 	   </query>
 	

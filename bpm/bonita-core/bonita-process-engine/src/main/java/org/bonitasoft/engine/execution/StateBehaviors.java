@@ -665,7 +665,6 @@ public class StateBehaviors {
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-
         if (flowNodeInstance instanceof SThrowEventInstance) {
             final SThrowEventInstance throwEventInstance = (SThrowEventInstance) flowNodeInstance;
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
@@ -694,7 +693,9 @@ public class StateBehaviors {
             do {
                 childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), i, BATCH_SIZE);
                 for (final SActivityInstance sActivityInstance : childrenOfAnActivity) {
-                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), sActivityInstance.getId(), null, null);
+                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(),
+                            sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
+                            sActivityInstance.getId(), null, null);
                 }
                 i += BATCH_SIZE;
             } while (childrenOfAnActivity.size() == BATCH_SIZE);
@@ -718,8 +719,9 @@ public class StateBehaviors {
             for (final SActivityInstance child : childrenToEnd) {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getProcessDefinitionId(), child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
-                            child.getId(), null,  null);
+                    containerRegistry.executeFlowNode(child.getProcessDefinitionId(),
+                            child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
+                            child.getId(), null, null);
                 }
             }
             queryOptions = QueryOptions.getNextPage(queryOptions);
@@ -727,7 +729,8 @@ public class StateBehaviors {
     }
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
-            final long flowNodeInstanceId,  final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition) throws SActivityStateExecutionException {
+            final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
+            throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();

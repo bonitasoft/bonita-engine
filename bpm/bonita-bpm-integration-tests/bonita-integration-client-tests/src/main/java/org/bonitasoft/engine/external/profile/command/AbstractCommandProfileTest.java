@@ -52,10 +52,11 @@ public abstract class AbstractCommandProfileTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         // Restoring up default profiles before tests:
         final InputStream xmlStream = ProfileImportCommandTest.class.getResourceAsStream("RestoreDefaultProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
+        xmlStream.close();
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>();
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
@@ -79,11 +80,12 @@ public abstract class AbstractCommandProfileTest extends CommonAPITest {
         // Clean profiles
         final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("CleanProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
+        xmlStream.close();
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
 
-        logout();
+        logoutOnTenant();
     }
 
 }

@@ -44,18 +44,18 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         donaBenta = createUser("donabenta", "bpm");
-        logout();
-        loginWith("donabenta", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("donabenta", "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(donaBenta.getId());
-        logout();
+        logoutOnTenant();
     }
 
     /**
@@ -142,7 +142,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         processDefinitionBuilder.addTransition(taskWithBoundaryName, normalFlowTaskName);
         processDefinitionBuilder.addTransition("timer", exceptionTaskName);
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
     }
 
     /**
@@ -179,7 +179,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
                 .addTransition("start", "callActivity").addTransition("callActivity", userTaskName).addTransition(userTaskName, "end")
                 .addTransition("timer", exceptionFlowTaskName);
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
@@ -198,7 +198,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
         processBuilder.addActor(ACTOR_NAME).addStartEvent("startCA").addUserTask(userTaskName, ACTOR_NAME).addEndEvent("endCA")
                 .addTransition("startCA", userTaskName).addTransition(userTaskName, "endCA");
-        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
@@ -240,7 +240,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         processBuilder.addTransition(normalFlowTaskName, "end");
         processBuilder.addTransition("timer", exceptionFlowTaskName);
 
-        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
@@ -279,7 +279,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
                 .addTransition("start", loopActivityName).addTransition(loopActivityName, normalFlowStepName).addTransition(normalFlowStepName, "end")
                 .addTransition("timer", exceptionFlowStepName);
 
-        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events

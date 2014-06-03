@@ -43,6 +43,7 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -57,12 +58,12 @@ public class ProcessActorTest extends CommonAPITest {
     public void afterTest() throws BonitaException {
         deleteUser(USERNAME);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser(USERNAME, PASSWORD);
     }
 
@@ -127,8 +128,8 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void johnHasGotAPendingTask() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("deliver", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, user);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("deliver", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -136,7 +137,6 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
         assertEquals(ACTOR_NAME, actor.getName());
-        assertEquals(DESCRIPTION, actor.getDescription());
 
         getProcessAPI().startProcess(processDefinition.getId());
         waitForPendingTasks(user.getId(), 1);
@@ -151,7 +151,7 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void deployProcessWithActorMappingNotMatchingOrganization() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("deliver", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("deliver", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder barBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         barBuilder.setProcessDefinition(designProcessDefinition);
@@ -192,12 +192,12 @@ public class ProcessActorTest extends CommonAPITest {
     public void butJamesHasNoPendingTask() throws Exception {
         final User plop = createUser("plop", PASSWORD);
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(designProcessDefinition);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(1000);
 
@@ -212,10 +212,10 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void eliasHasAssignedAndPendingUserTasks() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
                 .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, user);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask("userTask1", processInstance);
@@ -238,7 +238,7 @@ public class ProcessActorTest extends CommonAPITest {
 
     private ProcessDefinition preparationBeforeTest(final String actorName) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.setActorInitiator(actorName).addDescription(DESCRIPTION).addUserTask("userTask1", actorName);
+        processBuilder.setActorInitiator(actorName).addUserTask("userTask1", actorName);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -247,7 +247,7 @@ public class ProcessActorTest extends CommonAPITest {
             file.delete();
             BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive.done(), file);
             final BusinessArchive archive = BusinessArchiveFactory.readBusinessArchive(file);
-            return deployAndEnableWithActor(archive.getProcessDefinition(), actorName, user);
+            return deployAndEnableProcessWithActor(archive.getProcessDefinition(), actorName, user);
         } finally {
             file.delete();
         }
@@ -263,7 +263,6 @@ public class ProcessActorTest extends CommonAPITest {
         final ActorInstance actor = actors.get(0);
         assertEquals(ACTOR_NAME, actor.getName());
         assertEquals(definition.getId(), actor.getProcessDefinitionId());
-        assertEquals(DESCRIPTION, actor.getDescription());
 
         disableAndDeleteProcess(definition);
     }
@@ -271,8 +270,8 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void getActors() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        final List<String> actorNameList = initActorAndDescription(processBuilder, 5);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), actorNameList,
+        final List<String> actorNameList = BuildTestUtil.buildActorAndDescription(processBuilder, 5);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.getProcess(), actorNameList,
                 Arrays.asList(user, user, user, user, user));
 
         // test ASC
@@ -310,7 +309,7 @@ public class ProcessActorTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription("actor description1");
         processBuilder.addActor("actor2").addDescription("actor description2");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), Arrays.asList(ACTOR_NAME, "actor2"),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.getProcess(), Arrays.asList(ACTOR_NAME, "actor2"),
                 Arrays.asList(user, user));
 
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 5, null);
@@ -383,10 +382,10 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void addActorMembers() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, user);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -411,7 +410,7 @@ public class ProcessActorTest extends CommonAPITest {
     @Test(expected = AlreadyExistsException.class)
     public void cantAddTwiceUserToActor() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
@@ -431,7 +430,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Role role = createRole("Quality Manager");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
@@ -452,7 +451,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Group group = createGroup("Ergonomists");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
@@ -474,7 +473,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Group group = createGroup("Ergonomists");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
@@ -499,7 +498,7 @@ public class ProcessActorTest extends CommonAPITest {
         final User user3 = createUser("user3", "bpm");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
@@ -537,7 +536,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Role role3 = createRole("role3");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("roleTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("roleTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         addMappingOfActorsForRole(ACTOR_NAME, role1.getId(), definition);
@@ -573,8 +572,8 @@ public class ProcessActorTest extends CommonAPITest {
         final Group group3 = createGroup("group3");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("groupTask1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, group1, group2);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("groupTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, group1, group2);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -608,7 +607,7 @@ public class ProcessActorTest extends CommonAPITest {
         final Role role2 = createRole("role2");
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userMembershipTask1", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addUserTask("userMembershipTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
@@ -643,9 +642,9 @@ public class ProcessActorTest extends CommonAPITest {
     public void getStartableProcessesForActors() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
-        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.setActorInitiator(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
         final Set<Long> actorIds = new HashSet<Long>();
@@ -663,9 +662,9 @@ public class ProcessActorTest extends CommonAPITest {
     public void testIsAllowedToStartProcess() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
-        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.setActorInitiator(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
         final Set<Long> actorIds = new HashSet<Long>();
@@ -681,7 +680,7 @@ public class ProcessActorTest extends CommonAPITest {
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
-        processBuilder.addActor(actorName).addDescription(DESCRIPTION);
+        processBuilder.addActor(actorName);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addUserTask(userTaskName, actorName);
         processBuilder.addEndEvent("endEvent");
@@ -689,7 +688,7 @@ public class ProcessActorTest extends CommonAPITest {
         processBuilder.addTransition(userTaskName, "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
-        final ProcessDefinition processDef = deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDef.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -785,7 +784,7 @@ public class ProcessActorTest extends CommonAPITest {
         final String actorName = "ACTOR_NAME men";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(actorName).addDescription(DESCRIPTION);
+        processBuilder.addActor(actorName);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addUserTask("deliver", actorName);
         processBuilder.addEndEvent("endEvent");
@@ -825,14 +824,13 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void getNumberOfActors() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        processBuilder.addActor("Actor2").addDescription(DESCRIPTION + 2);
+        final List<String> actorNames = BuildTestUtil.buildActorAndDescription(processBuilder, 2);
         processBuilder.addActor("initiator", true);
 
         // Process def : one starting automatic activity that fires 3 human activities:
-        final DesignProcessDefinition designProcessDefinition = processBuilder.addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
-                .addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2").addTransition("step1", "step3")
-                .addTransition("step1", "step4").getProcess();
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addAutomaticTask("step1").addUserTask("step2", actorNames.get(0))
+                .addUserTask("step3", actorNames.get(0)).addUserTask("step4", actorNames.get(0)).addTransition("step1", "step2")
+                .addTransition("step1", "step3").addTransition("step1", "step4").getProcess();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
@@ -895,9 +893,9 @@ public class ProcessActorTest extends CommonAPITest {
     private ProcessDefinition getProcessDefinition(final String processName) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
-        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.setActorInitiator(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        return deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        return deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
     }
 
 }

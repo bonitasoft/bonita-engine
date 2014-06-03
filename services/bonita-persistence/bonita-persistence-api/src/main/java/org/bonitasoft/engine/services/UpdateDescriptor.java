@@ -31,6 +31,11 @@ public class UpdateDescriptor {
 
     private Map<String, Object> fields;
 
+    public UpdateDescriptor(final PersistentObject entity) {
+        super();
+        this.entity = entity;
+    }
+
     public static UpdateDescriptor buildSetField(final PersistentObject entity, final String fieldName, final Object fieldValue) {
         final UpdateDescriptor updateDescriptor = new UpdateDescriptor(entity);
         updateDescriptor.addField(fieldName, fieldValue);
@@ -41,11 +46,6 @@ public class UpdateDescriptor {
         final UpdateDescriptor updateDescriptor = new UpdateDescriptor(entity);
         updateDescriptor.addFields(fields);
         return updateDescriptor;
-    }
-
-    public UpdateDescriptor(final PersistentObject entity) {
-        super();
-        this.entity = entity;
     }
 
     public void addField(final String fieldName, final Object fieldValue) {

@@ -59,17 +59,17 @@ public class UserFilterTest extends CommonAPITest {
         deleteUser(JACK);
         deleteUser(JAMES);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         james = createUser(JAMES, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
     @Test
@@ -262,11 +262,11 @@ public class UserFilterTest extends CommonAPITest {
     public void unableToUpdateActorsOnAGateway() throws Exception {
         final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addDescription(DESCRIPTION)
+                .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE)
                 .addTransition("step1", "gateway1").addTransition("gateway1", "step2", scriptExpression).addDefaultTransition("gateway1", "step3").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -289,7 +289,7 @@ public class UserFilterTest extends CommonAPITest {
         processBuilder.addUserTask("step2", ACTOR_NAME);
         processBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTask("step2");

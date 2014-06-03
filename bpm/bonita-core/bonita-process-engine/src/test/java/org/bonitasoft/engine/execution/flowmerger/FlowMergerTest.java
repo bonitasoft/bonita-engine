@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -54,10 +54,10 @@ public class FlowMergerTest {
     private FlowNodeCompletionTokenProvider tokenProvider;
 
     @Mock
-    private SFlowNodeWrapper flowNodeWrapper;
+    private SFlowNodeDefinition flowNodeWrapper;
 
     @Mock
-    private SFlowNodeWrapper transitionDependentFlowNodeWrapper;
+    private SFlowNodeDefinition transitionDependentFlowNodeWrapper;
 
     private FlowMerger flowNodeMerger;
 
@@ -67,7 +67,6 @@ public class FlowMergerTest {
     public void setUp() {
         flowNodeMerger = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
         transitionDependentFlowNodeMerger = new FlowMerger(transitionDependentFlowNodeWrapper, transitionsDescriptor, tokenProvider);
-        doReturn(false).when(transitionDependentFlowNodeWrapper).isNull();
         doReturn(false).when(transitionDependentFlowNodeWrapper).isBoundaryEvent();
         doReturn(false).when(transitionDependentFlowNodeWrapper).isExclusive();
         doReturn(false).when(transitionsDescriptor).isLastFlowNode();
@@ -75,7 +74,7 @@ public class FlowMergerTest {
 
     @Test
     public void should_not__create_token_if_flowNode_is_null() {
-        doReturn(true).when(flowNodeWrapper).isNull();
+        flowNodeMerger = new FlowMerger(null, transitionsDescriptor, tokenProvider);
         assertFalse(flowNodeMerger.mustCreateTokenOnFinish());
     }
 
@@ -118,7 +117,7 @@ public class FlowMergerTest {
 
     @Test
     public void should_not_consume_token_if_flowNode_is_null() {
-        doReturn(true).when(flowNodeWrapper).isNull();
+        flowNodeMerger = new FlowMerger(null, transitionsDescriptor, tokenProvider);
         assertFalse(flowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
 
@@ -171,7 +170,7 @@ public class FlowMergerTest {
 
     @Test
     public void is_not_implicite_end_if_flowNode_is_null() {
-        doReturn(true).when(flowNodeWrapper).isNull();
+        flowNodeMerger = new FlowMerger(null, transitionsDescriptor, tokenProvider);
         assertFalse(flowNodeMerger.isImplicitEnd());
     }
 
