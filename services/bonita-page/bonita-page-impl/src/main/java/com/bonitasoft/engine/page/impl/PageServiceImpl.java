@@ -355,7 +355,7 @@ public class PageServiceImpl implements PageService {
             pageProperties.put(PROPERTIES_NAME, page.getName());
             pageProperties.put(PROPERTIES_DISPLAY_NAME, page.getDisplayName());
             pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());
-            contentAsMap.put("page.properties", IOUtil.getPropertyAsString(pageProperties).getBytes());
+            contentAsMap.put("page.properties", IOUtil.getPropertyAsString(pageProperties));
 
             return IOUtil.zip(contentAsMap);
         } catch (final IOException e) {

@@ -14,10 +14,12 @@ import static org.assertj.core.api.Assertions.fail;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -80,7 +82,7 @@ public class PageAPIIT extends CommonAPISPTest {
                 getPageAPI().deletePage(page.getId());
             }
         }
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Test
@@ -104,7 +106,7 @@ public class PageAPIIT extends CommonAPISPTest {
         final User john = createUser("john", "bpm");
         final User jack = createUser("jack", "bpm");
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("john", "bpm");
         final String pageName = generateUniquePageName();
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
@@ -112,7 +114,7 @@ public class PageAPIIT extends CommonAPISPTest {
                 pageContent);
         assertThat(page.getInstalledBy()).isEqualTo(john.getId());
         assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
         // when
         final PageUpdater pageUpdater = new PageUpdater();
@@ -137,7 +139,7 @@ public class PageAPIIT extends CommonAPISPTest {
         assertThat(returnedPage.getDescription()).as("description should be:" + newDescription).isEqualTo(newDescription);
         assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated").isAfter(page.getLastModificationDate());
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(john);
         deleteUser(jack);
@@ -239,15 +241,21 @@ public class PageAPIIT extends CommonAPISPTest {
     public void should_getPageContent_return_the_content() throws BonitaException {
         // given
         final String pageName = generateUniquePageName();
-        final byte[] bytes = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        String pageDescription = "a verry long page description, maybe the longest description you will ever see, check that:"
+                + " Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut"
+                + " labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"
+                + " nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit "
+                + "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
+                + "culpa qui officia deserunt mollit anim id est laborum.";
+        final byte[] bytes = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, pageDescription);
         final Page page = getPageAPI().createPage(
-                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                new PageCreator(pageName, CONTENT_NAME).setDescription(pageDescription).setDisplayName(DISPLAY_NAME),
                 bytes);
 
         // when
         final byte[] pageContent = getPageAPI().getPageContent(page.getId());
         // then
-        checkPageContentContainsProperties(pageContent, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        checkPageContentContainsProperties(pageContent, pageName, DISPLAY_NAME, pageDescription);
 
     }
 
@@ -257,6 +265,11 @@ public class PageAPIIT extends CommonAPISPTest {
         try {
             contentAsMap = unzip(content);
             assertThat(contentAsMap.keySet()).as("should contains page.properties").contains("page.properties");
+            String string = contentAsMap.get("page.properties");
+            Properties props = new Properties();
+            props.load(new StringReader(string));
+            assertThat(props.getProperty("description")).as("should have same description").isEqualTo(description);
+            assertThat(props.getProperty("displayName")).as("should have same displayName").isEqualTo(displayName);
         } catch (final IOException e) {
             fail("unzip error", e);
         }
