@@ -27,12 +27,12 @@ public class JobExecutionTest extends CommonAPITest {
     @After
     public void after() throws Exception {
         deleteUser(matti);
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         matti = createUser("matti", "keltainen");
     }
 
@@ -82,6 +82,5 @@ public class JobExecutionTest extends CommonAPITest {
         assertEquals(numberOfFailedJobs, failedJobs.size());
         return failedJobs;
     }
-
 
 }

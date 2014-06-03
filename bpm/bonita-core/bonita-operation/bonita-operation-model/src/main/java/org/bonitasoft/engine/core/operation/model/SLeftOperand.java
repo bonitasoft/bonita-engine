@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,20 +18,22 @@ import java.io.Serializable;
 /**
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public interface SLeftOperand extends Serializable {
 
-    public static String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
+    String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
 
-    public static String TYPE_DOCUMENT = "DOCUMENT";
+    String TYPE_DOCUMENT = "DOCUMENT";
 
-    public static String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
+    String TYPE_SEARCH_INDEX = "SEARCH_INDEX";
 
-    public static String TYPE_DATA = "DATA";
+    String TYPE_DATA = "DATA";
 
-    public static String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
+    String TYPE_BUSINESS_DATA = "BUSINESS_DATA";
 
     String getName();
 
     String getType();
+
 }

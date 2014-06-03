@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
@@ -25,11 +25,11 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class MembershipsBinding extends ElementBinding {
 
-    private List<BEntry<String, String>> memberships;
+    private List<Pair<String, String>> memberships;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
-        memberships = new ArrayList<BEntry<String, String>>(5);
+        memberships = new ArrayList<Pair<String, String>>(5);
     }
 
     @Override
@@ -39,12 +39,12 @@ public class MembershipsBinding extends ElementBinding {
     @Override
     public void setChildObject(final String name, final Object value) {
         if ("membership".equals(name)) {
-            memberships.add((BEntry<String, String>) value);
+            memberships.add((Pair<String, String>) value);
         }
     }
 
     @Override
-    public List<BEntry<String, String>> getObject() {
+    public List<Pair<String, String>> getObject() {
         return memberships;
     }
 

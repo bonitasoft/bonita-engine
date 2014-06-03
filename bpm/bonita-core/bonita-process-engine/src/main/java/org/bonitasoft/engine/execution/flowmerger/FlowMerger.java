@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,23 +16,25 @@ package org.bonitasoft.engine.execution.flowmerger;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.execution.TokenProvider;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  * 
  */
 public class FlowMerger {
 
-    private final SFlowNodeWrapper flowNodewrapper;
+    private final SFlowNodeDefinition sFlowNodeDefinition;
 
     private final FlowNodeTransitionsWrapper transitionsWrapper;
 
     private final TokenProvider tokenProvider;
 
-    public FlowMerger(final SFlowNodeWrapper flowNodeWrapper, final FlowNodeTransitionsWrapper transitionsDescriptor, TokenProvider tokenProvider) {
+    public FlowMerger(final SFlowNodeDefinition sFlowNodeDefinition, final FlowNodeTransitionsWrapper transitionsDescriptor, TokenProvider tokenProvider) {
         super();
-        this.flowNodewrapper = flowNodeWrapper;
+        this.sFlowNodeDefinition = sFlowNodeDefinition;
         this.transitionsWrapper = transitionsDescriptor;
         this.tokenProvider = tokenProvider;
     }
@@ -41,21 +43,22 @@ public class FlowMerger {
      * @return return true if the input token must be consume on taking the next transition; false otherwise.
      */
     public boolean mustConsumeInputTokenOnTakingTransition() {
-        return !flowNodewrapper.isBoundaryEvent()
-                && flowNodewrapper.isParalleleOrInclusive()
+        return sFlowNodeDefinition != null
+                && !sFlowNodeDefinition.isBoundaryEvent()
+                && sFlowNodeDefinition.isParalleleOrInclusive()
                 && !transitionsWrapper.isLastFlowNode()
                 && transitionsWrapper.hasMultipleIncomingTransitions();
     }
 
     public boolean mustCreateTokenOnFinish() {
-        if (flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive() || transitionsWrapper.isLastFlowNode()) {
+        if (sFlowNodeDefinition == null || sFlowNodeDefinition.isBoundaryEvent() || sFlowNodeDefinition.isExclusive() || transitionsWrapper.isLastFlowNode()) {
             return false;
         }
         return transitionsWrapper.hasMultipleOutgoingTransitions();
     }
 
     public boolean isImplicitEnd() {
-        if (flowNodewrapper.isNull()) {
+        if (sFlowNodeDefinition == null) {
             return false;
         }
         return transitionsWrapper.isLastFlowNode();

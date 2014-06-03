@@ -33,7 +33,7 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,12 +64,12 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         deleteGroups(groups);
         deleteRoles(roles);
 
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         categories = new ArrayList<Category>();
 
@@ -100,7 +100,7 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
 
     @Test
     public void searchUncategorizedProcessDefinitions() throws Exception {
-        loginWith("chicobento", "bpm");
+        loginOnDefaultTenantWith("chicobento", "bpm");
 
         // add categories to processDefinition1
         categories.add(getProcessAPI().createCategory("category1", "categoryDescription1"));
@@ -187,25 +187,25 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
 
     private void createProcessesDefForSearchProcessUserCanStart() throws BonitaException {
         final String actor1 = ACTOR_NAME;
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor1, true);
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, actor1, users.get(0));
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, actor1, users.get(0));
         processDefinitions.add(processDefinition1);
 
         // create process2
         final String actor2 = "Actor2";
-        final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
+        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, actor2, users.get(1));
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actor2, users.get(1));
         processDefinitions.add(processDefinition2);
 
-        final DesignProcessDefinition designProcessDefinition3 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process3", "1.0",
+        final DesignProcessDefinition designProcessDefinition3 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process3", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, actor2, users.get(1));
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, actor2, users.get(1));
         processDefinitions.add(processDefinition3);
 
         // process not enabled
-        final DesignProcessDefinition designProcessDefinition4 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process4", "1.0",
+        final DesignProcessDefinition designProcessDefinition4 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process4", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition4 = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition4).done());
@@ -213,27 +213,27 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         processDefinitions.add(processDefinition4);
 
         // process without actor initiator
-        final DesignProcessDefinition designProcessDefinition5 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process5", "1.0",
+        final DesignProcessDefinition designProcessDefinition5 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process5", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, false);
-        final ProcessDefinition processDefinition5 = deployAndEnableWithActor(designProcessDefinition5, actor2, users.get(2));
+        final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, actor2, users.get(2));
         processDefinitions.add(processDefinition5);
 
         // actor initiator is a group
-        final DesignProcessDefinition designProcessDefinition6 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process6", "1.0",
+        final DesignProcessDefinition designProcessDefinition6 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process6", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition6 = deployAndEnableWithActor(designProcessDefinition6, actor2, groups.get(0));
+        final ProcessDefinition processDefinition6 = deployAndEnableProcessWithActor(designProcessDefinition6, actor2, groups.get(0));
         processDefinitions.add(processDefinition6);
 
         // actor initiator is a role
-        final DesignProcessDefinition designProcessDefinition7 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process7", "1.0",
+        final DesignProcessDefinition designProcessDefinition7 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process7", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition7 = deployAndEnableWithActor(designProcessDefinition7, actor2, roles.get(0));
+        final ProcessDefinition processDefinition7 = deployAndEnableProcessWithActor(designProcessDefinition7, actor2, roles.get(0));
         processDefinitions.add(processDefinition7);
 
         // actor initiator is a membership
-        final DesignProcessDefinition designProcessDefinition8 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process8", "1.0",
+        final DesignProcessDefinition designProcessDefinition8 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process8", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition8 = deployAndEnableWithActor(designProcessDefinition8, actor2, roles.get(0), groups.get(0));
+        final ProcessDefinition processDefinition8 = deployAndEnableProcessWithActor(designProcessDefinition8, actor2, roles.get(0), groups.get(0));
         processDefinitions.add(processDefinition8);
     }
 

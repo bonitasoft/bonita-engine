@@ -64,4 +64,9 @@ public class SSubProcessDefinitionImpl extends SActivityDefinitionImpl implement
     public boolean isStartable() {
         return !isTriggeredByEvent() && super.isStartable();
     }
+
+    @Override
+    public boolean isEventSubProcess() {
+        return isTriggeredByEvent();
+    }
 }

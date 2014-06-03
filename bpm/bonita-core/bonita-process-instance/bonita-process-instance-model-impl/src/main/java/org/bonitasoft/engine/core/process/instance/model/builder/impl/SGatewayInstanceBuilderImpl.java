@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 20112 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -36,13 +36,13 @@ public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl im
 
     @Override
     public SGatewayInstanceBuilder setGatewayType(final SGatewayType gatewayType) {
-        ((SGatewayInstanceImpl)entity).setGatewayType(gatewayType);
+        ((SGatewayInstanceImpl) entity).setGatewayType(gatewayType);
         return this;
     }
 
     @Override
     public SGatewayInstanceBuilder setHitBys(final String hitBys) {
-        ((SGatewayInstanceImpl)entity).setHitBys(hitBys);
+        ((SGatewayInstanceImpl) entity).setHitBys(hitBys);
         return this;
     }
 
@@ -59,25 +59,19 @@ public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl im
     }
 
     @Override
-    public SGatewayInstanceBuilder setProcessDefinitionId(final long processDefinitionId) {
-        entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.PROCESS_DEFINITION_INDEX, processDefinitionId);
+    public SGatewayInstance done() {
+        return (SGatewayInstance) entity;
+    }
+
+    @Override
+    public SGatewayInstanceBuilder setParentActivityInstanceId(final long parentActivityInstanceId) {
+        entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.PARENT_ACTIVITY_INSTANCE_INDEX, parentActivityInstanceId);
         return this;
     }
 
     @Override
     public SGatewayInstanceBuilder setProcessInstanceId(final long processInstanceId) {
         entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.ROOT_PROCESS_INSTANCE_INDEX, processInstanceId);
-        return this;
-    }
-
-    @Override
-    public SGatewayInstance done() {
-        return (SGatewayInstance) entity;
-    }
-
-    @Override
-    public SGatewayInstanceBuilder setParentActivityInstanceId(final long logicalGroup3) {
-        entity.setLogicalGroup(2, logicalGroup3);
         return this;
     }
 

@@ -17,14 +17,14 @@ public abstract class AbstractProcessInstanceTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         pedro = createUser("pedro", "secreto");
     }
 
     @After
     public void after() throws Exception {
         deleteUser(pedro);
-        logout();
+        logoutOnTenant();
     }
 
     protected ProcessDefinition deployProcessWith2UserTasksAnd1AutoTask(final String actorName, final String taskName1, final String taskName2,
@@ -43,7 +43,7 @@ public abstract class AbstractProcessInstanceTest extends CommonAPITest {
         processDefinitionBuilder.addTransition("start", taskName2);
         processDefinitionBuilder.addTransition(taskName2, "end2");
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, pedro);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, pedro);
     }
 
     protected ProcessDefinition deployProcessWith2AutomaticTasks(final String taskName1, final String taskName2) throws BonitaException {

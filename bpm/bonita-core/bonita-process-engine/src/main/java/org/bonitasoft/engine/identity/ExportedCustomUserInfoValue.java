@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -13,37 +13,36 @@
  **/
 package org.bonitasoft.engine.identity;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ExportedCustomUserInfoValue {
-    
+
     private String name;
+
     private String value;
 
-    public ExportedCustomUserInfoValue(String name) {
+    public ExportedCustomUserInfoValue(final String name) {
         this.name = name;
     }
 
-    public ExportedCustomUserInfoValue(String name, String value) {
+    public ExportedCustomUserInfoValue(final String name, final String value) {
         this(name);
         this.value = value;
     }
-    
-    public void setName(String name) {
+
+    public void setName(final String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
-    
-    public void setValue(String value) {
+
+    public void setValue(final String value) {
         this.value = value;
     }
-    
+
     public String getValue() {
         return value;
     }
@@ -57,30 +56,37 @@ public class ExportedCustomUserInfoValue {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (value == null ? 0 : value.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        ExportedCustomUserInfoValue other = (ExportedCustomUserInfoValue) obj;
+        }
+        final ExportedCustomUserInfoValue other = (ExportedCustomUserInfoValue) obj;
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (value == null) {
-            if (other.value != null)
+            if (other.value != null) {
                 return false;
-        } else if (!value.equals(other.value))
+            }
+        } else if (!value.equals(other.value)) {
             return false;
+        }
         return true;
     }
 

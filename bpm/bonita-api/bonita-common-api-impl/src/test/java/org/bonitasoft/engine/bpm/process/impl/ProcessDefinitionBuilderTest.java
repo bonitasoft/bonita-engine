@@ -5,6 +5,8 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -62,7 +64,7 @@ public class ProcessDefinitionBuilderTest {
         final String taskWithBoundary = "step1";
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addUserTask(taskWithBoundary, "actor").addBoundaryEvent("b1", true)
-                .addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
+        .addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -151,7 +153,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addAutomaticTask(taskWithBoundary).addBoundaryEvent("b1")
-                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
+        .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -194,7 +196,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addReceiveTask(taskWithBoundary, "m1").addBoundaryEvent("b1")
-                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
+        .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -237,7 +239,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addSendTask(taskWithBoundary, "m1", new ExpressionBuilder().createConstantStringExpression("p1")).addBoundaryEvent("b1")
-                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
+        .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -252,7 +254,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addSendTask(taskWithBoundary, "m1", new ExpressionBuilder().createConstantStringExpression("p1")).addBoundaryEvent("b1")
-                .addSignalEventTrigger("go");
+        .addSignalEventTrigger("go");
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -267,7 +269,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addSendTask(taskWithBoundary, "m1", new ExpressionBuilder().createConstantStringExpression("p1")).addBoundaryEvent("b1")
-                .addMessageEventTrigger("m1");
+        .addMessageEventTrigger("m1");
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -378,6 +380,41 @@ public class ProcessDefinitionBuilderTest {
         processBuilder.createNewInstance("processName", "1.0");
         processBuilder.addIntermediateCatchEvent("name").addMessageEventTrigger("messageName");
         processBuilder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName2() throws Exception {
+        final Expression expression = new ExpressionBuilder().createConstantDoubleExpression(45d);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        builder.addActor("mainActor");
+        builder.addUserTask("step1", "mainActor")
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, expression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+        builder.done();
+    }
+
+    @Test
+    public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName3() throws Exception {
+        final Expression expression = new ExpressionBuilder().createConstantDoubleExpression(45d);
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        builder.addActor("mainActor");
+        builder.addUserTask("step1", "mainActor")
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+        builder.done();
+    }
+
+    @Test
+    public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName43() throws Exception {
+        final Expression expression = new ExpressionBuilder().createConstantDoubleExpression(45d);
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        builder.addActor("mainActor");
+        builder.addUserTask("step1", "mainActor")
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
+        builder.done();
     }
 
 }

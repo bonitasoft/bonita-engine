@@ -46,24 +46,22 @@ import org.junit.Test;
  */
 public class ProcessWithExpressionTestLocal extends CommonAPITest {
 
-    private static final String JOHN = "john";
-
     private User user;
 
     private ProcessDefinition processDefinition;
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
-        logout();
+        deleteUser(USERNAME);
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        user = createUser(JOHN, "bpm");
-        logout();
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        user = createUser(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     private ProcessDefinition deployEmptyProcess() throws BonitaException {
@@ -141,18 +139,17 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { DataInstance.class }, concept = BPMNConcept.OPERATION, keywords = { "Expression",
-            "Transient data" }, story = "Compare two objects with operator GREATER_THAN.", jira = "BS-1379")
+    @Cover(classes = { DataInstance.class }, concept = BPMNConcept.OPERATION, keywords = { "Expression", "Transient data" }, story = "Compare two objects with operator GREATER_THAN.", jira = "BS-1379")
     @Test
     public void should_operation_with_transient_data_reevaluate_the_definition_if_lost() throws Exception {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTransientData",
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTransientData",
                 String.valueOf(System.currentTimeMillis()));
         builder.addActor("actor");
-        builder.addUserTask("step1", "actor").addData("tData", String.class.getName(),
-                new ExpressionBuilder().createConstantStringExpression("The default value")).isTransient();
-        processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
+        builder.addUserTask("step1", "actor")
+        .addData("tData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("The default value")).isTransient();
+        processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         getProcessAPI().startProcess(processDefinition.getId());
-        HumanTaskInstance step1 = waitForUserTask("step1");
+        final HumanTaskInstance step1 = waitForUserTask("step1");
 
         // evaluate the expression of the transient data, it should return the default value
         assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The default value");
@@ -180,17 +177,17 @@ public class ProcessWithExpressionTestLocal extends CommonAPITest {
 
     private void updateDataWithOperation(final HumanTaskInstance step1, final String value, final String name) throws InvalidExpressionException,
             UpdateException {
-        Operation operation = new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
+        final Operation operation = new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperand.TYPE_TRANSIENT_DATA)
                 .setRightOperand(new ExpressionBuilder().createConstantStringExpression(value)).setType(OperatorType.ASSIGNMENT).done();
         getProcessAPI().updateActivityInstanceVariables(Arrays.asList(operation), step1.getId(), null);
     }
 
     private Map<String, Serializable> evaluateTransientDataWithExpression(final HumanTaskInstance step1) throws ExpressionEvaluationException,
             InvalidExpressionException {
-        Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<Expression, Map<String, Serializable>>();
+        final Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<Expression, Map<String, Serializable>>();
         expressionMap
                 .put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()), Collections.<String, Serializable> emptyMap());
-        Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(step1.getId(), expressionMap);
-        return result;
+        return getProcessAPI().evaluateExpressionsOnActivityInstance(step1.getId(), expressionMap);
     }
+
 }

@@ -27,6 +27,15 @@ public interface Profile extends NamedElement, BaseElement {
 
     String getDescription();
 
+    /**
+     * profile icons are removed in customer portal
+     * 
+     * @since
+     *        6.3.1
+     * @return
+     *         null
+     */
+    @Deprecated
     String getIconPath();
 
     Date getCreationDate();

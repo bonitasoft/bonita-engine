@@ -51,7 +51,7 @@ public class ProfilesBinding extends ElementBinding {
 
     @Override
     public String getElementTag() {
-        return "proFiles";
+        return "profiles";
     }
 
 }

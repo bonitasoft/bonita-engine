@@ -57,4 +57,9 @@ public class ExportedProfileEntryBuilder {
         return profileEntry;
     }
 
+    public ExportedProfileEntryBuilder setCustom(final boolean custom) {
+        profileEntry.setCustom(custom);
+        return this;
+    }
+
 }

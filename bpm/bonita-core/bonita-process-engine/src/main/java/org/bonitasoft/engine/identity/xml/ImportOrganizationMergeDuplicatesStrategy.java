@@ -55,9 +55,10 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganizationStrategy {
 
     private final IdentityService identityService;
-    private SCustomUserInfoValueAPI userInfoValueAPI;
 
-    public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService, SCustomUserInfoValueAPI userInfoValueAPI) {
+    private final SCustomUserInfoValueAPI userInfoValueAPI;
+
+    public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService, final SCustomUserInfoValueAPI userInfoValueAPI) {
         this.identityService = identityService;
         this.userInfoValueAPI = userInfoValueAPI;
     }
@@ -81,10 +82,9 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         updateCustomUserInfoValues(userToImport, existingUserId);
     }
 
-    private void updateCustomUserInfoValues(final ExportedUser userToImport,
-            final long existingUserId) throws SBonitaException {
-        for (ExportedCustomUserInfoValue infoValue : userToImport.getCustomUserInfoValues()) {
-            SCustomUserInfoDefinition customUserInfoDefinition = identityService.getCustomUserInfoDefinitionByName(infoValue.getName());
+    private void updateCustomUserInfoValues(final ExportedUser userToImport, final long existingUserId) throws SBonitaException {
+        for (final ExportedCustomUserInfoValue infoValue : userToImport.getCustomUserInfoValues()) {
+            final SCustomUserInfoDefinition customUserInfoDefinition = identityService.getCustomUserInfoDefinitionByName(infoValue.getName());
             userInfoValueAPI.set(customUserInfoDefinition.getId(), existingUserId, infoValue.getValue());
         }
     }
@@ -226,18 +226,17 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     @Override
-    public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
-            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException {
-        //only description is updated as it only matches if they have the same name
-        EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newUserInfoDefinition.getDescription());
+    public void foundExistingCustomUserInfoDefinition(final SCustomUserInfoDefinition existingUserInfoDefinition,
+            final CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException {
+        // only description is updated as it only matches if they have the same name
+        final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newUserInfoDefinition.getDescription());
         identityService.updateCustomUserInfoDefinition(existingUserInfoDefinition, updateDescriptor);
     }
-    
-    private EntityUpdateDescriptor getUpdateDescriptor(String newDescription) {
-        SCustomUserInfoDefinitionUpdateBuilder builder = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance();
+
+    private EntityUpdateDescriptor getUpdateDescriptor(final String newDescription) {
+        final SCustomUserInfoDefinitionUpdateBuilder builder = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance();
         builder.updateDescription(newDescription);
-        EntityUpdateDescriptor updateDescriptor = builder.done();
-        return updateDescriptor;
+        return builder.done();
     }
 
 }

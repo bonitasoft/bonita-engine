@@ -1,8 +1,6 @@
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +49,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         pedro = getIdentityAPI().createUser(USERNAME, PASSWORD);
         processDefinitions = new ArrayList<ProcessDefinition>();
     }
@@ -60,7 +58,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     public void after() throws Exception {
         disableAndDeleteProcess(processDefinitions);
         deleteUser(pedro);
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployProcessWithSeveralOutGoingTransitions() throws BonitaException {
@@ -72,7 +70,7 @@ public class ProcessDeletionTest extends CommonAPITest {
             processDefinitionBuilder.addUserTask(activityName, ACTOR_NAME);
             processDefinitionBuilder.addTransition("step1", activityName);
         }
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, pedro);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, pedro);
     }
 
     @Test
@@ -105,7 +103,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
-        assertEquals(33, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Test
@@ -139,7 +137,7 @@ public class ProcessDeletionTest extends CommonAPITest {
             processDefinitionBuilder.addTransition("step1", activityName);
 
         }
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, pedro);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, pedro);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
         disableAndDeleteProcess(processDefinition.getId()); // will fail in CommonAPITest.succeeded if activities are created after delete
@@ -190,7 +188,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that archived flow nodes were not deleted.
         taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT);
-        assertEquals(3, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Deprecated
@@ -260,7 +258,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         processDefBuilder.addEndEvent("tEnd");
         processDefBuilder.addTransition("tStart", userTaskName);
         processDefBuilder.addTransition(userTaskName, "tEnd");
-        return deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
+        return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
     }
 
     private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String userTaskName,
@@ -276,7 +274,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         processDefBuilder.addTransition("start", callActivityName);
         processDefBuilder.addTransition(callActivityName, userTaskName);
         processDefBuilder.addTransition(userTaskName, "end");
-        return deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
+        return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
     }
 
     @Test
@@ -318,12 +316,12 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that the archived instances of p1 were not deleted
         archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
-        assertEquals(3, archivedProcessInstanceList.size());
+        assertEquals(0, archivedProcessInstanceList.size());
 
         // check that archived flow node were not deleted.
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 10,
                 ActivityInstanceCriterion.DEFAULT);
-        assertEquals(8, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Test
@@ -419,7 +417,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         subProcessBuilder.addTransition("startSub", childTaskName);
         subProcessBuilder.addTransition(childTaskName, "endSubProcess");
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, "mainActor", pedro);
+        return deployAndEnableProcessWithActor(processDefinition, "mainActor", pedro);
     }
 
     @Deprecated
@@ -590,7 +588,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         processDefBuilder.addEndEvent("tEnd");
         processDefBuilder.addTransition("tStart", userTaskName);
         processDefBuilder.addTransition(userTaskName, "tEnd");
-        return deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
+        return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
     }
 
     @Test
