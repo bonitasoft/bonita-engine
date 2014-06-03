@@ -13,6 +13,8 @@ import java.util.List;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.InvalidPageTokenException;
+import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -162,6 +164,7 @@ public interface PageAPI {
      * @throws CreationException
      * @since 6.3.1
      */
-    Page createPage(String contentName, byte[] content) throws AlreadyExistsException, CreationException;
+    Page createPage(String contentName, byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException;
 
 }

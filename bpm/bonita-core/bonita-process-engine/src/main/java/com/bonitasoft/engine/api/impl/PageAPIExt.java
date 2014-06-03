@@ -19,6 +19,8 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.InvalidPageTokenException;
+import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -115,7 +117,8 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException
+    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException
     {
         byte[] zipEntryContent;
         try {
@@ -133,6 +136,7 @@ public class PageAPIExt implements PageAPI {
         } catch (final IOException e) {
             throw new CreationException("Error while reading zip file", e);
         }
+
     }
 
     protected Page convertToPage(final SPage addPage) {

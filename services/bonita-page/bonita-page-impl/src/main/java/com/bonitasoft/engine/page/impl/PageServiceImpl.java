@@ -614,7 +614,7 @@ public class PageServiceImpl implements PageService {
                         pageDisplayNameIsValid = pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME) != null
                                 && pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME).length() > 0;
                     }
-                    pagePropertiesContentIsValid = pageNameIsValid && pageDisplayNameIsValid;
+                    pagePropertiesContentIsValid = pagePropertiesContentIsValid && pageDisplayNameIsValid;
                 }
             }
             zin.close();
@@ -627,11 +627,11 @@ public class PageServiceImpl implements PageService {
             if (!zipContainsPageProperties) {
                 throw new SInvalidPageZipContentException(PAGE_CONTENT_DOES_NOT_CONTAINS_A_PAGE_PROPERTIES_FILE);
             }
-            if (!pageNameIsValid) {
-                throw new SInvalidPageTokenException(PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
-            }
             if (!pagePropertiesContentIsValid) {
                 throw new SInvalidPageZipContentException(PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+            }
+            if (!pageNameIsValid) {
+                throw new SInvalidPageTokenException(PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
             }
         } catch (final IOException e) {
             throw new SInvalidPageZipContentException(PAGE_CONTENT_IS_NOT_A_VALID_ZIP_FILE);

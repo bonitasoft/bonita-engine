@@ -72,6 +72,7 @@ import org.mockito.stubbing.Answer;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageContent;
 import com.bonitasoft.engine.page.SPageLogBuilder;
+import com.bonitasoft.engine.page.impl.exception.SInvalidPageTokenException;
 import com.bonitasoft.engine.page.impl.exception.SInvalidPageZipContentException;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
@@ -568,7 +569,7 @@ public class PageServiceImplTest {
 
     @Test
     public void zipTest_page_properties_no_description() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
         exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
 
         // given
@@ -577,13 +578,13 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        assertThat(pageServiceImpl.checkContentIsValid(content)).isFalse();
 
     }
 
     @Test
     public void zipTest_page_properties_invalid_name() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageTokenException.class);
         exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
 
         // given
@@ -598,7 +599,7 @@ public class PageServiceImplTest {
 
     @Test
     public void zipTest_page_properties_no_name() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
         exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
 
         // given
@@ -628,7 +629,7 @@ public class PageServiceImplTest {
 
     @Test
     public void zipTest_page_properties_no_display_name() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
         exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
 
         // given
@@ -636,14 +637,16 @@ public class PageServiceImplTest {
         final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndescription=mypage description\n".getBytes()));
 
-        // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        // when
+        pageServiceImpl.checkContentIsValid(content);
+
+        // then exception
 
     }
 
     @Test
     public void zipTestGroovyWithWrongName() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
         exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE);
 
         // given

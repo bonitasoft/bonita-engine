@@ -30,7 +30,9 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -85,6 +87,9 @@ public class PageAPIExtTest {
 
     @Mock
     private SPageUpdateContentBuilder sPageUpdateContentBuilder;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void before() throws Exception {
