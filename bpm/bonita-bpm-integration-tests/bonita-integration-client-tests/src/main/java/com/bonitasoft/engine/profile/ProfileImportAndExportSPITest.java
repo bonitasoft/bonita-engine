@@ -17,9 +17,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
@@ -231,8 +232,11 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         try {
             customPage = getPageAPI().getPageByName(pageName);
         } catch (final PageNotFoundException p) {
+            Map<String, byte[]> map = new HashMap<String, byte[]>();
+            map.put("index.html", "return \"\";".getBytes());
+            map.put("page.properties", ("name=" + pageName + "\ndisplayName=" + pageName + "\ndescription=description of " + pageName).getBytes());
             customPage = getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDescription("description").setDisplayName("display name"),
-                    IOUtil.zip(Collections.singletonMap("index.html", "return \"\";".getBytes())));
+                    IOUtil.zip(map));
         }
         assertThat(customPage).as("custompage %s should exists", pageName).isNotNull();
     }
