@@ -28,12 +28,12 @@ public class SupervisorTest extends CommonAPISPTest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        logout();
+       logoutOnTenant();
     }
 
     private void deleteSupervisors(final ProcessSupervisor... processSupervisors) throws BonitaException {

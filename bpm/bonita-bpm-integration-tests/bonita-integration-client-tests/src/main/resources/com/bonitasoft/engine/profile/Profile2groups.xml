@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+  <profile isDefault="false" name="Test">
+    <description/>
+    <profileMapping>
+      <groups>
+        <group>/acme/finance</group>
+        <group>/acme</group>
+      </groups>
+    </profileMapping>
+  </profile>
+</profiles:profiles>

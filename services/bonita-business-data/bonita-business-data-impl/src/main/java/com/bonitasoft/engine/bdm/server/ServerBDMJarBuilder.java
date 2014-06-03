@@ -23,8 +23,8 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;

@@ -10,24 +10,19 @@ package com.bonitasoft.engine.bdm.validator.rule;
 
 import javax.lang.model.SourceVersion;
 
-import com.bonitasoft.engine.bdm.Query;
+import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class QueryValidationRule implements ValidationRule {
+public class QueryValidationRule extends ValidationRule<Query> {
 
     private static final int MAX_QUERY_NAME_LENGTH = 150;
 
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof Query;
+    public QueryValidationRule() {
+        super(Query.class);
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(QueryValidationRule.class.getName() + " doesn't handle validation for " + modelElement.getClass().getName());
-        }
-        final Query query = (Query) modelElement;
+    public ValidationStatus validate(final Query query) {
         final ValidationStatus status = new ValidationStatus();
         final String name = query.getName();
         if (name == null || name.isEmpty()) {

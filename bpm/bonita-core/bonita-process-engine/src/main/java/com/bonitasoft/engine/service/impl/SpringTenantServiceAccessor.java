@@ -10,36 +10,15 @@ package com.bonitasoft.engine.service.impl;
 
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
-import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
-import org.bonitasoft.engine.actor.xml.UserNamesBinding;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
-import org.bonitasoft.engine.profile.xml.MembershipBinding;
-import org.bonitasoft.engine.profile.xml.MembershipsBinding;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryBinding;
-import org.bonitasoft.engine.profile.xml.ProfileEntriesBinding;
-import org.bonitasoft.engine.profile.xml.ProfileEntryBinding;
-import org.bonitasoft.engine.profile.xml.ProfileMappingBinding;
-import org.bonitasoft.engine.profile.xml.ProfilesBinding;
-import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.SInvalidSchemaException;
-
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
-import com.bonitasoft.engine.profile.xml.ProfileBinding;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+
 public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ParameterService parameterService;
@@ -53,6 +32,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
 
     private PageService pageService;
+
     private BusinessDataRepository businessDataRespository;
 
     private RefBusinessDataService refBusinessDataService;
@@ -140,39 +120,6 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
             refBusinessDataService = lookupService(RefBusinessDataService.class);
         }
         return refBusinessDataService;
-    }
-
-    public Parser getProfileParser() {
-        final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>();
-        bindings.add(ProfileBinding.class);
-        bindings.add(ProfilesBinding.class);
-        bindings.add(ProfileEntryBinding.class);
-        bindings.add(ParentProfileEntryBinding.class);
-        bindings.add(ChildrenEntriesBinding.class);
-        bindings.add(ProfileEntriesBinding.class);
-        bindings.add(ProfileMappingBinding.class);
-        bindings.add(MembershipsBinding.class);
-        bindings.add(MembershipBinding.class);
-        bindings.add(UserNamesBinding.class);
-        bindings.add(RoleNamesBinding.class);
-        bindings.add(RoleNamesBinding.class);
-        bindings.add(GroupPathsBinding.class);
-        final Parser parser = getParserFactgory().createParser(bindings);
-        final InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd");
-        try {
-            parser.setSchema(resource);
-            return parser;
-        } catch (final SInvalidSchemaException ise) {
-            throw new BonitaRuntimeException(ise);
-        } finally {
-            try {
-                if (resource != null) {
-                    resource.close();
-                }
-            } catch (final IOException ioe) {
-                throw new BonitaRuntimeException(ioe);
-            }
-        }
     }
 
 }

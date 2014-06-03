@@ -29,10 +29,15 @@ public class ExportAllProfiles extends AbstractExportProfiles {
 
     @Override
     protected XMLNode getProfilesXmlNode() throws SBonitaException {
-        final String NS_PREFIX = "profiles";
-        final String NAME_SPACE = "http://www.bonitasoft.org/ns/profile/6.0";
-        final XMLNode profilesNode = new XMLNode(NS_PREFIX + ":proFiles");
-        profilesNode.addAttribute("xmlns:" + NS_PREFIX, NAME_SPACE);
+        final StringBuilder stringBuilderNodeName = new StringBuilder();
+        stringBuilderNodeName.append(PROFILES_NAMESPACE_PREFIX);
+        stringBuilderNodeName.append(":");
+        stringBuilderNodeName.append(PROFILES_TAG_NAME);
+        final XMLNode profilesNode = new XMLNode(stringBuilderNodeName.toString());
+        final StringBuilder stringBuilderPrefix = new StringBuilder();
+        stringBuilderPrefix.append("xmlns:");
+        stringBuilderPrefix.append(PROFILES_NAMESPACE_PREFIX);
+        profilesNode.addAttribute(stringBuilderPrefix.toString(), PROFILES_NAMESPACE);
 
         int index = 0;
         List<SProfile> sProfiles = searchProfiles(index);

@@ -17,8 +17,8 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.Session;
 
-import com.bonitasoft.engine.api.TenantIsPausedException;
 import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.TenantStatusException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -50,32 +50,61 @@ public class ServerAPIExt extends ServerAPIImpl {
         // For tenant level method call:
         if (session instanceof APISession) {
             final long tenantId = ((APISession) session).getTenantId();
-            if (!isTenantInAValidModeFor(apiImpl, method, tenantId, session)) {
-                logTenantPausedMessage(apiImpl, apiInterfaceName, method.getName());
-                throw new TenantIsPausedException("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
+            checkTenantIsInAValidModeFor(apiImpl, method, apiInterfaceName, tenantId, session);
+        }
+    }
+
+
+    private void checkTenantIsInAValidModeFor(final Object apiImpl, final Method method, final String apiInterfaceName, final long tenantId,
+            final Session session
+            ) {
+        final boolean tenantRunning = isTenantAvailable(tenantId, session);
+        final AvailableWhenTenantIsPaused methodAnnotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
+        AvailableWhenTenantIsPaused annotation = null;
+        if (methodAnnotation != null) {
+            annotation = methodAnnotation;
+        } else {
+            final Class<?> apiClass = apiImpl.getClass();
+            annotation = apiClass.getAnnotation(AvailableWhenTenantIsPaused.class);
+        }
+        checkIsValidModeFor(tenantRunning, annotation, tenantId, apiImpl, method, apiInterfaceName);
+    }
+
+    protected void checkIsValidModeFor(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation, final long tenantId, final Object apiImpl,
+            final Method method, final String apiInterfaceName) {
+        // On running tenant, annotation must not be present, or present without ONLY flag:
+        boolean okOnRunningTenant = isMethodAvailableOnRunningTenant(tenantRunning, annotation);
+        // On paused tenant, annotation must be present (without consideration on ONLY flag):
+        boolean okOnPausedTenant = isMethodAvailableOnPausedTenant(tenantRunning, annotation);
+        if (!(okOnRunningTenant || okOnPausedTenant)) {
+            if (tenantRunning) {
+                methodCannotBeCalledOnRunningTenant(apiImpl, apiInterfaceName, method, tenantId);
+            }
+            else {
+                methodCannotBeCalledOnPausedTenant(apiImpl, apiInterfaceName, method, tenantId);
             }
         }
     }
 
-    protected void logTenantPausedMessage(final Object apiImpl, final String apiInterfaceName, final String methodName) {
-        logTechnicalErrorMessage("Tenant in pause. Method '" + apiInterfaceName + "." + methodName + "' on implementation '"
+    protected void methodCannotBeCalledOnRunningTenant(final Object apiImpl, final String apiInterfaceName, final Method method, final long tenantId) {
+        logTechnicalErrorMessage("Tenant is running. Method '" + apiInterfaceName + "." + method.getName() + "' on implementation '"
+                + apiImpl.getClass().getSimpleName() + "' can only be called when the tenant is PAUSED (call TenantManagementAPI.pause() first)");
+        throw new TenantStatusException("Tenant with ID " + tenantId + " is running, method '" + apiInterfaceName + "." + method.getName()
+                + "()' cannot be called.");
+    }
+
+    protected void methodCannotBeCalledOnPausedTenant(final Object apiImpl, final String apiInterfaceName, final Method method, final long tenantId) {
+        logTechnicalErrorMessage("Tenant in pause. Method '" + apiInterfaceName + "." + method.getName() + "' on implementation '"
                 + apiImpl.getClass().getSimpleName() + "' cannot be called until the tenant mode is RUNNING again (call TenantManagementAPI.resume() first)");
+        throw new TenantStatusException("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
     }
 
-    private boolean isTenantInAValidModeFor(final Object apiImpl, final Method method, final long tenantId, final Session session) {
-        final boolean tenantAvailable = isTenantAvailable(tenantId, session);
-        final AvailableWhenTenantIsPaused methodAnnotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
-        if (methodAnnotation != null) {
-            return isInAValidModeFor(tenantAvailable, methodAnnotation);
-        } else {
-            final Class<?> apiClass = apiImpl.getClass();
-            final AvailableWhenTenantIsPaused classAnnotation = apiClass.getAnnotation(AvailableWhenTenantIsPaused.class);
-            return isInAValidModeFor(tenantAvailable, classAnnotation);
-        }
+    protected boolean isMethodAvailableOnPausedTenant(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation) {
+        return !tenantRunning && annotation != null;
     }
 
-    protected boolean isInAValidModeFor(final boolean available, final AvailableWhenTenantIsPaused annotation) {
-        return !(annotation == null && !available || available && annotation != null && annotation.only());
+    protected boolean isMethodAvailableOnRunningTenant(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation) {
+        return tenantRunning && (annotation == null || !annotation.only());
     }
 
     /**

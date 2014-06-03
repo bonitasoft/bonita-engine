@@ -8,8 +8,8 @@ import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.BOMBuilder;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder;
 
 public class IOUtilsTest {
 
@@ -17,7 +17,7 @@ public class IOUtilsTest {
 
     @Test
     public void marshallAndUnmarshallShouldReturnTheSameObject() throws Exception {
-        final BusinessObjectModel expected = new BOMBuilder().buildDefaultBOM();
+        final BusinessObjectModel expected = new BusinessObjectModelBuilder().buildDefaultBOM();
         final byte[] xml = IOUtils.marshallObjectToXML(expected, resource);
         final BusinessObjectModel actual = IOUtils.unmarshallXMLtoObject(xml, BusinessObjectModel.class, resource);
 

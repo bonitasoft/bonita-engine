@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
-
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
 	<profile name="Process owner" isDefault="true">
 			<description>Process profile</description>
-			<iconPath>/profiles/profileAdmin.png</iconPath>
 			<profileEntries>
-				  <parentProfileEntry name="Process">
+				  <parentProfileEntry name="Process" isCustom="false">
 			        <parentName>NULL</parentName>
 			        <index>8</index>
 			        <description>Process DES</description>
@@ -31,12 +29,10 @@
 				</memberships>
 			  </profileMapping>
 	</profile>
-
     <profile name="Team Manager" isDefault="false">
 		<description>TM profile2</description>
-		<iconPath>/profiles/profileTeamManager2.png</iconPath>
 		<profileEntries>
-			  <parentProfileEntry name="Home2">
+			  <parentProfileEntry name="Home2" isCustom="false">
 					<parentName>NULL</parentName>
 					<index>0</index>
 					<description>My team activitys dashboard2</description>
@@ -54,4 +50,4 @@
 			</roles>
 		  </profileMapping>
 	</profile>
-</profiles:proFiles>
+</profiles:profiles>

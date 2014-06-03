@@ -22,12 +22,12 @@ public class JobSPTests extends CommonAPILocalTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test

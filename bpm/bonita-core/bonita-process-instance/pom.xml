@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.bonitasoft.engine.core.process.instance</groupId>
@@ -16,7 +16,5 @@
 	<modules>
 		<module>bonita-process-instance-api</module>
 		<module>bonita-process-instance-impl</module>
-		<module>bonita-process-instance-model</module>
-		<module>bonita-process-instance-model-impl</module>
 	</modules>
 </project>

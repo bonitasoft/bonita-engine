@@ -17,6 +17,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
+
 /**
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
@@ -77,7 +83,9 @@ public class BDMQueryUtil {
         final Query q = new Query(name, content, businessObject.getQualifiedName());
         for (final String fieldName : uniqueConstraint.getFieldNames()) {
             final Field f = getField(fieldName, businessObject);
-            q.addQueryParameter(f.getName(), f.getType().getClazz().getName());
+            if (f instanceof SimpleField) {
+                q.addQueryParameter(f.getName(), ((SimpleField) f).getType().getClazz().getName());
+            }
         }
         return q;
     }
@@ -92,7 +100,9 @@ public class BDMQueryUtil {
         final String name = createQueryNameForField(field);
         final String content = createQueryContentForField(businessObject.getQualifiedName(), field);
         final Query q = new Query(name, content, List.class.getName());
-        q.addQueryParameter(field.getName(), field.getType().getClazz().getName());
+        if (field instanceof SimpleField) {
+            q.addQueryParameter(field.getName(), ((SimpleField) field).getType().getClazz().getName());
+        }
         return q;
     }
 
@@ -152,11 +162,13 @@ public class BDMQueryUtil {
             queries.add(query);
         }
         for (final Field f : businessObject.getFields()) {
-            if (f.isCollection() == null || !f.isCollection()) {
-                final String potentialConflictingQueryName = createQueryNameForField(f);
-                if (!queryNames.contains(potentialConflictingQueryName)) {
-                    final Query query = createQueryForField(businessObject, f);
-                    queries.add(query);
+            if (f instanceof SimpleField) {
+                if (f.isCollection() == null || !f.isCollection()) {
+                    final String potentialConflictingQueryName = createQueryNameForField(f);
+                    if (!queryNames.contains(potentialConflictingQueryName)) {
+                        final Query query = createQueryForField(businessObject, f);
+                        queries.add(query);
+                    }
                 }
             }
         }
@@ -170,7 +182,11 @@ public class BDMQueryUtil {
             queryNames.add(createQueryNameForUniqueConstraint(uc));
         }
         for (final Field f : businessObject.getFields()) {
-            queryNames.add(createQueryNameForField(f));
+            if (f instanceof SimpleField) {
+                if (f.isCollection() == null || !f.isCollection()) {
+                    queryNames.add(createQueryNameForField(f));
+                }
+            }
         }
         queryNames.add(createSelectAllQueryName());
         return queryNames;

@@ -57,11 +57,11 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
     @Test
     public void executeConnectorWithExecutionTooLong() throws Exception {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
                 .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(5000));
 
-        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorLongToExecute(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorLongToExecute(designProcessDefinition, ACTOR_NAME, user);
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -91,7 +91,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addShortTextData("value", null);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithCustomType(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorWithCustomType(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = this.waitForUserTask("step1", process);
         final Map<String, Expression> params = Collections.emptyMap();

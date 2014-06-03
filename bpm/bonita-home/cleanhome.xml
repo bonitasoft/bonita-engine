@@ -26,6 +26,12 @@
 		<copy todir="${basedir}/target/home/server/licenses" failonerror="true">
 			<fileset dir="${user.home}/lic" includes="*.lic" />
 		</copy>
+		<!--echo>Copy DataManagement-required files for compilation</echo>
+		<copy todir="${basedir}/target/home/server/platform/data-management/compilation-dependencies" failonerror="true">
+			<fileset dir="../bonita-common/target" includes="*.jar" />
+			<fileset dir="../bonita-client/target" includes="*.jar" />
+			<fileset dir="../bonita-server/target" includes="*.jar" />
+		</copy-->
 		<loadfile srcFile="${basedir}/pom.xml" property="project.version">
 			<filterchain>
 				<linecontains>

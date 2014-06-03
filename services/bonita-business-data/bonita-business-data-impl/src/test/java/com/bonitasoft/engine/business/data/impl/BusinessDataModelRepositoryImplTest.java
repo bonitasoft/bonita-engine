@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.BOMBuilder;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,7 +44,10 @@ public class BusinessDataModelRepositoryImplTest {
         doReturn(sDependency).when(businessDataModelRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(businessDataModelRepository).createDependencyMapping(1, sDependency);
 
-        businessDataModelRepository.createAndDeployServerBDMJar(1, BOMBuilder.aBOM().build(), null);
+        BusinessObjectModel bom = BOMBuilder.aBOM().build();
+        doReturn("some bytes".getBytes()).when(businessDataModelRepository).generateServerBDMJar(bom);
+
+        businessDataModelRepository.createAndDeployServerBDMJar(1, bom, null);
 
         verify(dependencyService).createDependency(sDependency);
         verify(dependencyService).createDependencyMapping(dependencyMapping);

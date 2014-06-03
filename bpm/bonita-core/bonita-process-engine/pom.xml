@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.3.1-SNAPSHOT</version>
+		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-engine</artifactId>
@@ -113,7 +113,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl</artifactId>
+			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
