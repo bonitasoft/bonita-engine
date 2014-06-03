@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -44,6 +45,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -54,13 +56,13 @@ import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageNotFoundException;
 
-public class ProfileImportAndExportSPITest extends AbstractProfileTest {
+public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
     public void exportAllProfiles() throws Exception {
         // given
-        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("AllProfiles.xml"))));
 
         // when
@@ -82,7 +84,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
         assertThat(groupAcme).as("group acme").isNotNull();
         assertThat(groupFinance).as("group finance").isNotNull();
 
-        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("Profile2groups.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
 
@@ -115,11 +117,67 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     }
 
     @Test
+    public void importProfile_with_teamwork_level() throws Exception {
+        // given
+        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
+                .getResourceAsStream("Profiles_teamwork.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(profileByteArray));
+
+        // when import
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(profileByteArray, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        assertThat(importProfiles).as("should have 1 imported profiles").hasSize(1);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error found in status: %s ", importStatus).isEmpty();
+            assertThat(importStatus.getStatus()).isEqualTo(Status.REPLACED);
+        }
+
+        // when export
+
+        final long[] profileIds = new long[1];
+        profileIds[0] = adminProfileId;
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(getProfileAPI().exportProfilesWithIdsSpecified(profileIds)));
+
+        // then
+        assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
+
+    }
+
+    // for manual testing in dev mode with teamwork licence only
+    // @Test
+    public void importProfile_with_teamwork_level_customProfile() throws Exception {
+        // given
+        final byte[] profileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
+                .getResourceAsStream("Profiles_teamwork_customProfile.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(profileByteArray));
+
+        // when import
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(profileByteArray, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        assertThat(importProfiles).as("should have 1 imported profiles").hasSize(1);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error found in status: %s ", importStatus).isEmpty();
+            // Status is Status.ADDED in whith efficency licence
+            assertThat(importStatus.getStatus()).isEqualTo(Status.SKIPPED);
+        }
+    }
+
+    private void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
+        final List<?> allDifferences = diff.getAllDifferences();
+        assertThat(allDifferences).as("should have no differences").isEmpty();
+    }
+
+    @Test
     public void exportImportProfile_with_custom_page() throws Exception {
         final String profileName = "custom profile";
 
         // given
-        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileTest.class
+        final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("CustomPageProfile.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
         checkOrCreateCustomPage("custompage_page1");
@@ -183,16 +241,11 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
     @Test
     public void exportProfilesSpecified() throws Exception {
         // given
-        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileTest.class
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("AdministratorProfile.xml"))));
 
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
-        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
-        assertEquals(1, profiles.size());
-        final Profile profile1 = profiles.get(0);
         final long[] profilesIds = new long[1];
-        profilesIds[0] = profile1.getId();
+        profilesIds[0] = adminProfileId;// profile1.getId();
 
         // when
         final String xmlPrettyFormatExported = XmlStringPrettyFormatter
@@ -206,6 +259,32 @@ public class ProfileImportAndExportSPITest extends AbstractProfileTest {
             assertThat(xmlPrettyFormatExported).as("xml exported profile should be similar to original xml file").isEqualTo(xmlPrettyFormatExported);
         }
 
+    }
+
+    @Test
+    public void importDefaultProfileShouldUpdateLastModifyFields() throws Exception {
+        final byte[] byteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
+                .getResourceAsStream("AdministratorProfile_new_description.xml"));
+
+        // given
+        final Date now = new Date(System.currentTimeMillis());
+        final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
+
+        // when
+        logoutOnTenant();
+        loginOnDefaultTenantWith("userName1", "User1Pwd");
+        getProfileAPI().importProfiles(byteArray, ImportPolicy.REPLACE_DUPLICATES);
+
+        // then
+        final Profile profileAfter = getProfileAPI().getProfile(adminProfileId);
+        assertThat(profileAfter.getLastUpdateDate()).as("should have update LastUpdateDate").isAfter(now);
+        assertThat(profileAfter.getLastUpdateDate()).as("should have update LastUpdateDate").isAfter(profileBefore.getLastUpdateDate());
+
+        assertThat(profileAfter.getDescription()).as("should not change description").isNotEqualTo("new description");
+        assertThat(profileAfter.getDescription()).as("should not change description").isEqualTo("Administrator profile");
+
+        assertThat(profileAfter.getLastUpdatedBy()).as("should change LastUpdatedBy").isNotEqualTo(profileBefore.getLastUpdatedBy());
+        assertThat(profileAfter.getLastUpdatedBy()).as("should change LastUpdatedBy").isEqualTo(user1.getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")

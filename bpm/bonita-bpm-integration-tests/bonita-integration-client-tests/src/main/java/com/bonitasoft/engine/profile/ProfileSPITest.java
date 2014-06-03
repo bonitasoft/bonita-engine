@@ -37,7 +37,7 @@ import com.bonitasoft.engine.api.ProfileAPI;
  * @author Celine Souchet
  */
 @SuppressWarnings("javadoc")
-public class ProfileSPITest extends AbstractProfileTest {
+public class ProfileSPITest extends AbstractProfileSPTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.", jira = "")
     @Test
@@ -103,7 +103,7 @@ public class ProfileSPITest extends AbstractProfileTest {
         assertEquals(1, profiles.size());
         final Profile profile1 = profiles.get(0);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("userName1", "User1Pwd");
         final ProfileCreator profileCreator = new ProfileCreator(profile1);
         profileCreator.setName("name");
