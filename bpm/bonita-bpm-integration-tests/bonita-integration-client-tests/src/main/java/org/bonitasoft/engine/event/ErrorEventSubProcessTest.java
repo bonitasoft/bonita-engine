@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -27,6 +26,7 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -40,7 +40,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -226,7 +225,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         assignAndExecuteStep(subStep, john.getId());
         waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         // check that the transition wasn't taken
         checkWasntExecuted(processInstance, "end");
@@ -290,7 +289,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-1397")
@@ -314,7 +313,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-1397")
@@ -337,7 +336,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
     private void checkEvaluateExpression(final ActivityInstance subStep, final String dataName, final Class<?> expressionType, final Serializable expectedValue)
@@ -386,7 +385,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
+        waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
@@ -400,7 +399,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
     public void processWithErrorEventSubProcAndCallActivity_must_be_finished_when_subProcess_is_finished() throws Exception {
         // Create the target process
         processDefinitions.add(deployProcessWithTestConnectorThatThrowException(BuildTestUtil
-                .buildProcessDefinitionWithAutomaticTaskAndFailedConnector(PROCESS_NAME)));
+                .buildProcessDefinitionWithUserTaskAndFailedConnector(PROCESS_NAME)));
 
         // Create the caller process
         final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_NAME);
@@ -413,24 +412,19 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         // Start the caller process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
+        final HumanTaskInstance stepBeforeFailedConnector = waitForUserTaskAndExecuteIt("StepBeforeFailedConnector", john);
         final ActivityInstance subStep = waitForUserTask("SubStep");
-
-        // Search the process instance target
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
-        searchOptionsBuilder.filter("name", PROCESS_NAME);
-        final List<ProcessInstance> targetProcessInstances = getProcessAPI().searchProcessInstances(searchOptionsBuilder.done()).getResult();
-        assertFalse(targetProcessInstances.isEmpty());
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subStep.getParentProcessInstanceId());
         waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
-        waitForProcessToBeInState(targetProcessInstances.get(0), ProcessInstanceState.ABORTED);
+        waitForProcessToBeInState(stepBeforeFailedConnector.getParentProcessInstanceId(), ProcessInstanceState.ABORTED);
     }
 
     private ProcessDefinition deployProcessWithTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder)
             throws BonitaException, IOException {
-        return deployAndEnableProcessWithConnector(processDefinitionBuilder, "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class,
-                "TestConnectorThatThrowException.jar");
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, john, "TestConnectorThatThrowException.impl",
+                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }
 
 }

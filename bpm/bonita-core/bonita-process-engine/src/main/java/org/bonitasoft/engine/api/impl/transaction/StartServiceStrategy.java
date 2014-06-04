@@ -33,4 +33,9 @@ public class StartServiceStrategy implements ServiceStrategy {
         service.start();
     }
 
+    @Override
+    public boolean shouldRefreshClassLoaders() {
+        return true;
+    }
+
 }

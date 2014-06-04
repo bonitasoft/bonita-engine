@@ -69,11 +69,6 @@
 			<artifactId>bonita-category-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Classloader -->
 		<dependency>
@@ -375,8 +370,8 @@
 			<version>${project.version}</version>
 			<exclusions>
 			    <exclusion>
-			        <artifactId>bonita-common</artifactId>
 			        <groupId>org.bonitasoft.engine</groupId>
+			        <artifactId>bonita-common</artifactId>
 			    </exclusion>
 			</exclusions>
 		</dependency>
@@ -593,9 +588,6 @@
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
 									<!-- Category -->
-									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
 									<!-- Classloader -->

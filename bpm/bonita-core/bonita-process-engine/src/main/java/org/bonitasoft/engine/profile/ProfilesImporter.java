@@ -234,7 +234,7 @@ public class ProfilesImporter {
         return errors;
     }
 
-    SProfile importTheProfile(final long importerId,
+    protected SProfile importTheProfile(final long importerId,
             final ExportedProfile exportedProfile,
             final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
             SProfileUpdateException,

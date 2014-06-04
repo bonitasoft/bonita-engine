@@ -7,6 +7,8 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
 	</bean>
 
 </beans>

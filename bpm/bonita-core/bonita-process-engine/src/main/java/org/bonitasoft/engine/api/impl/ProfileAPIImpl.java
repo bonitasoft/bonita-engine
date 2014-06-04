@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **
+ ** 
  * @since 6.0
  */
 package org.bonitasoft.engine.api.impl;
@@ -242,9 +242,9 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final MemberType memberType = getMemberType(userId, groupId, roleId);
-        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId, memberType);
+        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
+                memberType);
         try {
             checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
         } catch (final SBonitaException e1) {
@@ -252,10 +252,14 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
         try {
             createProfileMember.execute();
-            return ModelConvertor.toProfileMember(createProfileMember.getResult());
+            return convertToProfileMember(createProfileMember);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
+    }
+
+    protected ProfileMember convertToProfileMember(final CreateProfileMember createProfileMember) {
+        return ModelConvertor.toProfileMember(createProfileMember.getResult());
     }
 
     @Override
@@ -321,13 +325,13 @@ public class ProfileAPIImpl implements ProfileAPI {
 
     public MemberType getMemberType(final Long userId, final Long groupId, final Long roleId) throws CreationException {
         MemberType memberType = null;
-        if (userId != null) {
+        if (isPositiveLong(userId)) {
             memberType = MemberType.USER;
-        } else if (groupId != null && roleId == null) {
+        } else if (isPositiveLong(groupId) && !isPositiveLong(roleId)) {
             memberType = MemberType.GROUP;
-        } else if (roleId != null && groupId == null) {
+        } else if (isPositiveLong(roleId) && !isPositiveLong(groupId)) {
             memberType = MemberType.ROLE;
-        } else if (roleId != null && groupId != null) {
+        } else if (isPositiveLong(roleId) && isPositiveLong(groupId)) {
             memberType = MemberType.MEMBERSHIP;
         } else {
             final StringBuilder stb = new StringBuilder("Parameters map must contain at least one of entries: ");
@@ -341,16 +345,25 @@ public class ProfileAPIImpl implements ProfileAPI {
         return memberType;
     }
 
-    @Override
-    public void deleteProfileMember(final Long profilMemberId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
+    private boolean isPositiveLong(final Long value) {
+        return (value != null && value > 0);
+    }
 
+    @Override
+    public void deleteProfileMember(final Long profileMemberId) throws DeletionException {
+        final ProfileService profileService = getTenantAccessor().getProfileService();
         try {
-            profileService.deleteProfileMember(profilMemberId);
+            final SProfileMember profileMember = profileService.getProfileMemberWithoutDisplayName(profileMemberId);
+            profileService.deleteProfileMember(profileMember.getId());
+            profileService.updateProfileMetaData(profileMember.getProfileId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
+    }
+
+    protected long getUserIdFromSession() {
+        final long updatedById = SessionInfos.getUserIdFromSession();
+        return updatedById;
     }
 
 }

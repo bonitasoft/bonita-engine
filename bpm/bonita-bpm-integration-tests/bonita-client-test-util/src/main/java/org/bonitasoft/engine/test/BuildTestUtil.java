@@ -162,6 +162,21 @@ public class BuildTestUtil {
         return builder;
     }
 
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithUserTaskAndFailedConnector(final String processName)
+            throws InvalidExpressionException {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        builder.addStartEvent("start");
+        builder.addActor(ACTOR_NAME).addUserTask("StepBeforeFailedConnector", ACTOR_NAME);
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addAutomaticTask("AutomaticStep")
+                .addConnector("testConnectorThatThrowException",
+                        "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER).throwErrorEventWhenFailed("errorCode");
+        connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
+        builder.addEndEvent("end");
+        builder.addTransition("start", "StepBeforeFailedConnector").addTransition("StepBeforeFailedConnector", "AutomaticStep")
+                .addTransition("AutomaticStep", "end");
+        return builder;
+    }
+
     public static void buildErrorEventSubProcessWithUserTask(final String taskName, final ProcessDefinitionBuilder builder) {
         final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess(EVENT_SUB_PROCESS_NAME, true).getSubProcessBuilder();
         subProcessBuilder.addStartEvent("SubStart").addErrorEventTrigger();

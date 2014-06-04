@@ -827,6 +827,53 @@ public interface ProcessRuntimeAPI {
     void updateActivityDataInstance(String dataName, long activityInstanceId, Serializable dataValue) throws UpdateException;
 
     /**
+     * Update the value of a named transient data instance in a specified activity instance.
+     * 
+     * @param dataName
+     *            The name of the data instance.
+     * @param activityInstanceId
+     *            The identifier of the activity instance.
+     * @param dataValue
+     *            The new value of the data to set.
+     * @throws InvalidSessionException
+     *             If the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             If an error occurs during the update.
+     * @since 6.0
+     */
+    void updateActivityTransientDataInstance(String dataName, long activityInstanceId, Serializable dataValue) throws UpdateException;
+
+    /**
+     * Get a list of the transient data instances from a specified activity instance.
+     * 
+     * @param activityInstanceId
+     *            The identifier of the activity instance.
+     * @param startIndex
+     *            The index of the first result (starting at 0).
+     * @param maxResults
+     *            The maximum number of results to get.
+     * @return The list of matching DataInstances.
+     * @since 6.0
+     */
+    List<DataInstance> getActivityTransientDataInstances(long activityInstanceId, int startIndex, int maxResults);
+
+    /**
+     * Get a named transient data instance from a specified activity instance.
+     * 
+     * @param dataName
+     *            The name of the data item.
+     * @param activityInstanceId
+     *            The identifier of the activity instance.
+     * @return An instance of data.
+     * @throws InvalidSessionException
+     *             If the session is invalid, e.g. the session has expired.
+     * @throws DataNotFoundException
+     *             If the specified data value cannot be found.
+     * @since 6.0
+     */
+    DataInstance getActivityTransientDataInstance(String dataName, long activityInstanceId) throws DataNotFoundException;
+
+    /**
      * Get the date when the specified activity instance reached the given state.
      * 
      * @param activityInstanceId
