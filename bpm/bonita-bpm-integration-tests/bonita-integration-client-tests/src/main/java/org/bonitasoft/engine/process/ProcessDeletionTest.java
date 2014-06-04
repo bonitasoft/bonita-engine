@@ -1,8 +1,6 @@
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +103,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
-        assertEquals(33, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Test
@@ -190,7 +188,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that archived flow nodes were not deleted.
         taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT);
-        assertEquals(3, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Deprecated
@@ -318,12 +316,12 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check that the archived instances of p1 were not deleted
         archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(simpleProcessInstance.getId(), 0, 10);
-        assertEquals(3, archivedProcessInstanceList.size());
+        assertEquals(0, archivedProcessInstanceList.size());
 
         // check that archived flow node were not deleted.
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 10,
                 ActivityInstanceCriterion.DEFAULT);
-        assertEquals(8, taskInstances.size());
+        assertEquals(0, taskInstances.size());
     }
 
     @Test

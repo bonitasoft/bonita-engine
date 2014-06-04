@@ -60,6 +60,7 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -665,6 +666,12 @@ public class PlatformAPIImpl implements PlatformAPI {
             inputStream.close();
         }
         List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
+        importProfiles(profileService, identityService, profilesFromXML, tenantServiceAccessor);
+    }
+
+    protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
+            final TenantServiceAccessor tenantServiceAccessor)
+            throws ExecutionException {
         new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
