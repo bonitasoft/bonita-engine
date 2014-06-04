@@ -31,7 +31,6 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
@@ -60,16 +59,19 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
-    public void exportAllProfiles() throws Exception {
+    public void exportImportAllProfiles() throws Exception {
         // given
-        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(IOUtils.toByteArray(AbstractProfileSPTest.class
-                .getResourceAsStream("AllProfiles.xml"))));
+        final byte[] exportAllProfiles = getProfileAPI().exportAllProfiles();
 
         // when
-        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(getProfileAPI().exportAllProfiles()));
+        final List<ImportStatus> importProfiles = getProfileAPI().importProfiles(exportAllProfiles, ImportPolicy.DELETE_EXISTING);
 
         // then
-        assertThat(xmlPrettyFormatExported.length()).as("should have samse size").isEqualTo(xmlPrettyFormatExpected.length());
+        assertThat(importProfiles).hasSize(4);
+        for (final ImportStatus importStatus : importProfiles) {
+            assertThat(importStatus.getErrors()).as("error on import").isEmpty();
+            assertThat(importStatus.getStatus()).as("should add the profile %s ", importStatus).isEqualTo(Status.ADDED);
+        }
     }
 
     @Test
@@ -77,13 +79,6 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         final String profileName = "Test";
 
         // given
-        createGroup("acme");
-        createGroup("finance", "/acme");
-        final Group groupAcme = getIdentityAPI().getGroupByPath("/acme");
-        final Group groupFinance = getIdentityAPI().getGroupByPath("/acme/finance");
-        assertThat(groupAcme).as("group acme").isNotNull();
-        assertThat(groupFinance).as("group finance").isNotNull();
-
         final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("Profile2groups.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
@@ -112,9 +107,6 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
         // then
         assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
-
-        // clean up
-        deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
     }
 
     @Test
@@ -169,7 +161,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         XMLUnit.setIgnoreAttributeOrder(true);
         final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
         final List<?> allDifferences = diff.getAllDifferences();
-        assertThat(allDifferences).as("should have no differences").isEmpty();
+        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
     }
 
     @Test
@@ -285,23 +277,6 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
         assertThat(profileAfter.getLastUpdatedBy()).as("should change LastUpdatedBy").isNotEqualTo(profileBefore.getLastUpdatedBy());
         assertThat(profileAfter.getLastUpdatedBy()).as("should change LastUpdatedBy").isEqualTo(user1.getId());
-    }
-
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
-    @Test
-    public void importAllProfiles() throws BonitaException, IOException, SAXException {
-        final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("AllProfiles.xml");
-        final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
-
-        // when
-        final List<ImportStatus> importStatusList = getProfileAPI().importProfiles(xmlContent, ImportPolicy.DELETE_EXISTING);
-
-        // then
-        assertThat(importStatusList).as("should import 4 profiles").hasSize(4);
-        for (final ImportStatus importStatus : importStatusList) {
-            assertThat(importStatus.getErrors()).as("error on import").isEmpty();
-        }
-
     }
 
     @Test
