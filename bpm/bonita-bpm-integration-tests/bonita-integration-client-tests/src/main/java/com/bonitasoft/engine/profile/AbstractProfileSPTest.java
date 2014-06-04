@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
@@ -35,7 +38,7 @@ import com.bonitasoft.engine.CommonAPISPTest;
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractProfileTest extends CommonAPISPTest {
+public abstract class AbstractProfileSPTest extends CommonAPISPTest {
 
     protected static final String IMPORT_PROFILES_CMD = "importProfilesCommand";
 
@@ -61,9 +64,13 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
 
     protected Group group1;
 
+    protected Group subGroup1;
+
     protected Group group2;
 
     protected Group group3;
+
+    protected Group subGroup3;
 
     protected Role role1;
 
@@ -78,14 +85,16 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         createUsers();
 
         group1 = createGroup("group1");
+        subGroup1 = createGroup("subGroup1", "/group1");
         group2 = createGroup("group2");
         group3 = createGroup("group3");
+        subGroup3 = createGroup("subGroup3", "/group3");
         role1 = createRole("role1");
         role2 = createRole("role2");
         role3 = createRole("role3");
 
         // Restoring up default profiles before tests:
-        final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("AllProfiles.xml");
+        final InputStream xmlStream = AbstractProfileSPTest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
@@ -118,15 +127,17 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         deleteUsers(user1, user2, user3, user4, user5);
         deleteGroups(group1, group2, group3);
         deleteRoles(role1, role2, role3);
+        cleanAllProfiles();
+        logoutOnTenant();
+    }
 
+    protected void cleanAllProfiles() throws IOException, CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
         // Clean profiles
-        final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("CleanProfiles.xml");
+        final InputStream xmlStream = AbstractProfileSPTest.class.getResourceAsStream("CleanProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
-
-       logoutOnTenant();
     }
 
 }

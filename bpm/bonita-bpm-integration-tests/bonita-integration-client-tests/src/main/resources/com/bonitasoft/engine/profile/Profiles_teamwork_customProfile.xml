@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+	<profile name="testProfile" isDefault="false">
+		<description>try to import custom profile</description>
+	</profile>
+</profiles:profiles>

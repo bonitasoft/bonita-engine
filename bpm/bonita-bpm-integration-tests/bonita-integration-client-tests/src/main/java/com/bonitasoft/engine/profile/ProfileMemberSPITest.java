@@ -25,7 +25,7 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.platform.TenantCreator;
 
-public class ProfileMemberSPITest extends AbstractProfileTest {
+public class ProfileMemberSPITest extends AbstractProfileSPTest {
 
     @Ignore("Problem with assumption that default values pre-exist")
     @Test
