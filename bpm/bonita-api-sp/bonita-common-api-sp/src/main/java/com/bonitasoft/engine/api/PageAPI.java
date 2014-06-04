@@ -17,6 +17,8 @@ import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -94,7 +96,8 @@ public interface PageAPI {
      * @throws CreationException
      *             if an error occurs during the creation.
      */
-    Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException;
+    Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException;
 
     /**
      * Updates a custom page.
@@ -111,10 +114,12 @@ public interface PageAPI {
      * @throws AlreadyExistsException
      *             if a page with this name already exists.
      */
-    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException;
+    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException, UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException;
 
     /**
      * Updates a custom page content.
+     * it read the page.properties inside to update the page properties
      * 
      * @param pageId
      *            the Identifier of the page to update
@@ -123,7 +128,8 @@ public interface PageAPI {
      * @throws UpdateException
      *             if an error occurs during the update.
      */
-    void updatePageContent(final long pageId, final byte[] getPageContent) throws UpdateException;
+    void updatePageContent(final long pageId, final byte[] getPageContent) throws UpdateException, UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException;
 
     /**
      * Deletes a page identified by its ID.

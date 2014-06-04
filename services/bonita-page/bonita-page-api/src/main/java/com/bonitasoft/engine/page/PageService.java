@@ -36,6 +36,17 @@ public interface PageService extends TenantLifecycleService {
 
     String PAGE = "PAGE";
 
+    /**
+     * add a page using the zip in parameters and the given properties
+     * 
+     * @param page
+     * @param content
+     * @return
+     * @throws SObjectCreationException
+     * @throws SObjectAlreadyExistsException
+     * @throws SInvalidPageZipContentException
+     * @throws SInvalidPageTokenException
+     */
     SPage addPage(SPage page, byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipContentException,
             SInvalidPageTokenException;
 
@@ -52,11 +63,26 @@ public interface PageService extends TenantLifecycleService {
     List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
 
     SPage updatePage(long pageId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
-            SObjectAlreadyExistsException;
+            SObjectAlreadyExistsException, SInvalidPageTokenException;
 
-    void updatePageContent(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SBonitaException;
+    void updatePageContent(long pageId, byte[] content, String contentName) throws SBonitaException;
 
     @Override
     void start() throws SBonitaException;
+
+    /**
+     * add a page using the zip in parameters, it get all informations from the page.properties file contain inside the zip
+     * 
+     * @param content
+     * @param userId
+     * @return
+     * @throws SObjectCreationException
+     * @throws SObjectAlreadyExistsException
+     * @throws SInvalidPageZipContentException
+     * @throws SInvalidPageTokenException
+     */
+    SPage addPage(final byte[] content, final String contentName, long userId) throws SObjectCreationException, SObjectAlreadyExistsException,
+            SInvalidPageZipContentException,
+            SInvalidPageTokenException;
 
 }

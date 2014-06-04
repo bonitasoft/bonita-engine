@@ -1,13 +1,9 @@
 package com.bonitasoft.engine.api.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -15,7 +11,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -24,6 +19,8 @@ import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -128,21 +125,20 @@ public class PageAPIExt implements PageAPI {
     public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException
     {
-        byte[] zipEntryContent;
-        try {
-            zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
+        final PageService pageService = getTenantAccessor().getPageService();
+        final long userId = getUserIdFromSessionInfos();
 
-            final Properties pageProperties = new Properties();
-            pageProperties.load(new ByteArrayInputStream(zipEntryContent));
-            final String name = pageProperties.getProperty(PageService.PROPERTIES_NAME);
-            final String displayName = pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME);
-            final String description = pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION);
-            final PageCreator pageCreator = new PageCreator(name, contentName);
-            pageCreator.setDescription(description);
-            pageCreator.setDisplayName(displayName);
-            return createPage(pageCreator, content);
-        } catch (final IOException e) {
-            throw new InvalidPageZipContentException("Error while reading zip file", e);
+        try {
+            final SPage addPage = pageService.addPage(content, contentName, userId);
+            return convertToPage(addPage);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException("A page already exists with the name ");
+        } catch (final SInvalidPageTokenException e) {
+            throw new InvalidPageTokenException(e.getMessage(), e);
+        } catch (final SInvalidPageZipContentException e) {
+            throw new InvalidPageZipContentException(e.getMessage(), e);
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
         }
 
     }
@@ -209,7 +205,9 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException {
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException,
+            UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
         }
@@ -246,6 +244,8 @@ public class PageAPIExt implements PageAPI {
             throw new UpdateException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
+        } catch (SInvalidPageTokenException e) {
+            throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
         }
 
     }
@@ -256,32 +256,20 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException {
+    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException {
         final PageService pageService = getTenantAccessor().getPageService();
-        final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
-        final SPageUpdateContentBuilder pageUpdateContentBuilder = getPageUpdateContentBuilder();
-
-        pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
 
         try {
+            SPage page = pageService.getPage(pageId);
+            pageService.updatePageContent(pageId, content, page.getContentName());
 
-            final byte[] zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
-            String string = new String(zipEntryContent, "UTF-8");
-            final Properties pageProperties = new Properties();
-            pageProperties.load(new StringReader(string));
-            pageUpdateBuilder.updateName(pageProperties.getProperty(PageService.PROPERTIES_NAME));
-            pageUpdateBuilder.updateDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME));
-            pageUpdateBuilder.updateDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
-
-            pageUpdateContentBuilder.updateContent(content);
-
-            pageService.updatePageContent(pageId, pageUpdateContentBuilder.done());
-            pageService.updatePage(pageId, pageUpdateBuilder.done());
-
+        } catch (final SInvalidPageTokenException e) {
+            throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
+        } catch (final SInvalidPageZipContentException e) {
+            throw new UpdatingWithInvalidPageZipContentException(e.getMessage(), e);
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
-        } catch (final IOException e) {
-            throw new UpdateException("Error while reading zip file", e);
         }
     }
 

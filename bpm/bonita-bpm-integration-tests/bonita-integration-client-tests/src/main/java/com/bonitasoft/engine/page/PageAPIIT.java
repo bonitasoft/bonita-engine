@@ -29,6 +29,8 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
@@ -163,6 +165,37 @@ public class PageAPIIT extends CommonAPISPTest {
         // when
         pageUpdater.setName(PAGE_NAME1);
         getPageAPI().updatePage(page2.getId(), pageUpdater);
+
+        // then
+        // exception
+
+    }
+
+    @Test(expected = UpdatingWithInvalidPageZipContentException.class)
+    public void updatePageContent_with_bad_content_should_fail() throws BonitaException, IOException {
+        // given
+        Page createPage = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        getPageAPI().updatePageContent(createPage.getId(), IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes())));
+
+        // then
+        // exception
+
+    }
+
+    @Test(expected = UpdatingWithInvalidPageTokenException.class)
+    public void updatePage_with_bad_token_should_fail() throws BonitaException {
+        final PageUpdater pageUpdater = new PageUpdater();
+
+        // given
+        Page createPage = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        pageUpdater.setName("invalid token");
+        getPageAPI().updatePage(createPage.getId(), pageUpdater);
 
         // then
         // exception
@@ -523,7 +556,7 @@ public class PageAPIIT extends CommonAPISPTest {
         assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(customPageProfileEntry);
 
         final PageUpdater pageUpdater = new PageUpdater();
-        pageUpdater.setName("newName_" + System.currentTimeMillis());
+        pageUpdater.setName("custompage_newName" + System.currentTimeMillis());
         pageUpdater.setDescription(page.getDescription());
         pageUpdater.setContentName(page.getContentName());
         final Page updatePage = getPageAPI().updatePage(page.getId(), pageUpdater);

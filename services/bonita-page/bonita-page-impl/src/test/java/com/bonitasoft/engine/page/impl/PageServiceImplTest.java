@@ -11,7 +11,6 @@ package com.bonitasoft.engine.page.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -172,18 +171,14 @@ public class PageServiceImplTest {
         // exception;
     }
 
-    @Test
-    public void createPage_should_throw_exception_when_name_is_empty() throws SBonitaException {
+    @Test(expected = SInvalidPageTokenException.class)
+    public void createPage_should_throw_exception_when_name_is_empty() throws SBonitaException, IOException {
 
         final long pageId = 15;
-        final SPage pageWithEmptyName = new SPageImpl("", 123456, 45, true, CONTENT_NAME);
+        final SPageImpl pageWithEmptyName = new SPageImpl("", 123456, 45, true, CONTENT_NAME);
+        pageWithEmptyName.setDisplayName("plop");
         pageWithEmptyName.setId(pageId);
-        try {
-            pageServiceImpl.addPage(pageWithEmptyName, new byte[] { 1, 2, 3 });
-            fail("should not be able to create a page with empty name");
-        } catch (final SInvalidPageTokenException e) {
-            assertTrue(e.getMessage().contains("empty name"));
-        }
+        pageServiceImpl.addPage(pageWithEmptyName, validPageContent("plop"));
 
     }
 
@@ -191,11 +186,11 @@ public class PageServiceImplTest {
     public void addPage_should_throw_exception_when_badContent() throws Exception {
 
         // given
-        final SPage newPage = new SPageImpl(PAGE_NAME, INSTALLATION_DATE_AS_LONG, INSTALLED_BY_ID, PROVIDED_TRUE, CONTENT_NAME);
-
+        final SPageImpl newPage = new SPageImpl(PAGE_NAME, INSTALLATION_DATE_AS_LONG, INSTALLED_BY_ID, PROVIDED_TRUE, CONTENT_NAME);
+        newPage.setDisplayName("plop");
         // when
         when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(newPage);
-        pageServiceImpl.addPage(newPage, validPageContent());
+        pageServiceImpl.addPage(newPage, validPageContent(PAGE_NAME));
 
         // then exception
 
@@ -205,19 +200,22 @@ public class PageServiceImplTest {
     public void should_create_page_throw_exception_when_name_exists() throws Exception {
 
         // given
-        final SPage newPage = new SPageImpl(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
+        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
+        newPage.setDisplayName("display Name");
 
         // when
         when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(newPage);
-        final byte[] validContent = validPageContent();
+        final byte[] validContent = validPageContent(PAGE_NAME);
         pageServiceImpl.addPage(newPage, validContent);
 
         // then exception
 
     }
 
-    private byte[] validPageContent() throws IOException {
-        return IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
+    @SuppressWarnings("unchecked")
+    private byte[] validPageContent(final String pageName) throws IOException {
+        return IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, ("name=custompage_" + pageName + "\ndisplayName=mypage display name\ndescription=mypage description\n").getBytes()));
     }
 
     @Test
@@ -268,15 +266,15 @@ public class PageServiceImplTest {
     public void start_should_import_provided_page() throws SBonitaException {
         // given
         // resource in the classpath bonita-groovy-example-page.zip
-        doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
+        doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
 
         // when
         pageServiceImpl.start();
 
         // then
-        verify(pageServiceImpl, times(2)).addPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(2)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
+        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
 
     }
 
@@ -300,15 +298,15 @@ public class PageServiceImplTest {
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
 
-        doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
+        doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
+        doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
         // when
         pageServiceImpl.start();
         // then
-        verify(pageServiceImpl, times(0)).addPage(any(SPage.class), any(byte[].class));
-        verify(pageServiceImpl, times(1)).updatePage(eq(12l), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, times(1)).updatePageContent(eq(12l), any(EntityUpdateDescriptor.class));
+        verify(pageServiceImpl, times(0)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(13l), any(byte[].class), eq("bonita-html-page-example.zip"));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(12l), any(byte[].class), eq("bonita-groovy-page-example.zip"));
     }
 
     @Test
@@ -387,13 +385,13 @@ public class PageServiceImplTest {
         final InputStream resourceHtmlAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-html-page-example.zip");
         doReturn(IOUtil.getAllContentFrom(resourceGroovyAsStream)).when(pageServiceImpl).getPageContent(12);
         doReturn(IOUtil.getAllContentFrom(resourceHtmlAsStream)).when(pageServiceImpl).getPageContent(13);
-        doReturn(null).when(pageServiceImpl).addPage(any(SPage.class), any(byte[].class));
+        doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         // when
         pageServiceImpl.start();
         // then
-        verify(pageServiceImpl, times(0)).addPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(0)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
+        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
     }
 
     @Test
@@ -443,18 +441,13 @@ public class PageServiceImplTest {
 
     @Test(expected = SBonitaException.class)
     public void updatePageContent_should_check_zip_content() throws Exception {
+        // given
         final long pageId = 15;
         final SPage sPage = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
-        final Map<String, Object> fields = new HashMap<String, Object>();
-
-        // given
-        sPage.setId(pageId);
-        fields.put(SPageContentFields.PAGE_CONTENT, "aaa".getBytes());
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(sPage);
 
         // when
-        doReturn(fields).when(entityUpdateDescriptor).getFields();
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(sPage);
-        pageServiceImpl.updatePageContent(pageId, entityUpdateDescriptor);
+        pageServiceImpl.updatePageContent(pageId, "aaa".getBytes(), CONTENT_NAME);
 
         // then
         // exception
@@ -466,8 +459,11 @@ public class PageServiceImplTest {
         final long pageId1 = 15;
         final long pageId2 = 20;
 
-        final SPage page1 = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
-        final SPage page2 = new SPageImpl("page2", 123456, 45, true, CONTENT_NAME);
+        final SPageImpl page1 = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
+        page1.setDisplayName("displayName1");
+        final SPageImpl page2 = new SPageImpl("page2", 123456, 45, true, CONTENT_NAME);
+        page2.setDisplayName("displayName2");
+
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
         final Map<String, Object> fields = new HashMap<String, Object>();
 
@@ -527,12 +523,11 @@ public class PageServiceImplTest {
     @Test
     public void zipTest_not_a_zip() throws Exception {
         exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_IS_NOT_A_VALID_ZIP_FILE);
         // given
         final byte[] content = "badContent".getBytes();
 
         // when
-        pageServiceImpl.checkContentIsValid(content);
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
         // then exception
     }
@@ -546,7 +541,7 @@ public class PageServiceImplTest {
         final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
 
         // when
-        pageServiceImpl.checkContentIsValid(content);
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
         // then
         // exception
@@ -562,29 +557,15 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
-    }
-
-    @Test
-    public void zipTest_page_properties_no_description() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
-
-        // given
-        @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\n".getBytes()));
-
-        // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isFalse();
+        // expected no exception
 
     }
 
     @Test
     public void zipTest_page_properties_invalid_name() throws Exception {
         exception.expect(SInvalidPageTokenException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
 
         // given
         @SuppressWarnings("unchecked")
@@ -592,14 +573,13 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
     }
 
     @Test
     public void zipTest_page_properties_no_name() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+        exception.expect(SInvalidPageTokenException.class);
 
         // given
         @SuppressWarnings("unchecked")
@@ -607,14 +587,13 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "displayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
     }
 
     @Test
     public void zipTest_page_properties_invalid_display_name() throws Exception {
         exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
 
         // given
         @SuppressWarnings("unchecked")
@@ -622,14 +601,14 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=\ndescription=mypage description\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
     }
 
     @Test
     public void zipTest_page_properties_no_display_name() throws Exception {
         exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_PROPERTIES_CONTENT_IS_NOT_VALID);
+        exception.expectMessage("display name is mandatory");
 
         // given
         @SuppressWarnings("unchecked")
@@ -637,7 +616,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndescription=mypage description\n".getBytes()));
 
         // when
-        pageServiceImpl.checkContentIsValid(content);
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
         // then exception
 
@@ -654,7 +633,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isFalse();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
     }
 
@@ -666,7 +645,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage final display name\ndescription=final mypage description\n".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
     }
 
@@ -680,7 +659,7 @@ public class PageServiceImplTest {
         final byte[] content = IOUtil.zip(pair(INDEX_HTML, "content of the groovy".getBytes()));
 
         // when then
-        assertThat(pageServiceImpl.checkContentIsValid(content)).isTrue();
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
     }
 
@@ -690,38 +669,19 @@ public class PageServiceImplTest {
         // given
 
         // when
-        pageServiceImpl.checkPageContentIsValid(null);
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(null, false);
 
         // then
 
     }
 
     @Test
-    public void checkPageContentIsValid_noFields() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-
-        // given
-        final Map<String, Object> fields = new HashMap<String, Object>();
-        doReturn(fields).when(entityUpdateDescriptor).getFields();
-
-        // when
-        pageServiceImpl.checkPageContentIsValid(entityUpdateDescriptor);
-
-        // then exception
-
-    }
-
-    @Test
     public void checkPageContentIsValid_badZip() throws Exception {
         exception.expect(SInvalidPageZipContentException.class);
-
         // given
-        final Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put(SPageContentFields.PAGE_CONTENT, "not a zip".getBytes());
-        doReturn(fields).when(entityUpdateDescriptor).getFields();
 
         // when
-        pageServiceImpl.checkPageContentIsValid(entityUpdateDescriptor);
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency("not a zip".getBytes(), false);
 
         // then
 
@@ -731,32 +691,13 @@ public class PageServiceImplTest {
     public void checkPageContentIsValid_validZip() throws Exception {
 
         // given
-        final Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put(SPageContentFields.PAGE_CONTENT, IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes())));
-
-        doReturn(fields).when(entityUpdateDescriptor).getFields();
-
+        @SuppressWarnings("unchecked")
+        byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));;
         // when
-        pageServiceImpl.checkPageContentIsValid(entityUpdateDescriptor);
+        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 
         // then no exception
-
-    }
-
-    @Test
-    public void checkPageContentIsValid_badField() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-
-        // given
-        final Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put(SPageContentFields.PAGE_ID, 1);
-        doReturn(fields).when(entityUpdateDescriptor).getFields();
-
-        // when
-        pageServiceImpl.checkPageContentIsValid(entityUpdateDescriptor);
-
-        // then exception
 
     }
 

@@ -1,9 +1,9 @@
 package com.bonitasoft.engine.api.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -19,10 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -98,6 +96,7 @@ public class PageAPIExtTest {
 
         doReturn(tenantServiceAccessor).when(pageAPIExt).getTenantAccessor();
         doReturn(pageService).when(tenantServiceAccessor).getPageService();
+        doReturn(123l).when(pageAPIExt).getUserIdFromSessionInfos();
 
         doReturn(1l).when(sPage).getId();
         doReturn("name").when(sPage).getName();
@@ -229,6 +228,7 @@ public class PageAPIExtTest {
 
         doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
         doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
+        doReturn(mock(SPage.class)).when(pageService).getPage(1);
 
         // given
         @SuppressWarnings("unchecked")
@@ -240,25 +240,7 @@ public class PageAPIExtTest {
         pageAPIExt.updatePageContent(pageId, content);
 
         // then
-        verify(pageService, times(1)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
-    }
-
-    @Test(expected = UpdateException.class)
-    public void testUpdatePageContentWithWrongZip() throws Exception {
-        final SObjectModificationException exception = new SObjectModificationException("message");
-        doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
-        doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
-        doThrow(exception).when(pageService).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
-
-        // given
-        final byte[] content = "bad".getBytes();
-        final long pageId = 1;
-
-        // when
-        pageAPIExt.updatePageContent(pageId, content);
-
-        // then
-        // exception
+        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), anyString());
     }
 
     @Test
@@ -303,41 +285,6 @@ public class PageAPIExtTest {
 
         // then
         // AlreadyExistsException
-
-    }
-
-    @Test
-    public void testCreatePageWithZipOnly() throws Exception {
-        // given
-        @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
-
-        final Page mock = mock(Page.class);
-        final PageCreator pageCreator = new PageCreator("mypage", "content.zip");
-        pageCreator.setDescription("mypage description");
-        pageCreator.setDisplayName("mypage display name");
-
-        doReturn(mock).when(pageAPIExt).createPage(eq(pageCreator), eq(content));
-
-        // when
-        final Page createPage = pageAPIExt.createPage("content.zip", content);
-
-        // then
-        assertThat(createPage).isEqualTo(mock);
-
-    }
-
-    @Test(expected = CreationException.class)
-    public void testCreatePageWithZipOnlyNotHavingProperties() throws Exception {
-        // given
-        @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()));
-
-        // when
-        pageAPIExt.createPage("content.zip", content);
-
-        // then: exception
 
     }
 }
