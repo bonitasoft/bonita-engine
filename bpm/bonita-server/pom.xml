@@ -357,11 +357,6 @@
 			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Process Document -->
 		<dependency>
@@ -692,8 +687,6 @@
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
 									<!-- Process Definition -->
-									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
-									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
 									<!-- Process Document -->

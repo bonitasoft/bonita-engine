@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model</artifactId>
+			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
