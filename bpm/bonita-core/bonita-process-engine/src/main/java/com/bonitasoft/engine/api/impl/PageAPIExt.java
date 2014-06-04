@@ -38,6 +38,8 @@ import com.bonitasoft.engine.page.PageNotFoundException;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
+import com.bonitasoft.engine.page.SInvalidPageTokenException;
+import com.bonitasoft.engine.page.SInvalidPageZipContentException;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageUpdateBuilder;
 import com.bonitasoft.engine.page.SPageUpdateBuilderFactory;
@@ -102,7 +104,8 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException {
+    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException {
         final PageService pageService = getTenantAccessor().getPageService();
         final long userId = getUserIdFromSessionInfos();
         final SPage sPage = constructPage(pageCreator, userId);
@@ -112,6 +115,10 @@ public class PageAPIExt implements PageAPI {
             return convertToPage(addPage);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException("A page already exists with the name " + pageCreator.getName());
+        } catch (final SInvalidPageTokenException e) {
+            throw new InvalidPageTokenException(e.getMessage(), e);
+        } catch (final SInvalidPageZipContentException e) {
+            throw new InvalidPageZipContentException(e.getMessage(), e);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
@@ -135,7 +142,7 @@ public class PageAPIExt implements PageAPI {
             pageCreator.setDisplayName(displayName);
             return createPage(pageCreator, content);
         } catch (final IOException e) {
-            throw new CreationException("Error while reading zip file", e);
+            throw new InvalidPageZipContentException("Error while reading zip file", e);
         }
 
     }

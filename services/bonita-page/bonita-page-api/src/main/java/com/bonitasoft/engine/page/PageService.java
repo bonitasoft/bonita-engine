@@ -36,7 +36,8 @@ public interface PageService extends TenantLifecycleService {
 
     String PAGE = "PAGE";
 
-    SPage addPage(SPage page, byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException;
+    SPage addPage(SPage page, byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidPageZipContentException,
+            SInvalidPageTokenException;
 
     SPage getPage(long pageId) throws SBonitaReadException, SObjectNotFoundException;
 

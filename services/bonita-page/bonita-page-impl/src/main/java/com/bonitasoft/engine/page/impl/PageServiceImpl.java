@@ -65,14 +65,14 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.page.SInvalidPageTokenException;
+import com.bonitasoft.engine.page.SInvalidPageZipContentException;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageContent;
 import com.bonitasoft.engine.page.SPageLogBuilder;
 import com.bonitasoft.engine.page.SPageUpdateBuilder;
 import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import com.bonitasoft.engine.page.SPageWithContent;
-import com.bonitasoft.engine.page.impl.exception.SInvalidPageTokenException;
-import com.bonitasoft.engine.page.impl.exception.SInvalidPageZipContentException;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
@@ -136,10 +136,11 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException {
+    public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException,
+            SInvalidPageZipContentException, SInvalidPageTokenException {
         check();
         if (page.getName() == null || page.getName().isEmpty()) {
-            throw new SObjectCreationException("Unable to create a page with null or empty name");
+            throw new SInvalidPageTokenException("Unable to create a page with null or empty name");
         }
         final String message = "Adding a new page with name " + page.getName();
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, message);
@@ -443,7 +444,8 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public void updatePageContent(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+    public void updatePageContent(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException,
+            SInvalidPageZipContentException, SInvalidPageTokenException {
         check();
         final String message = "Update a page with name " + pageId;
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
@@ -480,7 +482,7 @@ public class PageServiceImpl implements PageService {
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException,
-            SObjectModificationException {
+            SObjectModificationException, SInvalidPageZipContentException, SInvalidPageTokenException {
         try {
             // check if the provided pages are here or not up to date and import them from class path if needed
             final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(zipName);
@@ -520,8 +522,11 @@ public class PageServiceImpl implements PageService {
      * @param pageProperties
      * @param providedPageContent
      * @throws SObjectModificationException
+     * @throws SInvalidPageTokenException
+     * @throws SInvalidPageZipContentException
      */
-    private void updateProvidedPage(final long id, final Properties pageProperties, final byte[] providedPageContent) throws SObjectModificationException {
+    private void updateProvidedPage(final long id, final Properties pageProperties, final byte[] providedPageContent) throws SObjectModificationException,
+            SInvalidPageZipContentException, SInvalidPageTokenException {
         final SPageUpdateBuilder pageUpdateBuilder = new SPageUpdateBuilderImpl(new EntityUpdateDescriptor());
 
         final SPageUpdateContentBuilder pageUpdateContentBuilder = new SPageUpdateContentBuilderImpl(new EntityUpdateDescriptor());

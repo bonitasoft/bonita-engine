@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,10 @@ import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.InvalidPageTokenException;
+import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
@@ -227,6 +231,51 @@ public class PageAPIIT extends CommonAPISPTest {
         // , "content.zip"given
         final String pageName = generateUniquePageName();
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
+
+        // when
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
+
+        // then: expected exception
+    }
+
+    @Test(expected = InvalidPageTokenException.class)
+    public void should_createPage_with_invalid_name_InvalidPageTokenException() throws BonitaException {
+        // , "content.zip"given
+        final String pageName = "plop";
+        final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
+
+        // when
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
+
+        // then: expected exception
+    }
+
+    @Test(expected = InvalidPageTokenException.class)
+    public void should_createPage_with_no_name_InvalidPageTokenException() throws BonitaException {
+        // , "content.zip"given
+        final String pageName = "";
+        final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
+
+        // when
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
+
+        // then: expected exception
+    }
+
+    @Test(expected = InvalidPageZipContentException.class)
+    public void should_createPage_with_invalid_content_InvalidPageZipContentException() throws BonitaException, IOException {
+        // , "content.zip"given
+        final String pageName = generateUniquePageName();
+        final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
         getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 

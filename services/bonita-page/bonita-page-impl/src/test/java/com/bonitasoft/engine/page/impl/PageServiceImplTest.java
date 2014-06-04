@@ -35,7 +35,6 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -69,11 +68,11 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import com.bonitasoft.engine.page.SInvalidPageTokenException;
+import com.bonitasoft.engine.page.SInvalidPageZipContentException;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageContent;
 import com.bonitasoft.engine.page.SPageLogBuilder;
-import com.bonitasoft.engine.page.impl.exception.SInvalidPageTokenException;
-import com.bonitasoft.engine.page.impl.exception.SInvalidPageZipContentException;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
@@ -182,7 +181,7 @@ public class PageServiceImplTest {
         try {
             pageServiceImpl.addPage(pageWithEmptyName, new byte[] { 1, 2, 3 });
             fail("should not be able to create a page with empty name");
-        } catch (final SObjectCreationException e) {
+        } catch (final SInvalidPageTokenException e) {
             assertTrue(e.getMessage().contains("empty name"));
         }
 
@@ -687,7 +686,7 @@ public class PageServiceImplTest {
 
     @Test
     public void checkPageContentIsValid_null() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
         // given
 
         // when
@@ -699,7 +698,7 @@ public class PageServiceImplTest {
 
     @Test
     public void checkPageContentIsValid_noFields() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
 
         // given
         final Map<String, Object> fields = new HashMap<String, Object>();
@@ -714,7 +713,7 @@ public class PageServiceImplTest {
 
     @Test
     public void checkPageContentIsValid_badZip() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
 
         // given
         final Map<String, Object> fields = new HashMap<String, Object>();
@@ -747,7 +746,7 @@ public class PageServiceImplTest {
 
     @Test
     public void checkPageContentIsValid_badField() throws Exception {
-        exception.expect(SBonitaReadException.class);
+        exception.expect(SInvalidPageZipContentException.class);
 
         // given
         final Map<String, Object> fields = new HashMap<String, Object>();
