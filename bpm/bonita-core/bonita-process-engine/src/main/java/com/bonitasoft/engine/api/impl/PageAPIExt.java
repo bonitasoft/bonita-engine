@@ -3,6 +3,7 @@ package com.bonitasoft.engine.api.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -258,8 +259,9 @@ public class PageAPIExt implements PageAPI {
         try {
 
             final byte[] zipEntryContent = IOUtil.getZipEntryContent(PageService.PROPERTIES_FILE_NAME, content);
+            String string = new String(zipEntryContent, "UTF-8");
             final Properties pageProperties = new Properties();
-            pageProperties.load(new ByteArrayInputStream(zipEntryContent));
+            pageProperties.load(new StringReader(string));
             pageUpdateBuilder.updateName(pageProperties.getProperty(PageService.PROPERTIES_NAME));
             pageUpdateBuilder.updateDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME));
             pageUpdateBuilder.updateDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
