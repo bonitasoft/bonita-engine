@@ -31,7 +31,6 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
@@ -80,13 +79,6 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         final String profileName = "Test";
 
         // given
-        createGroup("acme");
-        createGroup("finance", "/acme");
-        final Group groupAcme = getIdentityAPI().getGroupByPath("/acme");
-        final Group groupFinance = getIdentityAPI().getGroupByPath("/acme/finance");
-        assertThat(groupAcme).as("group acme").isNotNull();
-        assertThat(groupFinance).as("group finance").isNotNull();
-
         final byte[] customProfileByteArray = IOUtils.toByteArray(AbstractProfileSPTest.class
                 .getResourceAsStream("Profile2groups.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(customProfileByteArray));
@@ -115,9 +107,6 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
         // then
         assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
-
-        // clean up
-        deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
     }
 
     @Test
@@ -172,7 +161,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         XMLUnit.setIgnoreAttributeOrder(true);
         final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
         final List<?> allDifferences = diff.getAllDifferences();
-        assertThat(allDifferences).as("should have no differences").isEmpty();
+        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
     }
 
     @Test

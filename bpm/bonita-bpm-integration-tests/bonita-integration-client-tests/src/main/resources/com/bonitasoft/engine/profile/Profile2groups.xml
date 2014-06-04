@@ -3,8 +3,8 @@
     <description/>
     <profileMapping>
       <groups>
-        <group>/acme/finance</group>
-        <group>/acme</group>
+        <group>/group1/subGroup1</group>
+        <group>/group1</group>
       </groups>
     </profileMapping>
   </profile>
