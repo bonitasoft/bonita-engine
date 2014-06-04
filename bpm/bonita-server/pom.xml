@@ -209,6 +209,12 @@
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-expression-resolver-api-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common</artifactId>
+			        <groupId>org.bonitasoft.engine</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- External Identity Mapping -->
@@ -356,6 +362,12 @@
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common</artifactId>
+			        <groupId>org.bonitasoft.engine</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Process Document -->
