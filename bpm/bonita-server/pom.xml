@@ -353,7 +353,7 @@
       <artifactId>bonita-page-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- Parameter -->
     <dependency>
       <groupId>com.bonitasoft.engine.core.parameter</groupId>
@@ -571,7 +571,7 @@
       <artifactId>bonita-synchro-jms</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- Time Tracker -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -656,7 +656,7 @@
             <artifactId>bonita-theme-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- Not in shade -->
     <dependency>
       <groupId>com.bonitasoft.engine</groupId>
@@ -934,7 +934,6 @@
                 </includes>
               </artifactSet>
               <outputDirectory>${basedir}/target</outputDirectory>
-              <destFileName>${project.build.finalName}.jar</destFileName>
               <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
               <createDependencyReducedPom>true</createDependencyReducedPom>
               <createSourcesJar>true</createSourcesJar>
