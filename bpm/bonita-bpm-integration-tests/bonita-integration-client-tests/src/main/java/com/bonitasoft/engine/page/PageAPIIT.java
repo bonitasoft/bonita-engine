@@ -223,7 +223,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
-    public void should_update_content_return_the_modified_content() throws BonitaException {
+    public void should_update_content_return_the_modified_content() throws BonitaException, InterruptedException {
         // given
         final long currentTimeMillis = System.currentTimeMillis();
         final String pageName = generateUniquePageName();
@@ -231,6 +231,7 @@ public class PageAPIIT extends CommonAPISPTest {
         final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 oldContent);
         final long pageId = page.getId();
+        Thread.sleep(10);
 
         // when
         final byte[] newContent = createTestPageContent(INDEX_HTML, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
