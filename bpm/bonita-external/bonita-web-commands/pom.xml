@@ -15,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-model</artifactId>
+			<artifactId>bonita-command-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
