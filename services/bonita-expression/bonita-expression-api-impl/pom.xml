@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-expression</artifactId>
 		<groupId>org.bonitasoft.engine.expression</groupId>
-		<version>6.3.1</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-expression-api-impl</artifactId>
