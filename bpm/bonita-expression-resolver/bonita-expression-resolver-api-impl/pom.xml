@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-model</artifactId>
+			<artifactId>bonita-data-instance-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

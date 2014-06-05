@@ -15,10 +15,7 @@
 	<name>Bonita Data Instance</name>
 
 	<modules>
-		<module>bonita-data-instance-model</module>
-		<module>bonita-data-instance-model-impl</module>
 		<module>bonita-data-instance-api</module>
-		<module>bonita-data-instance-api-impl</module>
-		<module>bonita-data-instance-model-impl-hibernate</module>
+		<module>bonita-data-instance-impl</module>
     </modules>
 </project>

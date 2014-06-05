@@ -118,17 +118,7 @@
 		<!-- Data Instance -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-model-impl-hibernate</artifactId>
+			<artifactId>bonita-data-instance-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -582,11 +572,8 @@
 									<include>org.bonitasoft.engine.data.definition:bonita-data-definition-model</include>
 									<include>org.bonitasoft.engine.data.definition:bonita-data-definition-model-impl</include>
 									<!-- Data Instance -->
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model</include>
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model-impl</include>
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api-impl</include>
+									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-impl</include>
 									<!-- Delete -->
 									<include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-delete-impl</include>

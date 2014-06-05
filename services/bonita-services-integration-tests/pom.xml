@@ -73,13 +73,7 @@
 		<!-- Data Instance -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-api-impl</artifactId>
+			<artifactId>bonita-data-instance-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
