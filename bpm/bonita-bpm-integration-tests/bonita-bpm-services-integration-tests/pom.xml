@@ -128,19 +128,7 @@
 		<!-- Command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-model-impl</artifactId>
+			<artifactId>bonita-command-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

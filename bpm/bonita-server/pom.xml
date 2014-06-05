@@ -111,17 +111,7 @@
     <!-- Command -->
     <dependency>
       <groupId>org.bonitasoft.engine.command</groupId>
-      <artifactId>bonita-command-api-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.command</groupId>
-      <artifactId>bonita-command-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.command</groupId>
-      <artifactId>bonita-command-model-impl-hibernate</artifactId>
+      <artifactId>bonita-command-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -731,11 +721,8 @@
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
                   <include>com.bonitasoft.engine.classloader:bonita-classloader-clustered</include>
                   <!-- Command -->
-                  <include>org.bonitasoft.engine.command:bonita-command-model</include>
-                  <include>org.bonitasoft.engine.command:bonita-command-model-impl</include>
-                  <include>org.bonitasoft.engine.command:bonita-command-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.command:bonita-command-api</include>
-                  <include>org.bonitasoft.engine.command:bonita-command-api-impl</include>
+                  <include>org.bonitasoft.engine.command:bonita-command-impl</include>
                   <!-- Connector Executor -->
                   <include>org.bonitasoft.engine.connector:bonita-connector-executor-api</include>
                   <include>org.bonitasoft.engine.connector:bonita-connector-executor-api-impl</include>
