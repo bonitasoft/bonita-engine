@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-deploy</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.1</version>
+		<version>6.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-deploy-ear2-sp</artifactId>
