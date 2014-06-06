@@ -112,6 +112,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return createProfile(creator);
     }
 
+    @Override
     public Profile createProfile(final String name, final String description) throws CreationException {
         final ProfileCreator creator = new ProfileCreator(name);
         creator.setDescription(description);
@@ -176,6 +177,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return new byte[] {};
     }
 
+    @Override
     public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -247,14 +249,9 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         SProfileEntry sProfileEntry;
         try {
+            profileService.updateProfileMetaData((Long) fields.get(ProfileEntryField.PROFILE_ID));
             sProfileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
-            profileService.updateProfileMetaData(sProfileEntry.getProfileId());
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
-
-        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
-        try {
+            final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
             updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
