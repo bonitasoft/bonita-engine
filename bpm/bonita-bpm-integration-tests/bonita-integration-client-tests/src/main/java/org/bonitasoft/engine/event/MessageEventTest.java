@@ -91,7 +91,7 @@ public class MessageEventTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -400,7 +400,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
