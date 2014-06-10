@@ -44,11 +44,6 @@ public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork 
     }
 
     @Override
-    public String getDescription() {
-        return getClass().getSimpleName() + ": processDefinitionId = " + processDefinitionId;
-    }
-
-    @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();

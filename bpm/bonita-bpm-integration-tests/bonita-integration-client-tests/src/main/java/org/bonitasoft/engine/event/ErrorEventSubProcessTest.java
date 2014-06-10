@@ -15,7 +15,9 @@ package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +26,14 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -41,7 +46,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -50,19 +54,22 @@ import org.junit.Test;
  */
 public class ErrorEventSubProcessTest extends EventsAPITest {
 
+    private List<ProcessDefinition> processDefinitions;
+
     private User john;
 
     @Before
     public void beforeTest() throws BonitaException {
+        processDefinitions = new ArrayList<ProcessDefinition>();
         loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser("john", "bpm");
         logoutOnTenant();
         loginOnDefaultTenantWith("john", "bpm");
-
     }
 
     @After
     public void afterTest() throws BonitaException {
+        disableAndDeleteProcess(processDefinitions);
         deleteUser(john);
         logoutOnTenant();
     }
@@ -193,8 +200,8 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
     private void executeProcessTriggeringEventSubProcess(final String catchErrorCode, final String throwErrorCode) throws Exception {
         final String subProcStartEventName = "errorStart";
-        final ProcessDefinition process = deployAndEnableProcessWithErrorEventSubProcess(catchErrorCode, throwErrorCode, subProcStartEventName);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess(catchErrorCode, throwErrorCode, subProcStartEventName));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
         List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
@@ -218,20 +225,18 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         assignAndExecuteStep(subStep, john.getId());
         waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         // check that the transition wasn't taken
         checkWasntExecuted(processInstance, "end");
-
-        disableAndDeleteProcess(process.getId());
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error" }, jira = "ENGINE-536")
     @Test
     public void errorEventSubProcessNotTriggered() throws Exception {
         final String subProcStartEventName = "errorStart";
-        final ProcessDefinition process = deployAndEnableProcessWithErrorEventSubProcess("error 1", "error 1", subProcStartEventName);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("error 1", "error 1", subProcStartEventName));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
         getProcessAPI().getProcessDataInstance("throwException", processInstance.getId());
@@ -248,16 +253,14 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         // the parent process instance has completed, so no more waiting events are expected
         checkNumberOfWaitingEvents(subProcStartEventName, 0);
-
-        disableAndDeleteProcess(process.getId());
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error" }, jira = "ENGINE-536")
     @Test
     public void createSeveralInstances() throws Exception {
-        final ProcessDefinition process = deployAndEnableProcessWithErrorEventSubProcess("e2", "e2", "errorStart");
-        final ProcessInstance processInstance1 = getProcessAPI().startProcess(process.getId());
-        final ProcessInstance processInstance2 = getProcessAPI().startProcess(process.getId());
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("e2", "e2", "errorStart"));
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinitions.get(0).getId());
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinitions.get(0).getId());
 
         // throw error
         waitForUserTask("step1", processInstance1.getId());
@@ -268,15 +271,13 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         waitForUserTask("subStep", processInstance1.getId());
         waitForUserTask("subStep", processInstance2.getId());
-
-        disableAndDeleteProcess(process.getId());
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
-        final ProcessDefinition process = deployAndEnableProcessWithErrorEventSubProcessAndData("error1", "error1", "errorStart");
-        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndData("error1", "error1", "errorStart"));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTask("step1", processInstance.getId());
         waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
 
@@ -288,9 +289,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
-
-        disableAndDeleteProcess(process.getId());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-1397")
@@ -300,9 +299,9 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final String subProcUserTaskName = "subStep";
         final String dataName = "content";
         final String dataValue = "default";
-        final ProcessDefinition process = deployAndEnableProcWithErrorEvSubProcAndDataOnlyInRoot("error1", "errorStart", rootUserTaskName,
-                subProcUserTaskName, dataName, dataValue);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        processDefinitions.add(deployAndEnableProcWithErrorEvSubProcAndDataOnlyInRoot("error1", "errorStart", rootUserTaskName,
+                subProcUserTaskName, dataName, dataValue));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance, john);
 
         final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance);
@@ -314,9 +313,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
-
-        disableAndDeleteProcess(process.getId());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-1397")
@@ -326,9 +323,9 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final String subProcUserTaskName = "subStep";
         final String dataName = "content";
         final String dataValue = "default";
-        final ProcessDefinition process = deployAndEnableProcWithErrorEvSubProcAndDataOnlyInSubProc("error1", "errorStart", rootUserTaskName,
-                subProcUserTaskName, dataName, dataValue);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        processDefinitions.add(deployAndEnableProcWithErrorEvSubProcAndDataOnlyInSubProc("error1", "errorStart", rootUserTaskName,
+                subProcUserTaskName, dataName, dataValue));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance.getId(), john.getId());
 
         final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance.getId());
@@ -339,9 +336,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
-
-        disableAndDeleteProcess(process.getId());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
     private void checkEvaluateExpression(final ActivityInstance subStep, final String dataName, final Class<?> expressionType, final Serializable expectedValue)
@@ -364,24 +359,22 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
     }
 
     private void checkProcessDataInstance(final String dataName, final long processInstanceId, final Serializable expectedValue) throws DataNotFoundException {
-        final DataInstance processDataInstance;
-        processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
+        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
     private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue) throws DataNotFoundException {
-        final DataInstance activityDataInstance;
-        activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
+        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "call activity" }, jira = "ENGINE-536")
     @Test
     public void errorEventSubProcInsideTargetCallActivity() throws Exception {
-        final ProcessDefinition targetProcess = deployAndEnableProcessWithErrorEventSubProcess("e1", "e1", "errorStart");
-        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity("ProcessWithCallActivity", targetProcess.getName(),
-                targetProcess.getVersion());
-        final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
+        processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("e1", "e1", "errorStart"));
+        processDefinitions.add(deployAndEnableProcessWithCallActivity("ProcessWithCallActivity", processDefinitions.get(0).getName(),
+                processDefinitions.get(0).getVersion()));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
 
@@ -392,23 +385,21 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
+        waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
-
-        disableAndDeleteProcess(callerProcess.getId());
-        disableAndDeleteProcess(targetProcess.getId());
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "call activity",
-            "archived" }, jira = "BS-8754")
+            "archived" }, story = "The process A have a call activity (calling the process B) and an event sub process. "
+            + "The process B have a automatic task with a failed connector. "
+            + "When the process B failed and execute the event sub process of the process A, the process A must be aborted.", jira = "BS-8754")
     @Test
-    @Ignore("BS-8754")
     public void processWithErrorEventSubProcAndCallActivity_must_be_finished_when_subProcess_is_finished() throws Exception {
         // Create the target process
-        final ProcessDefinition targetProcess = deployAndEnableProcess(BuildTestUtil.buildProcessDefinitionWithAutomaticTaskAndErrorEndEvent(PROCESS_NAME)
-                .done());
+        processDefinitions.add(deployProcessWithTestConnectorThatThrowException(BuildTestUtil
+                .buildProcessDefinitionWithUserTaskAndFailedConnector(PROCESS_NAME)));
 
         // Create the caller process
         final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_NAME);
@@ -417,15 +408,23 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final ProcessDefinitionBuilder builder = BuildTestUtil.buildProcessDefinitionWithCallActivity("ProcessWithEventSubProcessAndCallActivity",
                 targetProcessExpr, targetVersionExpr);
         BuildTestUtil.buildErrorEventSubProcessWithUserTask("SubStep", builder);
-        final ProcessDefinition callerProcess = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+        processDefinitions.add(deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john));
 
         // Start the caller process
-        final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
-        final ActivityInstance subStep = waitForUserTaskAndExecuteIt("SubStep", john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
+        final HumanTaskInstance stepBeforeFailedConnector = waitForUserTaskAndExecuteIt("StepBeforeFailedConnector", john);
+        final ActivityInstance subStep = waitForUserTask("SubStep");
 
+        assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subStep.getParentProcessInstanceId());
-        waitForProcessToFinish(processInstance);
-
-        disableAndDeleteProcess(callerProcess, targetProcess);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
+        waitForProcessToBeInState(stepBeforeFailedConnector.getParentProcessInstanceId(), ProcessInstanceState.ABORTED);
     }
+
+    private ProcessDefinition deployProcessWithTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder)
+            throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, john, "TestConnectorThatThrowException.impl",
+                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+    }
+
 }

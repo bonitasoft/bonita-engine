@@ -139,10 +139,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
         try {
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger1);
+            schedulerService.schedule(jobDescriptor2, parameters2, trigger1);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test(expected = SSchedulerException.class)
@@ -166,10 +166,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
         try {
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
+            schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test(expected = SSchedulerException.class)
@@ -193,10 +193,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
 
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
         try {
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
+            schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -226,10 +226,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new OneExecutionTrigger(null, now, 10);
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -259,10 +259,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger1 = new RepeatXTimesTrigger(null, now, 10, 1000, 100);
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger1);
+            schedulerService.schedule(jobDescriptor, parameters, trigger1);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -292,10 +292,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new UnixCronTrigger(null, now, 10, "0/1 * * * * ?");
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -326,10 +326,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, -2, 100);
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -362,10 +362,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, 0);
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
 
     }
 
@@ -382,10 +382,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, -1);
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -449,36 +449,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final boolean deleted = schedulerService.delete("MyJob");
         getTransactionService().complete();
         assertFalse(deleted);
-    }
-
-    @Test
-    public void testDeleteAGroupOfJobs() throws Exception {
-        final Date now = new Date();
-
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "job1").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "job2").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
-
-        final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 10000, 1000);
-        final Trigger trigger2 = new RepeatXTimesTrigger("trigger2", now, 10, 10000, 1000);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        getTransactionService().complete();
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
-        assertEquals(2, schedulerService.getJobs().size());
-        getTransactionService().complete();
-        getTransactionService().begin();
-        schedulerService.deleteJobs();
-        assertEquals(0, schedulerService.getJobs().size());
-        getTransactionService().complete();
     }
 
     @Test
