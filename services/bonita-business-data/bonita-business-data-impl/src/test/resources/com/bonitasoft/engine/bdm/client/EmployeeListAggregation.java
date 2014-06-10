@@ -20,7 +20,7 @@ import javax.persistence.Version;
 @javax.persistence.Entity(name = "Employee")
 @Table(name = "EMPLOYEE")
 @NamedQueries({
-    @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n"),
+    @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nJOIN FETCH e.addresses\nWHERE e.persistenceId= :persistenceId\n"),
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
