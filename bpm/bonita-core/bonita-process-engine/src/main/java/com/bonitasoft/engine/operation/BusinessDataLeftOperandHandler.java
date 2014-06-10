@@ -92,9 +92,8 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId != null) {
                 return businessDataRepository.findById(dataClass, dataId);
-            } else {
-                return dataClass.newInstance();
             }
+            return dataClass.newInstance();
         } catch (final Exception e) {
             throw new SBonitaReadException(e);
         }
@@ -136,11 +135,9 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         final String containerType = expressionContext.getContainerType();
         try {
             if (inputValues.get(businessDataName) == null) {
-                long processInstanceId;
-                processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+                final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
 
                 return getBusinessData(businessDataName, processInstanceId);
-
             }
         } catch (final SFlowNodeNotFoundException e) {
             throwBonitaReadException(businessDataName, e);
