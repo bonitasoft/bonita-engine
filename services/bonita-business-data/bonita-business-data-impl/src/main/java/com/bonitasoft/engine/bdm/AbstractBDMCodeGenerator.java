@@ -176,4 +176,8 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         }
     }
 
+    protected static String suffixPackage(String qualifiedName, String packageSuffix) {
+        int pointIdx = qualifiedName.lastIndexOf('.');
+        return qualifiedName.substring(0, pointIdx + 1) + packageSuffix + "." + qualifiedName.substring(pointIdx + 1);
+    }
 }

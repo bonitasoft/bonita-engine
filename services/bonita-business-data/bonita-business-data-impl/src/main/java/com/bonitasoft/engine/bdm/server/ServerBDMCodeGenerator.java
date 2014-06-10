@@ -40,7 +40,7 @@ import com.sun.codemodel.JVar;
  */
 public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
-    private static final String SERVER_DAO_PACKAGE_NAME = "server.";
+    private static final String SERVER_DAO_PACKAGE_NAME = "server";
 
     public ServerBDMCodeGenerator(final BusinessObjectModel bom) {
         super(bom);
@@ -148,9 +148,7 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     protected String toDaoImplClassname(final BusinessObject bo) {
-        final String boName = bo.getQualifiedName();
-        final int pointIdx = boName.lastIndexOf('.');
-        return boName.substring(0, pointIdx + 1) + SERVER_DAO_PACKAGE_NAME + boName.substring(pointIdx + 1) + DAO_IMPL_SUFFIX;
+        return suffixPackage(bo.getQualifiedName(), SERVER_DAO_PACKAGE_NAME) + DAO_IMPL_SUFFIX;
     }
 
 }
