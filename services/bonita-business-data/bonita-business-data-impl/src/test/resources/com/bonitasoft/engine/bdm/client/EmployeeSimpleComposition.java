@@ -3,6 +3,7 @@ package impl;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,14 +18,14 @@ import javax.persistence.Version;
 /**
  * 
  */
-@javax.persistence.Entity(name = "Employee")
+@Entity(name = "Employee")
 @Table(name = "EMPLOYEE")
 @NamedQueries({
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements com.bonitasoft.engine.bdm.Entity
+    implements Employee
 {
 
     @Id

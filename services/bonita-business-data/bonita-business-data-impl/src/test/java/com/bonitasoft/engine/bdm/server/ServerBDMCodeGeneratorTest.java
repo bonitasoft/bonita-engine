@@ -126,7 +126,7 @@ public class ServerBDMCodeGeneratorTest {
         serverBDMCodeGenerator.generate(destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
-        assertThat(serverDaoImplContent).contains("public org.bonitasoft.hr.Employee findByName(String name)");
+        assertThat(serverDaoImplContent).contains("public Employee findByName(String name)");
     }
 
     @Test

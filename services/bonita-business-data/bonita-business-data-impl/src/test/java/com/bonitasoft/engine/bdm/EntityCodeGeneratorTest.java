@@ -58,7 +58,7 @@ public class EntityCodeGeneratorTest {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         employeeBO.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
-        final JDefinedClass entity = entityCodeGenerator.addEntity(employeeBO);
+        final JDefinedClass entity = entityCodeGenerator.createEntityImplementation(employeeBO);
 
         final JAnnotationUse namedQueriesAnnotation = getAnnotation(entity, NamedQueries.class.getName());
         assertThat(namedQueriesAnnotation).isNotNull();

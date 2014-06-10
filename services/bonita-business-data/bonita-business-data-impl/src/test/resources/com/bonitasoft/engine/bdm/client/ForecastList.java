@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,13 +19,13 @@ import javax.persistence.Version;
 /**
  * 
  */
-@javax.persistence.Entity(name = "Forecast")
+@Entity(name = "Forecast")
 @Table(name = "FORECAST")
 @NamedQueries({
     @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
 })
 public class Forecast
-    implements com.bonitasoft.engine.bdm.Entity
+    implements Forecast
 {
 
     @Id

@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -227,7 +228,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(model);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "Employee.java");
+        assertFilesAreEqual("impl/Employee.java", "Employee.java");
     }
 
     @Test
@@ -238,7 +239,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.java");
+        assertFilesAreEqual("impl/Employee.java", "EmployeeSimpleComposition.java");
     }
 
     @Test
@@ -250,7 +251,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListComposition.java");
+        assertFilesAreEqual("impl/Employee.java", "EmployeeListComposition.java");
     }
 
     @Test
@@ -261,7 +262,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.java");
+        assertFilesAreEqual("impl/Employee.java", "EmployeeSimpleAggregation.java");
     }
 
     @Test
@@ -272,7 +273,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.java");
+        assertFilesAreEqual("impl/Employee.java", "EmployeeListAggregation.java");
     }
 
     @Test
@@ -293,7 +294,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator(model);
         bdmCodeGenerator.generate(destDir);
 
-        assertFilesAreEqual("Forecast.java", "ForecastList.java");
+        assertFilesAreEqual("impl/Forecast.java", "ForecastList.java");
     }
 
     private BusinessObject skillBO() {
@@ -334,9 +335,11 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws URISyntaxException, IOException {
-        final File file = new File(destDir, "impl/" + qualifiedName);
+        final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
+
+        System.out.println(IOUtils.toString(file.toURI()));
 
         assertThat(file).hasContentEqualTo(expected);
     }

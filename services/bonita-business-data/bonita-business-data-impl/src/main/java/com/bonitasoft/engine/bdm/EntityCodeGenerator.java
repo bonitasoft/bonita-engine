@@ -67,17 +67,26 @@ public class EntityCodeGenerator {
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
         validateClassNotExistsInRuntime(bo.getQualifiedName());
 
-        JDefinedClass entityClass = createEntityImplementation(bo);
+        JDefinedClass entityClass = createEntityInterface(bo);
+        createEntityImplementation(bo);
 
         return entityClass;
     }
 
-    private JDefinedClass createEntityImplementation(final BusinessObject bo) throws JClassAlreadyExistsException {
+    private JDefinedClass createEntityInterface(BusinessObject bo) throws JClassAlreadyExistsException {
+        JDefinedClass entityClass = codeGenerator.addInterface(bo.getQualifiedName());
+        entityClass = codeGenerator.addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
+        return entityClass;
+    }
+
+    /** protected for testing */
+    protected JDefinedClass createEntityImplementation(final BusinessObject bo) throws JClassAlreadyExistsException {
         final String qualifiedName = suffixPackage(bo.getQualifiedName(), IMPL_PACKAGE_SUFFIX);
         validateClassNotExistsInRuntime(qualifiedName);
 
         JDefinedClass entityClass = codeGenerator.addClass(qualifiedName);
-        entityClass = codeGenerator.addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
+
+        entityClass = codeGenerator.addInterface(entityClass, bo.getQualifiedName());
         entityClass.javadoc().add(bo.getDescription());
 
         final JAnnotationUse entityAnnotation = codeGenerator.addAnnotation(entityClass, Entity.class);
