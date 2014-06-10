@@ -61,7 +61,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bom.addBusinessObject(employeeBO);
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.buildJavaModelFromBom();
-        assertThat(bdmCodeGenerator.getModel()._getClass("Employee")).isNotNull();
+        assertThat(bdmCodeGenerator.getModel()._getClass("impl.Employee")).isNotNull();
     }
 
     @Test
@@ -334,7 +334,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws URISyntaxException, IOException {
-        final File file = new File(destDir, qualifiedName);
+        final File file = new File(destDir, "impl/" + qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
 

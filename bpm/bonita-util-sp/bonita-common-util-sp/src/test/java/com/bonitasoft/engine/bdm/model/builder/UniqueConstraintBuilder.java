@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model.builder;
 
+import static java.util.Arrays.asList;
+
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 
 /**
@@ -23,6 +25,11 @@ public class UniqueConstraintBuilder {
 
     public UniqueConstraintBuilder withName(String name) {
         uniqueConstraint.setName(name);
+        return this;
+    }
+
+    public UniqueConstraintBuilder withFieldNames(String... fieldNames) {
+        uniqueConstraint.setFieldNames(asList(fieldNames));
         return this;
     }
 

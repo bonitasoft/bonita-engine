@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
+import static com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator.suffixPackage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +56,8 @@ import com.sun.codemodel.JVar;
  */
 public class EntityCodeGenerator {
 
+    private static final String IMPL_PACKAGE_SUFFIX = "impl";
+
     private final CodeGenerator codeGenerator;
 
     public EntityCodeGenerator(final CodeGenerator codeGenerator) {
@@ -61,7 +65,15 @@ public class EntityCodeGenerator {
     }
 
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
-        final String qualifiedName = bo.getQualifiedName();
+        validateClassNotExistsInRuntime(bo.getQualifiedName());
+
+        JDefinedClass entityClass = createEntityImplementation(bo);
+
+        return entityClass;
+    }
+
+    private JDefinedClass createEntityImplementation(final BusinessObject bo) throws JClassAlreadyExistsException {
+        final String qualifiedName = suffixPackage(bo.getQualifiedName(), IMPL_PACKAGE_SUFFIX);
         validateClassNotExistsInRuntime(qualifiedName);
 
         JDefinedClass entityClass = codeGenerator.addClass(qualifiedName);
@@ -82,7 +94,6 @@ public class EntityCodeGenerator {
 
         codeGenerator.addEqualsMethod(entityClass);
         codeGenerator.addHashCodeMethod(entityClass);
-
         return entityClass;
     }
 
