@@ -87,6 +87,9 @@ public class CodeGenerator {
     }
 
     public JDefinedClass addInterface(final String fullyqualifiedName) throws JClassAlreadyExistsException {
+        if(fullyqualifiedName.indexOf(".") == -1){
+            return model.rootPackage()._class(JMod.PUBLIC, fullyqualifiedName, ClassType.INTERFACE);
+        }
         return model._class(fullyqualifiedName, ClassType.INTERFACE);
     }
 

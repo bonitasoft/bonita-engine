@@ -276,6 +276,17 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
+    public void addListReferenceWithLazyAggregation() throws Exception {
+        final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
+        bdmCodeGenerator.generate(destDir);
+
+        assertFilesAreEqual("AddressDAO.java", "AddressDAOWithLazyReferenceOnEmployee.java");
+    }
+
+    @Test
     public void addList() throws Exception {
         final BusinessObjectModel model = build();
 

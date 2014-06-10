@@ -114,6 +114,11 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             createMethodForQuery(entity, daoInterface, q);
         }
 
+        // Add method for lazy fields
+        for (final Query q : BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo)) {
+            createMethodForQuery(entity, daoInterface, q);
+        }
+
         // Add method signature in interface for custom queries
         for (final Query q : bo.getQueries()) {
             createMethodForQuery(entity, daoInterface, q);
