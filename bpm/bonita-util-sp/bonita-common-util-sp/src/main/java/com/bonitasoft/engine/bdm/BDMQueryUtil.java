@@ -21,8 +21,6 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
@@ -34,8 +32,6 @@ public class BDMQueryUtil {
     private static final String SELECT = "SELECT ";
 
     private static final String FROM = "FROM ";
-
-    private static final String JOIN_FETCH = "JOIN FETCH ";
 
     private static final String WHERE = "WHERE ";
 
@@ -165,7 +161,6 @@ public class BDMQueryUtil {
             queryNames.add(query.getName());
             queries.add(query);
         }
-        queries.add(createFindByPersistenceIdQueryForBusinessObject(businessObject));
         for (final Field f : businessObject.getFields()) {
             if (f instanceof SimpleField) {
                 if (f.isCollection() == null || !f.isCollection()) {
@@ -179,20 +174,6 @@ public class BDMQueryUtil {
         }
         queries.add(createSelectAllQueryForBusinessObject(businessObject));
         return queries;
-    }
-
-    public static Query createFindByPersistenceIdQueryForBusinessObject(BusinessObject businessObject) {
-        final String name = getQueryName(Arrays.asList(Field.PERSISTENCE_ID));
-        final String simpleName = getSimpleBusinessObjectName(businessObject.getQualifiedName());
-        final char var = Character.toLowerCase(simpleName.charAt(0));
-        final StringBuilder builder = new StringBuilder();
-        builder.append(buildSelectFromWithJoinFetch(simpleName, var, businessObject));
-        builder.append(buildWhereAnd(var, Arrays.asList(Field.PERSISTENCE_ID)));
-        final String content = builder.toString();
-
-        Query query = new Query(name, content, businessObject.getQualifiedName());
-        query.addQueryParameter(Field.PERSISTENCE_ID, Long.class.getName());
-        return query;
     }
 
     public static Set<String> getAllProvidedQueriesNameForBusinessObject(final BusinessObject businessObject) {
@@ -240,18 +221,6 @@ public class BDMQueryUtil {
         final StringBuilder builder = new StringBuilder();
         builder.append(SELECT).append(var).append("\n");
         builder.append(FROM).append(simpleName).append(' ').append(var).append("\n");
-        return builder.toString();
-    }
-
-    private static String buildSelectFromWithJoinFetch(final String simpleName, final char var, BusinessObject businessObject) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(SELECT).append(var).append("\n");
-        builder.append(FROM).append(simpleName).append(' ').append(var).append("\n");
-        for (Field f : businessObject.getFields()) {
-            if (f instanceof RelationField && ((RelationField) f).getFetchType() == FetchType.LAZY) {
-                builder.append(JOIN_FETCH).append(var).append('.').append(f.getName()).append("\n");
-            }
-        }
         return builder.toString();
     }
 

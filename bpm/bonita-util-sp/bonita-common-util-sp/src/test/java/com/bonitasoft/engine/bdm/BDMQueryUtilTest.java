@@ -3,7 +3,6 @@ package com.bonitasoft.engine.bdm;
 import static ch.lambdaj.Lambda.extract;
 import static ch.lambdaj.Lambda.on;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +14,8 @@ import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
  * @author Romain Bioteau
@@ -72,7 +70,7 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        assertThat(queries).hasSize(4);
+        assertThat(queries).hasSize(3);
     }
 
     @Test
@@ -87,7 +85,7 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        assertThat(queries).hasSize(3);
+        assertThat(queries).hasSize(2);
     }
 
     protected SimpleField aStringField(final String name) {
@@ -197,32 +195,5 @@ public class BDMQueryUtilTest {
         assertThat(queryContent).contains("ORDER BY n.persistenceId");
     }
 
-    @Test
-    public void createQueryForPersistenceIdQueryShouldJoinFetchAllRelationFieldFromBO() throws Exception {
-        // given :
-        BusinessObject businessObject = new BusinessObject();
-        businessObject.setQualifiedName("org.bonita.Employee");
 
-        final RelationField addressesField = new RelationField();
-        addressesField.setName("addresses");
-        addressesField.setType(Type.AGGREGATION);
-        addressesField.setFetchType(FetchType.LAZY);
-        addressesField.setCollection(true);
-        businessObject.addField(addressesField);
-
-        final RelationField skillField = new RelationField();
-        skillField.setName("skills");
-        skillField.setFetchType(FetchType.EAGER);
-        skillField.setType(Type.COMPOSITION);
-        skillField.setCollection(false);
-        businessObject.addField(skillField);
-
-        // when:
-        final Query query = BDMQueryUtil.createFindByPersistenceIdQueryForBusinessObject(businessObject);
-        // then:
-        assertThat(query.getName()).isEqualTo("findByPersistenceId");
-        assertThat(query.getReturnType()).isEqualTo(businessObject.getQualifiedName());
-        assertThat(query.getContent()).contains("JOIN FETCH e.addresses").doesNotContain("JOIN FETCH e.skills");
-        assertThat(query.getQueryParameters()).extracting("name", "className").containsExactly(tuple("persistenceId", Long.class.getName()));
-    }
 }
