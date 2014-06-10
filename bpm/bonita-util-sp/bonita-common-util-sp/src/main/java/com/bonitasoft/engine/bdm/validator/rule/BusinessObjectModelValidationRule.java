@@ -8,7 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.bonitasoft.engine.bdm.BDMQueryUtil;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
@@ -26,6 +33,22 @@ public class BusinessObjectModelValidationRule extends ValidationRule<BusinessOb
         if (bom.getBusinessObjects().isEmpty()) {
             status.addError("Business object model must have at least one business object declared");
         }
+        validateQueries(bom, status);
         return status;
+    }
+
+    private void validateQueries(final BusinessObjectModel bom, final ValidationStatus status) {
+        for (final BusinessObject bo : bom.getBusinessObjects()) {
+            final List<Query> lazyQueries = BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo);
+            final Set<String> lazyQueryNames = new HashSet<String>();
+            for(final Query query : lazyQueries){
+                lazyQueryNames.add(query.getName());
+            }
+            for (final Query q : bo.getQueries()) {
+                if (lazyQueryNames.contains(q.getName())) {
+                    status.addError("The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName());
+                }
+            }
+        }
     }
 }

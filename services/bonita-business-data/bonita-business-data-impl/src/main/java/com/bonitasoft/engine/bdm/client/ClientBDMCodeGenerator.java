@@ -53,7 +53,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-            ClassNotFoundException {
+    ClassNotFoundException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -62,6 +62,12 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
         // Add method for provided queries
         for (final Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
+            final JMethod method = createMethodForQuery(entity, implClass, q);
+            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
+        }
+
+        // Add method for lazy fields
+        for (final Query q : BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo)) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
             addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
         }

@@ -49,7 +49,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     protected static final String DAO_IMPL_SUFFIX = "DAOImpl";
 
-    private final BusinessObjectModel bom;
+    protected final BusinessObjectModel bom;
 
     public AbstractBDMCodeGenerator(final BusinessObjectModel bom) {
         super();
@@ -60,7 +60,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     public void buildJavaModelFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
-        EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this);
+        final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final JDefinedClass entity = entityCodeGenerator.addEntity(bo);
             addDAO(bo, entity);
