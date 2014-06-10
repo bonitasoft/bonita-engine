@@ -8,7 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.BonitaTestRunner;
@@ -38,7 +39,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
     protected User USER;
     
     @Before
-    public void before() throws Exception{
+    public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
         USER = createUser(USERNAME, PASSWORD);
     }
@@ -80,7 +81,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         logoutThenloginAs(USERNAME, PASSWORD);
         disableAndDeleteProcess(pd);
         deleteUser(USER);
-        logoutOnTenant();
+       logoutOnTenant();
     }
 
     protected TenantServiceAccessor getTenantAccessor(final long tenantId) {
