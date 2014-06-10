@@ -232,7 +232,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addSimpleReferenceWithComposition() throws Exception {
-        RelationField aggregation = aRelationField().withName("address").composition().referencing(addressBO()).build();
+        final RelationField aggregation = aRelationField().withName("address").composition().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
@@ -245,7 +245,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void addListReferenceWithComposition() throws Exception {
         final RelationField eager = aRelationField().withName("addresses").composition().multiple().referencing(addressBO()).build();
         final RelationField lazy = aRelationField().withName("skills").composition().multiple().lazy().referencing(skillBO()).build();
-        BusinessObjectModel bom = employeeWithRelations(eager, lazy);
+        final BusinessObjectModel bom = employeeWithRelations(eager, lazy);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
         bdmCodeGenerator.generate(destDir);
@@ -255,7 +255,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addSimpleReferenceWithAggregation() throws Exception {
-        RelationField aggregation = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
+        final RelationField aggregation = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
@@ -266,7 +266,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithAggregation() throws Exception {
-        RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().referencing(addressBO()).build();
+        final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
@@ -304,10 +304,10 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         return model;
     }
 
-    private BusinessObjectModel employeeWithRelations(RelationField... field) {
-        BusinessObject employeeBO = employeeBO();
+    private BusinessObjectModel employeeWithRelations(final RelationField... field) {
+        final BusinessObject employeeBO = employeeBO();
         BusinessObjectModelBuilder aBom = aBOM().withBO(employeeBO);
-        for (RelationField relationField : field) {
+        for (final RelationField relationField : field) {
             employeeBO.addField(relationField);
             aBom = aBom.withBO(relationField.getReference());
         }

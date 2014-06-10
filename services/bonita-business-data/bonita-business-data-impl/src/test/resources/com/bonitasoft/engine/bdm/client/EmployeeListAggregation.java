@@ -23,7 +23,8 @@ import javax.persistence.Version;
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
-public class Employee implements com.bonitasoft.engine.bdm.Entity
+public class Employee
+    implements com.bonitasoft.engine.bdm.Entity
 {
 
     @Id
