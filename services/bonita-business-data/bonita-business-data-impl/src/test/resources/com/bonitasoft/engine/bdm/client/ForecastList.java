@@ -18,7 +18,6 @@ import javax.persistence.Version;
 @javax.persistence.Entity(name = "Forecast")
 @Table(name = "FORECAST")
 @NamedQueries({
-    @NamedQuery(name = "Forecast.findByPersistenceId", query = "SELECT f\nFROM Forecast f\nWHERE f.persistenceId= :persistenceId\n"),
     @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
 })
 public class Forecast implements com.bonitasoft.engine.bdm.Entity
