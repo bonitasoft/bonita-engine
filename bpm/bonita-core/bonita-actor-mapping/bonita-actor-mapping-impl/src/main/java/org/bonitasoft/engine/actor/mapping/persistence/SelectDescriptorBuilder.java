@@ -105,8 +105,9 @@ public class SelectDescriptorBuilder {
 
     public static <T extends PersistentObject> SelectListDescriptor<T> getElementsByIds(final Class<T> clazz, final String elementName,
             final Collection<Long> ids) {
+        final QueryOptions queryOptions = new QueryOptions(0, ids.size(), clazz, "id", OrderByType.ASC);
         final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) ids);
-        return new SelectListDescriptor<T>("get" + elementName + "sByIds", parameters, clazz);
+        return new SelectListDescriptor<T>("get" + elementName + "sByIds", parameters, clazz, queryOptions);
     }
 
     public static SelectListDescriptor<SActor> getFullActorsListOfUser(final Set<Long> scopeIds, final long userId) {

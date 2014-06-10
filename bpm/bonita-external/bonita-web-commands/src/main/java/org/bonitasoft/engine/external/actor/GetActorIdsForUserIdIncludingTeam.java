@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersByManager;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -72,76 +72,60 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
     }
 
     private Map<Long, Set<Long>> getActorIdsForUserIdIncludingTeam(final long managerId) throws SBonitaException {
-        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final Map<Long, Set<Long>> map = new HashMap<Long, Set<Long>>();
 
         // Let's retrieve the list of all users of whom managerId is a manager:
-        final TransactionContentWithResult<List<SUser>> getUsersByManager = new GetUsersByManager(serviceAccessor.getIdentityService(), managerId);
-        getUsersByManager.execute();
-        final List<SUser> users = getUsersByManager.getResult();
-
-        // Let's construct the list of all user Ids:
-        final List<Long> userIds = new ArrayList<Long>(users.size() + 1);
-        for (final SUser sUser : users) {
-            userIds.add(sUser.getId());
-        }
-        // Then finally add managerId to the list:
-        userIds.add(managerId);
-
-        final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE);
-        final Map<Long, Set<Long>> map = new HashMap<Long, Set<Long>>(processDefinitionIds.size());
-
-        // For each process definition:
-        for (final Long processDefinition : processDefinitionIds) {
-            final Set<Long> actorIdsForProcessDef = new HashSet<Long>();
-            // for each user (manager included):
-            for (final long userId : userIds) {
-                final GetActors getActors = new GetActors(processDefinition, userId, serviceAccessor.getActorMappingService());
-                getActors.execute();
-                final List<Long> actorIds = getActors.getResult();
-                actorIdsForProcessDef.addAll(actorIds);
-            }
-            // Let's fill in the final result:
-            map.put(processDefinition, actorIdsForProcessDef);
+        int index = 0;
+        List<SUser> users = get100UsersByManager(managerId, index);
+        while (!users.isEmpty()) {
+            getActorIdsByProcessDefinitionId(managerId, map, users);
+            index++;
+            users = get100UsersByManager(managerId, index);
         }
 
         return map;
     }
 
-    /**
-     * Transaction content class for ActorMappingService.getActors() method feature.
-     * 
-     * @author Emmanuel Duchastenier
-     */
-    class GetActors implements TransactionContentWithResult<List<Long>> {
+    private List<SUser> get100UsersByManager(final long managerId, int index) throws SIdentityException {
+        return serviceAccessor.getIdentityService().getUsersByManager(managerId, 100 * index, 100);
+    }
 
-        private final long processDefinitionId;
+    private void getActorIdsByProcessDefinitionId(final long managerId, final Map<Long, Set<Long>> map, final List<SUser> users)
+            throws SProcessDefinitionReadException, SBonitaReadException {
+        int index = 0;
+        List<Long> processDefinitionIds = get100ProcessDefinitionIds(index);
+        // For each process definition:
+        while (!processDefinitionIds.isEmpty()) {
+            for (final Long processDefinitionId : processDefinitionIds) {
+                final Set<Long> actorIdsForProcessDef = new HashSet<Long>();
+                // for each user (manager included):
+                for (final SUser sUser : users) {
+                    actorIdsForProcessDef.addAll(getActors(processDefinitionId, sUser.getId()));
+                }
 
-        private final long userId;
+                // Idem for the manager
+                actorIdsForProcessDef.addAll(getActors(processDefinitionId, managerId));
 
-        private final ActorMappingService actorMappingService;
-
-        private List<Long> actorIds = null;
-
-        private GetActors(final long processDefinitionId, final long userId, final ActorMappingService actorMappingService) {
-            this.processDefinitionId = processDefinitionId;
-            this.userId = userId;
-            this.actorMappingService = actorMappingService;
-        }
-
-        @Override
-        public void execute() throws SBonitaException {
-            final List<SActor> actors = actorMappingService.getActors(Collections.singleton(processDefinitionId), userId);
-            actorIds = new ArrayList<Long>(actors.size());
-            for (final SActor actor : actors) {
-                actorIds.add(actor.getId());
+                // Let's fill in the final result:
+                map.put(processDefinitionId, actorIdsForProcessDef);
             }
+            index++;
+            processDefinitionIds = get100ProcessDefinitionIds(index);
         }
+    }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public List<Long> getResult() {
-            return (List<Long>) (actorIds != null ? actorIds : Collections.emptyList());
+    private List<Long> get100ProcessDefinitionIds(final int index) throws SProcessDefinitionReadException {
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        return processDefinitionService.getProcessDefinitionIds(100 * index, 100);
+    }
+
+    private List<Long> getActors(Long processDefinitionId, long userId) throws SBonitaReadException {
+        final List<SActor> actors = serviceAccessor.getActorMappingService().getActors(Collections.singleton(processDefinitionId), userId);
+        final List<Long> actorIds = new ArrayList<Long>(actors.size());
+        for (final SActor actor : actors) {
+            actorIds.add(actor.getId());
         }
+        return actorIds;
     }
 
 }

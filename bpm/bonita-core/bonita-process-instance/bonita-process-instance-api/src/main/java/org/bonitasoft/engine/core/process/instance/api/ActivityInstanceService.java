@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SUnhideableTaskException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
@@ -144,18 +143,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     SHumanTaskInstance getHumanTaskInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
     /**
-     * Get activities with specific states in the root container
-     * 
-     * @param rootContainerId
-     *            identifier of root container, the root container can be process instance
-     * @param stateIds
-     *            Identifiers of states
-     * @return a list of SActivityInstance objects
-     * @throws SActivityReadException
-     */
-    List<SActivityInstance> getActivitiesWithStates(long rootContainerId, Set<Integer> stateIds) throws SActivityReadException;
-
-    /**
      * Get activities with specific states in the root container in specific order, this is used for pagination
      * 
      * @param rootContainerId
@@ -173,8 +160,8 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return a list of SActivityInstance objects
      * @throws SActivityReadException
      */
-    List<SActivityInstance> getActivitiesWithStates(long rootContainerId, int fromIndex, int maxResults, String sortingField, OrderByType sortingOrder,
-            Set<Integer> stateIds) throws SActivityReadException;
+    List<SActivityInstance> getActivitiesWithStates(long rootContainerId, Set<Integer> stateIds, int fromIndex, int maxResults, String sortingField,
+            OrderByType sortingOrder) throws SActivityReadException;
 
     /**
      * Get the most recent archived version of a specified activity instance

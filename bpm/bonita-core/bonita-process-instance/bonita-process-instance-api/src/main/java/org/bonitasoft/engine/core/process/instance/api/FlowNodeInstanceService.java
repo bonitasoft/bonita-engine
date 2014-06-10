@@ -91,13 +91,6 @@ public interface FlowNodeInstanceService {
      */
     void setState(SFlowNodeInstance flowNodeInstance, FlowNodeState state) throws SFlowNodeModificationException;
 
-    /**
-     * @param rootContainerId
-     * @return
-     * @throws SFlowNodeReadException
-     * @since 6.0
-     */
-    List<SFlowNodeInstance> getActiveFlowNodes(long rootContainerId) throws SFlowNodeReadException;
 
     /**
      * @param flowNodeInstance
@@ -171,7 +164,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Set execute by for the specific flow node instance
-     *
+     * 
      * @param flowNodeInstance
      *            the flowNodeInstance will be updated
      * @param userId
@@ -183,7 +176,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Set execute by delegate for the specific flow node instance
-     *
+     * 
      * @param flowNodeInstance
      *            the flowNodeInstance will be updated
      * @param executerSubstituteId
@@ -195,7 +188,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.
-     *
+     * 
      * @param entityClass
      *            The type of the archived flow node to search for
      * @param queryOptions
@@ -207,7 +200,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
-     *
+     * 
      * @param supervisorId
      *            The identifier of the supervisor
      * @param entityClass
@@ -222,7 +215,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.
-     *
+     * 
      * @param entityClass
      *            The type of the archived flow node to search for
      * @param queryOptions
@@ -234,7 +227,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
-     *
+     * 
      * @param supervisorId
      *            The identifier of the supervisor
      * @param entityClass
@@ -314,7 +307,7 @@ public interface FlowNodeInstanceService {
     /**
      * Get the process instance ID. It can be itself if containerType is a PROCESS_INSTANCE, or the containing process instance id if containerType is a
      * ACTIVITY_INSTANCE.
-     *
+     * 
      * @param containerId
      *            the ID of the container of the flownode or process to get the process instance ID for.
      * @param containerType

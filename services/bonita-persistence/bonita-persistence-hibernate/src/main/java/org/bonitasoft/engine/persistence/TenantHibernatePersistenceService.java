@@ -196,10 +196,9 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     private String getQueryString(final String entityClassName, final List<FilterOption> filters, final boolean enableWordSearch) {
         if (filters == null || filters.isEmpty()) {
             return "DELETE FROM " + entityClassName + " WHERE tenantId= :tenantId";
-        } else {
-            return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId",
-                    filters, null, enableWordSearch);
         }
+        return getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName) + " WHERE tenantId= :tenantId",
+                filters, null, enableWordSearch);
     }
 
 }

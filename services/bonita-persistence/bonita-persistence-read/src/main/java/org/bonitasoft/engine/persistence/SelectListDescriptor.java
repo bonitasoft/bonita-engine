@@ -23,27 +23,14 @@ public final class SelectListDescriptor<T> extends AbstractSelectWithParametersD
 
     private final QueryOptions queryOptions;
 
-    @Deprecated
-    public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType) {
-        super(queryName, inputParameters, entityType, (Class<T>) entityType);
-        this.queryOptions = QueryOptions.defaultQueryOptions();
-    }
-
     public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
             final QueryOptions queryOptions) {
         super(queryName, inputParameters, entityType, (Class<T>) entityType);
         if (queryOptions != null) {
             this.queryOptions = queryOptions;
         } else {
-            this.queryOptions = QueryOptions.defaultQueryOptions();
+            throw new IllegalArgumentException("Need to have a query option to paginate and order the results.");
         }
-    }
-
-    @Deprecated
-    public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
-            final Class<T> returnType) {
-        super(queryName, inputParameters, entityType, returnType);
-        this.queryOptions = QueryOptions.defaultQueryOptions();
     }
 
     public SelectListDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
@@ -52,7 +39,7 @@ public final class SelectListDescriptor<T> extends AbstractSelectWithParametersD
         if (queryOptions != null) {
             this.queryOptions = queryOptions;
         } else {
-            this.queryOptions = QueryOptions.defaultQueryOptions();
+            throw new IllegalArgumentException("Need to have a query option to paginate and order the results.");
         }
     }
 

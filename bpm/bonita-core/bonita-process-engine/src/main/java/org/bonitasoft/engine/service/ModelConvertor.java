@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
@@ -590,6 +591,18 @@ public class ModelConvertor {
                 processDefinitionDI.getDeployedBy(), ActivationState.valueOf(processDefinitionDI.getActivationState()),
                 ConfigurationState.valueOf(processDefinitionDI.getConfigurationState()), processDefinitionDI.getDisplayName(), new Date(
                         processDefinitionDI.getLastUpdateDate()), processDefinitionDI.getIconPath(), processDefinitionDI.getDisplayDescription());
+    }
+
+    public static Map<Long, ProcessDeploymentInfo> toProcessDeploymentInfos(final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos) {
+        if (sProcessDeploymentInfos != null && !sProcessDeploymentInfos.isEmpty()) {
+            final Map<Long, ProcessDeploymentInfo> processDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
+            final Set<Entry<Long, SProcessDefinitionDeployInfo>> entries = sProcessDeploymentInfos.entrySet();
+            for (final Entry<Long, SProcessDefinitionDeployInfo> entry : entries) {
+                processDeploymentInfos.put(entry.getKey(), toProcessDeploymentInfo(entry.getValue()));
+            }
+            return processDeploymentInfos;
+        }
+        return Collections.emptyMap();
     }
 
     public static ArchivedUserTaskInstance toArchivedUserTaskInstance(final SAUserTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
@@ -1636,7 +1649,7 @@ public class ModelConvertor {
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                        .setType(operation.getLeftOperand().getType()).done()).done();
+                                .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {

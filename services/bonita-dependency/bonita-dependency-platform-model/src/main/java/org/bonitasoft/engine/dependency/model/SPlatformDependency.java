@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,24 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.dependency.model.builder.impl;
+package org.bonitasoft.engine.dependency.model;
 
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilder;
-import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl;
+import org.bonitasoft.engine.dependency.model.SDependency;
 
-public class SPlatformDependencyMappingBuilderImpl implements SPlatformDependencyMappingBuilder {
-
-    private final SPlatformDependencyMappingImpl object;
-    
-    public SPlatformDependencyMappingBuilderImpl(final SPlatformDependencyMappingImpl object) {
-        super();
-        this.object = object;
-    }
-
-    @Override
-    public SDependencyMapping done() {
-        return this.object;
-    }
+/**
+ * @author Celine Souchet
+ */
+public interface SPlatformDependency extends SDependency {
 
 }

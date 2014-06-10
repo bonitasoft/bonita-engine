@@ -188,9 +188,13 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
 
     @Override
     public void deleteEventTriggerInstances(final long eventInstanceId) throws SEventTriggerInstanceReadException, SEventTriggerInstanceDeletionException {
-        final List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(eventInstanceId);
-        for (final SEventTriggerInstance eventTriggerInstance : triggerInstances) {
-            deleteEventTriggerInstance(eventTriggerInstance);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(eventInstanceId, queryOptions);
+        while (!triggerInstances.isEmpty()) {
+            for (final SEventTriggerInstance eventTriggerInstance : triggerInstances) {
+                deleteEventTriggerInstance(eventTriggerInstance);
+            }
+            triggerInstances = getEventTriggerInstances(eventInstanceId, queryOptions);
         }
     }
 
@@ -258,11 +262,12 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
 
     @Override
     public SWaitingErrorEvent getBoundaryWaitingErrorEvent(final long relatedActivityInstanceId, final String errorCode) throws SWaitingEventReadException {
+        final QueryOptions queryOptions = new QueryOptions(0, 2, SWaitingErrorEvent.class, "id", OrderByType.ASC);
         SelectListDescriptor<SWaitingErrorEvent> selectDescriptor;
         if (errorCode == null) {
-            selectDescriptor = SelectDescriptorBuilder.getCaughtError(relatedActivityInstanceId);
+            selectDescriptor = SelectDescriptorBuilder.getCaughtError(relatedActivityInstanceId, queryOptions);
         } else {
-            selectDescriptor = SelectDescriptorBuilder.getCaughtError(relatedActivityInstanceId, errorCode);
+            selectDescriptor = SelectDescriptorBuilder.getCaughtError(relatedActivityInstanceId, errorCode, queryOptions);
         }
         SWaitingErrorEvent waitingError = null;
         try {
@@ -275,10 +280,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
                     stb.append("Only one catch error event was expected to handle the error code ");
                     stb.append(errorCode);
                     stb.append(" in the activity instance with id ");
-                    stb.append(relatedActivityInstanceId);
-                    stb.append(", but ");
-                    stb.append(selectList.size());
-                    stb.append(" was found.");
+                    stb.append(relatedActivityInstanceId + ".");
                     throw new SWaitingEventReadException(stb.toString());
                 }
             }
@@ -331,8 +333,9 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     }
 
     @Override
-    public List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId) throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId);
+    public List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final QueryOptions queryOptions)
+            throws SEventTriggerInstanceReadException {
+        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
         try {
             return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
@@ -371,8 +374,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     }
 
     @Override
-    public List<SMessageEventCouple> getMessageEventCouples() throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples();
+    public List<SMessageEventCouple> getMessageEventCouples(final int fromIndex, final int maxResults) throws SEventTriggerInstanceReadException {
+        final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples(fromIndex, maxResults);
         try {
             return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
@@ -415,24 +418,12 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     }
 
     @Override
-    public List<SWaitingEvent> getStartWaitingEvents(final long processDefinitionId) throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder.getStartWaitingEvents(processDefinitionId);
+    public List<SWaitingEvent> searchStartWaitingEvents(final long processDefinitionId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder.getStartWaitingEvents(processDefinitionId, queryOptions);
         try {
             return getPersistenceService().selectList(descriptor);
         } catch (final SBonitaReadException e) {
-            throw new SEventTriggerInstanceReadException(e);
-        }
-    }
-
-    @Override
-    public List<SMessageInstance> getThrownMessages(final String messageName, final String targetProcess, final String targetFlowNode)
-            throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SMessageInstance> selectDescriptor = SelectDescriptorBuilder.getMessageInstancesByNameAndTarget(messageName, targetProcess,
-                targetFlowNode);
-        try {
-            return getPersistenceService().selectList(selectDescriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SEventTriggerInstanceReadException(e);
+            throw new SBonitaSearchException(e);
         }
     }
 
@@ -466,19 +457,9 @@ public class SEventInstanceServiceImpl extends FlowNodeInstancesServiceImpl impl
     }
 
     @Override
-    public List<SWaitingMessageEvent> getWaitingMessages(final String messageName, final String processName, final String flowNodeName)
+    public List<SWaitingSignalEvent> getWaitingSignalEvents(final String signalName, final int fromIndex, final int maxResults)
             throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SWaitingMessageEvent> selectDescriptor = SelectDescriptorBuilder.getCaughtMessages(messageName, processName, flowNodeName);
-        try {
-            return getPersistenceService().selectList(selectDescriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SEventTriggerInstanceReadException(e);
-        }
-    }
-
-    @Override
-    public List<SWaitingSignalEvent> getWaitingSignalEvents(final String signalName) throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SWaitingSignalEvent> descriptor = SelectDescriptorBuilder.getListeningSignals(signalName);
+        final SelectListDescriptor<SWaitingSignalEvent> descriptor = SelectDescriptorBuilder.getListeningSignals(signalName, fromIndex, maxResults);
         try {
             return getPersistenceService().selectList(descriptor);
         } catch (final SBonitaReadException e) {

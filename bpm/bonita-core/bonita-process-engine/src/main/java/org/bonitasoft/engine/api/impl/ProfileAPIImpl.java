@@ -35,9 +35,11 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileMember;
@@ -91,11 +93,24 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
+    @Deprecated
     public List<Profile> getProfilesForUser(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            return ModelConvertor.toProfiles(profileService.getProfilesOfUser(userId));
+            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, 0, 1000, "name", OrderByType.ASC));
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    @Override
+    public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults, final ProfileCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProfileService profileService = tenantAccessor.getProfileService();
+        try {
+            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, startIndex, maxResults, criterion.getField(),
+                    OrderByType.valueOf(criterion.getOrder().name())));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
@@ -141,7 +156,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            final List<SProfileMember> listOfProfileMembers = profileService.getNumberOfProfileMembers(profileIds);
+            final List<SProfileMember> listOfProfileMembers = profileService.getProfileMembers(profileIds);
             final Map<Long, SProfileMember> profileMembers = new HashMap<Long, SProfileMember>();
             final Map<Long, Long> result = new HashMap<Long, Long>();
             for (final SProfileMember p : listOfProfileMembers) {

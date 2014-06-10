@@ -13,36 +13,46 @@
  **/
 package org.bonitasoft.engine.dependency.model.impl;
 
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SPlatformDependencyMapping implements SDependencyMapping {
+public class SPlatformDependencyImpl implements SPlatformDependency {
 
-    private static final long serialVersionUID = 3669487911530579373L;
+    private static final long serialVersionUID = -5880182078631771416L;
 
     private long id;
 
     private long tenantId;
 
-    private long artifactId;
+    private String name;
 
-    private ScopeType artifactType;
+    private String fileName;
 
-    private long dependencyId;
+    private String description;
 
-    public SPlatformDependencyMapping() {
+    private byte[] value_;
+
+    public SPlatformDependencyImpl() {
         // default constructor for hibernate
     }
 
-    public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+    public SPlatformDependencyImpl(final String name, final String fileName, final byte[] value) {
         super();
-        this.artifactId = artifactId;
-        this.artifactType = artifactType;
-        this.dependencyId = dependencyId;
+        this.name = name;
+        this.fileName = fileName;
+        value_ = value;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     @Override
@@ -60,36 +70,40 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
         return id;
     }
 
-    public void setArtifactId(final long artifactId) {
-        this.artifactId = artifactId;
+    public byte[] getValue_() {
+        return value_;
     }
 
-    public void setArtifactType(final ScopeType artifactType) {
-        this.artifactType = artifactType;
+    public void setValue_(final byte[] value_) {
+        this.value_ = value_;
     }
 
-    public void setDependencyId(final long dependencyId) {
-        this.dependencyId = dependencyId;
+    public void setName(final String name) {
+        this.name = name;
     }
 
-    @Override
-    public long getArtifactId() {
-        return artifactId;
-    }
-
-    @Override
-    public ScopeType getArtifactType() {
-        return artifactType;
+    public void setFileName(final String fileName) {
+        this.fileName = fileName;
     }
 
     @Override
-    public long getDependencyId() {
-        return dependencyId;
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFileName() {
+        return fileName;
+    }
+
+    @Override
+    public byte[] getValue() {
+        return value_;
     }
 
     @Override
     public String getDiscriminator() {
-        return SPlatformDependencyMapping.class.getName();
+        return SPlatformDependencyImpl.class.getName();
     }
 
 }

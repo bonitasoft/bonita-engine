@@ -195,19 +195,18 @@ public class OperationServiceImpl implements OperationService {
             if (operation.getType() == SOperatorType.JAVA_METHOD || operation.getType() == SOperatorType.XPATH_UPDATE_QUERY) {
                 // this operation will set a data, we retrieve it and put it in context
                 final SLeftOperand leftOperand = operation.getLeftOperand();
-                Object retrieve;
                 try {
-                    retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
+                    final Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
                             new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
+                    putRetrievedValueInContextIfNotNullAndNotAlreadyIn(inputValues, leftOperand, retrieve);
                 } catch (final SBonitaReadException e) {
                     throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
                 }
-                putRetrievedValueInContextifNotNullAndNotAlreadyIn(inputValues, leftOperand, retrieve);
             }
         }
     }
 
-    protected void putRetrievedValueInContextifNotNullAndNotAlreadyIn(final Map<String, Object> context, final SLeftOperand leftOperand, final Object retrieve) {
+    protected void putRetrievedValueInContextIfNotNullAndNotAlreadyIn(final Map<String, Object> context, final SLeftOperand leftOperand, final Object retrieve) {
         /* some left operand don't retrieve it, e.g. document, it's heavy */
         if (retrieve != null && !context.containsKey(leftOperand.getName())) {
             context.put(leftOperand.getName(), retrieve);

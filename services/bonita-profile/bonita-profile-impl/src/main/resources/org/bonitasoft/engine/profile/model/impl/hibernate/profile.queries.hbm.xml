@@ -256,7 +256,6 @@
 				)
 			)
 		)
-		ORDER BY profile.id
 	</query>
 
 	<query name="getNumberOfProfileMemberOfProfile">

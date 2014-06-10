@@ -25,7 +25,6 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
@@ -37,6 +36,8 @@ import org.bonitasoft.engine.profile.model.SProfileMember;
  * @author Emmanuel Duchastenier
  */
 public class DeleteRole extends DeleteWithActorMembers implements TransactionContent {
+
+    private static final int BATCH_SIZE = 100;
 
     private final IdentityService identityService;
 
@@ -74,23 +75,23 @@ public class DeleteRole extends DeleteWithActorMembers implements TransactionCon
         final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, field, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, 100, field, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }
-        } while (profileMembers.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (profileMembers.size() == 100);
     }
 
     private void deleteMembershipsByRole(final long roleId) throws SBonitaException {
         int i = 0;
         List<SUserMembership> memberships;
         do {
-            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-            i += QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
+            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + BATCH_SIZE);
+            i += 100;
             for (final SUserMembership sUserMembership : memberships) {
                 identityService.deleteUserMembership(sUserMembership.getId());
             }
-        } while (memberships.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (memberships.size() == 100);
     }
 
 }

@@ -26,6 +26,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
@@ -154,7 +155,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Long call() throws Exception {
-                return transitionService.getNumberOfArchivedTransitionInstances(null);
+                return transitionService.getNumberOfArchivedTransitionInstances(QueryOptions.countQueryOptions());
             }
         };
 
@@ -212,8 +213,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                assertEquals(3, commentService.getNumberOfComments(null));
-                assertEquals(0, commentService.getNumberOfArchivedComments(null));
+                assertEquals(3, commentService.getNumberOfComments(QueryOptions.countQueryOptions()));
+                assertEquals(0, commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions()));
                 return null;
             }
         });
@@ -230,9 +231,9 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                assertEquals(0, commentService.getNumberOfComments(null));
+                assertEquals(0, commentService.getNumberOfComments(QueryOptions.countQueryOptions()));
                 // 3 comments + 3 system comments
-                assertEquals(6, commentService.getNumberOfArchivedComments(null));
+                assertEquals(6, commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions()));
                 return null;
             }
         });
@@ -244,8 +245,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                assertEquals(0, commentService.getNumberOfComments(null));
-                assertEquals(0, commentService.getNumberOfArchivedComments(null));
+                assertEquals(0, commentService.getNumberOfComments(QueryOptions.countQueryOptions()));
+                assertEquals(0, commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions()));
                 return null;
             }
         });

@@ -27,7 +27,6 @@ import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
@@ -87,15 +86,14 @@ public class DeleteGroup extends DeleteWithActorMembers implements TransactionCo
     }
 
     private void deleteProfileMembers(final long groupId) throws SBonitaException {
-        final int numberOfElements = 1000;
         final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfGroup(groupId, 0, numberOfElements, field, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfGroup(groupId, 0, BATCH_SIZE, field, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }
-        } while (profileMembers.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (profileMembers.size() == BATCH_SIZE);
         int i = 0;
         List<SGroup> childrenGroup;
         do {
@@ -112,12 +110,12 @@ public class DeleteGroup extends DeleteWithActorMembers implements TransactionCo
         int i = 0;
         List<SUserMembership> memberships;
         do {
-            memberships = identityService.getUserMembershipsOfGroup(groupId, i, i + QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-            i += QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
+            memberships = identityService.getUserMembershipsOfGroup(groupId, i, i + BATCH_SIZE);
+            i += BATCH_SIZE;
             for (final SUserMembership sUserMembership : memberships) {
                 identityService.deleteUserMembership(sUserMembership.getId());
             }
-        } while (memberships.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (memberships.size() == BATCH_SIZE);
     }
 
 }

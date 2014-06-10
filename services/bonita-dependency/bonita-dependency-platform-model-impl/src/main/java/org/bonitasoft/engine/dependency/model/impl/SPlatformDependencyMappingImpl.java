@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,45 +13,36 @@
  **/
 package org.bonitasoft.engine.dependency.model.impl;
 
-import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class SPlatformDependency implements SDependency {
+public class SPlatformDependencyMappingImpl implements SPlatformDependencyMapping {
 
-    private static final long serialVersionUID = -5880182078631771416L;
+    private static final long serialVersionUID = 3669487911530579373L;
 
     private long id;
 
     private long tenantId;
 
-    private String name;
+    private long artifactId;
 
-    private String fileName;
+    private ScopeType artifactType;
 
-    private String description;
+    private long dependencyId;
 
-    private byte[] value_;
-
-    public SPlatformDependency() {
+    public SPlatformDependencyMappingImpl() {
         // default constructor for hibernate
     }
 
-    public SPlatformDependency(final String name, final String fileName, final byte[] value) {
+    public SPlatformDependencyMappingImpl(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
-        this.name = name;
-        this.fileName = fileName;
-        value_ = value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
+        this.artifactId = artifactId;
+        this.artifactType = artifactType;
+        this.dependencyId = dependencyId;
     }
 
     @Override
@@ -69,40 +60,36 @@ public class SPlatformDependency implements SDependency {
         return id;
     }
 
-    public byte[] getValue_() {
-        return value_;
+    public void setArtifactId(final long artifactId) {
+        this.artifactId = artifactId;
     }
 
-    public void setValue_(final byte[] value_) {
-        this.value_ = value_;
+    public void setArtifactType(final ScopeType artifactType) {
+        this.artifactType = artifactType;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setFileName(final String fileName) {
-        this.fileName = fileName;
+    public void setDependencyId(final long dependencyId) {
+        this.dependencyId = dependencyId;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public long getArtifactId() {
+        return artifactId;
     }
 
     @Override
-    public String getFileName() {
-        return fileName;
+    public ScopeType getArtifactType() {
+        return artifactType;
     }
 
     @Override
-    public byte[] getValue() {
-        return value_;
+    public long getDependencyId() {
+        return dependencyId;
     }
 
     @Override
     public String getDiscriminator() {
-        return SPlatformDependency.class.getName();
+        return SPlatformDependencyMappingImpl.class.getName();
     }
 
 }

@@ -327,8 +327,7 @@ public class ProcessArchiver {
             throws SDataInstanceException {
         List<SDataInstance> dataInstances;
         do {
-            dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, 100);
             for (final SDataInstance sDataInstance : dataInstances) {
                 dataInstanceService.deleteDataInstance(sDataInstance);
             }

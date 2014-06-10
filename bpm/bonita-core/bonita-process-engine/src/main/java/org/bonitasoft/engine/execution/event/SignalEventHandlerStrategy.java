@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinitio
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -60,11 +61,13 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
         SWaitingSignalEventBuilder builder = null;
         switch (eventDefinition.getType()) {
             case BOUNDARY_EVENT:
-                builder = builderFact.createNewWaitingSignalBoundaryEventInstance(processDefinition.getId(), eventInstance.getRootProcessInstanceId(), eventInstance.getParentContainerId(), eventInstance.getId(),
+                builder = builderFact.createNewWaitingSignalBoundaryEventInstance(processDefinition.getId(), eventInstance.getRootProcessInstanceId(),
+                        eventInstance.getParentContainerId(), eventInstance.getId(),
                         sSignalEventTriggerDefinition.getSignalName(), processDefinition.getName(), eventDefinition.getId(), eventInstance.getName());
                 break;
             case INTERMEDIATE_CATCH_EVENT:
-                builder = builderFact.createNewWaitingSignalIntermediateEventInstance(processDefinition.getId(), eventInstance.getRootProcessInstanceId(), eventInstance.getParentContainerId(), eventInstance.getId(),
+                builder = builderFact.createNewWaitingSignalIntermediateEventInstance(processDefinition.getId(), eventInstance.getRootProcessInstanceId(),
+                        eventInstance.getParentContainerId(), eventInstance.getId(),
                         sSignalEventTriggerDefinition.getSignalName(), processDefinition.getName(), eventDefinition.getId(), eventInstance.getName());
                 break;
             case START_EVENT:
@@ -91,10 +94,20 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SThrowSignalEventTriggerInstance signalEventTriggerInstance = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
                 .createNewInstance(eventInstanceId, signalTrigger.getSignalName()).done();
         getEventInstanceService().createEventTriggerInstance(signalEventTriggerInstance);
-        final List<SWaitingSignalEvent> listeningSignals = getEventInstanceService().getWaitingSignalEvents(signalTrigger.getSignalName());
-        for (final SWaitingSignalEvent listeningSignal : listeningSignals) {
-            eventsHandler.triggerCatchEvent(listeningSignal, null);
+        int index = 0;
+        List<SWaitingSignalEvent> listeningSignals = get100WaitingSignalEvents(signalTrigger, index);
+        while (!listeningSignals.isEmpty()) {
+            for (final SWaitingSignalEvent listeningSignal : listeningSignals) {
+                eventsHandler.triggerCatchEvent(listeningSignal, null);
+            }
+            index++;
+            listeningSignals = get100WaitingSignalEvents(signalTrigger, index);
         }
+    }
+
+    private List<SWaitingSignalEvent> get100WaitingSignalEvents(final SSignalEventTriggerDefinition signalTrigger, int index)
+            throws SEventTriggerInstanceReadException {
+        return getEventInstanceService().getWaitingSignalEvents(signalTrigger.getSignalName(), 100 * index, 100);
     }
 
     @Override
@@ -113,8 +126,8 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
             throws SBonitaException {
         final SWaitingSignalEventBuilderFactory builderFact = BuilderFactory.get(SWaitingSignalEventBuilderFactory.class);
         final SSignalEventTriggerDefinition sSignalEventTriggerDefinition = (SSignalEventTriggerDefinition) sEventTriggerDefinition;
-        final SWaitingSignalEventBuilder builder = builderFact.createNewWaitingSignalEventSubProcInstance(processDefinition.getId(), parentProcessInstance.getId(),
-                parentProcessInstance.getRootProcessInstanceId(), sSignalEventTriggerDefinition.getSignalName(), processDefinition.getName(),
+        final SWaitingSignalEventBuilder builder = builderFact.createNewWaitingSignalEventSubProcInstance(processDefinition.getId(),
+                parentProcessInstance.getId(),  parentProcessInstance.getRootProcessInstanceId(), sSignalEventTriggerDefinition.getSignalName(), processDefinition.getName(),
                 eventDefinition.getId(), eventDefinition.getName(), subProcessId);
 
         final SWaitingSignalEvent signalEvent = builder.done();

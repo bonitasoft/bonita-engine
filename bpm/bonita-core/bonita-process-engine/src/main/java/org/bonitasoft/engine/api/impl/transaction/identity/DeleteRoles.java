@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
@@ -34,8 +33,11 @@ import org.bonitasoft.engine.profile.model.SProfileMember;
 /**
  * @author Lu Kai
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class DeleteRoles extends DeleteWithActorMembers implements TransactionContent {
+
+    private static final int BATCH_SIZE = 100;
 
     private final IdentityService identityService;
 
@@ -89,11 +91,11 @@ public class DeleteRoles extends DeleteWithActorMembers implements TransactionCo
         int i = 0;
         List<SUserMembership> memberships;
         do {
-            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-            i += QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
+            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + BATCH_SIZE);
+            i += BATCH_SIZE;
             for (final SUserMembership sUserMembership : memberships) {
                 identityService.deleteUserMembership(sUserMembership.getId());
             }
-        } while (memberships.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (memberships.size() == BATCH_SIZE);
     }
 }

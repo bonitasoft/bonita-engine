@@ -39,10 +39,6 @@ public class QueryOptions implements Serializable {
 
     public static final int UNLIMITED_NUMBER_OF_RESULTS = Integer.MAX_VALUE;
 
-    public static final int DEFAULT_NUMBER_OF_RESULTS = 20;
-
-    private static final QueryOptions DEFAULT_QUERY_OPTIONS = new QueryOptions(0, DEFAULT_NUMBER_OF_RESULTS);
-
     private static final QueryOptions ALL_RESULTS_QUERY_OPTIONS = new QueryOptions(0, UNLIMITED_NUMBER_OF_RESULTS);
 
     public QueryOptions(final QueryOptions queryOptions) {
@@ -54,7 +50,9 @@ public class QueryOptions implements Serializable {
         multipleFilter = queryOptions.getMultipleFilter();
     }
 
-    @Deprecated
+    /**
+     * Just for get number of elements on a table
+     */
     public QueryOptions(final int fromIndex, final int numberOfResults) {
         super();
         this.fromIndex = fromIndex;
@@ -83,13 +81,16 @@ public class QueryOptions implements Serializable {
         this.multipleFilter = multipleFilter;
     }
 
-    @Deprecated
+    /**
+     * Just for get number of elements on a table
+     */
     public QueryOptions(final List<FilterOption> filters, final SearchFields multipleFilter) {
-        this(0, DEFAULT_NUMBER_OF_RESULTS, Collections.<OrderByOption> emptyList(), filters, multipleFilter);
+        this(0, UNLIMITED_NUMBER_OF_RESULTS, Collections.<OrderByOption> emptyList(), filters, multipleFilter);
     }
 
+    @Deprecated
     public QueryOptions(final List<OrderByOption> orderByOptions, final List<FilterOption> filters, final SearchFields multipleFilter) {
-        this(0, DEFAULT_NUMBER_OF_RESULTS, orderByOptions, filters, multipleFilter);
+        this(0, UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, multipleFilter);
     }
 
     public QueryOptions(final int fromIndex, final int numberOfResults, final Class<? extends PersistentObject> clazz, final String fieldName,
@@ -110,7 +111,7 @@ public class QueryOptions implements Serializable {
     public QueryOptions(final List<OrderByOption> orderByOptions) {
         super();
         fromIndex = 0;
-        numberOfResults = DEFAULT_NUMBER_OF_RESULTS;
+        numberOfResults = UNLIMITED_NUMBER_OF_RESULTS;
         this.orderByOptions = orderByOptions;
         filters = Collections.emptyList();
         multipleFilter = null;
@@ -119,7 +120,7 @@ public class QueryOptions implements Serializable {
     public QueryOptions(final Class<? extends PersistentObject> clazz, final String fieldName, final OrderByType orderByType) {
         super();
         fromIndex = 0;
-        numberOfResults = DEFAULT_NUMBER_OF_RESULTS;
+        numberOfResults = UNLIMITED_NUMBER_OF_RESULTS;
         orderByOptions = new ArrayList<OrderByOption>();
         orderByOptions.add(new OrderByOption(clazz, fieldName, orderByType));
         filters = Collections.emptyList();
@@ -150,11 +151,10 @@ public class QueryOptions implements Serializable {
         return orderByOptions != null && !orderByOptions.isEmpty();
     }
 
-    public static QueryOptions defaultQueryOptions() {
-        return DEFAULT_QUERY_OPTIONS;
-    }
-
-    public static QueryOptions allResultsQueryOptions() {
+    /**
+     * Just for get number of elements on a table
+     */
+    public static QueryOptions countQueryOptions() {
         return ALL_RESULTS_QUERY_OPTIONS;
     }
 

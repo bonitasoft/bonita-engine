@@ -27,7 +27,6 @@ import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
@@ -40,6 +39,8 @@ import org.bonitasoft.engine.profile.model.SProfileMember;
  * @author Celine Souchet
  */
 public class DeleteUser extends DeleteWithActorMembers implements TransactionContent {
+
+    private static final int BATCH_SIZE = 100;
 
     private final IdentityService identityService;
 
@@ -91,11 +92,11 @@ public class DeleteUser extends DeleteWithActorMembers implements TransactionCon
         final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembersOfUser;
         do {
-            profileMembersOfUser = profileService.getProfileMembersOfUser(id, 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, field, OrderByType.ASC);
+            profileMembersOfUser = profileService.getProfileMembersOfUser(id, 0, BATCH_SIZE, field, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembersOfUser) {
                 profileService.deleteProfileMember(sProfileMember);
             }
-        } while (profileMembersOfUser.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (profileMembersOfUser.size() == BATCH_SIZE);
     }
 
     private void deleteActorMembers(final long id) throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException {

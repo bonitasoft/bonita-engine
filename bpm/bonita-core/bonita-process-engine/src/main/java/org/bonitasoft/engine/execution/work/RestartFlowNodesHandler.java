@@ -20,6 +20,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -41,7 +42,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         final WorkService workService = tenantServiceAccessor.getWorkService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
-            QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+            QueryOptions queryOptions = new QueryOptions(0, 100, SFlowNodeInstance.class, "id", OrderByType.ASC);
             List<SFlowNodeInstance> sFlowNodeInstances;
             logInfo(logger, "Restarting flow nodes...");
             do {

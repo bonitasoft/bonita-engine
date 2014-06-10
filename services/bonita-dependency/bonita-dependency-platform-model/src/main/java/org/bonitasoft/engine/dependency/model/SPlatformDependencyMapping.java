@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,16 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl;
+package org.bonitasoft.engine.dependency.model;
 
-import java.util.Comparator;
+import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+/**
+ * @author Celine Souchet
+ */
+public interface SPlatformDependencyMapping extends SDependencyMapping {
 
-class ProcessDefinitionDeployInfoComparator implements Comparator<SProcessDefinitionDeployInfo> {
-
-    @Override
-    public int compare(final SProcessDefinitionDeployInfo o1, final SProcessDefinitionDeployInfo o2) {
-        return o1.getName().compareTo(o2.getName());
-    }
 }

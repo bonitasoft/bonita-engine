@@ -30,6 +30,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -59,7 +60,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         final boolean isInfo = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
         try {
             logInfo(logger, isInfo, "Restarting connectors of process...");
-            queryOptions = QueryOptions.defaultQueryOptions();
+            queryOptions = new QueryOptions(0, 100, SProcessInstance.class, "id", OrderByType.ASC);
             do {
                 processInstances = processInstanceService.getProcessInstancesInState(queryOptions, ProcessInstanceState.INITIALIZING);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
@@ -72,7 +73,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
 
-            queryOptions = QueryOptions.defaultQueryOptions();
+            queryOptions = new QueryOptions(0, 100, SProcessInstance.class, "id", OrderByType.ASC);
             do {
                 processInstances = processInstanceService.getProcessInstancesInState(queryOptions, ProcessInstanceState.COMPLETING);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
@@ -86,7 +87,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
             } while (processInstances.size() == queryOptions.getNumberOfResults());
 
             logInfo(logger, isInfo, "Restarting notification of finished sub-processes of Call-Activities...");
-            queryOptions = QueryOptions.defaultQueryOptions();
+            queryOptions = new QueryOptions(0, 100, SProcessInstance.class, "id", OrderByType.ASC);
             do {
                 processInstances = processInstanceService.getProcessInstancesInStates(queryOptions, ProcessInstanceState.COMPLETED,
                         ProcessInstanceState.ABORTED, ProcessInstanceState.CANCELLED);

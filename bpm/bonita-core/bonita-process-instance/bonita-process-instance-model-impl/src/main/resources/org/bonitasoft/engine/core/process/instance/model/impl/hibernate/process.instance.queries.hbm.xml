@@ -55,11 +55,10 @@
 	</query>
 
 	<query name="getFlowNodeInstancesToRestart">
-		SELECT a
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS a
-		WHERE a.deleted = FALSE
-		AND (a.stateExecuting = TRUE OR a.stable = FALSE OR a.terminal = TRUE)
-		ORDER BY id
+		SELECT f
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE f.deleted = FALSE
+		AND (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE)
 	</query>
 
 	<query name="getActiveGatewayInstanceOfProcess">
@@ -88,15 +87,6 @@
 		AND a.stateId IN (:stateIds)
 	</query>
 
-	<!-- FIXME do not use logical group  -->
-	<query name="getActiveFlowNodes">
-		SELECT flowNode
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS flowNode
-		WHERE flowNode.logicalGroup4 = :parentContainerId
-		AND flowNode.deleted = FALSE
-		AND flowNode.terminal = FALSE
-	</query>
-	
 	<query name="getChildrenOfAnActivity">
 		SELECT flowNode
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS flowNode
@@ -464,22 +454,6 @@
 		WHERE cfi.containerId = :id
 	</query>
 
-	<query name="getMessageInstancesByNameAndTarget">
-		SELECT m
-		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
-		WHERE m.messageName = :messageName
-		AND m.targetProcess = :targetProcess
-		AND m.targetFlowNode = :targetFlowNode
-	</query>
-
-	<query name="getCaughtMessagesByNameAndSource">
-		SELECT s
-		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s
-		WHERE s.messageName = :messageName
-		AND s.processName = :processName
-		AND s.flowNodeName = :flowNodeName
-	</query>
-
 	<query name="getCaughtErrorByRelatedActivityAndAnyErrorCode">
 		SELECT s
 		FROM  org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl AS s
@@ -511,7 +485,6 @@
 		AND s.correlation3 = m.correlation3
 		AND s.correlation4 = m.correlation4
 		AND s.correlation5 = m.correlation5
-		ORDER BY s.id
 	</query>
 
 	<query name="getListeningSignals">
@@ -1206,14 +1179,12 @@
 		SELECT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
 		WHERE p.stateId IN (:stateIds)
-		ORDER BY id
 	</query>
 	
 	<query name="getProcessInstancesInState">
 		SELECT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
 		WHERE p.stateId = :state
-		ORDER BY id
 	</query>
 
 	<query name="getNumberOfChildInstancesOfProcessInstance">

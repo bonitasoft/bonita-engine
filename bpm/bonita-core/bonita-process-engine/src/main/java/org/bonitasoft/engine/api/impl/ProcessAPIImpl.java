@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singletonMap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -107,8 +107,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDepl
 import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfoFromArchivedProcessInstanceIds;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfoFromProcessInstanceIds;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfos;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroup;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroups;
@@ -117,7 +115,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDe
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUsers;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionIDByNameAndVersion;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDeploymentInfosFromIds;
 import org.bonitasoft.engine.api.impl.transaction.process.SetProcessInstanceState;
 import org.bonitasoft.engine.api.impl.transaction.process.UpdateProcessDeploymentInfo;
 import org.bonitasoft.engine.api.impl.transaction.task.AssignOrUnassignUserTask;
@@ -190,7 +187,6 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
@@ -209,7 +205,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -1979,92 +1974,48 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long getNumberOfProcessDefinitionsOfCategory(final long categoryId) {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
-            final List<Long> ids = categoryService.getProcessDefinitionIdsOfCategory(categoryId);
-            if (ids != null) {
-                return ids.size();
-            }
+            return categoryService.getNumberOfProcessDeploymentInfosOfCategory(categoryId);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
-        return 0;
     }
 
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosOfCategory(final long categoryId, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortCriterion) {
+        if (sortCriterion == null) {
+            throw new IllegalArgumentException("You must to have a criterion to sort your result.");
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final OrderByType order = getOrderByType(sortCriterion);
-        List<Long> processDefinitionIds;
+        final OrderByType order = buildOrderByType(sortCriterion.getOrder());
+        final String field = sortCriterion.getField();
         try {
-            processDefinitionIds = categoryService.getProcessDefinitionIdsOfCategory(categoryId);
-            if (processDefinitionIds != null && processDefinitionIds.size() > 0) {
-                final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfoList = processDefinitionService
-                        .getProcessDeploymentInfos(processDefinitionIds);
-                if (processDefinitionDeployInfoList != null) {
-                    Collections.sort(processDefinitionDeployInfoList, new ProcessDefinitionDeployInfoComparator());
-                    if (order != null && order == OrderByType.DESC) {
-                        Collections.reverse(processDefinitionDeployInfoList);
-                    }
-                    if (startIndex >= processDefinitionDeployInfoList.size()) {
-                        return Collections.emptyList();
-                    }
-                    final int toIndex = Math.min(processDefinitionDeployInfoList.size(), startIndex + maxResults);
-                    return ModelConvertor.toProcessDeploymentInfo(new ArrayList<SProcessDefinitionDeployInfo>(processDefinitionDeployInfoList.subList(
-                            startIndex, toIndex)));
-                }
-            }
-            return Collections.emptyList();
+            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, SProcessDefinitionDeployInfo.class, field, order);
+            final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = processDefinitionService
+                    .searchProcessDeploymentInfosOfCategory(categoryId, queryOptions);
+            return ModelConvertor.toProcessDeploymentInfo(sProcessDefinitionDeployInfos);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
     }
 
-    private OrderByType getOrderByType(final ProcessDeploymentInfoCriterion sortCriterion) {
-        if (sortCriterion != null) {
-            switch (sortCriterion) {
-                case NAME_ASC:
-                    return OrderByType.ASC;
-                case NAME_DESC:
-                    return OrderByType.DESC;
-                case DEFAULT:
-                    return OrderByType.ASC;
-                default:
-                    return null;
-            }
-        }
-        return null;
-    }
-
-    private OrderByType mapPagingCriterionToOrderByType(final CategoryCriterion pagingCriterion) {
-        OrderByType order = null;
-        switch (pagingCriterion) {
-            case NAME_ASC:
-                order = OrderByType.ASC;
-                break;
-            case NAME_DESC:
-                order = OrderByType.DESC;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        return order;
-    }
-
     @Override
     public List<Category> getCategoriesOfProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults,
-            final CategoryCriterion pagingCriterion) {
+            final CategoryCriterion sortingCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            final OrderByType order = mapPagingCriterionToOrderByType(pagingCriterion);
+            final OrderByType order = buildOrderByType(sortingCriterion.getOrder());
             return ModelConvertor.toCategories(categoryService.getCategoriesOfProcessDefinition(processDefinitionId, startIndex, maxResults, order));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
+    }
+
+    private OrderByType buildOrderByType(final Order order) {
+        return OrderByType.valueOf(order.name());
     }
 
     @Override
@@ -2074,7 +2025,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            final OrderByType order = mapPagingCriterionToOrderByType(sortingCriterion);
+            final OrderByType order = buildOrderByType(sortingCriterion.getOrder());
             return ModelConvertor.toCategories(categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, startIndex, maxResults, order));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -2154,28 +2105,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<ProcessDeploymentInfo> getUncategorizedProcessDeploymentInfos(final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE);
-            processDefinitionIds.removeAll(categoryService.getCategorizedProcessIds(processDefinitionIds));
-            OrderByType order;
-            switch (sortCriterion) {
-                case NAME_ASC:
-                    order = OrderByType.ASC;
-                    break;
-                case NAME_DESC:
-                    order = OrderByType.DESC;
-                    break;
-                case DEFAULT:
-                    order = OrderByType.ASC;
-                    break;
-                default:
-                    order = null;
-            }
-            final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService.getProcessDeploymentInfos(processDefinitionIds,
-                    startIndex, maxResults, "name", order);
+            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, SProcessDefinitionDeployInfo.class, sortCriterion.getField(),
+                    buildOrderByType(sortCriterion.getOrder()));
+            final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService
+                    .searchUncategorizedProcessDeploymentInfos(queryOptions);
             return ModelConvertor.toProcessDeploymentInfo(processDefinitionDeployInfos);
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -2534,7 +2469,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (actorIds.isEmpty()) {
                 return 0L;
             }
-            return activityInstanceService.getNumberOfPendingTasksForUser(userId, QueryOptions.defaultQueryOptions());
+            return activityInstanceService.getNumberOfPendingTasksForUser(userId, QueryOptions.countQueryOptions());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -4210,7 +4145,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *            do we also want to retrieve tasks directly assigned to this user ?
+     *        do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
@@ -4652,9 +4587,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         try {
-            final GetProcessDeploymentInfosFromIds processDefinitions = new GetProcessDeploymentInfosFromIds(processDefinitionIds, processDefinitionService);
-            processDefinitions.execute();
-            final List<ProcessDeploymentInfo> processDeploymentInfos = ModelConvertor.toProcessDeploymentInfo(processDefinitions.getResult());
+            final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService.getProcessDeploymentInfos(processDefinitionIds);
+            final List<ProcessDeploymentInfo> processDeploymentInfos = ModelConvertor.toProcessDeploymentInfo(processDefinitionDeployInfos);
             final Map<Long, ProcessDeploymentInfo> mProcessDefinitions = new HashMap<Long, ProcessDeploymentInfo>();
             for (final ProcessDeploymentInfo p : processDeploymentInfos) {
                 mProcessDefinitions.put(p.getProcessId(), p);
@@ -4839,77 +4773,31 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(final List<Long> processInstantsIds) {
+    public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(final List<Long> processInstanceIds) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        final GetProcessDefinitionDeployInfoFromProcessInstanceIds processDefinitions = new GetProcessDefinitionDeployInfoFromProcessInstanceIds(
-                processInstantsIds, processDefinitionService);
         try {
-            processDefinitions.execute();
+            final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos = processDefinitionService
+                    .getProcessDeploymentInfosFromProcessInstanceIds(processInstanceIds);
+            return ModelConvertor.toProcessDeploymentInfos(sProcessDeploymentInfos);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
-        final List<Map<String, String>> sProcessDeploymentInfos = processDefinitions.getResult();
-        return getProcessDeploymentInfosFromMap(sProcessDeploymentInfos);
-
     }
 
-    private Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromMap(final List<Map<String, String>> sProcessDeploymentInfos) {
-        final Map<Long, ProcessDeploymentInfo> mProcessDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
-        long processInstanceId = 0;
-        long id = 0;
-        long processDefinitionId = 0;
-        String name = "";
-        String version = "";
-        String description = "";
-        long deploymentDate = 0;
-        long deployedBy = 0;
-        ActivationState activationState = null;
-        ConfigurationState configurationState = null;
-        String displayName = "";
-        long lastUpdateDate = 0;
-        String iconPath = "";
-        String displayDescription = "";
-        for (final Map<String, String> m : sProcessDeploymentInfos) {
-            for (final Entry<String, String> entry : m.entrySet()) {
-                final String key = entry.getKey();
-                final Object value = entry.getValue();
-                if ("processInstanceId".equals(key)) {
-                    processInstanceId = Long.parseLong(value.toString());
-                } else if ("id".equals(key)) {
-                    id = Long.parseLong(value.toString());
-                } else if ("processId".equals(key)) {
-                    processDefinitionId = Long.parseLong(value.toString());
-                } else if ("name".equals(key)) {
-                    name = m.get(key);
-                } else if ("version".equals(key)) {
-                    version = m.get(key);
-                } else if ("description".equals(key)) {
-                    description = String.valueOf(m.get(key));
-                } else if ("deploymentDate".equals(key)) {
-                    deploymentDate = Long.parseLong(value.toString());
-                } else if ("deployedBy".equals(key)) {
-                    deployedBy = Long.parseLong(value.toString());
-                } else if ("activationState".equals(key)) {
-                    activationState = ActivationState.valueOf(m.get(key));
-                } else if ("configurationState".equals(key)) {
-                    configurationState = ConfigurationState.valueOf(m.get(key));
-                } else if ("displayName".equals(key)) {
-                    displayName = m.get(key);
-                } else if ("lastUpdateDate".equals(key)) {
-                    lastUpdateDate = Long.parseLong(value.toString());
-                } else if ("iconPath".equals(key)) {
-                    iconPath = m.get(key);
-                } else if ("displayDescription".equals(key)) {
-                    displayDescription = String.valueOf(m.get(key));
-                }
-            }
-            final ProcessDeploymentInfoImpl pDeplInfoImpl = new ProcessDeploymentInfoImpl(id, processDefinitionId, name, version, description, new Date(
-                    deploymentDate), deployedBy, activationState, configurationState, displayName, new Date(lastUpdateDate), iconPath, displayDescription);
-            mProcessDeploymentInfos.put(processInstanceId, pDeplInfoImpl);
+    @Override
+    public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(final List<Long> archivedProcessInstantsIds) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+
+        try {
+            final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos = processDefinitionService
+                    .getProcessDeploymentInfosFromArchivedProcessInstanceIds(archivedProcessInstantsIds);
+            return ModelConvertor.toProcessDeploymentInfos(sProcessDeploymentInfos);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
         }
-        return mProcessDeploymentInfos;
     }
 
     @Override
@@ -5086,30 +4974,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             res.put(actor.getId(), ModelConvertor.toActorInstance(actor));
         }
         return res;
-    }
-
-    @Override
-    public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(final List<Long> archivedProcessInstantsIds) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
-        final GetProcessDefinitionDeployInfoFromArchivedProcessInstanceIds getProcessDeploymentInfoFromArchivedProcessInstanceIds = new GetProcessDefinitionDeployInfoFromArchivedProcessInstanceIds(
-                archivedProcessInstantsIds, processDefinitionService);
-        try {
-            getProcessDeploymentInfoFromArchivedProcessInstanceIds.execute();
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
-        final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos = getProcessDeploymentInfoFromArchivedProcessInstanceIds.getResult();
-        if (sProcessDeploymentInfos != null && !sProcessDeploymentInfos.isEmpty()) {
-            final Map<Long, ProcessDeploymentInfo> processDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
-            final Set<Entry<Long, SProcessDefinitionDeployInfo>> entries = sProcessDeploymentInfos.entrySet();
-            for (final Entry<Long, SProcessDefinitionDeployInfo> entry : entries) {
-                processDeploymentInfos.put(entry.getKey(), ModelConvertor.toProcessDeploymentInfo(entry.getValue()));
-            }
-            return processDeploymentInfos;
-        }
-        return Collections.emptyMap();
     }
 
     @Override

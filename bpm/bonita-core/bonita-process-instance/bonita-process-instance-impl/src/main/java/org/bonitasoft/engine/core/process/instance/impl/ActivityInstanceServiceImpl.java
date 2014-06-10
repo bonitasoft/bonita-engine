@@ -290,23 +290,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public List<SActivityInstance> getActivitiesWithStates(final long rootContainerId, final Set<Integer> stateIds) throws SActivityReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("rootContainerId", rootContainerId);
-        parameters.put("stateIds", stateIds);
-        final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getActivitiesWithStates", parameters,
-                SActivityInstance.class);
-        try {
-            // FIXME: this method must be paginated
-            return getPersistenceService().selectList(descriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SActivityReadException(e);
-        }
-    }
-
-    @Override
-    public List<SActivityInstance> getActivitiesWithStates(final long rootContainerId, final int fromIndex, final int maxResults, final String sortingField,
-            final OrderByType sortingOrder, final Set<Integer> stateIds) throws SActivityReadException {
+    public List<SActivityInstance> getActivitiesWithStates(final long rootContainerId, final Set<Integer> stateIds, final int fromIndex, final int maxResults,
+            final String sortingField, final OrderByType sortingOrder) throws SActivityReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("rootContainerId", rootContainerId);
         parameters.put("stateIds", stateIds);
@@ -337,13 +322,13 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public SAActivityInstance getMostRecentArchivedActivityInstance(final long activityInstanceId) throws SActivityReadException,
             SActivityInstanceNotFoundException {
         final ReadPersistenceService persistenceService = getArchiveService().getDefinitiveArchiveReadPersistenceService();
-        final SelectListDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityId(activityInstanceId);
+        final SelectOneDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getMostRecentArchivedActivityInstance(activityInstanceId);
         try {
-            final List<SAActivityInstance> activities = persistenceService.selectList(descriptor);
-            if (activities == null || activities.isEmpty()) {
+            final SAActivityInstance activitie = persistenceService.selectOne(descriptor);
+            if (activitie == null) {
                 throw new SActivityInstanceNotFoundException(activityInstanceId);
             }
-            return activities.get(0);
+            return activitie;
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }
@@ -694,9 +679,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         }
         try {
             // get assigned overdue open tasks for each user
-            final List<Map<String, Long>> result = getPersistenceService().selectList(SelectDescriptorBuilder.getNumbersOfAssignedOverdueOpenTasks(userIds));
+            final List<Map<Long, Long>> result = getPersistenceService().selectList(SelectDescriptorBuilder.getNumbersOfAssignedOverdueOpenTasks(userIds));
             final Map<Long, Long> userTaskNumbermap = new HashMap<Long, Long>();
-            for (final Map<String, Long> record : result) {
+            for (final Map<Long, Long> record : result) {
                 userTaskNumbermap.put(record.get("userId"), record.get("numberOfTasks")); // "userId" and "numberOfTasks" are embed in mybatis/hibernate query
                                                                                           // statements named "getNumbersOfOpenTasksForUsers"
             }

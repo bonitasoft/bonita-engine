@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.identity;
 
 import java.util.List;
-import java.util.Set;
 
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
@@ -151,17 +150,6 @@ public interface IdentityService {
     long getNumberOfGroups() throws SIdentityException;
 
     /**
-     * Get all groups having the specific name
-     * 
-     * @param groupName
-     *            The group name
-     * @return a set of SGroup object
-     * @throws SGroupNotFoundException
-     *             occurs when the groupName does not refer to any group.
-     */
-    Set<SGroup> getGroupsByName(String groupName) throws SGroupNotFoundException;
-
-    /**
      * Get groups for specific groupIds
      * 
      * @param groupIds
@@ -208,16 +196,6 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     long getNumberOfGroupChildren(long parentGroupId) throws SIdentityException;
-
-    /**
-     * Get all child groups for the specified group
-     * 
-     * @param parentGroupId
-     *            The parent group identifier
-     * @return a list of SGroup objects
-     * @throws SIdentityException
-     */
-    List<SGroup> getGroupChildren(long parentGroupId) throws SIdentityException;
 
     /**
      * Get child groups in a specific interval for specific group, this is used for pagination
@@ -347,20 +325,14 @@ public interface IdentityService {
      * 
      * @param managerId
      *            The manager identifier, actually it is user identifier
+     * @param fromIndex
+     *            Index of the record to be retrieved from. First record has index 0
+     * @param numberMaxOfUsers
+     *            Number of result we want to get. Maximum number of result returned.
      * @return a list of SUser objects
      * @throws SIdentityException
      */
-    List<SUser> getUsersByManager(long managerId) throws SIdentityException;
-
-    /**
-     * Get all users delegated by a specific delegate
-     * 
-     * @param delegateId
-     *            The delegate identifier, actually it is user identifier
-     * @return a list of SUser objects
-     * @throws SIdentityException
-     */
-    List<SUser> getUsersByDelegee(long delegateId) throws SIdentityException;
+    List<SUser> getUsersByManager(long managerId, int fromIndex, int numberMaxOfUsers) throws SIdentityException;
 
     /**
      * Get total number of users for the given role
@@ -371,16 +343,6 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     long getNumberOfUsersByRole(long roleId) throws SIdentityException;
-
-    /**
-     * Get total users for the given role
-     * 
-     * @param roleId
-     *            The identifier of the role
-     * @return a list of SUser object
-     * @throws SIdentityException
-     */
-    List<SUser> getUsersByRole(long roleId) throws SIdentityException;
 
     /**
      * Get users in a specific interval for the given role, this is used for pagination
@@ -423,16 +385,6 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     long getNumberOfUsersByGroup(long groupId) throws SIdentityException;
-
-    /**
-     * Get total users for the given group
-     * 
-     * @param groupId
-     *            Identifier of the group
-     * @return a list of SUser objects
-     * @throws SIdentityException
-     */
-    List<SUser> getUsersByGroup(long groupId) throws SIdentityException;
 
     /**
      * Get users in a specific interval for the given group, this is used for pagination
@@ -578,8 +530,10 @@ public interface IdentityService {
      * @param customUserInfoValueId
      *            The identifier of the custom user info value
      * @return the profileMetadataValue
-     * @throws SCustomUserInfoValueNotFoundException if no custom user info value is found for the given id
-     * @throws SCustomUserInfoValueReadException if an exception occurs while trying to get the custom user info value
+     * @throws SCustomUserInfoValueNotFoundException
+     *             if no custom user info value is found for the given id
+     * @throws SCustomUserInfoValueReadException
+     *             if an exception occurs while trying to get the custom user info value
      */
     SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException;
 
@@ -589,10 +543,13 @@ public interface IdentityService {
      * @param name
      *            The name custom user info definition name
      * @return the custom user info definition identified by the given name
-     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
-     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     * @throws SCustomUserInfoDefinitionNotFoundException
+     *             if there is no custom user info definition for the given name
+     * @throws SCustomUserInfoDefinitionReadException
+     *             if an exception occurs when trying to retrieve the custom user info definition
      */
-    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException, SCustomUserInfoDefinitionReadException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException,
+            SCustomUserInfoDefinitionReadException;
 
     /**
      * Verify if there is a custom user info for the given name
@@ -600,8 +557,10 @@ public interface IdentityService {
      * @param name
      *            The name custom user info definition name
      * @return the custom user info definition identified by the given name
-     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
-     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     * @throws SCustomUserInfoDefinitionNotFoundException
+     *             if there is no custom user info definition for the given name
+     * @throws SCustomUserInfoDefinitionReadException
+     *             if an exception occurs when trying to retrieve the custom user info definition
      */
     boolean hasCustomUserInfoDefinition(String name) throws SCustomUserInfoDefinitionReadException;
 
@@ -615,7 +574,7 @@ public interface IdentityService {
 
     /**
      * Get total number of custom user info value
-     *
+     * 
      * @param options
      *            The QueryOptions object containing some query conditions
      * @return the total number of custom user info value
@@ -654,8 +613,7 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int maxResults) throws SIdentityException;
-    
-    
+
     /**
      * Search custom user info values according to specific query options
      * 
@@ -782,10 +740,13 @@ public interface IdentityService {
      * 
      * @param customUserInfo
      *            SCustomUserInfoDefinition object
-     * @throws SCustomUserInfoDefinitionAlreadyExistsException TODO
-     * @throws SCustomUserInfoDefinitionCreationException TODO
+     * @throws SCustomUserInfoDefinitionAlreadyExistsException
+     *             TODO
+     * @throws SCustomUserInfoDefinitionCreationException
+     *             TODO
      */
-    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException;
+    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException,
+            SCustomUserInfoDefinitionCreationException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor
@@ -801,7 +762,7 @@ public interface IdentityService {
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
      * 
-     *
+     * 
      * @param customUserInfo
      *            A profileMetadataValue object
      * @throws SIdentityException

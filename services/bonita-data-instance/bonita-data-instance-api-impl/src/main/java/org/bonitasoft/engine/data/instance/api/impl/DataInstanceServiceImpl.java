@@ -307,7 +307,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         try {
             List<SDataInstanceVisibilityMapping> visibilityMappings;
             do {
-                visibilityMappings = getDataInstanceVisibilityMappings(containerId, containerType, 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+                visibilityMappings = getDataInstanceVisibilityMappings(containerId, containerType, 0, 100);
                 for (final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping : visibilityMappings) {
                     deleteDataInstanceVisibilityMapping(sDataInstanceVisibilityMapping);
                 }
