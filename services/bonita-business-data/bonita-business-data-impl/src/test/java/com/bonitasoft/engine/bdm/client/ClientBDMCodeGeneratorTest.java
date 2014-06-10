@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -338,8 +337,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-
-        System.out.println(IOUtils.toString(file.toURI()));
 
         assertThat(file).hasContentEqualTo(expected);
     }

@@ -67,20 +67,8 @@ public class EntityCodeGenerator {
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
         validateClassNotExistsInRuntime(bo.getQualifiedName());
 
-        JDefinedClass entityClass = createEntityInterface(bo);
-        createEntityImplementation(bo);
+        JDefinedClass entityInterface = createEntityInterface(bo);
 
-        return entityClass;
-    }
-
-    private JDefinedClass createEntityInterface(BusinessObject bo) throws JClassAlreadyExistsException {
-        JDefinedClass entityClass = codeGenerator.addInterface(bo.getQualifiedName());
-        entityClass = codeGenerator.addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
-        return entityClass;
-    }
-
-    /** protected for testing */
-    protected JDefinedClass createEntityImplementation(final BusinessObject bo) throws JClassAlreadyExistsException {
         final String qualifiedName = suffixPackage(bo.getQualifiedName(), IMPL_PACKAGE_SUFFIX);
         validateClassNotExistsInRuntime(qualifiedName);
 
@@ -96,24 +84,38 @@ public class EntityCodeGenerator {
         addUniqueConstraintAnnotations(bo, entityClass);
         addQueriesAnnotation(bo, entityClass);
 
-        addFieldsAndMethods(bo, entityClass);
+        addFieldsAndMethods(bo, entityClass, entityInterface);
 
         codeGenerator.addDefaultConstructor(entityClass);
         addCopyConstructor(entityClass, bo);
 
         codeGenerator.addEqualsMethod(entityClass);
         codeGenerator.addHashCodeMethod(entityClass);
+        return entityInterface;
+    }
+
+    private JDefinedClass createEntityInterface(BusinessObject bo) throws JClassAlreadyExistsException {
+        JDefinedClass entityClass = codeGenerator.addInterface(bo.getQualifiedName());
+        entityClass = codeGenerator.addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
         return entityClass;
     }
 
-    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass) throws JClassAlreadyExistsException {
-        addPersistenceIdFieldAndAccessors(entityClass);
-        addPersistenceVersionFieldAndAccessors(entityClass);
+    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass, JDefinedClass entityInterface)
+            throws JClassAlreadyExistsException {
+        JFieldVar persistenceId = addPersistenceIdField(entityClass);
+        addAccessors(entityClass, persistenceId);
+        addAccessors(entityInterface, persistenceId);
+
+        JFieldVar version = addPersistenceVersionField(entityClass);
+        addAccessors(entityClass, version);
 
         for (final Field field : bo.getFields()) {
             final JFieldVar fieldVar = addField(entityClass, field);
             addAccessors(entityClass, fieldVar);
+            addAccessors(entityInterface, fieldVar);
+
             addModifiers(entityClass, field);
+            addModifiers(entityInterface, field);
         }
     }
 
@@ -210,17 +212,17 @@ public class EntityCodeGenerator {
         }
     }
 
-    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    public JFieldVar addPersistenceIdField(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
         final JFieldVar idFieldVar = codeGenerator.addField(entityClass, Field.PERSISTENCE_ID, codeGenerator.toJavaClass(FieldType.LONG));
         codeGenerator.addAnnotation(idFieldVar, Id.class);
         codeGenerator.addAnnotation(idFieldVar, GeneratedValue.class);
-        addAccessors(entityClass, idFieldVar);
+        return idFieldVar;
     }
 
-    public void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    public JFieldVar addPersistenceVersionField(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
         final JFieldVar versionField = codeGenerator.addField(entityClass, Field.PERSISTENCE_VERSION, codeGenerator.toJavaClass(FieldType.LONG));
         codeGenerator.addAnnotation(versionField, Version.class);
-        addAccessors(entityClass, versionField);
+        return versionField;
     }
 
     public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {

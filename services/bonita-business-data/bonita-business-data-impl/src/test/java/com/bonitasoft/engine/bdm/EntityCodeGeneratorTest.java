@@ -6,14 +6,12 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
 
@@ -54,24 +52,11 @@ public class EntityCodeGeneratorTest {
     }
 
     @Test
-    public void shouldAddNamedQueries_InDefinedClass() throws Exception {
-        final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        employeeBO.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
-        final JDefinedClass entity = entityCodeGenerator.createEntityImplementation(employeeBO);
-
-        final JAnnotationUse namedQueriesAnnotation = getAnnotation(entity, NamedQueries.class.getName());
-        assertThat(namedQueriesAnnotation).isNotNull();
-        final Map<String, JAnnotationValue> annotationMembers = namedQueriesAnnotation.getAnnotationMembers();
-        assertThat(annotationMembers).hasSize(1);
-    }
-
-    @Test
     public void shouldAddPersistenceIdFieldAndAccessors_AddPersistenceId() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
+        entityCodeGenerator.addPersistenceIdField(definedClass);
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
         assertThat(idFieldVar).isNotNull();
@@ -219,7 +204,7 @@ public class EntityCodeGeneratorTest {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addPersistenceVersionFieldAndAccessors(definedClass);
+        entityCodeGenerator.addPersistenceVersionField(definedClass);
 
         final JFieldVar versionFieldVar = definedClass.fields().get(Field.PERSISTENCE_VERSION);
         assertThat(versionFieldVar).isNotNull();

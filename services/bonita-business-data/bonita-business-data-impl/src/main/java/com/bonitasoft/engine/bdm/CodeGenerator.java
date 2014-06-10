@@ -87,7 +87,7 @@ public class CodeGenerator {
     }
 
     public JDefinedClass addInterface(final String fullyqualifiedName) throws JClassAlreadyExistsException {
-        if(fullyqualifiedName.indexOf(".") == -1){
+        if (fullyqualifiedName.indexOf(".") == -1) {
             return model.rootPackage()._class(JMod.PUBLIC, fullyqualifiedName, ClassType.INTERFACE);
         }
         return model._class(fullyqualifiedName, ClassType.INTERFACE);
@@ -164,14 +164,21 @@ public class CodeGenerator {
     public JMethod addSetter(final JDefinedClass definedClass, final JFieldVar field) {
         final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
         method.param(field.type(), field.name());
-        method.body().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
+
+        if (definedClass.getClassType() != ClassType.INTERFACE) {
+            method.body().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
+        }
+
         return method;
     }
 
     public JMethod addGetter(final JDefinedClass definedClass, final JFieldVar field) {
         final JMethod method = definedClass.method(JMod.PUBLIC, field.type(), getGetterName(field));
-        final JBlock block = method.body();
-        block._return(field);
+
+        if (definedClass.getClassType() != ClassType.INTERFACE) {
+            final JBlock block = method.body();
+            block._return(field);
+        }
         return method;
     }
 
@@ -194,7 +201,10 @@ public class CodeGenerator {
 
         final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
         final JVar adderParam = method.param(fieldClass, parameterName);
-        method.body().invoke(JExpr.ref(field.getName()), listMethodName).arg(adderParam);
+
+        if (definedClass.getClassType() != ClassType.INTERFACE) {
+            method.body().invoke(JExpr.ref(field.getName()), listMethodName).arg(adderParam);
+        }
         return method;
     }
 
@@ -233,7 +243,11 @@ public class CodeGenerator {
     }
 
     public String getSetterName(final JFieldVar field) {
-        return "set" + WordUtils.capitalize(field.name());
+        return getSetterName(field.name());
+    }
+
+    public String getSetterName(final String fieldName) {
+        return "set" + WordUtils.capitalize(fieldName);
     }
 
     public JCodeModel getModel() {
