@@ -1,5 +1,5 @@
 
-package impl;
+package org.bonita.hr.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import javax.persistence.Version;
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements Employee
+    implements org.bonita.hr.Employee
 {
 
     @Id
@@ -41,11 +41,11 @@ public class Employee
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
-    private List<Address> addresses = new ArrayList<Address>(10);
+    private List<org.bonita.hr.Address> addresses = new ArrayList<org.bonita.hr.Address>(10);
     @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
-    private List<Skill> skills = new ArrayList<Skill>(10);
+    private List<org.bonita.hr.Skill> skills = new ArrayList<org.bonita.hr.Skill>(10);
 
     public Employee() {
     }
@@ -54,13 +54,13 @@ public class Employee
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();
-        this.addresses = new ArrayList<Address>();
-        for (Address i: employee.getAddresses()) {
-            this.addresses.add(new Address(i));
+        this.addresses = new ArrayList<org.bonita.hr.Address>();
+        for (org.bonita.hr.Address i: employee.getAddresses()) {
+            this.addresses.add(new org.bonita.hr.impl.Address(i));
         }
-        this.skills = new ArrayList<Skill>();
-        for (Skill i: employee.getSkills()) {
-            this.skills.add(new Skill(i));
+        this.skills = new ArrayList<org.bonita.hr.Skill>();
+        for (org.bonita.hr.Skill i: employee.getSkills()) {
+            this.skills.add(new org.bonita.hr.impl.Skill(i));
         }
     }
 
@@ -88,35 +88,35 @@ public class Employee
         return firstName;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(List<org.bonita.hr.Address> addresses) {
         this.addresses = addresses;
     }
 
-    public List<Address> getAddresses() {
+    public List<org.bonita.hr.Address> getAddresses() {
         return addresses;
     }
 
-    public void addToAddresses(Address addTo) {
+    public void addToAddresses(org.bonita.hr.Address addTo) {
         addresses.add(addTo);
     }
 
-    public void removeFromAddresses(Address removeFrom) {
+    public void removeFromAddresses(org.bonita.hr.Address removeFrom) {
         addresses.remove(removeFrom);
     }
 
-    public void setSkills(List<Skill> skills) {
+    public void setSkills(List<org.bonita.hr.Skill> skills) {
         this.skills = skills;
     }
 
-    public List<Skill> getSkills() {
+    public List<org.bonita.hr.Skill> getSkills() {
         return skills;
     }
 
-    public void addToSkills(Skill addTo) {
+    public void addToSkills(org.bonita.hr.Skill addTo) {
         skills.add(addTo);
     }
 
-    public void removeFromSkills(Skill removeFrom) {
+    public void removeFromSkills(org.bonita.hr.Skill removeFrom) {
         skills.remove(removeFrom);
     }
 

@@ -1,5 +1,5 @@
 
-package impl;
+package org.bonita.hr.impl;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +26,7 @@ import org.hibernate.annotations.Index;
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements Employee
+    implements org.bonita.hr.Employee
 {
 
     @Id

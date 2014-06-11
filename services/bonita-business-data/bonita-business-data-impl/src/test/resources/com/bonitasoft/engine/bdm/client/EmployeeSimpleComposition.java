@@ -1,5 +1,5 @@
 
-package impl;
+package org.bonita.hr.impl;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +13,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import org.bonita.hr.Address;
 
 
 /**
@@ -25,7 +26,7 @@ import javax.persistence.Version;
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements Employee
+    implements org.bonita.hr.Employee
 {
 
     @Id

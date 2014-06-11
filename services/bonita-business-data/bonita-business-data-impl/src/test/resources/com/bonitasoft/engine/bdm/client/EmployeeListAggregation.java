@@ -1,5 +1,5 @@
 
-package impl;
+package org.bonita.hr.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import javax.persistence.Version;
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements Employee
+    implements org.bonita.hr.Employee
 {
 
     @Id
@@ -45,7 +45,7 @@ public class Employee
         @JoinColumn(name = "ADDRESS_PID")
     })
     @OrderColumn
-    private List<Address> addresses = new ArrayList<Address>(10);
+    private List<org.bonita.hr.Address> addresses = new ArrayList<org.bonita.hr.Address>(10);
 
     public Employee() {
     }
@@ -54,9 +54,9 @@ public class Employee
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();
-        this.addresses = new ArrayList<Address>();
-        for (Address i: employee.getAddresses()) {
-            this.addresses.add(new Address(i));
+        this.addresses = new ArrayList<org.bonita.hr.Address>();
+        for (org.bonita.hr.Address i: employee.getAddresses()) {
+            this.addresses.add(new org.bonita.hr.impl.Address(i));
         }
     }
 
@@ -84,19 +84,19 @@ public class Employee
         return firstName;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(List<org.bonita.hr.Address> addresses) {
         this.addresses = addresses;
     }
 
-    public List<Address> getAddresses() {
+    public List<org.bonita.hr.Address> getAddresses() {
         return addresses;
     }
 
-    public void addToAddresses(Address addTo) {
+    public void addToAddresses(org.bonita.hr.Address addTo) {
         addresses.add(addTo);
     }
 
-    public void removeFromAddresses(Address removeFrom) {
+    public void removeFromAddresses(org.bonita.hr.Address removeFrom) {
         addresses.remove(removeFrom);
     }
 

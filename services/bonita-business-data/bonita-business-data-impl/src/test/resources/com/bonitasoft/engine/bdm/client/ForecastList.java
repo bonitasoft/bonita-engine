@@ -1,5 +1,5 @@
 
-package impl;
+package org.bonita.weather.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import javax.persistence.Version;
     @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
 })
 public class Forecast
-    implements Forecast
+    implements org.bonita.weather.Forecast
 {
 
     @Id

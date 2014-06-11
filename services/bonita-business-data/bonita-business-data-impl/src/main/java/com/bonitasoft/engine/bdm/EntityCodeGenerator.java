@@ -195,7 +195,7 @@ public class EntityCodeGenerator {
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
         for (final Field field : bo.getFields()) {
-            if (field.isCollection() != null && field.isCollection()) {
+            if (field.isCollection()) {
                 final JClass fieldClass = codeGenerator.toJavaClass(field);
                 final JClass arrayListFieldClazz = codeGenerator.narrowClass(ArrayList.class, fieldClass);
                 if (field instanceof SimpleField) {
@@ -204,7 +204,10 @@ public class EntityCodeGenerator {
                 } else {
                     copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz));
                     final JForEach forEach = copyBody.forEach(fieldClass, "i", JExpr.invoke(JExpr.ref(param.name()), codeGenerator.getGetterName(field)));
-                    forEach.body().invoke(JExpr.refthis(field.getName()), "add").arg(JExpr._new(fieldClass).arg(forEach.var()));
+                    forEach.body().invoke(JExpr.refthis(field.getName()), "add")
+                            .arg(JExpr
+                                    ._new(codeGenerator.getModel().ref(
+                                            suffixPackage(((RelationField) field).getReference().getQualifiedName(), IMPL_PACKAGE_SUFFIX))).arg(forEach.var()));
                 }
             } else {
                 copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), codeGenerator.getGetterName(field)));
