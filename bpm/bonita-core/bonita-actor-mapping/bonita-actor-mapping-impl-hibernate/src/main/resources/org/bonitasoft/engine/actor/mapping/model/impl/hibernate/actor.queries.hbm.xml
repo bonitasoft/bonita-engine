@@ -77,16 +77,15 @@
 	   AND (user.id = :userId OR user.managerUserId = :userId)
 	   AND (actormember.userId = user.id
 	       OR actormember.id IN (
-	           SELECT actormember.id
-	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+	           SELECT actormember2.id
+	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember2, 
 	                org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
 	           WHERE um.userId = user.id
 	           AND (
-	               (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-	               OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-	               OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+	               (actormember2.groupId = um.groupId AND actormember2.roleId &lt;= 0)
+	               OR (actormember2.roleId = um.roleId AND actormember2.groupId &lt;= 0)
+	               OR (actormember2.groupId = um.groupId AND actormember2.roleId = um.roleId)
 	           )
-			   ORDER BY actormember.id ASC, um.id ASC
 	       )
 	   )
     </query>
