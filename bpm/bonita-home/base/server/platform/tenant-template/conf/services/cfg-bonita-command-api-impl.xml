@@ -12,7 +12,7 @@
 	<bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.DefaultCommandProvider">
 		<property name="defaultCommands">
 			<list>
-				<ref bean="isActorMemberOrTeamManagerOfActorMember" />
+				<ref bean="getActorIdsForUserIdIncludingTeam" />
 				<ref bean="importProfiles" />
 				<ref bean="isUserProcessSupervisor" />
 				<ref bean="createSupervisor" />
@@ -48,16 +48,16 @@
 		</property>
 	</bean>
 
-	<bean id="isActorMemberOrTeamManagerOfActorMember" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+	<bean id="getActorIdsForUserIdIncludingTeam" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
 		<constructor-arg name="name">
-			<value>isActorMemberOrTeamManagerOfActorMember</value>
+			<value>getActorIdsForUserIdIncludingTeam</value>
 		</constructor-arg>
 		<constructor-arg name="description">
-            <value>Return true if the user is actor member or is manager of an actor member of the process, false otherwise. Use parameter key
-                USER_ID_KEY and PROCESS_INSTANCE_ID_KEY</value>
+			<value>Get Map of all (processDefinitionId, Set of ActorIds) for user passed as parameter and all users of his team (he is a manager of). Use parameter key
+				USER_ID_KEY</value>
 		</constructor-arg>
 		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.actor.IsActorMemberOrTeamManagerOfActorMember</value>
+			<value>org.bonitasoft.engine.external.actor.GetActorIdsForUserIdIncludingTeam</value>
 		</constructor-arg>
 	</bean>
 	
