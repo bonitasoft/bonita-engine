@@ -88,11 +88,9 @@ public class DeleteRoles extends DeleteWithActorMembers implements TransactionCo
     }
 
     private void deleteMembershipsByRole(final long roleId) throws SBonitaException {
-        int i = 0;
         List<SUserMembership> memberships;
         do {
-            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + BATCH_SIZE);
-            i += BATCH_SIZE;
+            memberships = identityService.getUserMembershipsOfRole(roleId, 0, BATCH_SIZE);
             for (final SUserMembership sUserMembership : memberships) {
                 identityService.deleteUserMembership(sUserMembership.getId());
             }
