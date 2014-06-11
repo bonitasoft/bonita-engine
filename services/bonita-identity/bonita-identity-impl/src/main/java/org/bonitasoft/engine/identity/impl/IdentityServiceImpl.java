@@ -154,15 +154,17 @@ public class IdentityServiceImpl implements IdentityService {
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
             return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
+        } else {
+            return null;
         }
-        return null;
     }
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
             return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
+        } else {
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -196,7 +198,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
-            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) {
+            final String methodName,
+            final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) throws SCustomUserInfoDefinitionCreationException {
         logOnExceptionMethod(methodName, exception);
         initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
@@ -1325,6 +1328,21 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
             throw new SIdentityException("Can't get the users having the group " + groupId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getUsersByManager(final long managerId, final int fromIndex, final int numberMaxOfUsers) throws SIdentityException {
+        final String methodName = "getUsersByManager";
+        logBeforeMethod(methodName);
+        try {
+            final QueryOptions queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
+            final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByManager(managerId, queryOptions));
+            logAfterMethod(methodName);
+            return listsSUsers;
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(methodName, e);
+            throw new SIdentityException("Can't get the users having the manager " + managerId, e);
         }
     }
 

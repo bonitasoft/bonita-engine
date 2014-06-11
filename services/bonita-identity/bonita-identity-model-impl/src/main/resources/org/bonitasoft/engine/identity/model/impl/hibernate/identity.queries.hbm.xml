@@ -120,6 +120,12 @@
 		AND user.id = user_membership.userId
 	</query>
 
+	<query name="getUsersByManager">
+		SELECT user
+		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+		WHERE user.managerUserId = :managerUserId
+	</query>
+
 	<query name="getUserContactInfo">
 		SELECT contactinfo
 		FROM org.bonitasoft.engine.identity.model.impl.SContactInfoImpl as contactinfo

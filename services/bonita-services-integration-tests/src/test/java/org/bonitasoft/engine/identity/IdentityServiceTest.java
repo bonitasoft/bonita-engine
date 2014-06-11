@@ -965,6 +965,58 @@ public class IdentityServiceTest extends CommonServiceTest {
     }
 
     @Test
+    public void testGetUsersByManager() throws Exception {
+        getTransactionService().begin();
+        createUsers(11, "testGetUsersByManager");
+        final SUser manager = identityService.getUsers(0, 1).get(0);
+        final List<SUser> users = identityService.getUsers(1, 10);
+        for (final SUser user : users) {
+            final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
+                    .updateManagerUserId(manager.getId()).done();
+            identityService.updateUser(user, changeDescriptor);
+        }
+        final long id = manager.getId();
+        final List<SUser> usersByManager = identityService.getUsersByManager(id, 0, 20);
+        getTransactionService().complete();
+        assertEquals("did not retrieved all user having the manager", 10, usersByManager.size());
+        for (final SUser sUser : usersByManager) {
+            assertEquals("One of the user have not the good manager", manager.getId(), sUser.getManagerUserId());
+        }
+    }
+
+    @Test
+    // FIXME change name
+    public void testUpdateUserDoesNotChangeManagerId() throws Exception {
+        getTransactionService().begin();
+        createUsers(3, "testGetUpdateUserDoesNotChangeanagerId");
+        final List<SUser> users = identityService.getUsers(0, 3);
+        assertEquals(3, users.size());
+        final SUser manager = users.get(0);
+        SUser user = users.get(1);
+        final SUser newManager = users.get(2);
+        EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateManagerUserId(manager.getId())
+                .done();
+        identityService.updateUser(user, changeDescriptor);
+        final long id = manager.getId();
+        final List<SUser> usersByManager = identityService.getUsersByManager(id, 0, 20);
+        assertEquals("did not retrieved all user having the manager", 1, usersByManager.size());
+        for (final SUser sUser : usersByManager) {
+            assertEquals("One of the user have not the good manager", manager.getId(), sUser.getManagerUserId());
+        }
+        changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateFirstName("kevin").done();
+        identityService.updateUser(user, changeDescriptor);
+        user = identityService.getUser(user.getId());
+        assertEquals("kevin", user.getFirstName());
+        assertEquals(manager.getId(), user.getManagerUserId());
+
+        changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateManagerUserId(newManager.getId()).done();
+        identityService.updateUser(user, changeDescriptor);
+        user = identityService.getUser(user.getId());
+        assertEquals(newManager.getId(), user.getManagerUserId());
+        getTransactionService().complete();
+    }
+
+    @Test
     public void testUpdateUser() throws Exception {
         getTransactionService().begin();
         SUserBuilder userBuilder = null;

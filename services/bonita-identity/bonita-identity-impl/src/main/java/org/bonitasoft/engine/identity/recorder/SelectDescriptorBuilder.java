@@ -232,6 +232,12 @@ public class SelectDescriptorBuilder {
         return getUsersByGroup(groupId, queryOptions);
     }
 
+    public static SelectListDescriptor<SUser> getUsersByManager(final long managerUserId, final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("managerUserId", managerUserId);
+        return new SelectListDescriptor<SUser>("getUsersByManager", parameters, SUser.class, queryOptions);
+    }
+
     public static SelectListDescriptor<SUser> getUsersByMembership(final long groupId, final long roleId) {
         return getUsersByMembership(groupId, roleId, null);
     }
