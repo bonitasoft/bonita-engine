@@ -986,8 +986,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         try {
-            return ModelConvertor.toActivityInstances(
-                    activityInstanceService.getActivityInstances(processInstanceId, startIndex, maxResults, "id", OrderByType.ASC), flowNodeStateManager);
+            return ModelConvertor.toActivityInstances(activityInstanceService.getActivityInstances(processInstanceId, startIndex, maxResults),
+                    flowNodeStateManager);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -2811,15 +2811,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         try {
             final int totalNumber = activityInstanceService.getNumberOfActivityInstances(processInstanceId);
-            final List<SActivityInstance> activityInstances = activityInstanceService.getActivityInstances(processInstanceId, 0, totalNumber, "id",
-                    OrderByType.ASC);
+            final List<SActivityInstance> activityInstances = activityInstanceService.getActivityInstances(processInstanceId, 0, totalNumber);
             for (final SActivityInstance activityInstance : activityInstances) {
                 if (activityInstance instanceof SUserTaskInstance) {
                     final SUserTaskInstance userTaskInstance = (SUserTaskInstance) activityInstance;

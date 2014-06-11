@@ -384,10 +384,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public List<SActivityInstance> getActivityInstances(final long rootContainerId, final int fromIndex, final int numberOfResults, final String sortingField,
-            final OrderByType orderbyType) throws SActivityReadException {
+    public List<SActivityInstance> getActivityInstances(final long rootContainerId, final int fromIndex, final int numberOfResults) throws SActivityReadException {
         final SelectListDescriptor<SActivityInstance> descriptor = SelectDescriptorBuilder.getActivitiesFromProcessInstance(rootContainerId, fromIndex,
-                numberOfResults, sortingField, orderbyType);
+                numberOfResults);
         try {
             final List<SActivityInstance> selectList = getPersistenceService().selectList(descriptor);
             return getUnmodifiableList(selectList);

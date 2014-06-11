@@ -28,7 +28,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
 		AND a.deleted = FALSE
-        ORDER BY name ASC
+        ORDER BY a.id ASC
 	</query>
 	
 	<query name="getNumberOfActivitiesFromProcessInstance">

@@ -83,12 +83,6 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SAFlowNodeInstance>("getArchivedFlowNodesFromProcessInstance", parameters, SAFlowNodeInstance.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SFlowNodeInstance> getActivitiesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        return new SelectListDescriptor<SFlowNodeInstance>("getActivitiesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
-    }
-
     public static SelectListDescriptor<SAActivityInstance> getArchivedActivitiesFromProcessInstance(final long rootContainerId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
         return new SelectListDescriptor<SAActivityInstance>("getAActivitiesFromProcessInstance", parameters, SAActivityInstance.class, queryOptions);
@@ -188,9 +182,9 @@ public class SelectDescriptorBuilder {
     }
 
     public static SelectListDescriptor<SActivityInstance> getActivitiesFromProcessInstance(final long rootContainerId, final int fromIndex,
-            final int maxResults, final String field, final OrderByType orderByType) {
+            final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SActivityInstance.class, field, orderByType);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SActivityInstance>("getActivitiesFromProcessInstance", parameters, SActivityInstance.class, queryOptions);
     }
 

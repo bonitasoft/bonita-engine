@@ -265,7 +265,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return a list of SActivityInstance objects
      * @throws SActivityReadException
      */
-    List<SActivityInstance> getActivityInstances(long rootContainerId, int fromIndex, int numberOfResults, String sortingField, OrderByType orderbyType)
+    List<SActivityInstance> getActivityInstances(long rootContainerId, int fromIndex, int numberOfResults)
             throws SActivityReadException;
 
     /**
