@@ -45,23 +45,51 @@
 	</query>
 
 	<query name="getActorsOfUser">
-		SELECT actor
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-		org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
-		WHERE actor.id = actormember.actorId 
-		AND actor.scopeId IN (:scopeIds)
-		AND ( actormember.userId = :userId
-		 	  OR actormember.id IN (
-					SELECT actormember.id
-					FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-					WHERE um.userId = :userId 
-					AND (
-						(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-						OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-						OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId))
-					)
-			)
+	   SELECT actor
+	   FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+	        org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+	   WHERE actor.id = actormember.actorId 
+	   AND actor.scopeId IN (:scopeIds)
+	   AND ( actormember.userId = :userId
+	       OR actormember.id IN (
+	           SELECT actormember.id
+	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+	                org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+	           WHERE um.userId = :userId 
+	           AND (
+	               (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+	               OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+	               OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+	           )
+	       )
+	   )
 	</query>
+    
+    <query name="getActorMembersForUserOrManaged">
+	   SELECT actormember
+	   FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+	        org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
+			org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS process_instance
+	   WHERE actor.id = actormember.actorId 
+	   AND actor.scopeId = process_instance.processDefinitionId
+	   AND process_instance.id = :processInstanceId
+	   AND (user.id = :userId OR user.managerUserId = :userId)
+	   AND (actormember.userId = user.id
+	       OR actormember.id IN (
+	           SELECT actormember.id
+	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+	                org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+	           WHERE um.userId = user.id
+	           AND (
+	               (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+	               OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+	               OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+	           )
+			   ORDER BY actormember.id ASC, um.id ASC
+	       )
+	   )
+    </query>
 	
 	<query name="getNumberOfUsersOfActor">
 		SELECT COUNT(user)
@@ -99,22 +127,24 @@
 	</query>
 	
 	<query name="getActorsOfUserCanStartProcessDefinition">
-		SELECT actor
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-		org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
-		WHERE actor.id = actormember.actorId 
-		AND actor.scopeId =:processDefinitionid AND actor.initiator = TRUE
-		AND ( actormember.userId = :userId
-		 	  OR actormember.id IN (
-					SELECT actormember.id
-					FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-					WHERE um.userId = :userId 
-					AND (
-						(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-						OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-						OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId))
-					)
-			)
+	   SELECT actor
+	   FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+		    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+	   WHERE actor.id = actormember.actorId 
+	   AND actor.scopeId =:processDefinitionid AND actor.initiator = TRUE
+	   AND ( actormember.userId = :userId
+	       OR actormember.id IN (
+	           SELECT actormember.id
+	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+               	    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+	           WHERE um.userId = :userId 
+	           AND (
+	               (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+	               OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+	               OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+               )
+	       )
+	   )
 	</query>
 
 	<query name="getActorMembersOfUser">
@@ -147,20 +177,23 @@
 	<query name="getPossibleUserIdsOfActorId">
 		SELECT user.id
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-			 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
 			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
 		WHERE actor.id = :actorId
 		AND actor.id = actormember.actorId
 		AND (
-			actormember.userId = user.id
-		 	OR (
-		 		user_membership.userId = user.id
-		 		AND (
-		 			actormember.groupId = user_membership.groupId
-        			OR actormember.roleId = user_membership.roleId
-		 		)
-		    )
+	       actormember.userId = user.id
+	       OR actormember.id IN (
+	           SELECT actormember.id
+	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
+               	    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+	           WHERE um.userId = user.id
+	           AND (
+	               (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+	               OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+	               OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+               )
+	       )
 		)
 		GROUP BY user.id
 		ORDER BY MIN(user.userName)

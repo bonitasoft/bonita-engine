@@ -478,6 +478,7 @@
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
 		WHERE aa.rootContainerId = :rootContainerId
+        ORDER BY aa.id
 	</query>
 	
 	

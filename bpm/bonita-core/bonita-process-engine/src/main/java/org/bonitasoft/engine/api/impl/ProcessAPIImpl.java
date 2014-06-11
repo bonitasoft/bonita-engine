@@ -122,7 +122,6 @@ import org.bonitasoft.engine.api.impl.transaction.task.GetAssignedTasks;
 import org.bonitasoft.engine.api.impl.transaction.task.GetHumanTaskInstance;
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfAssignedUserTaskInstances;
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
-import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOverdueOpenTasksForUsers;
 import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
@@ -1570,10 +1569,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(pagingCriterion);
 
         final ProcessDefinitionService definitionService = tenantAccessor.getProcessDefinitionService();
-        final ActivityInstanceService instanceService = tenantAccessor.getActivityInstanceService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
             final Set<Long> actorIds = getActorsForUser(userId, actorMappingService, definitionService);
-            final List<SHumanTaskInstance> pendingTasks = instanceService.getPendingTasks(userId, actorIds, startIndex, maxResults, orderAndField.getField(),
+            final List<SHumanTaskInstance> pendingTasks = activityInstanceService.getPendingTasks(userId, actorIds, startIndex, maxResults,
+                    orderAndField.getField(),
                     orderAndField.getOrder());
             return ModelConvertor.toHumanTaskInstances(pendingTasks, flowNodeStateManager);
         } catch (final SBonitaException e) {
@@ -4485,9 +4485,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
-            final GetNumberOfOverdueOpenTasksForUsers transactionContent = new GetNumberOfOverdueOpenTasksForUsers(userIds, activityInstanceService);
-            transactionContent.execute();
-            return transactionContent.getResult();
+            return activityInstanceService.getNumberOfOverdueOpenTasksForUsers(userIds);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new RetrieveException(e.getMessage());

@@ -51,7 +51,7 @@ public class QueryOptions implements Serializable {
     }
 
     /**
-     * Just for get number of elements on a table
+     * Just for get number of elements on a table, or if the request is already ordered
      */
     public QueryOptions(final int fromIndex, final int numberOfResults) {
         super();
@@ -108,6 +108,7 @@ public class QueryOptions implements Serializable {
         multipleFilter = null;
     }
 
+    @Deprecated
     public QueryOptions(final List<OrderByOption> orderByOptions) {
         super();
         fromIndex = 0;
@@ -117,6 +118,7 @@ public class QueryOptions implements Serializable {
         multipleFilter = null;
     }
 
+    @Deprecated
     public QueryOptions(final Class<? extends PersistentObject> clazz, final String fieldName, final OrderByType orderByType) {
         super();
         fromIndex = 0;

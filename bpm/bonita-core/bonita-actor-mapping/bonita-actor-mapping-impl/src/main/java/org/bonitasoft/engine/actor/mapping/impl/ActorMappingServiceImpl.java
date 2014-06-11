@@ -439,6 +439,14 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
+    public List<SActorMember> getActorMembersForUserOrManaged(final long userId, final long processInstanceId, final int pageNumber, final int numberPerPage)
+            throws SBonitaReadException {
+        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersForUserOrManaged(userId, processInstanceId, pageNumber,
+                numberPerPage);
+        return persistenceService.selectList(descriptor);
+    }
+
+    @Override
     public List<SActorMember> getActorMembersOfGroup(final long groupId) throws SBonitaReadException {
         final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfGroup(groupId);
         return persistenceService.selectList(descriptor);

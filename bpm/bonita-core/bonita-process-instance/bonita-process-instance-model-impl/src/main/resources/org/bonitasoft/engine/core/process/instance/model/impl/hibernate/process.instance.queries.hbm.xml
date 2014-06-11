@@ -28,6 +28,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
 		AND a.deleted = FALSE
+        ORDER BY name ASC
 	</query>
 	
 	<query name="getNumberOfActivitiesFromProcessInstance">
@@ -42,6 +43,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.rootContainerId = :rootContainerId
 		AND f.deleted = FALSE
+        ORDER BY f.id ASC
 	</query>
 
 	<query name="getOpenActivitiesFromProcessInstance">
@@ -214,6 +216,7 @@
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 		GROUP BY a.assigneeId
+        ORDER BY a.assigneeId ASC
 	</query>
 	
 	<query name="getNumberOfSHumanTaskInstancePendingForUser">
@@ -485,12 +488,14 @@
 		AND s.correlation3 = m.correlation3
 		AND s.correlation4 = m.correlation4
 		AND s.correlation5 = m.correlation5
+        ORDER BY s.id ASC, m.id ASC
 	</query>
 
 	<query name="getListeningSignals">
 		SELECT s
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl AS s
 		WHERE s.signalName = :signalName
+        ORDER BY s.id ASC
 	</query>
 
 	<query name="getStartWaitingEvents">
@@ -841,6 +846,7 @@
 		AND a.terminal = FALSE
 		AND a.expectedEndDate &lt; :currentTime
 		GROUP BY a.assigneeId
+        ORDER BY a.assigneeId ASC
 	</query>
 		
 	<query name="getNumberOfPendingOverdueTasksForUser">
@@ -1162,6 +1168,7 @@
 		SELECT h
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
 		WHERE h.activityId = :activityInstanceId
+        ORDER BY h.id ASC
 	</query>
 	
 	<!-- Process Instance  -->
@@ -1322,6 +1329,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
 		WHERE t.processInstanceId = :processInstanceId
 		AND t.refId = :refId
+        ORDER BY t.id ASC
 	</query>
 
 	<query name="getTokens">

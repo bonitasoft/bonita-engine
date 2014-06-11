@@ -38,7 +38,7 @@ public interface ActorMappingService {
      * Create an actor by given actor
      * 
      * @param actor
-     *            The given actor without id
+     *        The given actor without id
      * @return the new created actor with id
      * @throws SActorCreationException
      */
@@ -48,7 +48,7 @@ public interface ActorMappingService {
      * Create actors by given actors
      * 
      * @param actors
-     *            The given actors without IDs
+     *        The given actors without IDs
      * @return The set of the new created actors
      * @throws SActorCreationException
      */
@@ -59,7 +59,7 @@ public interface ActorMappingService {
      * If the actor by a given actorId is not found, it will throw SActorNotFoundException
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @return SActor object response to the given actorId
      * @throws SActorNotFoundException
      * @throws SBonitaReadException
@@ -71,12 +71,12 @@ public interface ActorMappingService {
      * If the actor by a given actorName and scopeId is not found, it will throw SActorNotFoundException
      * 
      * @param actorName
-     *            Name of actor
+     *        Name of actor
      * @param scopeId
-     *            Id of scope, it can be processDefinitionId
+     *        Id of scope, it can be processDefinitionId
      * @return SActor object corresponding to the given actorName and scopeId
      * @throws SActorNotFoundException
-     *             Error thrown if no actor have an id corresponding to the parameter.
+     *         Error thrown if no actor have an id corresponding to the parameter.
      */
     SActor getActor(String actorName, long scopeId) throws SActorNotFoundException;
 
@@ -84,9 +84,9 @@ public interface ActorMappingService {
      * Get a list of all actors for the id specified user in certain scopes specified by scopeIds
      * 
      * @param scopeIds
-     *            Ids of scope, it can be processDefinitionId
+     *        Ids of scope, it can be processDefinitionId
      * @param userId
-     *            Id of user which is added to actor
+     *        Id of user which is added to actor
      * @return The list of SActor Objects
      * @throws SBonitaReadException
      */
@@ -97,14 +97,14 @@ public interface ActorMappingService {
      * If the actor by a given actorId is not found, it will throw processDefinitionNotFountExcetion
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @param updateDescriptor
-     *            Update description
+     *        Update description
      * @return the updated actor
      * @throws SActorNotFoundException
-     *             Error thrown if no actor have an id corresponding to the parameter actorId.
+     *         Error thrown if no actor have an id corresponding to the parameter actorId.
      * @throws SActorUpdateException
-     *             Error thrown if has exceptions while try to update an actor
+     *         Error thrown if has exceptions while try to update an actor
      * @throws SBonitaReadException
      */
     SActor updateActor(long actorId, EntityUpdateDescriptor updateDescriptor) throws SActorNotFoundException, SActorUpdateException, SBonitaReadException;
@@ -113,9 +113,9 @@ public interface ActorMappingService {
      * Delete actors in the id specified scope
      * 
      * @param scopeId
-     *            Id of scope, it can be processDefinitionId
+     *        Id of scope, it can be processDefinitionId
      * @throws SActorDeletionException
-     *             Error thrown if has exceptions while try to delete actors
+     *         Error thrown if has exceptions while try to delete actors
      */
     void deleteActors(long scopeId) throws SActorDeletionException;
 
@@ -123,14 +123,14 @@ public interface ActorMappingService {
      * Add the userId specified user to the actorId specified actor
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @param userId
-     *            Id of user
+     *        Id of user
      * @return SActorMember object
      * @throws SActorNotFoundException
-     *             Error thrown if no actor have an id corresponding to the parameter actorId.
+     *         Error thrown if no actor have an id corresponding to the parameter actorId.
      * @throws SActorMemberCreationException
-     *             Error thrown if has exceptions while try to create the SActorMember object
+     *         Error thrown if has exceptions while try to create the SActorMember object
      */
     SActorMember addUserToActor(long actorId, long userId) throws SActorNotFoundException, SActorMemberCreationException;
 
@@ -138,14 +138,14 @@ public interface ActorMappingService {
      * Add the groupId specified group to the actorId specified actor
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @param groupId
-     *            Id of group
+     *        Id of group
      * @return SActorMember object
      * @throws SActorNotFoundException
-     *             Error thrown if no actor have an id corresponding to the parameter actorId.
+     *         Error thrown if no actor have an id corresponding to the parameter actorId.
      * @throws SActorMemberCreationException
-     *             Error thrown if has exceptions while try to create the SActorMember object
+     *         Error thrown if has exceptions while try to create the SActorMember object
      */
     SActorMember addGroupToActor(long actorId, long groupId) throws SActorNotFoundException, SActorMemberCreationException;
 
@@ -153,14 +153,14 @@ public interface ActorMappingService {
      * Add the roleId specified role to the actorId specified actor
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @param roleId
-     *            Id of role
+     *        Id of role
      * @return SActorMember object
      * @throws SActorNotFoundException
-     *             Error thrown if no actor have an id corresponding to the parameter actorId.
+     *         Error thrown if no actor have an id corresponding to the parameter actorId.
      * @throws SActorMemberCreationException
-     *             Error thrown if has exceptions while try to create the SActorMember object
+     *         Error thrown if has exceptions while try to create the SActorMember object
      */
     SActorMember addRoleToActor(long actorId, long roleId) throws SActorNotFoundException, SActorMemberCreationException;
 
@@ -168,16 +168,16 @@ public interface ActorMappingService {
      * Add the roleId and groupId specified relationship to the actorId specified actor
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @param roleId
-     *            Id of role
+     *        Id of role
      * @param groupId
-     *            Id of group
+     *        Id of group
      * @return SActorMember object
      * @throws SActorNotFoundException
-     *             Error thrown if no actor have an id corresponding to the parameter actorId.
+     *         Error thrown if no actor have an id corresponding to the parameter actorId.
      * @throws SActorMemberCreationException
-     *             Error thrown if has exceptions while try to create the SActorMember object
+     *         Error thrown if has exceptions while try to create the SActorMember object
      */
     SActorMember addRoleAndGroupToActor(long actorId, long roleId, long groupId) throws SActorNotFoundException, SActorMemberCreationException;
 
@@ -185,11 +185,11 @@ public interface ActorMappingService {
      * Remove actorMember for the give actorMemberId
      * 
      * @param actorMemberId
-     *            Id of actorMember
+     *        Id of actorMember
      * @throws SActorMemberNotFoundException
-     *             Error thrown if no actorMember have an id corresponding to the parameter actorMemberId.
+     *         Error thrown if no actorMember have an id corresponding to the parameter actorMemberId.
      * @throws SActorMemberDeletionException
-     *             Error thrown if has exceptions while try to remove the SActorMember object
+     *         Error thrown if has exceptions while try to remove the SActorMember object
      */
     SActorMember removeActorMember(long actorMemberId) throws SActorMemberNotFoundException, SActorMemberDeletionException;
 
@@ -197,9 +197,9 @@ public interface ActorMappingService {
      * Remove an actor member
      * 
      * @param actorMember
-     *            the actorMember to remove
+     *        the actorMember to remove
      * @throws SActorMemberDeletionException
-     *             Error thrown if has exceptions while try to remove the SActorMember object
+     *         Error thrown if has exceptions while try to remove the SActorMember object
      */
     void removeActorMember(final SActorMember actorMember) throws SActorMemberDeletionException;
 
@@ -207,15 +207,15 @@ public interface ActorMappingService {
      * Get list of SActorMember objects by pagination
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @param index
-     *            Index of the record to be retrieved from. First record has pageNumber 0.
+     *        Index of the record to be retrieved from. First record has pageNumber 0.
      * @param numberOfActorMembers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            Field to order
+     *        Field to order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return List of SActorMember objects
      * @throws SBonitaReadException
      */
@@ -225,47 +225,64 @@ public interface ActorMappingService {
      * Get number of ActorMembers for give actorId
      * 
      * @param actorId
-     *            Id of actor
+     *        Id of actor
      * @return the number of ActorMembers
      * @throws SBonitaReadException
      */
     long getNumberOfActorMembers(long actorId) throws SBonitaReadException;
 
     /**
-     * Get a set of SActor objects for give scopeId
+     * Get a list of SActor objects for give scopeId
      * 
      * @param scopeId
-     *            Id of scope. It can be processDefinitionId
+     *        Id of scope. It can be processDefinitionId
      * @return List of SActor objects
      * @throws SBonitaReadException
      */
     List<SActor> getActors(long scopeId) throws SBonitaReadException;
 
     /**
-     * Get a set of SActorMember objects for given userId
+     * Get a list of SActorMember objects for given userId
      * 
      * @param userId
-     *            Id of user
+     *        Id of user
      * @return List of SActorMember objects
      * @throws SBonitaReadException
      */
     List<SActorMember> getActorMembersOfUser(long userId) throws SBonitaReadException;
 
     /**
-     * Get a set of SActorMember objects for given groupId
+     * Get a list of actor members for the given userId, with the actor members for the users managed by the given userId
+     * 
+     * @param userId
+     *        Identifier of the user
+     * @param processInstanceId
+     *        Identifier of the process instance
+     * @param pageNumber
+     *        Index of the record to be retrieved from. First record has pageNumber 0.
+     * @param numberPerPage
+     *        Number of result we want to get. Maximum number of result returned.
+     * @return List of SActorMember objects
+     * @throws SBonitaReadException
+     * @since 6.3
+     */
+    List<SActorMember> getActorMembersForUserOrManaged(long userId, long processInstanceId, int pageNumber, int numberPerPage) throws SBonitaReadException;
+
+    /**
+     * Get a list of SActorMember objects for given groupId
      * 
      * @param groupId
-     *            Id of group
+     *        Id of group
      * @return a list of SActorMember objects
      * @throws SBonitaReadException
      */
     List<SActorMember> getActorMembersOfGroup(long groupId) throws SBonitaReadException;
 
     /**
-     * Get a set of SActorMember objects for given roleId
+     * Get a list of SActorMember objects for given roleId
      * 
      * @param roleId
-     *            Id of role
+     *        Id of role
      * @return a list of SActorMember objects
      * @throws SBonitaReadException
      */
@@ -275,9 +292,9 @@ public interface ActorMappingService {
      * Get a list of actors for id specified user who can start the id specified process definition
      * 
      * @param userId
-     *            Id of user
+     *        Id of user
      * @param processDefinitionid
-     *            Id of processDefinition
+     *        Id of processDefinition
      * @return a list of SActor objects
      * @throws SBonitaReadException
      */
@@ -287,7 +304,7 @@ public interface ActorMappingService {
      * Get a list of actors by the given list of actor ids
      * 
      * @param actorIds
-     *            the list of actor ids to retrieve
+     *        the list of actor ids to retrieve
      * @return a list of actors
      * @throws SActorNotFoundException
      * @throws SBonitaReadException
@@ -298,15 +315,15 @@ public interface ActorMappingService {
      * Get paginated actors
      * 
      * @param processDefinitionId
-     *            identifier of process definition
+     *        identifier of process definition
      * @param pageNumber
-     *            Index of the record to be retrieved from. First record has pageNumber 0.
+     *        Index of the record to be retrieved from. First record has pageNumber 0.
      * @param numberPerPage
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param orderByField
-     *            Field to order
+     *        Field to order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return the list of actors
      * @throws SBonitaReadException
      */
@@ -316,7 +333,7 @@ public interface ActorMappingService {
      * Return the number of users corresponding to an actor
      * 
      * @param actorId
-     *            the id of the actor to retrieve the users from
+     *        the id of the actor to retrieve the users from
      * @return Number of users mapped to actor
      */
     long getNumberOfUsersOfActor(long actorId);
@@ -325,7 +342,7 @@ public interface ActorMappingService {
      * Get the number of roles of an actor
      * 
      * @param actorId
-     *            the id corresponding to an actor
+     *        the id corresponding to an actor
      * @return Number of roles mapped to actor
      */
     long getNumberOfRolesOfActor(long actorId);
@@ -334,7 +351,7 @@ public interface ActorMappingService {
      * Get the number of groups corresponding to an actor
      * 
      * @param actorId
-     *            the id of the actor to retrieve the groups from
+     *        the id of the actor to retrieve the groups from
      * @return Number of groups mapped to actor
      * @throws RuntimeException
      */
@@ -344,7 +361,7 @@ public interface ActorMappingService {
      * Get the number of memberships (role and group) of an actor
      * 
      * @param actorId
-     *            the id of the actor to retrieve the memberships from
+     *        the id of the actor to retrieve the memberships from
      * @return Number of memberships mapped to actor
      */
     long getNumberOfMembershipsOfActor(long actorId);

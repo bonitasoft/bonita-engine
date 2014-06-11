@@ -82,6 +82,15 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SActorMember>("getActorMembersOfUser", parameters, SActorMember.class, queryOptions);
     }
 
+    public static SelectListDescriptor<SActorMember> getActorMembersForUserOrManaged(final long userId, final long processInstanceId, final int index,
+            final int numberPerPage) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+        parameters.put("processInstanceId", processInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(index, numberPerPage, SActorMember.class, "id", OrderByType.ASC);
+        return new SelectListDescriptor<SActorMember>("getActorMembersForUserOrManaged", parameters, SActorMember.class, queryOptions);
+    }
+
     public static SelectListDescriptor<SActor> getActors(final Set<Long> scopeIds) {
         final Map<String, Object> parameters = Collections.singletonMap("scopeIds", (Object) scopeIds);
         final QueryOptions queryOptions = new QueryOptions(SActor.class, "name", OrderByType.ASC);

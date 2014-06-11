@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -431,7 +432,7 @@ public class APITestUtil extends PlatformTestUtil {
         for (final User user : users) {
             getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
         }
-        getProcessAPI().enableProcess(processDefinition.getId());
+        enableProcess(processDefinition);
         return processDefinition;
     }
 
@@ -452,13 +453,38 @@ public class APITestUtil extends PlatformTestUtil {
         for (int i = 0; i < users.size(); i++) {
             getProcessAPI().addUserToActor(actorsName.get(i), processDefinition, users.get(i).getId());
         }
+        enableProcess(processDefinition);
+        return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final Map<String, List<User>> actorUsers)
+            throws BonitaException {
+        return deployAndEnableProcessWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
+                actorUsers);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final Map<String, List<User>> actorUsers)
+            throws BonitaException {
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        for (final Entry<String, List<User>> actorUser : actorUsers.entrySet()) {
+            final String actorName = actorUser.getKey();
+            final List<User> users = actorUser.getValue();
+            for (final User user : users) {
+                getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
+            }
+        }
+
+        enableProcess(processDefinition);
+        return processDefinition;
+    }
+
+    private void enableProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
         try {
             processAPI.enableProcess(processDefinition.getId());
         } catch (final ProcessEnablementException e) {
             final List<Problem> problems = processAPI.getProcessResolutionProblems(processDefinition.getId());
             throw new ProcessEnablementException("not resolved: " + problems);
         }
-        return processDefinition;
     }
 
     public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final String actorName, final User user)
