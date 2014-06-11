@@ -30,7 +30,7 @@ public class GroupTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         final GroupCreator groupCreator = new GroupCreator("test");
         groupCreator.setDescription("description").setDisplayName("label");
         defaultGroup = getIdentityAPI().createGroup(groupCreator);
@@ -39,7 +39,7 @@ public class GroupTest extends CommonAPITest {
     @After
     public void after() throws BonitaException {
         getIdentityAPI().deleteGroup(defaultGroup.getId());
-        logout();
+        logoutOnTenant();
         defaultGroup = null;
     }
 

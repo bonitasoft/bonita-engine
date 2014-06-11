@@ -56,12 +56,12 @@ public class GetUpdatedVariableValuesForActivityInstanceTest extends CommonAPITe
 
     @Before
     public void before() throws Exception {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -80,7 +80,7 @@ public class GetUpdatedVariableValuesForActivityInstanceTest extends CommonAPITe
         // a data in step1 with same name 'data1' is also defined with value 11:
         taskDefBuilder.addIntegerData(dataName1, new ExpressionBuilder().createConstantIntegerExpression(11));
         final DesignProcessDefinition processDef = taskDefBuilder.addUserTask("step2", actorName).addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, actorName, user);
 
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinitionId);

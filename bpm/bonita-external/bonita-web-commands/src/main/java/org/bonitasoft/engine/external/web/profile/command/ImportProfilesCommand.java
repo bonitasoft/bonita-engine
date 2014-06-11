@@ -14,26 +14,22 @@
  */
 package org.bonitasoft.engine.external.web.profile.command;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.api.impl.transaction.profile.DeleteAllExistingProfiles;
-import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.SValidationException;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * Specific Command to import profiles xml content as byte[].
@@ -65,47 +61,13 @@ public class ImportProfilesCommand extends TenantCommand {
         }
 
         final Parser parser = serviceAccessor.getProfileParser();
-        final List<ExportedProfile> profiles = getProfilesFromXML(new String(xmlContent), parser);
-
-        return (Serializable) importWithDeleteExisting(profileService, identityService, profiles);
-    }
-
-    private List<String> importWithDeleteExisting(final ProfileService profileService, final IdentityService identityService,
-            final List<ExportedProfile> profiles) throws SCommandExecutionException {
-        final DeleteAllExistingProfiles deleteAll = new DeleteAllExistingProfiles(profileService);
         try {
-            deleteAll.execute();
-        } catch (final SCommandExecutionException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SCommandExecutionException(e);
-        }
-        final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, SessionInfos.getUserIdFromSession());
-        try {
-            importProfiles.execute();
-        } catch (final SCommandExecutionException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SCommandExecutionException(e);
-        }
-        return importProfiles.getResult();
-    }
+            final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
 
-    private List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws SCommandExecutionException {
-        StringReader reader = new StringReader(xmlContent);
-        try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            return (List<ExportedProfile>) parser.getObjectFromXML(reader);
-        } catch (final IOException ioe) {
-            throw new SCommandExecutionException(ioe);
-        } catch (final SValidationException e) {
+            return (Serializable) ProfilesImporter.toWarnings(new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.DELETE_EXISTING)
+                    .importProfiles(SessionInfos.getUserIdFromSession()));
+        } catch (ExecutionException e) {
             throw new SCommandExecutionException(e);
-        } catch (final SXMLParseException e) {
-            throw new SCommandExecutionException(e);
-        } finally {
-            reader.close();
         }
     }
 

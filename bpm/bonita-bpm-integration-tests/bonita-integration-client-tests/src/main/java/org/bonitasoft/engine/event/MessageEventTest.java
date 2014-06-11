@@ -91,7 +91,7 @@ public class MessageEventTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -100,7 +100,7 @@ public class MessageEventTest extends CommonAPITest {
         if (user != null) {
             getIdentityAPI().deleteUser(user.getId());
         }
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String targetProcess, final String targetFlowNode) throws BonitaException {
@@ -290,7 +290,7 @@ public class MessageEventTest extends CommonAPITest {
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
         final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableWithActor(receiveMessaceArchive, ACTOR_NAME, user);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithActor(receiveMessaceArchive, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(receiveMessageProcess.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -400,7 +400,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
@@ -1137,7 +1137,7 @@ public class MessageEventTest extends CommonAPITest {
             processToKillDefinitionBuilder.addTransition("Step2", "ToKillEnd");
             processToKillDefinitionBuilder.addTransition("Gateway", CATCH_EVENT_NAME);
             processToKillDefinitionBuilder.addTransition(CATCH_EVENT_NAME, "ToKillEnd");
-            processToKillDefinition = deployAndEnableWithActor(processToKillDefinitionBuilder.done(), ACTOR_NAME, user);
+            processToKillDefinition = deployAndEnableProcessWithActor(processToKillDefinitionBuilder.done(), ACTOR_NAME, user);
 
             final StartProcessUntilStep toKillStartProcessAndWaitForTask = startProcessAndWaitForTask(processToKillDefinition.getId(), "Step1");
             final ProcessInstance processToKillInstance = toKillStartProcessAndWaitForTask.getProcessInstance();
@@ -1159,7 +1159,7 @@ public class MessageEventTest extends CommonAPITest {
             // Transitions
             killerProcessDefinitionBuilder.addTransition("KillerStart", "Step3");
             killerProcessDefinitionBuilder.addTransition("Step3", "KillerEnd");
-            killerProcessDefinition = deployAndEnableWithActor(killerProcessDefinitionBuilder.done(), ACTOR_NAME, user);
+            killerProcessDefinition = deployAndEnableProcessWithActor(killerProcessDefinitionBuilder.done(), ACTOR_NAME, user);
 
             final StartProcessUntilStep killerStartProcessAndWaitForTask = startProcessAndWaitForTask(killerProcessDefinition.getId(), "Step3");
             assignAndExecuteStep(killerStartProcessAndWaitForTask.getActivityInstance(), user.getId());

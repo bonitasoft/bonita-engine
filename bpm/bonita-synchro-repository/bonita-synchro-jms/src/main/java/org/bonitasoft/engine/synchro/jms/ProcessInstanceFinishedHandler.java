@@ -32,7 +32,7 @@ public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
 
     public ProcessInstanceFinishedHandler(final long tenantId, final long messageTimeout) {
         super(tenantId, messageTimeout);
-        this.identifier = UUID.randomUUID().toString();
+        identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -45,9 +45,8 @@ public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
     public boolean isInterested(final SEvent event) {
         final Object object = event.getObject();
         if (object instanceof SProcessInstance) {
-    		final SProcessInstance pi = (SProcessInstance) event.getObject();
-    		boolean result = pi.getStateId() == ProcessInstanceState.COMPLETED.getId();
-    		return result;
+            final SProcessInstance pi = (SProcessInstance) event.getObject();
+            return pi.getStateId() == ProcessInstanceState.COMPLETED.getId();
         }
         return false;
     }

@@ -20,11 +20,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface STenant extends PersistentObject {
 
-    public static final String PAUSED = "PAUSED";
+    String PAUSED = "PAUSED";
 
-    public static final String DEACTIVATED = "DEACTIVATED";
+    String DEACTIVATED = "DEACTIVATED";
 
-    public static final String ACTIVATED = "ACTIVATED";
+    String ACTIVATED = "ACTIVATED";
 
     String getName();
 

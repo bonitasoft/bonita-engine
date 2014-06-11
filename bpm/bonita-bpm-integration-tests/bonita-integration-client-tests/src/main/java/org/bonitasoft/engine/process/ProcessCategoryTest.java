@@ -30,6 +30,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -58,12 +59,12 @@ public class ProcessCategoryTest extends CommonAPITest {
         for (final ProcessDefinition processDefinitionId : processDefinitions) {
             deleteProcess(processDefinitionId);
         }
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         categories = new ArrayList<Category>();
         processDefinitions = new ArrayList<ProcessDefinition>();
     }
@@ -85,8 +86,8 @@ public class ProcessCategoryTest extends CommonAPITest {
     @Test
     public void createCategoryWithCreatorAsAnID() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final Category category = getProcessAPI().createCategory(name, description);
         categories.add(category);
@@ -682,8 +683,8 @@ public class ProcessCategoryTest extends CommonAPITest {
             throws InvalidBusinessArchiveFormatException, ProcessDeployException, InvalidProcessDefinitionException, AlreadyExistsException {
         final List<ProcessDefinition> processDefinitionList = new ArrayList<ProcessDefinition>();
         for (int i = 1; i <= count; i++) {
-            final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, version + i,
-                    Arrays.asList("step1"), Arrays.asList(true));
+            final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
+                    version + i, Arrays.asList("step1"), Arrays.asList(true));
             final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                     .done();
             processDefinitionList.add(getProcessAPI().deploy(businessArchive));

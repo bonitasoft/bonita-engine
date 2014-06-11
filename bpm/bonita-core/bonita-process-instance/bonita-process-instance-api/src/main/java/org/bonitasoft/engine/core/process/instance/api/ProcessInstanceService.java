@@ -60,7 +60,7 @@ public interface ProcessInstanceService {
 
     /**
      * Create process instance in DB according to the given process instance object
-     * 
+     *
      * @param processInstance
      *            the processInstance
      * @throws SProcessInstanceCreationException
@@ -69,7 +69,7 @@ public interface ProcessInstanceService {
 
     /**
      * Delete the id specified process instance
-     * 
+     *
      * @param processInstanceId
      *            identifier of process instance
      * @throws SProcessInstanceNotFoundException
@@ -79,11 +79,11 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceHierarchicalDeletionException
      */
     void deleteProcessInstance(long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
-            SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
+    SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instance
-     * 
+     *
      * @param processInstance
      *            the process instance
      * @throws SFlowNodeReadException
@@ -92,22 +92,22 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteProcessInstance(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceModificationException,
-            SProcessInstanceHierarchicalDeletionException;
+    SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instances with id, and their elements archived and not, if are not a subProcess
-     * 
+     *
      * @param sProcessInstances
      *            list of process instances to deleted
      * @return Number of deleted process instances
      * @since 6.1
      */
     long deleteParentProcessInstanceAndElements(List<SProcessInstance> sProcessInstances) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete the specified process instance with id, and its elements archived and not, if are not a subProcess
-     * 
+     *
      * @param processInstanceId
      *            identifier of process instance
      * @throws SProcessInstanceReadException
@@ -118,11 +118,11 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     void deleteParentProcessInstanceAndElements(long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
-            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Get process instance by its id
-     * 
+     *
      * @param processInstanceId
      *            identifier of process instance
      * @return the process instance object
@@ -133,7 +133,7 @@ public interface ProcessInstanceService {
 
     /**
      * Set state for the processInstance
-     * 
+     *
      * @param processInstance
      *            the process instance will be updated
      * @param state
@@ -145,7 +145,7 @@ public interface ProcessInstanceService {
 
     /**
      * Set process state category for the given process instance
-     * 
+     *
      * @param processInstance
      *            process instance to update
      * @param stateCatetory
@@ -155,11 +155,11 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void setStateCategory(SProcessInstance processInstance, SStateCategory stateCatetory) throws SProcessInstanceNotFoundException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * Delete specified archived process instance
-     * 
+     *
      * @param archivedProcessInstance
      *            the archived process instance
      * @throws SProcessInstanceModificationException
@@ -170,7 +170,7 @@ public interface ProcessInstanceService {
 
     /**
      * Delete specified archived process instances
-     * 
+     *
      * @param saProcessInstances
      *            List of archived process instances to delete
      * @return Number of deleted archived process instances
@@ -180,11 +180,11 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete all archived elements related to the specified process instance, even the archived process instances
-     * 
+     *
      * @param processInstanceId
      *            the process instance id
      * @throws SFlowNodeReadException
@@ -192,11 +192,11 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteArchivedProcessInstanceElements(long processInstanceId, final long processDefinitionId) throws SFlowNodeReadException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * Get child instance identifiers for specific process instance, this can be used for pagination
-     * 
+     *
      * @param processInstanceId
      *            identifier of process instance
      * @param fromIndex
@@ -215,7 +215,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get child process instance for the specific call activity or subprocess activity
-     * 
+     *
      * @param activityInstId
      *            identifier of call activity or subprocess activity
      * @return an SProcessInstance object
@@ -226,7 +226,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of child instance for specific process instance
-     * 
+     *
      * @param processInstanceId
      *            identifier of process instance
      * @return number of child instance for the process instance
@@ -236,7 +236,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of archived process instances according to specific criteria
-     * 
+     *
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
      * @return number of archived process instances
@@ -246,7 +246,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all archived process instance according to specific criteria
-     * 
+     *
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
      * @return A list of all archived process instance according to specific criteria
@@ -256,7 +256,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get the latest archived process instance object for the specific process instance
-     * 
+     *
      * @param archivedProcessInstanceId
      *            identifier of the archived process instance (not the process instance)
      * @param persistenceService
@@ -268,7 +268,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of process instances
-     * 
+     *
      * @param queryOptions
      *            a map of specific parameters of a query
      * @return total number of process instances
@@ -278,7 +278,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all process instance according to specific criteria
-     * 
+     *
      * @param queryOptions
      *            a map of specific parameters of a query
      * @return a list of SProcessInstance objects
@@ -288,7 +288,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of open process instances for the specific supervisor
-     * 
+     *
      * @param userId
      *            identifier of supervisor user
      * @param queryOptions
@@ -300,7 +300,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all open process instances for the specific supervisor
-     * 
+     *
      * @param userId
      *            identifier of supervisor user
      * @param queryOptions
@@ -312,7 +312,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of open process instance involving the specific user
-     * 
+     *
      * @param userId
      *            identifier of user who can perform or be assigned to tasks in process instance.
      * @param queryOptions
@@ -324,7 +324,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all open process instance involving the specific user
-     * 
+     *
      * @param userId
      *            identifier of user who can perform or be assigned to tasks in process instance.
      * @param queryOptions
@@ -335,7 +335,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of open process instance involving all users of the specific manager
-     * 
+     *
      * @param managerUserId
      * @param queryOptions
      * @return
@@ -345,7 +345,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all open process instance involving all users of the specific manager
-     * 
+     *
      * @param managerUserId
      * @param queryOptions
      * @return
@@ -355,7 +355,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get the list of sourceObjectIds for archived process instances children of process instance identified by rootProcessIntanceId
-     * 
+     *
      * @param rootProcessIntanceId
      *            the root process instance id
      * @param fromIndex
@@ -373,7 +373,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of archived process instance according to the search criteria
-     * 
+     *
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
      * @return number of archived process instance satisfied to the search criteria
@@ -383,7 +383,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all archived process instance according to the search criteria
-     * 
+     *
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
      * @return a list of SAProcessInstance objects
@@ -393,7 +393,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of archived process instance for the specific supervisor
-     * 
+     *
      * @param userId
      *            identifier of user who is the supervisor of archived process instance.
      * @param countOptions
@@ -405,7 +405,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all archived process instance for the specific supervisor
-     * 
+     *
      * @param userId
      *            identifier of user who is the supervisor of archived process instance.
      * @param queryOptions
@@ -417,7 +417,7 @@ public interface ProcessInstanceService {
 
     /**
      * Get total number of archived process instance involving the specific user
-     * 
+     *
      * @param userId
      *            the identifier of user who is assignee of tasks of process instance
      * @param countOptions
@@ -429,7 +429,7 @@ public interface ProcessInstanceService {
 
     /**
      * Search all archived process instance involving the specific user
-     * 
+     *
      * @param userId
      *            the identifier of user who is assignee of tasks of process instance
      * @param queryOptions
@@ -441,7 +441,7 @@ public interface ProcessInstanceService {
 
     /**
      * Update the specific process instance
-     * 
+     *
      * @param processInstance
      *            the processInstance will be updated
      * @param descriptor
@@ -452,7 +452,7 @@ public interface ProcessInstanceService {
 
     /**
      * set reference to the migration plan on the process instance
-     * 
+     *
      * @param processInstance
      * @param migrationPlanId
      * @throws SProcessInstanceModificationException
@@ -466,7 +466,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      */
     void deleteFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SProcessDefinition processDefinition) throws SFlowNodeReadException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * @param processDefinitionId
@@ -488,7 +488,7 @@ public interface ProcessInstanceService {
 
     /**
      * Returns the list of <code>SProcessInstance</code>s in a given list of states.
-     * 
+     *
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
      * @param states
@@ -497,7 +497,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceReadException
      *             if a read error occurs
      */
-    public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
+    List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
             throws SProcessInstanceReadException;
 
     /**
@@ -508,7 +508,6 @@ public interface ProcessInstanceService {
     void deleteArchivedProcessInstancesOfProcessInstance(long processInstanceId) throws SBonitaException;
 
     /**
-     * 
      * @param sourceObjectProcessInstanceId
      *            The source identifier of the process instance
      * @return The last archived process instance

@@ -29,10 +29,8 @@ public class JobNameBuilder {
     public static String getTimerEventJobName(final Long processDefinitionId, final SEventDefinition eventDefinition, final SCatchEventInstance flowNodeInstance) {
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             return PREFIX + processDefinitionId + eventDefinition.getName();
-        } else {
-            return PREFIX + flowNodeInstance.getId();
         }
-
+        return PREFIX + flowNodeInstance.getId();
     }
 
     public static String getTimerEventJobName(final Long processDefinitionId, final SEventDefinition eventDefinition, final long parentProcessInstanceId,

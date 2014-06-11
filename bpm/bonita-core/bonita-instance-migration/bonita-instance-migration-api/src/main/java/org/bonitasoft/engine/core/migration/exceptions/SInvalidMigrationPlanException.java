@@ -20,10 +20,10 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  */
 public class SInvalidMigrationPlanException extends SBonitaException {
 
+    private static final long serialVersionUID = 5447961948022104832L;
+
     public SInvalidMigrationPlanException(final Throwable e) {
         super(e);
     }
-
-    private static final long serialVersionUID = 5447961948022104832L;
 
 }

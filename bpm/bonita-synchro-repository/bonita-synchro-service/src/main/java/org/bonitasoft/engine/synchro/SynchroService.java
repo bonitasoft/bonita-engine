@@ -19,16 +19,15 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author Emmanuel Duchastenier
- *
  */
 public interface SynchroService {
 
-    public abstract void fireEvent(Map<String, Serializable> event, Serializable id);
+    void fireEvent(Map<String, Serializable> event, Serializable id);
 
-    public abstract Serializable waitForEvent(Map<String, Serializable> event, long timeout) throws InterruptedException, TimeoutException;
+    Serializable waitForEvent(Map<String, Serializable> event, long timeout) throws InterruptedException, TimeoutException;
 
-    public abstract void clearAllEvents();
+    void clearAllEvents();
 
-    public abstract boolean hasWaiters();
+    boolean hasWaiters();
 
 }

@@ -35,7 +35,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -58,12 +58,12 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Category" }, jira = "")
@@ -154,25 +154,25 @@ public class GetProcessDefinitionTest extends CommonAPITest {
     private void createProcessesDefForSearchProcessUserCanStart() throws BonitaException {
         processDefinitions = new ArrayList<ProcessDefinition>(4);
         final String actor1 = ACTOR_NAME;
-        final DesignProcessDefinition designProcessDefinition1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor1, true);
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, actor1, users.get(0));
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, actor1, users.get(0));
         processDefinitions.add(processDefinition1);
 
         // create process2
         final String actor2 = "Actor2";
-        final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
+        final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, actor2, users.get(1));
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actor2, users.get(1));
         processDefinitions.add(processDefinition2);
 
-        final DesignProcessDefinition designProcessDefinition3 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process3", "1.0",
+        final DesignProcessDefinition designProcessDefinition3 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process3", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, actor2, users.get(1));
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, actor2, users.get(1));
         processDefinitions.add(processDefinition3);
 
         // process not enabled
-        final DesignProcessDefinition designProcessDefinition4 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process4", "1.0",
+        final DesignProcessDefinition designProcessDefinition4 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process4", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition4 = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition4).done());
@@ -180,27 +180,27 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         processDefinitions.add(processDefinition4);
 
         // process without actor initiator
-        final DesignProcessDefinition designProcessDefinition5 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process5", "1.0",
+        final DesignProcessDefinition designProcessDefinition5 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process5", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, false);
-        final ProcessDefinition processDefinition5 = deployAndEnableWithActor(designProcessDefinition5, actor2, users.get(2));
+        final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, actor2, users.get(2));
         processDefinitions.add(processDefinition5);
 
         // actor initiator is a group
-        final DesignProcessDefinition designProcessDefinition6 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process6", "1.0",
+        final DesignProcessDefinition designProcessDefinition6 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process6", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition6 = deployAndEnableWithActor(designProcessDefinition6, actor2, groups.get(0));
+        final ProcessDefinition processDefinition6 = deployAndEnableProcessWithActor(designProcessDefinition6, actor2, groups.get(0));
         processDefinitions.add(processDefinition6);
 
         // actor initiator is a role
-        final DesignProcessDefinition designProcessDefinition7 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process7", "1.0",
+        final DesignProcessDefinition designProcessDefinition7 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process7", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition7 = deployAndEnableWithActor(designProcessDefinition7, actor2, roles.get(0));
+        final ProcessDefinition processDefinition7 = deployAndEnableProcessWithActor(designProcessDefinition7, actor2, roles.get(0));
         processDefinitions.add(processDefinition7);
 
         // actor initiator is a membership
-        final DesignProcessDefinition designProcessDefinition8 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process8", "1.0",
+        final DesignProcessDefinition designProcessDefinition8 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process8", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
-        final ProcessDefinition processDefinition8 = deployAndEnableWithActor(designProcessDefinition8, actor2, roles.get(0), groups.get(0));
+        final ProcessDefinition processDefinition8 = deployAndEnableProcessWithActor(designProcessDefinition8, actor2, roles.get(0), groups.get(0));
         processDefinitions.add(processDefinition8);
     }
 
@@ -220,12 +220,13 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         final String actorName2 = "ITAccountValidator";
         final User user1 = createUser("any", "contrasena");
         final User user2 = createUser("bob", "smith");
-        final DesignProcessDefinition design1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
+        final DesignProcessDefinition design1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actorName1, false);
-        final ProcessDefinition pDef1 = deployAndEnableWithActor(design1, actorName1, user1);
-        final DesignProcessDefinition design2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1", Arrays.asList("mi_etapa"),
+        final ProcessDefinition pDef1 = deployAndEnableProcessWithActor(design1, actorName1, user1);
+        final DesignProcessDefinition design2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1",
+                Arrays.asList("mi_etapa"),
                 Arrays.asList(true), actorName2, false);
-        final ProcessDefinition pDef2 = deployAndEnableWithActor(design2, actorName2, user1);
+        final ProcessDefinition pDef2 = deployAndEnableProcessWithActor(design2, actorName2, user1);
 
         final int startIndex = 0;
         final int maxResults = 10;
@@ -261,12 +262,12 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         final User user1 = createUser("any", "contrasena");
         final User user2 = createUser("bob", "smith");
         final User user3 = createUser("mark", "sampaio");
-        final DesignProcessDefinition design1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
+        final DesignProcessDefinition design1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actorName1, false);
-        final ProcessDefinition pDef1 = deployAndEnableWithActor(design1, actorName1, user1);
-        final DesignProcessDefinition design2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1", Arrays.asList("mi_etapa"),
-                Arrays.asList(true), actorName2, false);
-        final ProcessDefinition pDef2 = deployAndEnableWithActor(design2, actorName2, user2);
+        final ProcessDefinition pDef1 = deployAndEnableProcessWithActor(design1, actorName1, user1);
+        final DesignProcessDefinition design2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1",
+                Arrays.asList("mi_etapa"), Arrays.asList(true), actorName2, false);
+        final ProcessDefinition pDef2 = deployAndEnableProcessWithActor(design2, actorName2, user2);
 
         List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user1.getId(), user2.getId()), 0,
                 10, ProcessDeploymentInfoCriterion.NAME_ASC);
@@ -317,19 +318,19 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         // create user
         final User manu = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Role roleToDelete = createRole("roleToDelete");
         final Role roleToKeep = createRole("roleToKeep");
 
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("MyProcess1", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, roleToDelete);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, actorName, roleToDelete);
 
         final DesignProcessDefinition designProcessDefinition2 = new ProcessDefinitionBuilder().createNewInstance("MyProcess2", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, actorName, roleToDelete, roleToKeep);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actorName, roleToDelete, roleToKeep);
 
         List<ProcessDeploymentInfo> procDepInfos = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForRole(roleToDelete.getId(), 0, 10,
                 ProcessDeploymentInfoCriterion.NAME_ASC);
@@ -361,7 +362,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         // create user
         final User manu = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Role roleToDelete1 = createRole("roleToDelete1");
         final Role roleToKeep1 = createRole("roleToKeep1");
         final Role roleToDelete2 = createRole("roleToDelete2");
@@ -370,22 +371,22 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition11 = new ProcessDefinitionBuilder().createNewInstance("MyProcess11", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition11 = deployAndEnableWithActor(designProcessDefinition11, actorName, roleToDelete1);
+        final ProcessDefinition processDefinition11 = deployAndEnableProcessWithActor(designProcessDefinition11, actorName, roleToDelete1);
 
         final DesignProcessDefinition designProcessDefinition12 = new ProcessDefinitionBuilder().createNewInstance("MyProcess12", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition12 = deployAndEnableWithActor(designProcessDefinition12, actorName, roleToDelete1, roleToKeep1);
+        final ProcessDefinition processDefinition12 = deployAndEnableProcessWithActor(designProcessDefinition12, actorName, roleToDelete1, roleToKeep1);
 
         final DesignProcessDefinition designProcessDefinition21 = new ProcessDefinitionBuilder().createNewInstance("MyProcess21", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition21 = deployAndEnableWithActor(designProcessDefinition21, actorName, roleToDelete2);
+        final ProcessDefinition processDefinition21 = deployAndEnableProcessWithActor(designProcessDefinition21, actorName, roleToDelete2);
 
         final DesignProcessDefinition designProcessDefinition22 = new ProcessDefinitionBuilder().createNewInstance("MyProcess22", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition22 = deployAndEnableWithActor(designProcessDefinition22, actorName, roleToDelete2, roleToKeep2);
+        final ProcessDefinition processDefinition22 = deployAndEnableProcessWithActor(designProcessDefinition22, actorName, roleToDelete2, roleToKeep2);
 
         List<ProcessDeploymentInfo> pDepInfos = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForRoles(
                 Arrays.asList(roleToDelete1.getId(), roleToDelete2.getId()), 0, 10, ProcessDeploymentInfoCriterion.NAME_ASC);
@@ -432,22 +433,22 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         // create user
         final User manu = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group groupToDelete = createGroup("groupToDelete");
         final Group groupSonToDelete = createGroup("sonToDelete", "/groupToDelete");
         final Group groupToKeep = createGroup("groupToDeleteNot");
 
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("MyProcess1", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, groupToDelete);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, actorName, groupToDelete);
 
         final DesignProcessDefinition designProcessDefinition2 = new ProcessDefinitionBuilder().createNewInstance("MyProcess2", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, actorName, groupToDelete, groupToKeep);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actorName, groupToDelete, groupToKeep);
 
         final DesignProcessDefinition designProcessDefinition3 = new ProcessDefinitionBuilder().createNewInstance("MyProcess3", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, actorName, groupSonToDelete);
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, actorName, groupSonToDelete);
 
         List<ProcessDeploymentInfo> procDepInfos = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForGroup(groupToDelete.getId(), 0, 10,
                 ProcessDeploymentInfoCriterion.NAME_ASC);
@@ -491,7 +492,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         // create user
         final User manu = createUser(USERNAME, PASSWORD);
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group groupToDelete = createGroup("groupToDelete");
         final Group groupSonToDelete = createGroup("sonToDelete", "/groupToDeleteNot");
         final Group groupToKeep = createGroup("groupToDeleteNot");
@@ -499,15 +500,15 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("MyProcess1", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
 
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, actorName, groupToDelete);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, actorName, groupToDelete);
 
         final DesignProcessDefinition designProcessDefinition2 = new ProcessDefinitionBuilder().createNewInstance("MyProcess2", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, actorName, groupToDelete, groupToKeep);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actorName, groupToDelete, groupToKeep);
 
         final DesignProcessDefinition designProcessDefinition3 = new ProcessDefinitionBuilder().createNewInstance("MyProcess3", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, actorName, groupSonToDelete);
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, actorName, groupSonToDelete);
 
         List<ProcessDeploymentInfo> procDepInfos = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForGroups(
                 Arrays.asList(groupSonToDelete.getId(), groupToDelete.getId()), 0, 10, ProcessDeploymentInfoCriterion.NAME_ASC);
@@ -555,15 +556,15 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition1 = new ProcessDefinitionBuilder().createNewInstance("MyProcess1", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, actorName, roleToDelete1);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, actorName, roleToDelete1);
 
         final DesignProcessDefinition designProcessDefinition2 = new ProcessDefinitionBuilder().createNewInstance("MyProcess2", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, actorName, groupToDelete1);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actorName, groupToDelete1);
 
         final DesignProcessDefinition designProcessDefinition3 = new ProcessDefinitionBuilder().createNewInstance("MyProcess3", "1.0").addActor(actorName)
                 .addUserTask("userTask", actorName).getProcess();
-        final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, actorName, userToDelete1);
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, actorName, userToDelete1);
 
         List<ProcessDeploymentInfo> pDepInfos1 = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForRoles(Arrays.asList(roleToDelete1.getId()), 0, 10,
                 ProcessDeploymentInfoCriterion.NAME_ASC);
@@ -666,12 +667,12 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         final String actorName2 = "ITAccountValidator";
         final User user1 = createUser("any", "contrasena");
         final User user2 = createUser("bob", "smith");
-        final DesignProcessDefinition design1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
+        final DesignProcessDefinition design1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actorName1, false);
-        final ProcessDefinition pDef1 = deployAndEnableWithActor(design1, actorName1, user1);
-        final DesignProcessDefinition design2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1", Arrays.asList("mi_etapa"),
-                Arrays.asList(true), actorName2, false);
-        final ProcessDefinition pDef2 = deployAndEnableWithActor(design2, actorName2, user1);
+        final ProcessDefinition pDef1 = deployAndEnableProcessWithActor(design1, actorName1, user1);
+        final DesignProcessDefinition design2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1",
+                Arrays.asList("mi_etapa"), Arrays.asList(true), actorName2, false);
+        final ProcessDefinition pDef2 = deployAndEnableProcessWithActor(design2, actorName2, user1);
 
         final int startIndex = 0;
         final int maxResults = 1;
@@ -697,8 +698,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME, true);
-        processBuilder.addActor("actor2").addDescription(DESCRIPTION);
-        processBuilder.addDescription(DESCRIPTION);
+        processBuilder.addActor("actor2");
         processBuilder.addAutomaticTask("AutomaticTask").addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
                 .addManualTask("ManualTask", ACTOR_NAME)
                 .addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
@@ -707,7 +707,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
                 ConnectorEvent.ON_ENTER);
         processBuilder.addDocumentDefinition("Doc").addUrl("plop");
-        processBuilder.addGateway("Gateway", GatewayType.PARALLEL).addDescription(DESCRIPTION);
+        processBuilder.addGateway("Gateway", GatewayType.PARALLEL);
         processBuilder.addBlobData("BlobData", null).addDescription("blolbDescription").addBooleanData("BooleanData", null);
         processBuilder.addDisplayName("plop").addDisplayDescription("plop2").addEndEvent("EndEvent");
         processBuilder.addIntermediateCatchEvent("IntermediateCatchEvent").addIntermediateThrowEvent("IntermediateThrowEvent");
@@ -749,7 +749,9 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         businessArchiveBuilder.addConnectorImplementation(getResource("/org/bonitasoft/engine/connectors/TestConnectorThatThrowException.impl",
                 "TestConnectorThatThrowException.impl"));
-        businessArchiveBuilder.addClasspathResource(buildBarResource(TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar"));
+        businessArchiveBuilder
+                .addClasspathResource(BuildTestUtil
+                        .generateJarAndBuildBarResource(TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar"));
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, user.getId());

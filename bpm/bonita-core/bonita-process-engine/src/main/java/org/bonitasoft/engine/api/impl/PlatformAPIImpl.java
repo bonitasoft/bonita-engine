@@ -16,9 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -27,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.api.impl.transaction.GetTenantsCallable;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
@@ -40,7 +39,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
-import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.CommandDescriptor;
@@ -62,6 +60,7 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -69,8 +68,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -86,7 +83,9 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -340,7 +339,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private List<STenant> setTenantClassloaderAndStartTenantServicesWithLifecycle(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor) throws Exception {
+    private List<STenant> setTenantClassloaderAndStartTenantServicesWithLifecycle(final PlatformServiceAccessor platformAccessor,
+            final SessionAccessor sessionAccessor) throws Exception {
         final SessionService sessionService = platformAccessor.getSessionService();
 
         final List<STenant> tenants = getTenants(platformAccessor);
@@ -409,27 +409,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
+    protected List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
-        final List<STenant> tenantIds = transactionService.executeInTransaction(new Callable<List<STenant>>() {
-
-            @Override
-            public List<STenant> call() throws Exception {
-                List<STenant> tenants;
-                final int maxResults = 100;
-                int i = 0;
-                final List<STenant> tenantIds = new ArrayList<STenant>();
-                do {
-                    tenants = platformService.getTenants(new QueryOptions(i, maxResults, STenant.class, "id", OrderByType.ASC));
-                    i += maxResults;
-                    for (final STenant sTenant : tenants) {
-                        tenantIds.add(sTenant);
-                    }
-                } while (tenants.size() == maxResults);
-                return tenantIds;
-            }
-        });
+        final List<STenant> tenantIds = transactionService.executeInTransaction(new GetTenantsCallable(platformService));
         return tenantIds;
     }
 
@@ -454,14 +437,14 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (nodeConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
-            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
-                serviceWithLifecycle.stop();
-            }
             final List<STenant> tenantIds = getTenants(platformAccessor);
             for (final STenant tenant : tenantIds) {
                 // stop the tenant services:
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
+            }
+            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
+                serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -625,7 +608,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final STenantCreationException e) {
             throw e;
         } catch (final Exception e) {
-            throw new STenantCreationException("Unable to create tenant " + tenantName, e);
+            throw new STenantCreationException("Unable to create default tenant", e);
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
@@ -666,7 +649,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         return targetDir;
     }
 
-    @SuppressWarnings("unchecked")
     protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
         final Parser parser = tenantServiceAccessor.getProfileParser();
         final ProfileService profileService = tenantServiceAccessor.getProfileService();
@@ -683,20 +665,14 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             inputStream.close();
         }
+        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
+        importProfiles(profileService, identityService, profilesFromXML, tenantServiceAccessor);
+    }
 
-        StringReader reader = new StringReader(xmlContent);
-        List<ExportedProfile> profiles;
-        try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            profiles = (List<ExportedProfile>) parser.getObjectFromXML(reader);
-            // importer -1 because we create the tenant
-            final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, -1);
-            importProfiles.execute();
-        } finally {
-            reader.close();
-        }
+    protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
+            final TenantServiceAccessor tenantServiceAccessor)
+            throws ExecutionException {
+        new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {

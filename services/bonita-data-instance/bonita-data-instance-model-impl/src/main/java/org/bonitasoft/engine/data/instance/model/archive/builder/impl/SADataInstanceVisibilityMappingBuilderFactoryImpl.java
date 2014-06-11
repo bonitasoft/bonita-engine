@@ -25,9 +25,9 @@ public class SADataInstanceVisibilityMappingBuilderFactoryImpl implements SAData
     @Override
     public SADataInstanceVisibilityMappingBuilder createNewInstance(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long sourceObjectId) {
-        final SADataInstanceVisibilityMappingImpl entity = new SADataInstanceVisibilityMappingImpl(containerId, containerType, dataName, dataInstanceId, sourceObjectId);
-        final SADataInstanceVisibilityMappingBuilder builder = new SADataInstanceVisibilityMappingBuilderImpl(entity);
-        return builder;
+        final SADataInstanceVisibilityMappingImpl entity = new SADataInstanceVisibilityMappingImpl(containerId, containerType, dataName, dataInstanceId,
+                sourceObjectId);
+        return new SADataInstanceVisibilityMappingBuilderImpl(entity);
     }
 
 }

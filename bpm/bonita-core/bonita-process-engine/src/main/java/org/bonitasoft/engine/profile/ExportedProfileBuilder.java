@@ -37,11 +37,6 @@ public class ExportedProfileBuilder {
         return this;
     }
 
-    public ExportedProfileBuilder setIconPath(final String iconPath) {
-        profile.setIconPath(iconPath);
-        return this;
-    }
-
     public ExportedProfileBuilder setParentProfileEntries(final List<ExportedParentProfileEntry> parentProfileEntries) {
         profile.setParentProfileEntries(parentProfileEntries);
         return this;

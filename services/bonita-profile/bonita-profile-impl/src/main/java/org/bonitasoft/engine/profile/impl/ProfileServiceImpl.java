@@ -41,6 +41,8 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.builder.impl.SProfileLogBuilderImpl;
 import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilderImpl;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
@@ -73,6 +75,10 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -92,14 +98,21 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final SessionService sessionService;
+
+    private final ReadSessionAccessor sessionAccessor;
+
     public ProfileServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ReadSessionAccessor sessionAccessor,
+            final SessionService sessionService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -223,7 +236,8 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private void deleteAllProfileMembersOfProfile(final SProfile profile) throws SProfileMemberDeletionException {
+    @Override
+    public void deleteAllProfileMembersOfProfile(final SProfile profile) throws SProfileMemberDeletionException {
         try {
             List<SProfileMember> sProfileMembers;
             do {
@@ -237,7 +251,8 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private void deleteAllProfileEntriesOfProfile(final SProfile profile) throws SProfileEntryDeletionException {
+    @Override
+    public void deleteAllProfileEntriesOfProfile(final SProfile profile) throws SProfileEntryDeletionException {
         try {
             List<SProfileEntry> entries;
             do {
@@ -458,7 +473,8 @@ public class ProfileServiceImpl implements ProfileService {
         logAfterMethod("deleteProfileMember");
     }
 
-    private SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException {
+    @Override
+    public SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException {
         final SelectByIdDescriptor<SProfileMember> selectByIdDescriptor = SelectDescriptorBuilder.getProfileMemberWithoutDisplayName(profileMemberId);
         try {
             final SProfileMember profileMember = persistenceService.selectById(selectByIdDescriptor);
@@ -717,6 +733,35 @@ public class ProfileServiceImpl implements ProfileService {
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
         logBuilder.setActionType(actionType);
+    }
+
+    @Override
+    public void updateProfileMetaData(final long profileId) throws SProfileUpdateException {
+        final SProfileUpdateBuilder updateBuilder = getUpdateBuilder();
+        long userId;
+        try {
+            userId = getSessionUserId();
+            updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(userId);
+            updateProfile(getProfile(profileId), updateBuilder.done());
+        } catch (final SSessionNotFoundException e) {
+            throw new SProfileUpdateException(e);
+        } catch (final SessionIdNotSetException e) {
+            throw new SProfileUpdateException(e);
+        } catch (final SProfileNotFoundException e) {
+            throw new SProfileUpdateException(e);
+        }
+
+    }
+
+    private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
+        final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
+        return userId;
+    }
+
+    private SProfileUpdateBuilder getUpdateBuilder() {
+        final SProfileUpdateBuilder updateBuilder;
+        updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
+        return updateBuilder;
     }
 
 }

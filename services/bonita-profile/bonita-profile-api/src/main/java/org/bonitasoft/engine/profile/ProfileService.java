@@ -215,10 +215,10 @@ public interface ProfileService {
      * @param userName
      * @return sProfileMember
      * @throws SProfileMemberCreationException
-     *             TODO
      * @since 6.0
      */
-    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileMemberCreationException;
+    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName)
+            throws SProfileMemberCreationException;
 
     /**
      * Add a group to exist profile
@@ -454,5 +454,37 @@ public interface ProfileService {
      * @throws SBonitaSearchException
      */
     List<SProfileEntry> searchProfileEntries(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * @param profile
+     * @throws SProfileMemberDeletionException
+     * @since 6.3.1
+     */
+    void deleteAllProfileMembersOfProfile(SProfile profile) throws SProfileMemberDeletionException;
+
+    /**
+     * @param profile
+     * @throws SProfileEntryDeletionException
+     * @since 6.3.1
+     */
+    void deleteAllProfileEntriesOfProfile(SProfile profile) throws SProfileEntryDeletionException;
+
+    /**
+     * 
+     * @param profileMemberId
+     * @return
+     * @throws SProfileMemberNotFoundException
+     * @since 6.3.1
+     */
+    SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException;
+
+    /**
+     * updates profile metaData fields lastUpdateDate and lastUpdatedBy for a given profile
+     * 
+     * @param profileId
+     * @throws SProfileUpdateException
+     *             when given profileId is not found
+     */
+    void updateProfileMetaData(final long profileId) throws SProfileUpdateException;
 
 }

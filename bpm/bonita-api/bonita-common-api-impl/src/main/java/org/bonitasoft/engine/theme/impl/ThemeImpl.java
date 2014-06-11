@@ -51,7 +51,7 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         return content;
     }
 
-    public void setContent(byte[] content) {
+    public void setContent(final byte[] content) {
         this.content = content;
     }
 
@@ -60,7 +60,7 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         return cssContent;
     }
 
-    public void setCssContent(byte[] cssContent) {
+    public void setCssContent(final byte[] cssContent) {
         this.cssContent = cssContent;
     }
 
@@ -69,7 +69,7 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         return isDefault;
     }
 
-    public void setDefault(boolean isDefault) {
+    public void setDefault(final boolean isDefault) {
         this.isDefault = isDefault;
     }
 
@@ -78,8 +78,8 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         return lastUpdateDate;
     }
 
-    public void setLastUpdatedDate(Date lastUpdatedDate) {
-        this.lastUpdateDate = lastUpdatedDate;
+    public void setLastUpdatedDate(final Date lastUpdatedDate) {
+        lastUpdateDate = lastUpdatedDate;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         return type;
     }
 
-    public void setType(ThemeType type) {
+    public void setType(final ThemeType type) {
         this.type = type;
     }
 
@@ -95,8 +95,8 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((lastUpdateDate == null) ? 0 : lastUpdateDate.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
+        result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + Arrays.hashCode(content);
         result = prime * result + Arrays.hashCode(cssContent);
@@ -115,20 +115,18 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
             return false;
         }
 
-        ThemeImpl other = (ThemeImpl) obj;
+        final ThemeImpl other = (ThemeImpl) obj;
         if (!super.equals(obj)) {
             return false;
         }
         if (type == null && other.type != null) {
             return false;
-        }
-        else if (!type.equals(other.type)) {
+        } else if (!type.equals(other.type)) {
             return false;
         }
         if (lastUpdateDate == null && other.lastUpdateDate != null) {
             return false;
-        }
-        else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
+        } else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
             return false;
         }
         if (!Arrays.equals(content, other.content)) {

@@ -27,8 +27,6 @@ public interface SProfileBuilder {
 
     SProfileBuilder setDescription(String description);
 
-    SProfileBuilder setIconPath(String iconPath);
-
     SProfileBuilder setCreationDate(long creationDate);
 
     SProfileBuilder setCreatedBy(long createdBy);

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -43,17 +43,16 @@ public class TCPServerAPI implements ServerAPI {
         final String destinationsList = parameters.get("destinations");
         final String[] splittedDestinations = destinationsList.split(",");
         for (final String destination : splittedDestinations) {
-            this.destinations.add(getTcpdDestinationFromPattern(destination));
+            destinations.add(getTcpdDestinationFromPattern(destination));
         }
-        this.random = new Random();
+        random = new Random();
     }
 
     private TcpDestination getTcpdDestinationFromPattern(final String s) {
-        final int separatorIndex = s.indexOf(":");
+        final int separatorIndex = s.indexOf(':');
         final String host = s.substring(0, separatorIndex);
         final int port = Integer.valueOf(s.substring(separatorIndex + 1));
-        final TcpDestination tcpDestination = new TcpDestination(host, port);
-        return tcpDestination;
+        return new TcpDestination(host, port);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class TCPServerAPI implements ServerAPI {
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
-            final TcpDestination tcpDestination = this.destinations.get(random.nextInt(this.destinations.size()));
+            final TcpDestination tcpDestination = destinations.get(random.nextInt(destinations.size()));
             remoteServerAPI = new Socket(tcpDestination.getHost(), tcpDestination.getPort());
             final InputStream socketInputStream = remoteServerAPI.getInputStream();
             oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
@@ -87,14 +86,14 @@ public class TCPServerAPI implements ServerAPI {
                 if (remoteServerAPI != null) {
                     remoteServerAPI.close();
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
     private Object checkInvokeMethodReturn(final Object callReturn) throws Exception {
-        if (callReturn != null && callReturn instanceof Throwable) {
+        if (callReturn instanceof Throwable) {
             final Exception throwable = (Exception) callReturn;
             throw throwable;
         }
