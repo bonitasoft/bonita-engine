@@ -38,7 +38,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         getTransactionService().begin();
         List<SConnectorInstance> connetorInstances = null;
         do {
-            connetorInstances = this.connectorInstanceService.searchConnetorInstances(new QueryOptions(0, 100));
+            connetorInstances = this.connectorInstanceService.searchConnectorInstances(new QueryOptions(0, 100));
             for (final SConnectorInstance connectorInstance : connetorInstances) {
                 this.connectorInstanceService.deleteConnectorInstance(connectorInstance);
             }

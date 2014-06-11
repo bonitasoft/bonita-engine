@@ -193,8 +193,7 @@ public class ProcessArchiver {
     }
 
     private static void archiveComments(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final SCommentService commentService, final long archiveDate)
+            final ArchiveService archiveService, final TechnicalLoggerService logger, final SCommentService commentService, final long archiveDate)
             throws SArchivingException {
         List<SComment> sComments = null;
         int startIndex = 0;

@@ -197,10 +197,9 @@ public class TransientDataServiceImpl implements TransientDataService {
 
             if (!dataInstances.isEmpty()) {
                 return dataInstances;
-            } else {
-                return Collections.emptyList();
-                // throw new SDataInstanceException("No data instance found for container type " + containerType + " and container id " + containerId);
             }
+            return Collections.emptyList();
+            // throw new SDataInstanceException("No data instance found for container type " + containerType + " and container id " + containerId);
         } catch (final SCacheException e) {
             throw new SDataInstanceException("Impossible to get transient data: ", e);
         }

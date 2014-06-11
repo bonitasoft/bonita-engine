@@ -57,13 +57,6 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
         }
     }
 
-    private QueryOptions getWaitingEventsCountOptions(final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId,
-            final SProcessInstance parentProcessInstance) {
-        final List<FilterOption> filters = getFilterForWaitingEventsToUnregister(waitingEventClass, subProcessId,
-                parentProcessInstance);
-        return new QueryOptions(filters, null);
-    }
-
     private QueryOptions getWaitingEventsQueryOptions(final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId,
             final SProcessInstance parentProcessInstance) {
         final OrderByOption orderByOption = new OrderByOption(waitingEventClass, BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class).getIdKey(),

@@ -88,11 +88,6 @@ public class QueryOptions implements Serializable {
         this(0, UNLIMITED_NUMBER_OF_RESULTS, Collections.<OrderByOption> emptyList(), filters, multipleFilter);
     }
 
-    @Deprecated
-    public QueryOptions(final List<OrderByOption> orderByOptions, final List<FilterOption> filters, final SearchFields multipleFilter) {
-        this(0, UNLIMITED_NUMBER_OF_RESULTS, orderByOptions, filters, multipleFilter);
-    }
-
     public QueryOptions(final int fromIndex, final int numberOfResults, final Class<? extends PersistentObject> clazz, final String fieldName,
             final OrderByType orderByType) {
         super();
