@@ -87,7 +87,7 @@ public class EntityCodeGenerator {
         addFieldsAndMethods(bo, entityClass, entityInterface);
 
         codeGenerator.addDefaultConstructor(entityClass);
-        addCopyConstructor(entityClass, bo);
+        addCopyConstructor(entityClass, entityInterface, bo);
 
         codeGenerator.addEqualsMethod(entityClass);
         codeGenerator.addHashCodeMethod(entityClass);
@@ -188,9 +188,9 @@ public class EntityCodeGenerator {
         }
     }
 
-    protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
+    protected void addCopyConstructor(final JDefinedClass entityClass, JDefinedClass entityInterface, final BusinessObject bo) {
         final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
-        final JVar param = copyConstructor.param(entityClass, WordUtils.uncapitalize(entityClass.name()));
+        final JVar param = copyConstructor.param(entityInterface, WordUtils.uncapitalize(entityClass.name()));
         final JBlock copyBody = copyConstructor.body();
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
         copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));

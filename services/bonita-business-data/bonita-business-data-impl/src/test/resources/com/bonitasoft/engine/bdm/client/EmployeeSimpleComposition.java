@@ -43,7 +43,7 @@ public class Employee
     public Employee() {
     }
 
-    public Employee(Employee employee) {
+    public Employee(org.bonita.hr.Employee employee) {
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();

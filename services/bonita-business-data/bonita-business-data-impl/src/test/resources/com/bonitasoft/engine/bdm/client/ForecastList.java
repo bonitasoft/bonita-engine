@@ -41,7 +41,7 @@ public class Forecast
     public Forecast() {
     }
 
-    public Forecast(Forecast forecast) {
+    public Forecast(org.bonita.weather.Forecast forecast) {
         this.persistenceId = forecast.getPersistenceId();
         this.persistenceVersion = forecast.getPersistenceVersion();
         this.temperatures = new ArrayList<Double>(forecast.getTemperatures());
