@@ -52,12 +52,12 @@ public class LogTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test(expected = LogNotFoundException.class)
@@ -130,14 +130,14 @@ public class LogTest extends CommonAPISPTest {
 
     private void getPaginatedLogsByCreatedBy(final String orderByType) throws BonitaException {
         final User user3 = createUser("loguser3", PASSWORD);
-        logout();
-        loginWith("loguser3", PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith("loguser3", PASSWORD);
         final User user2 = createUser("loguser2", PASSWORD);
-        logout();
-        loginWith("loguser2", PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith("loguser2", PASSWORD);
         final User user1 = createUser("loguser1", PASSWORD);
-        logout();
-        login();
+       logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         getIdentityAPI().deleteUser(user1.getId());
         getIdentityAPI().deleteUser(user2.getId());
         getIdentityAPI().deleteUser(user3.getId());

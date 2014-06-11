@@ -10,6 +10,7 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -53,9 +54,29 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             If can't create the new profile
      * @throws AlreadyExistsException
      *             If the profile already exists
+     * @deprecated use {@link #createProfile(String name, String description)}
      * @since 6.0
      */
+    @Deprecated
     Profile createProfile(String name, String description, String iconPath) throws AlreadyExistsException, CreationException;
+
+    /**
+     * Create a new custom profile
+     * 
+     * @param name
+     *            the profile name
+     * @param description
+     *            the profile description
+     * @param iconPath
+     *            the profile icon path
+     * @return The new created custom profile
+     * @throws CreationException
+     *             If can't create the new profile
+     * @throws AlreadyExistsException
+     *             If the profile already exists
+     * @since 6.3.1
+     */
+    Profile createProfile(String name, String description) throws AlreadyExistsException, CreationException;
 
     /**
      * Create a new custom profile
@@ -117,8 +138,11 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *         A List<String> is a warning message list in case of non-existing User, Group or Role to map the profile to.
      * @throws ExecutionException
      *             If can't import profiles
+     * 
+     * @deprecated use {@link #importProfiles(byte[], ImportPolicy)}
      * @since 6.0
      */
+    @Deprecated
     List<String> importProfilesUsingSpecifiedPolicy(byte[] xmlContent, ImportPolicy policy) throws ExecutionException;
 
     /**
@@ -220,5 +244,21 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @since 6.0
      */
     ProfileEntry updateProfileEntry(long id, ProfileEntryUpdater updater) throws ProfileEntryNotFoundException, UpdateException;
+
+    /**
+     * Import profiles from XML file.
+     * 
+     * @param xmlContent
+     *            xml content to import
+     * @param policy
+     *            import policy to define different ways of how to import xml content in different case
+     * @return
+     *         A list that is the result of the import, there is one element for each profile
+     * @throws ExecutionException
+     *             If there is an unexpected error during the imports
+     * 
+     * @since 6.3.1
+     */
+    List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException;
 
 }

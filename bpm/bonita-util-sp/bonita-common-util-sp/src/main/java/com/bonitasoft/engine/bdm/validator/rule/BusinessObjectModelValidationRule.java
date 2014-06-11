@@ -8,26 +8,20 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectModelValidationRule implements ValidationRule {
+public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel> {
 
-    @Override
-    public boolean appliesTo(final Object modelElement) {
-        return modelElement instanceof BusinessObjectModel;
+    public BusinessObjectModelValidationRule() {
+        super(BusinessObjectModel.class);
     }
 
     @Override
-    public ValidationStatus checkRule(final Object modelElement) {
-        if (!appliesTo(modelElement)) {
-            throw new IllegalArgumentException(BusinessObjectModelValidationRule.class.getName() + " doesn't handle validation for "
-                    + modelElement.getClass().getName());
-        }
-        final BusinessObjectModel bom = (BusinessObjectModel) modelElement;
+    public ValidationStatus validate(final BusinessObjectModel bom) {
         final ValidationStatus status = new ValidationStatus();
         if (bom.getBusinessObjects().isEmpty()) {
             status.addError("Business object model must have at least one business object declared");

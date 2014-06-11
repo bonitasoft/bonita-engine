@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +23,6 @@ import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 
 /**
  * @author Romain Bioteau
- * 
  */
 public class BusinessObjectDAOFactory {
 
@@ -44,8 +41,7 @@ public class BusinessObjectDAOFactory {
             throw new IllegalArgumentException("daoInterface is null");
         }
         if (!daoInterface.isInterface()) {
-            throw new IllegalArgumentException(daoInterface.getName()
-                    + " is not an interface");
+            throw new IllegalArgumentException(daoInterface.getName() + " is not an interface");
         }
         String daoClassName = daoInterface.getName();
         Class<T> daoImplClass = null;
@@ -54,7 +50,7 @@ public class BusinessObjectDAOFactory {
         } catch (ClassNotFoundException e) {
             throw new BusinessObjectDaoCreationException(e);
         }
-        if(daoImplClass != null){
+        if (daoImplClass != null) {
             try {
                 Constructor<T> constructor = daoImplClass.getConstructor(APISession.class);
                 return constructor.newInstance(session);
@@ -76,12 +72,11 @@ public class BusinessObjectDAOFactory {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T extends BusinessObjectDAO> Class<T> loadClass(String daoClassName) throws ClassNotFoundException {
-        return (Class<T>) Class.forName(toDaoImplClassName(daoClassName), true, Thread
-                .currentThread().getContextClassLoader());
+    protected <T extends BusinessObjectDAO> Class<T> loadClass(final String daoClassName) throws ClassNotFoundException {
+        return (Class<T>) Class.forName(toDaoImplClassName(daoClassName), true, Thread.currentThread().getContextClassLoader());
     }
 
-    private String toDaoImplClassName(String daoClassName) {
+    private String toDaoImplClassName(final String daoClassName) {
         return daoClassName + IMPL_SUFFIX;
     }
 

@@ -67,7 +67,7 @@
         <dependency>
         	<groupId>org.bonitasoft.engine.profile</groupId>
         	<artifactId>bonita-profile-api</artifactId>
-        	<version>6.4.0-SNAPSHOT</version>
+        	<version>${project.version}</version>
         </dependency>
 	</dependencies>
 </project>

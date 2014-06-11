@@ -21,28 +21,28 @@ public class LicenseTest extends CommonAPISPTest {
 
     @Test
     public void invalidLicense() throws BonitaException {
-        final PlatformSession session = loginPlatform();
+        final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         try {
             // License invalid == not exists
             platformAPI.createTenant(new TenantCreator("lumi corp", "The snow maker", null, null, "lumi", "lumi"));
         } catch (final Exception e) {
-            logoutPlatform(session);
+            logoutOnPlatform(session);
         }
         try {
-            login();
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
         } catch (final LoginException le) {
             startNode();
-            login();
-            logout();
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
+           logoutOnTenant();
         }
     }
 
     private void startNode() throws BonitaException {
-        final PlatformSession session2 = loginPlatform();
+        final PlatformSession session2 = loginOnPlatform();
         final PlatformAPI platformAPI2 = PlatformAPIAccessor.getPlatformAPI(session2);
         platformAPI2.startNode();
-        logoutPlatform(session2);
+        logoutOnPlatform(session2);
     }
 
 }

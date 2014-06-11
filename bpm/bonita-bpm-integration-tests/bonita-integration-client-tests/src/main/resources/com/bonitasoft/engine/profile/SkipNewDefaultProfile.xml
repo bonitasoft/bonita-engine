@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+	<profile name="Plop" isDefault="true">
+		<description>this profile should be skipped at import with replaceDuplicate strategy</description>
+		<profileEntries>
+			<parentProfileEntry name="PlopEntry" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>BPM DES</description>
+				<type>folder</type>
+				<page></page>
+			</parentProfileEntry>
+		</profileEntries>
+		<profileMapping>
+			<roles>
+				<role>role60</role>
+			</roles>
+		</profileMapping>
+	</profile>
+	<profile name="Team Manager" isDefault="false">
+		<description>TM profile</description>
+		<profileEntries>
+			<parentProfileEntry name="Home" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>My team activitys dashboard</description>
+				<type>CurrentUserTeamTasksDashboard</type>
+				<page></page>
+			</parentProfileEntry>
+		</profileEntries>
+		<profileMapping>
+			<users>
+				<user>userName1</user>
+				<user>userName2</user>
+			</users>
+		</profileMapping>
+	</profile>
+</profiles:profiles>

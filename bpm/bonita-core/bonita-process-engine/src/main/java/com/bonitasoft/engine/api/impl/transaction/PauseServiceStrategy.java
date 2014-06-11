@@ -29,4 +29,9 @@ public class PauseServiceStrategy implements ServiceStrategy {
         service.pause();
     }
 
+    @Override
+    public boolean shouldRefreshClassLoaders() {
+        return false;
+    }
+
 }
