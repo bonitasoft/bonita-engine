@@ -75,23 +75,21 @@ public class DeleteRole extends DeleteWithActorMembers implements TransactionCon
         final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, 100, field, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, BATCH_SIZE, field, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }
-        } while (profileMembers.size() == 100);
+        } while (profileMembers.size() == BATCH_SIZE);
     }
 
     private void deleteMembershipsByRole(final long roleId) throws SBonitaException {
-        int i = 0;
         List<SUserMembership> memberships;
         do {
-            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + BATCH_SIZE);
-            i += 100;
+            memberships = identityService.getUserMembershipsOfRole(roleId, 0, BATCH_SIZE);
             for (final SUserMembership sUserMembership : memberships) {
                 identityService.deleteUserMembership(sUserMembership.getId());
             }
-        } while (memberships.size() == 100);
+        } while (memberships.size() == BATCH_SIZE);
     }
 
 }
