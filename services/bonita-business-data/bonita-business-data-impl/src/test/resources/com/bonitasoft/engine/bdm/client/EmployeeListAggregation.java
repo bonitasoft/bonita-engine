@@ -89,10 +89,12 @@ public class Employee
     }
 
     public void addToAddresses(Address addTo) {
+        List addresses = getAddresses();
         addresses.add(addTo);
     }
 
     public void removeFromAddresses(Address removeFrom) {
+        List addresses = getAddresses();
         addresses.remove(removeFrom);
     }
 

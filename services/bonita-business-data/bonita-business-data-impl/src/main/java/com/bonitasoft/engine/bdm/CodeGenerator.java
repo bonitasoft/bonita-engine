@@ -194,7 +194,10 @@ public class CodeGenerator {
 
         final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
         final JVar adderParam = method.param(fieldClass, parameterName);
-        method.body().invoke(JExpr.ref(field.getName()), listMethodName).arg(adderParam);
+        final JMethod getterMethod = definedClass.getMethod(getGetterName(field), new JType[0]);
+        final JBlock body = method.body();
+        final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getterMethod));
+        method.body().add(decl.invoke(listMethodName).arg(adderParam));
         return method;
     }
 

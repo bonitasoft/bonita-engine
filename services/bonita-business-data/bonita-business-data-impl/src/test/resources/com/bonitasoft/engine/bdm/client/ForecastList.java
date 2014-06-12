@@ -68,10 +68,12 @@ public class Forecast
     }
 
     public void addToTemperatures(Double addTo) {
+        List temperatures = getTemperatures();
         temperatures.add(addTo);
     }
 
     public void removeFromTemperatures(Double removeFrom) {
+        List temperatures = getTemperatures();
         temperatures.remove(removeFrom);
     }
 

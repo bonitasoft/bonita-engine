@@ -93,10 +93,12 @@ public class Employee
     }
 
     public void addToAddresses(Address addTo) {
+        List addresses = getAddresses();
         addresses.add(addTo);
     }
 
     public void removeFromAddresses(Address removeFrom) {
+        List addresses = getAddresses();
         addresses.remove(removeFrom);
     }
 
@@ -109,10 +111,12 @@ public class Employee
     }
 
     public void addToSkills(Skill addTo) {
+        List skills = getSkills();
         skills.add(addTo);
     }
 
     public void removeFromSkills(Skill removeFrom) {
+        List skills = getSkills();
         skills.remove(removeFrom);
     }
 
