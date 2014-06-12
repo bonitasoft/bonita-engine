@@ -2,6 +2,7 @@ package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -35,14 +36,12 @@ import org.junit.Test;
 
 public class ProcessArchiveTest extends CommonAPILocalTest {
 
-    private static final String JOHN = "john";
-
     private User john;
 
     @Before
     public void beforeTest() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
-        john = createUser(JOHN, "bpm");
+        john = createUser(USERNAME, "bpm");
     }
 
     @After
@@ -101,10 +100,10 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
-                assertTrue(saActDataInstances.size() > 0);
-                List<SADataInstance> saProcDataInstances = dataInstanceService.getSADataInstances(processDataInstance.getId());
-                assertTrue(saProcDataInstances.size() > 0);
+                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
+                assertNotNull(saActDataInstances);
+                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                assertNotNull(saProcDataInstances);
 
                 return null;
             }
@@ -121,22 +120,20 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
-                List<SADataInstance> saProcDataInstances = dataInstanceService.getSADataInstances(processDataInstance.getId());
-                assertEquals(toString(saActDataInstances), 0, saActDataInstances.size());
-                assertEquals(0, saProcDataInstances.size());
+                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
+                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                assertNull(saActDataInstances);
+                assertNull(saProcDataInstances);
                 return null;
             }
 
-            private String toString(final List<SADataInstance> saActDataInstances) {
+            private String toString(final SADataInstance saDataInstance) {
                 final StringBuilder stb = new StringBuilder("[");
-                for (final SADataInstance saDataInstance : saActDataInstances) {
-                    stb.append("name=");
-                    stb.append(saDataInstance.getName());
-                    stb.append("value=");
-                    stb.append(saDataInstance.getValue());
-                    stb.append(", ");
-                }
+                stb.append("name=");
+                stb.append(saDataInstance.getName());
+                stb.append("value=");
+                stb.append(saDataInstance.getValue());
+                stb.append(" ");
                 stb.append("]");
                 return stb.toString();
             }
@@ -190,7 +187,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final SCommentService commentService = tenantAccessor.getCommentService();
         logoutOnTenant();
-        loginOnDefaultTenantWith("john", "bpm");
+        loginOnDefaultTenantWith(USERNAME, "bpm");
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
@@ -256,7 +253,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
     @Test
     public void archivedFlowNodeInstance() throws Exception {
         logoutOnTenant();
-        loginOnDefaultTenantWith("john", "bpm");
+        loginOnDefaultTenantWith(USERNAME, "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
@@ -280,7 +277,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
     @Test
     public void getArchivedFlowNodeInstance() throws Exception {
         logoutOnTenant();
-        loginOnDefaultTenantWith("john", "bpm");
+        loginOnDefaultTenantWith(USERNAME, "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
