@@ -6,12 +6,16 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
 
@@ -24,10 +28,12 @@ import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JType;
 
 public class EntityCodeGeneratorTest {
 
@@ -43,12 +49,50 @@ public class EntityCodeGeneratorTest {
         entityCodeGenerator = new EntityCodeGenerator(codeGenerator);
     }
 
+    @Test
+    public void shouldAddEntity_CreateAValidEntityFromBusinessObject() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addEntity(employeeBO);
+        final JDefinedClass definedClass = codeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
+        assertThat(definedClass).isNotNull();
+        assertThat(definedClass._package().name()).isEqualTo("org.bonitasoft.hr");
+        assertThat(definedClass._implements()).hasSize(1);
+        final Iterator<JClass> it = definedClass._implements();
+        final JClass jClass = it.next();
+        assertThat(jClass.fullName()).isEqualTo(com.bonitasoft.engine.bdm.Entity.class.getName());
+        assertThat(definedClass.annotations()).hasSize(3);
+        final Iterator<JAnnotationUse> iterator = definedClass.annotations().iterator();
+        final JAnnotationUse entityAnnotation = iterator.next();
+        assertThat(entityAnnotation.getAnnotationClass().fullName()).isEqualTo(Entity.class.getName());
+        assertThat(entityAnnotation.getAnnotationMembers()).hasSize(1);
+
+        final JAnnotationUse tableAnnotation = iterator.next();
+        assertThat(tableAnnotation.getAnnotationClass().fullName()).isEqualTo(Table.class.getName());
+        assertThat(tableAnnotation.getAnnotationMembers()).hasSize(1);
+
+        assertThat(definedClass.getMethod("equals", new JType[] { definedClass.owner().ref(Object.class) })).isNotNull();
+        assertThat(definedClass.getMethod("hashCode", new JType[] {})).isNotNull();
+    }
+
     @Test(expected = IllegalArgumentException.class)
-    public void should_validate_that_classes_with_same_name_are_not_loaded_by_classloader() throws Exception {
+    public void shouldAddEntity_ThrowAnIllegalArgumentException() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName("java.lang.String");
-
         entityCodeGenerator.addEntity(employeeBO);
+    }
+
+    @Test
+    public void shouldAddNamedQueries_InDefinedClass() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        employeeBO.addQuery("getEmployees", "SELECT e FROM Employee e", List.class.getName());
+        final JDefinedClass entity = entityCodeGenerator.addEntity(employeeBO);
+
+        final JAnnotationUse namedQueriesAnnotation = getAnnotation(entity, NamedQueries.class.getName());
+        assertThat(namedQueriesAnnotation).isNotNull();
+        final Map<String, JAnnotationValue> annotationMembers = namedQueriesAnnotation.getAnnotationMembers();
+        assertThat(annotationMembers).hasSize(1);
     }
 
     @Test
@@ -56,7 +100,7 @@ public class EntityCodeGeneratorTest {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addPersistenceIdField(definedClass);
+        entityCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
         assertThat(idFieldVar).isNotNull();
@@ -204,7 +248,7 @@ public class EntityCodeGeneratorTest {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
-        entityCodeGenerator.addPersistenceVersionField(definedClass);
+        entityCodeGenerator.addPersistenceVersionFieldAndAccessors(definedClass);
 
         final JFieldVar versionFieldVar = definedClass.fields().get(Field.PERSISTENCE_VERSION);
         assertThat(versionFieldVar).isNotNull();

@@ -1,10 +1,6 @@
-
-package org.bonita.hr.impl;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,14 +17,14 @@ import javax.persistence.Version;
 /**
  * 
  */
-@Entity(name = "Employee")
+@javax.persistence.Entity(name = "Employee")
 @Table(name = "EMPLOYEE")
 @NamedQueries({
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements org.bonita.hr.Employee
+    implements com.bonitasoft.engine.bdm.Entity
 {
 
     @Id
@@ -45,18 +41,18 @@ public class Employee
         @JoinColumn(name = "ADDRESS_PID")
     })
     @OrderColumn
-    private List<org.bonita.hr.Address> addresses = new ArrayList<org.bonita.hr.Address>(10);
+    private List<Address> addresses = new ArrayList<Address>(10);
 
     public Employee() {
     }
 
-    public Employee(org.bonita.hr.Employee employee) {
+    public Employee(Employee employee) {
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();
-        this.addresses = new ArrayList<org.bonita.hr.Address>();
-        for (org.bonita.hr.Address i: employee.getAddresses()) {
-            this.addresses.add(new org.bonita.hr.impl.Address(i));
+        this.addresses = new ArrayList<Address>();
+        for (Address i: employee.getAddresses()) {
+            this.addresses.add(new Address(i));
         }
     }
 
@@ -84,19 +80,19 @@ public class Employee
         return firstName;
     }
 
-    public void setAddresses(List<org.bonita.hr.Address> addresses) {
+    public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
     }
 
-    public List<org.bonita.hr.Address> getAddresses() {
+    public List<Address> getAddresses() {
         return addresses;
     }
 
-    public void addToAddresses(org.bonita.hr.Address addTo) {
+    public void addToAddresses(Address addTo) {
         addresses.add(addTo);
     }
 
-    public void removeFromAddresses(org.bonita.hr.Address removeFrom) {
+    public void removeFromAddresses(Address removeFrom) {
         addresses.remove(removeFrom);
     }
 

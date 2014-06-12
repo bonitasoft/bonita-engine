@@ -1,6 +1,3 @@
-
-package org.bonita.hr;
-
 import java.util.List;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 

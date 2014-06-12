@@ -1,11 +1,7 @@
-
-package org.bonita.weather.impl;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -19,13 +15,13 @@ import javax.persistence.Version;
 /**
  * 
  */
-@Entity(name = "Forecast")
+@javax.persistence.Entity(name = "Forecast")
 @Table(name = "FORECAST")
 @NamedQueries({
     @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
 })
 public class Forecast
-    implements org.bonita.weather.Forecast
+    implements com.bonitasoft.engine.bdm.Entity
 {
 
     @Id
@@ -41,7 +37,7 @@ public class Forecast
     public Forecast() {
     }
 
-    public Forecast(org.bonita.weather.Forecast forecast) {
+    public Forecast(Forecast forecast) {
         this.persistenceId = forecast.getPersistenceId();
         this.persistenceVersion = forecast.getPersistenceVersion();
         this.temperatures = new ArrayList<Double>(forecast.getTemperatures());

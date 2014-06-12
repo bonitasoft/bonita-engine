@@ -1,8 +1,4 @@
-
-package org.bonita.hr.impl;
-
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
@@ -14,7 +10,7 @@ import org.hibernate.annotations.Index;
 /**
  * 
  */
-@Entity(name = "Employee")
+@javax.persistence.Entity(name = "Employee")
 @org.hibernate.annotations.Table(appliesTo = "EMPLOYEE", indexes = {
     @Index(name = "IDX_1", columnNames = {
         "FIRSTNAME, LASTNAME"
@@ -26,7 +22,7 @@ import org.hibernate.annotations.Index;
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements org.bonita.hr.Employee
+    implements com.bonitasoft.engine.bdm.Entity
 {
 
     @Id
@@ -40,7 +36,7 @@ public class Employee
     public Employee() {
     }
 
-    public Employee(org.bonita.hr.Employee employee) {
+    public Employee(Employee employee) {
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();

@@ -1,9 +1,5 @@
-
-package org.bonita.hr.impl;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,20 +9,19 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import org.bonita.hr.Address;
 
 
 /**
  * 
  */
-@Entity(name = "Employee")
+@javax.persistence.Entity(name = "Employee")
 @Table(name = "EMPLOYEE")
 @NamedQueries({
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
     @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
 public class Employee
-    implements org.bonita.hr.Employee
+    implements com.bonitasoft.engine.bdm.Entity
 {
 
     @Id
@@ -43,7 +38,7 @@ public class Employee
     public Employee() {
     }
 
-    public Employee(org.bonita.hr.Employee employee) {
+    public Employee(Employee employee) {
         this.persistenceId = employee.getPersistenceId();
         this.persistenceVersion = employee.getPersistenceVersion();
         this.firstName = employee.getFirstName();

@@ -17,7 +17,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
@@ -213,46 +212,6 @@ public class CodeGeneratorTest {
         } finally {
             FileUtils.deleteQuietly(destDir);
         }
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnIntegerClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.INTEGER).name()).isEqualTo(Integer.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnStringClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.STRING).name()).isEqualTo(String.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnLongClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.LONG).name()).isEqualTo(Long.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnDoubleClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.DOUBLE).name()).isEqualTo(Double.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnFloatClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.FLOAT).name()).isEqualTo(Float.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnBooleanClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.BOOLEAN).name()).isEqualTo(Boolean.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnDateClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.DATE).name()).isEqualTo(Date.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldToJavaClass_ReturnStringTextClass() throws Exception {
-        assertThat(codeGenerator.toJavaClass(FieldType.TEXT).name()).isEqualTo(String.class.getSimpleName());
     }
 
     protected File createTempDirectory(final String tmpDirName) throws IOException {
