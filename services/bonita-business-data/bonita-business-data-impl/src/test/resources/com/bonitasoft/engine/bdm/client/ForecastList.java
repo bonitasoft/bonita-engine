@@ -37,12 +37,6 @@ public class Forecast
     public Forecast() {
     }
 
-    public Forecast(Forecast forecast) {
-        this.persistenceId = forecast.getPersistenceId();
-        this.persistenceVersion = forecast.getPersistenceVersion();
-        this.temperatures = new ArrayList<Double>(forecast.getTemperatures());
-    }
-
     public void setPersistenceId(Long persistenceId) {
         this.persistenceId = persistenceId;
     }

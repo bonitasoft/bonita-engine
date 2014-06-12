@@ -22,6 +22,7 @@ import javax.persistence.OrderColumn;
 
 import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
@@ -48,6 +49,7 @@ public class RelationFieldAnnotator {
 
         if (field.isLazy()) {
             relation.param("fetch", FetchType.LAZY);
+            codeGenerator.addAnnotation(fieldVar, JsonIgnore.class);
         } else {
             relation.param("fetch", FetchType.EAGER);
         }

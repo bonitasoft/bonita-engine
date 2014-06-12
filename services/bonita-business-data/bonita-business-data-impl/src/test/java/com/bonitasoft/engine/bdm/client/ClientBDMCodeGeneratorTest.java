@@ -284,6 +284,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("AddressDAO.java", "AddressDAOWithLazyReferenceOnEmployee.java");
+        assertFilesAreEqual("AddressDAOImpl.java", "AddressDAOImplWithLazyReferenceOnEmployee.java");
     }
 
     @Test

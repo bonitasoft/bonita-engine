@@ -58,6 +58,7 @@ import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
@@ -91,6 +92,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         final RelationField address = new RelationField();
         address.setType(Type.AGGREGATION);
+        address.setFetchType(FetchType.LAZY);
         address.setName("addresses");
         address.setCollection(Boolean.TRUE);
         address.setNullable(Boolean.TRUE);
@@ -534,7 +536,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
             daoMethod = daoImpl.getClass().getMethod("findByFirstNameAndLastName", String.class, String.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
-            assertThat(daoMethod.invoke(daoImpl, "Marcel", "Pagnol")).isNotNull();
+            final Object employee = daoMethod.invoke(daoImpl, "Marcel", "Pagnol");
+            assertThat(employee).isNotNull();
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

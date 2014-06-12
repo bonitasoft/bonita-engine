@@ -9,16 +9,12 @@
 package com.bonitasoft.engine.command;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 
-import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -64,45 +60,14 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
             final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
             final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters, startIndex,
                     maxResults);
-            return serializeResult((Serializable) copyResults(list));
+            return serializeResult((Serializable) list);
         } else {
             try {
                 final Serializable result = businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
-                return serializeResult(copyResult(result));
+                return serializeResult(result);
             } catch (final NonUniqueResultException e) {
                 throw new SCommandExecutionException(e);
             }
-        }
-    }
-
-    private <T extends Serializable> List<T> copyResults(final List<T> results) throws SCommandExecutionException {
-        final List<T> copyList = new ArrayList<T>();
-        for (final T result : results) {
-            copyList.add(copyResult(result));
-        }
-        return copyList;
-    }
-
-    private <T extends Serializable> T copyResult(final T result) throws SCommandExecutionException {
-        if (result == null) {
-            return null;
-        }
-        if (ClassUtils.isPrimitiveOrWrapper(result.getClass())) {
-            return result;
-        } else if (result instanceof Entity) {
-            final Entity e = (Entity) result;
-            return (T) copy(e);
-        } else {
-            throw new SCommandExecutionException("Result type unknown" + result.getClass());
-        }
-    }
-
-    private Entity copy(final Entity entity) {
-        try {
-            final Constructor<? extends Entity> constructor = entity.getClass().getConstructor(entity.getClass());
-            return constructor.newInstance(entity);
-        } catch (final Exception e) {
-            throw new IllegalArgumentException(e);
         }
     }
 
@@ -110,6 +75,7 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try {
+            System.out.println(mapper.writeValueAsString(result));
             return mapper.writeValueAsBytes(result);
         } catch (final JsonProcessingException jpe) {
             throw new SCommandExecutionException(jpe);

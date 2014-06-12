@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -41,23 +42,10 @@ public class Employee
     @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
+    @JsonIgnore
     private List<Skill> skills = new ArrayList<Skill>(10);
 
     public Employee() {
-    }
-
-    public Employee(Employee employee) {
-        this.persistenceId = employee.getPersistenceId();
-        this.persistenceVersion = employee.getPersistenceVersion();
-        this.firstName = employee.getFirstName();
-        this.addresses = new ArrayList<Address>();
-        for (Address i: employee.getAddresses()) {
-            this.addresses.add(new Address(i));
-        }
-        this.skills = new ArrayList<Skill>();
-        for (Skill i: employee.getSkills()) {
-            this.skills.add(new Skill(i));
-        }
     }
 
     public void setPersistenceId(Long persistenceId) {

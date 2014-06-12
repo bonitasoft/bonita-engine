@@ -21,6 +21,7 @@ import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
@@ -53,7 +54,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-    ClassNotFoundException {
+            ClassNotFoundException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -128,19 +129,22 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JClass serial = getModel().ref(byte[].class);
         final JClass omClass = getModel().ref(ObjectMapper.class);
         final JInvocation omObject = JExpr._new(omClass);
+        final JVar omVar = tryBody.decl(omClass, "mapper", omObject);
+        final JClass deserFeatureClass = getModel().ref(DeserializationFeature.class);
+        tryBody.add(omVar.invoke("configure").arg(deserFeatureClass.staticRef("FAIL_ON_UNKNOWN_PROPERTIES")).arg(JExpr.FALSE));
 
         final JExpression invocation;
         final JClass ref = getModel().ref(returnType);
         final JExpression entityClassExpression = JExpr.dotclass(ref);
         if (isCollection) {
             final JClass list = getModel().ref(List.class);
-            invocation = omObject.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
+            invocation = omVar.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
         } else if (method.type().binaryName().equals(returnType)) {
             invocation = entityClassExpression;
         } else {
             invocation = JExpr.dotclass(getModel().ref(method.type().binaryName()));
         }
-        final JInvocation deserialize = omObject.invoke("readValue").arg(JExpr.cast(serial, executeQuery)).arg(invocation);
+        final JInvocation deserialize = omVar.invoke("readValue").arg(JExpr.cast(serial, executeQuery)).arg(invocation);
         tryBody._return(JExpr.cast(method.type(), deserialize));
 
         final JClass exceptionClass = getModel().ref(Exception.class);
