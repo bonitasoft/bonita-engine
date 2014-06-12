@@ -66,18 +66,14 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
             addQueryMethodBody(entity, method, q.getName(), entity.fullName(), businessDataRepository);
         }
 
-        // Add method for lazy fields
-        for (final Query q : BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo)) {
-            final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(entity, method, q.getName(), entity.fullName(), businessDataRepository);
-        }
-
         // Add method for queries
         for (final Query q : bo.getQueries()) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
             addQueryMethodBody(entity, method, q.getName(), entity.fullName(), businessDataRepository);
         }
 
+        final JMethod method = createMethodForNewInstance(bo, entity, implClass);
+        addNewInstanceMethodBody(method, entity);
     }
 
     // TODO unused ?

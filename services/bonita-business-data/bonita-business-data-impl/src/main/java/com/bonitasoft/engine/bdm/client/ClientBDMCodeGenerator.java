@@ -66,18 +66,14 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
             addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
         }
 
-        // Add method for lazy fields
-        for (final Query q : BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo)) {
-            final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
-        }
-
         // Add method for queries
         for (final Query q : bo.getQueries()) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
             addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
         }
 
+        final JMethod method = createMethodForNewInstance(bo, entity, implClass);
+        addNewInstanceMethodBody(method, entity);
     }
 
     private void createSessionConstructor(final JDefinedClass implClass) {

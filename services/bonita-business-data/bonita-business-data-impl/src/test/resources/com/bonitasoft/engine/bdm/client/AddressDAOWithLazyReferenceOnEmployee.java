@@ -12,6 +12,6 @@ public interface AddressDAO
 
     public List<Address> find(int startIndex, int maxResults);
 
-    public List<Address> findAddressesByEmployeePersistenceId(Long persistenceId, int startIndex, int maxResults);
+    public Address newInstance();
 
 }
