@@ -24,6 +24,11 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.lock.BonitaLock;
+import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
@@ -112,6 +117,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return createProfile(creator);
     }
 
+    @Override
     public Profile createProfile(final String name, final String description) throws CreationException {
         final ProfileCreator creator = new ProfileCreator(name);
         creator.setDescription(description);
@@ -176,6 +182,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return new byte[] {};
     }
 
+    @Override
     public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -244,20 +251,29 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-
+        LockService lockService = tenantAccessor.getLockService();
+        Long profileId = (Long) fields.get(ProfileEntryField.PROFILE_ID);
         SProfileEntry sProfileEntry;
+        BonitaLock lock = null;
+        long tenantId = tenantAccessor.getTenantId();
+        TechnicalLoggerService technicalLoggerService = tenantAccessor.getTechnicalLoggerService();
         try {
+            // add a lock because the update profile call getProfile then update profile -> deadlock...
+            lock = lockService.lock(profileId, "PROFILE", tenantId);
+            profileService.updateProfileMetaData(profileId);
             sProfileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
-            profileService.updateProfileMetaData(sProfileEntry.getProfileId());
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
-
-        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
-        try {
+            final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
             updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
+        } finally {
+            if (lock != null) {
+                try {
+                    lockService.unlock(lock, tenantId);
+                } catch (SLockException e) {
+                    technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "error while unlocking the update profile entry lock");
+                }
+            }
         }
 
         return SPModelConvertor.toProfileEntry(sProfileEntry);
