@@ -64,9 +64,9 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<SHiddenTaskInstance>("getSHiddenTaskByUserAndActivity", parameters, SHiddenTaskInstance.class);
     }
 
-    public static SelectListDescriptor<SHiddenTaskInstance> getSHiddenTasksForActivity(final long activityInstanceId) {
+    public static SelectListDescriptor<SHiddenTaskInstance> getSHiddenTasksForActivity(final long activityInstanceId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("activityInstanceId", (Object) activityInstanceId);
-        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SHiddenTaskInstance>("getSHiddenTasksForActivity", parameters, SHiddenTaskInstance.class, queryOptions);
     }
 

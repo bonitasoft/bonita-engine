@@ -384,7 +384,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public List<SActivityInstance> getActivityInstances(final long rootContainerId, final int fromIndex, final int numberOfResults) throws SActivityReadException {
+    public List<SActivityInstance> getActivityInstances(final long rootContainerId, final int fromIndex, final int numberOfResults)
+            throws SActivityReadException {
         final SelectListDescriptor<SActivityInstance> descriptor = SelectDescriptorBuilder.getActivitiesFromProcessInstance(rootContainerId, fromIndex,
                 numberOfResults);
         try {
@@ -919,9 +920,10 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public List<SHiddenTaskInstance> searchHiddenTasksForActivity(final long activityInstanceId) throws STaskVisibilityException {
+    public List<SHiddenTaskInstance> searchHiddenTasksForActivity(final long activityInstanceId, final int fromIndex, final int maxResults)
+            throws STaskVisibilityException {
         try {
-            return getPersistenceService().selectList(SelectDescriptorBuilder.getSHiddenTasksForActivity(activityInstanceId));
+            return getPersistenceService().selectList(SelectDescriptorBuilder.getSHiddenTasksForActivity(activityInstanceId, fromIndex, maxResults));
         } catch (final SBonitaReadException e) {
             throw new STaskVisibilityException("Error searching for hidden tasks for the activity.", activityInstanceId, e);
         }
@@ -930,7 +932,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public void deleteHiddenTasksForActivity(final long activityInstanceId) throws STaskVisibilityException {
         List<SHiddenTaskInstance> hiddenTasks;
-        while ((hiddenTasks = searchHiddenTasksForActivity(activityInstanceId)).size() > 0) {
+        while (!(hiddenTasks = searchHiddenTasksForActivity(activityInstanceId, 0, 100)).isEmpty()) {
             for (final SHiddenTaskInstance sHiddenTask : hiddenTasks) {
                 unhideTasks(sHiddenTask.getUserId(), activityInstanceId);
             }
