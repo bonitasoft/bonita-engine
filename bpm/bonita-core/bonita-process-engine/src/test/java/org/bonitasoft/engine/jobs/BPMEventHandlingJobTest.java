@@ -24,22 +24,30 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
+import org.bonitasoft.engine.work.WorkService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class BPMEventHandlingJobTest {
+
+    @Mock
+    private EventInstanceService eventInstanceService;
+
+    @Mock
+    private WorkService workService;
 
     @Spy
     @InjectMocks
@@ -65,7 +73,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get100MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -97,7 +105,7 @@ public class BPMEventHandlingJobTest {
 
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get100MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -127,7 +135,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get100MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -157,7 +165,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get100MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -190,7 +198,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get100MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -205,4 +213,21 @@ public class BPMEventHandlingJobTest {
         assertEquals(20L, second.getWaitingMessageId());
     }
 
+    @Test
+    public void get1000MessageEventCouples_should_be_paginated_by_1000() throws SEventTriggerInstanceReadException {
+        // Given
+        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
+
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
+        messageCouples.addAll(Arrays.asList(couple1));
+        doReturn(messageCouples).when(eventInstanceService).getMessageEventCouples(3000, 1000);
+
+        // When
+        final List<SMessageEventCouple> sMessageEventCouples = bPMEventHandlingJob.get1000MessageEventCouples(3);
+
+        // Then
+        assertEquals(messageCouples, sMessageEventCouples);
+    }
 }

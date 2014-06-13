@@ -111,7 +111,7 @@ public class BPMEventHandlingJob extends InternalJob {
      * selected several times to trigger multiple instances.
      * 
      * @param messageCouples
-     *            all the possible couples that match the potential correlation.
+     *        all the possible couples that match the potential correlation.
      * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
      */
     protected List<SMessageEventCouple> getMessageUniqueCouples() throws SEventTriggerInstanceReadException {
@@ -120,7 +120,7 @@ public class BPMEventHandlingJob extends InternalJob {
         final List<SMessageEventCouple> uniqueMessageCouples = new ArrayList<SMessageEventCouple>();
 
         int index = 0;
-        List<SMessageEventCouple> potentialMessageCouples = get100MessageEventCouples(index);
+        List<SMessageEventCouple> potentialMessageCouples = get1000MessageEventCouples(index);
         while (!potentialMessageCouples.isEmpty()) {
             for (final SMessageEventCouple couple : potentialMessageCouples) {
                 final long messageInstanceId = couple.getMessageInstanceId();
@@ -136,20 +136,34 @@ public class BPMEventHandlingJob extends InternalJob {
                 }
             }
             index++;
-            potentialMessageCouples = get100MessageEventCouples(index);
+            potentialMessageCouples = get1000MessageEventCouples(index);
         }
 
         return uniqueMessageCouples;
     }
 
-    List<SMessageEventCouple> get100MessageEventCouples(int index) throws SEventTriggerInstanceReadException {
+    List<SMessageEventCouple> get1000MessageEventCouples(int index) throws SEventTriggerInstanceReadException {
         return eventInstanceService.getMessageEventCouples(index * 1000, 1000);
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-        eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
-        workService = getTenantServiceAccessor().getWorkService();
+        setEventInstanceService(getTenantServiceAccessor().getEventInstanceService());
+        setWorkService(getTenantServiceAccessor().getWorkService());
+    }
+
+    /**
+     * For tests
+     */
+    void setEventInstanceService(final EventInstanceService eventInstanceService) {
+        this.eventInstanceService = eventInstanceService;
+    }
+
+    /**
+     * For tests
+     */
+    void setWorkService(final WorkService workService) {
+        this.workService = workService;
     }
 
     private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException {
