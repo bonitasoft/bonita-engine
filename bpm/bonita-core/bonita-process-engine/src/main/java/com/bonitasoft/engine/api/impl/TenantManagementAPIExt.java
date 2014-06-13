@@ -8,11 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.api.impl.StarterThread;
 import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
@@ -51,6 +53,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 @AvailableWhenTenantIsPaused
 public class TenantManagementAPIExt implements TenantManagementAPI {
@@ -150,12 +153,14 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throws UpdateException {
         // clustered services
         try {
+            beforeServiceStartOfRestartHandlersOfTenant(platformServiceAccessor, tenantId);
             resumeScheduler(platformServiceAccessor, tenantId);
 
             // on all nodes
             setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new ResumeServiceStrategy());
 
-            restartHandlersOfTenant(platformServiceAccessor, tenantId);
+            afterServiceStartOfRestartHandlersOfTenant(platformServiceAccessor, tenantId);
+
         } catch (final RestartException e) {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         } catch (final SSchedulerException e) {
@@ -163,13 +168,26 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    private void restartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
+    private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
         final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
         final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
         for (final TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
-            tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
+            tenantRestartHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
         }
+    }
+
+    private void afterServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
+        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
+        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        STenant tenant;
+        try {
+            tenant = platformServiceAccessor.getPlatformService().getTenant(tenantId);
+        } catch (STenantNotFoundException e) {
+            throw new RestartException("Unable to restart tenant", e);
+        }
+        new StarterThread(platformServiceAccessor, platformServiceAccessor.getSessionService(), nodeConfiguration, Arrays.asList(tenant),
+                tenantServiceAccessor.getSessionAccessor(), tenantServiceAccessor.getTechnicalLoggerService()).start();
     }
 
     // In Protected for unit tests
