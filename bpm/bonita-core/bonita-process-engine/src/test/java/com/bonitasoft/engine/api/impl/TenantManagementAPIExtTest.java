@@ -177,8 +177,8 @@ public class TenantManagementAPIExtTest {
         tenantManagementAPI.resume();
 
         // Then elements must be restarted
-        verify(tenantRestartHandler1, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler2, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
     }
 
     @Test(expected = UpdateException.class)
@@ -186,7 +186,7 @@ public class TenantManagementAPIExtTest {
         // Given
         final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
         final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
-        doThrow(RestartException.class).when(tenantRestartHandler2).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        doThrow(RestartException.class).when(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
         when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
 
         // When a tenant moved to available mode
