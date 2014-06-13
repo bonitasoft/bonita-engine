@@ -29,7 +29,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class BPMEventWorksHandler implements TenantRestartHandler {
 
     @Override
-    public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
+    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
         final EventInstanceService eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
@@ -55,5 +55,9 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
 
     private void handleException(final String message, final Exception e) throws RestartException {
         throw new RestartException(message, e);
+    }
+
+    @Override
+    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
     }
 }

@@ -13,17 +13,21 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.SWorkRegisterException;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -35,58 +39,58 @@ import org.bonitasoft.engine.work.WorkService;
  */
 public class RestartFlowNodesHandler implements TenantRestartHandler {
 
+    final Map<Long, List<Long>> flownodesToRestartByTenant = new HashMap<Long, List<Long>>();
+
     @Override
-    public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
-        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        final WorkService workService = tenantServiceAccessor.getWorkService();
-        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+            throws RestartException {
         try {
-            QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
-            List<SFlowNodeInstance> sFlowNodeInstances;
-            logInfo(logger, "Restarting flow nodes...");
+            long tenantId = tenantServiceAccessor.getTenantId();
+            TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+            ArrayList<Long> flownodesToRestart = new ArrayList<Long>();
+            flownodesToRestartByTenant.put(tenantId, flownodesToRestart);
+            FlowNodeInstanceService flowNodeInstanceService = tenantServiceAccessor.getActivityInstanceService();
+            QueryOptions queryOptions = new QueryOptions(0, 1000, null);
+            List<Long> ids = null;
             do {
-                // TODO: unitary test query under getFlowNodeInstancesToRestart():
-                sFlowNodeInstances = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
+                ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRestart(queryOptions);
+                flownodesToRestart.addAll(ids);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
-                for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-                    if (sFlowNodeInstance.isTerminal()) {
-                        createNotifyChildFinishedWork(workService, logger, sFlowNodeInstance);
-                    } else {
-                        createExecuteFlowNodeWork(workService, logger, sFlowNodeInstance);
-                    }
-                }
-            } while (sFlowNodeInstances.size() == queryOptions.getNumberOfResults());
-        } catch (final SWorkRegisterException e) {
-            throw new RestartException("Unable to restart flowNodes: can't register work", e);
-        } catch (final SBonitaException e) {
-            throw new RestartException("Unable to restart flowNodes: can't read flow nodes", e);
+
+            } while (ids.size() == queryOptions.getNumberOfResults());
+            logInfo(logger, "Found " + flownodesToRestart.size() + " flow nodes to restart on tenant " + tenantId);
+        } catch (SFlowNodeReadException e) {
+            throw new RestartException("unable to flag elements as to be restarted", e);
         }
     }
 
     private void logInfo(final TechnicalLoggerService logger, final String message) {
-        final boolean isInfo = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
+        final boolean isInfo = logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO);
         if (isInfo) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+            logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, message);
         }
     }
 
-    private void createExecuteFlowNodeWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
-            throws SWorkRegisterException {
-        logInfo(logger, "Restarting flow node (Execute ...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
-                + "> in state = <" + sFlowNodeInstance.getStateName() + ">");
-        // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(),
-                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), null, null));
-    }
 
-    private void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
-            throws SWorkRegisterException {
-        logInfo(logger, "Restarting flow node (Notify finished...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
-                + " in state = <" + sFlowNodeInstance.getStateName() + ">");
-        // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
-        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
-                .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
-                .name()));
-    }
 
+    @Override
+    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+            throws RestartException {
+        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
+        final WorkService workService = tenantServiceAccessor.getWorkService();
+        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+        TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantServiceAccessor.getTenantId());
+        try {
+            Iterator<Long> iterator = flownodesIds.iterator();
+            ExecuteFlowNodes exec = null;
+            do {
+                exec = new ExecuteFlowNodes(workService, logger, activityInstanceService, iterator);
+                transactionService.executeInTransaction(exec);
+            } while (iterator.hasNext());
+        } catch (Exception e) {
+            throw new RestartException("Unable to restart elements", e);
+        }
+
+    }
 }

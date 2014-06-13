@@ -263,7 +263,14 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
                 .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
-        final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
+
+        final ProcessDefinitionBuilder callingProcess = new ProcessDefinitionBuilder().createNewInstance("Caller", "1.0");
+        callingProcess.addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("ProcessToDelete"),
+                new ExpressionBuilder().createConstantStringExpression("1.0"));
+
+        final ProcessDefinition callingProcessDef = deployAndEnableProcess(callingProcess.getProcess());
+
+        final ProcessInstance p1 = getProcessAPI().startProcess(callingProcessDef.getId());
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());
         waitForProcessToFinish(p1);
@@ -273,7 +280,12 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         assertEquals("My Display Description", archivedUserTask.getDisplayDescription());
         assertEquals("My Display Name", archivedUserTask.getDisplayName());
         assertEquals("step1", archivedUserTask.getName());
+        assertEquals(archivedUserTask.getParentContainerId(), userTask.getParentContainerId());
+        assertEquals(archivedUserTask.getRootContainerId(), userTask.getRootContainerId());
+        assertEquals(archivedUserTask.getFlownodeDefinitionId(), userTask.getFlownodeDefinitionId());
+        assertEquals(archivedUserTask.getType(), userTask.getType());
         disableAndDeleteProcess(processDefinition);
+        disableAndDeleteProcess(callingProcessDef);
     }
 
     @Test
