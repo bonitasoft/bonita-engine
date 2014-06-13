@@ -75,24 +75,9 @@ public class AddressDAOImpl
         }
     }
 
-    public List<Address> findAddressesByEmployeePersistenceId(Long persistenceId, int startIndex, int maxResults) {
-        try {
-            org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Address.findAddressesByEmployeePersistenceId");
-            commandParameters.put("returnType", "Address");
-            commandParameters.put("returnsList", true);
-            commandParameters.put("startIndex", startIndex);
-            commandParameters.put("maxResults", maxResults);
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
-            queryParameters.put("persistenceId", persistenceId);
-            commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return ((List<Address> ) mapper.readValue(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), mapper.getTypeFactory().constructCollectionType(List.class, Address.class)));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+    public Address newInstance() {
+        Address instance = new Address();
+        return instance;
     }
 
 }
