@@ -1225,7 +1225,7 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
         user = identityService.getUserByUserName("testAddMembershipToUser0");
-        final int size = identityService.getUserMembershipsOfUser(user.getId()).size();
+        final int size = identityService.getUserMembershipsOfUser(user.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS).size();
         final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
                 .createNewInstance(user.getId(), group.getId(), role.getId()).done();
         identityService.createUserMembership(userMembership);
@@ -1233,7 +1233,8 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
         final SUser user2 = identityService.getUser(user.getId());
-        assertEquals("membership not added", size + 1, identityService.getUserMembershipsOfUser(user2.getId()).size());
+        assertEquals("membership not added", size + 1, identityService.getUserMembershipsOfUser(user2.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)
+                .size());
         getTransactionService().complete();
     }
 
@@ -1261,7 +1262,7 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
         user = identityService.getUserByUserName("testRemoveMembershipFromUser0");
-        final int size = identityService.getUserMembershipsOfUser(user.getId()).size();
+        final int size = identityService.getUserMembershipsOfUser(user.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS).size();
         assertTrue("no membership on user", size >= 1);
 
         final SUserMembership userMembership2 = identityService.getUserMembership(user.getId(), group.getId(), role.getId());
@@ -1269,7 +1270,8 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         final SUser user2 = identityService.getUser(user.getId());
 
-        assertEquals("no membership on user", size - 1, identityService.getUserMembershipsOfUser(user2.getId()).size());
+        assertEquals("no membership on user", size - 1, identityService.getUserMembershipsOfUser(user2.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)
+                .size());
         getTransactionService().complete();
     }
 

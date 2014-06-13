@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.external.actor;
+package org.bonitasoft.engine.external.permission;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -29,36 +29,35 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Celine Souchet
  */
 @RunWith(MockitoJUnitRunner.class)
-public class IsActorMemberOrTeamManagerOfActorMemberTest {
+public class IsInvolvedInHumanTaskTest {
 
     @Mock
     TenantServiceAccessor serviceAccessor;
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.external.actor.IsActorMemberOrTeamManagerOfActorMember#execute(java.util.Map, org.bonitasoft.engine.service.TenantServiceAccessor)}
-     * .
+     * {@link org.bonitasoft.engine.external.actor.IsInvolvedInHumanTask#execute(java.util.Map, org.bonitasoft.engine.service.TenantServiceAccessor)} .
      */
     @Test(expected = SCommandParameterizationException.class)
     public final void should_throw_exception_when_Execute_with_wrong_parameter() throws SCommandParameterizationException, SCommandExecutionException {
         // Given
-        final IsActorMemberOrTeamManagerOfActorMember isActorMemberOrTeamManagerOfActorMember = new IsActorMemberOrTeamManagerOfActorMember();
+        final IsInvolvedInHumanTask isInvolvedInHumanTask = new IsInvolvedInHumanTask();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("BAD_PARAMETER", "aa");
 
         // When
-        isActorMemberOrTeamManagerOfActorMember.execute(parameters, serviceAccessor);
+        isInvolvedInHumanTask.execute(parameters, serviceAccessor);
     }
 
     @Test(expected = SCommandParameterizationException.class)
     public final void should_throw_exception_when_Execute_with_non_existent_user() throws SCommandParameterizationException, SCommandExecutionException {
         // Given
-        final IsActorMemberOrTeamManagerOfActorMember isActorMemberOrTeamManagerOfActorMember = new IsActorMemberOrTeamManagerOfActorMember();
+        final IsInvolvedInHumanTask isInvolvedInHumanTask = new IsInvolvedInHumanTask();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("USER_ID_KEY", -1l);
 
         // When
-        isActorMemberOrTeamManagerOfActorMember.execute(parameters, serviceAccessor);
+        isInvolvedInHumanTask.execute(parameters, serviceAccessor);
     }
 
 }

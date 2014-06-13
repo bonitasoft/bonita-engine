@@ -24,9 +24,14 @@ import org.bonitasoft.engine.actor.xml.ActorMappingNodeBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SGroupNotFoundException;
+import org.bonitasoft.engine.identity.SRoleNotFoundException;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.xml.XMLNode;
 import org.bonitasoft.engine.xml.XMLWriter;
 
@@ -64,32 +69,53 @@ public class ExportActorMapping implements TransactionContentWithResult<String> 
 
     private ActorMapping getActorMapping() throws SBonitaException {
         final ActorMapping actorMapping = new ActorMapping();
-        final List<SActor> actors = actorMappingService.getActors(processDefinitionId);
-        for (final SActor sActor : actors) {
-            final Actor actor = new Actor(sActor.getName());
-            final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0, Integer.MAX_VALUE);
-            for (final SActorMember sActorMember : actorMembers) {
-                if (sActorMember.getUserId() > 0) {
-                    final SUser user = identityService.getUser(sActorMember.getUserId());
-                    actor.addUser(user.getUserName());
+        QueryOptions queryOptions = new QueryOptions(0, 100, SActor.class, "id", OrderByType.ASC);
+        List<SActor> actors = actorMappingService.getActors(processDefinitionId, queryOptions);
+        while (!actors.isEmpty()) {
+            for (final SActor sActor : actors) {
+                final Actor actor = new Actor(sActor.getName());
+                final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0, Integer.MAX_VALUE);
+                for (final SActorMember sActorMember : actorMembers) {
+                    addUser(actor, sActorMember);
+                    addGroup(actor, sActorMember);
+                    addRole(actor, sActorMember);
+                    addMembership(actor, sActorMember);
                 }
-                if (sActorMember.getGroupId() > 0 && sActorMember.getRoleId() <= 0) {
-                    final SGroup group = identityService.getGroup(sActorMember.getGroupId());
-                    actor.addGroup(group.getPath());
-                }
-                if (sActorMember.getRoleId() > 0 && sActorMember.getGroupId() <= 0) {
-                    final SRole role = identityService.getRole(sActorMember.getRoleId());
-                    actor.addRole(role.getName());
-                }
-                if (sActorMember.getRoleId() > 0 && sActorMember.getGroupId() > 0) {
-                    final SRole role = identityService.getRole(sActorMember.getRoleId());
-                    final SGroup group = identityService.getGroup(sActorMember.getGroupId());
-                    actor.addMembership(group.getPath(), role.getName());
-                }
+                actorMapping.addActor(actor);
             }
-            actorMapping.addActor(actor);
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+            actors = actorMappingService.getActors(processDefinitionId, queryOptions);
         }
         return actorMapping;
+    }
+
+    private void addUser(final Actor actor, final SActorMember sActorMember) throws SUserNotFoundException {
+        if (sActorMember.getUserId() > 0) {
+            final SUser user = identityService.getUser(sActorMember.getUserId());
+            actor.addUser(user.getUserName());
+        }
+    }
+
+    private void addGroup(final Actor actor, final SActorMember sActorMember) throws SGroupNotFoundException {
+        if (sActorMember.getGroupId() > 0 && sActorMember.getRoleId() <= 0) {
+            final SGroup group = identityService.getGroup(sActorMember.getGroupId());
+            actor.addGroup(group.getPath());
+        }
+    }
+
+    private void addRole(final Actor actor, final SActorMember sActorMember) throws SRoleNotFoundException {
+        if (sActorMember.getRoleId() > 0 && sActorMember.getGroupId() <= 0) {
+            final SRole role = identityService.getRole(sActorMember.getRoleId());
+            actor.addRole(role.getName());
+        }
+    }
+
+    private void addMembership(final Actor actor, final SActorMember sActorMember) throws SRoleNotFoundException, SGroupNotFoundException {
+        if (sActorMember.getRoleId() > 0 && sActorMember.getGroupId() > 0) {
+            final SRole role = identityService.getRole(sActorMember.getRoleId());
+            final SGroup group = identityService.getGroup(sActorMember.getGroupId());
+            actor.addMembership(group.getPath(), role.getName());
+        }
     }
 
     private XMLNode getNode(final ActorMapping mapping) {

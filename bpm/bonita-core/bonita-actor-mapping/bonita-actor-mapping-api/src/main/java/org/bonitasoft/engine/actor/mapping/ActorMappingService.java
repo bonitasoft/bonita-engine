@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -191,7 +191,7 @@ public interface ActorMappingService {
      * @throws SActorMemberDeletionException
      *         Error thrown if has exceptions while try to remove the SActorMember object
      */
-    SActorMember removeActorMember(long actorMemberId) throws SActorMemberNotFoundException, SActorMemberDeletionException;
+    SActorMember deleteActorMember(long actorMemberId) throws SActorMemberNotFoundException, SActorMemberDeletionException;
 
     /**
      * Remove an actor member
@@ -201,7 +201,7 @@ public interface ActorMappingService {
      * @throws SActorMemberDeletionException
      *         Error thrown if has exceptions while try to remove the SActorMember object
      */
-    void removeActorMember(final SActorMember actorMember) throws SActorMemberDeletionException;
+    void deleteActorMember(final SActorMember actorMember) throws SActorMemberDeletionException;
 
     /**
      * Get list of SActorMember objects by pagination
@@ -212,11 +212,7 @@ public interface ActorMappingService {
      *        Index of the record to be retrieved from. First record has pageNumber 0.
      * @param numberOfActorMembers
      *        Number of result we want to get. Maximum number of result returned.
-     * @param field
-     *        Field to order
-     * @param order
-     *        ASC or DESC
-     * @return List of SActorMember objects
+     * @return List of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
      */
     List<SActorMember> getActorMembers(long actorId, int index, int numberOfActorMembers) throws SBonitaReadException;
@@ -232,73 +228,55 @@ public interface ActorMappingService {
     long getNumberOfActorMembers(long actorId) throws SBonitaReadException;
 
     /**
-     * Get a list of SActor objects for give scopeId
-     * 
-     * @param scopeId
-     *        Id of scope. It can be processDefinitionId
-     * @return List of SActor objects
-     * @throws SBonitaReadException
-     */
-    List<SActor> getActors(long scopeId) throws SBonitaReadException;
-
-    /**
      * Get a list of SActorMember objects for given userId
      * 
      * @param userId
      *        Id of user
-     * @return List of SActorMember objects
-     * @throws SBonitaReadException
-     */
-    List<SActorMember> getActorMembersOfUser(long userId) throws SBonitaReadException;
-
-    /**
-     * Get a list of actor members for the given userId, with the actor members for the users managed by the given userId
-     * 
-     * @param userId
-     *        Identifier of the user
-     * @param processInstanceId
-     *        Identifier of the process instance
-     * @param pageNumber
+     * @param fromIndex
      *        Index of the record to be retrieved from. First record has pageNumber 0.
-     * @param numberPerPage
+     * @param numberOfActorMembers
      *        Number of result we want to get. Maximum number of result returned.
-     * @return List of SActorMember objects
+     * @return List of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
-     * @since 6.3
      */
-    List<SActorMember> getActorMembersForUserOrManaged(long userId, long processInstanceId, int pageNumber, int numberPerPage) throws SBonitaReadException;
+    List<SActorMember> getActorMembersOfUser(long userId, int fromIndex, int numberOfActorMembers) throws SBonitaReadException;
 
     /**
      * Get a list of SActorMember objects for given groupId
      * 
      * @param groupId
      *        Id of group
-     * @return a list of SActorMember objects
+     * @return a list of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
      */
-    List<SActorMember> getActorMembersOfGroup(long groupId) throws SBonitaReadException;
+    List<SActorMember> getActorMembersOfGroup(long groupId, int index, int numberOfActorMembers) throws SBonitaReadException;
 
     /**
      * Get a list of SActorMember objects for given roleId
      * 
      * @param roleId
      *        Id of role
-     * @return a list of SActorMember objects
+     * @return a list of SActorMember objects, ordered by id ascending
      * @throws SBonitaReadException
      */
-    List<SActorMember> getActorMembersOfRole(long roleId) throws SBonitaReadException;
+    List<SActorMember> getActorMembersOfRole(long roleId, int fromIndex, int numberOfActorMembers) throws SBonitaReadException;
 
     /**
      * Get a list of actors for id specified user who can start the id specified process definition
      * 
      * @param userId
      *        Id of user
-     * @param processDefinitionid
+     * @param processDefinitionId
      *        Id of processDefinition
+     * @param fromIndex
+     *        Index of the record to be retrieved from. First record has pageNumber 0.
+     * @param numberOfElements
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SActor objects
      * @throws SBonitaReadException
      */
-    List<SActor> getActorsOfUserCanStartProcessDefinition(long userId, long processDefinitionid) throws SBonitaReadException;
+    List<SActor> getActorsOfUserCanStartProcessDefinition(long userId, long processDefinitionId, int fromIndex, int numberOfElements)
+            throws SBonitaReadException;
 
     /**
      * Get a list of actors by the given list of actor ids
@@ -327,7 +305,7 @@ public interface ActorMappingService {
      * @return the list of actors
      * @throws SBonitaReadException
      */
-    List<SActor> getActors(long processDefinitionId, int pageNumber, int numberPerPage, String orderByField, OrderByType order) throws SBonitaReadException;
+    List<SActor> getActors(long processDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Return the number of users corresponding to an actor
@@ -375,5 +353,22 @@ public interface ActorMappingService {
     void deleteAllActorMembers() throws SActorMemberDeletionException;
 
     List<Long> getPossibleUserIdsOfActorId(long actorId, int startIndex, int maxResults) throws SBonitaReadException;
+
+    /**
+     * Get the actor member
+     * 
+     * @param actorId
+     *        The identifier of the actor
+     * @param userId
+     *        The identifier of the user
+     * @param groupId
+     *        The identifier of the group
+     * @param roleId
+     *        The identifier of the role
+     * @return The corresponding actor member
+     * @throws SBonitaReadException
+     * @since 6.3
+     */
+    SActorMember getActorMember(long actorId, long userId, long groupId, long roleId) throws SBonitaReadException;
 
 }

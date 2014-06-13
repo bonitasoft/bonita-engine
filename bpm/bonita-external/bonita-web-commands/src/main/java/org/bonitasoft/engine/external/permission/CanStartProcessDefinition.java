@@ -12,14 +12,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.engine.external.actor;
+package org.bonitasoft.engine.external.permission;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.SActorMember;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
@@ -27,20 +27,20 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Specific Command to know if a user is an actor member of a specific process, or if this user is the manager of a user who is an actor member of the process.
+ * Specific Command to know if a user can start a specific process.
  * The mandatory keys to set as parameter are "USER_ID_KEY" and "PROCESS_INSTANCE_ID_KEY".
  * 
  * @author Celine Souchet
  */
-public class IsActorMemberOrTeamManagerOfActorMember extends CommandWithParameters {
+public class CanStartProcessDefinition extends CommandWithParameters {
 
     private static final String USER_ID_KEY = "USER_ID_KEY";
 
-    private static final String PROCESS_INSTANCE_ID_KEY = "PROCESS_INSTANCE_ID_KEY";
+    private static final String PROCESS_DEFINITION_ID_KEY = "PROCESS_DEFINITION_ID_KEY";
 
     /**
      * @return a Boolean :
-     *         - true, if the user is an actor member of the process, or if the user is the manager of a user who is an actor member of the process;
+     *         - true, if the user can start the process;
      *         - false, otherwise.
      */
     @Override
@@ -49,14 +49,14 @@ public class IsActorMemberOrTeamManagerOfActorMember extends CommandWithParamete
         final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
 
         final long userId = getLongMandadoryParameter(parameters, USER_ID_KEY);
-        final long processInstanceId = getLongMandadoryParameter(parameters, PROCESS_INSTANCE_ID_KEY);
+        final long processDefinitionId = getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID_KEY);
 
         try {
-            final List<SActorMember> actorMembersForUserOrManaged = actorMappingService.getActorMembersForUserOrManaged(userId, processInstanceId, 0, 1);
-            return !actorMembersForUserOrManaged.isEmpty();
+            final List<SActor> sActors = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0, 1);
+            return !sActors.isEmpty();
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
-                    "Error executing command 'Boolean IsActorMemberOrTeamManagerOfActorMember(long userId, long processInstanceId)'", e);
+                    "Error executing command 'Boolean CanStartProcessDefinition(long userId, long processInstanceId)'", e);
         }
     }
 

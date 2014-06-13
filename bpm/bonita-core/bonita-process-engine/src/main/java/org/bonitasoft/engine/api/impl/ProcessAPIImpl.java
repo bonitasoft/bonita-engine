@@ -53,7 +53,6 @@ import org.bonitasoft.engine.api.impl.transaction.actor.ExportActorMapping;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActorMembers;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsByActorIds;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsByPagination;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActorMembers;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActors;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfGroupsOfActor;
@@ -1164,12 +1163,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ActorInstance> getActors(final long processDefinitionId, final int startIndex, final int maxResults, final ActorCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         try {
-            final GetActorsByPagination getActorsByPaging = new GetActorsByPagination(actorMappingService, processDefinitionId, startIndex, maxResults, sort);
-            getActorsByPaging.execute();
-            return ModelConvertor.toActors(getActorsByPaging.getResult());
+            OrderByType order;
+            if (sort == null) {
+                order = OrderByType.ASC;
+            } else {
+                switch (sort) {
+                    case NAME_ASC:
+                        order = OrderByType.ASC;
+                        break;
+                    default:
+                        order = OrderByType.DESC;
+                        break;
+                }
+            }
+            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, SActor.class, "name", order);
+            final List<SActor> actors = actorMappingService.getActors(processDefinitionId, queryOptions);
+            return ModelConvertor.toActors(actors);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -1303,11 +1314,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
-            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfUser(userId);
-            for (final SActorMember sActorMember : actorMembersOfUser) {
-                if (sActorMember.getActorId() == actorId && sActorMember.getRoleId() == -1 && sActorMember.getRoleId() == -1) {
-                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the user id = <" + userId + ">");
-                }
+            final SActorMember sActorMember = actorMappingService.getActorMember(actorId, userId, -1, -1);
+            if (sActorMember != null) {
+                throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the user id = <" + userId + ">");
             }
         } catch (final SBonitaReadException e) {
             // Do nothing
@@ -1350,11 +1359,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
-            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfGroup(groupId);
-            for (final SActorMember sActorMember : actorMembersOfUser) {
-                if (sActorMember.getActorId() == actorId && sActorMember.getRoleId() == -1 && sActorMember.getUserId() == -1) {
-                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the group id = <" + groupId + ">");
-                }
+            final SActorMember sActorMember = actorMappingService.getActorMember(actorId, -1, groupId, -1);
+            if (sActorMember != null) {
+                throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the group id = <" + groupId + ">");
             }
         } catch (final SBonitaReadException e) {
             // Do nothing
@@ -1392,17 +1399,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void checkIfActorMappingForRoleAlreadyExists(final long actorId, final long roleId)
-            throws AlreadyExistsException {
+    private void checkIfActorMappingForRoleAlreadyExists(final long actorId, final long roleId) throws AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
-            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfRole(roleId);
-            for (final SActorMember sActorMember : actorMembersOfUser) {
-                if (sActorMember.getActorId() == actorId && sActorMember.getGroupId() == -1 && sActorMember.getUserId() == -1) {
-                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the role id = <" + roleId + ">");
-                }
+            final SActorMember sActorMember = actorMappingService.getActorMember(actorId, -1, -1, roleId);
+            if (sActorMember != null) {
+                throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the role id = <" + roleId + ">");
             }
         } catch (final SBonitaReadException e) {
             // Do nothing
@@ -1456,12 +1460,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
-            final List<SActorMember> actorMembersOfUser = actorMappingService.getActorMembersOfRole(roleId);
-            for (final SActorMember sActorMember : actorMembersOfUser) {
-                if (sActorMember.getActorId() == actorId && sActorMember.getGroupId() == groupId && sActorMember.getUserId() == -1) {
-                    throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the role id = <" + roleId
-                            + ">, the group id = <" + groupId + ">");
-                }
+            final SActorMember sActorMember = actorMappingService.getActorMember(actorId, -1, groupId, roleId);
+            if (sActorMember != null) {
+                throw new AlreadyExistsException("The mapping already exists for the actor id = <" + actorId + ">, the role id = <" + roleId
+                        + ">, the group id = <" + groupId + ">");
             }
         } catch (final SBonitaReadException e) {
             // Do nothing

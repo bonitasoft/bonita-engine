@@ -438,24 +438,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public List<SADataInstance> getSADataInstances(final long dataInstanceId) throws SDataInstanceReadException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-        try {
-            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put("dataInstanceId", dataInstanceId);
-            final List<SADataInstance> listSADataInstance = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
-                    "getSADataInstanceByDataInstanceId", parameters, SADataInstance.class, new QueryOptions(Collections.singletonList(new OrderByOption(
-                            SADataInstance.class, BuilderFactory.get(SDataInstanceBuilderFactory.class).getArchiveDateKey(), OrderByType.DESC)))));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-            return listSADataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        }
-    }
-
-    @Override
     public SADataInstance getLastSADataInstance(final long dataInstanceId) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
         try {

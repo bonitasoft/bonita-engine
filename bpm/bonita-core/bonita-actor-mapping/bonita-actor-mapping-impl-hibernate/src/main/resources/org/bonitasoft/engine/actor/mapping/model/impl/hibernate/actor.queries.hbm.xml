@@ -21,12 +21,6 @@
 		WHERE actor.scopeId = :scopeId
 	</query>
 
-	<query name="getActorsOfScopes">
-		SELECT actor
-		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
-		WHERE actor.scopeId IN (:scopeIds)
-	</query>
-
 	<query name="getNumberOfActorMembersOfActor">
 		SELECT COUNT(actormember)
 		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
@@ -37,13 +31,25 @@
 		SELECT actormember
 		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
 		WHERE actormember.actorId = :actorId
+        ORDER BY actormember.id ASC
 	</query>
+    
+    <query name="getActorMember">
+        SELECT actormember
+        FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+        WHERE actormember.actorId = :actorId
+        AND actormember.userId = :userId
+        AND actormember.groupId = :groupId
+        AND actormember.roleId = :roleId
+        ORDER BY actormember.id ASC
+    </query>
 
 	<query name="getActorMembers">
 		SELECT actormember
 		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+        ORDER BY actormember.id ASC
 	</query>
-
+    
 	<query name="getActorsOfUser">
 	   SELECT actor
 	   FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
@@ -65,31 +71,7 @@
 	   )
 	</query>
     
-    <query name="getActorMembersForUserOrManaged">
-	   SELECT actormember
-	   FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-	        org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl as user,
-			org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS process_instance
-	   WHERE actor.id = actormember.actorId 
-	   AND actor.scopeId = process_instance.processDefinitionId
-	   AND process_instance.id = :processInstanceId
-	   AND (user.id = :userId OR user.managerUserId = :userId)
-	   AND (actormember.userId = user.id
-	       OR actormember.id IN (
-	           SELECT actormember2.id
-	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember2, 
-	                org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-	           WHERE um.userId = user.id
-	           AND (
-	               (actormember2.groupId = um.groupId AND actormember2.roleId &lt;= 0)
-	               OR (actormember2.roleId = um.roleId AND actormember2.groupId &lt;= 0)
-	               OR (actormember2.groupId = um.groupId AND actormember2.roleId = um.roleId)
-	           )
-	       )
-	   )
-    </query>
-	
+
 	<query name="getNumberOfUsersOfActor">
 		SELECT COUNT(user)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
@@ -128,34 +110,39 @@
 	<query name="getActorsOfUserCanStartProcessDefinition">
 	   SELECT actor
 	   FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-		    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+		    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+            org.bonitasoft.engine.identity.model.impl.SUserImpl as user
 	   WHERE actor.id = actormember.actorId 
-	   AND actor.scopeId =:processDefinitionid AND actor.initiator = TRUE
-	   AND ( actormember.userId = :userId
+	   AND actor.scopeId =:processDefinitionId AND actor.initiator = TRUE
+       AND (user.id = :userId OR user.managerUserId = :userId)
+	   AND ( actormember.userId = user.id
 	       OR actormember.id IN (
-	           SELECT actormember.id
-	           FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, 
-               	    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-	           WHERE um.userId = :userId 
-	           AND (
-	               (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-	               OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-	               OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+	           SELECT actormember2.id
+               FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember2, 
+                    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+               WHERE um.userId = user.id
+               AND (
+                   (actormember2.groupId = um.groupId AND actormember2.roleId &lt;= 0)
+                   OR (actormember2.roleId = um.roleId AND actormember2.groupId &lt;= 0)
+                   OR (actormember2.groupId = um.groupId AND actormember2.roleId = um.roleId)
                )
 	       )
 	   )
+       ORDER BY actor.name ASC
 	</query>
-
+    
 	<query name="getActorMembersOfUser">
 		SELECT actormember
 		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
 		WHERE actormember.userId = :userId
+        ORDER BY actormember.id ASC
 	</query>
 
 	<query name="getActorMembersOfGroup">
 		SELECT actormember
 		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
 		WHERE actormember.groupId = :groupId
+        ORDER BY actormember.id ASC
 	</query>
 
 	<query name="getNumberOfActorMembersOfGroupWithActor">
@@ -171,6 +158,7 @@
 		SELECT actormember
 		FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
 		WHERE actormember.roleId = :roleId
+        ORDER BY actormember.id ASC
 	</query>
 
 	<query name="getPossibleUserIdsOfActorId">

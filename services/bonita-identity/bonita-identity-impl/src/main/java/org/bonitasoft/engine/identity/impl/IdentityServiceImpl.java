@@ -1204,20 +1204,6 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfUser(final long userId) throws SIdentityException {
-        final String methodName = "getUserMembershipsOfUser";
-        logBeforeMethod(methodName);
-        try {
-            final List<SUserMembership> listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsOfUser(userId));
-            logAfterMethod(methodName);
-            return listSUserMembership;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get memberships of user: " + userId, e);
-        }
-    }
-
-    @Override
     public List<SUserMembership> getUserMemberships(final List<Long> userMembershipIds) throws SIdentityException {
         final String methodName = "getUserMemberships";
         logBeforeMethod(methodName);

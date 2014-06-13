@@ -74,7 +74,6 @@ public class BPMLocalTest extends CommonAPILocalTest {
         deleteUser(USERNAME);
         logoutOnTenant();
         cleanSession();
-
     }
 
     @Before
@@ -314,7 +313,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public List<SActor> call() throws Exception {
-                return getTenantAccessor().getActorMappingService().getActors(definition.getId());
+                final QueryOptions queryOptions = new QueryOptions(0, 1, SActor.class, "id", OrderByType.ASC);
+                return getTenantAccessor().getActorMappingService().getActors(definition.getId(), queryOptions);
             }
         });
 
@@ -340,7 +340,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public List<SActorMember> call() throws Exception {
-                return getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId());
+                return getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId(), 0, 1);
             }
         });
 
