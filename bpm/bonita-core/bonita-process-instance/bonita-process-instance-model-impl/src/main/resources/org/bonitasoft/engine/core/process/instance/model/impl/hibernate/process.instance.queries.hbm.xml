@@ -54,8 +54,8 @@
 		AND a.terminal = FALSE
 	</query>
 
-	<query name="getFlowNodeInstancesToRestart">
-		SELECT a
+	<query name="getFlowNodeInstanceIdsToRestart">
+		SELECT a.id
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS a
 		WHERE a.deleted = FALSE
 		AND (a.stateExecuting = TRUE OR a.stable = FALSE OR a.terminal = TRUE)

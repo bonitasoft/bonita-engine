@@ -171,7 +171,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Set execute by for the specific flow node instance
-     *
+     * 
      * @param flowNodeInstance
      *            the flowNodeInstance will be updated
      * @param userId
@@ -183,7 +183,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Set execute by delegate for the specific flow node instance
-     *
+     * 
      * @param flowNodeInstance
      *            the flowNodeInstance will be updated
      * @param executerSubstituteId
@@ -195,7 +195,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.
-     *
+     * 
      * @param entityClass
      *            The type of the archived flow node to search for
      * @param queryOptions
@@ -207,7 +207,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
-     *
+     * 
      * @param supervisorId
      *            The identifier of the supervisor
      * @param entityClass
@@ -222,7 +222,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.
-     *
+     * 
      * @param entityClass
      *            The type of the archived flow node to search for
      * @param queryOptions
@@ -234,7 +234,7 @@ public interface FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
-     *
+     * 
      * @param supervisorId
      *            The identifier of the supervisor
      * @param entityClass
@@ -288,12 +288,6 @@ public interface FlowNodeInstanceService {
      */
     void setExecuting(SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException;
 
-    /**
-     * @param queryOptions
-     * @return
-     * @throws SFlowNodeReadException
-     */
-    List<SFlowNodeInstance> getFlowNodeInstancesToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
     /**
      * @param saFlowNodeInstance
@@ -314,7 +308,7 @@ public interface FlowNodeInstanceService {
     /**
      * Get the process instance ID. It can be itself if containerType is a PROCESS_INSTANCE, or the containing process instance id if containerType is a
      * ACTIVITY_INSTANCE.
-     *
+     * 
      * @param containerId
      *            the ID of the container of the flownode or process to get the process instance ID for.
      * @param containerType
@@ -327,5 +321,17 @@ public interface FlowNodeInstanceService {
      * @since 6.3
      */
     long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException;
+
+
+    /**
+     * retrieve ids of elements that need to be restarted
+     * Called on start node to set the flag to tell the engine to restart these flow nodes
+     * Should not be called when the engine is started!
+     * 
+     * @param queryOptions
+     * @return
+     * @throws SFlowNodeReadException
+     */
+    List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
 }
