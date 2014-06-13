@@ -213,7 +213,7 @@ public class CodeGenerator {
         return hashCodeMethod;
     }
 
-    public String getGetterName(final JFieldVar field) {
+    public String getGetterName(final JVar field) {
         final JType type = field.type();
         final boolean bool = Boolean.class.getName().equals(type.fullName());
         return getGetterName(bool, field.name());
@@ -235,7 +235,7 @@ public class CodeGenerator {
         return builder.toString();
     }
 
-    public String getSetterName(final JFieldVar field) {
+    public String getSetterName(final JVar field) {
         return "set" + WordUtils.capitalize(field.name());
     }
 

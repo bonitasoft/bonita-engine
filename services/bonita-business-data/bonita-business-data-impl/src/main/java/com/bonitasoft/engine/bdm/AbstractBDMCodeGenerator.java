@@ -34,7 +34,6 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -92,7 +91,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     private JMethod getSetterForParam(final JVar param, final JDefinedClass entity) {
-        final String setterName = getSetterName((JFieldVar) param);
+        final String setterName = getSetterName(param);
         return entity.getMethod(setterName, new JType[] { param.type() });
     }
 
