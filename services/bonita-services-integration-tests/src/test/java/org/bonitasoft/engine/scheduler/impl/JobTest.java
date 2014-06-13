@@ -102,18 +102,18 @@ public class JobTest extends CommonServiceTest {
 
         Thread.sleep(800);
         getTransactionService().begin();
-        List<FilterOption> filters = new ArrayList<FilterOption>(1);
+        final List<FilterOption> filters = new ArrayList<FilterOption>(1);
         filters.add(new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
         final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
         List<SJobDescriptor> jobDescriptors = JOB_SERVICE.searchJobDescriptors(queryOptions);
         assertEquals(1, jobDescriptors.size());
 
-        long jobDescriptorId = jobDescriptors.get(0).getId();
+        final long jobDescriptorId = jobDescriptors.get(0).getId();
         final QueryOptions options = new QueryOptions(0, 1, null, Arrays.asList(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId)), null);
         List<SJobLog> jobLogs = JOB_SERVICE.searchJobLogs(options);
         try {
             assertEquals(1, jobLogs.size());
-        } catch (AssertionError e) {
+        } catch (final AssertionError e) {
             getTransactionService().complete();
             Thread.sleep(800);
             getTransactionService().begin();
@@ -134,7 +134,7 @@ public class JobTest extends CommonServiceTest {
         jobDescriptors = JOB_SERVICE.searchJobDescriptors(queryOptions);
         try {
             assertEquals(0, jobDescriptors.size());
-        } catch (AssertionError e) {
+        } catch (final AssertionError e) {
             getTransactionService().complete();
             Thread.sleep(800);
             getTransactionService().begin();
@@ -170,18 +170,20 @@ public class JobTest extends CommonServiceTest {
         List<SJobDescriptor> jobDescriptors = JOB_SERVICE.searchJobDescriptors(queryOptions);
         try {
             assertEquals(1, jobDescriptors.size());
-        } catch (AssertionError e) {
+        } catch (final AssertionError e) {
             getTransactionService().complete();
             Thread.sleep(800);
             getTransactionService().begin();
             jobDescriptors = JOB_SERVICE.searchJobDescriptors(queryOptions);
             assertEquals(1, jobDescriptors.size());
         }
+        getTransactionService().complete();
 
+        getTransactionService().begin();
         List<SFailedJob> failedJobs = JOB_SERVICE.getFailedJobs(0, 10);
         try {
             assertEquals(1, failedJobs.size());
-        } catch (AssertionError e) {
+        } catch (final AssertionError e) {
             getTransactionService().complete();
             Thread.sleep(800);
             getTransactionService().begin();
@@ -193,7 +195,7 @@ public class JobTest extends CommonServiceTest {
         getTransactionService().begin();
         parameters.clear();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(THROW_EXCEPTION, Boolean.FALSE).done());
-        long jobDescriptorId = jobDescriptors.get(0).getId();
+        final long jobDescriptorId = jobDescriptors.get(0).getId();
         JOB_SERVICE.setJobParameters(getDefaultTenantId(), jobDescriptorId, parameters);
         schedulerService.executeAgain(jobDescriptorId);
         getTransactionService().complete();
@@ -204,7 +206,7 @@ public class JobTest extends CommonServiceTest {
         failedJobs = JOB_SERVICE.getFailedJobs(0, 10);
         try {
             assertEquals(0, failedJobs.size());
-        } catch (AssertionError e) {
+        } catch (final AssertionError e) {
             getTransactionService().complete();
             Thread.sleep(800);
             getTransactionService().begin();
