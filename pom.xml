@@ -17,6 +17,7 @@
 		<hazelcast.version>3.0.3</hazelcast.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<create.sources.jar>true</create.sources.jar>
 	</properties>
 
 	<dependencyManagement>
@@ -83,6 +84,13 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<id>deploy</id>
+			<modules>
+				<module>bpm</module>
+				<module>services</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>developer</id>
 			<properties>
