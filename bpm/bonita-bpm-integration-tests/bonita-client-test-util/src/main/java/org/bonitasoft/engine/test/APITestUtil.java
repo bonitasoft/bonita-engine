@@ -921,6 +921,12 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(activityId);
     }
 
+    public void waitForFlowNodeInFailedState(final String flowNodeInstanceName) throws Exception {
+        final long failedTaskId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
+                ClientEventUtil.getTaskInState(TestStates.getFailedState(), flowNodeInstanceName), DEFAULT_TIMEOUT);
+        assertNotNull(failedTaskId);
+    }
+
     public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final long userId) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
         assignAndExecuteStep(humanTaskInstance, userId);
