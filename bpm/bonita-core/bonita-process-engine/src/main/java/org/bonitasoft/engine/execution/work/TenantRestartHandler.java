@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -23,8 +24,20 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public interface TenantRestartHandler {
 
     /**
+     * 
+     * called in a transaction during {@link PlatformAPI#startNode()}
+     * 
      * @param tenantServiceAccessor
      */
-    void handleRestart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
+    void beforeServicesStart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
+
+    /**
+     * called outside of a transaction after {@link PlatformAPI#startNode()} in a separate thread than the api call
+     * 
+     * @param platformServiceAccessor
+     * @param tenantServiceAccessor
+     * @throws RestartException
+     */
+    void afterServicesStart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
 
 }

@@ -44,7 +44,7 @@ public class BPMEventWorksHandlerTest {
     @Test
     public void handleRestartShouldLog4Infos() throws Exception {
         // when:
-        bpmEventWorksHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        bpmEventWorksHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
 
         // then:
         verify(bpmEventWorksHandler, times(4)).logInfo(any(TechnicalLoggerService.class), anyString());
@@ -53,7 +53,7 @@ public class BPMEventWorksHandlerTest {
     @Test
     public void handleRestartShouldResetMessageInstances() throws Exception {
         // when:
-        bpmEventWorksHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        bpmEventWorksHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
 
         // then:
         verify(eventInstanceService).resetProgressMessageInstances();
@@ -62,7 +62,7 @@ public class BPMEventWorksHandlerTest {
     @Test
     public void handleRestartShouldResetWaitingEvents() throws Exception {
         // when:
-        bpmEventWorksHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        bpmEventWorksHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
 
         // then:
         verify(eventInstanceService).resetInProgressWaitingEvents();
