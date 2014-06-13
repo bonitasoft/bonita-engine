@@ -1,7 +1,5 @@
 package com.bonitasoft.engine.business.data;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +61,8 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -619,6 +619,41 @@ public class BDRepositoryIT extends CommonAPISPTest {
             System.err.println(eee.getMessage());
             return null;
         }
+    }
+
+    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
+    "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
+    @Test
+    public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", PROCESS_VERSION);
+        final String businessDataName = "newBornBaby";
+        final String businessDataName2 = "data2";
+        processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder
+        .addAutomaticTask("step1")
+        .addOperation(
+                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setFirstName", String.class.getName(),
+                        new ExpressionBuilder().createConstantStringExpression("Manon")))
+                        .addOperation(
+                                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setFirstName", String.class.getName(),
+                                        new ExpressionBuilder().createConstantStringExpression("Plop")))
+                                        .addOperation(
+                                                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setLastName", String.class.getName(),
+                                                        new ExpressionBuilder().createConstantStringExpression("Péuigrec")))
+                                                        .addOperation(
+                                                                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setLastName", String.class.getName(),
+                                                                        new ExpressionBuilder().createConstantStringExpression("Plip")));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+        waitForUserTask("step2", processInstanceId);
+
+        disableAndDeleteProcess(definition.getId());
     }
 
     @Test

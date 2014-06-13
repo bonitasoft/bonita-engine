@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
-import static org.apache.commons.lang3.StringUtils.left;
-
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -27,6 +25,8 @@ import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+
+import static org.apache.commons.lang3.StringUtils.left;
 
 /**
  * @author Colin PUY
@@ -56,6 +56,9 @@ public class RelationFieldAnnotator {
 
         if (field.getType() == Type.COMPOSITION) {
             relation.param("cascade", CascadeType.ALL);
+        }
+        else if (field.getType() == Type.AGGREGATION) {
+            relation.param("cascade", CascadeType.MERGE);
         }
     }
 
