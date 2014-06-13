@@ -1,5 +1,6 @@
 package com.bonitasoft.engine.bdm.proxy;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -8,61 +9,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bdm.BusinessObjectDeserializer;
 import com.bonitasoft.engine.bdm.model.field.Field;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class LazyLoader {
 
-    private CommandAPI commandApi;
+    private final APISession apiSession;
+    private final BusinessObjectDeserializer deserializer;
 
     public LazyLoader(final APISession apiSession) {
         if (apiSession == null) {
             throw new IllegalArgumentException("apiSession cannot be null");
         }
-        try {
-            commandApi = TenantAPIAccessor.getCommandAPI(apiSession);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new IllegalArgumentException(e);
-        } catch (final ServerAPIException e) {
-            throw new IllegalArgumentException(e);
-        } catch (final UnknownAPITypeException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this.apiSession = apiSession;
+        deserializer = new BusinessObjectDeserializer();
     }
 
     public Object load(final Method method, final long persistenceId) {
         try {
+            final CommandAPI commandApi = TenantAPIAccessor.getCommandAPI(apiSession);
             final Map<String, Serializable> commandParameters = createCommandParameters(method, persistenceId);
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            JavaType javaType = null;
-            if (returnsAList(method)) {
-                final ParameterizedType listType = (ParameterizedType) method.getGenericReturnType();
-                javaType = mapper.getTypeFactory().constructCollectionType(List.class,
-                        mapper.getTypeFactory().constructType(listType.getActualTypeArguments()[0]));
-            } else {
-                javaType = mapper.getTypeFactory().constructType(method.getClass());
-            }
-
-            return mapper.readValue((byte[]) commandApi.execute("executeBDMQuery", commandParameters), javaType);
+            final byte[] serializedResult = (byte[]) commandApi.execute("executeBDMQuery", commandParameters);
+            return deserialize(method, serializedResult);
         } catch (final Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private Map<String, Serializable> createCommandParameters(final Method method, final long persistenceId) {
+    private Object deserialize(final Method method, final byte[] serializedResult) throws IOException, JsonParseException, JsonMappingException {
+        JavaType javaType = null;
+        if (returnsAList(method)) {
+            final ParameterizedType listType = (ParameterizedType) method.getGenericReturnType();
+            javaType = deserializer.createListJavaType(listType.getActualTypeArguments()[0]);
+        } else {
+            javaType = deserializer.createJavaType(method.getReturnType());
+        }
+
+        return deserializer.deserialize(serializedResult, javaType);
+    }
+
+    protected Map<String, Serializable> createCommandParameters(final Method method, final long persistenceId) {
         final Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-        commandParameters.put("queryName", "Address.findByStreet");
-        commandParameters.put("returnType", "Address");
+        commandParameters.put("queryName", getQueryNameFor(method));
+        commandParameters.put("returnType", getReturnTypeClassname(method));
         commandParameters.put("returnsList", returnsAList(method));
         commandParameters.put("startIndex", 0);
         commandParameters.put("maxResults", Integer.MAX_VALUE);
@@ -70,6 +67,42 @@ public class LazyLoader {
         queryParameters.put(Field.PERSISTENCE_ID, persistenceId);
         commandParameters.put("queryParameters", (Serializable) queryParameters);
         return commandParameters;
+    }
+
+    protected Serializable getQueryNameFor(final Method method) {
+        final String targetEntityName = getTargetEntityNameFrom(method);
+        final String sourceEntityName = getSourceEntityNameFrom(method);
+        final String name = toFieldName(method.getName());
+        return targetEntityName + ".find" + name + "By" + sourceEntityName + WordUtils.capitalize(Field.PERSISTENCE_ID);
+    }
+
+    private String toFieldName(final String methodName) {
+        if (methodName.startsWith("get") && methodName.length() > 3) {
+            return methodName.substring(3);
+        }
+        throw new IllegalArgumentException(methodName + " is not a valid getter name.");
+    }
+
+    private String getTargetEntityNameFrom(final Method method) {
+        if(returnsAList(method)){
+            final ParameterizedType listType = (ParameterizedType) method.getGenericReturnType();
+            final Class<?> type = (Class<?>) listType.getActualTypeArguments()[0];
+            return type.getSimpleName();
+        }else{
+            return method.getReturnType().getSimpleName();
+        }
+    }
+
+    private String getSourceEntityNameFrom(final Method method) {
+        return method.getDeclaringClass().getSimpleName();
+    }
+
+    private Serializable getReturnTypeClassname(final Method method) {
+        if (returnsAList(method)) {
+            return List.class.getName();
+        } else {
+            return method.getReturnType().getName();
+        }
     }
 
     private boolean returnsAList(final Method method) {
