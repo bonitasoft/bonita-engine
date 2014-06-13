@@ -77,7 +77,15 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName, OrderByType orderByType)
             throws SEventInstanceReadException;
 
-    List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId) throws SEventInstanceReadException;
+    /**
+     * @param activityInstanceId
+     * @param fromIndex
+     * @param maxResults
+     * @return List of SBoundaryEventInstance, ordered by identifier ascending
+     * @throws SEventInstanceReadException
+     * @since 6.2
+     */
+    List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId, int fromIndex, int maxResults) throws SEventInstanceReadException;
 
     SEventTriggerInstance getEventTriggerInstance(long eventTriggerInstanceId) throws SEventTriggerInstanceNotFoundException,
             SEventTriggerInstanceReadException;
@@ -92,7 +100,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     void deleteWaitingEvent(SWaitingEvent waitingEvent) throws SWaitingEventModificationException;
 
     /**
-     * 
      * @param signalName
      * @param fromIndex
      * @param maxResults
@@ -103,7 +110,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     List<SWaitingSignalEvent> getWaitingSignalEvents(String signalName, int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
 
     /**
-     * 
      * @param processDefinitionId
      * @param searchOptions
      * @return
@@ -159,7 +165,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * Resets all Message Instances marked as handled, so that they are elligible to match Waiting Events again.
      * 
      * @throws SMessageModificationException
-     *             if an error occurs when resetting the 'handled' flag.
+     *         if an error occurs when resetting the 'handled' flag.
      */
     int resetProgressMessageInstances() throws SMessageModificationException;
 
@@ -168,7 +174,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * 
      * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException
-     *             if an error occurs when resetting the 'progress' flag.
+     *         if an error occurs when resetting the 'progress' flag.
      */
     int resetInProgressWaitingEvents() throws SWaitingEventModificationException;
 

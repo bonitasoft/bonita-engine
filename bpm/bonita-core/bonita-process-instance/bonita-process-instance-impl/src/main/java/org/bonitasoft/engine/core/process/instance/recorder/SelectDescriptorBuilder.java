@@ -200,9 +200,10 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SEventInstance>("getEventInstancesFromRootContainer", parameters, SEventInstance.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SBoundaryEventInstance> getActivityBoundaryEvents(final long activityInstanceId) {
+    public static SelectListDescriptor<SBoundaryEventInstance> getActivityBoundaryEvents(final long activityInstanceId, final int fromIndex,
+            final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("activityInstanceId", (Object) activityInstanceId);
-        final QueryOptions queryOptions = QueryOptions.countQueryOptions();
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SBoundaryEventInstance>("getActivityBoundaryEventInstances", parameters, SBoundaryEventInstance.class, queryOptions);
     }
 

@@ -134,12 +134,12 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         });
     }
 
-    private List<SBoundaryEventInstance> getActiviyBoundaryEventInstances(final long activityId) throws Exception {
+    private List<SBoundaryEventInstance> getActiviyBoundaryEventInstances(final long activityId, final int fromIndex, final int maxResults) throws Exception {
         return userTransactionService.executeInTransaction(new Callable<List<SBoundaryEventInstance>>() {
 
             @Override
             public List<SBoundaryEventInstance> call() throws Exception {
-                return eventInstanceService.getActivityBoundaryEventInstances(activityId);
+                return eventInstanceService.getActivityBoundaryEventInstances(activityId, fromIndex, maxResults);
             }
         });
     }
@@ -309,28 +309,26 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     public void testGetActivityBoundaryEventInstances() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final long processDefinitionId = 5;
-        final SActivityInstance automaticTaskInstance = createSAutomaticTaskInstance("auto1",
-                1, processInstance.getId(), processDefinitionId, processInstance.getId());
+        final SActivityInstance automaticTaskInstance = createSAutomaticTaskInstance("auto1", 1, processInstance.getId(), processDefinitionId,
+                processInstance.getId());
         final long activityInstanceId = automaticTaskInstance.getId();
 
-        List<SBoundaryEventInstance> boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId);
+        List<SBoundaryEventInstance> boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId, 0, 1);
         assertTrue(boundaryEventInstances.isEmpty());
 
         final SEventInstance eventInstance1 = createBoundaryEventInstance("BoundaryEvent1", 2, processInstance.getId(),
-                processDefinitionId,
-                processInstance.getId(), activityInstanceId, true);
+                processDefinitionId, processInstance.getId(), activityInstanceId, true);
         final SEventInstance eventInstance2 = createBoundaryEventInstance("BoundaryEvent2", 3, processInstance.getId(),
-                processDefinitionId,
-                processInstance.getId(), activityInstanceId, true);
+                processDefinitionId, processInstance.getId(), activityInstanceId, true);
 
-        boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId);
+        boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId, 0, 3);
         assertEquals(2, boundaryEventInstances.size());
         checkBoundaryEventInstance(eventInstance1, boundaryEventInstances.get(0));
         checkBoundaryEventInstance(eventInstance2, boundaryEventInstances.get(1));
 
         deleteSProcessInstance(processInstance);
 
-        boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId);
+        boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId, 0, 1);
         assertTrue(boundaryEventInstances.isEmpty());
     }
 
