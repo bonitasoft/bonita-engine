@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.impl;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -182,7 +181,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
-    private String getTruncated(String value, int maxLengh, final SFlowNodeInstance flowNodeInstance, String key) {
+    private String getTruncated(final String value, final int maxLengh, final SFlowNodeInstance flowNodeInstance, final String key) {
         if (value.length() > maxLengh) {
             final String truncatedValue = value.substring(0, maxLengh);
             logTruncationWarning(value, truncatedValue, maxLengh, flowNodeInstance, key);
@@ -191,7 +190,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return value;
     }
 
-    private void logTruncationWarning(String value, String truncatedValue, int maxLengh, final SFlowNodeInstance flowNodeInstance, String key) {
+    private void logTruncationWarning(final String value, final String truncatedValue, final int maxLengh, final SFlowNodeInstance flowNodeInstance,
+            final String key) {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
             StringBuilder stb = new StringBuilder();
             stb.append("The field ");
@@ -217,8 +217,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey,
-            int maxLengh)
-            throws SFlowNodeModificationException {
+            final int maxLengh) throws SFlowNodeModificationException {
         String truncatedValue = getTruncated(attributeValue, maxLengh, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(attributeKey, truncatedValue);
@@ -515,12 +514,11 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstancesToRestart(final QueryOptions queryOptions) throws SFlowNodeReadException {
-        List<SFlowNodeInstance> selectList;
+    public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) throws SFlowNodeReadException {
+        List<Long> selectList;
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
             selectList = getPersistenceService().selectList(
-                    new SelectListDescriptor<SFlowNodeInstance>("getFlowNodeInstancesToRestart", parameters, SFlowNodeInstance.class, queryOptions));
+                    new SelectListDescriptor<Long>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }

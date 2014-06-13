@@ -281,12 +281,6 @@ public interface FlowNodeInstanceService {
      */
     void setExecuting(SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException;
 
-    /**
-     * @param queryOptions
-     * @return
-     * @throws SFlowNodeReadException
-     */
-    List<SFlowNodeInstance> getFlowNodeInstancesToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
     /**
      * @param saFlowNodeInstance
@@ -320,5 +314,17 @@ public interface FlowNodeInstanceService {
      * @since 6.3
      */
     long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException;
+
+
+    /**
+     * retrieve ids of elements that need to be restarted
+     * Called on start node to set the flag to tell the engine to restart these flow nodes
+     * Should not be called when the engine is started!
+     * 
+     * @param queryOptions
+     * @return
+     * @throws SFlowNodeReadException
+     */
+    List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
 }

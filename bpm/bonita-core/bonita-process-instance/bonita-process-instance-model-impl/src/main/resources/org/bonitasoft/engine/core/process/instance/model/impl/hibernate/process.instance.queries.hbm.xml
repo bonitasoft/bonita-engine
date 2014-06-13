@@ -56,11 +56,12 @@
 		AND a.terminal = FALSE
 	</query>
 
-	<query name="getFlowNodeInstancesToRestart">
-		SELECT f
+	<query name="getFlowNodeInstanceIdsToRestart">
+		SELECT f.id
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.deleted = FALSE
 		AND (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE)
+		ORDER BY id
 	</query>
 
 	<query name="getActiveGatewayInstanceOfProcess">
