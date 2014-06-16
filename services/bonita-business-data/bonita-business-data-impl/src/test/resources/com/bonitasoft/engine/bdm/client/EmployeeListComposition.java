@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -94,6 +95,7 @@ public class Employee
         this.skills = skills;
     }
 
+    @LazyLoaded
     public List<Skill> getSkills() {
         return skills;
     }

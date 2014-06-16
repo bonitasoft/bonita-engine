@@ -25,6 +25,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.model.Query;
@@ -38,6 +39,7 @@ import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
 
 /**
  * @author Colin PUY
@@ -81,7 +83,7 @@ public class EntityCodeGenerator {
 
         for (final Field field : bo.getFields()) {
             final JFieldVar fieldVar = addField(entityClass, field);
-            addAccessors(entityClass, fieldVar);
+            addAccessors(entityClass, fieldVar, field);
             addModifiers(entityClass, field);
         }
     }
@@ -212,8 +214,15 @@ public class EntityCodeGenerator {
     }
 
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
+        addAccessors(entityClass, fieldVar, null);
+    }
+
+    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) throws JClassAlreadyExistsException {
         codeGenerator.addSetter(entityClass, fieldVar);
-        codeGenerator.addGetter(entityClass, fieldVar);
+        final JMethod getter = codeGenerator.addGetter(entityClass, fieldVar);
+        if (field instanceof RelationField && ((RelationField) field).isLazy()) {
+            getter.annotate(LazyLoaded.class);
+        }
     }
 
     protected void addModifiers(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
