@@ -68,7 +68,7 @@ public class Proxyfier {
                 notLazyLoaded = lazyloader.load(thisMethod, ((Entity) self).getPersistenceId());
             }
             alreadyLoaded.add(toFieldName(thisMethod.getName()));
-            return Proxyfier.this.proxyfy(notLazyLoaded);
+            return notLazyLoaded;
         }
 
         private boolean shouldBeLoaded(Method thisMethod, Object notLazyLoaded) {
