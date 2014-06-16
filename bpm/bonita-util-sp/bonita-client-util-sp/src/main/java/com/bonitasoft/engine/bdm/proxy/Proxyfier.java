@@ -33,6 +33,14 @@ public class Proxyfier {
         }
     }
 
+    public <T extends Entity> List<T> proxify(List<T> entities) {
+        List<T> proxies = new ArrayList<T>();
+        for (T t : entities) {
+            proxies.add(proxify(t));
+        }
+        return proxies;
+    }
+
     private class LazyMethodHandler implements MethodHandler {
 
         private LazyLoader lazyloader;

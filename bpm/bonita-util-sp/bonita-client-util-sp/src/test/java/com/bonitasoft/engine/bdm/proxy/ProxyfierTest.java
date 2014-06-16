@@ -1,11 +1,14 @@
 package com.bonitasoft.engine.bdm.proxy;
 
+import static com.bonitasoft.engine.bdm.proxy.ProxyAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,6 +72,16 @@ public class ProxyfierTest {
         verifyZeroInteractions(lazyLoader);
     }
 
+    @Test
+    public void can_proxify_a_list_of_entities() throws Exception {
+        List<TestEntity> entities = Arrays.asList(new TestEntity(), new TestEntity());
+
+        List<TestEntity> proxies = proxyfier.proxify(entities);
+
+        for (TestEntity entity : proxies) {
+            assertThat(entity).isAProxy();
+        }
+    }
     // TODO, proxify returned object
     // TODO, proxify lists ?
 
