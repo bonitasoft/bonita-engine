@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.bdm.proxy;
 
 import static com.bonitasoft.engine.bdm.proxy.ProxyAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,7 +37,20 @@ public class ProxyfierTest {
     }
 
     @Test
-    public void proxy_should_not_load_object_when_it_has_been_already_loaded_before_proxyfication() throws Exception {
+    public void proxy_should_return_value_when_it_has_been_already_loaded_before_proxyfication() throws Exception {
+        String name = "this is a preloaded value";
+        TestEntity entity = new TestEntity();
+        entity.setName(name);
+        entity = proxyfier.proxify(entity);
+
+        String proxyName = entity.getName();
+
+        verifyZeroInteractions(lazyLoader);
+        assertThat(proxyName).isEqualTo(name);
+    }
+
+    @Test
+    public void proxy_should_not_load_entity_when_it_has_been_already_loaded_before_proxyfication() throws Exception {
         TestEntity alreadySetEntity = new TestEntity();
         TestEntity entity = new TestEntity();
         entity.setLazyEntity(alreadySetEntity);
@@ -46,6 +60,18 @@ public class ProxyfierTest {
 
         verifyZeroInteractions(lazyLoader);
         assertThat(loadedEntity).isEqualTo(alreadySetEntity);
+    }
+
+    @Test
+    public void proxy_should_not_load_object_when_it_has_been_already_loade_before_proxyfication() throws Exception {
+        TestEntity entity = new TestEntity();
+        entity = proxyfier.proxify(entity);
+        entity.setName("alreadySetEntity");
+
+        String loadedEntity = entity.getName();
+
+        verifyZeroInteractions(lazyLoader);
+        assertThat(loadedEntity).isEqualTo("alreadySetEntity");
     }
 
     @Test
@@ -78,7 +104,7 @@ public class ProxyfierTest {
     }
 
     @Test
-    @Ignore("not implemented")
+    @Ignore("Not yet implemented")
     public void proxy_should_return_a_proxy_when_calling_a_getter_on_an_entity() throws Exception {
         TestEntity entity = proxyfier.proxify(new TestEntity());
 

@@ -7,9 +7,10 @@ import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 public class TestEntity implements Entity {
 
     private TestEntity entity;
+    private String name;
 
     public TestEntity getEagerEntity() {
-        return entity;
+        return new TestEntity();
     }
 
     public void setLazyEntity(TestEntity entity) {
@@ -21,6 +22,14 @@ public class TestEntity implements Entity {
         return entity;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public Long getPersistenceId() {
         return 0L;
@@ -30,5 +39,4 @@ public class TestEntity implements Entity {
     public Long getPersistenceVersion() {
         return 0L;
     }
-
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 
@@ -25,7 +26,7 @@ public class Proxyfier {
     public <T extends Entity> T proxify(T entity) {
         ProxyFactory factory = new ProxyFactory();
         factory.setSuperclass(entity.getClass());
-        factory.setFilter(new EntityGetterAndSetterFilter());
+        factory.setFilter(new AllMethodFilter());
         try {
             return (T) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(entity, lazyLoader));
         } catch (Exception e) {
@@ -35,12 +36,15 @@ public class Proxyfier {
 
     public <T extends Entity> List<T> proxify(List<T> entities) {
         List<T> proxies = new ArrayList<T>();
-        for (T t : entities) {
-            proxies.add(proxify(t));
+        for (T entity : entities) {
+            proxies.add(proxify(entity));
         }
         return proxies;
     }
 
+    /**
+     * Handler that lazy load values for lazy loading methods that hasn't been loaded
+     */
     private class LazyMethodHandler implements MethodHandler {
 
         private LazyLoader lazyloader;
@@ -72,5 +76,17 @@ public class Proxyfier {
             }
             throw new IllegalArgumentException(methodName + " is not a valid getter or setter name.");
         }
+    }
+
+    /**
+     * Filter all methods
+     */
+    private class AllMethodFilter implements MethodFilter {
+
+        @Override
+        public boolean isHandled(Method m) {
+            return true;
+        }
+
     }
 }
