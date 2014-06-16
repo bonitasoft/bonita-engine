@@ -24,11 +24,15 @@ public class Proxyfier {
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> T proxify(T entity) {
+        return (T) proxifyEntity(entity);
+    }
+
+    private Entity proxifyEntity(Entity entity) {
         ProxyFactory factory = new ProxyFactory();
         factory.setSuperclass(entity.getClass());
         factory.setFilter(new AllMethodFilter());
         try {
-            return (T) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(entity, lazyLoader));
+            return (Entity) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(entity, lazyLoader));
         } catch (Exception e) {
             throw new RuntimeException("Error when proxifying object", e);
         }
@@ -59,15 +63,34 @@ public class Proxyfier {
         @Override
         public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
             Object invocationResult = thisMethod.invoke(entity, args);
-            if (shouldBeLoaded(thisMethod, invocationResult)) {
-                invocationResult = lazyloader.load(thisMethod, entity.getPersistenceId());
+
+            if (isGetterOrSetter(thisMethod.getName())) {
+                if (shouldBeLoaded(thisMethod, invocationResult)) {
+                    invocationResult = lazyloader.load(thisMethod, entity.getPersistenceId());
+                }
+                alreadyLoaded.add(toFieldName(thisMethod.getName()));
             }
-            alreadyLoaded.add(toFieldName(thisMethod.getName()));
+
+            if (invocationResult instanceof Entity) {
+                return proxifyEntity((Entity) invocationResult);
+            }
+
+            if (invocationResult instanceof List) {
+                List<Object> proxies = new ArrayList<Object>();
+                for (Object entity : (List<?>) invocationResult) {
+                    proxies.add(proxifyEntity((Entity) entity));
+                    return proxies;
+                }
+            }
             return invocationResult;
         }
 
         private boolean shouldBeLoaded(Method thisMethod, Object notLazyLoaded) {
             return notLazyLoaded == null && !alreadyLoaded.contains(toFieldName(thisMethod.getName())) && thisMethod.getAnnotation(LazyLoaded.class) != null;
+        }
+
+        private boolean isGetterOrSetter(String methodName) {
+            return methodName.startsWith("get") || methodName.startsWith("set") && methodName.length() > 3;
         }
 
         private String toFieldName(final String methodName) {

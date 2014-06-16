@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,6 +51,7 @@ public class ProxyfierTest {
     @Test
     public void proxy_should_not_load_entity_when_it_has_been_already_loaded_before_proxyfication() throws Exception {
         TestEntity alreadySetEntity = new TestEntity();
+        alreadySetEntity.setName("aDeepName");
         TestEntity entity = new TestEntity();
         entity.setLazyEntity(alreadySetEntity);
         entity = proxyfier.proxify(entity);
@@ -59,7 +59,7 @@ public class ProxyfierTest {
         TestEntity loadedEntity = entity.getLazyEntity();
 
         verifyZeroInteractions(lazyLoader);
-        assertThat(loadedEntity).isEqualTo(alreadySetEntity);
+        assertThat(loadedEntity.getName()).isEqualTo(alreadySetEntity.getName());
     }
 
     @Test
@@ -92,13 +92,23 @@ public class ProxyfierTest {
     }
 
     @Test
-    @Ignore("Not yet implemented")
-    public void proxy_should_return_a_proxy_when_calling_a_getter_on_an_entity() throws Exception {
+    public void proxy_should_return_a_proxy_when_calling_a_getter_returning_an_entity() throws Exception {
         TestEntity entity = proxyfier.proxify(new TestEntity());
 
         TestEntity eagerEntity = entity.getEagerEntity();
 
         assertThat(eagerEntity).isAProxy();
+    }
+
+    @Test
+    public void proxy_should_return_a_list_of_proxies_when_calling_a_getter_returning_a_list_of_entities() throws Exception {
+        TestEntity entity = proxyfier.proxify(new TestEntity());
+
+        List<TestEntity> entities = entity.getEagerEntities();
+
+        for (TestEntity e : entities) {
+            assertThat(e).isAProxy();
+        }
     }
 
     @Test

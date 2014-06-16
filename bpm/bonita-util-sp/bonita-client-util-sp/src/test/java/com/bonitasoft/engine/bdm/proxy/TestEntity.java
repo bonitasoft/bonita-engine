@@ -1,5 +1,9 @@
 package com.bonitasoft.engine.bdm.proxy;
 
+import static java.util.Arrays.asList;
+
+import java.util.List;
+
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
@@ -20,6 +24,10 @@ public class TestEntity implements Entity {
     @LazyLoaded
     public TestEntity getLazyEntity() {
         return entity;
+    }
+
+    public List<TestEntity> getEagerEntities() {
+        return asList(new TestEntity(), new TestEntity());
     }
 
     public String getName() {
