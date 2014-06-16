@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -87,6 +87,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(description, processInstance.getDescription());
 
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -433,7 +434,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     }
 
     private void getProcessInstancesOrderByProcessInstanceCriterion(final ProcessInstanceCriterion processInstanceCriterion,
-            final List<ProcessInstance> processInstances) throws Exception {
+            final List<ProcessInstance> processInstances) {
 
         // We asked for creation date descending order:
         final List<ProcessInstance> resultProcessInstances = getProcessAPI().getProcessInstances(0, 10, processInstanceCriterion);
@@ -761,6 +762,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     }
 
     @Test
+    @Ignore("Uncomment when fix the bug BS-9055")
     public void runProcessInstanceWithDefaultFlownode_should_pass_all_human_task() throws Exception {
         logoutThenloginAs("pedro", "secreto");
 
@@ -768,10 +770,11 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addDefaultTransition("step1", "step2").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
-        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
         waitForUserTaskAndExecuteIt("step2", pi, pedro);
 
+        waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -789,6 +792,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
         waitForUserTaskAndExecuteIt("step2", pi, pedro);
 
+        waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -806,6 +810,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
         waitForUserTaskAndExecuteIt("step3", pi, pedro);
 
+        waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
     }
 
