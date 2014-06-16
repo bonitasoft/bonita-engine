@@ -63,18 +63,6 @@ public class ProxyfierTest {
     }
 
     @Test
-    public void proxy_should_not_load_object_when_it_has_been_already_loade_before_proxyfication() throws Exception {
-        TestEntity entity = new TestEntity();
-        entity = proxyfier.proxify(entity);
-        entity.setName("alreadySetEntity");
-
-        String loadedEntity = entity.getName();
-
-        verifyZeroInteractions(lazyLoader);
-        assertThat(loadedEntity).isEqualTo("alreadySetEntity");
-    }
-
-    @Test
     public void proxy_should_not_load_object_which_has_been_already_lazy_loaded() throws Exception {
         TestEntity entity = proxyfier.proxify(new TestEntity());
 
