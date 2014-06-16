@@ -615,6 +615,19 @@ public interface IdentityService {
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int maxResults) throws SIdentityException;
 
     /**
+     * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
+     * @param userInfoName The user information name.
+     * @param userInfoValue The user information value.
+     * @param usePartialMatch Defines whether the custom user information value should use a partial match. 
+     * @param fromIndex The index of the first record to be retrieved. First record has index 0.
+     * @param maxResults The max results to be retrieved. 
+     * @return the list of user identifiers containing the chosen custom user information with the given value.
+     * @throws SIdentityException
+     * @since 6.3.2
+     */
+    List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException;
+
+    /**
      * Search custom user info values according to specific query options
      * 
      * @param options

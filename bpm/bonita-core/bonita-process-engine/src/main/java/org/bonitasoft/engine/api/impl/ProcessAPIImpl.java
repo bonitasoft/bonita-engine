@@ -5709,15 +5709,30 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             final SHumanTaskDefinition humanTask = (SHumanTaskDefinition) flowNode;
             final String actorName = humanTask.getActorName();
-            final ActorMappingService actorMappingService = getTenantAccessor().getActorMappingService();
-            final SActor actor = actorMappingService.getActor(actorName, processDefinitionId);
-            final List<Long> userIds = actorMappingService.getPossibleUserIdsOfActorId(actor.getId(), startIndex, maxResults);
+            final List<Long> userIds = getUserIdsForActor(tenantAccessor, processDefinitionId, actorName, startIndex, maxResults);
             final List<SUser> users = tenantAccessor.getIdentityService().getUsers(userIds);
             return ModelConvertor.toUsers(users);
         } catch (final SProcessDefinitionNotFoundException spdnfe) {
             return Collections.emptyList();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
+        }
+    }
+
+    private List<Long> getUserIdsForActor(final TenantServiceAccessor tenantAccessor, final long processDefinitionId, final String actorName,
+            final int startIndex, final int maxResults) throws SActorNotFoundException, SBonitaReadException {
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+        final SActor actor = actorMappingService.getActor(actorName, processDefinitionId);
+        final List<Long> userIds = actorMappingService.getPossibleUserIdsOfActorId(actor.getId(), startIndex, maxResults);
+        return userIds;
+    }
+    
+    @Override
+    public List<Long> getUserIdsForActor(long processDefinitionId, String actorName, int startIndex, int maxResults) {
+        try {
+            return getUserIdsForActor(getTenantAccessor(), processDefinitionId, actorName, startIndex, maxResults);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
         }
     }
 

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,8 +119,7 @@ public class IdentityServiceImpl implements IdentityService {
     private final CredentialsEncrypter encrypter;
 
     public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
-            final CredentialsEncrypter encrypter) {
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final CredentialsEncrypter encrypter) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
@@ -198,8 +198,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
-            final String methodName,
-            final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) throws SCustomUserInfoDefinitionCreationException {
+            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception)
+            throws SCustomUserInfoDefinitionCreationException {
         logOnExceptionMethod(methodName, exception);
         initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
@@ -427,8 +427,7 @@ public class IdentityServiceImpl implements IdentityService {
         final String methodName = "deleteCustomUserInfoDefinition";
         logBeforeMethod(methodName);
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.DELETED,
-                "Deleting profile custom user info definition with name "
-                        + info.getName());
+                "Deleting profile custom user info definition with name " + info.getName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(info);
             final SDeleteEvent deleteEvent = getDeleteEvent(info, CUSTOM_USER_INFO_DEFINITION);
@@ -934,8 +933,7 @@ public class IdentityServiceImpl implements IdentityService {
         return definition != null;
     }
 
-    private SCustomUserInfoDefinition getCustomUserInfoDefinitionWithoutCheck(final String name)
-            throws SBonitaReadException {
+    private SCustomUserInfoDefinition getCustomUserInfoDefinitionWithoutCheck(final String name) throws SBonitaReadException {
         return persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(name));
     }
 
@@ -948,6 +946,30 @@ public class IdentityServiceImpl implements IdentityService {
                     SCustomUserInfoDefinition.class, "CustomUserInfoDefinition", fromIndex, maxResults));
             logAfterMethod(methodName);
             return listSCustomUserInfoDefinition;
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(methodName, e);
+            throw new SIdentityException("Can't get the custom user info definitions", e);
+        }
+    }
+
+    @Override
+    public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException {
+        final String methodName = "getUserIdsWithCustomUserInfo";
+        logBeforeMethod(methodName);
+        try {
+            String queryName;
+            if (usePartialMatch) {
+                queryName = "getUserIdsWithCustomUserInfoContains";
+                userInfoValue = "%" + userInfoValue + "%";
+            } else {
+                queryName = "getUserIdsWithCustomUserInfo";
+            }
+            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            parameters.put("userInfoName", userInfoName);
+            parameters.put("userInfoValue", userInfoValue);
+            final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>(queryName, parameters, SUser.class, Long.class,
+                    new QueryOptions(fromIndex, maxResults));
+            return persistenceService.selectList(descriptor);
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
             throw new SIdentityException("Can't get the custom user info definitions", e);
@@ -1816,8 +1838,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private void logOnExceptionMethod(final String methodName, final SBonitaException re) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                    LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, re));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, re));
         }
     }
 

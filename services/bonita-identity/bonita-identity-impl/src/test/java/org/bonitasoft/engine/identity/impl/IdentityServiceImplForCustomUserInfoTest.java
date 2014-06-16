@@ -13,7 +13,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.identity.SCustomUserInfoValueReadException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -37,6 +40,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -49,6 +53,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -349,6 +354,49 @@ public class IdentityServiceImplForCustomUserInfoTest {
         verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), eventCaptor.capture());
         assertThat(recordCaptor.getValue().getEntity()).isEqualTo(userInfoValue);
         assertThat(eventCaptor.getValue().getObject()).isEqualTo(userInfoValue);
+    }
+    
+    @Test
+    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfo_when_no_partial_match() throws Exception {
+        //given
+        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("userInfoName", DEFAULT_NAME);
+        parameters.put("userInfoValue", "Java");
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfo", parameters, SUser.class, Long.class,
+                new QueryOptions(0, 10));
+        given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
+        
+        //when
+        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
+
+        //then
+        assertThat(userIds).containsExactly(10L, 20L);
+    }
+    
+    @Test
+    public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfoContains_when_partial_match() throws Exception {
+        //given
+        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("userInfoName", DEFAULT_NAME);
+        parameters.put("userInfoValue", "Java");
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfoContains", parameters, SUser.class, Long.class,
+                new QueryOptions(0, 10));
+        given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
+        
+        //when
+        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", true, 0, 10);
+        
+        //then
+        assertThat(userIds).containsExactly(10L, 20L);
+    }
+    
+    @Test(expected = SIdentityException.class) //then
+    public void getUserIdsWithCustomUserInfo_should_throw_SIdentityException_when_persistence_service_throws_exception() throws Exception {
+        //given
+        given(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>>any())).willThrow(new SBonitaReadException(""));
+        
+        //when
+        identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
     }
 
 }
