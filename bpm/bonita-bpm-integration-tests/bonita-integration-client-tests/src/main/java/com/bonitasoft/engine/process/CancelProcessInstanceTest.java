@@ -69,16 +69,12 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(task2.getId());
 
         waitForProcessToFinish(processInstance, TestStates.getCancelledState());
-
-        final ArchivedActivityInstance archTask1 = getProcessAPI().getArchivedActivityInstance(task1.getId());
-        final ArchivedActivityInstance archTask2 = getProcessAPI().getArchivedActivityInstance(task2.getId());
-        assertEquals(TestStates.getCancelledState(), archTask1.getState());
-        assertEquals(TestStates.getCancelledState(), archTask2.getState());
+        waitForArchivedActivity(task1.getId(), TestStates.getCancelledState());
+        waitForArchivedActivity(task2.getId(), TestStates.getCancelledState());
 
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId1));
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId2));
         disableAndDeleteProcess(processDefinition);
-
     }
 
     @Test
