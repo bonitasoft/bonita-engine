@@ -3,30 +3,21 @@ package com.bonitasoft.engine.bdm.proxy;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
+@SuppressWarnings("serial")
 public class TestEntity implements Entity {
 
     private TestEntity entity;
 
-    @LazyLoaded
-    public TestEntity getNotLoadedEntity() {
-        return null;
-    }
-
-    @LazyLoaded
-    public TestEntity getAlreadyLoadedEntity() {
-        return new TestEntity();
-    }
-
     public TestEntity getEagerEntity() {
-        return null;
+        return entity;
     }
 
-    public void setEntity(TestEntity entity) {
+    public void setLazyEntity(TestEntity entity) {
         this.entity = entity;
     }
 
     @LazyLoaded
-    public TestEntity getEntity() {
+    public TestEntity getLazyEntity() {
         return entity;
     }
 

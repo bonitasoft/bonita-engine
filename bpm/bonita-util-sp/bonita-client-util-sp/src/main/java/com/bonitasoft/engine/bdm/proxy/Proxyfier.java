@@ -27,7 +27,7 @@ public class Proxyfier {
         factory.setSuperclass(entity.getClass());
         factory.setFilter(new EntityGetterAndSetterFilter());
         try {
-            return (T) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(lazyLoader));
+            return (T) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(entity, lazyLoader));
         } catch (Exception e) {
             throw new RuntimeException("Error when proxifying object", e);
         }
@@ -41,34 +41,25 @@ public class Proxyfier {
         return proxies;
     }
 
-    private Object proxyfy(Object entity) {
-        ProxyFactory factory = new ProxyFactory();
-        factory.setSuperclass(entity.getClass());
-        factory.setFilter(new EntityGetterAndSetterFilter());
-        try {
-            return factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(lazyLoader));
-        } catch (Exception e) {
-            throw new RuntimeException("Error when proxifying object", e);
-        }
-    }
-
     private class LazyMethodHandler implements MethodHandler {
 
         private LazyLoader lazyloader;
         private List<String> alreadyLoaded = new ArrayList<String>();
+        private Entity entity;
 
-        public LazyMethodHandler(LazyLoader lazyloader) {
+        public LazyMethodHandler(Entity entity, LazyLoader lazyloader) {
+            this.entity = entity;
             this.lazyloader = lazyloader;
         }
 
         @Override
         public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
-            Object notLazyLoaded = proceed.invoke(self, args);
-            if (shouldBeLoaded(thisMethod, notLazyLoaded)) {
-                notLazyLoaded = lazyloader.load(thisMethod, ((Entity) self).getPersistenceId());
+            Object invocationResult = thisMethod.invoke(entity, args);
+            if (shouldBeLoaded(thisMethod, invocationResult)) {
+                invocationResult = lazyloader.load(thisMethod, entity.getPersistenceId());
             }
             alreadyLoaded.add(toFieldName(thisMethod.getName()));
-            return notLazyLoaded;
+            return invocationResult;
         }
 
         private boolean shouldBeLoaded(Method thisMethod, Object notLazyLoaded) {
