@@ -24,7 +24,7 @@ public class Proxyfier {
     @SuppressWarnings("unchecked")
     public <T extends Entity> T proxify(T entity) {
         ProxyFactory factory = new ProxyFactory();
-        factory.setSuperclass(TestEntity.class);
+        factory.setSuperclass(entity.getClass());
         factory.setFilter(new EntityGetterAndSetterFilter());
         try {
             return (T) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(lazyLoader));
