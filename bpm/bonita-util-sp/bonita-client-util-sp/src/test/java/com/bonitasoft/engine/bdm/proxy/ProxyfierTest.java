@@ -73,6 +73,15 @@ public class ProxyfierTest {
     }
 
     @Test
+    public void proxy_should_return_a_proxy_when_calling_a_getter_on_an_entity() throws Exception {
+        TestEntity entity = proxyfier.proxify(new TestEntity());
+
+        TestEntity eagerEntity = entity.getEagerEntity();
+
+        assertThat(eagerEntity).isAProxy();
+    }
+
+    @Test
     public void can_proxify_a_list_of_entities() throws Exception {
         List<TestEntity> entities = Arrays.asList(new TestEntity(), new TestEntity());
 

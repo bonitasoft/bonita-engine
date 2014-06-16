@@ -41,6 +41,17 @@ public class Proxyfier {
         return proxies;
     }
 
+    private Object proxyfy(Object entity) {
+        ProxyFactory factory = new ProxyFactory();
+        factory.setSuperclass(entity.getClass());
+        factory.setFilter(new EntityGetterAndSetterFilter());
+        try {
+            return factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(lazyLoader));
+        } catch (Exception e) {
+            throw new RuntimeException("Error when proxifying object", e);
+        }
+    }
+
     private class LazyMethodHandler implements MethodHandler {
 
         private LazyLoader lazyloader;
@@ -57,7 +68,7 @@ public class Proxyfier {
                 notLazyLoaded = lazyloader.load(thisMethod, ((Entity) self).getPersistenceId());
             }
             alreadyLoaded.add(toFieldName(thisMethod.getName()));
-            return notLazyLoaded;
+            return Proxyfier.this.proxyfy(notLazyLoaded);
         }
 
         private boolean shouldBeLoaded(Method thisMethod, Object notLazyLoaded) {
