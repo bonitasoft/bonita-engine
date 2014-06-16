@@ -802,10 +802,9 @@ public class APITestUtil extends PlatformTestUtil {
     public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final String stateName) throws Exception {
         final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, stateName,
                 getProcessAPI());
-        waitForArchivedActivity.waitUntil();
+        assertTrue(waitForArchivedActivity.waitUntil());
         final ArchivedActivityInstance archivedActivityInstance = waitForArchivedActivity.getArchivedActivityInstance();
         assertNotNull(archivedActivityInstance);
-        assertEquals(stateName, archivedActivityInstance.getState());
         return archivedActivityInstance;
     }
 
