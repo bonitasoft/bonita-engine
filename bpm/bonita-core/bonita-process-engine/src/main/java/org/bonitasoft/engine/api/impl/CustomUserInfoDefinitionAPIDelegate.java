@@ -33,7 +33,7 @@ import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBui
  * @author Vincent Elcrin
  * @author Elias Ricken de Medeiros
  */
-public class CustomUserInfoDefinitionAPI {
+public class CustomUserInfoDefinitionAPIDelegate {
 
     private static final int MAX_NAME_LENGHT = 75;
 
@@ -41,7 +41,7 @@ public class CustomUserInfoDefinitionAPI {
 
     private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
-    public CustomUserInfoDefinitionAPI(IdentityService service) {
+    public CustomUserInfoDefinitionAPIDelegate(IdentityService service) {
         this.service = service;
     }
 

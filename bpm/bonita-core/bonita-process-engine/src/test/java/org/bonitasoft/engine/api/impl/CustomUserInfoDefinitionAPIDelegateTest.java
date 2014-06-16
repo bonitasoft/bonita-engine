@@ -43,7 +43,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Vincent Elcrin
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CustomUserInfoDefinitionAPITest {
+public class CustomUserInfoDefinitionAPIDelegateTest {
 
     @Mock
     private IdentityService service;
@@ -51,11 +51,11 @@ public class CustomUserInfoDefinitionAPITest {
     @Mock(answer = Answers.RETURNS_MOCKS)
     private SCustomUserInfoDefinitionBuilderFactory factory;
 
-    private CustomUserInfoDefinitionAPI api;
+    private CustomUserInfoDefinitionAPIDelegate api;
 
     @Before
     public void setUp() {
-        api = new CustomUserInfoDefinitionAPI(service);
+        api = new CustomUserInfoDefinitionAPIDelegate(service);
     }
 
     @Test
