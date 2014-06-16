@@ -38,10 +38,15 @@ public class Proxyfier {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Entity> List<T> proxify(List<T> entities) {
-        List<T> proxies = new ArrayList<T>();
-        for (T entity : entities) {
-            proxies.add(proxify(entity));
+        return (List<T>) proxifyEntities((List<Entity>) entities);
+    }
+
+    private List<Entity> proxifyEntities(List<Entity> entities) {
+        List<Entity> proxies = new ArrayList<Entity>();
+        for (Entity entity : entities) {
+            proxies.add(proxifyEntity(entity));
         }
         return proxies;
     }
@@ -64,33 +69,48 @@ public class Proxyfier {
         public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
             Object invocationResult = thisMethod.invoke(entity, args);
 
-            if (isGetterOrSetter(thisMethod.getName())) {
+            if (isGetterOrSetter(thisMethod)) {
                 if (shouldBeLoaded(thisMethod, invocationResult)) {
                     invocationResult = lazyloader.load(thisMethod, entity.getPersistenceId());
                 }
                 alreadyLoaded.add(toFieldName(thisMethod.getName()));
             }
 
-            if (invocationResult instanceof Entity) {
+            return proxifyIfNeeded(invocationResult);
+        }
+
+        @SuppressWarnings("unchecked")
+        private Object proxifyIfNeeded(Object invocationResult) {
+            if (isAnEntity(invocationResult)) {
                 return proxifyEntity((Entity) invocationResult);
             }
 
-            if (invocationResult instanceof List) {
-                List<Object> proxies = new ArrayList<Object>();
-                for (Object entity : (List<?>) invocationResult) {
-                    proxies.add(proxifyEntity((Entity) entity));
-                    return proxies;
-                }
+            if (isAListOfEntities(invocationResult)) {
+                return proxifyEntities((List<Entity>) invocationResult);
             }
             return invocationResult;
+        }
+
+        private boolean isAListOfEntities(Object invocationResult) {
+            if (invocationResult instanceof List) {
+                List<?> list = (List<?>) invocationResult;
+                if (!list.isEmpty() && list.get(0) instanceof Entity) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean isAnEntity(Object invocationResult) {
+            return invocationResult instanceof Entity;
         }
 
         private boolean shouldBeLoaded(Method thisMethod, Object notLazyLoaded) {
             return notLazyLoaded == null && !alreadyLoaded.contains(toFieldName(thisMethod.getName())) && thisMethod.getAnnotation(LazyLoaded.class) != null;
         }
 
-        private boolean isGetterOrSetter(String methodName) {
-            return methodName.startsWith("get") || methodName.startsWith("set") && methodName.length() > 3;
+        private boolean isGetterOrSetter(Method method) {
+            return method.getName().startsWith("get") || method.getName().startsWith("set") && method.getName().length() > 3;
         }
 
         private String toFieldName(final String methodName) {

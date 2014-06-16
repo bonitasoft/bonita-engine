@@ -1,6 +1,5 @@
 package com.bonitasoft.engine.bdm.proxy;
 
-import static com.bonitasoft.engine.bdm.proxy.ProxyAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -97,7 +96,17 @@ public class ProxyfierTest {
 
         TestEntity eagerEntity = entity.getEagerEntity();
 
-        assertThat(eagerEntity).isAProxy();
+        ProxyAssert.assertThat(eagerEntity).isAProxy();
+    }
+
+    @Test
+    public void proxy_should_not_return_a_proxy_when_calling_a_getter_not_returning_an_entity() throws Exception {
+        TestEntity entity = proxyfier.proxify(new TestEntity());
+        entity.setName("aName");
+
+        String name = entity.getName();
+
+        ProxyAssert.assertThat(name).isNotAProxy();
     }
 
     @Test
@@ -107,7 +116,18 @@ public class ProxyfierTest {
         List<TestEntity> entities = entity.getEagerEntities();
 
         for (TestEntity e : entities) {
-            assertThat(e).isAProxy();
+            ProxyAssert.assertThat(e).isAProxy();
+        }
+    }
+
+    @Test
+    public void proxy_should_not_return_a_list_of_proxies_when_calling_a_getter_not_returning_a_list_of_entities() throws Exception {
+        TestEntity entity = proxyfier.proxify(new TestEntity());
+
+        List<String> strings = entity.getStrings();
+
+        for (String string : strings) {
+            ProxyAssert.assertThat(string).isNotAProxy();
         }
     }
 
@@ -118,10 +138,7 @@ public class ProxyfierTest {
         List<TestEntity> proxies = proxyfier.proxify(entities);
 
         for (TestEntity entity : proxies) {
-            assertThat(entity).isAProxy();
+            ProxyAssert.assertThat(entity).isAProxy();
         }
     }
-    // TODO, proxify returned object
-    // TODO, proxify lists ?
-
 }

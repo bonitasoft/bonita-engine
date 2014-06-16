@@ -38,6 +38,10 @@ public class TestEntity implements Entity {
         this.name = name;
     }
 
+    public List<String> getStrings() {
+        return asList("aString", "anotherString");
+    }
+
     @Override
     public Long getPersistenceId() {
         return 0L;
