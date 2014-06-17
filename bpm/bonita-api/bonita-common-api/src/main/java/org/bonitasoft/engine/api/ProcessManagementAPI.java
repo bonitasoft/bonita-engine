@@ -1671,5 +1671,21 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     List<User> getPossibleUsersOfHumanTask(long processDefinitionId, String humanTaskName, int startIndex, int maxResults);
+    
+    /**
+     * Retrieves the list of user identifiers for the given actor and process.
+     * 
+     * @param processDefinitionId
+     *            The process definition identifier
+     * @param actorName
+     *            The actor name
+     * @param startIndex
+     *            The start index (the first valid value is zero)
+     * @param maxResults
+     *            max number of user identifiers to be retrieved
+     * @return Retrieves the list of user identifiers for the given actor and process.
+     * @since 6.3.2
+     */
+    List<Long> getUserIdsForActor(long processDefinitionId, String actorName, int startIndex, int maxResults);
 
 }

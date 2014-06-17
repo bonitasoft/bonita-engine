@@ -21,6 +21,7 @@
                <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
                <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
+               <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
                
                <!-- GLUPSSSS Needed by process instance queries -->
                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
@@ -56,4 +57,8 @@
         <constructor-arg ref="sessionFactory" />
    </bean>
 
+   <bean id="userInfoRepository" class="org.bonitasoft.engine.test.persistence.repository.CustomUserInfoRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+  
 </beans>
