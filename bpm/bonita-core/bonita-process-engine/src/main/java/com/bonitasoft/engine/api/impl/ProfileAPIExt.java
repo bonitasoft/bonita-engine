@@ -24,11 +24,6 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.lock.BonitaLock;
-import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
@@ -142,7 +137,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public byte[] exportAllProfiles() throws ExecutionException {
+    public synchronized byte[] exportAllProfiles() throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityservice = tenantAccessor.getIdentityService();
@@ -159,7 +154,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws ExecutionException {
+    public synchronized byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityservice = tenantAccessor.getIdentityService();
@@ -183,7 +178,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
+    public synchronized List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
@@ -195,7 +190,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         // at profile level in ProfilesImporterExt
         return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
                 org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
-                .importProfiles(getUserIdFromSession());
+        .importProfiles(getUserIdFromSession());
 
     }
 
@@ -206,7 +201,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
+    public synchronized Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
@@ -239,7 +234,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileEntry createProfileEntry(final ProfileEntryCreator creator) throws CreationException {
+    public synchronized ProfileEntry createProfileEntry(final ProfileEntryCreator creator) throws CreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
@@ -251,29 +246,15 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-        LockService lockService = tenantAccessor.getLockService();
         Long profileId = (Long) fields.get(ProfileEntryField.PROFILE_ID);
         SProfileEntry sProfileEntry;
-        BonitaLock lock = null;
-        long tenantId = tenantAccessor.getTenantId();
-        TechnicalLoggerService technicalLoggerService = tenantAccessor.getTechnicalLoggerService();
         try {
-            // add a lock because the update profile call getProfile then update profile -> deadlock...
-            lock = lockService.lock(profileId, "PROFILE", tenantId);
             profileService.updateProfileMetaData(profileId);
             sProfileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
             final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
             updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
-        } finally {
-            if (lock != null) {
-                try {
-                    lockService.unlock(lock, tenantId);
-                } catch (SLockException e) {
-                    technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "error while unlocking the update profile entry lock");
-                }
-            }
         }
 
         return SPModelConvertor.toProfileEntry(sProfileEntry);
@@ -293,7 +274,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public void deleteProfileEntry(final long id) throws DeletionException {
+    public synchronized void deleteProfileEntry(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
@@ -304,7 +285,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileEntry updateProfileEntry(final long id, final ProfileEntryUpdater updateDescriptor) throws UpdateException {
+    public synchronized ProfileEntry updateProfileEntry(final long id, final ProfileEntryUpdater updateDescriptor) throws UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
