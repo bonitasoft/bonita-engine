@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,17 +18,20 @@ import org.bonitasoft.engine.identity.model.SUser;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SUserNotFoundException extends SIdentityException {
 
     private static final long serialVersionUID = -8190385127379005323L;
 
     public SUserNotFoundException(final SUser user) {
-        super(user.getId(), user.getUserName());
+        this(user.getUserName());
+        setUserIdOnContext(user.getId());
     }
 
     public SUserNotFoundException(final long userId) {
-        super(userId, "?");
+        super("Can't find the user");
+        setUserIdOnContext(userId);
     }
 
     public SUserNotFoundException(final String userName) {

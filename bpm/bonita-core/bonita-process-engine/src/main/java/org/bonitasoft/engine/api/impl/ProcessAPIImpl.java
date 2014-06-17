@@ -51,7 +51,6 @@ import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityIn
 import org.bonitasoft.engine.api.impl.transaction.activity.GetNumberOfActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.actor.ExportActorMapping;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetActorMembers;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsByActorIds;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActorMembers;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetNumberOfActors;
@@ -285,7 +284,6 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
@@ -444,6 +442,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Arthur Freycon
  */
 public class ProcessAPIImpl implements ProcessAPI {
+
+    private static final int BATCH_SIZE = 100;
 
     private static final String CONTAINER_TYPE_PROCESS_INSTANCE = "PROCESS_INSTANCE";
 
@@ -1192,9 +1192,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
-            final GetActorMembers getActorMembers = new GetActorMembers(actorMappingService, actorId, startIndex, maxResults);
-            getActorMembers.execute();
-            return ModelConvertor.toActorMembers(getActorMembers.getResult());
+            final List<SActorMember> actorMembers = actorMappingService.getActorMembers(actorId, startIndex, maxResults);
+            return ModelConvertor.toActorMembers(actorMembers);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -2813,50 +2812,75 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         try {
-            final int totalNumber = activityInstanceService.getNumberOfActivityInstances(processInstanceId);
-            final List<SActivityInstance> activityInstances = activityInstanceService.getActivityInstances(processInstanceId, 0, totalNumber);
-            for (final SActivityInstance activityInstance : activityInstances) {
-                if (activityInstance instanceof SUserTaskInstance) {
-                    final SUserTaskInstance userTaskInstance = (SUserTaskInstance) activityInstance;
-                    if (userId == userTaskInstance.getAssigneeId()) {
+            final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SHumanTaskInstance.class, "id", OrderByType.ASC));
+            final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
+            QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, orderByOptions, filterOptions, null);
+
+            List<SHumanTaskInstance> sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
+            while (!sHumanTaskInstances.isEmpty()) {
+                for (final SHumanTaskInstance sHumanTaskInstance : sHumanTaskInstances) {
+                    if (userId == sHumanTaskInstance.getAssigneeId()) {
                         return true;
                     }
-                    final long actorId = userTaskInstance.getActorId();
-                    final int numOfActorMembers = (int) actorMappingService.getNumberOfActorMembers(actorId);
-                    final int numberPerPage = 100;
-                    for (int i = 0; i < numOfActorMembers % numberPerPage; i++) {
-                        final GetActorMembers getActorMembers = new GetActorMembers(actorMappingService, actorId, i, numberPerPage);
-                        getActorMembers.execute();
-                        for (final SActorMember actorMember : getActorMembers.getResult()) {
-                            if (actorMember.getUserId() == userId) {
-                                return true;
-                            }
-                            // if userId is as id of a user manager, return true
-                            final SUser user = identityService.getUser(actorMember.getUserId());
-                            if (userId == user.getManagerUserId()) {
-                                return true;
-                            }
-                        }
+                    final boolean isActorMemberOrManagerOfActorMember = checkIfUserIsActorMemberOrManagerOfActorMember(userId,
+                            sHumanTaskInstance.getActorId());
+                    if (isActorMemberOrManagerOfActorMember) {
+                        return true;
                     }
                 }
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+                sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
             }
-            if (activityInstances.isEmpty()) {
-                // check if the process exists in case of there is no results
-                try {
-                    tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
-                } catch (final SProcessInstanceNotFoundException e) {
-                    throw new ProcessInstanceNotFoundException(processInstanceId);
-                }
-            }
+
+            checkIfProcessInstanceExistsWhenNoHumanTask(processInstanceId);
             return false;
         } catch (final SBonitaException e) {
             // no rollback, read only method
             throw new BonitaRuntimeException(e);// TODO refactor Exceptions!!!!!!!!!!!!!!!!!!!
         }
+    }
+
+    private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaSearchException, SProcessInstanceReadException,
+            ProcessInstanceNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
+        final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
+        final QueryOptions queryOptions = new QueryOptions(filterOptions, null);
+        if (activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0) {
+            // check if the process exists in case of there is no results
+            try {
+                tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
+            } catch (final SProcessInstanceNotFoundException e) {
+                throw new ProcessInstanceNotFoundException(processInstanceId);
+            }
+        }
+    }
+
+    private boolean checkIfUserIsActorMemberOrManagerOfActorMember(final long userId, final long actorId) throws SBonitaReadException, SUserNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+
+        int index = 0;
+        List<SActorMember> actorMembers = actorMappingService.getActorMembers(actorId, index * BATCH_SIZE, BATCH_SIZE);
+        while (!actorMembers.isEmpty()) {
+            for (final SActorMember actorMember : actorMembers) {
+                if (actorMember.getUserId() == userId) {
+                    return true;
+                }
+                // if userId is as id of a user manager, return true
+                final SUser user = identityService.getUser(actorMember.getUserId());
+                if (userId == user.getManagerUserId()) {
+                    return true;
+                }
+            }
+            index++;
+            actorMembers = actorMappingService.getActorMembers(actorId, index * BATCH_SIZE, BATCH_SIZE);
+        }
+        return false;
     }
 
     @Override
@@ -5726,7 +5750,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final List<Long> userIds = actorMappingService.getPossibleUserIdsOfActorId(actor.getId(), startIndex, maxResults);
         return userIds;
     }
-    
+
     @Override
     public List<Long> getUserIdsForActor(long processDefinitionId, String actorName, int startIndex, int maxResults) {
         try {
