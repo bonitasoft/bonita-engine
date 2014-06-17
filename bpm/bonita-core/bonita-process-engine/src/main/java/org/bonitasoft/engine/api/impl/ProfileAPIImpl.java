@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api.impl;
@@ -237,8 +237,9 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId) throws CreationException,
-            AlreadyExistsException {
+    public synchronized ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId)
+            throws CreationException,
+    AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
@@ -346,7 +347,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     private boolean isPositiveLong(final Long value) {
-        return (value != null && value > 0);
+        return value != null && value > 0;
     }
 
     @Override
