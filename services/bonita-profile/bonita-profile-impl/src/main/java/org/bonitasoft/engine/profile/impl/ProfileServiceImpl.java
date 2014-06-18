@@ -15,6 +15,7 @@ package org.bonitasoft.engine.profile.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -74,6 +74,7 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -88,7 +89,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     private static final int BATCH_NUMBER = 1000;
 
-    private final ReadPersistenceService persistenceService;
+    private static final String QUERY_UPDATE_LASTUPDATE_PROFILE = "updateLastupdatePtofile";
+
+    private final PersistenceService persistenceService;
 
     private final Recorder recorder;
 
@@ -102,7 +105,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ReadSessionAccessor sessionAccessor;
 
-    public ProfileServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+    public ProfileServiceImpl(final PersistenceService persistenceService, final Recorder recorder, final EventService eventService,
             final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ReadSessionAccessor sessionAccessor,
             final SessionService sessionService) {
         super();
@@ -268,7 +271,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfile(final long profileId) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
-            SProfileMemberDeletionException {
+    SProfileMemberDeletionException {
         logBeforeMethod("deleteProfile");
         final SProfile profile = getProfile(profileId);
         deleteProfile(profile);
@@ -737,17 +740,15 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateProfileMetaData(final long profileId) throws SProfileUpdateException {
-        final SProfileUpdateBuilder updateBuilder = getUpdateBuilder();
         long userId;
         try {
             userId = getSessionUserId();
-            updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(userId);
-            updateProfile(getProfile(profileId), updateBuilder.done());
-        } catch (final SSessionNotFoundException e) {
-            throw new SProfileUpdateException(e);
-        } catch (final SessionIdNotSetException e) {
-            throw new SProfileUpdateException(e);
-        } catch (final SProfileNotFoundException e) {
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("lastUpdateDate", System.currentTimeMillis());
+            params.put("lastUpdatedBy", userId);
+            params.put("id", profileId);
+            persistenceService.update(QUERY_UPDATE_LASTUPDATE_PROFILE, params);
+        } catch (final SBonitaException e) {
             throw new SProfileUpdateException(e);
         }
 
