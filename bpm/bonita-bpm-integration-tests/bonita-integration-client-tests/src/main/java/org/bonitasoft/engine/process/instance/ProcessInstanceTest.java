@@ -28,6 +28,8 @@ import java.util.Map;
 
 import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.actor.ActorCriterion;
+import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
@@ -46,6 +48,8 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
@@ -336,7 +340,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     public void getSingleChildInstanceOfProcessInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("SubProcessInAInstance", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addAutomaticTask("step1").addAutomaticTask("step2")
-                .addUserTask("userSubTask", ACTOR_NAME).addTransition("step1", "userSubTask").addTransition("userSubTask", "step2");
+        .addUserTask("userSubTask", ACTOR_NAME).addTransition("step1", "userSubTask").addTransition("userSubTask", "step2");
 
         final ProcessDefinition subProcess = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, pedro);
 
@@ -345,9 +349,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         final ProcessDefinitionBuilder builderProc = new ProcessDefinitionBuilder().createNewInstance("executeInstanceSequentialWithSubProcess", "1.1");
         builderProc.addActor(ACTOR_NAME).addStartEvent("start")
-                .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+        .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         builderProc.addAutomaticTask("step3").addEndEvent("end").addTransition("start", "callActivity").addTransition("callActivity", "step3")
-                .addUserTask("userTask", ACTOR_NAME).addTransition("step3", "userTask").addTransition("userTask", "end");
+        .addUserTask("userTask", ACTOR_NAME).addTransition("step3", "userTask").addTransition("userTask", "end");
 
         DesignProcessDefinition processDefinition = builderProc.done();
         final ProcessDefinition mainProcess = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, pedro);
@@ -525,10 +529,32 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void isInvolvedInProcessInstance() throws Exception {
-        // add user
-        final UserCreator creator = new UserCreator(USERNAME, PASSWORD);
-        creator.setManagerUserId(pedro.getId());
-        final User user = createUser(creator);
+
+        //given
+
+        //user and manager
+
+        final User managerOfJohn = createUser(new UserCreator("managerOfJohn", "bpm"));
+        final User john = createUser(new UserCreator("john", "bpm").setManagerUserId(managerOfJohn.getId()));
+
+        final User managerOfJack = createUser(new UserCreator("managerOfJack", "bpm"));
+        final User jack = createUser(new UserCreator("jack", "bpm").setManagerUserId(managerOfJack.getId()));
+        Group jackGroup = createGroup("jackGroup", null);
+        Role jackRole = createRole("jackRole");
+        getIdentityAPI().addUserMembership(jack.getId(), jackGroup.getId(), jackRole.getId());
+
+        final User managerOfJames = createUser(new UserCreator("managerOfJames", "bpm"));
+        final User james = createUser(new UserCreator("james", "bpm").setManagerUserId(managerOfJames.getId()));
+        Group jamesGroup = createGroup("jamesGroup", null);
+        Role jamesRole = createRole("jamesRole");
+        getIdentityAPI().addUserMembership(james.getId(), jamesGroup.getId(), jamesRole.getId());
+
+        final User managerOfToto = createUser(new UserCreator("managerOfToto", "bpm"));
+        final User toto = createUser(new UserCreator("toto", "bpm").setManagerUserId(managerOfToto.getId()));
+        Group totoGroup = createGroup("totoGroup", null);
+        Role totoRole = createRole("totoRole");
+        getIdentityAPI().addUserMembership(toto.getId(), totoGroup.getId(), totoRole.getId());
+
 
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder1.addActor(ACTOR_NAME);
@@ -540,17 +566,38 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
 
-        addUserToFirstActorOfProcess(user.getId(), processDefinition);
+        //map user, group, role, and membership to that actor
+        ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
+        getProcessAPI().addUserToActor(actor.getId(), john.getId());
+        getProcessAPI().addGroupToActor(actor.getId(), jackGroup.getId());
+        getProcessAPI().addRoleToActor(actor.getId(), jamesRole.getId());
+        getProcessAPI().addRoleAndGroupToActor(actor.getId(), totoRole.getId(), totoGroup.getId());
+
         getProcessAPI().enableProcess(processDefinition.getId());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        boolean isInvolved = getProcessAPI().isInvolvedInProcessInstance(user.getId(), processInstance.getId());
-        assertTrue(isInvolved);
-        isInvolved = getProcessAPI().isInvolvedInProcessInstance(pedro.getId(), processInstance.getId());
-        assertTrue(isInvolved);
+        //then
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstance.getId())).as("directly mapped user should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJohn.getId(), processInstance.getId())).as(
+                "manager of directly mapped user should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(jack.getId(), processInstance.getId())).as("user mapped using group should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJack.getId(), processInstance.getId())).as(
+                "manager of user mapped using group should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(james.getId(), processInstance.getId())).as("user mapped using role should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJames.getId(), processInstance.getId())).as(
+                "manger of user mapped using role should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(toto.getId(), processInstance.getId())).as("user mapped using membership should be involed")
+                .isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfToto.getId(), processInstance.getId())).as(
+                "manager of user mapped using membership should be involed").isTrue();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(pedro.getId(), processInstance.getId())).as("not mapped user should not be involved").isFalse();
 
-        deleteUser(user);
+        //clean
+        deleteUsers(john, jack, james, toto, managerOfJohn, managerOfJames, managerOfJack, managerOfToto);
+        deleteGroups(jackGroup, jamesGroup, totoGroup);
+        deleteRoles(jackRole, jamesRole, totoRole);
+
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -659,7 +706,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
                         || comment.getContent()
-                                .contains("The user " + USERNAME + " acting as delegate of the user " + otherUserName + " has started the case.");
+                        .contains("The user " + USERNAME + " acting as delegate of the user " + otherUserName + " has started the case.");
             }
             assertTrue(haveCommentForDelegate);
         } finally {

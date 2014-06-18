@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.actor.mapping.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -209,7 +211,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActor updateActor(final long actorId, final EntityUpdateDescriptor descriptor) throws SActorNotFoundException, SActorUpdateException,
-            SBonitaReadException {
+    SBonitaReadException {
         final SActor actor = getActor(actorId);
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating an actor");
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(actor, descriptor);
@@ -346,7 +348,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActorMember addRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws SActorNotFoundException,
-            SActorMemberCreationException {
+    SActorMemberCreationException {
         try {
             final SActorMember addActorMember = addOnlyThisRoleAndGroupToActor(actorId, roleId, groupId);
             int i = 0;
@@ -448,7 +450,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public List<SActorMember> getActorMembersOfRole(final long roleId, int fromIndex, int numberOfActorMembers) throws SBonitaReadException {
+    public List<SActorMember> getActorMembersOfRole(final long roleId, final int fromIndex, final int numberOfActorMembers) throws SBonitaReadException {
         final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembersOfRole(roleId, fromIndex, numberOfActorMembers);
         return persistenceService.selectList(descriptor);
     }
@@ -493,6 +495,16 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getPossibleUserIdsOfActorId", parameters, SActor.class, new QueryOptions(
                 startIndex, maxResults));
         return persistenceService.selectList(descriptor);
+    }
+
+    @Override
+    public boolean isUserInActorMemberOrManagerOfAUserInActorMember(final long userId, final long actorId) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+        parameters.put("actorId", actorId);
+        final SelectOneDescriptor<SUser> descriptor = new SelectOneDescriptor<SUser>("getUserInActorMemberOrManagerOfAUserInActorMember", parameters,
+                SUser.class);
+        return persistenceService.selectOne(descriptor) != null;
     }
 
 }

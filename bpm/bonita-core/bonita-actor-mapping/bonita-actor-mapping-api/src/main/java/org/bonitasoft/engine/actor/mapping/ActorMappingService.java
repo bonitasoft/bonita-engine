@@ -371,4 +371,15 @@ public interface ActorMappingService {
      */
     SActorMember getActorMember(long actorId, long userId, long groupId, long roleId) throws SBonitaReadException;
 
+    /**
+     * return true if the user is in an actor member of this actor or if the user is a manager of this kind of user
+     * 
+     * @param userId
+     * @param actorId
+     * @return
+     * @throws SBonitaReadException
+     * @since 6.3.2
+     */
+    boolean isUserInActorMemberOrManagerOfAUserInActorMember(long userId, long actorId) throws SBonitaReadException;
+
 }
