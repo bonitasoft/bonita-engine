@@ -137,7 +137,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized byte[] exportAllProfiles() throws ExecutionException {
+    public byte[] exportAllProfiles() throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityservice = tenantAccessor.getIdentityService();
@@ -154,7 +154,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws ExecutionException {
+    public byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityservice = tenantAccessor.getIdentityService();
@@ -178,7 +178,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
+    public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
@@ -201,7 +201,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
+    public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
@@ -234,7 +234,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized ProfileEntry createProfileEntry(final ProfileEntryCreator creator) throws CreationException {
+    public ProfileEntry createProfileEntry(final ProfileEntryCreator creator) throws CreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
@@ -255,6 +255,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
+        } finally {
         }
 
         return SPModelConvertor.toProfileEntry(sProfileEntry);
@@ -274,10 +275,11 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized void deleteProfileEntry(final long id) throws DeletionException {
+    public void deleteProfileEntry(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
+            // add a lock because the update profile call getProfile then update profile -> deadlock...
             new DeleteProfileEntry(profileService, id).execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
@@ -285,7 +287,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public synchronized ProfileEntry updateProfileEntry(final long id, final ProfileEntryUpdater updateDescriptor) throws UpdateException {
+    public ProfileEntry updateProfileEntry(final long id, final ProfileEntryUpdater updateDescriptor) throws UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();

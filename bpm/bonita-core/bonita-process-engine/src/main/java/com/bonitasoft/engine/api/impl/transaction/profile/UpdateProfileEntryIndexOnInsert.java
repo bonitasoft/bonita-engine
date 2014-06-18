@@ -58,6 +58,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
+        profileService.updateProfileMetaData(insertedProfileEntry.getProfileId());
         List<SProfileEntry> profileEntryList;
         long loopIndex = 0L;
 
@@ -77,7 +78,6 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
             }
             loopIndex++;
         } while (!profileEntryList.isEmpty());
-        profileService.updateProfileMetaData(insertedProfileEntry.getProfileId());
     }
 
     private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final long fromIndex) throws SBonitaSearchException {
