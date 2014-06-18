@@ -270,4 +270,11 @@
 		WHERE pm.profileId IN (:profileIds)
 	</query>
 
+    <query name="updateLastupdatePtofile">
+        UPDATE org.bonitasoft.engine.profile.model.impl.SProfileImpl AS p
+        SET p.lastUpdateDate = :lastUpdateDate,
+        p.lastUpdatedBy = :lastUpdatedBy
+        WHERE p.id = :id
+    </query>
+
 </hibernate-mapping>

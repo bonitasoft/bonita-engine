@@ -249,8 +249,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @Override
     public int update(final String updateQueryName) throws SPersistenceException {
+        return update(updateQueryName, null);
+    }
+
+    @Override
+    public int update(final String updateQueryName, final Map<String, Object> inputParameters) throws SPersistenceException {
         final Query query = getSession(true).getNamedQuery(updateQueryName);
         try {
+            if (inputParameters != null) {
+                setParameters(query, inputParameters);
+            }
             return query.executeUpdate();
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
