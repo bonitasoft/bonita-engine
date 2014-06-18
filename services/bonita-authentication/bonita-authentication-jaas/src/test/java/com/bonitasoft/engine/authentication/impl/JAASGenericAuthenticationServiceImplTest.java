@@ -1,7 +1,7 @@
 package com.bonitasoft.engine.authentication.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,6 +19,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -61,40 +62,39 @@ public class JAASGenericAuthenticationServiceImplTest {
         System.clearProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG);
     }
 
-    @Test
-    public void testExtractUserFromSubjetWithNoCallPrincipal() {
-        LoginContext lc = mock(LoginContext.class);
-        Subject subject = new Subject();
+    @Test(expected = AuthenticationException.class)
+    public void testExtractUserFromSubjetWithNoCallPrincipal() throws AuthenticationException {
+        final LoginContext lc = mock(LoginContext.class);
+        final Subject subject = new Subject();
         when(lc.getSubject()).thenReturn(subject);
-        Set<Principal> principals = subject.getPrincipals();
-        Principal principalUnknown = mock(Principal.class);
-        Principal principalCaller = mock(Principal.class);
+        final Set<Principal> principals = subject.getPrincipals();
+        final Principal principalUnknown = mock(Principal.class);
+        final Principal principalCaller = mock(Principal.class);
 
         when(principalCaller.getName()).thenReturn(JAASGenericAuthenticationServiceImpl.CALLER_PRINCIPAL);
 
         principals.add(principalUnknown);
         principals.add(principalCaller);
 
-        String result = jaasGenericAuthenticationServiceImpl.extractUserFromSubjet(lc);
-        assertThat(result).isNull();
+        jaasGenericAuthenticationServiceImpl.extractUserFromSubjet(lc);
     }
 
     @Test
-    public void testExtractUserFromSubject() {
+    public void testExtractUserFromSubject() throws AuthenticationException {
 
-        String username = "install";
-        LoginContext lc = mock(LoginContext.class);
-        Subject subject = new Subject();
+        final String username = "install";
+        final LoginContext lc = mock(LoginContext.class);
+        final Subject subject = new Subject();
 
         when(lc.getSubject()).thenReturn(subject);
 
-        Set<Principal> principals = subject.getPrincipals();
+        final Set<Principal> principals = subject.getPrincipals();
 
-        Principal principalUnknown = mock(Principal.class);
-        Group principalCaller = mock(Group.class);
-        Principal principalUser = mock(Principal.class);
+        final Principal principalUnknown = mock(Principal.class);
+        final Group principalCaller = mock(Group.class);
+        final Principal principalUser = mock(Principal.class);
         when(principalUser.getName()).thenReturn(username);
-        Enumeration enumeration = mock(Enumeration.class);
+        final Enumeration enumeration = mock(Enumeration.class);
 
         when(enumeration.hasMoreElements()).thenReturn(true, false, false, false);
         when(enumeration.nextElement()).thenReturn(principalUser);
@@ -105,7 +105,7 @@ public class JAASGenericAuthenticationServiceImplTest {
         principals.add(principalUnknown);
         principals.add(principalCaller);
 
-        String result = jaasGenericAuthenticationServiceImpl.extractUserFromSubjet(lc);
+        final String result = jaasGenericAuthenticationServiceImpl.extractUserFromSubjet(lc);
         verify(principalCaller, times(1)).getName();
         assertThat(result).isSameAs(username);
     }
@@ -124,31 +124,42 @@ public class JAASGenericAuthenticationServiceImplTest {
     public void testCreateContextWithNullTenantId() {
         try {
             jaasGenericAuthenticationServiceImpl.createContext(authenticationCallbackHandler);
-        } catch (AuthenticationException e) {
+        } catch (final AuthenticationException e) {
             assertThat(e).hasCauseExactlyInstanceOf(LoginException.class);
             return;
         }
-        fail();
+        fail("Context contains a null tenant identifier");
     }
 
     @Test
     public void testCreateContext() throws Exception {
         when(sessionAccessor.getTenantId()).thenReturn(1L);
-        LoginContext lc = jaasGenericAuthenticationServiceImpl.createContext(authenticationCallbackHandler);
+        final LoginContext lc = jaasGenericAuthenticationServiceImpl.createContext(authenticationCallbackHandler);
         assertThat(lc).isNotNull();
     }
 
     @Test
     public void testLogin() throws Exception {
-        LoginContext loginContext = mock(LoginContext.class);
+        final LoginContext loginContext = mock(LoginContext.class);
         jaasGenericAuthenticationServiceImpl.login(loginContext);
         verify(loginContext, times(1)).login();
     }
 
     @Test
     public void testTryToAuthenticate() {
-        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         jaasGenericAuthenticationServiceImpl.tryToAuthenticate(credentials);
+    }
+
+    @Test
+    public void canLoginWithCorrectUsernamePassword() throws Exception {
+        final String userName = "admin";
+        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, "bpm");
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
+        when(sessionAccessor.getTenantId()).thenReturn(1L);
+
+        assertThat(jaasGenericAuthenticationServiceImpl.checkUserCredentials(credentials)).isEqualTo(userName);
     }
 
 }
