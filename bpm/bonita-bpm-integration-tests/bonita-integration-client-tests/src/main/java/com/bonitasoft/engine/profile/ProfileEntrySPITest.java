@@ -148,7 +148,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     @Test
     public void createProfileEntryWithoutIndex() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -185,7 +185,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     @Test
     public void createProfileEntryNico() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
 
         // Create Folder Profile Entry
@@ -290,7 +290,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
         final String profileEntryName = "entry1";
 
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
 
         // Create Folder Profile Entry
@@ -301,17 +301,17 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
         // custom page
         final ProfileEntry createProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(profileEntryName, profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
-                        .setDescription(ENTRY_DESCRIPTION)
-                        .setCustom(true)
-                        .setParentId(folderProfileEntry.getId()));
+                .setDescription(ENTRY_DESCRIPTION)
+                .setCustom(true)
+                .setParentId(folderProfileEntry.getId()));
         profileEntries.add(createProfileEntry);
 
         // page with same name but not a custom page
         profileEntries.add(getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(profileEntryName, profileId).setType(ENTRY_TYPE_LINK).setPage(pageToSearch)
-                        .setDescription(ENTRY_DESCRIPTION)
-                        .setCustom(false)
-                        .setParentId(folderProfileEntry.getId())));
+                .setDescription(ENTRY_DESCRIPTION)
+                .setCustom(false)
+                .setParentId(folderProfileEntry.getId())));
 
         profileEntries.add(getProfileAPI().createProfileEntry(new ProfileEntryCreator("entry2", profileId).setType(ENTRY_TYPE_LINK).setPage("tasklistingadmin")
                 .setDescription(ENTRY_DESCRIPTION)
@@ -374,7 +374,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     @Test
     public void updateProfileEntryIndexOnDelete() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final Long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -412,7 +412,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     @Test
     public void deleteProfileEntryAndChildren() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final Long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -447,7 +447,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     @Test
     public void updateProfileEntryIndexOnInsert() throws BonitaException {
         // Create Profile Entry 1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
@@ -484,7 +484,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     @Test
     public void updateProfileEntryIndexOnUpdate() throws BonitaException {
         // Create Profile1
-        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry Menu1
@@ -573,7 +573,7 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
                 .setType("page").setIndex(0L).setPage("MyPage1").setParentId(folderProfileEntry.getId());
 
         final ProfileEntryCreator secondProfileEntryCreator = new ProfileEntryCreator("secondProfileEntry", profileId)
-                .setDescription("the second profile entry").setIndex(2L).setType("page").setPage("MyPage2").setParentId(folderProfileEntry.getId());
+        .setDescription("the second profile entry").setIndex(2L).setType("page").setPage("MyPage2").setParentId(folderProfileEntry.getId());
         final ProfileEntryCreator thirdProfileEntryCreator = new ProfileEntryCreator("thirdProfileEntry", profileId).setDescription("the third profile entry")
                 .setIndex(4L).setType("page").setPage("MyPage3").setParentId(folderProfileEntry.getId());
 
@@ -739,6 +739,48 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
                 .setIndex(0L).setType("folder").setParentId(1L).setPage("MyPage");
         return getProfileAPI().createProfileEntry(profileEntryCreator);
+    }
+
+    @Test
+    public void createProfileEntryMultiThreaded() throws Throwable {
+        List<FailableThread> threads = new ArrayList<FailableThread>();
+
+        for (int i = 0; i < 10; i++) {
+            threads.add(createThreadThatAddProfileEntry(i));
+        }
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            thread.join(1000);
+        }
+
+        for (FailableThread thread : threads) {
+            if (thread.getException() != null) {
+                throw thread.getException();
+            }
+        }
+
+    }
+
+    private FailableThread createThreadThatAddProfileEntry(final int i) {
+        final FailableThread t1 = new FailableThread("faiblablethread"+i,new FailableRunnable() {
+
+            @Override
+            public void run() {
+                try {
+                    System.out.println("t1 start");
+                    final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry" + i, adminProfileId)
+                    .setDescription("Description profileEntry" + i)
+                    .setIndex(i * 2).setType("folder").setParentId(1L).setPage("MyPage");
+                    getProfileAPI().createProfileEntry(profileEntryCreator);
+                    System.out.println("t1 done");
+                } catch (Throwable e) {
+                    setException(e);
+                }
+            }
+        });
+        return t1;
     }
 
 }
