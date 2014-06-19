@@ -37,7 +37,7 @@ public class RemoveActorMember implements TransactionContentWithResult<SActorMem
 
     @Override
     public void execute() throws SBonitaException {
-        removedMember = actorMappingService.removeActorMember(actorMemberId);
+        removedMember = actorMappingService.deleteActorMember(actorMemberId);
     }
 
     @Override

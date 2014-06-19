@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.identity.model.SContactInfo;
@@ -40,13 +39,8 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
  */
 public class SelectDescriptorBuilder {
 
-    public static SelectListDescriptor<SGroup> getChildrenOfGroup(final SGroup group) {
-        return getChildrenOfGroup(group, null);
-    }
-
     public static SelectListDescriptor<SGroup> getChildrenOfGroup(final SGroup group, final int fromIndex, final int numberOfGroups) {
-        final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SGroup.class, "id", OrderByType.ASC));
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfGroups, orderByOptions);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfGroups, SGroup.class, "id", OrderByType.ASC);
         return getChildrenOfGroup(group, queryOptions);
     }
 
@@ -100,11 +94,6 @@ public class SelectDescriptorBuilder {
         parameters.put("name", groupName);
         parameters.put("parentPath", parentPath);
         return new SelectOneDescriptor<SGroup>("getGroupByNameAndPath", parameters, SGroup.class);
-    }
-
-    public static SelectListDescriptor<SGroup> getGroupsByName(final String groupName) {
-        final Map<String, Object> parameters = Collections.singletonMap("name", (Object) groupName);
-        return new SelectListDescriptor<SGroup>("getGroupsByName", parameters, SGroup.class);
     }
 
     public static <T extends PersistentObject> SelectByIdDescriptor<T> getLightElementById(final Class<T> clazz, final String elementName, final long id) {
@@ -226,15 +215,6 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SUserMembership>("getUserMembershipsWithRole", parameters, SUserMembership.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByDelegee(final String delegeeUserName) {
-        final Map<String, Object> parameters = Collections.singletonMap("delegeeUserName", (Object) delegeeUserName);
-        return new SelectListDescriptor<SUser>("getUsersByDelegee", parameters, SUser.class);
-    }
-
-    public static SelectListDescriptor<SUser> getUsersByGroup(final long groupId) {
-        return getUsersByGroup(groupId, null);
-    }
-
     public static SelectListDescriptor<SUser> getUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers);
         return getUsersByGroup(groupId, queryOptions);
@@ -252,10 +232,10 @@ public class SelectDescriptorBuilder {
         return getUsersByGroup(groupId, queryOptions);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByManager(final long managerUserId) {
+    public static SelectListDescriptor<SUser> getUsersByManager(final long managerUserId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("managerUserId", managerUserId);
-        return new SelectListDescriptor<SUser>("getUsersByManager", parameters, SUser.class);
+        return new SelectListDescriptor<SUser>("getUsersByManager", parameters, SUser.class, queryOptions);
     }
 
     public static SelectListDescriptor<SUser> getUsersByMembership(final long groupId, final long roleId) {

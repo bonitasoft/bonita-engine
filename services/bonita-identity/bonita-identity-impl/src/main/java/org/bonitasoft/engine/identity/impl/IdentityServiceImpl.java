@@ -19,10 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
@@ -625,21 +623,6 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SGroup> getGroupChildren(final long groupId) throws SIdentityException {
-        final String methodName = "getGroupChildren";
-        logBeforeMethod(methodName);
-        try {
-            final SGroup group = getGroup(groupId);
-            final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group));
-            logAfterMethod(methodName);
-            return listGroups;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the children of the group", e);
-        }
-    }
-
-    @Override
     public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups) throws SIdentityException {
         final String methodName = "getGroupChildren";
         logBeforeMethod(methodName);
@@ -715,21 +698,6 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
             throw new SGroupNotFoundException(e);
-        }
-    }
-
-    @Override
-    public Set<SGroup> getGroupsByName(final String groupName) throws SGroupNotFoundException {
-        final String methodName = "getGroupsByName";
-        logBeforeMethod(methodName);
-        try {
-            final Set<SGroup> setGroups = CollectionUtil.buildHashSetFromList(SGroup.class,
-                    persistenceService.selectList(SelectDescriptorBuilder.getGroupsByName(groupName)));
-            logAfterMethod(methodName);
-            return setGroups;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SGroupNotFoundException(bre);
         }
     }
 
@@ -831,6 +799,7 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
+    @Override
     public long getNumberOfCustomUserInfoValue(final QueryOptions options) throws SBonitaSearchException {
         final String methodName = "getNumberOfCustomUserInfoValue";
         logBeforeMethod(methodName);
@@ -1257,20 +1226,6 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfUser(final long userId) throws SIdentityException {
-        final String methodName = "getUserMembershipsOfUser";
-        logBeforeMethod(methodName);
-        try {
-            final List<SUserMembership> listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsOfUser(userId));
-            logAfterMethod(methodName);
-            return listSUserMembership;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get memberships of user: " + userId, e);
-        }
-    }
-
-    @Override
     public List<SUserMembership> getUserMemberships(final List<Long> userMembershipIds) throws SIdentityException {
         final String methodName = "getUserMemberships";
         logBeforeMethod(methodName);
@@ -1343,42 +1298,14 @@ public class IdentityServiceImpl implements IdentityService {
             return Collections.emptyList();
         }
         try {
+            final QueryOptions queryOptions = new QueryOptions(0, userNames.size(), SUser.class, "userName", OrderByType.ASC);
             final Map<String, Object> parameters = Collections.singletonMap("userNames", (Object) userNames);
-            final List<SUser> users = persistenceService.selectList(new SelectListDescriptor<SUser>("getUsersByName", parameters, SUser.class));
+            final List<SUser> users = persistenceService.selectList(new SelectListDescriptor<SUser>("getUsersByName", parameters, SUser.class, queryOptions));
             logAfterMethod(methodName);
             return users;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
             throw new SUserNotFoundException(e);
-        }
-    }
-
-    @Override
-    public List<SUser> getUsersByDelegee(final long delegateId) throws SIdentityException {
-        final String methodName = "getUsersByDelegee";
-        logBeforeMethod(methodName);
-        try {
-            final SUser delegee = getUser(delegateId);
-            final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByDelegee(delegee.getUserName()));
-            logAfterMethod(methodName);
-            return listsUsers;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the users having the delegee " + delegateId, e);
-        }
-    }
-
-    @Override
-    public List<SUser> getUsersByGroup(final long groupId) throws SIdentityException {
-        final String methodName = "getUsersByGroup";
-        logBeforeMethod(methodName);
-        try {
-            final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId));
-            logAfterMethod(methodName);
-            return listsUsers;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the users having the group " + groupId, e);
         }
     }
 
@@ -1413,30 +1340,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getUsersByManager(final long managerId) throws SIdentityException {
+    public List<SUser> getUsersByManager(final long managerId, final int fromIndex, final int numberMaxOfUsers) throws SIdentityException {
         final String methodName = "getUsersByManager";
         logBeforeMethod(methodName);
         try {
-            final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByManager(managerId));
+            final QueryOptions queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
+            final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByManager(managerId, queryOptions));
             logAfterMethod(methodName);
             return listsSUsers;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
             throw new SIdentityException("Can't get the users having the manager " + managerId, e);
-        }
-    }
-
-    @Override
-    public List<SUser> getUsersByRole(final long roleId) throws SIdentityException {
-        final String methodName = "getUsersByRole";
-        logBeforeMethod(methodName);
-        try {
-            final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByRole(roleId));
-            logAfterMethod(methodName);
-            return listsUsers;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the users having the role " + roleId, e);
         }
     }
 
@@ -1941,4 +1855,5 @@ public class IdentityServiceImpl implements IdentityService {
             throw new SBonitaSearchException(bre);
         }
     }
+
 }

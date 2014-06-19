@@ -91,13 +91,6 @@ public interface FlowNodeInstanceService {
      */
     void setState(SFlowNodeInstance flowNodeInstance, FlowNodeState state) throws SFlowNodeModificationException;
 
-    /**
-     * @param rootContainerId
-     * @return
-     * @throws SFlowNodeReadException
-     * @since 6.0
-     */
-    List<SFlowNodeInstance> getActiveFlowNodes(long rootContainerId) throws SFlowNodeReadException;
 
     /**
      * @param flowNodeInstance

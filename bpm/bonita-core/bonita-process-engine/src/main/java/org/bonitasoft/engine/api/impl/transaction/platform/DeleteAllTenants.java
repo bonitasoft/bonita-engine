@@ -37,7 +37,7 @@ public class DeleteAllTenants implements TransactionContent {
     public void execute() throws SBonitaException {
         List<STenant> tenants;
         do {
-            tenants = platformService.getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id", OrderByType.ASC));
+            tenants = platformService.getTenants(new QueryOptions(0, 100, STenant.class, "id", OrderByType.ASC));
             for (final STenant sTenant : tenants) {
                 platformService.deactiveTenant(sTenant.getId());
                 platformService.deleteTenant(sTenant.getId());

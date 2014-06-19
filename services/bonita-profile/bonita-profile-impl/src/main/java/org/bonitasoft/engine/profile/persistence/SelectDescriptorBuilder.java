@@ -188,21 +188,23 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SProfileMember>("getDirectProfileMembersOfRole", parameters, SProfileMember.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SProfileMember> getProfileMembers(final String field, final OrderByType order, final int fromIndex,
-            final int numberOfElements) {
+    public static SelectListDescriptor<SProfileMember> getProfileMembers(final int fromIndex, final int numberOfElements, final String field,
+            final OrderByType order) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field, order);
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
         return new SelectListDescriptor<SProfileMember>("getProfileMembers", parameters, SProfileMember.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SProfile> getProfilesOfUser(final long userId) {
+    public static SelectListDescriptor<SProfile> getProfilesOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field,
+            final OrderByType order) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfile.class, field, order);
         final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-        return new SelectListDescriptor<SProfile>("getProfilesOfUser", parameters, SProfile.class);
+        return new SelectListDescriptor<SProfile>("getProfilesOfUser", parameters, SProfile.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SProfileMember> getSProfileMembersWithoutDisplayName(final long profileId) {
+    public static SelectListDescriptor<SProfileMember> getSProfileMembersWithoutDisplayName(final long profileId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap(PROFILE_ID, (Object) profileId);
-        return new SelectListDescriptor<SProfileMember>("getSProfileMembersWithoutDisplayName", parameters, SProfileMember.class);
+        return new SelectListDescriptor<SProfileMember>("getSProfileMembersWithoutDisplayName", parameters, SProfileMember.class, queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfUsersOfProfile(final long profileId) {

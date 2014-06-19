@@ -36,6 +36,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.xml.Parser;
@@ -104,21 +106,30 @@ public class ActorProcessDependencyResolver implements ProcessDependencyResolver
     }
 
     public List<Problem> checkResolution(final ActorMappingService actorMappingService, final long processDefinitionId) {
-        List<SActor> actors;
         try {
-            actors = actorMappingService.getActors(processDefinitionId);
             final List<Problem> problems = new ArrayList<Problem>();
-            for (final SActor sActor : actors) {
-                final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0, 1);
-                if (actorMembers.isEmpty()) {
-                    final Problem problem = new ProblemImpl(Level.ERROR, sActor.getId(), "actor", "Actor '" + sActor.getName()
-                            + "' does not contain any members");
-                    problems.add(problem);
+            QueryOptions queryOptions = new QueryOptions(0, 100, SActor.class, "id", OrderByType.ASC);
+            List<SActor> actors = actorMappingService.getActors(processDefinitionId, queryOptions);
+            while (!actors.isEmpty()) {
+                for (final SActor sActor : actors) {
+                    checkIfAActorMemberExists(actorMappingService, problems, sActor);
                 }
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+                actors = actorMappingService.getActors(processDefinitionId, queryOptions);
             }
             return problems;
         } catch (final SBonitaReadException e) {
             return Collections.singletonList((Problem) new ProblemImpl(Level.ERROR, processDefinitionId, "process", "Unable to read actors"));
+        }
+    }
+
+    private void checkIfAActorMemberExists(final ActorMappingService actorMappingService, final List<Problem> problems, final SActor sActor)
+            throws SBonitaReadException {
+        final List<SActorMember> actorMembers = actorMappingService.getActorMembers(sActor.getId(), 0, 1);
+        if (actorMembers.isEmpty()) {
+            final Problem problem = new ProblemImpl(Level.ERROR, sActor.getId(), "actor", "Actor '" + sActor.getName()
+                    + "' does not contain any members");
+            problems.add(problem);
         }
     }
 }

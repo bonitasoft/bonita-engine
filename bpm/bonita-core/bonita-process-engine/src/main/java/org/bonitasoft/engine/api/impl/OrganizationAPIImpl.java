@@ -32,21 +32,21 @@ import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 public class OrganizationAPIImpl {
-    
-    private TenantServiceAccessor tenantAccessor;
-    private int pageSize;
+
+    private final TenantServiceAccessor tenantAccessor;
+
+    private final int pageSize;
 
     public OrganizationAPIImpl(TenantServiceAccessor tenantAccessor, int pageSize) {
         this.tenantAccessor = tenantAccessor;
         this.pageSize = pageSize;
     }
-    
+
     public void deleteOrganization() throws DeletionException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SCommentService commentService = tenantAccessor.getCommentService();
@@ -54,7 +54,8 @@ public class OrganizationAPIImpl {
 
         try {
             final QueryOptions queryOptions = new QueryOptions(0, 1);
-            boolean canDeleteOrganization = processInstanceService.getNumberOfProcessInstances(queryOptions) == 0 && activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0
+            boolean canDeleteOrganization = processInstanceService.getNumberOfProcessInstances(queryOptions) == 0
+                    && activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0
                     && commentService.getNumberOfComments(queryOptions) == 0;
             if (canDeleteOrganization) {
                 deleteOrganizationElements(activityInstanceService);
@@ -73,7 +74,7 @@ public class OrganizationAPIImpl {
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SupervisorMappingService supervisorService = tenantAccessor.getSupervisorService();
         final ExternalIdentityMappingService externalIdentityMappingService = tenantAccessor.getExternalIdentityMappingService();
-        
+
         deleteCustomUserInfo(identityService);
         actorMappingService.deleteAllActorMembers();
         profileService.deleteAllProfileMembers();
@@ -86,13 +87,13 @@ public class OrganizationAPIImpl {
         identityService.deleteAllRoles();
         identityService.deleteAllUsers();
     }
-    
+
     private void deleteCustomUserInfo(IdentityService identityService) throws SIdentityException {
         // only definitions will be deleted because values are deleted on cascade from DB
         List<SCustomUserInfoDefinition> customUserInfoDefinitions = null;
         do {
-            //the start index is always zero because the curent page will be deleted
-            customUserInfoDefinitions = identityService.getCustomUserInfoDefinitions(0 , pageSize);
+            // the start index is always zero because the curent page will be deleted
+            customUserInfoDefinitions = identityService.getCustomUserInfoDefinitions(0, pageSize);
             deleteCustomUserInfo(customUserInfoDefinitions, identityService);
         } while (customUserInfoDefinitions.size() == pageSize);
     }
@@ -101,7 +102,7 @@ public class OrganizationAPIImpl {
         for (SCustomUserInfoDefinition definition : customUserInfoDefinitions) {
             identityService.deleteCustomUserInfoDefinition(definition.getId());
         }
-        
+
     }
 
     /**
@@ -112,12 +113,11 @@ public class OrganizationAPIImpl {
         List<Long> processDefinitionIds;
         final ActorProcessDependencyResolver dependencyResolver = new ActorProcessDependencyResolver();
         do {
-            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, 100);
             for (final Long processDefinitionId : processDefinitionIds) {
                 tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor, dependencyResolver);
             }
-        } while (processDefinitionIds.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-
+        } while (processDefinitionIds.size() == 100);
     }
 
 }

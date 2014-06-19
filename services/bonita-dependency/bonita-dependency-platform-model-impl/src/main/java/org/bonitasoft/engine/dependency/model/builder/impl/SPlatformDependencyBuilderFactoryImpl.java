@@ -15,7 +15,7 @@ package org.bonitasoft.engine.dependency.model.builder.impl;
 
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
-import org.bonitasoft.engine.dependency.model.impl.SPlatformDependency;
+import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -24,7 +24,7 @@ public class SPlatformDependencyBuilderFactoryImpl implements SPlatformDependenc
 
     @Override
     public SPlatformDependencyBuilder createNewInstance(final String name, final String fileName, final byte[] value) {
-        final SPlatformDependency object = new SPlatformDependency(name, fileName, value);
+        final SPlatformDependencyImpl object = new SPlatformDependencyImpl(name, fileName, value);
         return new SPlatformDependencyBuilderImpl(object);
     }
 

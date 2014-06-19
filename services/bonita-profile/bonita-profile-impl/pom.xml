@@ -1,67 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>bonita-profile</artifactId>
-        <groupId>org.bonitasoft.engine.profile</groupId>
-        <version>6.3.2-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<artifactId>bonita-profile</artifactId>
+		<groupId>org.bonitasoft.engine.profile</groupId>
+		<version>6.3.2-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>bonita-profile-impl</artifactId>
+	<artifactId>bonita-profile-impl</artifactId>
 
-    <name>Bonita Profile: Service Implementation</name>
+	<name>Bonita Profile: Service Implementation</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.bonitasoft.engine.profile</groupId>
-            <artifactId>bonita-profile-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
+	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine.profile</groupId>
+			<artifactId>bonita-profile-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
             <artifactId>bonita-persistence-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.recorder</groupId>
-            <artifactId>bonita-recorder-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-model-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-technical-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+			<groupId>org.bonitasoft.engine.recorder</groupId>
+			<artifactId>bonita-recorder-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-technical-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.session</groupId>
-            <artifactId>bonita-session-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-            <artifactId>bonita-session-accessor-read</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+			<groupId>org.bonitasoft.engine.session</groupId>
+			<artifactId>bonita-session-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
+			<artifactId>bonita-session-accessor-read</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

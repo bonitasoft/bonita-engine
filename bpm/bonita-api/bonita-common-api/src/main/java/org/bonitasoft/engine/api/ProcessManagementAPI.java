@@ -53,14 +53,12 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * This API deals with definition objects such as {@link ProcessDefinition}, {@link ProcessDeploymentInfo}, {@link Category}, ...
@@ -985,7 +983,8 @@ public interface ProcessManagementAPI {
     Map<String, byte[]> getProcessResources(long processDefinitionId, String filenamesPattern) throws RetrieveException;
 
     /**
-     * Returns the identifier of the most recently deployed process definition with the given name. This method does not take into consideration the process version,
+     * Returns the identifier of the most recently deployed process definition with the given name. This method does not take into consideration the process
+     * version,
      * but only its deployment date.
      * 
      * @param processName
@@ -1177,7 +1176,7 @@ public interface ProcessManagementAPI {
      * 
      * @param processDefinitionIds
      *            the identifiers of the process definitions.
-     * @return the process deployment information of the process definitions.
+     * @return The process deployment information of the process definitions, order by name ascending.
      * @since 6.0
      */
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromIds(List<Long> processDefinitionIds);
@@ -1602,7 +1601,7 @@ public interface ProcessManagementAPI {
      * 
      * @param processInstanceIds
      *            Identifier of the processInstance
-     * @return A map of <processInstantsIds,ProcessDeploymentInfos>
+     * @return A map of <processInstantsIds,ProcessDeploymentInfos>, ordered by the name of the process ascending
      * @since 6.0
      */
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(List<Long> processInstanceIds);

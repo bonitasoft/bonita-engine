@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **
+ ** 
  * @since 6.2
  */
 package org.bonitasoft.engine.execution.work;
@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -34,7 +33,6 @@ public class ExecuteFlowNodes implements Callable<Object> {
     private final TechnicalLoggerService logger;
 
     private final ActivityInstanceService activityInstanceService;
-
 
     private final Iterator<Long> iterator;
 
@@ -49,8 +47,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
     @Override
     public Object call() throws Exception {
         try {
-
-            for (int i = 0; i < QueryOptions.DEFAULT_NUMBER_OF_RESULTS && iterator.hasNext(); i++) {
+            for (int i = 0; i < 20 && iterator.hasNext(); i++) {
                 SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(iterator.next());
                 if (flowNodeInstance.isTerminal()) {
                     createNotifyChildFinishedWork(workService, logger, flowNodeInstance);

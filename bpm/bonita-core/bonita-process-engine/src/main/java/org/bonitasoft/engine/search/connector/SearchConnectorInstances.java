@@ -43,7 +43,7 @@ public class SearchConnectorInstances extends AbstractConnectorSearchEntity {
 
     @Override
     public List<SConnectorInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return connectorInstanceService.searchConnetorInstances(searchOptions);
+        return connectorInstanceService.searchConnectorInstances(searchOptions);
     }
 
 }

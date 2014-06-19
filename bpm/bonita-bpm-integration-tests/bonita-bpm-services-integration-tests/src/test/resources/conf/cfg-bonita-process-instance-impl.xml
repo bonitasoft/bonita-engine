@@ -48,7 +48,7 @@
 		<constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 	
-	<bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">
+	<bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />

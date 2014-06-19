@@ -38,13 +38,13 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class UserImporter {
 
-    private IdentityService identityService;
+    private final IdentityService identityService;
 
-    private ImportOrganizationStrategy strategy;
+    private final ImportOrganizationStrategy strategy;
 
-    private long userIdFromSession;
+    private final long userIdFromSession;
 
-    private CustomUserInfoValueImporter infoValueImporter;
+    private final CustomUserInfoValueImporter infoValueImporter;
 
     public UserImporter(TenantServiceAccessor serviceAccessor, final ImportOrganizationStrategy strategy, long userIdFromSession,
             CustomUserInfoValueImporter infoValueImporter) {
@@ -70,15 +70,15 @@ public class UserImporter {
     }
 
     private boolean hasUserWithUserName(String userName) throws SBonitaSearchException {
-        SUserBuilderFactory keyProvider = BuilderFactory.get(SUserBuilderFactory.class);
-        FilterOption filter = new FilterOption(SUser.class, keyProvider.getUserNameKey(), userName);
-        QueryOptions queryOptions = new QueryOptions(Collections.singletonList(filter), null);
-        long numberOfUsers = identityService.getNumberOfUsers(queryOptions);
+        final SUserBuilderFactory keyProvider = BuilderFactory.get(SUserBuilderFactory.class);
+        final FilterOption filter = new FilterOption(SUser.class, keyProvider.getUserNameKey(), userName);
+        final QueryOptions queryOptions = new QueryOptions(Collections.singletonList(filter), null);
+        final long numberOfUsers = identityService.getNumberOfUsers(queryOptions);
         return numberOfUsers > 0;
     }
 
     private SUser addAllUserInfo(final ExportedUser userToImport) throws SBonitaException {
-        SUser persistedUser = addUser(userToImport);
+        final SUser persistedUser = addUser(userToImport);
         addContactInfo(userToImport, persistedUser);
         infoValueImporter.imporCustomUserInfoValues(userToImport.getCustomUserInfoValues(), persistedUser.getId());
         return persistedUser;
@@ -101,24 +101,24 @@ public class UserImporter {
         return sUser;
     }
 
-    private SUser constructSUser(final ExportedUser newUser) {
+    private SUser constructSUser(final ExportedUser exportedUser) {
         final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
         final long now = System.currentTimeMillis();
         userBuilder.setCreationDate(now);
         userBuilder.setLastUpdate(now);
         userBuilder.setLastConnection(null);
 
-        userBuilder.setUserName(newUser.getUserName());
-        userBuilder.setPassword(newUser.getPassword());
-        userBuilder.setFirstName(newUser.getFirstName());
-        userBuilder.setLastName(newUser.getLastName());
-        userBuilder.setIconName(newUser.getIconName());
-        userBuilder.setIconPath(newUser.getIconPath());
-        userBuilder.setJobTitle(newUser.getJobTitle());
-        userBuilder.setTitle(newUser.getTitle());
-        userBuilder.setCreatedBy(newUser.getCreatedBy() == 0 ? userIdFromSession : newUser.getCreatedBy());
-        userBuilder.setManagerUserId(newUser.getManagerUserId());
-        userBuilder.setEnabled(newUser.isEnabled());
+        userBuilder.setUserName(exportedUser.getUserName());
+        userBuilder.setPassword(exportedUser.getPassword());
+        userBuilder.setFirstName(exportedUser.getFirstName());
+        userBuilder.setLastName(exportedUser.getLastName());
+        userBuilder.setIconName(exportedUser.getIconName());
+        userBuilder.setIconPath(exportedUser.getIconPath());
+        userBuilder.setJobTitle(exportedUser.getJobTitle());
+        userBuilder.setTitle(exportedUser.getTitle());
+        userBuilder.setCreatedBy(exportedUser.getCreatedBy() == 0 ? userIdFromSession : exportedUser.getCreatedBy());
+        userBuilder.setManagerUserId(exportedUser.getManagerUserId());
+        userBuilder.setEnabled(exportedUser.isEnabled());
         return userBuilder.done();
     }
 

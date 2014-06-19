@@ -41,8 +41,7 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
     private TokenInfo tokenInfo = null;
 
     public FlowNodeCompletionTokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
-            final SFlowNodeDefinition sFlowNodeDefinition,
-            final FlowNodeTransitionsWrapper transitionsDescriptor, TokenService tokenService) {
+            final SFlowNodeDefinition sFlowNodeDefinition, final FlowNodeTransitionsWrapper transitionsDescriptor, final TokenService tokenService) {
         this.child = child;
         this.processInstance = sProcessInstance;
         this.sFlowNodeDefinition = sFlowNodeDefinition;
