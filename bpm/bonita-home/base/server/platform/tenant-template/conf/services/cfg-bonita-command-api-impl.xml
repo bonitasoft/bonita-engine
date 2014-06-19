@@ -12,7 +12,8 @@
 	<bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.DefaultCommandProvider">
 		<property name="defaultCommands">
 			<list>
-				<ref bean="getActorIdsForUserIdIncludingTeam" />
+				<ref bean="canStartProcessDefinition" />
+                <ref bean="isInvolvedInHumanTask" />
 				<ref bean="importProfiles" />
 				<ref bean="isUserProcessSupervisor" />
 				<ref bean="createSupervisor" />
@@ -48,18 +49,29 @@
 		</property>
 	</bean>
 
-	<bean id="getActorIdsForUserIdIncludingTeam" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>getActorIdsForUserIdIncludingTeam</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Get Map of all (processDefinitionId, Set of ActorIds) for user passed as parameter and all users of his team (he is a manager of). Use parameter key
-				USER_ID_KEY</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.actor.GetActorIdsForUserIdIncludingTeam</value>
-		</constructor-arg>
-	</bean>
+    <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+        <constructor-arg name="name">
+            <value>canStartProcessDefinition</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Return true if the user can start the process, false otherwise. Use parameter key USER_ID_KEY and PROCESS_DEFINITION_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.CanStartProcessDefinition</value>
+        </constructor-arg>
+    </bean>
+    
+    <bean id="isInvolvedInHumanTask" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+        <constructor-arg name="name">
+            <value>isInvolvedInHumanTask</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Return true if a user is involved in a specific human task, false otherwise. Use parameter key USER_ID_KEY and HUMAN_TASK_INSTANCE_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.IsInvolvedInHumanTask</value>
+        </constructor-arg>
+    </bean>
 	
 	<bean id="importProfiles" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
 		<constructor-arg name="name">

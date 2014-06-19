@@ -68,8 +68,8 @@
 			<!-- platform -->
 				<entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="0" />
 				<entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="1" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="2" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="3" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="2" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="3" />
 				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="4" />
 				<!--  tenant -->
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="10" />
