@@ -52,12 +52,6 @@
 		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
 	</query>
 	
-	<query name="getProcessIdsOfCategory">
-		SELECT categorymapping.processId
-		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
-		WHERE categorymapping.categoryId = :categoryId
-	</query>
-	
 	<query name="getCategoryMappingOfProcessAndCategories">
 		SELECT categorymapping
 		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
@@ -70,15 +64,15 @@
 		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
 		WHERE categorymapping.processId = :processId
 	</query>
+    
+    <query name="getNumberOfProcessDefinitionsOfCategory">
+        SELECT COUNT(categorymapping)
+        FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+        WHERE categorymapping.categoryId = :categoryId
+    </query>
 
 	<query name="getNumberOfCategorizedProcessIds">
 		SELECT COUNT(categorymapping)
-		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
-		WHERE categorymapping.processId IN (:processIds)
-	</query>
-
-	<query name="getCategorizedProcessIds">
-		SELECT DISTINCT categorymapping.processId
 		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
 		WHERE categorymapping.processId IN (:processIds)
 	</query>
@@ -89,5 +83,5 @@
 		WHERE categorymapping.processId = :processDefinitionId
 		AND categorymapping.categoryId = :categoryId
 	</query>
-
+    
 </hibernate-mapping>

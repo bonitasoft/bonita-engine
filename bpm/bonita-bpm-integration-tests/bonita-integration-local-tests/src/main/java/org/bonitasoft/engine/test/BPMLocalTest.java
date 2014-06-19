@@ -74,7 +74,6 @@ public class BPMLocalTest extends CommonAPILocalTest {
         deleteUser(USERNAME);
         logoutOnTenant();
         cleanSession();
-
     }
 
     @Before
@@ -159,14 +158,14 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public Long call() throws Exception {
-                return commentService.getNumberOfComments(QueryOptions.defaultQueryOptions());
+                return commentService.getNumberOfComments(QueryOptions.countQueryOptions());
             }
         };
         final Callable<Long> getNumberOfArchivedComments = new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {
-                return commentService.getNumberOfArchivedComments(QueryOptions.defaultQueryOptions());
+                return commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions());
             }
         };
         assertEquals(0, (long) transactionService.executeInTransaction(getNumberOfComments));
@@ -215,7 +214,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public List<SPendingActivityMapping> call() throws Exception {
-                return activityInstanceService.getPendingMappings(taskId, QueryOptions.defaultQueryOptions());
+                final QueryOptions queryOptions = new QueryOptions(0, 100, SPendingActivityMapping.class, "id", OrderByType.ASC);
+                return activityInstanceService.getPendingMappings(taskId, queryOptions);
             }
         };
         List<SPendingActivityMapping> mappings = transactionService.executeInTransaction(getPendingMappings);
@@ -246,9 +246,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(businessArchive, "delivery", john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
-        List<Long> dependencyIds;
-        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, QueryOptions
-                .defaultQueryOptions()));
+        List<Long> dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0,
+                100));
         assertEquals(1, dependencyIds.size());
         final SDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
         assertTrue(dependency.getName().endsWith("myDep"));
@@ -258,8 +257,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(definition);
 
-        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, QueryOptions
-                .defaultQueryOptions()));
+        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0, 100));
         assertEquals(0, dependencyIds.size());
     }
 
@@ -285,7 +283,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         List<Long> dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService,
-                QueryOptions.allResultsQueryOptions()));
+                0, 100));
         assertEquals(25, dependencyIds.size());
         final SDependency dependency = transactionService.executeInTransaction(new GetSDependency(dependencyIds.get(0), dependencyService));
         assertNotNull(dependency);
@@ -294,8 +292,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(definition);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, QueryOptions
-                .defaultQueryOptions()));
+        dependencyIds = transactionService.executeInTransaction(new GetDependenciesIds(getSession(), definition.getId(), dependencyService, 0, 100));
         assertEquals(0, dependencyIds.size());
     }
 
@@ -316,7 +313,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public List<SActor> call() throws Exception {
-                return getTenantAccessor().getActorMappingService().getActors(definition.getId());
+                final QueryOptions queryOptions = new QueryOptions(0, 1, SActor.class, "id", OrderByType.ASC);
+                return getTenantAccessor().getActorMappingService().getActors(definition.getId(), queryOptions);
             }
         });
 
@@ -342,7 +340,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public List<SActorMember> call() throws Exception {
-                return getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId());
+                return getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId(), 0, 1);
             }
         });
 
@@ -522,21 +520,23 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
         private final DependencyService dependencyService;
 
-        private final QueryOptions queryOptions;
+        private final int startIndex;
+
+        private final int maxResult;
 
         public GetDependenciesIds(final APISession session, final long processDefinitionId, final DependencyService dependencyService,
-                final QueryOptions queryOptions) {
+                final int startIndex, final int maxResult) {
             this.session = session;
             this.processDefinitionId = processDefinitionId;
             this.dependencyService = dependencyService;
-            this.queryOptions = queryOptions;
-
+            this.startIndex = startIndex;
+            this.maxResult = maxResult;
         }
 
         @Override
         public List<Long> call() throws Exception {
             setSessionInfo(session); // the session was cleaned by api call. This must be improved
-            return dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, queryOptions);
+            return dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, startIndex, maxResult);
         }
     }
 

@@ -183,7 +183,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     private String getTruncated(final String value, final int maxLengh, final SFlowNodeInstance flowNodeInstance, final String key) {
         if (value.length() > maxLengh) {
-            String truncatedValue = value.substring(0, maxLengh);
+            final String truncatedValue = value.substring(0, maxLengh);
             logTruncationWarning(value, truncatedValue, maxLengh, flowNodeInstance, key);
             return truncatedValue;
         }
@@ -217,8 +217,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey,
-            final int maxLengh)
-                    throws SFlowNodeModificationException {
+            final int maxLengh) throws SFlowNodeModificationException {
         String truncatedValue = getTruncated(attributeValue, maxLengh, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(attributeKey, truncatedValue);
@@ -254,16 +253,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             recorder.recordUpdate(updateRecord, updateEvent);
         } catch (final SRecorderException e) {
             throw new SFlowNodeModificationException(e);
-        }
-    }
-
-    @Override
-    public List<SFlowNodeInstance> getActiveFlowNodes(final long rootContainerId) throws SFlowNodeReadException {
-        try {
-            final SelectListDescriptor<SFlowNodeInstance> selectListDescriptor = SelectDescriptorBuilder.getActiveFlowNodes(rootContainerId);
-            return persistenceService.selectList(selectListDescriptor);
-        } catch (final SBonitaReadException bre) {
-            throw new SFlowNodeReadException(bre);
         }
     }
 

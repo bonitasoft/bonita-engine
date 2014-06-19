@@ -71,8 +71,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
         @Override
         public Object call() throws Exception {
-
-            for (int i = 0; i < QueryOptions.DEFAULT_NUMBER_OF_RESULTS && iterator.hasNext(); i++) {
+            for (int i = 0; i < 20 && iterator.hasNext(); i++) {
                 Long processId = iterator.next();
                 try {
                     SProcessInstance processInstance = processInstanceService.getProcessInstance(processId);
@@ -119,7 +118,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
         List<Long> ids = new ArrayList<Long>();
         processInstancesByTenant.put(tenantId, ids);
-        queryOptions = new QueryOptions(0, 1000, null);
+        queryOptions = new QueryOptions(0, 1000);
         try {
             do {
                 processInstances = processInstanceService.getProcessInstancesInStates(queryOptions, ProcessInstanceState.INITIALIZING,

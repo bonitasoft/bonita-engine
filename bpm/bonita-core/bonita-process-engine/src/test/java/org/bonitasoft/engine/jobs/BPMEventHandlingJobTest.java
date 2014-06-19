@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,27 +14,51 @@
 package org.bonitasoft.engine.jobs;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
+import org.bonitasoft.engine.work.WorkService;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
+ * @author Celine Souchet
  * @author Emmanuel Duchastenier
  */
-@SuppressWarnings("javadoc")
+@RunWith(MockitoJUnitRunner.class)
 public class BPMEventHandlingJobTest {
 
-    @Test
-    public void makeMessageUniqueCouplesWithDuplicateMessage() {
-        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
+    @Mock
+    private EventInstanceService eventInstanceService;
 
+    @Mock
+    private WorkService workService;
+
+    @Spy
+    @InjectMocks
+    private BPMEventHandlingJob bPMEventHandlingJob;
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.jobs.BPMEventHandlingJob#getMessageUniqueCouples()}.
+     */
+    @Test
+    public void getMessageUniqueCouplesWithDuplicateMessage() throws SEventTriggerInstanceReadException {
+        // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
         when(couple1.getWaitingMessageId()).thenReturn(10L);
@@ -47,8 +71,14 @@ public class BPMEventHandlingJobTest {
         when(couple3.getMessageInstanceId()).thenReturn(1L);
         when(couple3.getWaitingMessageId()).thenReturn(30L);
 
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+
+        // When
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+
+        // Then
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
         assertEquals(1L, first.getMessageInstanceId());
@@ -59,9 +89,8 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void makeMessageUniqueCouplesWithDuplicateWaitingEvent() {
-        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
-
+    public void getMessageUniqueCouplesWithDuplicateWaitingEvent() throws SEventTriggerInstanceReadException {
+        // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
         when(couple1.getWaitingMessageId()).thenReturn(10L);
@@ -74,8 +103,14 @@ public class BPMEventHandlingJobTest {
         when(couple3.getMessageInstanceId()).thenReturn(3L);
         when(couple3.getWaitingMessageId()).thenReturn(30L);
 
+        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+
+        // When
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+
+        // Then
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
         assertEquals(1L, first.getMessageInstanceId());
@@ -86,9 +121,8 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() {
-        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
-
+    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() throws SEventTriggerInstanceReadException {
+        // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
         when(couple1.getWaitingMessageId()).thenReturn(10L);
@@ -99,8 +133,14 @@ public class BPMEventHandlingJobTest {
         when(couple2.getWaitingMessageId()).thenReturn(10L);
         when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.START_EVENT);
 
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+
+        // When
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+
+        // Then
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
         assertEquals(1L, first.getMessageInstanceId());
@@ -111,9 +151,8 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() {
-        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
-
+    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() throws SEventTriggerInstanceReadException {
+        // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
         when(couple1.getWaitingMessageId()).thenReturn(10L);
@@ -124,8 +163,14 @@ public class BPMEventHandlingJobTest {
         when(couple2.getWaitingMessageId()).thenReturn(10L);
         when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
 
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+
+        // When
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+
+        // Then
         assertEquals(1, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
         assertEquals(1L, first.getMessageInstanceId());
@@ -133,9 +178,8 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void makeMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent() {
-        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
-
+    public void getMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent() throws SEventTriggerInstanceReadException {
+        // Given
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
         when(couple1.getMessageInstanceId()).thenReturn(1L);
         when(couple1.getWaitingMessageId()).thenReturn(10L);
@@ -152,8 +196,14 @@ public class BPMEventHandlingJobTest {
         when(couple4.getMessageInstanceId()).thenReturn(2L);
         when(couple4.getWaitingMessageId()).thenReturn(20L);
 
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
-        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+
+        // When
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+
+        // Then
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
         assertEquals(1L, first.getMessageInstanceId());
@@ -163,4 +213,21 @@ public class BPMEventHandlingJobTest {
         assertEquals(20L, second.getWaitingMessageId());
     }
 
+    @Test
+    public void get1000MessageEventCouples_should_be_paginated_by_1000() throws SEventTriggerInstanceReadException {
+        // Given
+        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
+
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
+        messageCouples.addAll(Arrays.asList(couple1));
+        doReturn(messageCouples).when(eventInstanceService).getMessageEventCouples(3000, 1000);
+
+        // When
+        final List<SMessageEventCouple> sMessageEventCouples = bPMEventHandlingJob.get1000MessageEventCouples(3);
+
+        // Then
+        assertEquals(messageCouples, sMessageEventCouples);
+    }
 }

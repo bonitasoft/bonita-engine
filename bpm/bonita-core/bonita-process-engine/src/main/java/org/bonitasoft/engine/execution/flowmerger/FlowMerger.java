@@ -22,7 +22,6 @@ import org.bonitasoft.engine.execution.TokenProvider;
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
- * 
  */
 public class FlowMerger {
 
@@ -32,7 +31,7 @@ public class FlowMerger {
 
     private final TokenProvider tokenProvider;
 
-    public FlowMerger(final SFlowNodeDefinition sFlowNodeDefinition, final FlowNodeTransitionsWrapper transitionsDescriptor, TokenProvider tokenProvider) {
+    public FlowMerger(final SFlowNodeDefinition sFlowNodeDefinition, final FlowNodeTransitionsWrapper transitionsDescriptor, final TokenProvider tokenProvider) {
         super();
         this.sFlowNodeDefinition = sFlowNodeDefinition;
         this.transitionsWrapper = transitionsDescriptor;

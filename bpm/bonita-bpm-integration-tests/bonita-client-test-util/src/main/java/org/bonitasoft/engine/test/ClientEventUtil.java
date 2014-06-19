@@ -146,20 +146,28 @@ public class ClientEventUtil {
         }
     }
 
-    public static Map<String, Serializable> getTaskInState(final long processInstanceId, final String stateName) {
+    public static Map<String, Serializable> getTaskInState(final long rootContainerId, final String stateName) {
         final Map<String, Serializable> map = new HashMap<String, Serializable>(3);
         map.put(TYPE, FLOW_NODE);
-        map.put(ROOT_CONTAINER_ID, processInstanceId);
+        map.put(ROOT_CONTAINER_ID, rootContainerId);
         map.put(STATE, stateName);
         return map;
     }
 
-    public static Map<String, Serializable> getTaskInState(final long processInstanceId, final String state, final String flowNodeName) {
+    public static Map<String, Serializable> getTaskInState(final long rootContainerId, final String state, final String flowNodeName) {
         final Map<String, Serializable> map = new HashMap<String, Serializable>(4);
         map.put(TYPE, FLOW_NODE);
-        map.put(ROOT_CONTAINER_ID, processInstanceId);
+        map.put(ROOT_CONTAINER_ID, rootContainerId);
         map.put(STATE, state);
         map.put(NAME, flowNodeName);
+        return map;
+    }
+
+    public static Map<String, Serializable> getTaskInState(final String state, final String taskName) {
+        final Map<String, Serializable> map = new HashMap<String, Serializable>(5);
+        map.put(TYPE, FLOW_NODE);
+        map.put(NAME, taskName);
+        map.put(STATE, state);
         return map;
     }
 

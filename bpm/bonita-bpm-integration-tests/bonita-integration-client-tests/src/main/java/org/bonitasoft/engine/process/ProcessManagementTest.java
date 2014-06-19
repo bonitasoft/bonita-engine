@@ -1426,10 +1426,7 @@ public class ProcessManagementTest extends CommonAPITest {
         assertEquals(processDefinition4.getId(), processDeploymentInfos.get(processInstantsIdD).getProcessId());
 
         // delete data for test
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
-        disableAndDeleteProcess(processDefinition3);
-        disableAndDeleteProcess(processDefinition4);
+        disableAndDeleteProcess(processDefinition1, processDefinition2, processDefinition3, processDefinition4);
         deleteUser(john.getId());
     }
 

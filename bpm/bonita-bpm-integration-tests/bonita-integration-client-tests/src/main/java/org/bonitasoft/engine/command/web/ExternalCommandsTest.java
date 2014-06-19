@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        ActorCommandTest.class,
+        UserPermissionCommandTest.class,
         ProfileImportCommandTest.class,
         ActorPermissionCommandTest.class,
         GetUpdatedVariableValuesForProcessDefinitionTest.class,

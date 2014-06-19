@@ -56,6 +56,7 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
 
     @Override
     public void execute() throws SBonitaException {
+        profileService.updateProfileMetaData(profileId);
         SUser user = null;
         SGroup group = null;
         SRole role = null;
@@ -82,7 +83,6 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
                 sProfileMember = profileService.addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
                 break;
         }
-        profileService.updateProfileMetaData(profileId);
     }
 
     @Override

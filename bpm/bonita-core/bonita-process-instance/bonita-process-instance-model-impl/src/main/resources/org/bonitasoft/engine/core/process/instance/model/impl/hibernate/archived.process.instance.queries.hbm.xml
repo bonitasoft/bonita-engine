@@ -114,11 +114,14 @@
 		WHERE aa.id = :id
 	</query>
 
-  <query name="getAActivityInstanceByActivityInstanceId">
-    SELECT aa
-    FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa
-    WHERE aa.sourceObjectId = :activityInstanceId
-    ORDER BY aa.archiveDate DESC, aa.id DESC
+  <query name="getMostRecentArchivedActivityInstance">
+	    SELECT aa
+	    FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa
+	    WHERE aa.archiveDate = (
+			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
+			WHERE aa2.sourceObjectId = aa.sourceObjectId
+			AND aa2.sourceObjectId = :activityInstanceId
+		)
   </query>
 
   <query name="getAActivityInstanceByActivityInstanceIdAndStateId">
@@ -475,6 +478,7 @@
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
 		WHERE aa.rootContainerId = :rootContainerId
+        ORDER BY aa.id
 	</query>
 	
 	

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api.impl;
@@ -35,9 +35,11 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileMember;
@@ -91,11 +93,24 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
+    @Deprecated
     public List<Profile> getProfilesForUser(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            return ModelConvertor.toProfiles(profileService.getProfilesOfUser(userId));
+            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, 0, 1000, "name", OrderByType.ASC));
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    @Override
+    public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults, final ProfileCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProfileService profileService = tenantAccessor.getProfileService();
+        try {
+            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, startIndex, maxResults, criterion.getField(),
+                    OrderByType.valueOf(criterion.getOrder().name())));
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
@@ -141,7 +156,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
-            final List<SProfileMember> listOfProfileMembers = profileService.getNumberOfProfileMembers(profileIds);
+            final List<SProfileMember> listOfProfileMembers = profileService.getProfileMembers(profileIds);
             final Map<Long, SProfileMember> profileMembers = new HashMap<Long, SProfileMember>();
             final Map<Long, Long> result = new HashMap<Long, Long>();
             for (final SProfileMember p : listOfProfileMembers) {
@@ -237,25 +252,27 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId) throws CreationException,
+    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId)
+            throws CreationException,
             AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final MemberType memberType = getMemberType(userId, groupId, roleId);
-        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
-                memberType);
         try {
-            checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
-        } catch (final SBonitaException e1) {
-            throw new AlreadyExistsException(e1);
-        }
-        try {
+            final MemberType memberType = getMemberType(userId, groupId, roleId);
+            final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
+                    memberType);
+            try {
+                checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
+            } catch (final SBonitaException e1) {
+                throw new AlreadyExistsException(e1);
+            }
             createProfileMember.execute();
             return convertToProfileMember(createProfileMember);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
+
     }
 
     protected ProfileMember convertToProfileMember(final CreateProfileMember createProfileMember) {
@@ -346,19 +363,22 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     private boolean isPositiveLong(final Long value) {
-        return (value != null && value > 0);
+        return value != null && value > 0;
     }
 
     @Override
     public void deleteProfileMember(final Long profileMemberId) throws DeletionException {
-        final ProfileService profileService = getTenantAccessor().getProfileService();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProfileService profileService = tenantAccessor.getProfileService();
         try {
+            // add a lock because the update profile call getProfile then update profile -> deadlock...
             final SProfileMember profileMember = profileService.getProfileMemberWithoutDisplayName(profileMemberId);
-            profileService.deleteProfileMember(profileMember.getId());
             profileService.updateProfileMetaData(profileMember.getProfileId());
+            profileService.deleteProfileMember(profileMember.getId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
+
     }
 
     protected long getUserIdFromSession() {

@@ -8,12 +8,10 @@
 		WHERE process_definition.processId = :processId
 	</query>
 
-	<query name="getProcessDefinitionDeployInfosByTimeDesc">
+	<query name="getProcessDefinitionDeployInfosByName">
 		SELECT process_definition
 		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
 		WHERE process_definition.name = :name
-		ORDER BY process_definition.deploymentDate
-		DESC
 	</query>
 
 	<query name="getProcessesWithActorOnlyForUser">
@@ -702,6 +700,14 @@
 			 org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
 		WHERE categorymapping.processId = process_definition.processId
 	</query>
+    
+    <query name="searchSProcessDeploymentInfosOfCategory">
+        SELECT process_definition
+        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
+             org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+        WHERE categorymapping.processId = process_definition.processId
+        AND categorymapping.categoryId = :categoryId
+    </query>
 
 	<query name="getNumberOfSUserWhoCanStartProcess">
 		SELECT COUNT(DISTINCT user)
