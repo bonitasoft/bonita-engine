@@ -127,6 +127,7 @@ public class ClientEventUtil {
         try {
             return (Long) commandAPI.execute(WAIT_SERVER_COMMAND, parameters);
         } catch (final CommandExecutionException e) {
+            LOGGER.error("error while executing wait server command for element:" + event, e);
             if (e.getMessage().toLowerCase().contains("timeout")) {
                 throw new TimeoutException("Timeout (" + defaultTimeout + " ms) when looking for element: " + event);
             } else {
