@@ -33,11 +33,6 @@
       <artifactId>bonita-actor-mapping-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
-      <artifactId>bonita-actor-mapping-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- API -->
     <dependency>
@@ -691,7 +686,6 @@
                   <!-- Actor Mapping -->
                   <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
                   <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
-                  <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl-hibernate</include>
                   <!-- API -->
                   <include>org.bonitasoft.engine.api:bonita-server-api-http</include>
                   <!-- Archive -->

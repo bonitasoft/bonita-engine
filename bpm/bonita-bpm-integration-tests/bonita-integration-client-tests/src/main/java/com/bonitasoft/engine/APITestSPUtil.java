@@ -297,13 +297,24 @@ public class APITestSPUtil extends APITestUtil {
         if (numberOfActiveTransactions != 0) {
             // retry 50 ms after because the might still be some jobs/works that run
             try {
+                LOGGER.warn("There was " + numberOfActiveTransactions + " active transaction, waiting 50ms and checking it again");
                 Thread.sleep(50);
             } catch (final InterruptedException e) {
                 throw new MonitoringException("interrupted while sleeping");
             }
             numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
             if (numberOfActiveTransactions != 0) {
-                messages.add("There are " + numberOfActiveTransactions + " active transactions.");
+                // resleep 15 s now
+                LOGGER.warn("There was still " + numberOfActiveTransactions + " active transaction, waiting 15s and checking it again");
+                try {
+                    Thread.sleep(15000);
+                } catch (final InterruptedException e) {
+                    throw new MonitoringException("interrupted while sleeping");
+                }
+                numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
+                if (numberOfActiveTransactions != 0) {
+                    messages.add("There are " + numberOfActiveTransactions + " active transactions.");
+                }
             }
         }
         return messages;

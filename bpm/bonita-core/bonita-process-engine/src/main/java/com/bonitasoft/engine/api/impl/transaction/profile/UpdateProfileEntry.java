@@ -51,6 +51,7 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
     @Override
     public void execute() throws SBonitaException {
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
+        profileService.updateProfileMetaData(sProfileEntry.getProfileId());
         final EntityUpdateDescriptor profileEntryUpdateDescriptor = getProfileEntryUpdateDescriptor();
         final Map<String, Object> fields = profileEntryUpdateDescriptor.getFields();
         final String type = (String) fields.get(SProfileEntryBuilderFactory.TYPE);
@@ -60,7 +61,6 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         }
 
         profileService.updateProfileEntry(sProfileEntry, profileEntryUpdateDescriptor);
-        profileService.updateProfileMetaData(sProfileEntry.getProfileId());
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
     }
 

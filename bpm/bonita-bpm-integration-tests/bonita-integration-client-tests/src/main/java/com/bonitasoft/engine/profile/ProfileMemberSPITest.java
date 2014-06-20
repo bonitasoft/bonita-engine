@@ -10,9 +10,15 @@ package com.bonitasoft.engine.profile;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -30,7 +36,7 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
     @Ignore("Problem with assumption that default values pre-exist")
     @Test
     public void multitenancyOnSearchUserProfileMembers() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
 
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
@@ -44,7 +50,7 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
 
         final User userTenant2 = createUser("userName_tenant2", "UserPwd_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2");
         getProfileAPI().createProfileMember(Long.valueOf(1), userTenant2.getId(), null, null);
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         // Create UserProfile1
@@ -66,7 +72,7 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
         assertEquals(0, searchedProfileMember.getResult().size());
         getIdentityAPI().deleteUser(user1.getId());
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnTenantWith("default_tenant2", "default_password2", tenant2Id);
         getIdentityAPI().deleteUser(userTenant2.getId());
 
@@ -76,6 +82,72 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
         platformAPI.deleteTenant(tenant2Id);
 
         loginOnDefaultTenantWithDefaultTechnicalLogger();
+    }
+
+    @Test
+    public void createProfileMembersMultiThreaded() throws Throwable {
+
+        //given
+        Profile profile = getProfileAPI().createProfile("Mine", "My custom profile");
+        User john = getIdentityAPI().createUser("john", "bpm");
+        User jack = getIdentityAPI().createUser("jack", "bpm");
+        User james = getIdentityAPI().createUser("james", "bpm");
+        Role member = getIdentityAPI().createRole("member");
+
+        List<Group> groups = new ArrayList<Group>();
+        for (int i = 0; i < 20; i++) {
+            groups.add(getIdentityAPI().createGroup("myGroup" + i, null));
+        }
+
+        List<FailableThread> threads = new ArrayList<FailableThread>();
+
+        threads.add(createThreadForProfileMember("t1", profile.getId(), john.getId(), null, null));
+        threads.add(createThreadForProfileMember("t2", profile.getId(), jack.getId(), null, null));
+        threads.add(createThreadForProfileMember("t3", profile.getId(), james.getId(), null, null));
+        threads.add(createThreadForProfileMember("t4", profile.getId(), null, null, member.getId()));
+        threads.add(createThreadForProfileMember("t5", profile.getId(), null, groups.get(0).getId(), member.getId()));
+        for (Group group : groups) {
+            threads.add(createThreadForProfileMember(group.getName(), profile.getId(), null, group.getId(), null));
+        }
+
+        //when
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        //then: threads are ok
+        for (Thread thread : threads) {
+            thread.join(1000);
+        }
+        for (Thread thread : threads) {
+            thread.join(1000);
+        }
+
+        for (FailableThread thread : threads) {
+            if (thread.getException() != null) {
+                throw thread.getException();
+            }
+        }
+
+        deleteGroups(groups);
+        deleteRoles(member);
+        deleteUsers(john, jack, james);
+    }
+
+    private FailableThread createThreadForProfileMember(final String threadName, final Long profileId, final Long userId, final Long grouId, final Long roleId) {
+        FailableThread t1 = new FailableThread(threadName, new FailableRunnable() {
+            @Override
+            public void run() {
+                System.out.println(threadName + " start");
+                try {
+                    getProfileAPI().createProfileMember(profileId, userId, grouId, roleId);
+                } catch (Throwable e) {
+                    setException(e);
+                }
+                System.out.println(threadName + " done");
+            }
+        });
+        return t1;
     }
 
 }

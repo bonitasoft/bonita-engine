@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,8 +18,10 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 /**
  * @author Elias Ricken de Medeiros
  * @author Julien Reboul
+ * @author Matthieu Chaffotte
  */
 public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticationService {
 
@@ -50,15 +53,16 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     @Override
     public String checkUserCredentials(final Map<String, Serializable> credentials) throws AuthenticationException {
-        Map<String, Serializable> jaasCredentials = tryToAuthenticate(credentials);
-        LoginContext loginContext = createContext(new AuthenticationCallbackHandler(jaasCredentials));
+        final Map<String, Serializable> jaasCredentials = tryToAuthenticate(credentials);
+        final LoginContext loginContext = createContext(new AuthenticationCallbackHandler(jaasCredentials));
         login(loginContext);
-        return extractUserFromSubjet(loginContext);
+        String userName = (String) credentials.get(AuthenticationConstants.BASIC_USERNAME);
+        if (userName == null) {
+            userName = extractUserFromSubjet(loginContext);
+        }
+        return userName;
     }
 
-    /**
-     * @param credentials
-     */
     protected Map<String, Serializable> tryToAuthenticate(final Map<String, Serializable> credentials) {
         if (authenticatorDelegate != null) {
             return authenticatorDelegate.authenticate(credentials);
@@ -68,11 +72,11 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     /**
      * attempts a login on the given {@link LoginContext}. see JAAS documentation for more information
-     * 
+     *
      * @param loginContext
-     *            the {@link LoginContext} to use to login
+     *        the {@link LoginContext} to use to login
      * @throws AuthenticationException
-     *             if the authentication fails
+     *         if the authentication fails
      */
     protected void login(final LoginContext loginContext) throws AuthenticationException {
         try {
@@ -87,12 +91,12 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     /**
      * creates {@link LoginContext} to use to authenticate
-     * 
+     *
      * @param authenticationCallbackHandler
-     *            the callback handler to use when managing callback in underlying {@link LoginModule}
+     *        the callback handler to use when managing callback in underlying {@link LoginModule}
      * @return the created {@link LoginContext}
      * @throws AuthenticationException
-     *             if a problem occurs during context creation
+     *         if a problem occurs during context creation
      */
     protected LoginContext createContext(final AuthenticationCallbackHandler authenticationCallbackHandler) throws AuthenticationException {
         try {
@@ -111,39 +115,36 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
      * (yes, it is a lot of should...) <br>
      * <br>
      * It is at least what CAS is giving us. It is then acceptable.
-     * 
+     *
      * @param loginContext
-     *            the login context to extract user from
+     *        the login context to extract user from
      * @return the user if it had succeed, null otherwise
+     * @throws AuthenticationException
      */
-    protected String extractUserFromSubjet(final LoginContext loginContext) {
+    protected String extractUserFromSubjet(final LoginContext loginContext) throws AuthenticationException {
         try {
-            Subject subject = loginContext.getSubject();
-            Set<Principal> principals = subject.getPrincipals();
-            for (Principal principal : principals) {
+            final Subject subject = loginContext.getSubject();
+            final Set<Principal> principals = subject.getPrincipals();
+            for (final Principal principal : principals) {
                 if (StringUtils.equals(principal.getName(), CALLER_PRINCIPAL) && isGroupPrincipal(principal)) {
-                    Group group = (Group) principal;
+                    final Group group = (Group) principal;
                     @SuppressWarnings("unchecked")
-                    Enumeration<Principal> enumeration = (Enumeration<Principal>) group.members();
+                    final Enumeration<Principal> enumeration = (Enumeration<Principal>) group.members();
                     if (enumeration.hasMoreElements()) {
                         return enumeration.nextElement().getName();
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // since it is a supposition that the principal holds the user name,
             // error should happen if something goes wrong and we don't want to manage it yet
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "impossible to retrieve username from credentials", e);
             }
         }
-        return null;
+        throw new AuthenticationException("Unable to retrieve the user name from login context");
     }
 
-    /**
-     * @param principal
-     * @return
-     */
     protected boolean isGroupPrincipal(final Principal principal) {
         return Group.class.isAssignableFrom(principal.getClass());
     }
@@ -152,18 +153,12 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
         return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
     }
 
-    /**
-     * @return the authenticatorDelegate
-     */
     public AuthenticatorDelegate getAuthenticatorDelegate() {
         return authenticatorDelegate;
     }
 
-    /**
-     * @param authenticatorDelegate
-     *            the authenticatorDelegate to set
-     */
-    public void setAuthenticatorDelegate(AuthenticatorDelegate authenticatorDelegate) {
+    public void setAuthenticatorDelegate(final AuthenticatorDelegate authenticatorDelegate) {
         this.authenticatorDelegate = authenticatorDelegate;
     }
+
 }
