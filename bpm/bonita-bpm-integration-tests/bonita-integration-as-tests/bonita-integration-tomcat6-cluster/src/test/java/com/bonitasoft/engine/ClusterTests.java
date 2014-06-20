@@ -144,10 +144,10 @@ public class ClusterTests extends CommonAPISPTest {
         UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
-                .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
-                .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
-                .addOutput(
-                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+        .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+        .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
+        .addOutput(
+                new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -303,11 +303,10 @@ public class ClusterTests extends CommonAPISPTest {
         System.out.println("[test] resume on node 2");
         getTenantManagementAPI().resume();
         // wait that quartz launch its jobs
-        Thread.sleep(3000);
+        Thread.sleep(20000);
         logoutOnTenant();
         loginOnTenantWith("install", "install", otherTenantId);
 
-        Thread.sleep(10000);
         // check executed on node 2 and/or 1 (because matching of events result in non deterministic target node)
         System.out.println("[test] check if executed on node 1 or node 2");
         boolean executedOnNode2 = isExecuted(systemProperty, processDefinitionOnTheOtherTenant);
@@ -328,7 +327,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     private boolean isExecuted(final String systemProperty, final ProcessDefinition processDefinitionOnTheOtherTenant) throws ExpressionEvaluationException,
-            InvalidExpressionException {
+    InvalidExpressionException {
         String evaluateExpressionOnProcessDefinition = (String) getProcessAPI().evaluateExpressionOnProcessDefinition(
                 new ExpressionBuilder().createGroovyScriptExpression("getSystemProp", "return System.getProperty(\"" + systemProperty + "\")",
                         String.class.getName()), Collections.<String, Serializable> emptyMap(), processDefinitionOnTheOtherTenant.getId());
@@ -336,7 +335,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     private ProcessDefinition deployProcessThatSetASystemPropertyOnTheNode(final String systemProperty) throws InvalidExpressionException, BonitaException,
-            InvalidProcessDefinitionException {
+    InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);
