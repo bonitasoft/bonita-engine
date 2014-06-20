@@ -335,7 +335,6 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
     @Test
     public void connectorsAreDeletedAfterTaskCompletion() throws Exception {
         // deploy process
-
         final String taskName = "step1";
         final ProcessDefinition processDefinition = deployProcessWithConnectorOnUserTask(johnUser, taskName);
 
@@ -343,9 +342,9 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for step containing the connector and execute it
-        final ActivityInstance step1 = waitForUserTask(taskName, processInstance);
-        assignAndExecuteStep(step1, johnUserId);
-        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
+        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(taskName, processInstance, johnUserId);
+        waitForTaskInState(processInstance, taskName, TestStates.getNormalFinalState());
+        waitForUserTask("step2", processInstance);
 
         // check that there are no more connector instances
         final SearchResult<ConnectorInstance> searchResult = searchConnectors(step1.getId(), ConnectorInstance.FLOWNODE_TYPE, 10);
@@ -369,7 +368,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask(taskName, ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_ENTER).addInput("input1", input1Expression);
-
+        processBuilder.addUserTask("step2", ACTOR_NAME).addTransition(taskName, "step2");
         return deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
     }
 

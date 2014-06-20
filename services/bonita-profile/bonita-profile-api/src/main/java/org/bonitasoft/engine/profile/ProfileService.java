@@ -124,11 +124,11 @@ public interface ProfileService {
      * Get all profiles of the user by userId
      * 
      * @param userId
-     * @return a list of sProfile
+     * @return A list of sProfile
      * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfile> getProfilesOfUser(long userId) throws SBonitaReadException;
+    List<SProfile> searchProfilesOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
 
     /**
      * Get profile entry by its id
@@ -384,7 +384,7 @@ public interface ProfileService {
      * @throws SBonitaSearchException
      * @since 6.0
      */
-    List<SProfileMember> getNumberOfProfileMembers(List<Long> profileIds) throws SBonitaSearchException;
+    List<SProfileMember> getProfileMembers(List<Long> profileIds) throws SBonitaSearchException;
 
     /**
      * Get profile by given name
@@ -404,7 +404,7 @@ public interface ProfileService {
      * @return a list of profileMembers
      * @throws SProfileMemberNotFoundException
      */
-    List<SProfileMember> getSProfileMembers(long profileId) throws SProfileMemberNotFoundException;
+    List<SProfileMember> getProfileMembers(long profileId, QueryOptions queryOptions) throws SProfileMemberNotFoundException;
 
     /**
      * Get a list of profileEntries by the given profileId and parentId

@@ -10,8 +10,8 @@
 		</property>
 		<property name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="pdependency" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="pdependencymapping" />
+				<entry key="org.bonitasoft.engine.dependency.model.SPlatformDependency" value="pdependency" />
+				<entry key="org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping" value="pdependencymapping" />
 			</map>
 		</property>
 	</bean>

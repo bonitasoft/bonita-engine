@@ -1,15 +1,21 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
@@ -142,5 +148,31 @@ public class QuartzSchedulerExecutorTest {
 
         // then
         assertEquals(CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW, quartzTrigger.getMisfireInstruction());
+    }
+
+    @Test
+    public void deleteJobs_delete_only_job_of_tenant() throws Exception {
+        // given
+        doReturn(123l).when(sessionAccessor).getTenantId();
+        HashSet<JobKey> jobKeyList = new HashSet<JobKey>();
+        jobKeyList.add(new JobKey("job1", "123"));
+        jobKeyList.add(new JobKey("job2", "123"));
+        HashSet<JobKey> jobKeyList2 = new HashSet<JobKey>();
+        jobKeyList2.add(new JobKey("job3", "124"));
+        jobKeyList2.add(new JobKey("job4", "124"));
+
+        doReturn(jobKeyList).when(scheduler).getJobKeys(jobGroupEquals(123 + ""));
+        doReturn(jobKeyList2).when(scheduler).getJobKeys(not(eq(jobGroupEquals(123 + ""))));
+
+        // when
+        quartzSchedulerExecutor.deleteJobs();
+
+        // then
+        verify(scheduler).deleteJob(jobKey("job1", "123"));
+        verify(scheduler).deleteJob(jobKey("job2", "123"));
+        verify(scheduler, never()).deleteJob(jobKey("job3", "123"));
+        verify(scheduler, never()).deleteJob(jobKey("job4", "123"));
+        verify(scheduler, never()).deleteJob(jobKey("job3", "124"));
+        verify(scheduler, never()).deleteJob(jobKey("job4", "124"));
     }
 }

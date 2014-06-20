@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
@@ -141,8 +142,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         waitForArchivedActivity(callActivity.getId(), TestStates.getAbortedState());
         checkWasntExecuted(processInstance, "step2");
 
-        disableAndDeleteProcess(calledProcDef);
-        disableAndDeleteProcess(callerProcDef);
+        disableAndDeleteProcess(calledProcDef, callerProcDef);
     }
 
     @Test
@@ -168,14 +168,13 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         waitForProcessToFinish(processInstance);
         checkWasntExecuted(processInstance, "exceptionStep");
 
-        disableAndDeleteProcess(calledProcDef);
-        disableAndDeleteProcess(callerProcDef);
+        disableAndDeleteProcess(calledProcDef, callerProcDef);
     }
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event" }, jira = "ENGINE-501")
-    public void testUncaughtThrowErrorEvent() throws Exception {
+    public void uncaughtThrowErrorEvent() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1", "delivery");
         // catch a different error
         final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
@@ -183,9 +182,8 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
         waitForFlowNodeInExecutingState(processInstance, "callStep", false);
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
         final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
-        assignAndExecuteStep(calledStep1, donaBenta.getId());
+        waitForUserTaskAndExecuteIt("calledStep1", processInstance.getId(), donaBenta.getId());
 
         waitForArchivedActivity(calledStep2.getId(), TestStates.getAbortedState());
         // if there are no catch error able to handle the thrown error, the throw error event has the same behavior as a terminate event.
@@ -195,9 +193,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
         checkWasntExecuted(processInstance, "exceptionStep");
 
-        disableAndDeleteProcess(calledProcDef);
-        disableAndDeleteProcess(callerProcDef);
-
+        disableAndDeleteProcess(calledProcDef, callerProcDef);
     }
 
     @Test
@@ -213,11 +209,11 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
         final FlowNodeInstance callActivityL2 = waitForFlowNodeInExecutingState(processInstance, "callStepL2", false);
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
+        final HumanTaskInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
+        final ActivityInstance calledStep1 = waitForUserTaskAndExecuteIt("calledStep1", processInstance.getId(), donaBenta.getId());
+
         final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
-        assignAndExecuteStep(calledStep1, donaBenta.getId());
 
         waitForArchivedActivity(calledStep2.getId(), TestStates.getAbortedState());
         final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(processInstance, "exceptionStep", false);
@@ -230,9 +226,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         waitForArchivedActivity(callActivityL2.getId(), TestStates.getAbortedState());
         checkWasntExecuted(processInstance, "step2");
 
-        disableAndDeleteProcess(procDefLevel0);
-        disableAndDeleteProcess(procDefLevel1);
-        disableAndDeleteProcess(procDefLevel2);
+        disableAndDeleteProcess(procDefLevel0, procDefLevel1, procDefLevel2);
     }
 
     @Test
@@ -268,8 +262,6 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         waitForArchivedActivity(callActivityL2.getId(), TestStates.getNormalFinalState());
         checkWasntExecuted(calledProcessInstanceL1, "step2");
 
-        disableAndDeleteProcess(procDefLevel0);
-        disableAndDeleteProcess(procDefLevel1);
-        disableAndDeleteProcess(procDefLevel2);
+        disableAndDeleteProcess(procDefLevel0, procDefLevel1, procDefLevel2);
     }
 }

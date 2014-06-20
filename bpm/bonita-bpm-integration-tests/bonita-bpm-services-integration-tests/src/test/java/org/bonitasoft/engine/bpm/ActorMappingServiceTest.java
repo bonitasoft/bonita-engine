@@ -192,7 +192,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(1, actorMembers.size());
             checkActorMember(actorMembers.get(0), 1, -1, -1);
 
-            actorMappingService.removeActorMember(actorMembers.get(0).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(0).getId());
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
@@ -229,7 +229,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(1, actorMembers.size());
             checkActorMember(actorMembers.get(0), -1, -1, 1);
 
-            actorMappingService.removeActorMember(actorMembers.get(0).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(0).getId());
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
@@ -260,7 +260,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(1, actorMembers.size());
             checkActorMember(actorMembers.get(0), -1, mainGroup.getId(), -1);
 
-            actorMappingService.removeActorMember(actorMembers.get(0).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(0).getId());
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
@@ -292,8 +292,8 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             checkActorMember(actorMembers.get(0), -1, parentGroup.getId(), -1);
             checkActorMember(actorMembers.get(1), -1, childGroup.getId(), -1);
 
-            actorMappingService.removeActorMember(actorMembers.get(0).getId());
-            actorMappingService.removeActorMember(actorMembers.get(1).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(0).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(1).getId());
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
@@ -324,7 +324,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(1, actorMembers.size());
             checkActorMember(actorMembers.get(0), -1, mainGroup.getId(), 1);
 
-            actorMappingService.removeActorMember(actorMembers.get(0).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(0).getId());
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
@@ -356,8 +356,8 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             checkActorMember(actorMembers.get(0), -1, parentGroup.getId(), 1);
             checkActorMember(actorMembers.get(1), -1, childGroup.getId(), 1);
 
-            actorMappingService.removeActorMember(actorMembers.get(0).getId());
-            actorMappingService.removeActorMember(actorMembers.get(1).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(0).getId());
+            actorMappingService.deleteActorMember(actorMembers.get(1).getId());
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);

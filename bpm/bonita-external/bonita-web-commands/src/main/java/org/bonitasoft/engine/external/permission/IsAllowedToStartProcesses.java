@@ -26,6 +26,7 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -67,7 +68,8 @@ public class IsAllowedToStartProcesses extends TenantCommand {
         if (!processDefinitionIds.isEmpty()) {
             for (Long processDefinitionId : processDefinitionIds) {
                 try {
-                    List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId);
+                    List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0,
+                            QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
                     if (ckRes != null && ckRes.size() == 1) {
                         resMap.put(processDefinitionId, true);
                     } else {

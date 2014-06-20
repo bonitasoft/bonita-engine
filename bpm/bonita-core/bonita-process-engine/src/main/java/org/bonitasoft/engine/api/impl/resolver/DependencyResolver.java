@@ -47,7 +47,6 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -60,6 +59,8 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Celine Souchet
  */
 public class DependencyResolver {
+
+    private static final int BATCH_SIZE = 100;
 
     private final List<ProcessDependencyResolver> dependencyResolvers;
 
@@ -90,13 +91,13 @@ public class DependencyResolver {
             loggerService.log(DependencyResolver.class, ERROR, "Unable to retrieve tenant process definitions, dependency resolution aborted");
         }
     }
-    
+
     private void resolveDependencies(final List<Long> processDefinitionIds, final TenantServiceAccessor tenantAccessor) {
         for (Long id : processDefinitionIds) {
             resolveDependencies(id, tenantAccessor);
         }
     }
-    
+
     /*
      * Done in a separated transaction
      * We try here to check if now the process is resolved so it must not be done in the same transaction that did the modification
@@ -215,13 +216,13 @@ public class DependencyResolver {
 
     private List<Long> getDependencyMappingsOfProcess(final DependencyService dependencyService, final long processDefinitionId) throws SDependencyException {
         final List<Long> dependencyIds = new ArrayList<Long>();
-        QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        int fromIndex = 0;
         List<Long> currentPage;
         do {
-            currentPage = dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, queryOptions);
+            currentPage = dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, fromIndex, BATCH_SIZE);
             dependencyIds.addAll(currentPage);
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (currentPage.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            fromIndex = fromIndex + BATCH_SIZE;
+        } while (currentPage.size() == BATCH_SIZE);
         return dependencyIds;
     }
 

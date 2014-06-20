@@ -127,6 +127,7 @@ public class ClientEventUtil {
         try {
             return (Long) commandAPI.execute(WAIT_SERVER_COMMAND, parameters);
         } catch (final CommandExecutionException e) {
+            LOGGER.error("error while executing wait server command for element:" + event, e);
             if (e.getMessage().toLowerCase().contains("timeout")) {
                 throw new TimeoutException("Timeout (" + defaultTimeout + " ms) when looking for element: " + event);
             } else {
@@ -146,20 +147,28 @@ public class ClientEventUtil {
         }
     }
 
-    public static Map<String, Serializable> getTaskInState(final long processInstanceId, final String stateName) {
+    public static Map<String, Serializable> getTaskInState(final long rootContainerId, final String stateName) {
         final Map<String, Serializable> map = new HashMap<String, Serializable>(3);
         map.put(TYPE, FLOW_NODE);
-        map.put(ROOT_CONTAINER_ID, processInstanceId);
+        map.put(ROOT_CONTAINER_ID, rootContainerId);
         map.put(STATE, stateName);
         return map;
     }
 
-    public static Map<String, Serializable> getTaskInState(final long processInstanceId, final String state, final String flowNodeName) {
+    public static Map<String, Serializable> getTaskInState(final long rootContainerId, final String state, final String flowNodeName) {
         final Map<String, Serializable> map = new HashMap<String, Serializable>(4);
         map.put(TYPE, FLOW_NODE);
-        map.put(ROOT_CONTAINER_ID, processInstanceId);
+        map.put(ROOT_CONTAINER_ID, rootContainerId);
         map.put(STATE, state);
         map.put(NAME, flowNodeName);
+        return map;
+    }
+
+    public static Map<String, Serializable> getTaskInState(final String state, final String taskName) {
+        final Map<String, Serializable> map = new HashMap<String, Serializable>(5);
+        map.put(TYPE, FLOW_NODE);
+        map.put(NAME, taskName);
+        map.put(STATE, state);
         return map;
     }
 

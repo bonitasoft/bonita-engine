@@ -270,16 +270,7 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_PLATFORM));
         }
         final SPlatform platform = readPlatform();
-        List<STenant> existingTenants;
-        try {
-            existingTenants = getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id", OrderByType.ASC));
-        } catch (final STenantException e) {
-            throw new SPlatformDeletionException(e);
-        }
-
-        if (existingTenants.size() > 0) {
-            throw new SPlatformDeletionException("Some tenants still are in the system. Can not delete platform.");
-        }
+        checkNotExistingTenant();
 
         try {
             platformPersistenceService.delete(platform);
@@ -294,6 +285,19 @@ public class PlatformServiceImpl implements PlatformService {
             throw new SPlatformDeletionException("Unable to delete the platform row : " + e.getMessage(), e);
         } catch (final SCacheException e) {
             throw new SPlatformDeletionException("Unable to delete the platform from cache : " + e.getMessage(), e);
+        }
+    }
+
+    private void checkNotExistingTenant() throws SPlatformDeletionException {
+        List<STenant> existingTenants;
+        try {
+            existingTenants = getTenants(new QueryOptions(0, 1, STenant.class, "id", OrderByType.ASC));
+        } catch (final STenantException e) {
+            throw new SPlatformDeletionException(e);
+        }
+
+        if (existingTenants.size() > 0) {
+            throw new SPlatformDeletionException("Some tenants still are in the system. Can not delete platform.");
         }
     }
 

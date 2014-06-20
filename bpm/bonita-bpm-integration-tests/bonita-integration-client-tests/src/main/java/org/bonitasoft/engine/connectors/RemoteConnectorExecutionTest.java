@@ -15,7 +15,6 @@ package org.bonitasoft.engine.connectors;
 
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -50,6 +49,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -1056,12 +1056,13 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-        final ConnectorDefinitionBuilder addConnector;
-        addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
+        processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression).addUserTask("step1", ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
+                "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createConstantStringExpression("normal"));
         addConnector.throwErrorEventWhenFailed("error");
+        processDefinitionBuilder.addTransition("step1", "step2");
         final ProcessDefinition calledProcess = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, johnUser);
 
         // create parent process with call activity and boundary
@@ -1077,22 +1078,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // start parent
         final ProcessInstance processInstance = getProcessAPI().startProcess(callingProcess.getId());
 
+        final HumanTaskInstance step1 = waitForUserTaskAndExecuteIt("step1", johnUser);
         // the connector must trigger this exception step of the calling process
         final ActivityInstance errorTask = waitForUserTask("errorTask", processInstance);
 
-        // Search the process instance target
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
-        searchOptionsBuilder.filter("name", "processWithConnector");
-        final List<ProcessInstance> targetProcessInstances = getProcessAPI().searchProcessInstances(searchOptionsBuilder.done()).getResult();
-        assertFalse(targetProcessInstances.isEmpty());
-
         assignAndExecuteStep(errorTask, johnUser.getId());
         waitForProcessToFinish(processInstance);
-        waitForProcessToBeInState(targetProcessInstances.get(0), ProcessInstanceState.ABORTED);
+        waitForProcessToBeInState(step1.getParentProcessInstanceId(), ProcessInstanceState.ABORTED);
 
         // clean up
-        disableAndDeleteProcess(callingProcess);
-        disableAndDeleteProcess(calledProcess);
+        disableAndDeleteProcess(callingProcess, calledProcess);
     }
 
     @Cover(classes = ConnectorInstance.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Search" }, story = "Search connector instances", jira = "")

@@ -56,11 +56,6 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SCategory>("getCategories", parameters, SCategory.class, queryOptions);
     }
 
-    public static SelectListDescriptor<Long> getProcessIdsOfCategory(final long categoryId) {
-        final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
-        return new SelectListDescriptor<Long>("getProcessIdsOfCategory", parameters, SProcessCategoryMapping.class, Long.class);
-    }
-
     public static SelectListDescriptor<SCategory> getCategoriesOfProcess(final long processId, final int fromIndex, final int numberOfCategories,
             final OrderByType order) {
         final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
@@ -90,11 +85,6 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<Long>("getNumberOfCategorizedProcessIds", parameters, SProcessCategoryMapping.class, Long.class);
     }
 
-    public static SelectListDescriptor<Long> getCategorizedProcessIds(final List<Long> processIds) {
-        final Map<String, Object> parameters = Collections.singletonMap("processIds", (Object) processIds);
-        return new SelectListDescriptor<Long>("getCategorizedProcessIds", parameters, SProcessCategoryMapping.class);
-    }
-
     public static SelectOneDescriptor<Long> isCategoryExistsInProcess(final long categoryId, final long processDefinitionId) {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("categoryId", categoryId);
@@ -102,11 +92,18 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<Long>("isCategoryExistsInProcess", parameters, SProcessCategoryMapping.class);
     }
 
-    public static SelectListDescriptor<SProcessCategoryMapping> getCategoryMappingOfProcessAndCategories(long processDefinitionId, List<Long> categoryIds) {
+    public static SelectListDescriptor<SProcessCategoryMapping> getCategoryMappingOfProcessAndCategories(final long processDefinitionId,
+            final List<Long> categoryIds, final int fromIndex, final int maxResults) {
+        final QueryOptions queryOptions = buildQueryOptionsForCategoryMappingOrderedByCategoryId(fromIndex, maxResults, OrderByType.ASC);
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("categoryIds", categoryIds);
         parameters.put("processDefinitionId", processDefinitionId);
-        return new SelectListDescriptor<SProcessCategoryMapping>("getCategoryMappingOfProcessAndCategories", parameters, SProcessCategoryMapping.class);
+        return new SelectListDescriptor<SProcessCategoryMapping>("getCategoryMappingOfProcessAndCategories", parameters, SProcessCategoryMapping.class,
+                queryOptions);
+    }
+
+    public static QueryOptions buildQueryOptionsForCategoryMappingOrderedByCategoryId(final int fromIndex, final int maxResults, final OrderByType order) {
+        return new QueryOptions(fromIndex, maxResults, SProcessCategoryMapping.class, "categoryId", order);
     }
 
 }

@@ -14,22 +14,22 @@
 package org.bonitasoft.engine.dependency.model.builder.impl;
 
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilder;
-import org.bonitasoft.engine.dependency.model.impl.SPlatformDependency;
+import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl;
 
 /**
  * @author Charles Souillard
  */
 public class SPlatformDependencyBuilderImpl implements SPlatformDependencyBuilder {
 
-    private final SPlatformDependency entity;
+    private final SPlatformDependencyImpl entity;
     
-    public SPlatformDependencyBuilderImpl(final SPlatformDependency entity) {
+    public SPlatformDependencyBuilderImpl(final SPlatformDependencyImpl entity) {
         super();
         this.entity = entity;
     }
 
     @Override
-    public SPlatformDependency done() {
+    public SPlatformDependencyImpl done() {
         return this.entity;
     }
     

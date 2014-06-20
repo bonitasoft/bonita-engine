@@ -21,6 +21,7 @@ import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -121,7 +122,7 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAll"));
         }
-        final QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SPlatformCommand.class, "id", OrderByType.ASC);
         List<SPlatformCommand> sPlatformCommands = null;
         do {
             try {
