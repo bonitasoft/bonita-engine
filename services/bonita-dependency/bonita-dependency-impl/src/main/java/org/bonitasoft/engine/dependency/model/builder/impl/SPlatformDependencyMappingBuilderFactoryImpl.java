@@ -16,7 +16,7 @@ package org.bonitasoft.engine.dependency.model.builder.impl;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl;
+import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -26,7 +26,7 @@ public class SPlatformDependencyMappingBuilderFactoryImpl implements SPlatformDe
 
     @Override
     public SPlatformDependencyMappingBuilder createNewInstance(final long dependencyId, final long artifactId, final ScopeType artifactType) {
-        final SPlatformDependencyMappingImpl object = new SPlatformDependencyMappingImpl(artifactId, artifactType, dependencyId);
+        final SDependencyMappingImpl object = new SDependencyMappingImpl(artifactId, artifactType, dependencyId);
         return new SPlatformDependencyMappingBuilderImpl(object);
     }
 

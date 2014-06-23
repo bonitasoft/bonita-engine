@@ -29,10 +29,5 @@
 			<artifactId>bonita-log-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-platform-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>
