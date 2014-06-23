@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -79,7 +79,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * all types of tasks, assigning a user to a task, retrieving archived versions of a task, accessing / updating data / variable values, adding / retrieving
  * process comments ...
  * It generally allows all BPM runtime actions, that is, once process instances are running of finished executing.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
@@ -95,7 +95,7 @@ public interface ProcessRuntimeAPI {
      * Search for pending hidden tasks that are available to the specified user.
      * Only searches for pending tasks for the current user: if a hidden task has been assigned
      * or executed, it will not be retrieved.
-     * 
+     *
      * @param userId
      *            The identifier of the user for whom to list the hidden tasks.
      * @param searchOptions
@@ -109,7 +109,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * List all open root process instances.
-     * 
+     *
      * @param searchOptions
      *            The search criterion.
      * @return A processInstance object.
@@ -121,7 +121,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * List all process instances.
-     * 
+     *
      * @param searchOptions
      *            The search criterion.
      * @return A processInstance object.
@@ -134,7 +134,7 @@ public interface ProcessRuntimeAPI {
     /**
      * List all open process instances supervised by a user.
      * If the specified userId does not correspond to a user, an empty SearchResult is returned.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -148,7 +148,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of process data instances by process id.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @return The number of process data instances.
@@ -160,7 +160,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of activity data instances by activity id.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The number of activity data instances.
@@ -172,7 +172,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a paged list of all process instances.
-     * 
+     *
      * @param startIndex
      *            The index of the first result (starting from 0).
      * @param maxResults
@@ -188,7 +188,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a paged list of archived process instances.
-     * 
+     *
      * @param startIndex
      *            The index of the first result (starting from 0).
      * @param maxResults
@@ -202,7 +202,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a paged list of archived activity instances for a process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param startIndex
@@ -218,7 +218,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Retrieve a paged list of open activities for a given process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param startIndex
@@ -234,7 +234,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the total number of open activity instances by process instance id.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @return The number of open activity instances.
@@ -249,7 +249,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the number of open process instances.
      * An open process instance is a process instance that has not been archived.
-     * 
+     *
      * @return The total number of open process instances.
      * @since 6.0
      */
@@ -258,7 +258,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the number of archived process instances.
      * Process instances in state COMPLETED are counted.
-     * 
+     *
      * @return The number of archived process instances.
      * @since 6.0
      */
@@ -266,7 +266,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance to delete.
      * @throws ProcessInstanceHierarchicalDeletionException
@@ -280,7 +280,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Delete all instances of a specified process definition.
      * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the processDefinition.
      * @throws ProcessInstanceHierarchicalDeletionException
@@ -290,7 +290,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int)} and {@link #deleteArchivedProcessInstances(long, int, int)}.
      *             As these new methods are paginated, to delete ALL archived and non-archived process instances, use some code like:
-     * 
+     *
      *             <pre>
      * <blockquote>
      * long nbDeleted = 0;
@@ -311,7 +311,7 @@ public interface ProcessRuntimeAPI {
      * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters.
      * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
      * Instead, to delete all Process instances of a specific process definition, should you should use a loop and delete instances in bulk.
-     * 
+     *
      * @param processDefinitionId
      *            Identifier of the processDefinition
      * @param startIndex
@@ -329,7 +329,7 @@ public interface ProcessRuntimeAPI {
      * Delete archived process instances of process definition given as input parameter respecting the pagination parameters.
      * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
      * Instead, to delete all archived process instances of a specific process definition, you should use a loop and delete archived instances in bulk.
-     * 
+     *
      * @param processDefinitionId
      *            Identifier of the processDefinition
      * @param startIndex
@@ -346,7 +346,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition, using the current session user.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the process definition for which an instance will be started.
      * @return An instance of the process.
@@ -364,7 +364,7 @@ public interface ProcessRuntimeAPI {
      * Instantiates a process.
      * <b>
      * The process variables will be initialized by the initialVariables.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param initialVariables
@@ -383,7 +383,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the process definition for which an instance will be started.
      * @param operations
@@ -404,7 +404,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user.
-     * 
+     *
      * @param userId
      *            The user id of the user.
      * @param processDefinitionId
@@ -426,7 +426,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
      * given operations.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param processDefinitionId
@@ -454,7 +454,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
      * given initialVariables.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param processDefinitionId
@@ -478,7 +478,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Executes a flow node that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
-     * 
+     *
      * @param flownodeInstanceId
      *            The identifier of the flow node to execute.
      * @throws FlowNodeExecutionException
@@ -492,7 +492,7 @@ public interface ProcessRuntimeAPI {
      * Will make the flow node go in the next stable state and then continue the execution of the process
      * If userId equals 0, the logged-in user is declared as the executer of the flow node.
      * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
-     * 
+     *
      * @param userId
      *            The identifier of the user for which you want to execute the flow node
      * @param flownodeInstanceId
@@ -505,7 +505,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Returns all activities (active and finished) of a process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance,
      * @param startIndex
@@ -519,7 +519,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @return The matching instance of process.
@@ -531,7 +531,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the specified activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The matching activity instance.
@@ -547,7 +547,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a specified flow node instance.
-     * 
+     *
      * @param flowNodeInstanceId
      *            The identifier of the flow node instance.
      * @return The matching flow node instance.
@@ -559,7 +559,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get an activity instance that is archived.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The matching archived activity instance.
@@ -575,7 +575,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the list of human task instances assigned to the specified user.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param startIndex
@@ -598,7 +598,7 @@ public interface ProcessRuntimeAPI {
      * A human task is pending for a given user if it is not yet assigned and if the
      * user is a candidate either through an {@link ActorMember} or through a {@link UserFilter}. Hidden tasks for this user are not retrieved (see
      * {@link #hideTasks(long, Long...)}).
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param startIndex
@@ -616,7 +616,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Count the total number of human task instances assigned to the specified user.
-     * 
+     *
      * @param userId
      *            The identifier of a user.
      * @return A number of human task instances assigned.
@@ -630,7 +630,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * For a specified list of users, get the number of pending tasks.
-     * 
+     *
      * @param userIds
      *            A list of user identifiers.
      * @return A map with userId as key and number of tasks as value.
@@ -644,7 +644,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Count the number of pending human task instances available to a specified user.
-     * 
+     *
      * @param userId
      *            The identifier of a user.
      * @return A number of pending human task instances.
@@ -658,7 +658,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Retrieve a human task instance by the corresponding activity instance id.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The matching instance of human task.
@@ -674,7 +674,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a list of event instances related to a process instance that match the specified conditions.
-     * 
+     *
      * @param rootContainerId
      *            The identifier of the containing root process instance.
      * @param startIndex
@@ -692,7 +692,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Assign a task to a user with given user identifier.
-     * 
+     *
      * @param userTaskId
      *            The identifier of the user task.
      * @param userId
@@ -707,7 +707,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Updates the actors of the user task. It evaluates again the eligible users for that task.
-     * 
+     *
      * @param userTaskId
      *            The identifier of the user task
      * @throws UpdateException
@@ -718,7 +718,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Returns all data of a process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param startIndex
@@ -733,7 +733,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the value of named data item from a specified process instance.
      * The value is returned in a DataInstance object.
-     * 
+     *
      * @param dataName
      *            The name of the data item.
      * @param processInstanceId
@@ -749,7 +749,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Update the value of a named data item in a specified process instance.
-     * 
+     *
      * @param dataName
      *            The name of the data item.
      * @param processInstanceId
@@ -766,7 +766,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Update the value of a named data item in a specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param dataNameValues
@@ -781,7 +781,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a list of the data instances from a specified activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param startIndex
@@ -795,7 +795,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a named data instance from a specified activity instance.
-     * 
+     *
      * @param dataName
      *            The name of the data item.
      * @param activityInstanceId
@@ -811,7 +811,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Update the value of a named data instance in a specified activity instance.
-     * 
+     *
      * @param dataName
      *            The name of the data instance.
      * @param activityInstanceId
@@ -828,7 +828,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Update the value of a named transient data instance in a specified activity instance.
-     * 
+     *
      * @param dataName
      *            The name of the data instance.
      * @param activityInstanceId
@@ -845,7 +845,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a list of the transient data instances from a specified activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param startIndex
@@ -859,7 +859,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get a named transient data instance from a specified activity instance.
-     * 
+     *
      * @param dataName
      *            The name of the data item.
      * @param activityInstanceId
@@ -875,7 +875,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the date when the specified activity instance reached the given state.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param state
@@ -892,7 +892,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Update the given variables of an activity instance.
      * The updates are treated as a single transaction, so if any variable update fails, none of the values is changed.
-     * 
+     *
      * @param activityInstanceId
      *            The activity identifier.
      * @param variables
@@ -907,7 +907,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Update the values of variables in an activity instance using expressions.
-     * 
+     *
      * @param operations
      *            A sequence of operations on expressions that update the values variables.
      * @param activityInstanceId
@@ -925,7 +925,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Update the due date of a task.
-     * 
+     *
      * @param userTaskId
      *            The identifier of the task to update.
      * @param dueDate
@@ -940,7 +940,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get an instance of a task asssigned to a given user for the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param userId
@@ -960,7 +960,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get an instance of a task asssigned to a given user for the specified process definition.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the process definition.
      * @param userId
@@ -981,7 +981,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the state of a specified activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The state of the activity instance.
@@ -993,7 +993,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Check whether a specified task can be executed by a given user.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param userId
@@ -1013,7 +1013,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Release a task (unclaim or unassign). After the operation, the task is in the pending task list.
-     * 
+     *
      * @param userTaskId
      *            The identifier of the user task.
      * @throws InvalidSessionException
@@ -1029,7 +1029,7 @@ public interface ProcessRuntimeAPI {
     /**
      * List the archived process instances for the specified process instance.
      * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param startIndex
@@ -1049,7 +1049,7 @@ public interface ProcessRuntimeAPI {
      * Get the last archived instance of a process instance.
      * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
      * The last archived instance is returned.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @return The archived process instance.
@@ -1065,7 +1065,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Set the state of an activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param stateId
@@ -1080,7 +1080,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Set the state of an activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param state
@@ -1095,7 +1095,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Set a state of a process instance.
-     * 
+     *
      * @param processInstance
      *            The process instance.
      * @param state
@@ -1110,7 +1110,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Set the priority of a user task.
-     * 
+     *
      * @param userTaskInstanceId
      *            The identifier of user task instance.
      * @param priority
@@ -1125,7 +1125,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Execute a connector in a specified processDefinition.
-     * 
+     *
      * @param connectorDefinitionId
      *            The identifier of connector definition.
      * @param connectorDefinitionVersion
@@ -1151,7 +1151,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Execute a connector in a specified processDefinition with operations.
-     * 
+     *
      * @param connectorDefinitionId
      *            The identifier of connector definition.
      * @param connectorDefinitionVersion
@@ -1181,7 +1181,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the archived human tasks for tasks that match the search options.
-     * 
+     *
      * @param searchOptions
      *            The search conditions and the options for sorting and paging the results.
      * @return The archived human tasks that match the search conditions.
@@ -1195,7 +1195,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the assigned human tasks for tasks that match the search options and are administered by the specified user.
-     * 
+     *
      * @param managerUserId
      *            The identifier of the user.
      * @param searchOptions
@@ -1209,7 +1209,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the pending human tasks for tasks that match the search options and are supervised by the specified user.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -1223,7 +1223,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the pending human tasks for tasks available to the specified user.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -1237,7 +1237,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the pending human tasks for tasks that match the search options and are managed by the specified user.
-     * 
+     *
      * @param managerUserId
      *            The identifier of the user.
      * @param searchOptions
@@ -1253,7 +1253,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of assigned and pending overdue tasks for the specified users.
-     * 
+     *
      * @param userIds
      *            A list of user identifiers.
      * @return A map of user identifiers and numbers of overdue tasks.
@@ -1265,7 +1265,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Cancels the process instance and all of its active flownodes.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @throws ProcessInstanceNotFoundException
@@ -1281,7 +1281,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Reset the state of a failed activity instance to its previous state and then execute it.
      * The activity must be in state FAILED.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @throws InvalidSessionException
@@ -1298,7 +1298,7 @@ public interface ProcessRuntimeAPI {
      * Hides a list of tasks from a specified user. A task that is "hidden" for a user is not pending for that user,
      * so is not retrieved by #searchPendingTasksForUser.
      * As soon as a task is claimed by or assigned to a user, it is no longer hidden from any users.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param activityInstanceId
@@ -1314,7 +1314,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Un-hides a list of tasks for a specified user. Un-hiding a task makes it available for a user if the task is pending for that user.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param activityInstanceId
@@ -1331,7 +1331,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Evaluate an expression in the context of the specified process.
      * Some context values can also be provided
-     * 
+     *
      * @param expression
      *            The expression to evaluate.
      * @param context
@@ -1350,7 +1350,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Checks whether a specified task is hidden from a given user.
-     * 
+     *
      * @param userTaskId
      *            The identifier of the task to check.
      * @param userId
@@ -1366,7 +1366,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of comments matching the search conditions.
-     * 
+     *
      * @param searchOptions
      *            The search conditions and the options for sorting and paging the results.
      * @return The number of comments matching the search conditions.
@@ -1378,7 +1378,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of attachments matching the search conditions.
-     * 
+     *
      * @param searchOptions
      *            The search conditions and the options for sorting and paging the results.
      * @return The number of attachments matching the search conditions.
@@ -1391,7 +1391,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Send a BPMN signal event. Invoking this method acts as executing a Throw Signal Event.
-     * 
+     *
      * @param signalName
      *            The signal name.
      * @throws InvalidSessionException
@@ -1404,7 +1404,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Send a BPMN message event. Invoking this method acts as executing a Throw Message Event.
-     * 
+     *
      * @param messageName
      *            The message name.
      * @param targetProcess
@@ -1424,7 +1424,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Send a BPMN message event, with message correlation. Invoking this method acts as executing a Throw Message Event.
-     * 
+     *
      * @param messageName
      *            The message name.
      * @param targetProcess
@@ -1446,7 +1446,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Retrieve an <code>ArchivedProcessInstance</code> specified by its identifier.
-     * 
+     *
      * @param archivedProcessInstanceId
      *            The identifier of the <code>ArchivedProcessInstance</code> to be retrieved.
      * @return The <code>ArchivedProcessInstance</code> instance.
@@ -1462,7 +1462,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Retrieve an <code>ArchivedFlowNodeInstance</code> specified by its identifier.
-     * 
+     *
      * @param archivedFlowNodeInstanceId
      *            The identifier of the <code>ArchivedFlowNodeInstance</code> to be retrieved.
      * @return The <code>ArchivedFlowNodeInstance</code> instance.
@@ -1478,7 +1478,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Retrieve an <code>ArchivedComment</code> specified by its identifier.
-     * 
+     *
      * @param archivedCommentId
      *            The identifier of the <code>ArchivedComment</code> to be retrieved.
      * @return The <code>ArchivedComment</code> instance.
@@ -1494,7 +1494,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for connector instances.
-     * 
+     *
      * @param searchOptions
      *            The search conditions and the options for sorting and paging the results.
      * @return The {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options.
@@ -1508,7 +1508,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived connector instances.
-     * 
+     *
      * @param searchOptions
      *            The search options parameters
      * @return The {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options.
@@ -1522,7 +1522,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * List the named human tasks belonging to the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param taskName
@@ -1540,7 +1540,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Return the last created human task instance with the specified name for the given process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param taskName
@@ -1556,7 +1556,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are not considered.
-     * 
+     *
      * @param searchOptions
      *            The criterion used to search for archived activity instances.
      * @return A {@link SearchResult} containing the search result.
@@ -1570,7 +1570,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for activity instances.
-     * 
+     *
      * @param searchOptions
      *            The criterion used to search for activity instances.
      * @return A {@link SearchResult} containing the search result.
@@ -1584,7 +1584,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for flow node instances (activities, gateways and events).
-     * 
+     *
      * @param searchOptions
      *            The criterion used to search for flow node instances.
      * @return A {@link SearchResult} containing the search result
@@ -1598,7 +1598,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived flow node instances (activities, gateways and events)
-     * 
+     *
      * @param searchOptions
      *            The options used to search for flow node instances.
      * @return A {@link SearchResult} containing the search result.
@@ -1615,7 +1615,7 @@ public interface ProcessRuntimeAPI {
      * Search for all tasks available to a specified user.
      * A task is available to a user if is assigned to the user or it is pending for that user.
      * Hidden tasks are not retrieved.
-     * 
+     *
      * @param userId
      *            The identifier of the user for whom the tasks are available.
      * @param searchOptions
@@ -1631,7 +1631,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for comments related to the specified process instance.
-     * 
+     *
      * @param searchOptions
      *            The options used to search for comments.
      * @return The matching comments.
@@ -1645,7 +1645,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Add a comment on a process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param comment
@@ -1661,7 +1661,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Add a comment on a process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param comment
@@ -1677,7 +1677,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the first 20 comments of the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @return The list of comments found
@@ -1695,7 +1695,7 @@ public interface ProcessRuntimeAPI {
      * - the author of the comment is a subordinate of user A (A the author's manager).
      * - the comment belongs to a process started by a subordinate of user A.
      * - the comment belongs to a process where at least one human task is assigned to a subordinate of user A.
-     * 
+     *
      * @param managerUserId
      *            The identifier of the user.
      * @param searchOptions
@@ -1711,7 +1711,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the comments on process instances that the specified user can access.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -1728,7 +1728,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the children instances (sub process or call activity) of a process instance. The returned list is paginated.
      * It does not return the process instance of the given id (itself).
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process definition.
      * @param startIndex
@@ -1745,31 +1745,33 @@ public interface ProcessRuntimeAPI {
     List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Check whether a specified user is involved in a process instance.
+     * Check whether a specified user is involved in a process instance.<br/>
      * User A is involved with a process instance if any of the following is true:
-     * - a task in the process instance is assigned to user A
-     * - a task in the process instance is pending for user A
-     * - a task in the process instance is assigned to a user managed by user A
-     * - a task in the process instance is pending for a user managed by user A
-     * 
+     * <ul>
+     * <li>a task in the process instance is assigned to user A</li>
+     * <li>a task in the process instance is pending for user A</li>
+     * <li>a task in the process instance is assigned to a user managed by user A</li>
+     * <li>a task in the process instance is pending for a user managed by user A</li>
+     * </ul>
+     *
      * @param userId
-     *            The identifier of the user.
+     *        The identifier of the user.
      * @param processInstanceId
-     *            The identifier of the process instance.
+     *        The identifier of the process instance.
      * @return True if the user is involved with the process instance.
      * @throws InvalidSessionException
-     *             If the session is invalid, e.g. the session has expired.
+     *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
-     *             If there is no processInstance with the specified identifier.
+     *         If there is no processInstance with the specified identifier.
      * @throws UserNotFoundException
-     *             If there is no user with the specified identifier.
+     *         If there is no user with the specified identifier.
      * @since 6.0
      */
     boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
 
     /**
      * Get the process instance id from an activity instance id.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The corresponding process instance id.
@@ -1783,7 +1785,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the process definition id from an process instance id.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @return The corresponding process definition id.
@@ -1797,7 +1799,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the process definition id from an activity instance id.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @return The corresponding process definition id.
@@ -1811,7 +1813,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived comments.
-     * 
+     *
      * @param searchOptions
      *            The options used to search for comments.
      * @throws InvalidSessionException
@@ -1825,7 +1827,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived human tasks managed by the specified user.
-     * 
+     *
      * @param managerUserId
      *            The identifier of the user manager,
      * @param searchOptions
@@ -1839,7 +1841,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for open process instances that the specified user can access.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -1855,7 +1857,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for open process instances that all subordinates of the specified user can access.
-     * 
+     *
      * @param managerUserId
      *            The identifier of the user manager.
      * @param searchOptions
@@ -1871,7 +1873,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved.
-     * 
+     *
      * @param searchOptions
      *            The search options (pagination, filter, order sort).
      * @return The archived process instances that match the search options.
@@ -1886,7 +1888,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Search for archived process instances in all states (even intermediate states). Depending on used filters several ArchivedProcessInstance will be
      * retrieved for a single ProcessInstance (one for each reached state).
-     * 
+     *
      * @param searchOptions
      *            The search options (pagination, filter, order sort).
      * @return The archived process instances in all states that match the search options.
@@ -1898,7 +1900,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived process instances supervised by the specified user.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -1914,7 +1916,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived process instances that the specified user can access.
-     * 
+     *
      * @param userId
      *            The identifier of the user.
      * @param searchOptions
@@ -1930,7 +1932,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for human task instances.
-     * 
+     *
      * @param searchOptions
      *            The search options (pagination, filter, order sort).
      * @return The human task instances that match the search options.
@@ -1944,7 +1946,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for tasks assigned to users supervised by the specified user.
-     * 
+     *
      * @param supervisorId
      *            The identifier of supervising user.
      * @param searchOptions
@@ -1960,7 +1962,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for archived tasks assigned to users supervised by the specified user.
-     * 
+     *
      * @param supervisorId
      *            The identifier of the supervising user.
      * @param searchOptions
@@ -1976,7 +1978,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Evaluate expressions with values valid at process instantiation scope.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param expressions
@@ -1994,7 +1996,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Evaluate expressions with values valid on a completed process instance scope.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param expressions
@@ -2012,7 +2014,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Evaluate expressions with values valid on a process instance scope.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance.
      * @param expressions
@@ -2030,7 +2032,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Evaluate expressions with values valid on a process definition scope.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the process definition.
      * @param expressions
@@ -2048,7 +2050,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Evaluate expressions with values valid on an activity instance scope.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param expressions
@@ -2066,7 +2068,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Evaluate expressions with values valid on a completed activity instance scope.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance.
      * @param expressions
@@ -2084,7 +2086,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Returns the list of jobs that failed.
-     * 
+     *
      * @param startIndex
      *            The result start index (starting from 0).
      * @param maxResults
@@ -2098,7 +2100,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Replays the failed job in order to unlock it. The replay will use the stored parameters of the job.
-     * 
+     *
      * @param jobDescriptorId
      *            The identifier of the job descriptor.
      * @throws ExecutionException
@@ -2112,7 +2114,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Replays the failed job in order to unlock it. The specified parameters replace the stored parameters. If the job is launched from CRON, all job
      * executions use the specified parameters.
-     * 
+     *
      * @param jobDescriptorId
      *            The identifier of the job descriptor.
      * @param parameters
@@ -2127,7 +2129,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Gets the last archived data instance of the named data of the specified process instance.
-     * 
+     *
      * @param dataName
      *            The name of the data
      * @param processInstanceId
@@ -2143,7 +2145,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Gets the last archived data instance of the named data of the specified activity instance.
-     * 
+     *
      * @param dataName
      *            The name of the data
      * @param activityInstanceId
@@ -2159,7 +2161,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Lists the last archived instances of data of the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance
      * @param startIndex
@@ -2177,7 +2179,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Lists the last archived instances of data of the specified activity instance.
-     * 
+     *
      * @param activityInstanceId
      *            The identifier of the activity instance
      * @param startIndex
@@ -2196,7 +2198,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Lists the possible users (candidates) of the specified human task instance.
      * Users are ordered by user name.
-     * 
+     *
      * @param humanTaskInstanceId
      *            The identifier of the human task instance
      * @param startIndex
@@ -2215,7 +2217,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Lists the possible users (candidates) that can execute the specified human task instance.
      * Users are ordered by user name.
-     * 
+     *
      * @param humanTaskInstanceId
      *            The identifier of the human task instance
      * @param searchOptions
