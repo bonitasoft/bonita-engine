@@ -167,7 +167,9 @@ public class RestartProcessHandler implements TenantRestartHandler {
         ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         WorkService workService = tenantServiceAccessor.getWorkService();
 
-        Iterator<Long> iterator = processInstancesByTenant.get(tenantId).iterator();
+        List<Long> list = processInstancesByTenant.get(tenantId);
+        Iterator<Long> iterator = list.iterator();
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + list.size() + " processes for tenant " + tenantId);
         ExecuteProcesses exec = null;
         try {
             do {

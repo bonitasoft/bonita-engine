@@ -60,12 +60,15 @@ public class StarterThread extends Thread {
         this.tenants = tenants;
         this.sessionAccessor = sessionAccessor;
         this.technicalLoggerService = technicalLoggerService;
+        technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO,
+                "Restarting elements in the Thread " + this.getId());
     }
 
     @Override
     public void run() {
         try {
             for (final STenant tenant : tenants) {
+                technicalLoggerService.log(getClass(), TechnicalLogSeverity.INFO, "Restarting elements for tenant " + tenant.getId());
                 if (!tenant.isPaused()) {
                     final long tenantId = tenant.getId();
                     long sessionId = -1;
