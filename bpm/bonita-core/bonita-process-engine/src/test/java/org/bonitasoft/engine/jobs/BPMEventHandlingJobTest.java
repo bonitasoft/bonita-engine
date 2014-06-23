@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.jobs;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -73,7 +72,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -103,9 +102,9 @@ public class BPMEventHandlingJobTest {
         when(couple3.getMessageInstanceId()).thenReturn(3L);
         when(couple3.getWaitingMessageId()).thenReturn(30L);
 
-        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
+        final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -135,7 +134,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -165,7 +164,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -198,7 +197,7 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).get1000MessageEventCouples(anyInt());
+        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
         final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
@@ -222,10 +221,10 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
         messageCouples.addAll(Arrays.asList(couple1));
-        doReturn(messageCouples).when(eventInstanceService).getMessageEventCouples(3000, 1000);
+        doReturn(messageCouples).when(eventInstanceService).getMessageEventCouples(0, 1000);
 
         // When
-        final List<SMessageEventCouple> sMessageEventCouples = bPMEventHandlingJob.get1000MessageEventCouples(3);
+        final List<SMessageEventCouple> sMessageEventCouples = bPMEventHandlingJob.getMessageEventCouples();
 
         // Then
         assertEquals(messageCouples, sMessageEventCouples);
