@@ -216,7 +216,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public boolean isStarted() throws SSchedulerException {
         try {
-            return scheduler != null && scheduler.isStarted();
+            return scheduler != null && scheduler.isStarted() && !scheduler.isShutdown();
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

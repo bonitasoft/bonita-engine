@@ -32,10 +32,15 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobParameter;
+import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -59,9 +64,17 @@ public class BPMEventHandlingJob extends InternalJob {
 
     private transient WorkService workService;
 
+    private transient UserTransactionService transactionService;
+
+    private transient JobService jobService;
+
+    private transient SchedulerService schedulerService;
+
+    private transient TechnicalLoggerService loggerService;
+
     @Override
     public String getName() {
-        return "BPMEventHandlingJob";
+        return "BPMEventHandling";
     }
 
     @Override
@@ -74,7 +87,10 @@ public class BPMEventHandlingJob extends InternalJob {
         try {
             final List<SMessageEventCouple> uniqueCouples = getMessageUniqueCouples();
             executeUniqueMessageCouplesWork(uniqueCouples);
-        } catch (final SBonitaException e) {
+            if (uniqueCouples.size() == maxCouples) {
+                rescheduleJob();
+            }
+        } catch (final Exception e) {
             throw new SJobExecutionException(e);
         }
     }
@@ -134,20 +150,22 @@ public class BPMEventHandlingJob extends InternalJob {
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-        setEventInstanceService(getTenantServiceAccessor().getEventInstanceService());
-        setWorkService(getTenantServiceAccessor().getWorkService());
+        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+        setAttributes(tenantServiceAccessor, attributes);
+    }
+
+    void setAttributes(final TenantServiceAccessor tenantServiceAccessor, final Map<String, Serializable> attributes) throws SJobConfigurationException {
+        eventInstanceService = tenantServiceAccessor.getEventInstanceService();
+        workService = tenantServiceAccessor.getWorkService();
+        transactionService = tenantServiceAccessor.getUserTransactionService();
+        jobService = tenantServiceAccessor.getJobService();
+        schedulerService = tenantServiceAccessor.getSchedulerService();
+        loggerService = tenantServiceAccessor.getTechnicalLoggerService();
+
         final Integer batchSize = (Integer) attributes.get(JobParameter.BATCH_SIZE.name());
         if (batchSize != null) {
             maxCouples = batchSize;
         }
-    }
-
-    void setEventInstanceService(final EventInstanceService eventInstanceService) {
-        this.eventInstanceService = eventInstanceService;
-    }
-
-    void setWorkService(final WorkService workService) {
-        this.workService = workService;
     }
 
     private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException {
@@ -161,6 +179,15 @@ public class BPMEventHandlingJob extends InternalJob {
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
+    }
+
+    private void rescheduleJob() throws Exception {
+        final ExecuteAgainJobSynchronization jobSynchronization = new ExecuteAgainJobSynchronization(getName(), jobService, schedulerService, loggerService);
+        transactionService.registerBonitaSynchronization(jobSynchronization);
+    }
+
+    protected int getMaxCouples() {
+        return maxCouples;
     }
 
 }
