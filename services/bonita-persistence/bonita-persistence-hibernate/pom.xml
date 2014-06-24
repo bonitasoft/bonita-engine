@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.persistence</groupId>
 		<artifactId>bonita-persistence</artifactId>
-		<version>6.3.2-SNAPSHOT</version>
+		<version>6.3.2.RC1</version>
 	</parent>
 
 	<artifactId>bonita-persistence-hibernate-sp</artifactId>
