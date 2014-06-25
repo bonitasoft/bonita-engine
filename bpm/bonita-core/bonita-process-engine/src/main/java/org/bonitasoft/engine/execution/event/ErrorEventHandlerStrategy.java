@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,6 +34,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefi
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
@@ -74,12 +75,15 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
 
     private final ProcessInstanceService processInstanceService;
+
+    private final FlowNodeInstanceService flowNodeInstanceService;
 
     private final ContainerRegistry containerRegistry;
 
@@ -89,11 +93,12 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final TechnicalLoggerService logger;
 
-    public ErrorEventHandlerStrategy(final EventInstanceService eventInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry,
+    public ErrorEventHandlerStrategy(final EventInstanceService eventInstanceService, final ProcessInstanceService processInstanceService,
+            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
             final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler, final TechnicalLoggerService logger) {
         super(eventInstanceService);
         this.processInstanceService = processInstanceService;
+        this.flowNodeInstanceService = flowNodeInstanceService;
         this.containerRegistry = containerRegistry;
         this.processDefinitionService = processDefinitionService;
         this.eventsHandler = eventsHandler;
@@ -184,7 +189,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                     flowNodeInstance);
         }
         return waitingErrorEvent;
-
     }
 
     private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SThrowEventInstance eventInstance,
@@ -214,7 +218,14 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SCallActivityDefinition callActivityDef = (SCallActivityDefinition) callActivityContainer.getProcessContainer().getFlowNode(
                 callActivityInstance.getFlowNodeDefinitionId());
         final List<SBoundaryEventDefinition> boundaryEventDefinitions = callActivityDef.getBoundaryEventDefinitions();
-        SWaitingErrorEvent waitingErrorEvent = getWaitingErrorEventFromBoundary(errorCode, callActivityInstance, boundaryEventDefinitions);
+        SWaitingErrorEvent waitingErrorEvent;
+        if (callActivityDef.getLoopCharacteristics() != null) {
+            final long multipleInstanceActivityId = callActivityInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
+            final SFlowNodeInstance miActivityInstance = flowNodeInstanceService.getFlowNodeInstance(multipleInstanceActivityId);
+            waitingErrorEvent = getWaitingErrorEventFromBoundary(errorCode, miActivityInstance, boundaryEventDefinitions);
+        } else {
+            waitingErrorEvent = getWaitingErrorEventFromBoundary(errorCode, callActivityInstance, boundaryEventDefinitions);
+        }
         if (waitingErrorEvent == null) {
             final long callActivityParentProcInstId = callActivityInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
             waitingErrorEvent = getWaitingErrorEvent(callActivityContainer.getProcessContainer(), callActivityParentProcInstId, errorTrigger, eventInstance,
@@ -321,7 +332,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                         eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
                 final SWaitingErrorEvent errorEvent = builder.done();
                 getEventInstanceService().createWaitingEvent(errorEvent);
-
                 break;
             case INTERMEDIATE_CATCH_EVENT:
             case START_EVENT:
