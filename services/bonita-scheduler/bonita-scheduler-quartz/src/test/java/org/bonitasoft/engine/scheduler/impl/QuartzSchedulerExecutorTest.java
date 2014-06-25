@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
+import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -46,6 +47,20 @@ import org.quartz.impl.matchers.GroupMatcher;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuartzSchedulerExecutorTest {
+
+    private static final int GOOD_COUNT = 1;
+
+    private static final int BAD_COUNT = -2;
+
+    private static final int GOOD_INTERVAL = 1;
+
+    private static final int BAD_INTERVAL = -1;
+
+    private static final int GOOD_PRIORITY = -1;
+
+    private static final String GOOD_TRIGGER_NAME = "triggerName";
+
+    private static final String BAD_TRIGGER_NAME = null;
 
     @Mock
     private BonitaSchedulerFactory schedulerFactory;
@@ -86,6 +101,84 @@ public class QuartzSchedulerExecutorTest {
     @After
     public void after() throws Exception {
         quartzSchedulerExecutor.shutdown();
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void should_scheduler_check_RepeatTrigger_with_bad_interval_param() throws Exception {
+
+        //given
+        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = getRepeatTrigger(new Date(), GOOD_TRIGGER_NAME, BAD_INTERVAL,
+                GOOD_COUNT,
+                GOOD_PRIORITY,
+                MisfireRestartPolicy.ONE);
+        // when
+        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", trigger, true);
+
+        //then exception
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void should_scheduler_check_RepeatTrigger_with_bad_name_param() throws Exception {
+
+        //given
+        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = getRepeatTrigger(new Date(), BAD_TRIGGER_NAME, GOOD_INTERVAL, GOOD_COUNT,
+                GOOD_PRIORITY,
+                MisfireRestartPolicy.ONE);
+        // when
+        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", trigger, true);
+
+        //then exception
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void should_scheduler_check_RepeatTrigger_with_bad_count_param() throws Exception {
+
+        //given
+        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = getRepeatTrigger(new Date(), GOOD_TRIGGER_NAME, GOOD_INTERVAL, BAD_COUNT,
+                GOOD_PRIORITY,
+                MisfireRestartPolicy.ONE);
+        // when
+        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", trigger, true);
+
+        //then exception
+    }
+
+    private org.bonitasoft.engine.scheduler.trigger.RepeatTrigger getRepeatTrigger(final Date now, final String triggerName, final int interval,
+            final int count,
+            final int priority, final MisfireRestartPolicy misfireRestartPolicy) {
+        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = new RepeatTrigger() {
+
+            @Override
+            public Date getStartDate() {
+                return now;
+            }
+
+            @Override
+            public int getPriority() {
+                return priority;
+            }
+
+            @Override
+            public String getName() {
+                return triggerName;
+            }
+
+            @Override
+            public MisfireRestartPolicy getMisfireHandlingPolicy() {
+                return misfireRestartPolicy;
+            }
+
+            @Override
+            public long getInterval() {
+                return interval;
+            }
+
+            @Override
+            public int getCount() {
+                return count;
+            }
+        };
+        return trigger;
     }
 
     @Test
