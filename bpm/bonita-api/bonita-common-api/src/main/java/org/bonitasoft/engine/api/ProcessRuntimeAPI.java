@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -379,7 +379,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -421,7 +421,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -977,7 +977,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-            UserNotFoundException;
+    UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1147,7 +1147,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
@@ -1870,28 +1870,29 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for archived process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved.
+     * Search for archived root process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved.
      * 
      * @param searchOptions
-     *            The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort).
      * @return The archived process instances that match the search options.
      * @throws SearchException
-     *             If the search could not be fullfilled correctly
+     *         If the search could not be fullfilled correctly
      * @throws InvalidSessionException
-     *             If the session is invalid, e.g. the session has expired.
+     *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for archived process instances in all states (even intermediate states). Depending on used filters several ArchivedProcessInstance will be
+     * Search for archived process instances (root and intermediate levels) in all states (even intermediate states). Depending on used filters several
+     * ArchivedProcessInstance will be
      * retrieved for a single ProcessInstance (one for each reached state).
      * 
      * @param searchOptions
-     *            The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort).
      * @return The archived process instances in all states that match the search options.
      * @throws SearchException
-     *             If the search could not be completed correctly.
+     *         If the search could not be completed correctly.
      * @since 6.2
      */
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(SearchOptions searchOptions) throws SearchException;
