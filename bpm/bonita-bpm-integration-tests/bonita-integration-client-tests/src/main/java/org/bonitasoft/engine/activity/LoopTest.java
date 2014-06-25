@@ -47,7 +47,7 @@ public class LoopTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -96,14 +96,11 @@ public class LoopTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
-        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        final HumanTaskInstance pendingTask = pendingTasks.get(0);
+        HumanTaskInstance step1 = waitForUserTask("step1");
 
-        assignAndExecuteStep(pendingTask, john.getId());
+        assignAndExecuteStep(step1, john.getId());
 
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 500, false, 1, john).waitUntil());
-        pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        waitForUserTask("step1");
 
         disableAndDeleteProcess(processDefinition);
     }

@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -82,7 +81,10 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         final WorkService workService = tenantServiceAccessor.getWorkService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantServiceAccessor.getTenantId());
+        long tenantId = tenantServiceAccessor.getTenantId();
+        List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
+
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
         try {
             Iterator<Long> iterator = flownodesIds.iterator();
             ExecuteFlowNodes exec = null;
