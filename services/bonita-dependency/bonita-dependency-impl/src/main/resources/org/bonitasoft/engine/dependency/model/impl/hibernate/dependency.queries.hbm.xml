@@ -14,7 +14,7 @@
 		SELECT dependency
 		FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
 		WHERE dependency.id IN (:ids)
-		ORDER BY dependency.id
+		ORDER BY dependency.id ASC
 	</query>
   
 	<query name="getDependencies">
@@ -51,7 +51,7 @@
 		FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
 		WHERE dependencymapping.artifactId = :artifactId
 		AND dependencymapping.artifactType = :artifactType
-		ORDER BY dependencymapping.id
+		ORDER BY dependencymapping.dependencyId
 	</query>
 
 </hibernate-mapping>

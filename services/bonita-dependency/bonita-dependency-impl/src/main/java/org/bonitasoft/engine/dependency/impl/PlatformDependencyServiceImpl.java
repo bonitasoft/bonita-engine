@@ -282,7 +282,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
             throws SDependencyException {
         try {
             NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, startIndex, maxResult);
-            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult, SPlatformDependencyMapping.class, "id", OrderByType.ASC);
+            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult);
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("artifactId", artifactId);
             parameters.put("artifactType", artifactType);

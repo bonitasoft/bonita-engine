@@ -20,7 +20,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SPlatformDependencyMapping implements SDependencyMapping {
+public class SPlatformDependencyMappingImpl implements SDependencyMapping {
 
     private static final long serialVersionUID = 3669487911530579373L;
 
@@ -34,11 +34,11 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
 
     private long dependencyId;
 
-    public SPlatformDependencyMapping() {
+    public SPlatformDependencyMappingImpl() {
         // default constructor for hibernate
     }
 
-    public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
+    public SPlatformDependencyMappingImpl(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
         this.artifactId = artifactId;
         this.artifactType = artifactType;
@@ -89,7 +89,7 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
 
     @Override
     public String getDiscriminator() {
-        return SPlatformDependencyMapping.class.getName();
+        return SPlatformDependencyMappingImpl.class.getName();
     }
 
 }
