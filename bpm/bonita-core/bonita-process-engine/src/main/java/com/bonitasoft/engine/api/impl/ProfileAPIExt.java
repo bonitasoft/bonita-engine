@@ -112,6 +112,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return createProfile(creator);
     }
 
+    @Override
     public Profile createProfile(final String name, final String description) throws CreationException {
         final ProfileCreator creator = new ProfileCreator(name);
         creator.setDescription(description);
@@ -176,6 +177,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         return new byte[] {};
     }
 
+    @Override
     public List<ImportStatus> importProfiles(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -188,7 +190,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         // at profile level in ProfilesImporterExt
         return new ProfilesImporterExt(profileService, identityService, pageService, profiles,
                 org.bonitasoft.engine.profile.ImportPolicy.valueOf(policy.name()))
-                .importProfiles(getUserIdFromSession());
+        .importProfiles(getUserIdFromSession());
 
     }
 
@@ -244,20 +246,16 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-
+        Long profileId = (Long) fields.get(ProfileEntryField.PROFILE_ID);
         SProfileEntry sProfileEntry;
         try {
+            profileService.updateProfileMetaData(profileId);
             sProfileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
-            profileService.updateProfileMetaData(sProfileEntry.getProfileId());
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
-
-        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
-        try {
+            final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
             updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
+        } finally {
         }
 
         return SPModelConvertor.toProfileEntry(sProfileEntry);
@@ -281,6 +279,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         try {
+            // add a lock because the update profile call getProfile then update profile -> deadlock...
             new DeleteProfileEntry(profileService, id).execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);

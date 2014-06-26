@@ -67,7 +67,7 @@
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache
-		name="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency"
+		name="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl"
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache
@@ -90,7 +90,7 @@
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache
-		name="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping"
+		name="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl"
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache name="org.bonitasoft.engine.platform.model.impl.STenantImpl"

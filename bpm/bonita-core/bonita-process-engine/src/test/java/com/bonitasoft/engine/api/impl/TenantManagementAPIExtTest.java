@@ -34,6 +34,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -96,6 +97,8 @@ public class TenantManagementAPIExtTest {
 
     @Mock
     private DependencyResolver dependencyResolver;
+    @Mock
+    private TechnicalLoggerService technicalLoggerService;
 
     private final long tenantId = 17;
 
@@ -112,9 +115,12 @@ public class TenantManagementAPIExtTest {
         when(platformServiceAccessor.getPlatformService()).thenReturn(platformService);
         when(platformServiceAccessor.getPlaformConfiguration()).thenReturn(nodeConfiguration);
         when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
+        when(platformServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
+        when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getDependencyResolver()).thenReturn(dependencyResolver);
+        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
 
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
     }
@@ -177,8 +183,8 @@ public class TenantManagementAPIExtTest {
         tenantManagementAPI.resume();
 
         // Then elements must be restarted
-        verify(tenantRestartHandler1, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
-        verify(tenantRestartHandler2, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler1, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler2, times(1)).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
     }
 
     @Test(expected = UpdateException.class)
@@ -186,7 +192,7 @@ public class TenantManagementAPIExtTest {
         // Given
         final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
         final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
-        doThrow(RestartException.class).when(tenantRestartHandler2).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        doThrow(RestartException.class).when(tenantRestartHandler2).beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
         when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
 
         // When a tenant moved to available mode
