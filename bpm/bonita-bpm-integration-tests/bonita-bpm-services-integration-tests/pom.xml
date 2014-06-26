@@ -169,6 +169,12 @@
 			<scope>test</scope>
 		</dependency>
 
+        <dependency>
+            <groupId>org.bonitasoft.engine.data.definition</groupId>
+            <artifactId>bonita-data-definition-model-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<!-- Delete -->
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
