@@ -44,4 +44,9 @@ public class SProcessDefinitionNotFoundException extends SProcessDefinitionExcep
         setProcessDefinitionVersionOnContext(processDefinitionDeployInfo.getVersion());
     }
 
+    public SProcessDefinitionNotFoundException(final String processName) {
+        super("Can't find the process.");
+        setProcessDefinitionNameOnContext(processName);
+    }
+
 }

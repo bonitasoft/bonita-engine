@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -50,6 +50,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface EventInstanceService extends FlowNodeInstanceService {
 
@@ -76,7 +77,15 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName, OrderByType orderByType)
             throws SEventInstanceReadException;
 
-    List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId) throws SEventInstanceReadException;
+    /**
+     * @param activityInstanceId
+     * @param fromIndex
+     * @param maxResults
+     * @return List of SBoundaryEventInstance, ordered by identifier ascending
+     * @throws SEventInstanceReadException
+     * @since 6.2
+     */
+    List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId, int fromIndex, int maxResults) throws SEventInstanceReadException;
 
     SEventTriggerInstance getEventTriggerInstance(long eventTriggerInstanceId) throws SEventTriggerInstanceNotFoundException,
             SEventTriggerInstanceReadException;
@@ -84,22 +93,32 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     List<SEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, int fromIndex, int maxResults, String fieldName, OrderByType orderByType)
             throws SEventTriggerInstanceReadException;
 
-    List<SEventTriggerInstance> getEventTriggerInstances(long eventInstanceId) throws SEventTriggerInstanceReadException;
-
-    List<SMessageInstance> getThrownMessages(String messageName, String targetProcess, String targetFlowNode) throws SEventTriggerInstanceReadException;
-
-    List<SWaitingMessageEvent> getWaitingMessages(String messageName, String processName, String flowNodeName) throws SEventTriggerInstanceReadException;
+    List<SEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, QueryOptions queryOptions) throws SEventTriggerInstanceReadException;
 
     void deleteMessageInstance(SMessageInstance messageInstance) throws SMessageModificationException;
 
     void deleteWaitingEvent(SWaitingEvent waitingEvent) throws SWaitingEventModificationException;
 
-    List<SWaitingSignalEvent> getWaitingSignalEvents(String signalName) throws SEventTriggerInstanceReadException;
+    /**
+     * @param signalName
+     * @param fromIndex
+     * @param maxResults
+     * @return
+     * @throws SEventTriggerInstanceReadException
+     * @since 6.3
+     */
+    List<SWaitingSignalEvent> getWaitingSignalEvents(String signalName, int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
 
-    List<SWaitingEvent> getStartWaitingEvents(long processDefinitionId) throws SEventTriggerInstanceReadException;
+    /**
+     * @param processDefinitionId
+     * @param searchOptions
+     * @return
+     * @throws SBonitaSearchException
+     * @since 6.3
+     */
+    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions) throws SBonitaSearchException;
 
-    List<SMessageEventCouple> getMessageEventCouples() throws SEventTriggerInstanceReadException, SMessageModificationException,
-            SWaitingEventModificationException;
+    List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
 
     SWaitingMessageEvent getWaitingMessage(long waitingMessageId) throws SWaitingEventNotFoundException, SWaitingEventReadException;
 
@@ -146,7 +165,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * Resets all Message Instances marked as handled, so that they are elligible to match Waiting Events again.
      * 
      * @throws SMessageModificationException
-     *             if an error occurs when resetting the 'handled' flag.
+     *         if an error occurs when resetting the 'handled' flag.
      */
     int resetProgressMessageInstances() throws SMessageModificationException;
 
@@ -155,7 +174,8 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * 
      * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException
-     *             if an error occurs when resetting the 'progress' flag.
+     *         if an error occurs when resetting the 'progress' flag.
      */
     int resetInProgressWaitingEvents() throws SWaitingEventModificationException;
+
 }

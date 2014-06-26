@@ -101,7 +101,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         if (processDefinitionId != 0) {
             final ActorMappingService actorMappingService = this.tenantAccessor.getActorMappingService();
             try {
-                final List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId);
+                final List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0, 2);
                 if (ckRes != null && ckRes.size() == 1) {
                     isHas = true;
                 }

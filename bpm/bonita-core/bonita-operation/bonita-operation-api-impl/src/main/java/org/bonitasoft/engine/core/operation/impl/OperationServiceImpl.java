@@ -15,11 +15,9 @@ package org.bonitasoft.engine.core.operation.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -87,58 +85,11 @@ public class OperationServiceImpl implements OperationService {
         // TODO implement batch retrieve in leftOperandHandlers
         retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
 
-        if (useBatchMode(operations)) {
-            // execute operation and put it in context again
-            final Map<SLeftOperand, Boolean> leftOperandUpdates = executeOperators(operations, expressionContext);
-            // update data
-            // TODO implement batch update in leftOperandHandlers
-            updateLeftOperands(leftOperandUpdates, leftOperandContainerId, leftOperandContainerType, expressionContext);
-        } else {
-            executeOperatorsAndUpdateLeftOperand(operations, expressionContext, leftOperandContainerId, leftOperandContainerType);
-        }
-    }
-
-    boolean useBatchMode(final List<SOperation> operations) throws SOperationExecutionException {
-        int countNoBatch = 0;
-        final Set<String> dataNames = new HashSet<String>();
-        for (final SOperation operation : operations) {
-            final SLeftOperand leftOperand = operation.getLeftOperand();
-            final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand);
-            if (!leftOperandHandler.supportBatchUpdate()) {
-                countNoBatch++;
-                dataNames.add(leftOperand.getName());
-            }
-        }
-        return countNoBatch <= 1 || dataNames.size() <= 1;
-    }
-
-    void executeOperatorsAndUpdateLeftOperand(final List<SOperation> operations, final SExpressionContext expressionContext, final long leftOperandContainerId,
-            final String leftOperandContainerType) throws SOperationExecutionException {
-        for (int i = 0; i < operations.size(); i++) {
-            final SOperation operation = operations.get(i);
-            if (operation.getType() != SOperatorType.DELETION) {
-                final Object rightOperandValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
-                final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
-                final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext);
-                expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
-                logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
-            }
-            updateLeftOperand(operation, leftOperandContainerId, leftOperandContainerType, expressionContext);
-        }
-    }
-
-    void updateLeftOperand(final SOperation operation, final long leftOperandContainerId, final String leftOperandContainerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
-        final SLeftOperand leftOperand = operation.getLeftOperand();
-        final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand);
-        if (operation.getType() == SOperatorType.DELETION) {
-            leftOperandHandler.delete(leftOperand, leftOperandContainerId, leftOperandContainerType);
-            expressionContext.getInputValues().remove(leftOperand.getName());
-        } else {
-            final Object updatedValue = leftOperandHandler.update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()),
-                    leftOperandContainerId, leftOperandContainerType);
-            expressionContext.getInputValues().put(leftOperand.getName(), updatedValue);
-        }
+        // execute operation and put it in context again
+        final Map<SLeftOperand, Boolean> leftOperandUpdates = executeOperators(operations, expressionContext);
+        // update data
+        // TODO implement batch update in leftOperandHandlers
+        updateLeftOperands(leftOperandUpdates, leftOperandContainerId, leftOperandContainerType, expressionContext);
     }
 
     Map<SLeftOperand, Boolean> executeOperators(final List<SOperation> operations, final SExpressionContext expressionContext)
@@ -195,19 +146,18 @@ public class OperationServiceImpl implements OperationService {
             if (operation.getType() == SOperatorType.JAVA_METHOD || operation.getType() == SOperatorType.XPATH_UPDATE_QUERY) {
                 // this operation will set a data, we retrieve it and put it in context
                 final SLeftOperand leftOperand = operation.getLeftOperand();
-                Object retrieve;
                 try {
-                    retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
+                    final Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
                             new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
+                    putRetrievedValueInContextIfNotNullAndNotAlreadyIn(inputValues, leftOperand, retrieve);
                 } catch (final SBonitaReadException e) {
                     throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
                 }
-                putRetrievedValueInContextifNotNullAndNotAlreadyIn(inputValues, leftOperand, retrieve);
             }
         }
     }
 
-    protected void putRetrievedValueInContextifNotNullAndNotAlreadyIn(final Map<String, Object> context, final SLeftOperand leftOperand, final Object retrieve) {
+    protected void putRetrievedValueInContextIfNotNullAndNotAlreadyIn(final Map<String, Object> context, final SLeftOperand leftOperand, final Object retrieve) {
         /* some left operand don't retrieve it, e.g. document, it's heavy */
         if (retrieve != null && !context.containsKey(leftOperand.getName())) {
             context.put(leftOperand.getName(), retrieve);

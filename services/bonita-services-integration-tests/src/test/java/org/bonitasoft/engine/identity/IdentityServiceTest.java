@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -159,23 +158,6 @@ public class IdentityServiceTest extends CommonServiceTest {
         getTransactionService().complete();
         assertNotNull("can't find the role after adding it", role2);
         assertEquals("Does not retrieved the good role", roleName, role2.getName());
-    }
-
-    @Test
-    public void testGetGroupsByName() throws Exception {
-        getTransactionService().begin();
-        final String groupName = "myGroup";
-        final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName(groupName).done();
-        identityService.createGroup(group);
-        final Set<SGroup> groups = identityService.getGroupsByName(groupName);
-        for (final SGroup sGroup : groups) {
-            if (groupName.equals(sGroup.getName())) {
-                getTransactionService().complete();
-                return;
-            }
-        }
-        getTransactionService().complete();
-        fail("can't find a group with name " + groupName);
     }
 
     @Test
@@ -513,25 +495,6 @@ public class IdentityServiceTest extends CommonServiceTest {
     /*
      * Method that helps to retrieve groups
      */
-
-    @Test
-    public void testGetGroupChildren() throws Exception {
-        getTransactionService().begin();
-        final SGroup parentGroup = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroupChildren").done();
-        identityService.createGroup(parentGroup);
-        SGroup group;
-        for (int i = 0; i < 8; i++) {
-            group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroupChildren" + i).setParentPath(parentGroup.getPath()).done();
-            identityService.createGroup(group);
-        }
-        final List<SGroup> groupChildren = identityService.getGroupChildren(parentGroup.getId());
-        getTransactionService().complete();
-        assertEquals("not the good number of children", 8, groupChildren.size());
-        for (final SGroup sGroup : groupChildren) {
-            assertEquals("an element was not the child of the parent group", parentGroup.getPath(), sGroup.getParentPath());
-        }
-    }
-
     @Test
     public void testGetGroupsPaginated() throws Exception {
         getTransactionService().begin();
@@ -632,17 +595,15 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testGetGroupChildrenPaginated() throws Exception {
         getTransactionService().begin();
         deleteGroups();
-        createGroups(1, "testGetGroupChildrenPaginated_name", "testGetGroupChildrenPaginated_label", null);
-        final Set<SGroup> groupsByName2 = identityService.getGroupsByName("testGetGroupChildrenPaginated_name0");
-        assertEquals(1, groupsByName2.size());
+        final List<SGroup> groups = createGroups(1, "testGetGroupChildrenPaginated_name", "testGetGroupChildrenPaginated_label", null);
+        identityService.getGroup(groups.get(0).getId());
 
-        createGroups(5, "testGetGroupChildrenPaginatedChildren_name", "testGetGroupChildrenPaginatedChildren_label", groupsByName2.iterator().next());
+        final SGroup parentGroup = groups.iterator().next();
+        createGroups(5, "testGetGroupChildrenPaginatedChildren_name", "testGetGroupChildrenPaginatedChildren_label", parentGroup);
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final Set<SGroup> groupsByName = identityService.getGroupsByName("testGetGroupChildrenPaginated_name0");
-        final long parentGroupId = groupsByName.iterator().next().getId();
-        final List<SGroup> retrievedGroups = identityService.getGroupChildren(parentGroupId, 0, 5);
+        final List<SGroup> retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 5);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved groups", 5, retrievedGroups.size());
@@ -652,22 +613,20 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testGetGroupChildrenWithCriterion() throws Exception {
         getTransactionService().begin();
         deleteGroups();
-        createGroups(1, "testGetGroupChildrenWithCriterion_name", "testGetGroupChildrenWithCriterion_label", null);
-        final Set<SGroup> groupsByName2 = identityService.getGroupsByName("testGetGroupChildrenWithCriterion_name0");
-        assertEquals(1, groupsByName2.size());
-
-        createGroups(5, "testGetGroupChildrenWithCriterionChildren_name", "testGetGroupChildrenWithCriterionChildren_label", groupsByName2.iterator().next());
-
+        final List<SGroup> groups = createGroups(1, "testGetGroupChildrenWithCriterion_name", "testGetGroupChildrenWithCriterion_label", null);
+        final SGroup parentGroup = groups.iterator().next();
+        createGroups(5, "testGetGroupChildrenWithCriterionChildren_name", "testGetGroupChildrenWithCriterionChildren_label", parentGroup);
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final long parentGroupId = identityService.getGroupsByName("testGetGroupChildrenWithCriterion_name0").iterator().next().getId();
-        List<SGroup> retrievedGroups = identityService.getGroupChildren(parentGroupId, 0, 3, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(), OrderByType.DESC);
+        List<SGroup> retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 3, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(),
+                OrderByType.DESC);
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved groups", 3, retrievedGroups.size());
         assertTrue("not in descending order", retrievedGroups.get(1).getName().compareTo(retrievedGroups.get(2).getName()) > 0);
 
-        retrievedGroups = identityService.getGroupChildren(parentGroupId, 0, 3, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(), OrderByType.ASC);
+        retrievedGroups = identityService.getGroupChildren(parentGroup.getId(), 0, 3, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(),
+                OrderByType.ASC);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedGroups);
         assertEquals("bad number of retrieved groups", 3, retrievedGroups.size());
@@ -679,16 +638,12 @@ public class IdentityServiceTest extends CommonServiceTest {
     public void testGetNumberOfGroupChildren() throws Exception {
         getTransactionService().begin();
         deleteGroups();
-        createGroups(1, "testGetNumberOfGroupChildren_name", "testGetNumberOfGroupChildren_label", null);
-        final Set<SGroup> groupsByName2 = identityService.getGroupsByName("testGetNumberOfGroupChildren_name0");
-        assertEquals(1, groupsByName2.size());
-
-        createGroups(5, "testGetNumberOfGroupChildrenChildren_name", "testGetNumberOfGroupChildrenChildren_label", groupsByName2.iterator().next());
-
+        final List<SGroup> groups = createGroups(1, "testGetNumberOfGroupChildren_name", "testGetNumberOfGroupChildren_label", null);
+        final SGroup parentGroup = groups.iterator().next();
+        createGroups(5, "testGetNumberOfGroupChildrenChildren_name", "testGetNumberOfGroupChildrenChildren_label", parentGroup);
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final SGroup parentGroup = identityService.getGroupsByName("testGetNumberOfGroupChildren_name0").iterator().next();
         assertEquals("bad count of groups", 5, identityService.getNumberOfGroupChildren(parentGroup.getId()));
         getTransactionService().complete();
     }
@@ -705,7 +660,8 @@ public class IdentityServiceTest extends CommonServiceTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + i;
-            metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetProfileMetadataPaginated" + i).setId(id).done();
+            metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetProfileMetadataPaginated" + i)
+                    .setId(id).done();
             identityService.createCustomUserInfoDefinition(metadata);
         }
 
@@ -728,7 +684,8 @@ public class IdentityServiceTest extends CommonServiceTest {
         final long time = new Date().getTime();
         for (int i = 0; i < 30; i++) {
             id = time + 50L + i;
-            info = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetNumberOfCustomUserInfoDefinition" + i).setId(id).done();
+            info = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("testGetNumberOfCustomUserInfoDefinition" + i)
+                    .setId(id).done();
             identityService.createCustomUserInfoDefinition(info);
         }
         assertEquals("bad count of custom user info definition", numberOfMetadata + 30, identityService.getNumberOfCustomUserInfoDefinition());
@@ -738,33 +695,6 @@ public class IdentityServiceTest extends CommonServiceTest {
     /*
      * Method that helps to retrieve users
      */
-
-    @Test
-    public void testGetUsersByRole() throws Exception {
-        getTransactionService().begin();
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
-        final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
-
-        for (int i = 0; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            final SUser user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
-            identityService.createUserMembership(userMembership1);
-        }
-        for (int i = 10; i < 20; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            final SUser user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
-            identityService.createUserMembership(userMembership2);
-        }
-        final List<SUser> usersByRole = identityService.getUsersByRole(role.getId());
-        getTransactionService().complete();
-        assertEquals("not all user were retrieved", 20, usersByRole.size());
-    }
-
     @Test
     public void testGetUsersByRolePaginated() throws Exception {
         getTransactionService().begin();
@@ -774,14 +704,16 @@ public class IdentityServiceTest extends CommonServiceTest {
         for (int i = 0; i < 10; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             final SUser user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 10; i < 20; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            final SUser user =  identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
+            final SUser user = identityService.createUser(userBuilder.done());
+            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership2);
         }
@@ -802,19 +734,22 @@ public class IdentityServiceTest extends CommonServiceTest {
         for (int i = 0; i < 10; i++) {
             user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo").done();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user2.getId(), groups.get(0).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user2.getId(), groups.get(0).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 10; i < 20; i++) {
             user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo").done();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user2.getId(), groups.get(1).getId(), role.getId())
+            final SUserMembership userMembership2 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user2.getId(), groups.get(1).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership2);
         }
 
-        List<SUser> usersByRole = identityService.getUsersByRole(role.getId(), 10, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.DESC);
+        List<SUser> usersByRole = identityService.getUsersByRole(role.getId(), 10, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+                OrderByType.DESC);
         assertEquals("not all user were retrieved", 10, usersByRole.size());
         assertTrue("not in descending order", usersByRole.get(1).getUserName().compareTo(usersByRole.get(2).getUserName()) > 0);
         usersByRole = identityService.getUsersByRole(role.getId(), 10, 10, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.ASC);
@@ -835,39 +770,12 @@ public class IdentityServiceTest extends CommonServiceTest {
         for (int i = 0; i < 5; i++) {
             user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testGetNumberOfUsersByRole" + i).setPassword("kikoo").done();
             final SUser user2 = identityService.createUser(user);
-            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user2.getId(), group.getId(), role.getId()).done();
+            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user2.getId(), group.getId(), role.getId()).done();
             identityService.createUserMembership(userMembership);
         }
         assertEquals("not the good number of users by role", numberOfUsersByRole + 5, identityService.getNumberOfUsersByRole(role.getId()));
         getTransactionService().complete();
-    }
-
-    @Test
-    public void testGetUsersByGroup() throws Exception {
-        getTransactionService().begin();
-
-        final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
-        final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
-        SUser user;
-        for (int i = 0; i < 5; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
-                    .done();
-            identityService.createUserMembership(userMembership1);
-        }
-        for (int i = 5; i < 10; i++) {
-            final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
-            user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
-                    .done();
-            identityService.createUserMembership(userMembership1);
-        }
-
-        final List<SUser> usersByGroup = identityService.getUsersByGroup(groups.get(0).getId());
-        getTransactionService().complete();
-        assertEquals("not the good number of user with the role", 5, usersByGroup.size());
     }
 
     @Test
@@ -880,14 +788,16 @@ public class IdentityServiceTest extends CommonServiceTest {
         for (int i = 0; i < 5; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
@@ -907,22 +817,26 @@ public class IdentityServiceTest extends CommonServiceTest {
         for (int i = 0; i < 5; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
 
-        List<SUser> usersByGroup = identityService.getUsersByGroup(groups.get(0).getId(), 1, 2, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.DESC);
+        List<SUser> usersByGroup = identityService.getUsersByGroup(groups.get(0).getId(), 1, 2, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+                OrderByType.DESC);
         assertEquals("not the good number of user with the role", 2, usersByGroup.size());
         assertTrue("not in descending order", usersByGroup.get(0).getUserName().compareTo(usersByGroup.get(1).getUserName()) > 0);
-        usersByGroup = identityService.getUsersByGroup(groups.get(0).getId(), 1, 2, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(), OrderByType.ASC);
+        usersByGroup = identityService.getUsersByGroup(groups.get(0).getId(), 1, 2, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey(),
+                OrderByType.ASC);
         getTransactionService().complete();
         assertEquals("not all user were retrieved", 2, usersByGroup.size());
         assertTrue("not in asc order", usersByGroup.get(0).getUserName().compareTo(usersByGroup.get(1).getUserName()) < 0);
@@ -939,14 +853,16 @@ public class IdentityServiceTest extends CommonServiceTest {
         for (int i = 0; i < 5; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(0).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
         for (int i = 5; i < 10; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
             user = identityService.createUser(userBuilder.done());
-            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
+            final SUserMembership userMembership1 = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(user.getId(), groups.get(1).getId(), role.getId())
                     .done();
             identityService.createUserMembership(userMembership1);
         }
@@ -963,7 +879,8 @@ public class IdentityServiceTest extends CommonServiceTest {
         final SRole role = createRoles(1, "testGetUserByMembership", "testGetUserByMembership").iterator().next();
         final List<SUser> users = createUsers(5, "getMembershipUsers");
         for (final SUser sUser : users) {
-            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(sUser.getId(), group.getId(), role.getId()).done();
+            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                    .createNewInstance(sUser.getId(), group.getId(), role.getId()).done();
             identityService.createUserMembership(userMembership);
         }
         assertEquals("not the good number of user by membership", 5, identityService.getNumberOfUsersByMembership(group.getId(), role.getId()));
@@ -1054,11 +971,12 @@ public class IdentityServiceTest extends CommonServiceTest {
         final SUser manager = identityService.getUsers(0, 1).get(0);
         final List<SUser> users = identityService.getUsers(1, 10);
         for (final SUser user : users) {
-            final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateManagerUserId(manager.getId()).done();
+            final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
+                    .updateManagerUserId(manager.getId()).done();
             identityService.updateUser(user, changeDescriptor);
         }
         final long id = manager.getId();
-        final List<SUser> usersByManager = identityService.getUsersByManager(id);
+        final List<SUser> usersByManager = identityService.getUsersByManager(id, 0, 20);
         getTransactionService().complete();
         assertEquals("did not retrieved all user having the manager", 10, usersByManager.size());
         for (final SUser sUser : usersByManager) {
@@ -1076,10 +994,11 @@ public class IdentityServiceTest extends CommonServiceTest {
         final SUser manager = users.get(0);
         SUser user = users.get(1);
         final SUser newManager = users.get(2);
-        EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateManagerUserId(manager.getId()).done();
+        EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateManagerUserId(manager.getId())
+                .done();
         identityService.updateUser(user, changeDescriptor);
         final long id = manager.getId();
-        final List<SUser> usersByManager = identityService.getUsersByManager(id);
+        final List<SUser> usersByManager = identityService.getUsersByManager(id, 0, 20);
         assertEquals("did not retrieved all user having the manager", 1, usersByManager.size());
         for (final SUser sUser : usersByManager) {
             assertEquals("One of the user have not the good manager", manager.getId(), sUser.getManagerUserId());
@@ -1098,35 +1017,19 @@ public class IdentityServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void testGetUsersByDelegee() throws Exception {
-        getTransactionService().begin();
-        createUsers(11, "testGetUsersByDelegee");
-        final SUser delegee = identityService.getUsers(0, 1).get(0);
-        final List<SUser> users = identityService.getUsers(1, 10);
-        for (final SUser user : users) {
-            final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateDelegeeUserName(delegee.getUserName()).done();
-            identityService.updateUser(user, changeDescriptor);
-        }
-        final long id = delegee.getId();
-        final List<SUser> usersByDelegee = identityService.getUsersByDelegee(id);
-        getTransactionService().complete();
-        assertEquals("did not retrieved all user having the manager", 10, usersByDelegee.size());
-        for (final SUser sUser : usersByDelegee) {
-            assertEquals("One of the user have not the good manager", delegee.getUserName(), sUser.getDelegeeUserName());
-        }
-    }
-
-    @Test
     public void testUpdateUser() throws Exception {
         getTransactionService().begin();
         SUserBuilder userBuilder = null;
-        userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User");
+        userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testUpdateUser").setPassword("kikoo")
+                .setFirstName("Update").setLastName("User");
         final SUser user = identityService.createUser(userBuilder.done());
         final String password = user.getPassword();
-        final SContactInfo contactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(user.getId(), true).setAddress("Somewhere").setBuilding("AA11")
+        final SContactInfo contactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(user.getId(), true).setAddress("Somewhere")
+                .setBuilding("AA11")
                 .setCity("Taiwan").done();
         identityService.createUserContactInfo(contactInfo);
-        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateUserName("testUpdateUser2").updatePassword("lol")
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance()
+                .updateUserName("testUpdateUser2").updatePassword("lol")
                 .updateFirstName("updated").updateLastName("user2").updateEnabled(true).done();
         final String newAddress = "SomeWhereElse";
         final String newCity = "Ouarzazate";
@@ -1140,7 +1043,8 @@ public class IdentityServiceTest extends CommonServiceTest {
         final String state = "State2";
         final String website = "website2";
         final String zipCode = "zipCode2";
-        final EntityUpdateDescriptor updateContactInfo = BuilderFactory.get(SContactInfoUpdateBuilderFactory.class).createNewInstance().updateAddress(newAddress).updateCity(newCity)
+        final EntityUpdateDescriptor updateContactInfo = BuilderFactory.get(SContactInfoUpdateBuilderFactory.class).createNewInstance()
+                .updateAddress(newAddress).updateCity(newCity)
                 .updateBuilding(newBuilding).updateCountry(country).updateEmail(email).updateFaxNumber(faxNumber).updateMobileNumber(mobileNumber)
                 .updatePhoneNumber(phoneNumber).updateRoom(room).updateState(state).updateWebsite(website).updateZipCode(zipCode).done();
         identityService.updateUser(user, changeDescriptor);
@@ -1187,7 +1091,8 @@ public class IdentityServiceTest extends CommonServiceTest {
         final SCustomUserInfoDefinition metadata = identityService.getCustomUserInfoDefinitions(0, 1).get(0);
         final long metadataId = metadata.getId();
         final String newName = "theNewName";
-        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance().updateName(newName).done();
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance()
+                .updateName(newName).done();
         identityService.updateCustomUserInfoDefinition(metadata, changeDescriptor);
         final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinition(metadataId);
         getTransactionService().complete();
@@ -1267,7 +1172,8 @@ public class IdentityServiceTest extends CommonServiceTest {
     @Test(expected = SIdentityException.class)
     public void testDeleteProfileMetadata() throws Exception {
         getTransactionService().begin();
-        final SCustomUserInfoDefinition metadataDefinition = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName("kikooMetadata").done();
+        final SCustomUserInfoDefinition metadataDefinition = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance()
+                .setName("kikooMetadata").done();
         identityService.createCustomUserInfoDefinition(metadataDefinition);
         final long id = metadataDefinition.getId();
         identityService.deleteCustomUserInfoDefinition(metadataDefinition);
@@ -1288,11 +1194,11 @@ public class IdentityServiceTest extends CommonServiceTest {
     @Test(expected = SIdentityException.class)
     public void testDeleteGroup() throws Exception {
         getTransactionService().begin();
-        createGroups(1, "testDeleteGroup_name", "testDeleteGroup_label", null);
+        final List<SGroup> groups = createGroups(1, "testDeleteGroup_name", "testDeleteGroup_label", null);
         getTransactionService().complete();
 
         getTransactionService().begin();
-        final SGroup group = identityService.getGroupsByName("testDeleteGroup_name0").iterator().next();
+        final SGroup group = groups.iterator().next();
         assertNotNull(group);
         final long id = group.getId();
         identityService.deleteGroup(group);
@@ -1307,9 +1213,9 @@ public class IdentityServiceTest extends CommonServiceTest {
     @Test
     public void testAddMembershipToUser() throws Exception {
         getTransactionService().begin();
-        createGroups(1, "testAddMembershipToUser_name", "testAddMembershipToUser_label", null);
+        final List<SGroup> groups = createGroups(1, "testAddMembershipToUser_name", "testAddMembershipToUser_label", null);
         createRoles(1, "testAddMembershipToUser_name", "testAddMembershipToUser_label");
-        final SGroup group = identityService.getGroupsByName("testAddMembershipToUser_name0").iterator().next();
+        final SGroup group = groups.iterator().next();
 
         final SRole role = identityService.getRoleByName("testAddMembershipToUser_name0");
         createUsers(1, "testAddMembershipToUser");
@@ -1319,14 +1225,16 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
         user = identityService.getUserByUserName("testAddMembershipToUser0");
-        final int size = identityService.getUserMembershipsOfUser(user.getId()).size();
-        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), group.getId(), role.getId()).done();
+        final int size = identityService.getUserMembershipsOfUser(user.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS).size();
+        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                .createNewInstance(user.getId(), group.getId(), role.getId()).done();
         identityService.createUserMembership(userMembership);
         getTransactionService().complete();
 
         getTransactionService().begin();
         final SUser user2 = identityService.getUser(user.getId());
-        assertEquals("membership not added", size + 1, identityService.getUserMembershipsOfUser(user2.getId()).size());
+        assertEquals("membership not added", size + 1, identityService.getUserMembershipsOfUser(user2.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)
+                .size());
         getTransactionService().complete();
     }
 
@@ -1335,9 +1243,9 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
         deleteGroups();
-        createGroups(1, "testRemoveMembershipFromUser_name", "testRemoveMembershipFromUser_label", null);
+        final List<SGroup> groups = createGroups(1, "testRemoveMembershipFromUser_name", "testRemoveMembershipFromUser_label", null);
         createRoles(1, "testRemoveMembershipFromUser_name", "testRemoveMembershipFromUser_label");
-        final SGroup group = identityService.getGroupsByName("testRemoveMembershipFromUser_name0").iterator().next();
+        final SGroup group = groups.iterator().next();
         final SRole role = identityService.getRoleByName("testRemoveMembershipFromUser_name0");
         createUsers(1, "testRemoveMembershipFromUser");
         SUser user = identityService.getUserByUserName("testRemoveMembershipFromUser0");
@@ -1347,13 +1255,14 @@ public class IdentityServiceTest extends CommonServiceTest {
         getTransactionService().begin();
 
         user = identityService.getUserByUserName("testRemoveMembershipFromUser0");
-        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), group.getId(), role.getId()).done();
+        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                .createNewInstance(user.getId(), group.getId(), role.getId()).done();
         identityService.createUserMembership(userMembership);
         getTransactionService().complete();
 
         getTransactionService().begin();
         user = identityService.getUserByUserName("testRemoveMembershipFromUser0");
-        final int size = identityService.getUserMembershipsOfUser(user.getId()).size();
+        final int size = identityService.getUserMembershipsOfUser(user.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS).size();
         assertTrue("no membership on user", size >= 1);
 
         final SUserMembership userMembership2 = identityService.getUserMembership(user.getId(), group.getId(), role.getId());
@@ -1361,16 +1270,19 @@ public class IdentityServiceTest extends CommonServiceTest {
 
         final SUser user2 = identityService.getUser(user.getId());
 
-        assertEquals("no membership on user", size - 1, identityService.getUserMembershipsOfUser(user2.getId()).size());
+        assertEquals("no membership on user", size - 1, identityService.getUserMembershipsOfUser(user2.getId(), 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)
+                .size());
         getTransactionService().complete();
     }
 
     @Test
     public void searchUsersWithWildcards() throws Exception {
         getTransactionService().begin();
-        final SUser user1 = identityService.createUser(BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user1").setFirstName("firstname1")
+        final SUser user1 = identityService.createUser(BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user1")
+                .setFirstName("firstname1")
                 .setLastName("lastname1").setPassword("lkh").done());
-        final SUser user2 = identityService.createUser(BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user2").setFirstName("firstname2")
+        final SUser user2 = identityService.createUser(BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user2")
+                .setFirstName("firstname2")
                 .setLastName("lastname2").setPassword("mlbxcvjmsdkljf").done());
         getTransactionService().complete();
 

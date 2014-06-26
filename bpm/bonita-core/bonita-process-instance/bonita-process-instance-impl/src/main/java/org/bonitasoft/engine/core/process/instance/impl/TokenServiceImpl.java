@@ -50,6 +50,8 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
  */
 public class TokenServiceImpl implements TokenService {
 
+    private static final int BATCH_SIZE = 100;
+
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceRead;
@@ -60,7 +62,7 @@ public class TokenServiceImpl implements TokenService {
 
     private static final OrderByOption ORDER_BY_OPTION = new OrderByOption(SToken.class, "id", OrderByType.ASC);
 
-    private static final QueryOptions QUERY_OPTIONS = new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, Arrays.asList(ORDER_BY_OPTION));
+    private static final QueryOptions QUERY_OPTIONS = new QueryOptions(0, 100, Arrays.asList(ORDER_BY_OPTION));
 
     public TokenServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
             final EventService eventService, final TechnicalLoggerService logger) {
@@ -139,7 +141,7 @@ public class TokenServiceImpl implements TokenService {
             for (final SToken token : tokens) {
                 deleteToken(token);
             }
-        } while (tokens.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (tokens.size() == 100);
     }
 
     @Override
@@ -150,7 +152,7 @@ public class TokenServiceImpl implements TokenService {
             for (final SToken token : tokens) {
                 deleteToken(token);
             }
-        } while (tokens.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } while (tokens.size() == BATCH_SIZE);
     }
 
     public SToken getToken(final long tokenId) throws SObjectNotFoundException, SObjectReadException {

@@ -36,7 +36,7 @@ public class WorkServiceTest extends CommonServiceTest {
         logger.addHandler(new ConsoleHandler());
         getTransactionService().begin();
         final List<String> works = new ArrayList<String>();
-        getWorkService().registerWork(new ListAdder(works, "1", 0));
+        getWorkService().registerWork(new ListAdder(works, "1"));
         getTransactionService().complete();
         Thread.sleep(1000);
         assertEquals(1, works.size());
@@ -46,7 +46,7 @@ public class WorkServiceTest extends CommonServiceTest {
     @Test(expected = SWorkRegisterException.class)
     public void testWorkOnNotActiveTransaction() throws Exception {
         final List<String> works = new ArrayList<String>();
-        getWorkService().registerWork(new ListAdder(works, "1", 0));
+        getWorkService().registerWork(new ListAdder(works, "1"));
     }
 
     @Test
@@ -54,14 +54,14 @@ public class WorkServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final List<String> works = new ArrayList<String>();
         final WorkService workService = getWorkService();
-        workService.registerWork(new ListAdder(works, "1", 0));
+        workService.registerWork(new ListAdder(works, "1"));
         getTransactionService().complete();
         Thread.sleep(100);
         assertEquals(1, works.size());
         assertTrue(works.contains("1"));
 
         getTransactionService().begin();
-        workService.registerWork(new ListAdder(works, "2", 0));
+        workService.registerWork(new ListAdder(works, "2"));
         getTransactionService().complete();
         Thread.sleep(100);
         assertEquals(2, works.size());
@@ -72,12 +72,12 @@ public class WorkServiceTest extends CommonServiceTest {
     public void testMultipleContinuation() throws Exception {
         getTransactionService().begin();
         final List<String> works = new ArrayList<String>();
-        getWorkService().registerWork(new ListAdder(works, "1", 0));
-        getWorkService().registerWork(new ListAdder(works, "2", 0));
-        getWorkService().registerWork(new ListAdder(works, "3", 0));
-        getWorkService().registerWork(new ListAdder(works, "4", 0));
-        getWorkService().registerWork(new ListAdder(works, "5", 0));
-        getWorkService().registerWork(new ListAdder(works, "6", 0));
+        getWorkService().registerWork(new ListAdder(works, "1"));
+        getWorkService().registerWork(new ListAdder(works, "2"));
+        getWorkService().registerWork(new ListAdder(works, "3"));
+        getWorkService().registerWork(new ListAdder(works, "4"));
+        getWorkService().registerWork(new ListAdder(works, "5"));
+        getWorkService().registerWork(new ListAdder(works, "6"));
 
         getTransactionService().complete();
         Thread.sleep(100);
@@ -88,38 +88,6 @@ public class WorkServiceTest extends CommonServiceTest {
         assertTrue(works.contains("4"));
         assertTrue(works.contains("5"));
         assertTrue(works.contains("6"));
-    }
-
-    @Test
-    public void testContinuationWithDelay() throws Exception {
-        getTransactionService().begin();
-
-        final List<String> works = new ArrayList<String>();
-        getWorkService().registerWork(new ListAdder(works, "1", 500));
-
-        getTransactionService().complete();
-        Thread.sleep(250);
-        assertEquals(0, works.size());
-        Thread.sleep(500);
-        assertEquals(1, works.size());
-        assertTrue(works.contains("1"));
-    }
-
-    @Test
-    public void testMultipleContinuationWithDelay() throws Exception {
-        getTransactionService().begin();
-
-        final List<String> works = new ArrayList<String>();
-        getWorkService().registerWork(new ListAdder(works, "1", 150));
-        getWorkService().registerWork(new ListAdder(works, "2", 150));
-
-        getTransactionService().complete();
-        Thread.sleep(100);
-        assertEquals(0, works.size());
-        Thread.sleep(250);
-        assertEquals(2, works.size());
-        assertTrue(works.contains("1"));
-        assertTrue(works.contains("2"));
     }
 
 }

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.1
  */
 package org.bonitasoft.engine.scheduler.impl;
@@ -123,10 +123,14 @@ public class TechnicalLoggerJobListener extends AbstractJobListener {
         final Class<? extends Job> jobClass = job.getClass();
         if (QuartzJob.class.isAssignableFrom(jobClass)) {
             final StatelessJob bosJob = ((QuartzJob) job).getBosJob();
-            if (bosJob instanceof JobWrapper) {
-                jobType = ((JobWrapper) bosJob).getStatelessJob().getClass().getName();
+            if (bosJob != null) {
+                if (bosJob instanceof JobWrapper) {
+                    jobType = ((JobWrapper) bosJob).getStatelessJob().getClass().getName();
+                } else {
+                    jobType = bosJob.getClass().getName();
+                }
             } else {
-                jobType = bosJob.getClass().getName();
+                return "null";
             }
         } else {
             jobType = jobClass.getName();

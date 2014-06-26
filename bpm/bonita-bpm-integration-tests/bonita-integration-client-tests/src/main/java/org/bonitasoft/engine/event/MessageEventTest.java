@@ -91,7 +91,7 @@ public class MessageEventTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -267,7 +267,7 @@ public class MessageEventTest extends CommonAPITest {
 
     private ProcessDefinition deployAndEnableProcessWithMessageIntermediateCatchEvent(final String processName, final String messageName,
             final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData, final List<Operation> operations)
-            throws BonitaException {
+                    throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
@@ -400,7 +400,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
@@ -511,18 +511,18 @@ public class MessageEventTest extends CommonAPITest {
     public void correlationKeyInWrongOrderShouldWork() throws Exception {
         final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(2);
         correlations.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
-                .createConstantStringExpression("value1")));
+        .createConstantStringExpression("value1")));
         correlations.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
-                .createConstantStringExpression("value2")));
+        .createConstantStringExpression("value2")));
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEventWithCorrelations(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME,
                 correlations);
 
         final ArrayList<BEntry<Expression, Expression>> correlationsReceive = new ArrayList<BEntry<Expression, Expression>>(2);
         correlationsReceive.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
-                .createConstantStringExpression("value2")));
+        .createConstantStringExpression("value2")));
         correlationsReceive.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
-                .createConstantStringExpression("value1")));
+        .createConstantStringExpression("value1")));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(correlationsReceive, null, null);
 
@@ -707,7 +707,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : sendProcess is finished, , receiveProcess start and stop on user task, data is transmitted to the receiveProcess
      */
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", " Message data",
-            "Send", "Receive" }, story = "Send a message with data from an end event of a process to a start event of an other process.", jira = "")
+        "Send", "Receive" }, story = "Send a message with data from an end event of a process to a start event of an other process.", jira = "")
     @Test
     public void dataTransferFromMessageEndEventToStartMessageEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null,
@@ -791,7 +791,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
         forceMatchingOfEvents();
         waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
@@ -944,7 +944,7 @@ public class MessageEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "throw event", "send message",
-            "intermediate catch event" }, jira = "ENGINE-447")
+    "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageViaAPIToIntermediateMessageEvent() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
@@ -963,7 +963,7 @@ public class MessageEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "message content", "throw event", "send message",
-            "start event" }, jira = "ENGINE-447")
+    "start event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageWithDataViaAPIToStartMessageEvent() throws Exception {
         final Expression lastNameDisplay = new ExpressionBuilder().createConstantStringExpression("lName");
@@ -1016,7 +1016,7 @@ public class MessageEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "correlation", "throw event", "send message",
-            "intermediate catch event" }, jira = "ENGINE-447")
+    "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageWithCorrelationViaAPIToIntermediateMessageEvent() throws Exception {
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
@@ -1058,7 +1058,7 @@ public class MessageEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "correlation", "throw event", "send message",
-            "intermediate catch event" }, jira = "ENGINE-447")
+    "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageWithDataViaAPIToIntermediateCatchMessageEvent() throws Exception {
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),

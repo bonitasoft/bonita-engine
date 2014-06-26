@@ -281,7 +281,8 @@ public class TenantTest extends CommonServiceTest {
         final Child child = buildChild("child1FN", "child11LN", 45, parent);
         persistenceService.insert(child);
 
-        final List<Child> allChildren = persistenceService.selectList(new SelectListDescriptor<Child>("getAllChildren", null, Child.class));
+        final QueryOptions queryOptions = new QueryOptions(0, 10, Child.class, "firstName", OrderByType.ASC);
+        final List<Child> allChildren = persistenceService.selectList(new SelectListDescriptor<Child>("getAllChildren", null, Child.class, queryOptions));
 
         assertEquals(1, allChildren.size());
         assertEquals(child, allChildren.get(0));
@@ -302,7 +303,8 @@ public class TenantTest extends CommonServiceTest {
         final Child child = buildChild("child1FN", "child11LN", 45, parent);
         persistenceService.insert(child);
 
-        final List<Human> allHumans = persistenceService.selectList(new SelectListDescriptor<Human>("getAllHumans", null, Human.class));
+        final QueryOptions queryOptions = new QueryOptions(0, 10, Human.class, "firstName", OrderByType.ASC);
+        final List<Human> allHumans = persistenceService.selectList(new SelectListDescriptor<Human>("getAllHumans", null, Human.class, queryOptions));
         assertEquals(3, allHumans.size());
 
         persistenceService.delete(child);
@@ -846,19 +848,17 @@ public class TenantTest extends CommonServiceTest {
         getTransactionService().begin();
         final Human human = PersistenceTestUtil.buildHuman("Matti", "Makela", 27);
         human.setDeleted(true);
-        List<Human> humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class));
+        final QueryOptions queryOptions = new QueryOptions(0, 10, Human.class, "firstName", OrderByType.ASC);
+        List<Human> humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class, queryOptions));
         final int priviousSize = humans.size();
         persistenceService.insert(human);
-        humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class));
+        humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class, queryOptions));
         assertEquals(priviousSize + 1, humans.size());
         persistenceService.purge(Human.class.getName());
-        humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class));
+        humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class, queryOptions));
         assertEquals(priviousSize, humans.size());
         getTransactionService().complete();
     }
-
-
-
 
     @Test
     public void search_Humans_With_Fields_Starting_With_Prefix() throws Exception {
@@ -884,14 +884,13 @@ public class TenantTest extends CommonServiceTest {
         assertEquals(1, allHumans.size());
     }
 
-
     protected QueryOptions buildQueryOptionsOrderByFirstnameASC(final String searchTerm) {
         Map<Class<? extends PersistentObject>, Set<String>> allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
         final Set<String> fields = new HashSet<String>(2);
         fields.add("firstName");
         fields.add("lastName");
         allFields.put(Human.class, fields);
-        QueryOptions queryOptions =new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstName", OrderByType.ASC)),
+        QueryOptions queryOptions = new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstName", OrderByType.ASC)),
                 new ArrayList<FilterOption>(0), new SearchFields(Arrays.asList(searchTerm), allFields));
         return queryOptions;
     }

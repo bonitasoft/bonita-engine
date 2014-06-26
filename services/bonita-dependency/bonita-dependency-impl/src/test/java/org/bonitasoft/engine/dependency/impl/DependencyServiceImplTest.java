@@ -148,7 +148,7 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencies);
 
         final QueryOptions options = new QueryOptions(0, 10);
-        Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, options));
+        Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, 1, 100));
     }
 
     @Test(expected = SDependencyException.class)
@@ -156,7 +156,7 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
-        dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, options);
+        dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, 1, 100);
     }
 
     /**
@@ -182,28 +182,6 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         dependencyServiceImpl.getDependencyMapping(456L);
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMappings(long, java.lang.String, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
-    @Test
-    public final void getDependencyMappingsWithArtifactIdAndTypeAndQueryOptions() throws SBonitaReadException, SDependencyException {
-        final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
-
-        final QueryOptions options = new QueryOptions(0, 10);
-        Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDependencyMappings(54156L, ScopeType.PROCESS, options));
-    }
-
-    @Test(expected = SDependencyException.class)
-    public final void getDependencyMappingsWithArtifactIdAndTypeAndQueryOptionsThrowException() throws SBonitaReadException, SDependencyException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
-
-        final QueryOptions options = new QueryOptions(0, 10);
-        dependencyServiceImpl.getDependencyMappings(54156L, ScopeType.PROCESS, options);
     }
 
     /**

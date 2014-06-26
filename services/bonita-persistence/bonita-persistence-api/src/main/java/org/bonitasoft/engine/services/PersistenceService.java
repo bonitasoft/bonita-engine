@@ -170,12 +170,22 @@ public interface PersistenceService extends ReadPersistenceService {
     int update(final String updateQueryName) throws SPersistenceException;
 
     /**
+     * Executes a query update.
+     * 
+     * @param updateQueryName
+     * @param inputParameters
+     * @return
+     * @throws SPersistenceException
+     */
+    int update(String updateQueryName, Map<String, Object> inputParameters) throws SPersistenceException;
+
+    /**
      * Delete all elements of a specific table for a specific tenant
      * 
      * @param entityClass
-     *            Entity class corresponding to the table to empty
+     *        Entity class corresponding to the table to empty
      * @param filters
-     *            Filters
+     *        Filters
      * @throws SPersistenceException
      * @since 6.1
      */

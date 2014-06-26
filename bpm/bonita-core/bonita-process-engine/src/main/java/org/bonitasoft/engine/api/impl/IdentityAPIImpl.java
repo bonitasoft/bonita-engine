@@ -630,6 +630,17 @@ public class IdentityAPIImpl implements IdentityAPI {
             throw new RetrieveException(sbe);
         }
     }
+    
+    @Override
+    public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        try {
+            return identityService.getUserIdsWithCustomUserInfo(infoName, infoValue, usePartialMatch, startIndex, maxResults);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+    }
 
     @Override
     public Role createRole(final String roleName) throws AlreadyExistsException, CreationException {
@@ -1477,12 +1488,12 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    private CustomUserInfoAPI createCustomUserInfoAPI() {
-        return new CustomUserInfoAPI(getTenantAccessor().getIdentityService());
+    private CustomUserInfoAPIDelegate createCustomUserInfoAPI() {
+        return new CustomUserInfoAPIDelegate(getTenantAccessor().getIdentityService());
     }
 
-    private CustomUserInfoDefinitionAPI createCustomUserInfoDefinitionAPI() {
-        return new CustomUserInfoDefinitionAPI(getTenantAccessor().getIdentityService());
+    private CustomUserInfoDefinitionAPIDelegate createCustomUserInfoDefinitionAPI() {
+        return new CustomUserInfoDefinitionAPIDelegate(getTenantAccessor().getIdentityService());
     }
 
     private SCustomUserInfoValueAPI createCustomUserInfoValueAPI() {

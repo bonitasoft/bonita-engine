@@ -91,28 +91,6 @@ public class IdentityServiceImplForGroupTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupChildren(long)}.
-     */
-    @Test
-    public void getGroupChildrenById() throws Exception {
-        final SGroup group = mock(SGroup.class);
-        final SGroup child = mock(SGroup.class);
-        when(persistenceService.selectById(SelectDescriptorBuilder.getElementById(SGroup.class, "Group", 123l))).thenReturn(group);
-        when(persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group))).thenReturn(Collections.singletonList(child));
-
-        assertEquals(child, identityServiceImpl.getGroupChildren(123l).get(0));
-    }
-
-    @Test(expected = SIdentityException.class)
-    public void getGroupChildrenByIdThrowException() throws Exception {
-        final SGroup group = mock(SGroup.class);
-        when(persistenceService.selectById(SelectDescriptorBuilder.getElementById(SGroup.class, "Group", 123l))).thenReturn(group);
-        when(persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group))).thenThrow(new SBonitaReadException(""));
-
-        identityServiceImpl.getGroupChildren(123l);
-    }
-
-    /**
      * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupChildren(long, int, int)}.
      */
     @Test
@@ -239,24 +217,6 @@ public class IdentityServiceImplForGroupTest {
         final SGroup group = mock(SGroup.class);
 
         assertEquals(group, identityServiceImpl.getGroup(123l));
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupsByName(java.lang.String)}.
-     */
-    @Test
-    public void getGroupsByName() throws Exception {
-        final SGroup group = mock(SGroup.class);
-        when(persistenceService.selectList(SelectDescriptorBuilder.getGroupsByName("name"))).thenReturn(Collections.singletonList(group));
-
-        assertEquals(group, identityServiceImpl.getGroupsByName("name").iterator().next());
-    }
-
-    @Test(expected = SIdentityException.class)
-    public void getGroupByNameThrowException() throws Exception {
-        when(persistenceService.selectList(SelectDescriptorBuilder.getGroupsByName("name"))).thenThrow(new SBonitaReadException(""));
-
-        identityServiceImpl.getGroupsByName("name");
     }
 
     /**

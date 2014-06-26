@@ -19,6 +19,10 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
+import org.bonitasoft.engine.platform.STenantDeactivationException;
+import org.bonitasoft.engine.platform.STenantDeletionException;
+import org.bonitasoft.engine.platform.STenantException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -131,15 +135,7 @@ public class PlatformUtil {
     public static void deletePlatform(final TransactionService transactionService, final PlatformService platformService) throws Exception {
         try {
             transactionService.begin();
-            final List<STenant> existingTenants = platformService.getTenants(new QueryOptions(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, STenant.class, "id",
-                    OrderByType.ASC));
-            if (existingTenants.size() > 0) {
-                for (final STenant sTenant : existingTenants) {
-                    final long tenantId = sTenant.getId();
-                    platformService.deactiveTenant(tenantId);
-                    platformService.deleteTenant(tenantId);
-                }
-            }
+            deactiveAndDeleteAllTenants(platformService);
             platformService.deletePlatform();
         } finally {
             transactionService.complete();
@@ -151,6 +147,19 @@ public class PlatformUtil {
         } finally {
             transactionService.complete();
         }
+    }
+
+    private static void deactiveAndDeleteAllTenants(final PlatformService platformService) throws STenantException, STenantNotFoundException,
+            STenantDeactivationException, STenantDeletionException, SDeletingActivatedTenantException {
+        List<STenant> existingTenants;
+        do {
+            existingTenants = platformService.getTenants(new QueryOptions(0, 100, STenant.class, "id", OrderByType.ASC));
+            for (final STenant sTenant : existingTenants) {
+                final long tenantId = sTenant.getId();
+                platformService.deactiveTenant(tenantId);
+                platformService.deleteTenant(tenantId);
+            }
+        } while (existingTenants.size() == 100);
     }
 
     public static String getDefaultTenantName() {

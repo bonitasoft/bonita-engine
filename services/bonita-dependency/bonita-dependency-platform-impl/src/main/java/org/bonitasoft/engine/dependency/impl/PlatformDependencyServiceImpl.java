@@ -32,7 +32,10 @@ import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.SPlatformDependency;
+import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -48,6 +51,8 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
  * @author Celine Souchet
  */
 public class PlatformDependencyServiceImpl implements DependencyService {
+
+    private static final int BATCH_SIZE = 100;
 
     private final PersistenceService platformPersistenceService;
 
@@ -94,7 +99,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public void deleteAllDependencies() throws SDependencyDeletionException {
-        final QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SPlatformDependency.class, "id", OrderByType.ASC);
         List<SDependency> dependencies = null;
         do {
             try {
@@ -114,7 +119,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         desc.addFields(descriptor.getFields());
         try {
             platformPersistenceService.update(desc);
-            QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+            QueryOptions queryOptions = new QueryOptions(0, 100, SPlatformDependencyMapping.class, "id", OrderByType.ASC);
             List<SDependencyMapping> dependencyMappings = null;
             final long updateTimeStamp = System.currentTimeMillis();
             do {
@@ -162,9 +167,8 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     public List<SDependency> getDependencies(final QueryOptions queryOptions) throws SDependencyException {
         final Map<String, Object> parameters = Collections.emptyMap();
         try {
-            final List<SDependency> dependencies = platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependencies",
+            return platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependencies",
                     parameters, SDependency.class, queryOptions));
-            return dependencies;
         } catch (final SBonitaReadException bre) {
             throw new SDependencyException(bre);
         }
@@ -173,10 +177,10 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     @Override
     public List<SDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
         final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) ids);
+        final QueryOptions queryOptions = new QueryOptions(0, ids.size(), SPlatformDependency.class, "id", OrderByType.ASC);
         try {
-            final List<SDependency> dependencies = platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependenciesById",
-                    parameters, SDependency.class));
-            return dependencies;
+            return platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependenciesById",
+                    parameters, SPlatformDependency.class, queryOptions));
         } catch (final SBonitaReadException bre) {
             throw new SDependencyException(bre);
         }
@@ -212,7 +216,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public void deleteAllDependencyMappings() throws SDependencyException {
-        final QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SPlatformDependencyMapping.class, "id", OrderByType.ASC);
         List<SDependencyMapping> dependencyMappings = null;
         do {
             dependencyMappings = getDependencyMappings(queryOptions);
@@ -254,24 +258,9 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     public List<SDependencyMapping> getDependencyMappings(final QueryOptions queryOptions) throws SDependencyException {
         try {
             return platformPersistenceService.selectList(new SelectListDescriptor<SDependencyMapping>("getPlatformDependencyMappings", null,
-                    SDependencyMapping.class, queryOptions));
+                    SPlatformDependencyMapping.class, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SDependencyException("can't get dependency mappings", e);
-        }
-    }
-
-    @Override
-    public List<SDependencyMapping> getDependencyMappings(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions)
-            throws SDependencyException {
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>();
-            parameters.put("artifactId", artifactId);
-            parameters.put("artifactType", artifactType);
-            final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<SDependencyMapping>("getPlatformDependencyMappingsByArtifact",
-                    parameters, SDependencyMapping.class, queryOptions);
-            return platformPersistenceService.selectList(desc);
-        } catch (final SBonitaReadException e) {
-            throw new SDependencyException("can't get dependency mappings by artifact: " + artifactType + ", " + artifactId, e);
         }
     }
 
@@ -281,7 +270,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("dependencyId", dependencyId);
             final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<SDependencyMapping>("getPlatformDependencyMappingsByDependency",
-                    parameters, SDependencyMapping.class, queryOptions);
+                    parameters, SPlatformDependencyMapping.class, queryOptions);
             return platformPersistenceService.selectList(desc);
         } catch (final SBonitaReadException e) {
             throw new SDependencyException("can't get dependency mappings by dependencyId: " + dependencyId, e);
@@ -289,13 +278,16 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions) throws SDependencyException {
+    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final int startIndex, final int maxResult)
+            throws SDependencyException {
         try {
+            NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, startIndex, maxResult);
+            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult, SPlatformDependencyMapping.class, "id", OrderByType.ASC);
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("artifactId", artifactId);
             parameters.put("artifactType", artifactType);
-            final SelectListDescriptor<Long> desc = new SelectListDescriptor<Long>("getPlatformDependencyIds", parameters, SDependency.class, Long.class,
-                    queryOptions);
+            final SelectListDescriptor<Long> desc = new SelectListDescriptor<Long>("getPlatformDependencyIds", parameters, SPlatformDependency.class,
+                    Long.class, queryOptions);
             return platformPersistenceService.selectList(desc);
         } catch (final SBonitaReadException e) {
             throw new SDependencyException(e);
@@ -313,7 +305,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public List<SDependencyMapping> removeDisconnectedDependencyMappings(final ArtifactAccessor artifactAccessor) throws SDependencyException {
-        QueryOptions loopQueryOptions = QueryOptions.defaultQueryOptions();
+        QueryOptions loopQueryOptions = new QueryOptions(0, 100, SPlatformDependencyMapping.class, "id", OrderByType.ASC);
         List<SDependencyMapping> dependencyMappings = null;
         final List<SDependencyMapping> result = new ArrayList<SDependencyMapping>();
         do {
@@ -366,20 +358,22 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public void deleteDependencies(final long id, final ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException {
-        QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
-        final ArrayList<Long> allDependencyIds = new ArrayList<Long>();
-        List<Long> dependencyIds;
-        do {
-            dependencyIds = getDependencyIds(id, type, queryOptions);
-            allDependencyIds.addAll(dependencyIds);
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (dependencyIds.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-        for (final Long dependencyId : allDependencyIds) {
-            final List<SDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId, QueryOptions.defaultQueryOptions());
-            if (dependencyMappings.size() == 1) {// only when the dependency is linked only to on element
-                deleteDependencyMapping(dependencyMappings.get(0));
-                deleteDependency(dependencyId);
+        final QueryOptions queryOptionsForMapping = new QueryOptions(0, 2, SDependencyMapping.class, "id", OrderByType.ASC);
+        int fromIndex = 0;
+
+        List<Long> dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        while (!dependencyIds.isEmpty()) {
+            for (final Long dependencyId : dependencyIds) {
+                final List<SDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId, queryOptionsForMapping);
+                if (dependencyMappings.size() == 1) {// only when the dependency is linked only to on element
+                    final SDependencyMapping dependencyMapping = dependencyMappings.get(0);
+                    deleteDependencyMapping(dependencyMapping);
+                    deleteDependency(dependencyId);
+                } else {
+                    fromIndex++;
+                }
             }
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
         }
     }
 
@@ -400,21 +394,18 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     private Map<String, byte[]> getDependenciesResources() throws SDependencyException {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         int fromIndex = 0;
-        final int pageSize = QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
         List<Long> dependencyIds = null;
-
         do {
-            final QueryOptions queryOptions = new QueryOptions(fromIndex, pageSize);
             dependencyIds = getDependencyIds(classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
-                    queryOptions);
+                    fromIndex, BATCH_SIZE);
             if (dependencyIds != null && dependencyIds.size() > 0) {
                 final List<SDependency> dependencies = getDependencies(dependencyIds);
                 for (final SDependency dependency : dependencies) {
                     resources.put(dependency.getFileName(), dependency.getValue());
                 }
             }
-            fromIndex = fromIndex + pageSize;
-        } while (dependencyIds.size() == pageSize);
+            fromIndex = fromIndex + BATCH_SIZE;
+        } while (dependencyIds.size() == BATCH_SIZE);
         return resources;
     }
 

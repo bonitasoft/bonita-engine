@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.category.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -293,16 +294,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Long> getProcessDefinitionIdsOfCategory(final long categoryId) throws SCategoryException {
-        final SelectListDescriptor<Long> descriptor = SelectDescriptorBuilder.getProcessIdsOfCategory(categoryId);
-        try {
-            return persistenceService.selectList(descriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SCategoryException(e);
-        }
-    }
-
-    @Override
     public List<SCategory> getCategoriesOfProcessDefinition(final long processDefinitionId, final int fromIndex, final int numberOfCategories,
             final OrderByType order) throws SCategoryException {
         final SelectListDescriptor<SCategory> descriptor = SelectDescriptorBuilder.getCategoriesOfProcess(processDefinitionId, fromIndex, numberOfCategories,
@@ -329,14 +320,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void removeCategoriesFromProcessDefinition(final long processDefinitionId, final List<Long> categoryIds) throws SCategoryException {
         final SelectListDescriptor<SProcessCategoryMapping> descriptor = SelectDescriptorBuilder.getCategoryMappingOfProcessAndCategories(processDefinitionId,
-                categoryIds);
+                categoryIds, 0, 100);
         try {
-            final List<SProcessCategoryMapping> mappings = persistenceService.selectList(descriptor);
-            for (final SProcessCategoryMapping mapping : mappings) {
-                // Is the current category mapping in the list of the ones we want to remove? :
-                if (categoryIds.contains(mapping.getCategoryId())) {
-                    deleteProcessCategoryMapping(mapping);
-                }
+            List<SProcessCategoryMapping> mappings = persistenceService.selectList(descriptor);
+            while (!mappings.isEmpty()) {
+                deleteProcessCategoryMappings(mappings);
+                mappings = persistenceService.selectList(descriptor);
             }
         } catch (final SBonitaReadException e) {
             throw new SCategoryException(e);
@@ -359,7 +348,7 @@ public class CategoryServiceImpl implements CategoryService {
             try {
                 deleteProcessCategoryMapping(mapping);
                 nbDeleted = +1;
-            } catch (SBonitaException e) {
+            } catch (final SBonitaException e) {
                 // FIXME : Nothing to do, or add logs ??
             }
         }
@@ -414,15 +403,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Long> getCategorizedProcessIds(final List<Long> processIds) throws SCategoryException {
-        if (processIds == null || processIds.size() <= 0) {
-            return Collections.emptyList();
-        }
-        final SelectListDescriptor<Long> descriptor = SelectDescriptorBuilder.getCategorizedProcessIds(processIds);
+    public long getNumberOfProcessDeploymentInfosOfCategory(final long categoryId) throws SBonitaSearchException {
+        final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
+        final SelectOneDescriptor<Long> descriptor = new SelectOneDescriptor<Long>("getNumberOfProcessDefinitionsOfCategory", parameters,
+                SProcessCategoryMapping.class, Long.class);
+
         try {
-            return persistenceService.selectList(descriptor);
+            return persistenceService.selectOne(descriptor);
         } catch (final SBonitaReadException e) {
-            throw new SCategoryException(e);
+            throw new SBonitaSearchException(e);
         }
     }
 
