@@ -17,7 +17,5 @@
 	<modules>
 		<module>bonita-process-comment-api</module>
 		<module>bonita-process-comment-api-impl</module>
-		<module>bonita-process-comment-model</module>
-		<module>bonita-process-comment-model-impl</module>
 	</modules>
 </project>

@@ -17,6 +17,5 @@
 	<modules>
 		<module>bonita-external-identity-mapping-api</module>
 		<module>bonita-external-identity-mapping-impl</module>
-		<module>bonita-external-identity-mapping-impl-hibernate</module>
 	</modules>
 </project>

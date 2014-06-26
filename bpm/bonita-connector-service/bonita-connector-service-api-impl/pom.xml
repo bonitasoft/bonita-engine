@@ -20,8 +20,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-model</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-builder</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -36,17 +36,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-parse-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-write-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-validate-api</artifactId>
+			<artifactId>bonita-xml-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -131,7 +121,7 @@
             <!-- because we need the builderfactory impl and it does not 
                 make sense to mock them -->
             <groupId>org.bonitasoft.engine.dependency</groupId>
-            <artifactId>bonita-dependency-model-impl</artifactId>
+            <artifactId>bonita-dependency-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

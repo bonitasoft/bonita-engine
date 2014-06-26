@@ -410,7 +410,7 @@ public class DependencyServiceImpl implements DependencyService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyIds"));
         }
         NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, startIndex, maxResult);
-        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult, SDependencyMapping.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult);
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("artifactId", artifactId);

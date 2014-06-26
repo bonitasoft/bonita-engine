@@ -15,8 +15,6 @@
 	<name>Bonita Identity</name>
 
 	<modules>
-		<module>bonita-identity-model</module>
-		<module>bonita-identity-model-impl</module>
 		<module>bonita-identity-api</module>
 		<module>bonita-identity-impl</module>
 	</modules>
