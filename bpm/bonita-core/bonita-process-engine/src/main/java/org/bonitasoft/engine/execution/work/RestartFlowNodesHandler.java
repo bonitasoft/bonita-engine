@@ -45,12 +45,15 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
             throws RestartException {
         try {
-            long tenantId = tenantServiceAccessor.getTenantId();
-            TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-            ArrayList<Long> flownodesToRestart = new ArrayList<Long>();
+            final long tenantId = tenantServiceAccessor.getTenantId();
+            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+            final ArrayList<Long> flownodesToRestart = new ArrayList<Long>();
             flownodesToRestartByTenant.put(tenantId, flownodesToRestart);
-            FlowNodeInstanceService flowNodeInstanceService = tenantServiceAccessor.getActivityInstanceService();
-            QueryOptions queryOptions = new QueryOptions(0, 100);
+            final FlowNodeInstanceService flowNodeInstanceService = tenantServiceAccessor.getActivityInstanceService();
+
+            //using a to low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
+            //As we retrieve only the id we can use a greater page size
+            QueryOptions queryOptions = new QueryOptions(0, 50000);
             List<Long> ids = null;
             logInfo(logger, "Restarting flow nodes...");
             do {
@@ -60,7 +63,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
 
             } while (ids.size() == queryOptions.getNumberOfResults());
             logInfo(logger, "Found " + flownodesToRestart.size() + " flow nodes to restart on tenant " + tenantId);
-        } catch (SFlowNodeReadException e) {
+        } catch (final SFlowNodeReadException e) {
             throw new RestartException("unable to flag elements as to be restarted", e);
         }
     }
@@ -80,19 +83,19 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final WorkService workService = tenantServiceAccessor.getWorkService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-        TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        long tenantId = tenantServiceAccessor.getTenantId();
-        List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
+        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        final long tenantId = tenantServiceAccessor.getTenantId();
+        final List<Long> flownodesIds = flownodesToRestartByTenant.get(tenantId);
 
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + flownodesIds.size() + " flow nodes for tenant " + tenantId);
         try {
-            Iterator<Long> iterator = flownodesIds.iterator();
+            final Iterator<Long> iterator = flownodesIds.iterator();
             ExecuteFlowNodes exec = null;
             do {
                 exec = new ExecuteFlowNodes(workService, logger, activityInstanceService, iterator);
                 transactionService.executeInTransaction(exec);
             } while (iterator.hasNext());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RestartException("Unable to restart elements", e);
         }
 
