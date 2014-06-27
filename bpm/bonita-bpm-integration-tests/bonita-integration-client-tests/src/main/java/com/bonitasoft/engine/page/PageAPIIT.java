@@ -174,7 +174,8 @@ public class PageAPIIT extends CommonAPISPTest {
     @Test(expected = UpdatingWithInvalidPageZipContentException.class)
     public void updatePageContent_with_bad_content_should_fail() throws BonitaException, IOException {
         // given
-        Page createPage = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page createPage = getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
@@ -190,7 +191,8 @@ public class PageAPIIT extends CommonAPISPTest {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        Page createPage = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page createPage = getPageAPI().createPage(
+                new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
@@ -231,9 +233,12 @@ public class PageAPIIT extends CommonAPISPTest {
         final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 oldContent);
         final long pageId = page.getId();
-        Thread.sleep(10);
 
         // when
+
+        // wait to see modified last update time
+        Thread.sleep(1000);
+
         final byte[] newContent = createTestPageContent(INDEX_HTML, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         getPageAPI().updatePageContent(pageId, newContent);
         final byte[] returnedPageContent = getPageAPI().getPageContent(pageId);
@@ -324,7 +329,7 @@ public class PageAPIIT extends CommonAPISPTest {
     public void should_getPageContent_return_the_content() throws BonitaException {
         // given
         final String pageName = generateUniquePageName();
-        String pageDescription = "a verry long page description, maybe the longest description you will ever see, check that:"
+        final String pageDescription = "a verry long page description, maybe the longest description you will ever see, check that:"
                 + " Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut"
                 + " labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"
                 + " nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit "
@@ -348,8 +353,8 @@ public class PageAPIIT extends CommonAPISPTest {
         try {
             contentAsMap = unzip(content);
             assertThat(contentAsMap.keySet()).as("should contains page.properties").contains("page.properties");
-            String string = contentAsMap.get("page.properties");
-            Properties props = new Properties();
+            final String string = contentAsMap.get("page.properties");
+            final Properties props = new Properties();
             props.load(new StringReader(string));
             assertThat(props.getProperty("description")).as("should have same description").isEqualTo(description);
             assertThat(props.getProperty("displayName")).as("should have same displayName").isEqualTo(displayName);
@@ -589,7 +594,7 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int noneMatchingCount = 8;
         for (int i = 0; i < noneMatchingCount; i++) {
-            final String generateUniquePageName = generateUniquePageName();
+            final String generateUniquePageName = generateUniquePageName() + i;
             getPageAPI().createPage(
                     new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(noneMatchingdisplayName),
                     createTestPageContent(INDEX_GROOVY, generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION));
@@ -610,7 +615,7 @@ public class PageAPIIT extends CommonAPISPTest {
 
     private String generateUniquePageName() {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("custompage_uniquepagename");
+        stringBuilder.append("custompage_unique");
         stringBuilder.append(System.currentTimeMillis());
         return stringBuilder.toString();
     }
