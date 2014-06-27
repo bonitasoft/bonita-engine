@@ -244,7 +244,7 @@ public class PageAPIExt implements PageAPI {
             throw new UpdateException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
-        } catch (SInvalidPageTokenException e) {
+        } catch (final SInvalidPageTokenException e) {
             throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
         }
 
@@ -259,11 +259,13 @@ public class PageAPIExt implements PageAPI {
     public void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException {
         final PageService pageService = getTenantAccessor().getPageService();
-
+        final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
+        pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
+        pageUpdateBuilder.updateLastUpdatedBy(getUserIdFromSessionInfos());
         try {
-            SPage page = pageService.getPage(pageId);
+            final SPage page = pageService.getPage(pageId);
             pageService.updatePageContent(pageId, content, page.getContentName());
-
+            pageService.updatePage(pageId, pageUpdateBuilder.done());
         } catch (final SInvalidPageTokenException e) {
             throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
         } catch (final SInvalidPageZipContentException e) {
