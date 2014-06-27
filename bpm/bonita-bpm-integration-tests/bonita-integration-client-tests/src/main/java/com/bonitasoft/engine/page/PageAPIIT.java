@@ -78,16 +78,16 @@ public class PageAPIIT extends CommonAPISPTest {
     @Before
     public void before() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
-    }
-
-    @After
-    public void after() throws BonitaException {
         final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         for (final Page page : searchPages.getResult()) {
             if (!page.isProvided()) {
                 getPageAPI().deletePage(page.getId());
             }
         }
+    }
+
+    @After
+    public void after() throws BonitaException {
         logoutOnTenant();
     }
 
@@ -227,7 +227,7 @@ public class PageAPIIT extends CommonAPISPTest {
     @Test
     public void should_update_content_return_the_modified_content() throws BonitaException, InterruptedException {
         // given
-        final long currentTimeMillis = System.currentTimeMillis();
+        final Date createTimeMillis = new Date(System.currentTimeMillis());
         final String pageName = generateUniquePageName();
         final byte[] oldContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
@@ -239,6 +239,9 @@ public class PageAPIIT extends CommonAPISPTest {
         // wait to see modified last update time
         Thread.sleep(1000);
 
+        final Date updateTimeMillis = new Date(System.currentTimeMillis());
+        assertThat(updateTimeMillis).as("should wait 1 second").isAfter(createTimeMillis);
+
         final byte[] newContent = createTestPageContent(INDEX_HTML, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         getPageAPI().updatePageContent(pageId, newContent);
         final byte[] returnedPageContent = getPageAPI().getPageContent(pageId);
@@ -246,7 +249,8 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // then
         checkPageContentContainsProperties(returnedPageContent, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        assertThat(returnedPage.getLastModificationDate()).isAfter(new Date(currentTimeMillis));
+        assertThat(returnedPage.getLastModificationDate()).as("last modification date should be modified ").isAfter(
+                page.getLastModificationDate());
 
     }
 
@@ -419,10 +423,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                        .setPage(page.getName())
-                        .setCustom(new Boolean(true))
-                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                        .setParentId(folderProfileEntry.getId()));
+                .setPage(page.getName())
+                .setCustom(new Boolean(true))
+                .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                .setParentId(folderProfileEntry.getId()));
 
         getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")
@@ -475,10 +479,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                        .setPage(page.getName())
-                        .setCustom(new Boolean(true))
-                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                        .setParentId(folderProfileEntry.getId()));
+                .setPage(page.getName())
+                .setCustom(new Boolean(true))
+                .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                .setParentId(folderProfileEntry.getId()));
 
         // when
         getPageAPI().deletePage(page.getId());
@@ -538,10 +542,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                        .setPage(page.getName())
-                        .setCustom(true)
-                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                        .setParentId(folderProfileEntry.getId()));
+                .setPage(page.getName())
+                .setCustom(true)
+                .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                .setParentId(folderProfileEntry.getId()));
 
         getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")
@@ -685,7 +689,7 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int numberOfNonsMatchingPage = 5;
         for (int i = 0; i < numberOfNonsMatchingPage; i++) {
-            final String generateUniquePageName = generateUniquePageName();
+            final String generateUniquePageName = generateUniquePageName() + i;
             final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, displayName, description);
             getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
                     pageContent);
