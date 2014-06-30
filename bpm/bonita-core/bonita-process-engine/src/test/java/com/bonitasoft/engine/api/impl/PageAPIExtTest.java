@@ -1,19 +1,25 @@
 package com.bonitasoft.engine.api.impl;
 
+import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -22,7 +28,9 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -78,6 +86,9 @@ public class PageAPIExtTest {
     @Mock
     private SPageUpdateContentBuilder sPageUpdateContentBuilder;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Before
     public void before() throws Exception {
 
@@ -85,6 +96,7 @@ public class PageAPIExtTest {
 
         doReturn(tenantServiceAccessor).when(pageAPIExt).getTenantAccessor();
         doReturn(pageService).when(tenantServiceAccessor).getPageService();
+        doReturn(123l).when(pageAPIExt).getUserIdFromSessionInfos();
 
         doReturn(1l).when(sPage).getId();
         doReturn("name").when(sPage).getName();
@@ -216,34 +228,19 @@ public class PageAPIExtTest {
 
         doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
         doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
+        doReturn(mock(SPage.class)).when(pageService).getPage(1);
 
         // given
-        final byte[] content = "content".getBytes();
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
+                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
         final long pageId = 1;
 
         // when
         pageAPIExt.updatePageContent(pageId, content);
 
         // then
-        verify(pageService, times(1)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
-    }
-
-    @Test(expected = UpdateException.class)
-    public void testUpdatePageContentWithWrongZip() throws Exception {
-        final SObjectModificationException exception = new SObjectModificationException("message");
-        doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
-        doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
-        doThrow(exception).when(pageService).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
-
-        // given
-        final byte[] content = "bad".getBytes();
-        final long pageId = 1;
-
-        // when
-        pageAPIExt.updatePageContent(pageId, content);
-
-        // then
-        // exception
+        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), anyString());
     }
 
     @Test
@@ -276,14 +273,18 @@ public class PageAPIExtTest {
     @Test(expected = AlreadyExistsException.class)
     public void testCheckPageAlreadyExists() throws Exception {
         // given
-        doReturn(sPage).when(pageService).getPageByName("name");
+        final PageCreator pageCreator = new PageCreator("name", "content.zip");
+        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
+        doReturn(sPage).when(pageAPIExt).constructPage(pageCreator, userId);
+        doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+        final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
+        doThrow(SObjectAlreadyExistsException.class).when(pageService).addPage(sPage, content);
 
         // when
-        pageAPIExt.checkPageAlreadyExists("name");
+        pageAPIExt.createPage(pageCreator, content);
 
         // then
         // AlreadyExistsException
 
     }
-
 }

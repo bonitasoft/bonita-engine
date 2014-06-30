@@ -13,8 +13,12 @@ import java.util.List;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.InvalidPageTokenException;
+import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -92,7 +96,8 @@ public interface PageAPI {
      * @throws CreationException
      *             if an error occurs during the creation.
      */
-    Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException;
+    Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException;
 
     /**
      * Updates a custom page.
@@ -109,10 +114,12 @@ public interface PageAPI {
      * @throws AlreadyExistsException
      *             if a page with this name already exists.
      */
-    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException;
+    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException, UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException;
 
     /**
      * Updates a custom page content.
+     * it read the page.properties inside to update the page properties
      * 
      * @param pageId
      *            the Identifier of the page to update
@@ -121,7 +128,8 @@ public interface PageAPI {
      * @throws UpdateException
      *             if an error occurs during the update.
      */
-    void updatePageContent(final long pageId, final byte[] getPageContent) throws UpdateException;
+    void updatePageContent(final long pageId, final byte[] getPageContent) throws UpdateException, UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException;
 
     /**
      * Deletes a page identified by its ID.
@@ -142,5 +150,27 @@ public interface PageAPI {
      *             if a problem occurs during deletion.
      */
     void deletePages(final List<Long> pageIds) throws DeletionException;
+
+    /**
+     * 
+     * create a page using the given content
+     * 
+     * the content must contain a page.properties file that contains informations on the page:
+     * 
+     * name, displayName and description
+     * 
+     * @param contentName
+     *            name of the zip file containing the page
+     * @param content
+     *            content of the zip file containing the page
+     * @return
+     *         the created page
+     * @throws AlreadyExistsException
+     *             if a page with the same name already exists
+     * @throws CreationException
+     * @since 6.3.1
+     */
+    Page createPage(String contentName, byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException;
 
 }
