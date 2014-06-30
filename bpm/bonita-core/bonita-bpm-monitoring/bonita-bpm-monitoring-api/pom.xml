@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-bpm-monitoring</artifactId>
 		<groupId>com.bonitasoft.engine.core.monitoring</groupId>
-		<version>6.3.2.RC2</version>
+		<version>6.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-bpm-monitoring-api</artifactId>
