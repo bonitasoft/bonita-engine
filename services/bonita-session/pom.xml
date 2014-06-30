@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
 		<artifactId>services</artifactId>
-		<version>6.3.2-SNAPSHOT</version>
+		<version>6.3.2.RC2</version>
 	</parent>
 	<groupId>com.bonitasoft.engine.session</groupId>
 	<artifactId>bonita-session</artifactId>
