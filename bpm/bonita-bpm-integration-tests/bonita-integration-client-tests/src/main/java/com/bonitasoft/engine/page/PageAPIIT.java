@@ -423,10 +423,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                .setPage(page.getName())
-                .setCustom(new Boolean(true))
-                .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                .setParentId(folderProfileEntry.getId()));
+                        .setPage(page.getName())
+                        .setCustom(new Boolean(true))
+                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                        .setParentId(folderProfileEntry.getId()));
 
         getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")
@@ -479,10 +479,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                .setPage(page.getName())
-                .setCustom(new Boolean(true))
-                .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                .setParentId(folderProfileEntry.getId()));
+                        .setPage(page.getName())
+                        .setCustom(new Boolean(true))
+                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                        .setParentId(folderProfileEntry.getId()));
 
         // when
         getPageAPI().deletePage(page.getId());
@@ -542,10 +542,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                .setPage(page.getName())
-                .setCustom(true)
-                .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                .setParentId(folderProfileEntry.getId()));
+                        .setPage(page.getName())
+                        .setCustom(true)
+                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                        .setParentId(folderProfileEntry.getId()));
 
         getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")
@@ -632,7 +632,7 @@ public class PageAPIIT extends CommonAPISPTest {
         // given
         final int expectedResultSize = 5;
         for (int i = 0; i < expectedResultSize + 3; i++) {
-            final String generateUniquePageName = generateUniquePageName();
+            final String generateUniquePageName = generateUniquePageName() + 1;
             final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION);
             getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
                     pageContent);
