@@ -31,9 +31,15 @@
         <jboss.lib.dir>${jboss.default.dir}/lib</jboss.lib.dir>
         <invoker.port>4411</invoker.port>
 
+        <bonita.home>${jboss.home}/bonita</bonita.home>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
 
         <db.vendor>h2</db.vendor>
+
+        <cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+        <invoker.port>4422</invoker.port>
+        <!-- -Xdebug -->
+        <!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
     </properties>
 
     <dependencies>
@@ -152,7 +158,8 @@
                                                 <get src="${jboss.url}" dest="${jboss.zip.folder}/${jboss.name}.zip"/>
                                             </then>
                                         </if>
-                                        <unzip dest="${project.build.directory}" src="${env.HOME}/${jboss.name}.zip"/>
+                                        <unzip dest="${project.build.directory}"
+                                               src="${jboss.zip.folder}/${jboss.name}.zip"/>
 
                                         <!-- Update database configuration -->
                                         <property file="jboss/${db.vendor}/database.properties"/>
@@ -313,7 +320,6 @@
                     <plugin>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-maven2-plugin</artifactId>
-                        <version>1.2.2</version>
                         <executions>
                             <execution>
                                 <id>start-container</id>
@@ -331,8 +337,10 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <wait>false</wait>
                             <container>
                                 <containerId>jboss51x</containerId>
+                                <type>installed</type>
                                 <home>${jboss.home}</home>
                                 <systemProperties>
                                     <bonita.home>${bonita.home}</bonita.home>
@@ -359,6 +367,7 @@
                                     <cargo.jboss.configuration>default</cargo.jboss.configuration>
                                     <cargo.servlet.port>${jboss.web.port}</cargo.servlet.port>
                                     <cargo.rmi.port>${provider.port}</cargo.rmi.port>
+                                    <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
                                     <cargo.jboss.jrmp.invoker.port>${invoker.port}</cargo.jboss.jrmp.invoker.port>
                                 </properties>
                                 <configfiles>
@@ -368,7 +377,6 @@
                                     </configfile>
                                 </configfiles>
                             </configuration>
-                            <wait>false</wait>
                         </configuration>
                     </plugin>
                 </plugins>

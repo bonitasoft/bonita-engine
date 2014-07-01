@@ -333,6 +333,7 @@
                         <configuration>
                             <container>
                                 <containerId>tomcat7x</containerId>
+                                <type>installed</type>
                                 <home>${tomcat.home}</home>
                                 <systemProperties>
                                     <bonita.home>${bonita.home}</bonita.home>
@@ -357,8 +358,8 @@
                                     <cargo.servlet.port>${provider.port}</cargo.servlet.port>
                                     <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
                                 </properties>
-                                <wait>false</wait>
                             </configuration>
+                            <wait>false</wait>
                         </configuration>
                     </plugin>
                 </plugins>

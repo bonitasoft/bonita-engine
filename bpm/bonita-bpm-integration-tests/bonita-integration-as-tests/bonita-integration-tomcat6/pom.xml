@@ -366,6 +366,7 @@
                         <configuration>
                             <container>
                                 <containerId>tomcat6x</containerId>
+                                <type>installed</type>
                                 <home>${tomcat.home}</home>
                                 <systemProperties>
                                     <bonita.home>${bonita.home}</bonita.home>
