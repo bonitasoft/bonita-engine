@@ -38,6 +38,7 @@ import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
+import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -77,6 +78,9 @@ public class JDBCJobListener extends AbstractJobListener {
     @Override
     public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
         final JobDetail jobDetail = context.getJobDetail();
+        if (isEmptyJob(context)) {
+            return;
+        }
         final Long jobDescriptorId = Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("jobId"));
         try {
             if (jobException != null) {
@@ -98,6 +102,17 @@ public class JDBCJobListener extends AbstractJobListener {
         }
     }
 
+    private boolean isEmptyJob(final JobExecutionContext context) {
+        final Job instance = context.getJobInstance();
+        if (instance != null && instance instanceof QuartzJob) {
+            final QuartzJob job = (QuartzJob) instance;
+            if (job.getBosJob() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void createJobLog(final JobExecutionException jobException, final Long jobDescriptorId) throws SJobLogCreationException {
         final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
         jobLog.setLastMessage(getStackTrace(jobException));
@@ -114,7 +129,7 @@ public class JDBCJobListener extends AbstractJobListener {
     }
 
     private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorNotFoundException, SJobDescriptorReadException,
-            SSchedulerException {
+    SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         if (!getSchedulerService().isStillScheduled(jobDescriptor)) {
             getSchedulerService().delete(jobDescriptor.getJobName());

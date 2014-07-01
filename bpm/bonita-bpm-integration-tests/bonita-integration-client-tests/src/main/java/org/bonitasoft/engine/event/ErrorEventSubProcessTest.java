@@ -221,9 +221,8 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         // the parent process instance is supposed to be aborted, so no more waiting events are expected
         checkNumberOfWaitingEvents(subProcStartEventName, 0);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
+
         waitForProcessToFinish(subProcInst);
         waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 

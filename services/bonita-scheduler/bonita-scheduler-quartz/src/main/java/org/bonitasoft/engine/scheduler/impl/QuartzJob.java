@@ -32,7 +32,9 @@ public abstract class QuartzJob implements org.quartz.Job {
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
-            bosJob.execute();
+            if (bosJob != null) {
+                bosJob.execute();
+            }
         } catch (final SBonitaException e) {
             throw new JobExecutionException(e);
         }
