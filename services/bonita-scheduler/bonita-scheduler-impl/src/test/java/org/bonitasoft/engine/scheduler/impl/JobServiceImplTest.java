@@ -3,6 +3,7 @@ package org.bonitasoft.engine.scheduler.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -28,16 +29,27 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogNotFoundException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogReadException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterCreationException;
+import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDeletionException;
+import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterNotFoundException;
+import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterReadException;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
+import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +60,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
 public class JobServiceImplTest {
+
+    private static final long NUMBER_OF_JOBS = 15l;
 
     private static final int NEW_SIZE = 15;
 
@@ -102,6 +116,12 @@ public class JobServiceImplTest {
 
     @Mock
     private SBonitaSearchException sBonitaSearchException;
+
+    @Mock
+    private SJobLog sJobLog;
+
+    @Mock
+    private SFailedJob sFailedJob;
 
     @Before
     public void before() throws Exception {
@@ -212,6 +232,23 @@ public class JobServiceImplTest {
 
     }
 
+    @Test
+    public void deleteJobDescriptor_by_job_name() throws Exception {
+        final List<SJobDescriptor> jobDescriptors = new ArrayList<SJobDescriptor>();
+        for (int i = 0; i < NEW_SIZE; i++) {
+            jobDescriptors.add(sJobDescriptor);
+        }
+        //given
+        doReturn(jobDescriptors).when(jobService).searchJobDescriptors(any(QueryOptions.class));
+
+        //when
+        jobService.deleteJobDescriptorByJobName("jobName");
+
+        //then
+        verify(jobService, times(1)).deleteJobDescriptor(any(SJobDescriptor.class));
+
+    }
+
     @Test(expected = SJobDescriptorNotFoundException.class)
     public void deleteJobDescriptor_should_throw_not_found_exception() throws Exception {
         //given
@@ -237,7 +274,7 @@ public class JobServiceImplTest {
 
     @Test
     public void deleteJobDescriptor_withHandlers() throws Exception {
-        //given 
+        //given
         doReturn(true).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doReturn(sDeleteEvent).when(jobService).createDeleteEvent(any(PersistentObject.class), anyString());
 
@@ -252,7 +289,7 @@ public class JobServiceImplTest {
     @SuppressWarnings("unchecked")
     @Test(expected = SJobDescriptorReadException.class)
     public void getJobDescriptor_should_throw_exception() throws Exception {
-        //given 
+        //given
         doThrow(sBonitaReadException).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
 
         //when
@@ -265,7 +302,7 @@ public class JobServiceImplTest {
     @SuppressWarnings("unchecked")
     @Test
     public void getJobDescriptor_should_return_jobDescriptor() throws Exception {
-        //given 
+        //given
         doReturn(sJobDescriptor).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
 
         //when
@@ -374,9 +411,289 @@ public class JobServiceImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void createJobParameter_with_null_parameters_should_thro_wexception() throws Exception {
+    public void createJobParameter_with_null_parameters_should_throw_exception() throws Exception {
         //when
         jobService.createJobParameter(null, TENANT_ID, JOB_DESCRIPTOR_ID);
+
+        //then exception
+    }
+
+    @Test(expected = SJobParameterCreationException.class)
+    public void createJobParameter_should_throw_exception() throws Exception {
+        //given
+        doThrow(sRecorderException).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+        //when
+        jobService.createJobParameter(sJobParameter, TENANT_ID, JOB_DESCRIPTOR_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void deleteJobParameter() throws Exception {
+        //given
+        doReturn(sJobParameter).when(jobService).getJobParameter(anyLong());
+
+        //when
+        jobService.deleteJobParameter(1l);
+
+        //then exception
+        verify(jobService).deleteJobParameter(sJobParameter);
+        verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+    }
+
+    @Test(expected = SJobParameterDeletionException.class)
+    public void deleteJobParameter_should_throw_exception() throws Exception {
+        //given
+        doThrow(sRecorderException).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doReturn(sJobParameter).when(jobService).getJobParameter(anyLong());
+
+        //when
+        jobService.deleteJobParameter(1l);
+
+    }
+
+    @Test
+    public void getJobParameter() throws Exception {
+        //given
+        doReturn(sJobParameter).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        //when
+        final SJobParameter parameter = jobService.getJobParameter(1l);
+
+        //then
+        assertThat(parameter).isEqualTo(sJobParameter);
+
+    }
+
+    @Test(expected = SJobParameterNotFoundException.class)
+    public void getJobParameter_should_throw_exception_with_null_parameter() throws Exception {
+        //given
+        doReturn(null).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        //when
+        jobService.getJobParameter(1l);
+
+        //then exception
+
+    }
+
+    @Test(expected = SJobParameterReadException.class)
+    public void getJobParameter_should_throw_exception() throws Exception {
+        //given
+        doThrow(sBonitaReadException).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        //when
+        jobService.getJobParameter(1l);
+
+        //then exception
+
+    }
+
+    @Test
+    public void searchJobParameter() throws Exception {
+        //given
+        final List<SJobParameter> jobParameterList = new ArrayList<SJobParameter>();
+        for (int i = 0; i < NEW_SIZE; i++) {
+            jobParameterList.add(sJobParameter);
+        }
+        doReturn(jobParameterList).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+
+        //when
+        final List<SJobParameter> searchJobParameters = jobService.searchJobParameters(queryOptions);
+
+        //then
+        verify(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+        assertThat(searchJobParameters).hasSameSizeAs(jobParameterList);
+
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void searchJobParameter_should_throw_exception() throws Exception {
+        //given
+        doThrow(sBonitaReadException).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+
+        //when
+        jobService.searchJobParameters(queryOptions);
+
+        //then exception
+
+    }
+
+    @Test
+    public void createJobLog() throws Exception {
+        //when
+        jobService.createJobLog(sJobLog);
+
+        //then exception
+        verify(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+    }
+
+    @Test(expected = SJobLogCreationException.class)
+    public void createJobLog_should_throw_exception() throws Exception {
+        //given
+        doThrow(sRecorderException).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+        //when
+        jobService.createJobLog(sJobLog);
+
+        //then exception
+    }
+
+    @Test
+    public void deleteJobLog() throws Exception {
+        //when
+        jobService.deleteJobLog(sJobLog);
+
+        //then exception
+        verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+    }
+
+    @Test
+    public void deleteJobLogById() throws Exception {
+        //given
+        doReturn(sJobLog).when(jobService).getJobLog(anyLong());
+
+        //when
+
+        jobService.deleteJobLog(1l);
+
+        //then exception
+        verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+    }
+
+    @Test(expected = SJobLogDeletionException.class)
+    public void deleteJobLog_should_throw_exception() throws Exception {
+        //given
+        doThrow(sRecorderException).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+        //when
+        jobService.deleteJobLog(sJobLog);
+
+        //then exception
+    }
+
+    @Test
+    public void getJobLog() throws Exception {
+        //given
+        doReturn(sJobLog).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        //when
+        final SJobLog parameter = jobService.getJobLog(1l);
+
+        //then
+        assertThat(parameter).isEqualTo(sJobLog);
+
+    }
+
+    @Test(expected = SJobLogNotFoundException.class)
+    public void getJobLog_should_throw_exception_with_null_parameter() throws Exception {
+        //given
+        doReturn(null).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        //when
+        jobService.getJobLog(1l);
+
+        //then exception
+
+    }
+
+    @Test(expected = SJobLogReadException.class)
+    public void getJobLog_should_throw_exception() throws Exception {
+        //given
+        doThrow(sBonitaReadException).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        //when
+        jobService.getJobLog(1l);
+
+        //then exception
+
+    }
+
+    @Test
+    public void getNumberOfJobLog() throws Exception {
+        //given
+        doReturn(NUMBER_OF_JOBS).when(readPersistenceService).getNumberOfEntities(any(Class.class), any(QueryOptions.class),
+                anyMapOf(String.class, Object.class));
+
+        //when
+        final long numberOfJobLogs = jobService.getNumberOfJobLogs(queryOptions);
+
+        //then
+        assertThat(numberOfJobLogs).isEqualTo(15l);
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void getNumberOfJobLog_should_throw_exception() throws Exception {
+        //given
+        doThrow(sBonitaReadException).when(readPersistenceService).getNumberOfEntities(any(Class.class), any(QueryOptions.class),
+                anyMapOf(String.class, Object.class));
+
+        //when
+        jobService.getNumberOfJobLogs(queryOptions);
+
+        //then exception
+    }
+
+    @Test
+    public void searchJobLog() throws Exception {
+        //given
+        final List<SJobLog> JobLogList = new ArrayList<SJobLog>();
+        for (int i = 0; i < NEW_SIZE; i++) {
+            JobLogList.add(sJobLog);
+        }
+        doReturn(JobLogList).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+
+        //when
+        final List<SJobLog> searchJobLogs = jobService.searchJobLogs(queryOptions);
+
+        //then
+        verify(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+        assertThat(searchJobLogs).hasSameSizeAs(JobLogList);
+
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void searchJobLog_should_throw_exception() throws Exception {
+        //given
+        doThrow(sBonitaReadException).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+
+        //when
+        jobService.searchJobLogs(queryOptions);
+
+        //then exception
+
+    }
+
+    @Test
+    public void getFailedJobs() throws Exception {
+        //given
+        final List<SFailedJob> failedJobList = new ArrayList<SFailedJob>();
+        for (int i = 0; i < NEW_SIZE; i++) {
+            failedJobList.add(sFailedJob);
+        }
+        doReturn(failedJobList).when(readPersistenceService).selectList(any(SelectListDescriptor.class));
+
+        //when
+        final List<SFailedJob> returnedList = jobService.getFailedJobs(1, 10);
+
+        //then
+        verify(readPersistenceService).selectList(any(SelectListDescriptor.class));
+        assertThat(returnedList).hasSameSizeAs(failedJobList);
+
+    }
+
+    @Test(expected = SFailedJobReadException.class)
+    public void getFailedJobs_should_throw_exception() throws Exception {
+        //given
+        doThrow(sBonitaReadException).when(readPersistenceService).selectList(any(SelectListDescriptor.class));
+
+        //when
+        jobService.getFailedJobs(1, 10);
 
         //then exception
     }
