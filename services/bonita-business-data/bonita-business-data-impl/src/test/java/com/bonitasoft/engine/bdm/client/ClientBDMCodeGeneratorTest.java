@@ -1,7 +1,5 @@
 package com.bonitasoft.engine.bdm.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -12,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
+import org.assertj.core.util.FilesException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +28,8 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     private static final String EMPLOYEE_QUALIFIED_NAME = "org.bonitasoft.hr.Employee";
@@ -41,7 +42,12 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void setUp() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        destDir = Files.newTemporaryFolder();
+        try {
+            destDir = Files.newTemporaryFolder();
+        } catch (final FilesException fe) {
+            System.err.println("Seems we cannot create temporary folder. Retrying...");
+            destDir = Files.newTemporaryFolder();
+        }
     }
 
     @After
