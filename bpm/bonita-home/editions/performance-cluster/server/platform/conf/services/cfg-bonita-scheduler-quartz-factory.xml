@@ -11,6 +11,7 @@
 				<prop key="org.quartz.jobStore.clusterCheckinInterval">10000</prop>
 			</props>
 		</constructor-arg>
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>
