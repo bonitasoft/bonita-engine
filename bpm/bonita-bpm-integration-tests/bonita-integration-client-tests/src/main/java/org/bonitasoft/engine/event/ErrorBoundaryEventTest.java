@@ -20,9 +20,11 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
@@ -173,7 +175,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
+    "event" }, jira = "ENGINE-501")
     public void uncaughtThrowErrorEvent() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1", "delivery");
         // catch a different error
@@ -198,7 +200,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
+    "event" }, jira = "ENGINE-501")
     public void errorEventCaughtAtParentLevel2() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1", "delivery");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
@@ -231,7 +233,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
+    "event" }, jira = "ENGINE-501")
     public void errorEventTwoCatchErrorMatching() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1", "delivery");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
@@ -264,4 +266,58 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
         disableAndDeleteProcess(procDefLevel0, procDefLevel1, procDefLevel2);
     }
+
+    @Test
+    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class, MultiInstanceActivityInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = {
+            "error", "boundary", "event", "call activity", "mutliple instance" }, jira = "ENGINE-9023")
+    public void errorCodeThrownBySubProcessShouldBeCatchByMainProcess() throws Exception {
+        final ProcessDefinition subProcess = deployAndEnableSubProcessWhichThrowsAnErrorEvent("SubProcess", "Mistake");
+        final ProcessDefinition midProcess = deployAndEnableMidProcessWhichContainsACallActivity("MidProcess", "SubProcess");
+        final ProcessDefinition mainProcess = deployAndEnableProcessWithBoundaryErrorEventOnMICallActivity("Process", "MidProcess", "Mistake", "acme");
+
+        final ProcessInstance instance = getProcessAPI().startProcess(mainProcess.getId());
+        waitForFlowNodeInReadyState(instance, "exceptionStep", true);
+        waitForFlowNodeInState(instance, "step1", TestStates.getAbortedState(), false);
+
+        disableAndDeleteProcess(mainProcess, midProcess, subProcess);
+    }
+
+    private ProcessDefinition deployAndEnableSubProcessWhichThrowsAnErrorEvent(final String processName, final String errorCode)
+            throws BonitaException {
+        final ProcessDefinitionBuilder process = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        process.addStartEvent("start");
+        process.addEndEvent("end").addErrorEventTrigger(errorCode);
+        process.addTransition("start", "end");
+        return deployAndEnableProcess(process.done());
+    }
+
+    private ProcessDefinition deployAndEnableMidProcessWhichContainsACallActivity(final String processName, final String targetProcessName)
+            throws BonitaException {
+        final ProcessDefinitionBuilder process = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        process.addStartEvent("start");
+        process.addCallActivity("ca",
+                new ExpressionBuilder().createConstantStringExpression(targetProcessName), new ExpressionBuilder().createConstantStringExpression("1.0"));
+        process.addEndEvent("end");
+        process.addTransition("start", "ca");
+        process.addTransition("ca", "end");
+        return deployAndEnableProcess(process.done());
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithBoundaryErrorEventOnMICallActivity(final String processName, final String targetProcessName,
+            final String errorCode, final String actorName) throws BonitaException {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        processDefinitionBuilder.addActor(actorName);
+        processDefinitionBuilder.addStartEvent("start");
+        final CallActivityBuilder callActivityBuilder = processDefinitionBuilder.addCallActivity("step1",
+                new ExpressionBuilder().createConstantStringExpression(targetProcessName), new ExpressionBuilder().createConstantStringExpression("1.0"));
+        callActivityBuilder.addBoundaryEvent("error", true).addErrorEventTrigger(errorCode);
+        callActivityBuilder.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(1));
+        processDefinitionBuilder.addUserTask("step2", actorName);
+        processDefinitionBuilder.addUserTask("exceptionStep", actorName);
+        processDefinitionBuilder.addTransition("start", "step1");
+        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("error", "exceptionStep");
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
+    }
+
 }

@@ -163,12 +163,17 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<SJobParameter> setJobParameters(final long tenantId, final long jobDescriptorId, final List<SJobParameter> parameters)
             throws SJobParameterCreationException {
+        deleteAllJobParameters(jobDescriptorId);
+        return createJobParameters(parameters, tenantId, jobDescriptorId);
+    }
+
+    protected void deleteAllJobParameters(final long jobDescriptorId) throws SJobParameterCreationException {
         try {
             final int limit = 100;
             final List<FilterOption> filters = new ArrayList<FilterOption>(1);
 
             filters.add(new FilterOption(SJobParameter.class, "jobDescriptorId", jobDescriptorId));
-            List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
+            final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SJobParameter.class, "id", OrderByType.ASC));
             final QueryOptions options = new QueryOptions(0, limit, orderByOptions, filters, null);
             List<SJobParameter> jobParameters = null;
             do {
@@ -180,7 +185,6 @@ public class JobServiceImpl implements JobService {
         } catch (final SBonitaException sbe) {
             throw new SJobParameterCreationException(sbe);
         }
-        return createJobParameters(parameters, tenantId, jobDescriptorId);
     }
 
     @Override
@@ -301,18 +305,30 @@ public class JobServiceImpl implements JobService {
         final DeleteRecord deleteRecord = new DeleteRecord(persistentObject);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(eventType, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(eventType).setObject(persistentObject).done();
+            deleteEvent = createDeleteEvent(persistentObject, eventType);
         }
         recorder.recordDelete(deleteRecord, deleteEvent);
+    }
+
+    protected SDeleteEvent createDeleteEvent(final PersistentObject persistentObject, final String eventType) {
+        return (SDeleteEvent) getEventBuilderFactory().createDeleteEvent(eventType).setObject(persistentObject).done();
     }
 
     private void create(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(persistentObject);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(eventType, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(eventType).setObject(persistentObject).done();
+            insertEvent = createInsertEvent(persistentObject, eventType);
         }
         recorder.recordInsert(insertRecord, insertEvent);
+    }
+
+    protected SInsertEvent createInsertEvent(final PersistentObject persistentObject, final String eventType) {
+        return (SInsertEvent) getEventBuilderFactory().createInsertEvent(eventType).setObject(persistentObject).done();
+    }
+
+    protected SEventBuilderFactory getEventBuilderFactory() {
+        return BuilderFactory.get(SEventBuilderFactory.class);
     }
 
     @Override
@@ -326,17 +342,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void deleteJobDescriptorByJobName(String jobName) throws SJobDescriptorDeletionException {
+    public void deleteJobDescriptorByJobName(final String jobName) throws SJobDescriptorDeletionException {
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
         final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
         try {
-            List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
+            final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
             if (!jobDescriptors.isEmpty()) {
                 final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
                 deleteJobDescriptor(sJobDescriptor);
             }
-        } catch (SBonitaSearchException e) {
+        } catch (final SBonitaSearchException e) {
             throw new SJobDescriptorDeletionException("Job " + jobName + " not found, can't delete corresponding job descriptor");
         }
     }

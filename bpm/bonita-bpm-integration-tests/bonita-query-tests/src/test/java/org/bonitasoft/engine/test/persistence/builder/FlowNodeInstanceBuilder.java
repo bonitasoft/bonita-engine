@@ -50,7 +50,7 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
     protected Long tokenRefId;
 
     @Override
-    protected T fill(T persistent) {
+    protected T fill(final T persistent) {
         super.fill(persistent);
         persistent.setDeleted(deleted);
         persistent.setDescription(description);
@@ -110,17 +110,17 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
         return thisBuilder;
     }
 
-    public B withId(long id) {
+    public B withId(final long id) {
         this.id = id;
         return thisBuilder;
     }
 
-    public B withName(String name) {
+    public B withName(final String name) {
         this.name = name;
         return thisBuilder;
     }
 
-    public B withStateName(String stateName) {
+    public B withStateName(final String stateName) {
         this.stateName = stateName;
         return thisBuilder;
     }

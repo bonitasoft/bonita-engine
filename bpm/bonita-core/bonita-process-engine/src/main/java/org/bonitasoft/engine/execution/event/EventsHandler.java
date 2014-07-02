@@ -39,6 +39,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -74,10 +75,10 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
  * * Move all code that instantiate process/execute flow node after a event was triggered here + make it call reachedCatchEvent
  * * For event sub process: the instantiate process must cancel all activities then instantiate the process
  * * the instantiate event subprocess method is like the start of the process executor but with less things: factorise it
- * * check that there is no execution issues with event sub proces (add more test)
+ * * check that there is no execution issues with event sub process (add more test)
  * * add test for each kind of start event in event sub process
  * * try to trigger event subprocess with multiple events
- * 
+ *
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
@@ -105,7 +106,8 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final ProcessInstanceService processInstanceService, final TokenService tokenService, final TechnicalLoggerService logger) {
+            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TokenService tokenService,
+            final TechnicalLoggerService logger) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -120,7 +122,8 @@ public class EventsHandler {
         handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
-        handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, containerRegistry,
+        handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
+                containerRegistry,
                 processDefinitionService, this, logger));
     }
 
@@ -134,7 +137,7 @@ public class EventsHandler {
      * e.g. we are going on a catch event in the flow of a process
      * This is different of trigger catch event:
      * e.g. for a message handleCatchEvent will create the waiting event and triggerCatchEvent is called when the message is received
-     * 
+     *
      * @param processDefinition
      * @param eventDefinition
      * @param eventInstance
@@ -162,7 +165,7 @@ public class EventsHandler {
      * e.g. we are going on a catch event in the flow of a process
      * This is different of trigger catch event:
      * e.g. for a message handleCatchEvent will create the waiting event and triggerCatchEvent is called when the message is received
-     * 
+     *
      * @param processDefinition
      * @param eventDefinition
      * @param eventInstance
@@ -213,7 +216,7 @@ public class EventsHandler {
 
     /**
      * called when we reach a throw event in the flow of a process
-     * 
+     *
      * @param processDefinition
      * @param eventDefinition
      * @param eventInstance
@@ -269,7 +272,7 @@ public class EventsHandler {
 
     /**
      * called when a BPM event is triggered by the API
-     * 
+     *
      * @param sEventTriggerDefinition
      * @throws SBonitaException
      */
@@ -283,7 +286,7 @@ public class EventsHandler {
     /**
      * When a trigger is 'launched' the catch event is reached and is waken up/created using its waiting event
      * Depending on the type it will execute the catch event of instantiate the process/subprocess
-     * 
+     *
      * @param waitingEvent
      * @param triggeringElementID
      * @throws SBonitaException
@@ -343,7 +346,7 @@ public class EventsHandler {
                     eventInstanceService.deleteWaitingEvent(waitingEvent);
                     executeFlowNode(flowNodeInstanceId, operations, waitingEvent.getParentProcessInstanceId());
                 } else {
-                    long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
+                    final long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
                     executeFlowNode(flowNodeInstanceId, operations, processInstanceId);
                 }
                 break;
@@ -368,14 +371,14 @@ public class EventsHandler {
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
-            TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(processInstanceService, eventInstanceService,
+            final TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(processInstanceService,
+                    eventInstanceService,
                     processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
                 null, null, subProcflowNodeInstance.getId(), subProcessId);
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
-
     }
 
     public void triggerCatchEvent(final String eventType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,

@@ -21,6 +21,7 @@
 				<prop key="org.quartz.jobStore.misfireThreshold">2000</prop>
 			</props>
 		</constructor-arg>
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">

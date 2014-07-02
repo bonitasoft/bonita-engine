@@ -60,5 +60,9 @@
    <bean id="userInfoRepository" class="org.bonitasoft.engine.test.persistence.repository.CustomUserInfoRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
+
+   <bean id="flowNodeInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
   
 </beans>
