@@ -19,68 +19,63 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class FlowNodeTransitionsWrapper {
-    
+
     //TODO: calculate the value of this three attributes in this class
-    
+
     private int inputTransitionsSize;
-    
+
     private List<STransitionDefinition> allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
-    
+
     private List<STransitionDefinition> validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
-    
+
     public int getInputTransitionsSize() {
         return inputTransitionsSize;
     }
 
-    
-    public void setInputTransitionsSize(int inputTransitionsSize) {
+    public void setInputTransitionsSize(final int inputTransitionsSize) {
         this.inputTransitionsSize = inputTransitionsSize;
     }
 
-    
     public List<STransitionDefinition> getAllOutgoingTransitionDefinitions() {
         return allOutgoingTransitionDefinitions;
     }
 
-    public void setAllOutgoingTransitionDefinitions(List<STransitionDefinition> allOutgoingTransitionDefinitions) {
-        if(allOutgoingTransitionDefinitions != null) {
+    public void setAllOutgoingTransitionDefinitions(final List<STransitionDefinition> allOutgoingTransitionDefinitions) {
+        if (allOutgoingTransitionDefinitions != null) {
             this.allOutgoingTransitionDefinitions = allOutgoingTransitionDefinitions;
         } else {
             this.allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
         }
     }
 
-    
     public List<STransitionDefinition> getValidOutgoingTransitionDefinitions() {
         return validOutgoingTransitionDefinitions;
     }
 
-    public void setValidOutgoingTransitionDefinitions(List<STransitionDefinition> validOutgoingTransitionDefinitions) {
-        if(validOutgoingTransitionDefinitions != null) {
+    public void setValidOutgoingTransitionDefinitions(final List<STransitionDefinition> validOutgoingTransitionDefinitions) {
+        if (validOutgoingTransitionDefinitions != null) {
             this.validOutgoingTransitionDefinitions = validOutgoingTransitionDefinitions;
         } else {
             this.validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
         }
     }
-    
+
     public boolean isLastFlowNode() {
         return validOutgoingTransitionDefinitions == null || validOutgoingTransitionDefinitions.isEmpty();
     }
-    
+
     public boolean hasMultipleOutgoingTransitions() {
         return hasMultipleElements(allOutgoingTransitionDefinitions);
     }
 
-    private boolean hasMultipleElements(Collection<?> collection) {
+    private boolean hasMultipleElements(final Collection<?> collection) {
         return collection != null && collection.size() > 1;
     }
-    
+
     public boolean hasMultipleIncomingTransitions() {
         return inputTransitionsSize > 1;
     }
@@ -91,6 +86,7 @@ public class FlowNodeTransitionsWrapper {
 
     /**
      * from 0 or 1 input transition to one outgoing transition
+     * 
      * @return true for flow node with 0 or 1 input transition and one outgoing transitions
      * @since 6.2
      */
@@ -98,13 +94,13 @@ public class FlowNodeTransitionsWrapper {
         return !hasMultipleIncomingTransitions() && hasOneElement();
     }
 
-
     private boolean hasOneElement() {
-        return allOutgoingTransitionDefinitions.size() == 1;
+        return allOutgoingTransitionDefinitions.size() == 1 || allOutgoingTransitionDefinitions.isEmpty() && validOutgoingTransitionDefinitions.size() == 1;
     }
 
     /**
      * from 0 or 1 input transition to more than one outgoing transitions
+     * 
      * @return true for flow node with 0 or 1 input transition and more than one outgoing transitions
      * @since 6.2
      */
@@ -112,14 +108,14 @@ public class FlowNodeTransitionsWrapper {
         return !hasMultipleIncomingTransitions() && hasMultipleOutgoingTransitions();
     }
 
-
     /**
      * from more than 1 input transition to one outgoing transition
+     * 
      * @return true for flow node with more than 1 input transition and one outgoing transitions
      * @since 6.2
      */
     public boolean isManyToOne() {
         return hasMultipleIncomingTransitions() && hasOneElement();
     }
-    
+
 }

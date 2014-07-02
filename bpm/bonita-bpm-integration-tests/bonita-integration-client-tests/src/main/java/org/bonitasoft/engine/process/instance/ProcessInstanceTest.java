@@ -340,7 +340,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     public void getSingleChildInstanceOfProcessInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("SubProcessInAInstance", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addAutomaticTask("step1").addAutomaticTask("step2")
-        .addUserTask("userSubTask", ACTOR_NAME).addTransition("step1", "userSubTask").addTransition("userSubTask", "step2");
+                .addUserTask("userSubTask", ACTOR_NAME).addTransition("step1", "userSubTask").addTransition("userSubTask", "step2");
 
         final ProcessDefinition subProcess = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, pedro);
 
@@ -349,14 +349,14 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         final ProcessDefinitionBuilder builderProc = new ProcessDefinitionBuilder().createNewInstance("executeInstanceSequentialWithSubProcess", "1.1");
         builderProc.addActor(ACTOR_NAME).addStartEvent("start")
-        .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+                .addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         builderProc.addAutomaticTask("step3").addEndEvent("end").addTransition("start", "callActivity").addTransition("callActivity", "step3")
-        .addUserTask("userTask", ACTOR_NAME).addTransition("step3", "userTask").addTransition("userTask", "end");
+                .addUserTask("userTask", ACTOR_NAME).addTransition("step3", "userTask").addTransition("userTask", "end");
 
-        DesignProcessDefinition processDefinition = builderProc.done();
+        final DesignProcessDefinition processDefinition = builderProc.done();
         final ProcessDefinition mainProcess = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, pedro);
         final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
-        HumanTaskInstance userTask = waitForUserTask("userSubTask");
+        final HumanTaskInstance userTask = waitForUserTask("userSubTask");
 
         final List<Long> ids = getProcessAPI().getChildrenInstanceIdsOfProcessInstance(processInstance.getId(), 0, 10, ProcessInstanceCriterion.DEFAULT);
         assertThat(ids).isNotEmpty().hasSize(1).containsExactly(userTask.getParentProcessInstanceId());
@@ -539,22 +539,21 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         final User managerOfJack = createUser(new UserCreator("managerOfJack", "bpm"));
         final User jack = createUser(new UserCreator("jack", "bpm").setManagerUserId(managerOfJack.getId()));
-        Group jackGroup = createGroup("jackGroup", null);
-        Role jackRole = createRole("jackRole");
+        final Group jackGroup = createGroup("jackGroup", null);
+        final Role jackRole = createRole("jackRole");
         getIdentityAPI().addUserMembership(jack.getId(), jackGroup.getId(), jackRole.getId());
 
         final User managerOfJames = createUser(new UserCreator("managerOfJames", "bpm"));
         final User james = createUser(new UserCreator("james", "bpm").setManagerUserId(managerOfJames.getId()));
-        Group jamesGroup = createGroup("jamesGroup", null);
-        Role jamesRole = createRole("jamesRole");
+        final Group jamesGroup = createGroup("jamesGroup", null);
+        final Role jamesRole = createRole("jamesRole");
         getIdentityAPI().addUserMembership(james.getId(), jamesGroup.getId(), jamesRole.getId());
 
         final User managerOfToto = createUser(new UserCreator("managerOfToto", "bpm"));
         final User toto = createUser(new UserCreator("toto", "bpm").setManagerUserId(managerOfToto.getId()));
-        Group totoGroup = createGroup("totoGroup", null);
-        Role totoRole = createRole("totoRole");
+        final Group totoGroup = createGroup("totoGroup", null);
+        final Role totoRole = createRole("totoRole");
         getIdentityAPI().addUserMembership(toto.getId(), totoGroup.getId(), totoRole.getId());
-
 
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder1.addActor(ACTOR_NAME);
@@ -567,7 +566,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
 
         //map user, group, role, and membership to that actor
-        ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
+        final ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
         getProcessAPI().addUserToActor(actor.getId(), john.getId());
         getProcessAPI().addGroupToActor(actor.getId(), jackGroup.getId());
         getProcessAPI().addRoleToActor(actor.getId(), jamesRole.getId());
@@ -706,7 +705,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
             for (final Comment comment : comments) {
                 haveCommentForDelegate = haveCommentForDelegate
                         || comment.getContent()
-                        .contains("The user " + USERNAME + " acting as delegate of the user " + otherUserName + " has started the case.");
+                                .contains("The user " + USERNAME + " acting as delegate of the user " + otherUserName + " has started the case.");
             }
             assertTrue(haveCommentForDelegate);
         } finally {
@@ -809,7 +808,6 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     }
 
     @Test
-    @Ignore("Uncomment when fix the bug BS-9055")
     public void runProcessInstanceWithDefaultFlownode_should_pass_all_human_task() throws Exception {
         logoutThenloginAs("pedro", "secreto");
 
@@ -835,7 +833,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
-        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
         waitForUserTaskAndExecuteIt("step2", pi, pedro);
 
@@ -853,7 +851,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
-        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
         waitForUserTaskAndExecuteIt("step3", pi, pedro);
 
@@ -869,9 +867,9 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 addTransition("step1", "step2").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(pedro));
-        ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", pi, pedro);
-        long nbDeleted = getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);
+        final long nbDeleted = getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);
 
         // there is one archived process instance deleted because the former process_instance state has been archived
         assertThat(nbDeleted).isEqualTo(1);
