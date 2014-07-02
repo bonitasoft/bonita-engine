@@ -1,6 +1,6 @@
 <project name="bonita-engine-SP-home" default="hibernate">
 
-	<property name="bos_home" value="../../../bonita-engine/bpm/bonita-home"/>
+	<property name="bos_home" value="../../../BOS/bpm/bonita-home"/>
 
 	<target name="hibernate">
 		<delete dir="${basedir}/target/home" />
