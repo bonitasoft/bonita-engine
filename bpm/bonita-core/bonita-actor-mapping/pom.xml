@@ -17,6 +17,5 @@
 	<modules>
 		<module>bonita-actor-mapping-api</module>
 		<module>bonita-actor-mapping-impl</module>
-		<module>bonita-actor-mapping-impl-hibernate</module>
 	</modules>
 </project>

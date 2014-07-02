@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013-2014 Bonitasoft S.A.
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,8 +19,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
+ * Wraps a Bonita job.
+ *
  * @author Matthieu Chaffotte
- * @author Baptsite Mesta : the bos job is set before the execution.
+ * @author Baptsite Mesta
  * @author Celine Souchet
  */
 public abstract class QuartzJob implements org.quartz.Job {
@@ -30,7 +32,9 @@ public abstract class QuartzJob implements org.quartz.Job {
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
-            bosJob.execute();
+            if (bosJob != null) {
+                bosJob.execute();
+            }
         } catch (final SBonitaException e) {
             throw new JobExecutionException(e);
         }

@@ -26,26 +26,18 @@ public class ListAdder extends BonitaWork {
 
     private final String toAdd;
 
-    private final long delay;
-
-    public ListAdder(final List<String> arrayList, final String toAdd, final long delay) {
+    public ListAdder(final List<String> arrayList, final String toAdd) {
         list = arrayList;
         this.toAdd = toAdd;
-        this.delay = delay;
     }
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
+        return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString();
     }
 
     @Override
     public void work(final Map<String, Object> context) {
-        try {
-            Thread.sleep(delay);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
         list.add(toAdd);
     }
 

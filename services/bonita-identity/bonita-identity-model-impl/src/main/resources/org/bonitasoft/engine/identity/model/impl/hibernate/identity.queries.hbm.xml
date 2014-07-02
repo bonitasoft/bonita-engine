@@ -70,20 +70,13 @@
 		AND group_.parentPath = :parentPath
 	</query>
 
-	<query name="getGroupsByName">
-		SELECT group_
-		FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
-		WHERE group_.name = :name
-	</query>
-
 	<query name="getCustomUserInfoDefinitionByName">
         SELECT custom_usr_inf_def
         FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
         WHERE custom_usr_inf_def.name = :name
     </query>
 
-<!--	Users -->
-
+	<!--	Users -->
 	<query name="getUsersByIds">
 		SELECT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
@@ -95,7 +88,6 @@
 		SELECT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
 		WHERE user.userName IN (:userNames)
-		ORDER BY user.userName
 	</query>
 
 	<query name="getUsers">
@@ -132,14 +124,6 @@
 		SELECT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
 		WHERE user.managerUserId = :managerUserId
-		ORDER BY user.userName
-	</query>
-
-	<query name="getUsersByDelegee">
-		SELECT user
-		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-		WHERE user.delegeeUserName = :delegeeUserName
-		ORDER BY user.userName
 	</query>
 
 	<query name="getUserContactInfo">
@@ -149,7 +133,7 @@
 		AND personal = :personal
 	</query>
 
-<!--	 Roles -->
+	<!--	 Roles -->
 	<query name="getRoles">
 		SELECT role
 		FROM org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role 
@@ -163,9 +147,7 @@
 		ORDER BY role.name
 	</query>
 
-<!--	 groups -->
-
- 
+	<!--	 Groups -->
 	<query name="getGroupsByIds">
 		SELECT group_
 		FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
@@ -395,6 +377,30 @@
 		WHERE user_membership.roleId = role.id 
 		AND user_membership.groupId = group_.id 
 		AND user_membership.userId = user.id
+	</query>
+	
+	<query name="getUserIdsWithCustomUserInfo">
+		SELECT user.id
+  		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS infoDef, 
+  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS infoValue
+ 		WHERE infoValue.userId = user.id
+ 			AND infoValue.definitionId = infoDef.id  
+ 			AND infoDef.name = :userInfoName
+ 			AND infoValue.value = :userInfoValue
+ 		ORDER BY user.id
+	</query>
+
+	<query name="getUserIdsWithCustomUserInfoContains">
+		SELECT user.id
+  		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS infoDef, 
+  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS infoValue
+ 		WHERE infoValue.userId = user.id
+ 			AND infoValue.definitionId = infoDef.id  
+ 			AND infoDef.name = :userInfoName
+ 			AND infoValue.value like :userInfoValue
+ 		ORDER BY user.id
 	</query>
 
 </hibernate-mapping>

@@ -307,7 +307,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         try {
             List<SDataInstanceVisibilityMapping> visibilityMappings;
             do {
-                visibilityMappings = getDataInstanceVisibilityMappings(containerId, containerType, 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+                visibilityMappings = getDataInstanceVisibilityMappings(containerId, containerType, 0, 100);
                 for (final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping : visibilityMappings) {
                     deleteDataInstanceVisibilityMapping(sDataInstanceVisibilityMapping);
                 }
@@ -433,24 +433,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        }
-    }
-
-    @Override
-    public List<SADataInstance> getSADataInstances(final long dataInstanceId) throws SDataInstanceReadException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-        try {
-            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put("dataInstanceId", dataInstanceId);
-            final List<SADataInstance> listSADataInstance = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
-                    "getSADataInstanceByDataInstanceId", parameters, SADataInstance.class, new QueryOptions(Collections.singletonList(new OrderByOption(
-                            SADataInstance.class, BuilderFactory.get(SDataInstanceBuilderFactory.class).getArchiveDateKey(), OrderByType.DESC)))));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-            return listSADataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
             throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }

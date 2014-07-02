@@ -246,7 +246,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         final Category category = getProcessAPI().createCategory(name, description);
         categories.add(category);
         // test
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertEquals(0, processDeploymentInfos.size());
     }
 
@@ -304,7 +305,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         processDefinitions.add(processDefinition);
         // test
         getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null).get(0);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC).get(0);
         assertEquals(processDefinition.getName(), processDeploymentInfo.getName());
         assertEquals(processDefinition.getVersion(), processDeploymentInfo.getVersion());
     }
@@ -341,7 +343,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         }
         // test
         getProcessAPI().addProcessDefinitionsToCategory(categoryId, processDefinitionIds);
-        final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
         assertNotNull(processDeploymentInfoList);
         assertEquals(3, processDeploymentInfoList.size());
     }
@@ -537,7 +540,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
         getProcessAPI().removeAllProcessDefinitionsFromCategory(category.getId());
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertNotNull(processDeploymentInfos);
         assertEquals(0, processDeploymentInfos.size());
     }
@@ -557,7 +561,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
         getProcessAPI().removeProcessDefinitionsFromCategory(category.getId(), 0, 2);
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertNotNull(processDeploymentInfos);
         assertEquals(1, processDeploymentInfos.size());
     }

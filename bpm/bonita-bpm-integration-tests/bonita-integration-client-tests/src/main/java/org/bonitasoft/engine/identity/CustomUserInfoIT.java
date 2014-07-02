@@ -182,8 +182,7 @@ public class CustomUserInfoIT extends CommonAPITest {
         assertThat(values.getCount()).isEqualTo(0);
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
-            "Custom user info value", "User deletion" })
+    @Cover(classes = { CustomUserInfoValue.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info value", "User deletion" })
     @Test
     public void deleteUser_should_delete_related_custom_user_info_value_from_database() throws Exception {
         // given
@@ -209,4 +208,27 @@ public class CustomUserInfoIT extends CommonAPITest {
         return getIdentityAPI().createCustomUserInfoDefinition(creator);
     }
 
+    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoValue.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-8842", keywords = { "Custom user info value", "Users" })
+    @Test
+    public void getUserIdsWithCustomUserInfo_should_return_only_users_with_the_given_user_info() throws Exception {
+        //given
+        User user2 = createUser("jack", "bpm");
+        CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
+        getIdentityAPI().setCustomUserInfoValue(info.getId(), user.getId(), "Java");
+        getIdentityAPI().setCustomUserInfoValue(info.getId(), user2.getId(), "C++");
+        
+        //when
+        List<Long> userIdsExactMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "C++", false, 0, 10);
+        List<Long> userIdsExactMatchNoResults = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", false, 0, 10);
+        List<Long> userIdsPartialMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", true, 0, 10);
+
+        //then
+        assertThat(userIdsExactMatch).containsExactly(user2.getId());
+        assertThat(userIdsExactMatchNoResults).isEmpty();
+        assertThat(userIdsPartialMatch).containsExactly(user.getId());
+        
+        //clean
+        deleteUser(user2);
+    }
+    
 }

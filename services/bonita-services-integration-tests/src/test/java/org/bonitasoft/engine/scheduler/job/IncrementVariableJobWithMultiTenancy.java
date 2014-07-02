@@ -24,9 +24,9 @@ public class IncrementVariableJobWithMultiTenancy extends GroupJob {
     public void execute() throws SJobExecutionException {
         synchronized (IncrementVariableJobWithMultiTenancy.class) {
 
-            VariableStorage storage;
+            VariableStorageByTenant storage;
             try {
-                storage = VariableStorage.getInstance(readSessionAccessor.getTenantId());
+                storage = VariableStorageByTenant.getInstance(readSessionAccessor.getTenantId());
             } catch (final STenantIdNotSetException e) {
                 throw new SJobExecutionException(e);
             }

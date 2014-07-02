@@ -193,8 +193,7 @@ public class ProcessArchiver {
     }
 
     private static void archiveComments(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final SCommentService commentService, final long archiveDate)
+            final ArchiveService archiveService, final TechnicalLoggerService logger, final SCommentService commentService, final long archiveDate)
             throws SArchivingException {
         List<SComment> sComments = null;
         int startIndex = 0;
@@ -327,8 +326,7 @@ public class ProcessArchiver {
             throws SDataInstanceException {
         List<SDataInstance> dataInstances;
         do {
-            dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, 100);
             for (final SDataInstance sDataInstance : dataInstances) {
                 dataInstanceService.deleteDataInstance(sDataInstance);
             }

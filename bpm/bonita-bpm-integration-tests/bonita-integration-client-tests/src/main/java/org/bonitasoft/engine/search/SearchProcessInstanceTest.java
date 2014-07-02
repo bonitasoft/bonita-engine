@@ -69,8 +69,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     @Test
     public void searchOpenProcessInstances() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process",
-                "1.0",
-                Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+                "1.0", Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance2 = getProcessAPI().startProcess(processDefinition.getId());
@@ -425,7 +424,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-    "User Performed Task" }, jira = "ENGINE-715")
+            "User Performed Task" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserPerformedTask() throws Exception {
         // create user
@@ -583,7 +582,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-    "User Started Process" }, jira = "ENGINE-715")
+            "User Started Process" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserStartedProcess() throws Exception {
         // create user
@@ -712,7 +711,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class, ArchivedProcessInstancesSearchDescriptor.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Archived",
-    "Process Instances" }, jira = "ENGINE-998")
+            "Process Instances" }, jira = "ENGINE-998")
     @Test
     public void searchArchivedProcessInstances() throws Exception {
         final User user1 = createUser("john1", "bpm");
@@ -911,7 +910,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedProcessInstances",
-    "Apostrophe" }, jira = "ENGINE-366, ENGINE-589")
+            "Apostrophe" }, jira = "ENGINE-366, ENGINE-589")
     @Test
     public void searchArchivedProcessInstancesWithApostrophe() throws Exception {
         // Create process
