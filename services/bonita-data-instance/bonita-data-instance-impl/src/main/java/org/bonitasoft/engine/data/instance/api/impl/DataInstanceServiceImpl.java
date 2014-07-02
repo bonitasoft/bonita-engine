@@ -173,7 +173,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         return persistenceService.selectList(selectListDescriptor);
     }
 
-    private long getSADataInstanceDataVisibilityMapping(final String dataName, final long containerId, final String containerType) throws SBonitaReadException {
+    protected long getSADataInstanceDataVisibilityMapping(final String dataName, final long containerId, final String containerType)
+            throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("dataName", dataName);
         parameters.put("containerId", containerId);
@@ -190,7 +191,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         return dataInstanceId;
     }
 
-    private List<Long> getSADataInstanceDataVisibilityMapping(final List<String> dataNames, final long containerId, final String containerType)
+    protected List<Long> getSADataInstanceDataVisibilityMapping(final List<String> dataNames, final long containerId, final String containerType)
             throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("dataNames", dataNames);
@@ -217,7 +218,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    private List<SDataInstanceVisibilityMapping> getDataInstanceVisibilityMappings(final long containerId, final String containerType, final int fromIndex,
+    protected List<SDataInstanceVisibilityMapping> getDataInstanceVisibilityMappings(final long containerId, final String containerType, final int fromIndex,
             final int numberOfResults) throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("containerId", containerId);
@@ -320,10 +321,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     }
 
-    /**
-     * @param sDataInstanceVisibilityMapping
-     * @throws SDataInstanceReadException
-     */
     private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
         final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
         final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
@@ -581,9 +578,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    @Override
-    public void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
-        NullCheckingUtil.checkArgsNotNull(dataInstance);
+    private void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
         final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_INSTANCE).setObject(dataInstance)
                 .done();
@@ -596,14 +591,50 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void deleteLocalArchivedDataInstances(final long containerId, final String dataInstanceContainerType) throws SDataInstanceException {
+    public void deleteLocalArchivedDataInstances(final long containerId, final String containerType) throws SDataInstanceException {
         List<SADataInstance> sDataInstances;
         do {
-            sDataInstances = getLocalSADataInstances(containerId, dataInstanceContainerType, 0, 100);
+            sDataInstances = getLocalSADataInstances(containerId, containerType, 0, 100);
             for (final SADataInstance sDataInstance : sDataInstances) {
                 deleteSADataInstance(sDataInstance);
             }
         } while (!sDataInstances.isEmpty());
+        deleteArchivedContainer(containerId, containerType);
+    }
+
+    private void deleteArchivedContainer(final long containerId, final String containerType) throws SDataInstanceException {
+        try {
+            List<SADataInstanceVisibilityMapping> visibilityMappings;
+            do {
+                visibilityMappings = getSADataInstanceVisibilityMappings(containerId, containerType, 0, 100);
+                for (final SADataInstanceVisibilityMapping sDataInstanceVisibilityMapping : visibilityMappings) {
+                    deleteSADataInstanceVisibilityMapping(sDataInstanceVisibilityMapping);
+                }
+            } while (visibilityMappings.size() > 0);
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException(e);
+        }
+    }
+
+    private void deleteSADataInstanceVisibilityMapping(final SADataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
+        final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
+        try {
+            recorder.recordDelete(record, deleteEvent);
+        } catch (final SRecorderException e) {
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "deleteSADataInstanceVisibilityMapping", e);
+            throw new SDataInstanceException(e);
+        }
+    }
+
+    protected List<SADataInstanceVisibilityMapping> getSADataInstanceVisibilityMappings(final long containerId, final String containerType,
+            final int fromIndex, final int numberOfResults) throws SBonitaReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("containerId", containerId);
+        parameters.put("containerType", containerType);
+        final SelectListDescriptor<SADataInstanceVisibilityMapping> selectDescriptor = new SelectListDescriptor<SADataInstanceVisibilityMapping>(
+                "getSADataInstanceVisibilityMappings", parameters, SADataInstanceVisibilityMapping.class, new QueryOptions(fromIndex, numberOfResults));
+        return persistenceService.selectList(selectDescriptor);
     }
 
     @Override

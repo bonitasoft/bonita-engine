@@ -33,95 +33,29 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * @author Celine Souchet
- */
+@RunWith(MockitoJUnitRunner.class)
 public class DataInstanceServiceImplTest {
 
+    @Mock
     private Recorder recorder;
 
+    @Mock
     private ReadPersistenceService persistenceService;
 
+    @Mock
     private ArchiveService archiveService;
 
+    @Mock
     private TechnicalLoggerService logger;
 
+    @InjectMocks
     private DataInstanceServiceImpl dataInstanceServiceImpl;
-
-    @Before
-    public void setUp() {
-        persistenceService = mock(ReadPersistenceService.class);
-        recorder = mock(Recorder.class);
-        logger = mock(TechnicalLoggerService.class);
-        archiveService = mock(ArchiveService.class);
-        dataInstanceServiceImpl = new DataInstanceServiceImpl(recorder, persistenceService,
-                archiveService, logger);
-    }
-
-    // /**
-    // * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(long)}.
-    // *
-    // * @throws SDataInstanceException
-    // * @throws SDataException
-    // * @throws SDataSourceInactiveException
-    // * @throws SDataSourceInitializationException
-    // * @throws SDataSourceNotFoundException
-    // */
-    // @Test
-    // public final void getTransientDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
-    // SDataSourceInactiveException, SDataException {
-    // final long dataInstanceId = 456L;
-    // final SDataSource dataSource = mock(SDataSource.class);
-    // doReturn(dataSource).when(dataSourceService).getDataSource(anyString(), anyString());
-    // final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
-    // doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
-    // final SDataInstance sDataInstance = mock(SDataInstance.class);
-    // doReturn(sDataInstance).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
-    //
-    // Assert.assertEquals(sDataInstance, dataInstanceServiceImpl.getDataInstance(dataInstanceId));
-    // }
-    //
-    // @Test
-    // public final void getDefaultDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
-    // SDataSourceInactiveException, SDataException {
-    // final long dataInstanceId = 456L;
-    // // Throw exception when get transient data
-    // final SDataSource transientSDataSource = mock(SDataSource.class);
-    // doReturn(1L).when(transientSDataSource).getId();
-    // doReturn(transientSDataSource).when(dataSourceService).getDataSource(anyString(),
-    // anyString());
-    // final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
-    // doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(DataInstanceDataSource.class, 1L);
-    // doThrow(new SDataInstanceReadException("plop")).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
-    //
-    // // Get data instance in database
-    // final SDataSource defaultSDataSource = mock(SDataSource.class);
-    // doReturn(defaultSDataSource).when(dataSourceService).getDataSource(DataInstanceServiceImpl.DEFAULT_DATA_SOURCE,
-    // DataInstanceServiceImpl.DATA_SOURCE_VERSION);
-    // doReturn(2L).when(transientSDataSource).getId();
-    // final DataInstanceDataSource dataInstanceDataSource2 = mock(DataInstanceDataSource.class);
-    // doReturn(dataInstanceDataSource2).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
-    // final SDataInstance sDataInstance = mock(SDataInstance.class);
-    // doReturn(sDataInstance).when(dataInstanceDataSource2).getDataInstance(dataInstanceId);
-    //
-    // Assert.assertEquals(sDataInstance, dataInstanceServiceImpl.getDataInstance(dataInstanceId));
-    // }
-    //
-    // @Test(expected = SDataInstanceReadException.class)
-    // public final void getDataInstanceByIdNotExists() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
-    // SDataSourceInactiveException, SDataException {
-    // final long dataInstanceId = 456L;
-    // final SDataSource transientSDataSource = mock(SDataSource.class);
-    // doReturn(transientSDataSource).when(dataSourceService).getDataSource(anyString(), anyString());
-    // final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
-    // doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
-    // doThrow(new SDataInstanceReadException("plop")).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
-    //
-    // dataInstanceServiceImpl.getDataInstance(dataInstanceId);
-    // }
 
     @Test
     public final void getLastSADataInstanceFromContainer() throws SBonitaException {
