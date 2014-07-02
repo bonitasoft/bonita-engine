@@ -11,6 +11,7 @@ package com.bonitasoft.engine.scheduler.impl;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory;
 import org.quartz.SchedulerException;
 
@@ -22,8 +23,9 @@ import com.bonitasoft.manager.Manager;
  */
 public class BonitaSchedulerFactoryExtended extends BonitaSchedulerFactory {
 
-    public BonitaSchedulerFactoryExtended(final Properties props, final Properties additionalProperties) throws SchedulerException {
-        super(merge(props, additionalProperties));
+    public BonitaSchedulerFactoryExtended(final Properties props, final Properties additionalProperties, final TechnicalLoggerService logger)
+            throws SchedulerException {
+        super(merge(props, additionalProperties), logger);
     }
 
     private static Properties merge(final Properties props, final Properties additionalProperties) {
