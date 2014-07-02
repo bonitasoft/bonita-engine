@@ -354,6 +354,8 @@
                                     <sysprop.bonita.hibernate.transaction.jta_platform>
                                         org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
                                     </sysprop.bonita.hibernate.transaction.jta_platform>
+                                    <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+                                    <!--souillac DO NOT COMMIT THIS LINE -->
                                     <jboss.server.log.threshold>WARN</jboss.server.log.threshold>
                                 </systemProperties>
                             </container>
