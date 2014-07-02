@@ -17,6 +17,19 @@
 		<module>bonita-query-tests</module>
 	</modules>
 
+	<build>
+		<plugins>
+			<plugin>
+				<!-- don't execute tests in test phase -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<profiles>
 		<profile>
 			<id>package-all</id>
