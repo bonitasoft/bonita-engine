@@ -359,7 +359,6 @@
                                     <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
                                 </properties>
                             </configuration>
-                            <wait>false</wait>
                         </configuration>
                     </plugin>
                 </plugins>

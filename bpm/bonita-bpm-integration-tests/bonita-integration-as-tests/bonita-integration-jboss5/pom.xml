@@ -337,7 +337,6 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <wait>false</wait>
                             <container>
                                 <containerId>jboss51x</containerId>
                                 <type>installed</type>
@@ -355,8 +354,6 @@
                                     <sysprop.bonita.hibernate.transaction.jta_platform>
                                         org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
                                     </sysprop.bonita.hibernate.transaction.jta_platform>
-                                    <sysprop.bonita.db.vendor>postgres</sysprop.bonita.db.vendor>
-                                    <!--souillac DO NOT COMMIT THIS LINE -->
                                     <jboss.server.log.threshold>WARN</jboss.server.log.threshold>
                                 </systemProperties>
                             </container>
@@ -370,12 +367,6 @@
                                     <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
                                     <cargo.jboss.jrmp.invoker.port>${invoker.port}</cargo.jboss.jrmp.invoker.port>
                                 </properties>
-                                <configfiles>
-                                    <configfile>
-                                        <file>${jboss.home}/server/default/conf/jboss-log4j.xml</file>
-                                        <tofile>conf/jboss-log4j.xml</tofile>
-                                    </configfile>
-                                </configfiles>
                             </configuration>
                         </configuration>
                     </plugin>
