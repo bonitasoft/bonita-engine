@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -52,6 +53,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.Pair;
 import org.w3c.dom.Document;
 
 /**
@@ -86,7 +88,7 @@ public class IOUtil {
             stream = new JarInputStream(new ByteArrayInputStream(jarContent));
             JarEntry nextJarEntry = null;
             while ((nextJarEntry = stream.getNextJarEntry()) != null) {
-                String name = nextJarEntry.getName();
+                final String name = nextJarEntry.getName();
                 if (name.endsWith(".class")) {
                     classes.add(toQualifiedClassName(name));
                 }
@@ -311,7 +313,7 @@ public class IOUtil {
      * @param file
      */
     public static String read(final File file) throws IOException {
-        FileInputStream inputStream = new FileInputStream(file);
+        final FileInputStream inputStream = new FileInputStream(file);
         try {
             return read(inputStream);
         } finally {
@@ -485,12 +487,52 @@ public class IOUtil {
             for (final Entry<String, byte[]> file : files.entrySet()) {
                 zos.putNextEntry(new ZipEntry(file.getKey()));
                 zos.write(file.getValue());
+                zos.flush();
                 zos.closeEntry();
             }
-            return baos.toByteArray();
         } finally {
             zos.close();
+            baos.close();
         }
+        return baos.toByteArray();
+    }
+
+    public static byte[] zip(final Pair<String, byte[]>... files) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
+            for (final Entry<String, byte[]> file : files) {
+                zos.putNextEntry(new ZipEntry(file.getKey()));
+                zos.write(file.getValue());
+                zos.flush();
+                zos.closeEntry();
+            }
+        } finally {
+            zos.close();
+            baos.close();
+        }
+        return baos.toByteArray();
+    }
+
+    public static final Map<String, byte[]> unzip(final byte[] zipFile) throws IOException {
+        final ByteArrayInputStream bais = new ByteArrayInputStream(zipFile);
+        final ZipInputStream zipInputstream = new ZipInputStream(bais);
+        ZipEntry zipEntry = null;
+        final Map<String, byte[]> files = new HashMap<String, byte[]>();
+        try {
+            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
+                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                int bytesRead;
+                final byte[] buffer = new byte[BUFFER_SIZE];
+                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+                files.put(zipEntry.getName(), byteArrayOutputStream.toByteArray());
+            }
+        } finally {
+            zipInputstream.close();
+        }
+        return files;
     }
 
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
@@ -568,10 +610,6 @@ public class IOUtil {
         return temp;
     }
 
-    /**
-     * @param string
-     * @throws IOException
-     */
     public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {
         final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -595,11 +633,15 @@ public class IOUtil {
         throw new IOException("Entry " + entryName + " does not exists in the zip file");
     }
 
-    public static byte[] toByteArray(Document document) throws IOException, TransformerException {
+    public static byte[] getZipEntryContent(final String entryName, final byte[] zipFile) throws IOException {
+        return getZipEntryContent(entryName, new ByteArrayInputStream(zipFile));
+    }
+
+    public static byte[] toByteArray(final Document document) throws IOException, TransformerException {
         if (document == null) {
             throw new IllegalArgumentException("Document should not be null.");
         }
-        Transformer tf = TransformerFactory.newInstance().newTransformer();
+        final Transformer tf = TransformerFactory.newInstance().newTransformer();
         tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         tf.setOutputProperty(OutputKeys.INDENT, "yes");
         ByteArrayOutputStream out = null;
@@ -614,12 +656,12 @@ public class IOUtil {
         }
     }
 
-    public static byte[] addJarEntry(byte[] jarToUpdate, String entryName, byte[] entryContent) throws IOException {
+    public static byte[] addJarEntry(final byte[] jarToUpdate, final String entryName, final byte[] entryContent) throws IOException {
         ByteArrayOutputStream out = null;
         ByteArrayInputStream bais = null;
         JarOutputStream jos = null;
         JarInputStream jis = null;
-        byte[] buffer = new byte[4096];
+        final byte[] buffer = new byte[4096];
         try {
             bais = new ByteArrayInputStream(jarToUpdate);
             jis = new JarInputStream(bais);
@@ -638,7 +680,7 @@ public class IOUtil {
                 }
                 jos.flush();
             }
-            JarEntry entry = new JarEntry(entryName);
+            final JarEntry entry = new JarEntry(entryName);
             jos.putNextEntry(entry);
             jos.write(entryContent);
             jos.closeEntry();
@@ -656,6 +698,12 @@ public class IOUtil {
                 jis.close();
             }
         }
+    }
+
+    public static byte[] getPropertyAsString(final Properties prop) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        prop.store(out, "");
+        return out.toByteArray();
     }
 
 }

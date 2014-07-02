@@ -175,7 +175,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
+    "event" }, jira = "ENGINE-501")
     public void uncaughtThrowErrorEvent() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1", "delivery");
         // catch a different error
@@ -200,7 +200,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
+    "event" }, jira = "ENGINE-501")
     public void errorEventCaughtAtParentLevel2() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1", "delivery");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
@@ -233,7 +233,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
+    "event" }, jira = "ENGINE-501")
     public void errorEventTwoCatchErrorMatching() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1", "delivery");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
@@ -270,13 +270,14 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class, MultiInstanceActivityInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = {
             "error", "boundary", "event", "call activity", "mutliple instance" }, jira = "ENGINE-9023")
-    public void testName() throws Exception {
+    public void errorCodeThrownBySubProcessShouldBeCatchByMainProcess() throws Exception {
         final ProcessDefinition subProcess = deployAndEnableSubProcessWhichThrowsAnErrorEvent("SubProcess", "Mistake");
         final ProcessDefinition midProcess = deployAndEnableMidProcessWhichContainsACallActivity("MidProcess", "SubProcess");
         final ProcessDefinition mainProcess = deployAndEnableProcessWithBoundaryErrorEventOnMICallActivity("Process", "MidProcess", "Mistake", "acme");
 
         final ProcessInstance instance = getProcessAPI().startProcess(mainProcess.getId());
         waitForFlowNodeInReadyState(instance, "exceptionStep", true);
+        waitForFlowNodeInState(instance, "step1", TestStates.getAbortedState(), false);
 
         disableAndDeleteProcess(mainProcess, midProcess, subProcess);
     }
