@@ -244,6 +244,11 @@
                                                 <include name="${db.vendor}-ds.xml"/>
                                             </fileset>
                                         </copy>
+                                        <copy todir="${jboss.conf.dir}/bootstrap">
+                                            <fileset dir="jboss/server/default/conf/bootstrap">
+                                                <include name="vfs.xml"/>
+                                            </fileset>
+                                        </copy>
                                         <replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.ip#"
                                                  value="${database.ip}"/>
                                         <replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.port#"
@@ -343,7 +348,8 @@
                                 <home>${jboss.home}</home>
                                 <systemProperties>
                                     <bonita.home>${bonita.home}</bonita.home>
-                                    <jboss.vfs.forceCopy>false</jboss.vfs.forceCopy>
+                                    <jboss.vfs.cache>org.jboss.virtual.plugins.cache.IterableTimedVFSCache</jboss.vfs.cache>
+                                    <jboss.vfs.cache.TimedPolicyCaching.lifetime>500</jboss.vfs.cache.TimedPolicyCaching.lifetime>
                                     <sysprop.bonita.transaction.manager>java:/TransactionManager</sysprop.bonita.transaction.manager>
                                     <sysprop.bonita.userTransaction>UserTransaction</sysprop.bonita.userTransaction>
                                     <sysprop.bonita.database.journal.datasource.name>bonitaDS</sysprop.bonita.database.journal.datasource.name>
