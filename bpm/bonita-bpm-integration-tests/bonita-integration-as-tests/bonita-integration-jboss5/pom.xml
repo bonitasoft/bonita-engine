@@ -224,7 +224,7 @@
 
                                         <copy todir="${jboss.deploy.dir}">
                                             <fileset dir="jboss/server/default/deploy">
-                                                <include name="*xml"/>
+                                                <include name="${db.vendor}-ds.xml"/>
                                             </fileset>
                                         </copy>
                                         <replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.ip#" value="${database.ip}" />
@@ -349,8 +349,7 @@
                                     <sysprop.bonita.database.sequence.manager.datasource.name>bonitaSequenceManagerDS</sysprop.bonita.database.sequence.manager.datasource.name>
                                     <sysprop.bonita.hibernate.transaction.jta_platform>org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform</sysprop.bonita.hibernate.transaction.jta_platform>
                                     <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
-                                    <!--souillac DO NOT COMMIT THIS LINE -->
-                                    <jboss.server.log.threshold>INFO</jboss.server.log.threshold>
+                                    <jboss.server.log.threshold>WARN</jboss.server.log.threshold>
                                 </systemProperties>
                             </container>
                             <configuration>
