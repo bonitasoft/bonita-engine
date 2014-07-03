@@ -344,18 +344,12 @@
                                 <systemProperties>
                                     <bonita.home>${bonita.home}</bonita.home>
                                     <jboss.vfs.forceCopy>false</jboss.vfs.forceCopy>
-                                    <sysprop.bonita.transaction.manager>java:/TransactionManager
-                                    </sysprop.bonita.transaction.manager>
+                                    <sysprop.bonita.transaction.manager>java:/TransactionManager</sysprop.bonita.transaction.manager>
                                     <sysprop.bonita.userTransaction>UserTransaction</sysprop.bonita.userTransaction>
-                                    <sysprop.bonita.database.journal.datasource.name>bonitaDS
-                                    </sysprop.bonita.database.journal.datasource.name>
-                                    <sysprop.bonita.database.sequence.manager.datasource.name>bonitaSequenceManagerDS
-                                    </sysprop.bonita.database.sequence.manager.datasource.name>
-                                    <sysprop.bonita.hibernate.transaction.jta_platform>
-                                        org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
-                                    </sysprop.bonita.hibernate.transaction.jta_platform>
+                                    <sysprop.bonita.database.journal.datasource.name>bonitaDS</sysprop.bonita.database.journal.datasource.name>
+                                    <sysprop.bonita.database.sequence.manager.datasource.name>bonitaSequenceManagerDS</sysprop.bonita.database.sequence.manager.datasource.name>
+                                    <sysprop.bonita.hibernate.transaction.jta_platform>org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform</sysprop.bonita.hibernate.transaction.jta_platform>
                                     <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
-                                    <!--souillac DO NOT COMMIT THIS LINE -->
                                     <jboss.server.log.threshold>WARN</jboss.server.log.threshold>
                                 </systemProperties>
                             </container>
