@@ -28,7 +28,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeTransitionsWrapperTest {
@@ -99,6 +98,22 @@ public class FlowNodeTransitionsWrapperTest {
         flowNodeTransitionsWrapper.setInputTransitionsSize(1);
         flowNodeTransitionsWrapper.setAllOutgoingTransitionDefinitions(Arrays.asList(transition1));
         assertTrue(flowNodeTransitionsWrapper.isSimpleMerge());
+    }
+
+    @Test
+    public void isSimple_return_true_if_has_one_incoming_and_one_default_outgoing_transitions() {
+        flowNodeTransitionsWrapper.setInputTransitionsSize(1);
+        flowNodeTransitionsWrapper.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
+        flowNodeTransitionsWrapper.setValidOutgoingTransitionDefinitions(Arrays.asList(transition1));
+        assertTrue(flowNodeTransitionsWrapper.isSimpleMerge());
+    }
+
+    @Test
+    public void isSimple_return_false_if_has_one_incoming_and_no_default_outgoing_transitions() {
+        flowNodeTransitionsWrapper.setInputTransitionsSize(1);
+        flowNodeTransitionsWrapper.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
+        flowNodeTransitionsWrapper.setValidOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
+        assertFalse(flowNodeTransitionsWrapper.isSimpleMerge());
     }
 
     @Test
@@ -194,7 +209,7 @@ public class FlowNodeTransitionsWrapperTest {
 
     @Test
     public void isManyToOne_return_false_if_has_multiple_incoming_and_multiple_zero_transition() {
-        flowNodeTransitionsWrapper.setInputTransitionsSize(2);
+        flowNodeTransitionsWrapper.setInputTransitionsSize(12);
         flowNodeTransitionsWrapper.setAllOutgoingTransitionDefinitions(Arrays.<STransitionDefinition> asList());
         assertFalse(flowNodeTransitionsWrapper.isManyToOne());
     }
