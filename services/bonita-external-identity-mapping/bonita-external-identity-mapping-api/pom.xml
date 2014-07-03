@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-external-identity-mapping</artifactId>
 		<groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
-		<version>6.3.2-SNAPSHOT</version>
+		<version>6.3.2</version>
 	</parent>
 
 	<artifactId>bonita-external-identity-mapping-api</artifactId>
