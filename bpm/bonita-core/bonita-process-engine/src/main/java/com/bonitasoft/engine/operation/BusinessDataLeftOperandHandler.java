@@ -60,15 +60,11 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         final Entity newBusinessDataValue = (Entity) newValue;
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
-            final Long businessDataId = newBusinessDataValue.getPersistenceId();
-            if (businessDataId != null || refBusinessDataInstance.getDataId() == null) {
-                final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
-                if (!businessData.getPersistenceId().equals(refBusinessDataInstance.getDataId())) {
-                    refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
-                }
-                return businessData;
+            final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
+            if (!businessData.getPersistenceId().equals(refBusinessDataInstance.getDataId())) {
+                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
             }
-            return newValue;
+            return businessData;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
