@@ -89,9 +89,16 @@ public class TriggerTimerEventJob extends InternalJob {
                         "Rescheduling Timer job " + jobDescriptorId + " because the work service was shutdown. the timer is in process definition "
                                 + processDefinitionId
                                 + " on definition element " + targetSFlowNodeDefinitionId);
-                final ExecuteAgainJobSynchronization jobSynchronization = new ExecuteAgainJobSynchronization(jobDescriptorId, jobService, schedulerService,
-                        loggerService);
-                transactionService.registerBonitaSynchronization(jobSynchronization);
+                try {
+                    final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
+                    schedulerService.executeAgain(sJobDescriptor.getId());
+                } catch (final SBonitaException sbe) {
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                        loggerService
+                                .log(getClass(), TechnicalLogSeverity.WARNING, "Unable to reschedule the job: " + jobDescriptorId, sbe);
+                    }
+                }
+                return;
             }
             if (subProcessId == null) {
                 eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
