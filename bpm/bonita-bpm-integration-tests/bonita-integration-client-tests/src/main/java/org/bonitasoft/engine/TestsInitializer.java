@@ -67,7 +67,7 @@ public class TestsInitializer {
         ArrayList<Thread> list = new ArrayList<Thread>();
         while (iterator.hasNext()) {
             Thread thread = iterator.next();
-            if (isEngine(thread)) {
+            if (isEngine(thread) && !thread.getName().startsWith("net.sf.ehcache.CacheManager")) {
                 // wait for the thread to die
                 thread.join(5000);
                 // if still alive print it
