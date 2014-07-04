@@ -14,14 +14,25 @@
 package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
@@ -52,6 +63,13 @@ public class TriggerTimerEventJob extends InternalJob {
 
     private Long subProcessId;
 
+    private transient WorkService workService;
+    private transient JobService jobService;
+    private transient SchedulerService schedulerService;
+    private transient TechnicalLoggerService loggerService;
+    private Long jobDescriptorId;
+    private UserTransactionService transactionService;
+
     @Override
     public String getName() {
         return null;
@@ -65,6 +83,16 @@ public class TriggerTimerEventJob extends InternalJob {
     @Override
     public void execute() throws SJobExecutionException {
         try {
+            if (workService.isStopped()) {
+
+                loggerService.log(getClass(), TechnicalLogSeverity.INFO,
+                        "Rescheduling Timer job " + jobDescriptorId + " because the work service was shutdown. the timer is in process definition "
+                                + processDefinitionId
+                                + " on definition element " + targetSFlowNodeDefinitionId);
+                final ExecuteAgainJobSynchronization jobSynchronization = new ExecuteAgainJobSynchronization(jobDescriptorId, jobService, schedulerService,
+                        loggerService);
+                transactionService.registerBonitaSynchronization(jobSynchronization);
+            }
             if (subProcessId == null) {
                 eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
             } else {
@@ -87,12 +115,13 @@ public class TriggerTimerEventJob extends InternalJob {
         parentProcessInstanceId = (Long) attributes.get("processInstanceId");
         rootProcessInstanceId = (Long) attributes.get("rootProcessInstanceId");
         isInterrupting = (Boolean) attributes.get("isInterrupting");
-        try {
-            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-            eventsHandler = tenantServiceAccessor.getEventsHandler();
-        } catch (final SJobConfigurationException e) {
-            throw e;
-        }
+        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+        eventsHandler = tenantServiceAccessor.getEventsHandler();
+        workService = tenantServiceAccessor.getWorkService();
+        jobService = tenantServiceAccessor.getJobService();
+        schedulerService = tenantServiceAccessor.getSchedulerService();
+        loggerService = tenantServiceAccessor.getTechnicalLoggerService();
+        transactionService = tenantServiceAccessor.getUserTransactionService();
+        jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }
-
 }

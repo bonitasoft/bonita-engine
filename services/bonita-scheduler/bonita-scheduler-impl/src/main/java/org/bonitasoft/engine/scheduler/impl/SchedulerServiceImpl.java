@@ -248,6 +248,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void start() throws SSchedulerException, SFireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "start");
+        logger.log(getClass(),TechnicalLogSeverity.INFO,"Start scheduler");
         schedulerExecutor.start();
         eventService.fireEvent(schedulStarted);
         logAfterMethod(TechnicalLogSeverity.TRACE, "start");
@@ -361,6 +362,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             for (final SJobParameter sJobParameterImpl : parameters) {
                 parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
             }
+            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID,jobIdentifier.getId());
             statelessJob.setAttributes(parameterMap);
             if (servicesResolver != null) {
                 injectServices(statelessJob);
