@@ -281,7 +281,7 @@ public class BusinessDataLeftOperandHandlerTest {
     }
 
     @Test
-    public void should_update_throw_exception_if_we_update_a_ref_with_an_already_existing_business_data() throws Exception {
+    public void should_update_an_existing_reference_with_a_new_business_data() throws Exception {
         // given: business data having null id and ref having not null id
         final SLeftOperand leftOperand = createLeftOperand("bizData");
         final Peticion bizData = new Peticion(null);
@@ -295,8 +295,63 @@ public class BusinessDataLeftOperandHandlerTest {
         leftOperandHandler.update(leftOperand, bizData, 1, "cont");
 
         // then
-        verify(repository, times(0)).merge(any(Entity.class));
-        verify(refBusinessDataService, times(0)).updateRefBusinessDataInstance(eq(ref), anyLong());
+        verify(repository).merge(bizData);
+        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
+    }
+
+    @Test
+    public void should_update_an_existing_reference_with_an_updated_business_data() throws Exception {
+        // given: business data having null id and ref having not null id
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(123456789L);
+        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
+        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456L);
+        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
+        doReturn(bizData).when(repository).merge(bizData);
+
+        // when
+        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
+
+        // then
+        verify(repository).merge(bizData);
+        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
+    }
+
+    @Test
+    public void should_update_a_new_reference_with_a_new_business_data() throws Exception {
+        // given: business data having null id and ref having not null id
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(null);
+        final Peticion mergedBizData = new Peticion(123456789L);
+        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
+        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
+        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
+        doReturn(mergedBizData).when(repository).merge(bizData);
+
+        // when
+        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
+
+        // then
+        verify(repository).merge(bizData);
+        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
+    }
+
+    @Test
+    public void should_update_a_new_reference_with_an_updated_business_data() throws Exception {
+        // given: business data having null id and ref having not null id
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(123456789L);
+        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
+        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
+        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
+        doReturn(bizData).when(repository).merge(bizData);
+
+        // when
+        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
+
+        // then
+        verify(repository).merge(bizData);
+        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
     }
 
     @Test
