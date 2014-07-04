@@ -66,7 +66,7 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
         dataInstanceService = getDataInstanceServiceImplementation();
     }
 
-    private SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
+    public SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
             final long containerId, final String containerType, final boolean isTransient) throws SBonitaException {
         // create definition
         final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
