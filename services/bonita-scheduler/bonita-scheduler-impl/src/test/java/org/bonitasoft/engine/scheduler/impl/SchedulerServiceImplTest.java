@@ -3,8 +3,12 @@ package org.bonitasoft.engine.scheduler.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -14,6 +18,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -25,14 +30,12 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
-import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -45,6 +48,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -53,6 +57,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BuilderFactory.class)
 public class SchedulerServiceImplTest {
+
+    private static final long TENANT_ID = 1L;
 
     SchedulerServiceImpl schedulerService;
 
@@ -65,6 +71,12 @@ public class SchedulerServiceImplTest {
     @Mock
     private EventService eventService;
 
+    @Mock
+    private SessionAccessor sessionAccessor;
+
+    @Mock
+    private SSchedulerQueriableLogBuilderFactory schedulerLogBuilderFactory;
+
     ServicesResolver servicesResolver;
 
     @Before
@@ -74,7 +86,6 @@ public class SchedulerServiceImplTest {
 
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TransactionService transactionService = mock(TransactionService.class);
-        final SessionAccessor sessionAccessor = mock(SessionAccessor.class);
 
         final SEventBuilder sEventBuilder = mock(SEventBuilder.class);
         final SEventBuilderFactory sEventBuilderFactory = mock(SEventBuilderFactory.class);
@@ -84,8 +95,14 @@ public class SchedulerServiceImplTest {
         when(sEventBuilderFactory.createInsertEvent(anyString())).thenReturn(sEventBuilder);
         when(sEventBuilder.setObject(any(Object.class))).thenReturn(sEventBuilder);
 
+        final SSchedulerQueriableLogBuilderFactory schedulerLogBuilderFactory = mock(SSchedulerQueriableLogBuilderFactory.class);
+        final ReturnLogBuilder builderAnswer = new ReturnLogBuilder();
+        final SSchedulerQueriableLogBuilder schedulerLogBuilder = mock(SSchedulerQueriableLogBuilder.class, builderAnswer);
+        builderAnswer.setObject(schedulerLogBuilder);
+        when(BuilderFactory.get(SSchedulerQueriableLogBuilderFactory.class)).thenReturn(schedulerLogBuilderFactory);
+        when(schedulerLogBuilderFactory.createNewInstance()).thenReturn(schedulerLogBuilder);
+
         final SJobQueriableLogBuilder jobLogBuilder = mock(SJobQueriableLogBuilder.class);
-        final SJobQueriableLogBuilderFactory jobLogBuilderFact = mock(SJobQueriableLogBuilderFactory.class);
 
         final SSchedulerQueriableLogBuilderFactory schedulerLogBuilderFact = mock(SSchedulerQueriableLogBuilderFactory.class);
 
@@ -95,10 +112,6 @@ public class SchedulerServiceImplTest {
         final SQueriableLog sQueriableLog = mock(SQueriableLog.class);
         when(jobLogBuilder.done()).thenReturn(sQueriableLog);
 
-        when(jobLogBuilderFact.createNewInstance()).thenReturn(sLogBuilder);
-        when(sLogBuilder.actionStatus(any(int.class))).thenReturn(sLogBuilder);
-        when(sLogBuilder.severity(any(SQueriableLogSeverity.class))).thenReturn(sLogBuilder);
-        when(sLogBuilder.rawMessage(anyString())).thenReturn(sLogBuilder);
         servicesResolver = mock(ServicesResolver.class);
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver);
     }
@@ -229,6 +242,43 @@ public class SchedulerServiceImplTest {
 
         assertEquals(myService, beanThatNeedMyService.getMyService());
 
+    }
+
+    @Test
+    public void schedule_should_use_tenantId_on_jobDescriptor_jobParameters_and_on_call_executor_schedule()
+            throws Exception {
+        //given
+        given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
+        final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
+        given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
+        final Trigger trigger = mock(Trigger.class);
+        final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
+
+        //when
+        schedulerService.schedule(jobDescriptor, parameters, trigger);
+
+        //then
+        verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
+        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
+        verify(schedulerExecutor, times(1)).schedule(anyLong(), eq(TENANT_ID), anyString(), eq(trigger), anyBoolean());
+    }
+
+    @Test
+    public void executeNow_should_use_tenantId_on_jobDescriptor_jobParameters_and_call_executor_executeNow()
+            throws Exception {
+        //given
+        given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
+        final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
+        given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
+        final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
+
+        //when
+        schedulerService.executeNow(jobDescriptor, parameters);
+
+        //then
+        verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
+        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
+        verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(TENANT_ID), anyString(), anyBoolean());
     }
 
     private final class BeanThatNeedMyService implements StatelessJob {
