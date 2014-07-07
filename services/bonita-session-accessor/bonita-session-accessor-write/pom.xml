@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
 		<artifactId>bonita-session-accessor</artifactId>
-		<version>6.3.2-SNAPSHOT</version>
+		<version>6.3.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-session-accessor-write</artifactId>

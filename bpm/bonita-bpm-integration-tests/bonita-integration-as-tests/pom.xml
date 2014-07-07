@@ -1,88 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>bonita-bpm-integration-tests</artifactId>
-        <groupId>org.bonitasoft.engine</groupId>
-        <version>6.3.2-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<artifactId>bonita-bpm-integration-tests</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.3.3-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>bonita-integration-as-tests</artifactId>
-    <packaging>pom</packaging>
+	<artifactId>bonita-integration-as-tests</artifactId>
+	<packaging>pom</packaging>
 
-    <name>Bonita AS Tests</name>
+	<name>Bonita AS Tests</name>
 
-    <properties>
-        <distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
-        <report.results>${distrib.dir}/target/testresults</report.results>
+	<properties>
+		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
+		<report.results>${distrib.dir}/target/testresults</report.results>
         <bonita.home>${distrib.dir}/resources/home/</bonita.home>
+		<report.xml>${report.results}/xml</report.xml>
         <report.xml>${report.results}/xml</report.xml>
-        <report.xml>${report.results}/xml</report.xml>
-        <surefire.reports>${project.build.directory}/surefire-reports</surefire.reports>
+		<surefire.reports>${project.build.directory}/surefire-reports</surefire.reports>
         <test.class>org.bonitasoft.engine.BPMRemoteTestsForServers</test.class>
-    </properties>
+	</properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-integration-client-tests</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-integration-client-tests</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+	</dependencies>
     <modules>
         <module>bonita-deploy-ear3</module>
         <module>bonita-deploy-war</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>package-all</id>
-            <modules>
-                <module>bonita-integration-jboss5</module>
-                <module>bonita-integration-tomcat6</module>
-                <module>bonita-integration-tomcat7</module>
-            </modules>
-        </profile>
-    </profiles>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+	<profiles>
+		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-integration-jboss5</module>
+				<module>bonita-integration-tomcat6</module>
+				<module>bonita-integration-tomcat7</module>
+			</modules>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
+				<executions>
+					<execution>
+						<goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
-                        </goals>
-                    </execution>
+						</goals>
+					</execution>
                 </executions>
-                <configuration>
+						<configuration>
                     <systemProperties>
                         <property>
                             <name>bonita.home</name>
                             <value>${bonita.home}</value>
                         </property>
                     </systemProperties>
-                </configuration>
-            </plugin>
-        </plugins>
+						</configuration>
+			</plugin>
+		</plugins>
 
-    </build>
+	</build>
 
 </project>

@@ -34,9 +34,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -519,4 +521,73 @@ public class QuartzSchedulerExecutorTest {
         jobKeyListAll.add(new JobKey("job5", "124"));
         return jobKeyListAll;
     }
+
+    @Test
+    public void schedule_should_use_tenant_id_as_group_in_job_details() throws Exception {
+        //given
+        final long tenantId = 3L;
+        final org.bonitasoft.engine.scheduler.trigger.Trigger trigger = getRepeatTrigger(new Date(), "trigger", GOOD_INTERVAL, GOOD_COUNT, GOOD_PRIORITY,
+                MisfireRestartPolicy.NONE);
+
+        //when
+        quartzSchedulerExecutor.schedule(10L, tenantId, "myJob", trigger, true);
+
+        //then
+        final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
+        verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(Trigger.class));
+        final String group = jobDetailCaptor.getValue().getKey().getGroup();
+        assertThat(group).isEqualTo(String.valueOf(tenantId));
+    }
+
+
+    @Test
+    public void schedule_should_store_tenant_id_in_jobDataMap() throws Exception {
+        //given
+        final long tenantId = 3L;
+        final org.bonitasoft.engine.scheduler.trigger.Trigger trigger = getRepeatTrigger(new Date(), "trigger", GOOD_INTERVAL, GOOD_COUNT, GOOD_PRIORITY,
+                MisfireRestartPolicy.NONE);
+
+        //when
+        quartzSchedulerExecutor.schedule(10L, tenantId, "myJob", trigger, true);
+
+        //then
+        final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
+        verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(Trigger.class));
+        final JobDataMap dataMap = jobDetailCaptor.getValue().getJobDataMap();
+        assertThat(dataMap.get("tenantId")).isEqualTo(String.valueOf(tenantId));
+    }
+
+    @Test
+    public void executeNow_should_store_tenant_id_in_jobDataMap() throws Exception {
+        //given
+        final long tenantId = 3L;
+
+        //when
+        quartzSchedulerExecutor.executeNow(10L, tenantId, "myJob", true);
+
+        //then
+        final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
+        verify(scheduler, times(1)).addJob(jobDetailCaptor.capture(), anyBoolean());
+        final JobDataMap dataMap = jobDetailCaptor.getValue().getJobDataMap();
+        assertThat(dataMap.get("tenantId")).isEqualTo(String.valueOf(tenantId));
+        verify(scheduler, times(1)).triggerJob(any(JobKey.class));
+    }
+
+    @Test
+    public void executeNow_should_use_tenant_id_as_group_in_job_details() throws Exception {
+        //given
+        final long tenantId = 3L;
+
+        //when
+        quartzSchedulerExecutor.executeNow(10L, tenantId, "myJob", true);
+
+        //then
+        final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
+        verify(scheduler, times(1)).addJob(jobDetailCaptor.capture(), anyBoolean());
+        final String group = jobDetailCaptor.getValue().getKey().getGroup();
+        assertThat(group).isEqualTo(String.valueOf(tenantId));
+
+        verify(scheduler, times(1)).triggerJob(any(JobKey.class));
+    }
+
 }
