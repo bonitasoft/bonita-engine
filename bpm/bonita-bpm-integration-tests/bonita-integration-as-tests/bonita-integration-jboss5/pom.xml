@@ -358,6 +358,7 @@
                                     <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
 									<jboss.server.log.threshold>WARN</jboss.server.log.threshold>
 								</systemProperties>
+                                <timeout>360000</timeout>
 							</container>
 							<configuration>
 								<type>existing</type>
@@ -369,6 +370,7 @@
 									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 									<cargo.jboss.jrmp.invoker.port>${invoker.port}</cargo.jboss.jrmp.invoker.port>
 								</properties>
+                                <wait>false</wait>
 							</configuration>
 						</configuration>
 					</plugin>
