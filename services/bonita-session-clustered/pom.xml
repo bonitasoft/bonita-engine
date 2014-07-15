@@ -4,17 +4,28 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.bonitasoft.engine.platform.session</groupId>
-		<artifactId>bonita-platform-session</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
+		<artifactId>services</artifactId>
 		<version>6.3.3-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-platform-session-clustered-impl</artifactId>
+	<groupId>com.bonitasoft.engine.session</groupId>
+	<artifactId>bonita-session-clustered</artifactId>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-api</artifactId>
+			<groupId>org.bonitasoft.engine.session</groupId>
+			<artifactId>bonita-session-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.session</groupId>
+			<artifactId>bonita-session-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -39,11 +50,6 @@
 			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
+
 </project>

@@ -17,7 +17,6 @@
 		<module>bonita-common</module>
 		<module>bonita-client</module>
 		<module>bonita-server</module>
-		<module>bonita-deploy</module>
 		<module>bonita-util-sp</module>
 		<module>bonita-synchro-repository-sp</module>
 		<module>bonita-api-sp</module>

@@ -17,7 +17,6 @@
 		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
 		<bonita.home>${project.build.directory}/bonita</bonita.home>
 		<bonita.home.classifier>teamwork</bonita.home.classifier>
-		<bonita.version></bonita.version>
 		<!-- TESTS DIRS -->
 		<test.class>com.bonitasoft.engine.BPMSPTestsForServers</test.class>
 		<report.results>${distrib.dir}/target/testresults</report.results>
@@ -32,7 +31,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -47,69 +45,10 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-engine-deploy</artifactId>
-									<version>${project.version}</version>
-									<type>zip</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${distrib.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-home-sp</artifactId>
-									<version>${project.version}</version>
-									<classifier>${bonita.home.classifier}</classifier>
-									<type>zip</type>
-									<outputDirectory>${distrib.dir}/resources</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.h2database</groupId>
-									<artifactId>h2</artifactId>
-									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>mysql</groupId>
-									<artifactId>mysql-connector-java</artifactId>
-									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.postgresql</groupId>
-									<artifactId>postgresql</artifactId>
-									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <modules>
+        <module>bonita-deploy-ear3</module>
+        <module>bonita-deploy-war</module>
+    </modules>
 
 	<profiles>
 		<profile>
