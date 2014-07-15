@@ -94,7 +94,7 @@ public class TestsInitializer {
         }
         final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */);
+                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */);
         for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return false;

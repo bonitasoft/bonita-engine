@@ -17,9 +17,6 @@
 	<modules>
 		<module>bonita-document-api</module>
 		<module>bonita-document-opencmis</module>
-		<module>bonita-document-model</module>
-		<module>bonita-document-model-impl</module>
-		<module>bonita-document-model-impl-hibernate</module>
 		<module>bonita-document-impl</module>
 	</modules>
 </project>

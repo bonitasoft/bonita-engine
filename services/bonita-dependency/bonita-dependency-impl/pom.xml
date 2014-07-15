@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -24,6 +25,11 @@
             <version>${project.version}</version>
         </dependency>
 		<dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
 		  <groupId>org.bonitasoft.engine.classloader</groupId>
       <artifactId>bonita-classloader-api</artifactId>
       <version>${project.version}</version>
@@ -51,6 +57,11 @@
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-model-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

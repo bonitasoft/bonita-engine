@@ -17,6 +17,5 @@
 	<modules>
 		<module>bonita-theme-api</module>
 		<module>bonita-theme-impl</module>
-		<module>bonita-theme-impl-hibernate</module>
 	</modules>
 </project>

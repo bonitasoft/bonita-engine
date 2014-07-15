@@ -16,9 +16,6 @@
 
 	<modules>
 		<module>bonita-platform-command-api</module>
-		<module>bonita-platform-command-api-impl</module>
-		<module>bonita-platform-command-model</module>
-		<module>bonita-platform-command-model-impl</module>
-		<module>bonita-platform-command-model-impl-hibernate</module>
+		<module>bonita-platform-command-impl</module>
 	</modules>
 </project>

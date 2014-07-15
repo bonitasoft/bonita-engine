@@ -15,14 +15,7 @@
 	<name>Bonita Dependency</name>
 
 	<modules>
-		<module>bonita-dependency-model</module>
-		<module>bonita-dependency-model-impl</module>
-		<module>bonita-dependency-model-impl-hibernate</module>
 		<module>bonita-dependency-api</module>
 		<module>bonita-dependency-impl</module>
-		<module>bonita-dependency-platform-model-impl</module>
-		<module>bonita-dependency-platform-model-impl-hibernate</module>
-		<module>bonita-dependency-platform-impl</module>
-		<module>bonita-dependency-platform-model</module>
 	</modules>
 </project>

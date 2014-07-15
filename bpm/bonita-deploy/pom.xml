@@ -14,12 +14,7 @@
 	<name>Bonita Deploy</name>
 
 	<modules>
-		<module>bonita-deploy-ejb2</module>
 		<module>bonita-deploy-ejb3</module>
-		<module>bonita-deploy-ear2</module>
-		<module>bonita-deploy-ear3</module>
-		<module>bonita-deploy-war</module>
-		<module>bonita-engine-deploy</module>
 		<module>bonita-deploy-tcp</module>
 	</modules>
 </project>
