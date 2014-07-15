@@ -268,7 +268,7 @@
 		<profile>
 			<id>slow</id>
 			<properties>
-				<bonita.home.classifier>performance-cluster</bonita.home.classifier>
+				<bonita.home.classifier>performance</bonita.home.classifier>
 			</properties>
 			<build>
 				<plugins>
