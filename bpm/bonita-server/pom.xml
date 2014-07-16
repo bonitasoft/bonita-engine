@@ -66,7 +66,7 @@
    
      <!-- Business Application -->
     <dependency>
-      <groupId>com.bonitasoft.engine.business.application</groupId>
+      <groupId>com.bonitasoft.engine.application</groupId>
       <artifactId>bonita-business-application-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -800,8 +800,8 @@
                   <include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
                   <include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
 			     <!-- Business application -->
-				<inlude>com.bonitasoft.engine.business.application:bonita-business-application-api</inlude>
-				<inlude>com.bonitasoft.engine.business.application:bonita-business-application-impl</inlude>
+				<inlude>com.bonitasoft.engine.application:bonita-business-application-api</inlude>
+				<inlude>com.bonitasoft.engine.application:bonita-business-application-impl</inlude>
 									<!-- Business Data -->
 									<inlude>com.bonitasoft.engine.data:bonita-business-data-api</inlude>
 									<inlude>com.bonitasoft.engine.data:bonita-business-data-impl</inlude>
