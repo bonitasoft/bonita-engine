@@ -31,6 +31,10 @@ public class PageCreator implements Serializable {
         fields.put(PageField.CONTENT_NAME, contentName);
     }
 
+    public String getName() {
+        return fields.get(PageField.NAME).toString();
+    }
+
     public PageCreator setDescription(final String description) {
         fields.put(PageField.DESCRIPTION, description);
         return this;
@@ -43,6 +47,41 @@ public class PageCreator implements Serializable {
 
     public Map<PageField, Serializable> getFields() {
         return fields;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (fields == null ? 0 : fields.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        PageCreator other = (PageCreator) obj;
+        if (fields == null) {
+            if (other.fields != null) {
+                return false;
+            }
+        } else if (!fields.equals(other.fields)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "PageCreator [fields=" + fields + "]";
     }
 
 }

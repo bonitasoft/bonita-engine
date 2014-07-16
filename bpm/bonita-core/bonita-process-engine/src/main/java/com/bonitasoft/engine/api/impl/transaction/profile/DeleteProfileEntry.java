@@ -51,6 +51,7 @@ public class DeleteProfileEntry implements TransactionContent {
     public void execute() throws SBonitaException {
         sDeletedProfileEntry = profileService.getProfileEntry(profileEntryId);
         if (sDeletedProfileEntry != null) {
+            profileService.updateProfileMetaData(sDeletedProfileEntry.getProfileId());
             deleteProfileEntryChildren();
             profileService.deleteProfileEntry(profileEntryId);
             updateProfileEntriesIndexOnDelete();

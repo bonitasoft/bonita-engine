@@ -20,7 +20,7 @@ public class ProfileUpdater implements Serializable {
     private static final long serialVersionUID = 728214104237982027L;
 
     public enum ProfileField {
-        NAME, DESCRIPTION, ICON_PATH, PAGE, CUSTOM;
+        NAME, DESCRIPTION, PAGE, CUSTOM;
     }
 
     private final Map<ProfileField, Serializable> fields;
@@ -35,10 +35,6 @@ public class ProfileUpdater implements Serializable {
 
     public void description(final String description) {
         fields.put(ProfileField.DESCRIPTION, description);
-    }
-
-    public void iconPath(final String iconPath) {
-        fields.put(ProfileField.ICON_PATH, iconPath);
     }
 
     public Map<ProfileField, Serializable> getFields() {

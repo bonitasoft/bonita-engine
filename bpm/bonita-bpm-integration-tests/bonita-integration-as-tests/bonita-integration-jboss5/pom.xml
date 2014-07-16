@@ -221,6 +221,10 @@
 							</execution>
 						</executions>
 						<configuration>
+                            <configfile>
+                                <file>${jboss.home}/server/default/conf/jboss-log4j.xml</file>
+                                <tofile>conf/jboss-log4j.xml</tofile>
+                            </configfile>
 							<container>
 								<containerId>jboss51x</containerId>
 								<home>${jboss.home}</home>

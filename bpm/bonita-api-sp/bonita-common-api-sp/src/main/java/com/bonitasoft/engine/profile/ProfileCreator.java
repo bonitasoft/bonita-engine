@@ -22,7 +22,7 @@ public class ProfileCreator implements Serializable {
     private static final long serialVersionUID = -1414989152963184543L;
 
     public enum ProfileField {
-        NAME, DESCRIPTION, ICON_PATH;
+        NAME, DESCRIPTION;
     }
 
     private final Map<ProfileField, Serializable> fields;
@@ -35,7 +35,6 @@ public class ProfileCreator implements Serializable {
     public ProfileCreator(final Profile profile) {
         fields = new HashMap<ProfileField, Serializable>(3);
         fields.put(ProfileField.DESCRIPTION, profile.getDescription());
-        fields.put(ProfileField.ICON_PATH, profile.getIconPath());
     }
 
     public ProfileCreator setName(final String name) {
@@ -45,11 +44,6 @@ public class ProfileCreator implements Serializable {
 
     public ProfileCreator setDescription(final String description) {
         fields.put(ProfileField.DESCRIPTION, description);
-        return this;
-    }
-
-    public ProfileCreator setIconPath(final String iconPath) {
-        fields.put(ProfileField.ICON_PATH, iconPath);
         return this;
     }
 

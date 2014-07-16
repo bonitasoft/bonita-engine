@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.bonitasoft.engine.service.BroadCastedTask;
 import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.TaskResult;
 import com.hazelcast.core.HazelcastInstance;
@@ -55,11 +56,13 @@ public class BroadcastServiceCluster implements BroadcastService {
 
     @Override
     public <T> Map<String, TaskResult<T>> execute(final Callable<T> callable) {
+        setNameOfCallingNode(callable);
         return execute(callable, null);
     }
 
     @Override
     public <T> Map<String, TaskResult<T>> execute(final Callable<T> callable, final Long tenantId) {
+        setNameOfCallingNode(callable);
         Callable<T> wrapped = new InTransactionCallable<T>(callable, tenantId);
         Map<Member, Future<T>> submitToAllMembers = hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(wrapped);
         HashMap<String, TaskResult<T>> resultMap = new HashMap<String, TaskResult<T>>();
@@ -77,6 +80,19 @@ public class BroadcastServiceCluster implements BroadcastService {
             }
         }
         return resultMap;
+    }
+
+    @Override
+    public void submit(final Callable<?> callable) {
+        setNameOfCallingNode(callable);
+        hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(callable);
+    }
+
+    private void setNameOfCallingNode(final Callable<?> callable) {
+        if (callable instanceof BroadCastedTask) {
+            BroadCastedTask<?> task = (BroadCastedTask<?>) callable;
+            task.setName(hazelcastInstance.getCluster().getLocalMember().getUuid());
+        }
     }
 
 }

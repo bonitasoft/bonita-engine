@@ -58,6 +58,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
+        profileService.updateProfileMetaData(insertedProfileEntry.getProfileId());
         List<SProfileEntry> profileEntryList;
         long loopIndex = 0L;
 
@@ -70,7 +71,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
                 // for every element of the set we update the index
                 try {
                     updateProfileEntryIndex(profileEntry, i);
-                } catch (SProfileEntryUpdateException e) {
+                } catch (final SProfileEntryUpdateException e) {
                     throw new SProfileEntryUpdateException(e);
                 }
                 i++;
@@ -98,7 +99,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
     }
 
     private void updateProfileEntryIndex(final SProfileEntry profileEntry, final long position) throws SProfileEntryUpdateException {
-        long indexToSet = 2L * position;
+        final long indexToSet = 2L * position;
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.INDEX, indexToSet);
         profileService.updateProfileEntry(profileEntry, entityUpdateDescriptor);

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+  <profile isDefault="false" name="custom profile">
+    <description>custom profile</description>
+    <profileEntries>
+      <parentProfileEntry isCustom="false" name="custom pages">
+        <parentName>NULL</parentName>
+        <index>0</index>
+        <type>folder</type>
+        <page>Null</page>
+        <childrenEntries>
+          <profileEntry isCustom="true" name="Groovy example page">
+            <parentName>custom pages</parentName>
+            <index>0</index>
+            <description>Groovy class example of custom page source structure (in English).</description>
+            <type>link</type>
+            <page>custompage_page1</page>
+          </profileEntry>
+          <profileEntry isCustom="true" name="HTML example page">
+            <parentName>custom pages</parentName>
+            <index>2</index>
+            <description>HTML and Javascript example of custom page source structure (in English).</description>
+            <type>link</type>
+            <page>custompage_page2</page>
+          </profileEntry>
+        </childrenEntries>
+      </parentProfileEntry>
+    </profileEntries>
+    <profileMapping/>
+  </profile>
+</profiles:profiles>

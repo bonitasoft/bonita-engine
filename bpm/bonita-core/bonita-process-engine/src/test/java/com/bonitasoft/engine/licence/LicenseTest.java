@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.licence;
 
-import org.apache.commons.log.ConfigurationError;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,8 +31,8 @@ public class LicenseTest {
     private void valideFeature(final String feature) {
         try {
             Assert.assertTrue("The feature: ' " + feature + "' is not active.", Manager.getInstance().isFeatureActive(feature));
-        } catch (final ConfigurationError exception) {
-            Assert.assertTrue("The feature : '" + feature + "' is not supported due to an invalid license.", false);
+        } catch (final Exception exception) {
+            Assert.assertTrue("The feature : '" + feature + "' is not supported due to an invalid license." + exception.getMessage(), false);
         }
     }
 

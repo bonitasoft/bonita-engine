@@ -51,6 +51,7 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
     @Override
     public void execute() throws SBonitaException {
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
+        profileService.updateProfileMetaData(sProfileEntry.getProfileId());
         final EntityUpdateDescriptor profileEntryUpdateDescriptor = getProfileEntryUpdateDescriptor();
         final Map<String, Object> fields = profileEntryUpdateDescriptor.getFields();
         final String type = (String) fields.get(SProfileEntryBuilderFactory.TYPE);
@@ -68,8 +69,8 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         return sProfileEntry;
     }
 
-    private EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
-        final SProfileEntryUpdateBuilder updateBuilder = BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance();
+    protected EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
+        final SProfileEntryUpdateBuilder updateBuilder = getUpdateBuilder();
         final Map<ProfileEntryUpdateField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<ProfileEntryUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
@@ -99,6 +100,10 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
             }
         }
         return updateBuilder.done();
+    }
+
+    protected SProfileEntryUpdateBuilder getUpdateBuilder() {
+        return BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance();
     }
 
 }

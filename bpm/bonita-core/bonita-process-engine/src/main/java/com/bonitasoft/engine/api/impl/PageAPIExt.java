@@ -15,8 +15,12 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.InvalidPageTokenException;
+import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
+import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -31,6 +35,8 @@ import com.bonitasoft.engine.page.PageNotFoundException;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
+import com.bonitasoft.engine.page.SInvalidPageTokenException;
+import com.bonitasoft.engine.page.SInvalidPageZipContentException;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageUpdateBuilder;
 import com.bonitasoft.engine.page.SPageUpdateBuilderFactory;
@@ -95,18 +101,46 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException {
+    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException {
         final PageService pageService = getTenantAccessor().getPageService();
         final long userId = getUserIdFromSessionInfos();
         final SPage sPage = constructPage(pageCreator, userId);
 
-        checkPageAlreadyExists((String) pageCreator.getFields().get(PageCreator.PageField.NAME));
         try {
             final SPage addPage = pageService.addPage(sPage, content);
             return convertToPage(addPage);
-        } catch (final SBonitaException sBonitaException) {
-            throw new CreationException(sBonitaException);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException("A page already exists with the name " + pageCreator.getName());
+        } catch (final SInvalidPageTokenException e) {
+            throw new InvalidPageTokenException(e.getMessage(), e);
+        } catch (final SInvalidPageZipContentException e) {
+            throw new InvalidPageZipContentException(e.getMessage(), e);
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
         }
+    }
+
+    @Override
+    public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
+            InvalidPageZipContentException
+    {
+        final PageService pageService = getTenantAccessor().getPageService();
+        final long userId = getUserIdFromSessionInfos();
+
+        try {
+            final SPage addPage = pageService.addPage(content, contentName, userId);
+            return convertToPage(addPage);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException("A page already exists with the name ");
+        } catch (final SInvalidPageTokenException e) {
+            throw new InvalidPageTokenException(e.getMessage(), e);
+        } catch (final SInvalidPageZipContentException e) {
+            throw new InvalidPageZipContentException(e.getMessage(), e);
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
+        }
+
     }
 
     protected Page convertToPage(final SPage addPage) {
@@ -127,7 +161,6 @@ public class PageAPIExt implements PageAPI {
         final PageService pageService = getTenantAccessor().getPageService();
         try {
             pageService.deletePage(pageId);
-
         } catch (final SBonitaException sBonitaException) {
             throw new DeletionException(sBonitaException);
         }
@@ -156,19 +189,6 @@ public class PageAPIExt implements PageAPI {
         }
     }
 
-    protected void checkPageAlreadyExists(final String name) throws AlreadyExistsException {
-        final PageService pageService = getTenantAccessor().getPageService();
-        // Check if the problem is primary key duplication:
-        try {
-            final SPage sPage = pageService.getPageByName(name);
-            if (sPage != null) {
-                throw new AlreadyExistsException("A page already exists with the name " + name);
-            }
-        } catch (final SBonitaException e) {
-            // ignore it
-        }
-    }
-
     @Override
     public Page getPageByName(final String name) throws PageNotFoundException {
         final PageService pageService = getTenantAccessor().getPageService();
@@ -185,7 +205,9 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException {
+    public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException,
+            UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
         }
@@ -222,6 +244,8 @@ public class PageAPIExt implements PageAPI {
             throw new UpdateException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
+        } catch (final SInvalidPageTokenException e) {
+            throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
         }
 
     }
@@ -232,18 +256,20 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException {
+    public void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
+            UpdatingWithInvalidPageZipContentException {
         final PageService pageService = getTenantAccessor().getPageService();
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
-        final SPageUpdateContentBuilder pageUpdateContentBuilder = getPageUpdateContentBuilder();
-
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
-        pageUpdateContentBuilder.updateContent(content);
-
+        pageUpdateBuilder.updateLastUpdatedBy(getUserIdFromSessionInfos());
         try {
-            pageService.updatePageContent(pageId, pageUpdateContentBuilder.done());
+            final SPage page = pageService.getPage(pageId);
+            pageService.updatePageContent(pageId, content, page.getContentName());
             pageService.updatePage(pageId, pageUpdateBuilder.done());
-
+        } catch (final SInvalidPageTokenException e) {
+            throw new UpdatingWithInvalidPageTokenException(e.getMessage(), e);
+        } catch (final SInvalidPageZipContentException e) {
+            throw new UpdatingWithInvalidPageZipContentException(e.getMessage(), e);
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
         }

@@ -26,6 +26,12 @@ public class FakeTenantLevelAPI {
 
     }
 
+    @AvailableWhenTenantIsPaused(only = true)
+    @AvailableOnStoppedNode
+    public void canOnlyBeCalledOnPausedTenant() {
+
+    }
+
     @AvailableOnStoppedNode
     public void platformAPIMethod() {
 

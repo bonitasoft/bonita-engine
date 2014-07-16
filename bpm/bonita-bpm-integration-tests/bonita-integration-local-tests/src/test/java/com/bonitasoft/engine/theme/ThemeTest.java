@@ -37,12 +37,12 @@ public class ThemeTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         getThemeAPI().restoreDefaultTheme(ThemeType.MOBILE);
         getThemeAPI().restoreDefaultTheme(ThemeType.PORTAL);
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom" }, jira = "BS-2396, BS-2397")

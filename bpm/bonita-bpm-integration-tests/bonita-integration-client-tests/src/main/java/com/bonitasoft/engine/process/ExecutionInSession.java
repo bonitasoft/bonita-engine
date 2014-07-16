@@ -69,7 +69,7 @@ public abstract class ExecutionInSession {
             }
         } else {
             if (tenantId > 0) {
-                session = BPMTestSPUtil.loginOnTenantWithTechnicalLogger(tenantId);
+                session = BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId);
             } else {
                 session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
             }

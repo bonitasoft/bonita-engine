@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+	<profile name="Administrator" isDefault="true">
+		<description>new description</description>
+		<profileEntries>
+			<parentProfileEntry isCustom="false" name="Home">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>Dynamic dashboard</description>
+				<type>link</type>
+				<page>DynamicDashboard</page>
+			</parentProfileEntry>
+			<parentProfileEntry isCustom="false" name="Organization">
+				<parentName>NULL</parentName>
+				<index>2</index>
+				<description>Organization</description>
+				<type>folder</type>
+				<page>1</page>
+				<childrenEntries>
+					<profileEntry isCustom="false" name="Users">
+						<parentName>Organization</parentName>
+						<index>0</index>
+						<description>All users</description>
+						<type>link</type>
+						<page>AllUsers</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Groups">
+						<parentName>Organization</parentName>
+						<index>2</index>
+						<description>All groups</description>
+						<type>link</type>
+						<page>AllGroups</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Roles">
+						<parentName>Organization</parentName>
+						<index>4</index>
+						<description>All roles</description>
+						<type>link</type>
+						<page>AllRoles</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Import / Export">
+						<parentName>Organization</parentName>
+						<index>6</index>
+						<description>Import / Export an final organization</description>
+						<type>link</type>
+						<page>ImportExportFinalOrganization</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry isCustom="false" name="BPM">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>BPM</description>
+				<type>folder</type>
+				<page>2</page>
+				<childrenEntries>
+					<profileEntry isCustom="false" name="Processes">
+						<parentName>BPM</parentName>
+						<index>0</index>
+						<description>All processes</description>
+						<type>link</type>
+						<page>AllProcesses</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Migration plan">
+						<parentName>BPM</parentName>
+						<index>2</index>
+						<description>All Migration plan</description>
+						<type>link</type>
+						<page>AllMigrationPlan</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Documents">
+						<parentName>BPM</parentName>
+						<index>4</index>
+						<description>All Documents</description>
+						<type>link</type>
+						<page>AllDocuments</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry isCustom="false" name="Reporting">
+				<parentName>NULL</parentName>
+				<index>6</index>
+				<description>Reporting</description>
+				<type>folder</type>
+				<page>3</page>
+				<childrenEntries>
+					<profileEntry isCustom="false" name="Dashboard">
+						<parentName>Reporting</parentName>
+						<index>0</index>
+						<description>Reporting dashboard</description>
+						<type>link</type>
+						<page>ReportingDashboardOfCurrentProfile</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Reports">
+						<parentName>Reporting</parentName>
+						<index>2</index>
+						<description>List and manage all the reports</description>
+						<type>link</type>
+						<page>ListAndManageAllReports</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry isCustom="false" name="Monitoring">
+				<parentName>NULL</parentName>
+				<index>8</index>
+				<description>Monitoring</description>
+				<type>folder</type>
+				<page>4</page>
+				<childrenEntries>
+					<profileEntry isCustom="false" name="Dashboard">
+						<parentName>Monitoring</parentName>
+						<index>0</index>
+						<description>Monitoring dashboard</description>
+						<type>link</type>
+						<page>MonitoringDashboardOfCurrentProfile</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Monitors">
+						<parentName>Monitoring</parentName>
+						<index>2</index>
+						<description>list and manage all the monitors</description>
+						<type>link</type>
+						<page>ListAndManageAllMonitors</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry isCustom="false" name="User XP">
+				<parentName>NULL</parentName>
+				<index>10</index>
+				<description>User XP</description>
+				<type>folder</type>
+				<page>5</page>
+				<childrenEntries>
+					<profileEntry isCustom="false" name="Profiles">
+						<parentName>User XP</parentName>
+						<index>0</index>
+						<description>All profiles</description>
+						<type>link</type>
+						<page>AllProfiles</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Look'n'feel">
+						<parentName>User XP</parentName>
+						<index>2</index>
+						<description>All look'n'feel</description>
+						<type>link</type>
+						<page>AllThemes</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="SSO">
+						<parentName>User XP</parentName>
+						<index>4</index>
+						<description>SSO settings</description>
+						<type>link</type>
+						<page>SsoSettings</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry isCustom="false" name="Server">
+				<parentName>NULL</parentName>
+				<index>12</index>
+				<description>Server</description>
+				<type>folder</type>
+				<page>6</page>
+				<childrenEntries>
+					<profileEntry isCustom="false" name="Commands">
+						<parentName>Server</parentName>
+						<index>0</index>
+						<description>All commands</description>
+						<type>link</type>
+						<page>AllCommands</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Logs">
+						<parentName>Server</parentName>
+						<index>2</index>
+						<description>All logs</description>
+						<type>link</type>
+						<page>AllLogs</page>
+					</profileEntry>
+					<profileEntry isCustom="false" name="Licence">
+						<parentName>Server</parentName>
+						<index>4</index>
+						<description>Licence details</description>
+						<type>link</type>
+						<page>LicenceDetails</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+		</profileEntries>
+		<profileMapping>
+			<users>
+				<user>userName1</user>
+			</users>
+			<roles>
+				<role>role1</role>
+				<role>role2</role>
+			</roles>
+			<memberships>
+				<membership>
+					<role>role2</role>
+					<group>/group1</group>
+				</membership>
+				<membership>
+					<role>role2</role>
+					<group>/group2</group>
+				</membership>
+			</memberships>
+		</profileMapping>
+	</profile>
+</profiles:profiles>

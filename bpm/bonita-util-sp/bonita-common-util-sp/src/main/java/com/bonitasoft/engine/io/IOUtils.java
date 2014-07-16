@@ -61,6 +61,9 @@ public class IOUtils {
         if (jaxbModel == null) {
             return null;
         }
+        if (schemaURL == null) {
+            throw new IllegalArgumentException("schemaURL is null");
+        }
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema = sf.newSchema(schemaURL);
@@ -80,6 +83,9 @@ public class IOUtils {
             SAXException {
         if (xmlObject == null) {
             return null;
+        }
+        if (schemaURL == null) {
+            throw new IllegalArgumentException("schemaURL is null");
         }
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema = sf.newSchema(schemaURL);

@@ -1,45 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
 	<profile name="Administrator" isDefault="true">
 		<description>Administrator profile</description>
-		<iconPath>/profiles/profileAdmin.png</iconPath>
 		<profileEntries>
-			<parentProfileEntry name="Home">
+			<parentProfileEntry name="Home" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>0</index>
 				<description>Dynamic dashboard</description>
 				<type>link</type>
 				<page>DynamicDashboard</page>
 			</parentProfileEntry>
-			<parentProfileEntry name="Organization">
+			<parentProfileEntry name="Organization" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>2</index>
 				<description>Organization</description>
 				<type>folder</type>
 				<page>1</page>
 				<childrenEntries>
-					<profileEntry name="Users">
+					<profileEntry name="Users" isCustom="false">
 						<parentName>Organization</parentName>
 						<index>0</index>
 						<description>All users</description>
 						<type>link</type>
 						<page>AllUsers</page>
 					</profileEntry>
-					<profileEntry name="Groups">
+					<profileEntry name="Groups" isCustom="false">
 						<parentName>Organization</parentName>
 						<index>2</index>
 						<description>All groups</description>
 						<type>link</type>
 						<page>AllGroups</page>
 					</profileEntry>
-					<profileEntry name="Roles">
+					<profileEntry name="Roles" isCustom="false">
 						<parentName>Organization</parentName>
 						<index>4</index>
 						<description>All roles</description>
 						<type>link</type>
 						<page>AllRoles</page>
 					</profileEntry>
-					<profileEntry name="Import / Export">
+					<profileEntry name="Import / Export" isCustom="false">
 						<parentName>Organization</parentName>
 						<index>6</index>
 						<description>Import / Export an final organization</description>
@@ -48,28 +47,28 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="BPM">
+			<parentProfileEntry name="BPM" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>4</index>
 				<description>BPM</description>
 				<type>folder</type>
 				<page>2</page>
 				<childrenEntries>
-					<profileEntry name="Processes">
+					<profileEntry name="Processes" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>0</index>
 						<description>All processes</description>
 						<type>link</type>
 						<page>AllProcesses</page>
 					</profileEntry>
-					<profileEntry name="Migration plan">
+					<profileEntry name="Migration plan" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>2</index>
 						<description>All Migration plan</description>
 						<type>link</type>
 						<page>AllMigrationPlan</page>
 					</profileEntry>
-					<profileEntry name="Documents">
+					<profileEntry name="Documents" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>4</index>
 						<description>All Documents</description>
@@ -78,21 +77,21 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="Reporting">
+			<parentProfileEntry name="Reporting" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>6</index>
 				<description>Reporting</description>
 				<type>folder</type>
 				<page>3</page>
 				<childrenEntries>
-					<profileEntry name="Dashboard">
+					<profileEntry name="Dashboard" isCustom="false">
 						<parentName>Reporting</parentName>
 						<index>0</index>
 						<description>Reporting dashboard</description>
 						<type>link</type>
 						<page>ReportingDashboardOfCurrentProfile</page>
 					</profileEntry>
-					<profileEntry name="Reports">
+					<profileEntry name="Reports" isCustom="false">
 						<parentName>Reporting</parentName>
 						<index>2</index>
 						<description>List and manage all the reports</description>
@@ -101,21 +100,21 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="Monitoring">
+			<parentProfileEntry name="Monitoring" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>8</index>
 				<description>Monitoring</description>
 				<type>folder</type>
 				<page>4</page>
 				<childrenEntries>
-					<profileEntry name="Dashboard">
+					<profileEntry name="Dashboard" isCustom="false">
 						<parentName>Monitoring</parentName>
 						<index>0</index>
 						<description>Monitoring dashboard</description>
 						<type>link</type>
 						<page>MonitoringDashboardOfCurrentProfile</page>
 					</profileEntry>
-					<profileEntry name="Monitors">
+					<profileEntry name="Monitors" isCustom="false">
 						<parentName>Monitoring</parentName>
 						<index>2</index>
 						<description>list and manage all the monitors</description>
@@ -124,28 +123,28 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="User XP">
+			<parentProfileEntry name="User XP" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>10</index>
 				<description>User XP</description>
 				<type>folder</type>
 				<page>5</page>
 				<childrenEntries>
-					<profileEntry name="Profiles">
+					<profileEntry name="Profiles" isCustom="false">
 						<parentName>User XP</parentName>
 						<index>0</index>
 						<description>All profiles</description>
 						<type>link</type>
 						<page>AllProfiles</page>
 					</profileEntry>
-					<profileEntry name="Look'n'feel">
+					<profileEntry name="Look'n'feel" isCustom="false">
 						<parentName>User XP</parentName>
 						<index>2</index>
 						<description>All look'n'feel</description>
 						<type>link</type>
 						<page>AllThemes</page>
 					</profileEntry>
-					<profileEntry name="SSO">
+					<profileEntry name="SSO" isCustom="false">
 						<parentName>User XP</parentName>
 						<index>4</index>
 						<description>SSO settings</description>
@@ -154,27 +153,27 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="Server">
+			<parentProfileEntry name="Server" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>12</index>
 				<description>Server</description>
 				<type>folder</type>
 				<childrenEntries>
-					<profileEntry name="Commands">
+					<profileEntry name="Commands" isCustom="false">
 						<parentName>Server</parentName>
 						<index>0</index>
 						<description>All commands</description>
 						<type>link</type>
 						<page>AllCommands</page>
 					</profileEntry>
-					<profileEntry name="Logs">
+					<profileEntry name="Logs" isCustom="false">
 						<parentName>Server</parentName>
 						<index>2</index>
 						<description>All logs</description>
 						<type>link</type>
 						<page>AllLogs</page>
 					</profileEntry>
-					<profileEntry name="Licence">
+					<profileEntry name="Licence" isCustom="false">
 						<parentName>Server</parentName>
 						<index>4</index>
 						<description>Licence details</description>
@@ -193,37 +192,36 @@
 	</profile>
 	<profile name="User" isDefault="false">
 		<description>User profile</description>
-		<iconPath>/profiles/profileUser.png</iconPath>
 		<profileEntries>
-			<parentProfileEntry name="Home">
+			<parentProfileEntry name="Home" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>0</index>
 				<description>Current user's tasks - Summary</description>
 				<type>link</type>
 				<page>CurrentUserTasksSummary</page>
 			</parentProfileEntry>
-			<parentProfileEntry name="Tasks">
+			<parentProfileEntry name="Tasks" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>2</index>
 				<description>Tasks</description>
 				<type>folder</type>
 				<page>1</page>
 				<childrenEntries>
-					<profileEntry name="My tasks">
+					<profileEntry name="My tasks" isCustom="false">
 						<parentName>Tasks</parentName>
 						<index>0</index>
 						<description>Current user's tasks - Opened</description>
 						<type>link</type>
 						<page>CurrentUserTasksOpened</page>
 					</profileEntry>
-					<profileEntry name="Pending tasks">
+					<profileEntry name="Pending tasks" isCustom="false">
 						<parentName>Tasks</parentName>
 						<index>2</index>
 						<description>Current user's tasks - Pending</description>
 						<type>link</type>
 						<page>CurrentUserTasksPending</page>
 					</profileEntry>
-					<profileEntry name="History">
+					<profileEntry name="History" isCustom="false">
 						<parentName>Tasks</parentName>
 						<index>4</index>
 						<description>Current user's tasks - History</description>
@@ -232,14 +230,14 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="Applications">
+			<parentProfileEntry name="Applications" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>4</index>
 				<description>Applications</description>
 				<type>folder</type>
 				<page>2</page>
 				<childrenEntries>
-					<profileEntry name="Recently used">
+					<profileEntry name="Recently used" isCustom="false">
 						<parentName>Applications</parentName>
 						<index>0</index>
 						<description>Processes current user can run - Recently used
@@ -247,7 +245,7 @@
 						<type>link</type>
 						<page>ProcessesCurrentUserCanRunRecentlyUsed</page>
 					</profileEntry>
-					<profileEntry name="All">
+					<profileEntry name="All" isCustom="false">
 						<parentName>Applications</parentName>
 						<index>2</index>
 						<description>Processes current user can run</description>
@@ -256,28 +254,28 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="Cases">
+			<parentProfileEntry name="Cases" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>6</index>
 				<description>Cases</description>
 				<type>folder</type>
 				<page>3</page>
 				<childrenEntries>
-					<profileEntry name="Recently used">
+					<profileEntry name="Recently used" isCustom="false">
 						<parentName>Cases</parentName>
 						<index>0</index>
 						<description>Cases in progress for the current user</description>
 						<type>link</type>
 						<page>CasesInProgressForTheCurrentUser</page>
 					</profileEntry>
-					<profileEntry name="Cases I work on">
+					<profileEntry name="Cases I work on" isCustom="false">
 						<parentName>Cases</parentName>
 						<index>2</index>
 						<description>Cases current user works on</description>
 						<type>link</type>
 						<page>CasesCurrentUserWorksOn</page>
 					</profileEntry>
-					<profileEntry name="History">
+					<profileEntry name="History" isCustom="false">
 						<parentName>Cases</parentName>
 						<index>4</index>
 						<description>Current user's cases - History</description>
@@ -286,35 +284,35 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
-			<parentProfileEntry name="My activity">
+			<parentProfileEntry name="My activity" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>8</index>
 				<description>My activity</description>
 				<type>folder</type>
 				<page>9</page>
 				<childrenEntries>
-					<profileEntry name="Reporting dashboard">
+					<profileEntry name="Reporting dashboard" isCustom="false">
 						<parentName>My activity</parentName>
 						<index>0</index>
 						<description>Reporting dashboard</description>
 						<type>link</type>
 						<page>ReportingDashboardOfCurrentProfile</page>
 					</profileEntry>
-					<profileEntry name="Reports">
+					<profileEntry name="Reports" isCustom="false">
 						<parentName>My activity</parentName>
 						<index>2</index>
 						<description>List and run allowed reports</description>
 						<type>link</type>
 						<page>ListAndRunCurrentUserReports</page>
 					</profileEntry>
-					<profileEntry name="Monitoring dashboard">
+					<profileEntry name="Monitoring dashboard" isCustom="false">
 						<parentName>My activity</parentName>
 						<index>4</index>
 						<description>Monitoring dashboard</description>
 						<type>link</type>
 						<page>MonitoringDashboardOfCurrentProfile</page>
 					</profileEntry>
-					<profileEntry name="Monitors">
+					<profileEntry name="Monitors" isCustom="false">
 						<parentName>My activity</parentName>
 						<index>6</index>
 						<description>list and run allowed monitors</description>
@@ -325,4 +323,4 @@
 			</parentProfileEntry>
 		</profileEntries>
 	</profile>
-</profiles:proFiles>
+</profiles:profiles>
