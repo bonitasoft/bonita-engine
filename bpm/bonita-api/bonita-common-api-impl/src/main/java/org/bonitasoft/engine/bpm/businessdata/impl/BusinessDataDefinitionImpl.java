@@ -19,6 +19,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Romain Bioteau
  */
 public class BusinessDataDefinitionImpl extends NamedElementImpl implements BusinessDataDefinition {
 
@@ -29,6 +30,8 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     private String type;
 
     private String className;
+
+    private boolean isMultiple = false;
 
     private Expression defaultValueExpression;
 
@@ -45,14 +48,6 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     @Override
     public String getClassName() {
         return className;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(final String type) {
-        this.type = type;
     }
 
     @Override
@@ -72,75 +67,64 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
         this.className = className;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (className == null ? 0 : className.hashCode());
-        result = prime * result + (defaultValueExpression == null ? 0 : defaultValueExpression.hashCode());
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+    public boolean isMultiple() {
+        return isMultiple;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BusinessDataDefinitionImpl other = (BusinessDataDefinitionImpl) obj;
-        if (className == null) {
-            if (other.className != null) {
-                return false;
-            }
-        } else if (!className.equals(other.className)) {
-            return false;
-        }
-        if (defaultValueExpression == null) {
-            if (other.defaultValueExpression != null) {
-                return false;
-            }
-        } else if (!defaultValueExpression.equals(other.defaultValueExpression)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
+    public void setMultiple(boolean isMultiple) {
+        this.isMultiple = isMultiple;
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("BusinessDataDefinitionImpl [name=");
-        builder.append(getName());
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", type=");
-        builder.append(type);
-        builder.append(", className=");
-        builder.append(className);
-        builder.append(", defaultValueExpression=");
-        builder.append(defaultValueExpression);
-        builder.append("]");
-        return builder.toString();
+        return "BusinessDataDefinitionImpl [description=" + description + ", type=" + type + ", className=" + className + ", isMultiple=" + isMultiple
+                + ", defaultValueExpression=" + defaultValueExpression + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((className == null) ? 0 : className.hashCode());
+        result = prime * result + ((defaultValueExpression == null) ? 0 : defaultValueExpression.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + (isMultiple ? 1231 : 1237);
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BusinessDataDefinitionImpl other = (BusinessDataDefinitionImpl) obj;
+        if (className == null) {
+            if (other.className != null)
+                return false;
+        } else if (!className.equals(other.className))
+            return false;
+        if (defaultValueExpression == null) {
+            if (other.defaultValueExpression != null)
+                return false;
+        } else if (!defaultValueExpression.equals(other.defaultValueExpression))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (isMultiple != other.isMultiple)
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
+        return true;
     }
 
 }

@@ -45,6 +45,11 @@ public class BusinessDataDefinitionBuilder extends FlowElementContainerBuilder i
         processDefinitionBuilder.checkName(businessDataDefinition.getName());
     }
 
+    public BusinessDataDefinitionBuilder setMultiple(final boolean isMultiple) {
+        businessDataDefinition.setMultiple(isMultiple);
+        return this;
+    }
+
     @Override
     public BusinessDataDefinitionBuilder addDescription(final String description) {
         businessDataDefinition.setDescription(description);

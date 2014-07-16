@@ -25,6 +25,8 @@ public interface SBusinessDataDefinitionBuilder {
 
     SBusinessDataDefinitionBuilder setDefaultValue(SExpression expression);
 
+    SBusinessDataDefinitionBuilder setMultiple(boolean isMultiple);
+
     SBusinessDataDefinition done();
 
 }

@@ -31,6 +31,8 @@ public class SBusinessDataDefinitionImpl implements SBusinessDataDefinition {
 
     private SExpression defaultValueExpression;
 
+    private boolean isMultiple;
+
     public SBusinessDataDefinitionImpl() {
         super();
     }
@@ -69,6 +71,15 @@ public class SBusinessDataDefinitionImpl implements SBusinessDataDefinition {
 
     public void setClassName(final String className) {
         this.className = className;
+    }
+
+    @Override
+    public boolean isMultiple() {
+        return this.isMultiple;
+    }
+
+    public void setMultiple(boolean isMultiple) {
+        this.isMultiple = isMultiple;
     }
 
 }
