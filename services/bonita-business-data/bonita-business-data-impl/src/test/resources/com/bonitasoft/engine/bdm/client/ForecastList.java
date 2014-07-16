@@ -1,12 +1,13 @@
-import javax.persistence.CascadeType;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -14,13 +15,12 @@ import javax.persistence.Version;
 /**
  * 
  */
-@javax.persistence.Entity(name = "Employee")
-@Table(name = "EMPLOYEE")
+@javax.persistence.Entity(name = "Forecast")
+@Table(name = "FORECAST")
 @NamedQueries({
-    @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
-    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
+    @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
 })
-public class Employee
+public class Forecast
     implements com.bonitasoft.engine.bdm.Entity
 {
 
@@ -29,20 +29,12 @@ public class Employee
     private Long persistenceId;
     @Version
     private Long persistenceVersion;
-    @Column(name = "FIRSTNAME", nullable = true)
-    private String firstName;
-    @OneToOne(orphanRemoval = true, optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ADDRESS_PID")
-    private Address address;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    @Column(name = "TEMPERATURES", nullable = true)
+    private List<Double> temperatures = new ArrayList<Double>(10);
 
-    public Employee() {
-    }
-
-    public Employee(Employee employee) {
-        this.persistenceId = employee.getPersistenceId();
-        this.persistenceVersion = employee.getPersistenceVersion();
-        this.firstName = employee.getFirstName();
-        this.address = employee.getAddress();
+    public Forecast() {
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -61,20 +53,22 @@ public class Employee
         return persistenceVersion;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setTemperatures(List<Double> temperatures) {
+        this.temperatures = temperatures;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public List<Double> getTemperatures() {
+        return temperatures;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void addToTemperatures(Double addTo) {
+        List temperatures = getTemperatures();
+        temperatures.add(addTo);
     }
 
-    public Address getAddress() {
-        return address;
+    public void removeFromTemperatures(Double removeFrom) {
+        List temperatures = getTemperatures();
+        temperatures.remove(removeFrom);
     }
 
     @Override
@@ -88,7 +82,7 @@ public class Employee
         if (getClass()!= obj.getClass()) {
             return false;
         }
-        Employee other = ((Employee) obj);
+        Forecast other = ((Forecast) obj);
         if (persistenceId == null) {
             if (other.persistenceId!= null) {
                 return false;
@@ -107,21 +101,12 @@ public class Employee
                 return false;
             }
         }
-        if (firstName == null) {
-            if (other.firstName!= null) {
+        if (temperatures == null) {
+            if (other.temperatures!= null) {
                 return false;
             }
         } else {
-            if (!firstName.equals(other.firstName)) {
-                return false;
-            }
-        }
-        if (address == null) {
-            if (other.address!= null) {
-                return false;
-            }
-        } else {
-            if (!address.equals(other.address)) {
+            if (!temperatures.equals(other.temperatures)) {
                 return false;
             }
         }
@@ -142,16 +127,11 @@ public class Employee
             persistenceVersionCode = persistenceVersion.hashCode();
         }
         result = ((prime*result)+ persistenceVersionCode);
-        int firstNameCode = 0;
-        if (firstName!= null) {
-            firstNameCode = firstName.hashCode();
+        int temperaturesCode = 0;
+        if (temperatures!= null) {
+            temperaturesCode = temperatures.hashCode();
         }
-        result = ((prime*result)+ firstNameCode);
-        int addressCode = 0;
-        if (address!= null) {
-            addressCode = address.hashCode();
-        }
-        result = ((prime*result)+ addressCode);
+        result = ((prime*result)+ temperaturesCode);
         return result;
     }
 

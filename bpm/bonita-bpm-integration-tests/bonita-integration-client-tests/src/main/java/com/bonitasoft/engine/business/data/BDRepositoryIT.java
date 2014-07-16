@@ -56,6 +56,7 @@ import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
@@ -91,6 +92,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         final RelationField address = new RelationField();
         address.setType(Type.AGGREGATION);
+        address.setFetchType(FetchType.LAZY);
         address.setName("addresses");
         address.setCollection(Boolean.TRUE);
         address.setNullable(Boolean.TRUE);
@@ -273,6 +275,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(returnedFirstName).isEqualTo(newEmployeeFirstName);
         assertThat(returnedLastName).isEqualTo(newEmployeeLastName);
 
+        assertCount(processInstanceId);
         disableAndDeleteProcess(definition.getId());
     }
 
@@ -309,7 +312,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @Test
-    public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
+    public void deployABDRAndCreateABOAndUdpateThroughAGroovyScript() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
@@ -328,7 +331,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         waitForUserTask("step1", instance.getId());
         final String employeeToString = getEmployeeToString("myEmployee", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Doe]");
+        assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=BPM]");
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -426,6 +429,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final String employeeToString = getEmployeeToString("myEmployee", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Hakkinen]");
 
+        assertCount(instance.getId());
         disableAndDeleteProcess(definition);
     }
 
@@ -495,6 +499,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
 
+        assertCount(processInstanceId);
         disableAndDeleteProcess(definition.getId());
     }
 
@@ -531,7 +536,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
             daoMethod = daoImpl.getClass().getMethod("findByFirstNameAndLastName", String.class, String.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
-            assertThat(daoMethod.invoke(daoImpl, "Marcel", "Pagnol")).isNotNull();
+            final Object employee = daoMethod.invoke(daoImpl, "Marcel", "Pagnol");
+            assertThat(employee).isNotNull();
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -681,6 +687,15 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(result.get("countEmployee")).isEqualTo(0L);
 
         disableAndDeleteProcess(definition.getId());
+    }
+
+    public void assertCount(final long processInstanceId) throws Exception {
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
+                Collections.<String, Serializable> emptyMap());
+
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        assertThat(result.get("countEmployee")).isEqualTo(1L);
     }
 
 }

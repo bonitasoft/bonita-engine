@@ -27,10 +27,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.InvalidPageTokenException;
-import org.bonitasoft.engine.exception.InvalidPageZipContentException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
-import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.profile.Profile;
@@ -423,10 +419,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                        .setPage(page.getName())
-                        .setCustom(new Boolean(true))
-                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                        .setParentId(folderProfileEntry.getId()));
+                .setPage(page.getName())
+                .setCustom(new Boolean(true))
+                .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                .setParentId(folderProfileEntry.getId()));
 
         getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")
@@ -479,10 +475,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                        .setPage(page.getName())
-                        .setCustom(new Boolean(true))
-                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                        .setParentId(folderProfileEntry.getId()));
+                .setPage(page.getName())
+                .setCustom(new Boolean(true))
+                .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                .setParentId(folderProfileEntry.getId()));
 
         // when
         getPageAPI().deletePage(page.getId());
@@ -542,10 +538,10 @@ public class PageAPIIT extends CommonAPISPTest {
 
         final ProfileEntry customPageProfileEntry = getProfileAPI().createProfileEntry(
                 new ProfileEntryCreator(ENTRY_NAME + "1", profileId).setType(ENTRY_TYPE_LINK)
-                        .setPage(page.getName())
-                        .setCustom(true)
-                        .setDescription(DESCRIPTION_CUSTOM_PAGE)
-                        .setParentId(folderProfileEntry.getId()));
+                .setPage(page.getName())
+                .setCustom(true)
+                .setDescription(DESCRIPTION_CUSTOM_PAGE)
+                .setParentId(folderProfileEntry.getId()));
 
         getProfileAPI().createProfileEntry(new ProfileEntryCreator(ENTRY_NAME + "2", profileId).setType(ENTRY_TYPE_LINK)
                 .setPage("tasklistingadmin")

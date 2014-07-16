@@ -1,16 +1,12 @@
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -35,26 +31,11 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(name = "EMPLOYEE_ADDRESSES", joinColumns = {
-        @JoinColumn(name = "EMPLOYEE_PID")
-    }, inverseJoinColumns = {
-        @JoinColumn(name = "ADDRESS_PID")
-    })
-    @OrderColumn
-    private List<Address> addresses = new ArrayList<Address>(10);
+    @OneToOne(orphanRemoval = true, optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ADDRESS_PID")
+    private Address address;
 
     public Employee() {
-    }
-
-    public Employee(Employee employee) {
-        this.persistenceId = employee.getPersistenceId();
-        this.persistenceVersion = employee.getPersistenceVersion();
-        this.firstName = employee.getFirstName();
-        this.addresses = new ArrayList<Address>();
-        for (Address i: employee.getAddresses()) {
-            this.addresses.add(new Address(i));
-        }
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -81,20 +62,12 @@ public class Employee
         return firstName;
     }
 
-    public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
-    public List<Address> getAddresses() {
-        return addresses;
-    }
-
-    public void addToAddresses(Address addTo) {
-        addresses.add(addTo);
-    }
-
-    public void removeFromAddresses(Address removeFrom) {
-        addresses.remove(removeFrom);
+    public Address getAddress() {
+        return address;
     }
 
     @Override
@@ -136,12 +109,12 @@ public class Employee
                 return false;
             }
         }
-        if (addresses == null) {
-            if (other.addresses!= null) {
+        if (address == null) {
+            if (other.address!= null) {
                 return false;
             }
         } else {
-            if (!addresses.equals(other.addresses)) {
+            if (!address.equals(other.address)) {
                 return false;
             }
         }
@@ -167,11 +140,11 @@ public class Employee
             firstNameCode = firstName.hashCode();
         }
         result = ((prime*result)+ firstNameCode);
-        int addressesCode = 0;
-        if (addresses!= null) {
-            addressesCode = addresses.hashCode();
+        int addressCode = 0;
+        if (address!= null) {
+            addressCode = address.hashCode();
         }
-        result = ((prime*result)+ addressesCode);
+        result = ((prime*result)+ addressCode);
         return result;
     }
 

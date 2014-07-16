@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -26,8 +25,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.apache.commons.lang3.text.WordUtils;
-
+import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.model.Query;
@@ -38,16 +36,10 @@ import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JVar;
 
 /**
  * @author Colin PUY
@@ -78,7 +70,6 @@ public class EntityCodeGenerator {
         addFieldsAndMethods(bo, entityClass);
 
         codeGenerator.addDefaultConstructor(entityClass);
-        addCopyConstructor(entityClass, bo);
 
         codeGenerator.addEqualsMethod(entityClass);
         codeGenerator.addHashCodeMethod(entityClass);
@@ -92,7 +83,7 @@ public class EntityCodeGenerator {
 
         for (final Field field : bo.getFields()) {
             final JFieldVar fieldVar = addField(entityClass, field);
-            addAccessors(entityClass, fieldVar);
+            addAccessors(entityClass, fieldVar, field);
             addModifiers(entityClass, field);
         }
     }
@@ -166,30 +157,6 @@ public class EntityCodeGenerator {
         }
     }
 
-    protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
-        final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
-        final JVar param = copyConstructor.param(entityClass, WordUtils.uncapitalize(entityClass.name()));
-        final JBlock copyBody = copyConstructor.body();
-        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
-        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
-        for (final Field field : bo.getFields()) {
-            if (field.isCollection() != null && field.isCollection()) {
-                final JClass fieldClass = codeGenerator.toJavaClass(field);
-                final JClass arrayListFieldClazz = codeGenerator.narrowClass(ArrayList.class, fieldClass);
-                if (field instanceof SimpleField) {
-                    copyBody.assign(JExpr.refthis(field.getName()),
-                            JExpr._new(arrayListFieldClazz).arg(JExpr.invoke(JExpr.ref(param.name()), codeGenerator.getGetterName(field))));
-                } else {
-                    copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz));
-                    final JForEach forEach = copyBody.forEach(fieldClass, "i", JExpr.invoke(JExpr.ref(param.name()), codeGenerator.getGetterName(field)));
-                    forEach.body().invoke(JExpr.refthis(field.getName()), "add").arg(JExpr._new(fieldClass).arg(forEach.var()));
-                }
-            } else {
-                copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), codeGenerator.getGetterName(field)));
-            }
-        }
-    }
-
     public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
         final JFieldVar idFieldVar = codeGenerator.addField(entityClass, Field.PERSISTENCE_ID, codeGenerator.toJavaClass(FieldType.LONG));
         codeGenerator.addAnnotation(idFieldVar, Id.class);
@@ -247,8 +214,15 @@ public class EntityCodeGenerator {
     }
 
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
+        addAccessors(entityClass, fieldVar, null);
+    }
+
+    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) throws JClassAlreadyExistsException {
         codeGenerator.addSetter(entityClass, fieldVar);
-        codeGenerator.addGetter(entityClass, fieldVar);
+        final JMethod getter = codeGenerator.addGetter(entityClass, fieldVar);
+        if (field instanceof RelationField && ((RelationField) field).isLazy()) {
+            getter.annotate(LazyLoaded.class);
+        }
     }
 
     protected void addModifiers(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {

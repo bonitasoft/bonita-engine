@@ -25,6 +25,7 @@ import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -49,7 +50,9 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     protected static final String DAO_IMPL_SUFFIX = "DAOImpl";
 
-    private final BusinessObjectModel bom;
+    private static final String NEW_INSTANCE_METHOD_NAME = "newInstance";
+
+    protected final BusinessObjectModel bom;
 
     public AbstractBDMCodeGenerator(final BusinessObjectModel bom) {
         super();
@@ -60,11 +63,41 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     public void buildJavaModelFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
-        EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this);
+        final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final JDefinedClass entity = entityCodeGenerator.addEntity(bo);
             addDAO(bo, entity);
         }
+    }
+
+    protected void addNewInstanceMethodBody(final JMethod method, final JDefinedClass entity) {
+        final JBlock methodBody = method.body();
+        for (final JVar param : method.params()) {
+            addNotNullParamCheck(methodBody, param);
+        }
+        final JVar instanceRef = methodBody.decl(entity, "instance", JExpr._new(entity));
+        for (final JVar param : method.params()) {
+            callSetter(methodBody, param, instanceRef, entity);
+        }
+        methodBody._return(instanceRef);
+    }
+
+    private void callSetter(final JBlock methodBody, final JVar param, final JVar instanceRef, final JDefinedClass entity) {
+        final JMethod setter = getSetterForParam(param, entity);
+        if (setter == null) {
+            throw new IllegalStateException("No setter found for parameter " + param.name());
+        }
+        methodBody.add(instanceRef.invoke(setter).arg(param));
+    }
+
+    private JMethod getSetterForParam(final JVar param, final JDefinedClass entity) {
+        final String setterName = getSetterName(param);
+        return entity.getMethod(setterName, new JType[] { param.type() });
+    }
+
+    private void addNotNullParamCheck(final JBlock methodBody, final JVar param) {
+        methodBody._if(param.eq(JExpr._null()))._then()
+        ._throw(JExpr._new(getModel().ref(IllegalArgumentException.class)).arg(JExpr.lit(param.name() + " cannot be null")));
     }
 
     protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
@@ -119,7 +152,25 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             createMethodForQuery(entity, daoInterface, q);
         }
 
+        createMethodForNewInstance(bo, entity, daoInterface);
+
         return daoInterface;
+    }
+
+    protected JMethod createMethodForNewInstance(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) {
+        final JMethod newInstanceMethod = addMethodSignature(daoInterface, NEW_INSTANCE_METHOD_NAME, entity);
+        for (final Field field : bo.getFields()) {
+            if (!field.isNullable()) {
+                String typeClassName = null;
+                if (field instanceof SimpleField) {
+                    typeClassName = ((SimpleField) field).getType().getClazz().getName();
+                } else if (field instanceof RelationField) {
+                    typeClassName = ((RelationField) field).getReference().getQualifiedName();
+                }
+                newInstanceMethod.param(getModel().ref(typeClassName), field.getName());
+            }
+        }
+        return newInstanceMethod;
     }
 
     protected JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) throws ClassNotFoundException {
@@ -169,6 +220,11 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             }
             body.invoke(commandParametersRef, "put").arg(JExpr.lit("queryParameters")).arg(JExpr.cast(getModel().ref(Serializable.class), queryParametersRef));
         }
+    }
+
+    protected static String suffixPackage(final String qualifiedName, final String packageSuffix) {
+        final int pointIdx = qualifiedName.lastIndexOf('.');
+        return qualifiedName.substring(0, pointIdx + 1) + packageSuffix + "." + qualifiedName.substring(pointIdx + 1);
     }
 
 }

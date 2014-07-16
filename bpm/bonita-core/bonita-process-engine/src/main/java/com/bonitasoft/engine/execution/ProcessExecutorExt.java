@@ -103,7 +103,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     protected boolean initialize(final long userId, final SProcessDefinition sDefinition, final SProcessInstance sInstance,
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
-            throws SProcessInstanceCreationException {
+                    throws SProcessInstanceCreationException {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
@@ -122,8 +122,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 final SExpression expression = bdd.getDefaultValueExpression();
                 Long primaryKey = null;
                 if (expression != null) {
-                    Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
-                    businessData = businessDataRepository.merge(businessData);
+                    final Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                    businessDataRepository.persist(businessData);
                     primaryKey = businessData.getPersistenceId();
                 }
                 final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
@@ -155,7 +155,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     }
 
     private void initializeStringIndexes(final SProcessInstance sInstance, final SProcessDefinition sDefinition) throws SExpressionTypeUnknownException,
-            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
+    SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
         final SExpressionContext contextDependency = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 sDefinition.getId());
         boolean update = false;

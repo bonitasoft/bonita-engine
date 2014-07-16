@@ -36,12 +36,6 @@ public class Employee
     public Employee() {
     }
 
-    public Employee(Employee employee) {
-        this.persistenceId = employee.getPersistenceId();
-        this.persistenceVersion = employee.getPersistenceVersion();
-        this.firstName = employee.getFirstName();
-    }
-
     public void setPersistenceId(Long persistenceId) {
         this.persistenceId = persistenceId;
     }

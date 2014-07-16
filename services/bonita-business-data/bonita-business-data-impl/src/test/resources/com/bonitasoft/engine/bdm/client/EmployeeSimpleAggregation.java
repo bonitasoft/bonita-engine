@@ -1,13 +1,12 @@
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -15,12 +14,13 @@ import javax.persistence.Version;
 /**
  * 
  */
-@javax.persistence.Entity(name = "Forecast")
-@Table(name = "FORECAST")
+@javax.persistence.Entity(name = "Employee")
+@Table(name = "EMPLOYEE")
 @NamedQueries({
-    @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
+    @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
+    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
 })
-public class Forecast
+public class Employee
     implements com.bonitasoft.engine.bdm.Entity
 {
 
@@ -29,18 +29,13 @@ public class Forecast
     private Long persistenceId;
     @Version
     private Long persistenceVersion;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @OrderColumn
-    @Column(name = "TEMPERATURES", nullable = true)
-    private List<Double> temperatures = new ArrayList<Double>(10);
+    @Column(name = "FIRSTNAME", nullable = true)
+    private String firstName;
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "ADDRESS_PID")
+    private Address address;
 
-    public Forecast() {
-    }
-
-    public Forecast(Forecast forecast) {
-        this.persistenceId = forecast.getPersistenceId();
-        this.persistenceVersion = forecast.getPersistenceVersion();
-        this.temperatures = new ArrayList<Double>(forecast.getTemperatures());
+    public Employee() {
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -59,20 +54,20 @@ public class Forecast
         return persistenceVersion;
     }
 
-    public void setTemperatures(List<Double> temperatures) {
-        this.temperatures = temperatures;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public List<Double> getTemperatures() {
-        return temperatures;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void addToTemperatures(Double addTo) {
-        temperatures.add(addTo);
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
-    public void removeFromTemperatures(Double removeFrom) {
-        temperatures.remove(removeFrom);
+    public Address getAddress() {
+        return address;
     }
 
     @Override
@@ -86,7 +81,7 @@ public class Forecast
         if (getClass()!= obj.getClass()) {
             return false;
         }
-        Forecast other = ((Forecast) obj);
+        Employee other = ((Employee) obj);
         if (persistenceId == null) {
             if (other.persistenceId!= null) {
                 return false;
@@ -105,12 +100,21 @@ public class Forecast
                 return false;
             }
         }
-        if (temperatures == null) {
-            if (other.temperatures!= null) {
+        if (firstName == null) {
+            if (other.firstName!= null) {
                 return false;
             }
         } else {
-            if (!temperatures.equals(other.temperatures)) {
+            if (!firstName.equals(other.firstName)) {
+                return false;
+            }
+        }
+        if (address == null) {
+            if (other.address!= null) {
+                return false;
+            }
+        } else {
+            if (!address.equals(other.address)) {
                 return false;
             }
         }
@@ -131,11 +135,16 @@ public class Forecast
             persistenceVersionCode = persistenceVersion.hashCode();
         }
         result = ((prime*result)+ persistenceVersionCode);
-        int temperaturesCode = 0;
-        if (temperatures!= null) {
-            temperaturesCode = temperatures.hashCode();
+        int firstNameCode = 0;
+        if (firstName!= null) {
+            firstNameCode = firstName.hashCode();
         }
-        result = ((prime*result)+ temperaturesCode);
+        result = ((prime*result)+ firstNameCode);
+        int addressCode = 0;
+        if (address!= null) {
+            addressCode = address.hashCode();
+        }
+        result = ((prime*result)+ addressCode);
         return result;
     }
 

@@ -1,12 +1,16 @@
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -31,18 +35,16 @@ public class Employee
     private Long persistenceVersion;
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName;
-    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "ADDRESS_PID")
-    private Address address;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(name = "EMPLOYEE_ADDRESSES", joinColumns = {
+        @JoinColumn(name = "EMPLOYEE_PID")
+    }, inverseJoinColumns = {
+        @JoinColumn(name = "ADDRESS_PID")
+    })
+    @OrderColumn
+    private List<Address> addresses = new ArrayList<Address>(10);
 
     public Employee() {
-    }
-
-    public Employee(Employee employee) {
-        this.persistenceId = employee.getPersistenceId();
-        this.persistenceVersion = employee.getPersistenceVersion();
-        this.firstName = employee.getFirstName();
-        this.address = employee.getAddress();
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -69,12 +71,22 @@ public class Employee
         return firstName;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
     }
 
-    public Address getAddress() {
-        return address;
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void addToAddresses(Address addTo) {
+        List addresses = getAddresses();
+        addresses.add(addTo);
+    }
+
+    public void removeFromAddresses(Address removeFrom) {
+        List addresses = getAddresses();
+        addresses.remove(removeFrom);
     }
 
     @Override
@@ -116,12 +128,12 @@ public class Employee
                 return false;
             }
         }
-        if (address == null) {
-            if (other.address!= null) {
+        if (addresses == null) {
+            if (other.addresses!= null) {
                 return false;
             }
         } else {
-            if (!address.equals(other.address)) {
+            if (!addresses.equals(other.addresses)) {
                 return false;
             }
         }
@@ -147,11 +159,11 @@ public class Employee
             firstNameCode = firstName.hashCode();
         }
         result = ((prime*result)+ firstNameCode);
-        int addressCode = 0;
-        if (address!= null) {
-            addressCode = address.hashCode();
+        int addressesCode = 0;
+        if (addresses!= null) {
+            addressesCode = addresses.hashCode();
         }
-        result = ((prime*result)+ addressCode);
+        result = ((prime*result)+ addressesCode);
         return result;
     }
 

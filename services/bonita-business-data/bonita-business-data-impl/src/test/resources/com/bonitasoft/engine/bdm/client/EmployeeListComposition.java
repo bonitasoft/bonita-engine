@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -38,18 +40,13 @@ public class Employee
     @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
     @OrderColumn
     private List<Address> addresses = new ArrayList<Address>(10);
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "EMPLOYEE_PID", nullable = false)
+    @OrderColumn
+    @JsonIgnore
+    private List<Skill> skills = new ArrayList<Skill>(10);
 
     public Employee() {
-    }
-
-    public Employee(Employee employee) {
-        this.persistenceId = employee.getPersistenceId();
-        this.persistenceVersion = employee.getPersistenceVersion();
-        this.firstName = employee.getFirstName();
-        this.addresses = new ArrayList<Address>();
-        for (Address i: employee.getAddresses()) {
-            this.addresses.add(new Address(i));
-        }
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -85,11 +82,32 @@ public class Employee
     }
 
     public void addToAddresses(Address addTo) {
+        List addresses = getAddresses();
         addresses.add(addTo);
     }
 
     public void removeFromAddresses(Address removeFrom) {
+        List addresses = getAddresses();
         addresses.remove(removeFrom);
+    }
+
+    public void setSkills(List<Skill> skills) {
+        this.skills = skills;
+    }
+
+    @LazyLoaded
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void addToSkills(Skill addTo) {
+        List skills = getSkills();
+        skills.add(addTo);
+    }
+
+    public void removeFromSkills(Skill removeFrom) {
+        List skills = getSkills();
+        skills.remove(removeFrom);
     }
 
     @Override
@@ -140,6 +158,15 @@ public class Employee
                 return false;
             }
         }
+        if (skills == null) {
+            if (other.skills!= null) {
+                return false;
+            }
+        } else {
+            if (!skills.equals(other.skills)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -167,6 +194,11 @@ public class Employee
             addressesCode = addresses.hashCode();
         }
         result = ((prime*result)+ addressesCode);
+        int skillsCode = 0;
+        if (skills!= null) {
+            skillsCode = skills.hashCode();
+        }
+        result = ((prime*result)+ skillsCode);
         return result;
     }
 

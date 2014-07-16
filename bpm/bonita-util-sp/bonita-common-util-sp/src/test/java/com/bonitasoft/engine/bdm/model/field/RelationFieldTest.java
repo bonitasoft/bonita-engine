@@ -83,4 +83,12 @@ public class RelationFieldTest {
         
         assertThat(field.getFetchType()).isEqualTo(FetchType.EAGER);
     }
+    
+    @Test
+    public void can_be_lazy() throws Exception {
+        final RelationField field = new RelationField();
+        field.setFetchType(FetchType.LAZY);
+        
+        assertThat(field.getFetchType()).isEqualTo(FetchType.LAZY);
+    }
 }
