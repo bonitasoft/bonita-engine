@@ -370,7 +370,6 @@
                                     <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 									<cargo.jboss.jrmp.invoker.port>${invoker.port}</cargo.jboss.jrmp.invoker.port>
 								</properties>
-                                <wait>false</wait>
 							</configuration>
 						</configuration>
 					</plugin>
