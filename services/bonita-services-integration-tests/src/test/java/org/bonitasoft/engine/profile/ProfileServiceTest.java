@@ -122,13 +122,13 @@ public class ProfileServiceTest extends CommonServiceTest {
         final SUser john = createUser("john", "bpm");
         final SUser jane = createUser("jane", "bpm");
 
-        List<SProfile> profilesOfUser = profileService.getProfilesOfUser(john.getId());
+        List<SProfile> profilesOfUser = profileService.searchProfilesOfUser(john.getId(), 0, 10, "name", OrderByType.ASC);
         Assert.assertEquals(0, profilesOfUser.size());
 
         final SProfileMember johnProfileMember = profileService.addUserToProfile(profile.getId(), john.getId(), "John", "Doe", "john");
         final SProfileMember janeProfileMember = profileService.addUserToProfile(profile.getId(), jane.getId(), "Jane", "Doe", "jane");
 
-        profilesOfUser = profileService.getProfilesOfUser(john.getId());
+        profilesOfUser = profileService.searchProfilesOfUser(john.getId(), 0, 10, "name", OrderByType.ASC);
         Assert.assertEquals(1, profilesOfUser.size());
 
         final QueryOptions countOptions = new QueryOptions(0, 10, null, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId", profile
@@ -139,7 +139,7 @@ public class ProfileServiceTest extends CommonServiceTest {
         profileService.deleteProfileMember(johnProfileMember);
         profileService.deleteProfileMember(janeProfileMember);
 
-        profilesOfUser = profileService.getProfilesOfUser(john.getId());
+        profilesOfUser = profileService.searchProfilesOfUser(john.getId(), 0, 10, "name", OrderByType.ASC);
         Assert.assertEquals(0, profilesOfUser.size());
 
         identityService.deleteUser(john);

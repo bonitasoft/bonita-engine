@@ -32,7 +32,7 @@ public class AbstractDBPersistenceServiceTest {
         public DummyDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
                 final String likeEscapeCharacter, final SequenceManager sequenceManager,
                 final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
-                throws ClassNotFoundException {
+                        throws ClassNotFoundException {
             super(name, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                     wordSearchExclusionMappings, logger);
         }
@@ -119,8 +119,12 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public int update(String updateQueryName) throws SPersistenceException {
-            // TODO Auto-generated method stub
+        public int update(final String updateQueryName) throws SPersistenceException {
+            return 0;
+        }
+
+        @Override
+        public int update(final String updateQueryName, final Map<String, Object> inputParameters) throws SPersistenceException {
             return 0;
         }
     }
@@ -271,7 +275,7 @@ public class AbstractDBPersistenceServiceTest {
 
     private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
             final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
-            throws ClassNotFoundException {
+                    throws ClassNotFoundException {
         DBConfigurationsProvider dbConfigurationsProvider = mock(DBConfigurationsProvider.class);
         SequenceManager sequenceManager = mock(SequenceManager.class);
         DataSource datasource = mock(DataSource.class);

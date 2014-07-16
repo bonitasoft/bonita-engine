@@ -58,7 +58,7 @@ import org.hibernate.stat.Statistics;
 
 /**
  * Hibernate implementation of the persistence service
- * 
+ *
  * @author Charles Souillard
  * @author Nicolas Chabanoles
  * @author Yanyan Liu
@@ -93,13 +93,13 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final TechnicalLoggerService logger) throws ClassNotFoundException {
         super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
-        this.statistics = sessionFactory.getStatistics();
+        statistics = sessionFactory.getStatistics();
 
         this.classAliasMappings = classAliasMappings;
-        this.cacheQueries = Collections.emptyMap();
+        cacheQueries = Collections.emptyMap();
         this.classMapping = classMapping;
-        this.interfaceToClassMapping = Collections.emptyMap();
-        this.mappingExclusions = Collections.emptyList();
+        interfaceToClassMapping = Collections.emptyMap();
+        mappingExclusions = Collections.emptyList();
     }
 
     // Setter for session
@@ -108,8 +108,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
         Configuration configuration;
@@ -207,30 +207,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         session.flush();
     }
 
-    private <T> void checkOrderByClause(final SelectListDescriptor<T> selectDescriptor, final Query query) {
-        final boolean needOrderBy = needOrderBy(selectDescriptor, query);
-        if (needOrderBy) {
-            logWarningMessage(selectDescriptor, query);
-        }
-    }
-
-    private <T> boolean needOrderBy(final SelectListDescriptor<T> selectDescriptor, final Query query) {
-        boolean needOrderBy = true;
-        if (selectDescriptor.getQueryName().startsWith("getNumberOf")) {
-            needOrderBy = false;
-        }
-
-        if (query.toString().toLowerCase().contains("order by")) {
-            needOrderBy = false;
-        }
-
-        if (selectDescriptor.getPageSize() == QueryOptions.UNLIMITED_NUMBER_OF_RESULTS) {
-            needOrderBy = false;
-        }
-
-        return needOrderBy;
-    }
-
     protected <T> void logWarningMessage(final SelectListDescriptor<T> selectDescriptor, final Query query) {
         final StringBuilder message = new StringBuilder();
         message.append("selectList call without \"order by\" clause ");
@@ -273,8 +249,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @Override
     public int update(final String updateQueryName) throws SPersistenceException {
+        return update(updateQueryName, null);
+    }
+
+    @Override
+    public int update(final String updateQueryName, final Map<String, Object> inputParameters) throws SPersistenceException {
         final Query query = getSession(true).getNamedQuery(updateQueryName);
         try {
+            if (inputParameters != null) {
+                setParameters(query, inputParameters);
+            }
             return query.executeUpdate();
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
@@ -739,7 +723,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                final boolean enableWordSearch = this.isWordSearchEnabled(selectDescriptor.getEntityType());
+                final boolean enableWordSearch = isWordSearchEnabled(selectDescriptor.getEntityType());
                 builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
             }
 

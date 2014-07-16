@@ -44,33 +44,33 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         donaBenta = createUser("donabenta", "bpm");
-        logout();
-        loginWith("donabenta", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("donabenta", "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(donaBenta.getId());
-        logout();
+        logoutOnTenant();
     }
 
     /**
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
      * 
      * @param timerValue
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param taskWithBoundaryName
-     *            the name of user task containing the boundary event
+     *        the name of user task containing the boundary event
      * @param exceptionTaskName
-     *            the name of human task reached by exception flow
+     *        the name of human task reached by exception flow
      * @param normalFlowTaskName
-     *            name of human task following the task containing the boundary (normal flow)
+     *        name of human task following the task containing the boundary (normal flow)
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -84,17 +84,17 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
      * 
      * @param timerType
-     *            the timer time
+     *        the timer time
      * @param timerValue
-     *            the timer value
+     *        the timer value
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param taskWithBoundaryName
-     *            the name of user task containing the boundary event
+     *        the name of user task containing the boundary event
      * @param exceptionTaskName
-     *            the name of human task reached by exception flow
+     *        the name of human task reached by exception flow
      * @param normalFlowTaskName
-     *            name of human task following the task containing the boundary (normal flow)
+     *        name of human task following the task containing the boundary (normal flow)
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -110,19 +110,19 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
      * 
      * @param timerType
-     *            the timer time
+     *        the timer time
      * @param timerExpr
-     *            the timer value
+     *        the timer value
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param taskWithBoundaryName
-     *            the name of user task containing the boundary event
+     *        the name of user task containing the boundary event
      * @param exceptionTaskName
-     *            the name of human task reached by exception flow
+     *        the name of human task reached by exception flow
      * @param normalFlowTaskName
-     *            name of human task following the task containing the boundary (normal flow)
+     *        name of human task following the task containing the boundary (normal flow)
      * @param timerValue
-     *            the timer value
+     *        the timer value
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -142,22 +142,22 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         processDefinitionBuilder.addTransition(taskWithBoundaryName, normalFlowTaskName);
         processDefinitionBuilder.addTransition("timer", exceptionTaskName);
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
     }
 
     /**
      * Deploy and enable a process containing a timer boundary event attached to a call activity
      * 
      * @param timerDuration
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param targetProcessName
-     *            the name of called process
+     *        the name of called process
      * @param userTaskName
-     *            the name of user task following the call activity in the normal flow
+     *        the name of user task following the call activity in the normal flow
      * @param exceptionFlowTaskName
-     *            the name of the user task reached by the exception flow
+     *        the name of the user task reached by the exception flow
      * @return
      * @throws InvalidExpressionException
      * @throws BonitaException
@@ -179,16 +179,16 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
                 .addTransition("start", "callActivity").addTransition("callActivity", userTaskName).addTransition(userTaskName, "end")
                 .addTransition("timer", exceptionFlowTaskName);
 
-        return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
      * Deploy and enable a simple process: start event -> user task -> end event
      * 
      * @param processName
-     *            the process name
+     *        the process name
      * @param userTaskName
-     *            the user task name
+     *        the user task name
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -198,26 +198,26 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
         processBuilder.addActor(ACTOR_NAME).addStartEvent("startCA").addUserTask(userTaskName, ACTOR_NAME).addEndEvent("endCA")
                 .addTransition("startCA", userTaskName).addTransition(userTaskName, "endCA");
-        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
      * Deploy and enable a process with a timer boundary event attached to a multi-instance
      * 
      * @param timerValue
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param multiTaskName
-     *            the multi-instance name
+     *        the multi-instance name
      * @param loopCardinality
-     *            the multi-instance cardinality
+     *        the multi-instance cardinality
      * @param isSequential
-     *            define whether the multi-instance is sequential or parallel
+     *        define whether the multi-instance is sequential or parallel
      * @param normalFlowTaskName
-     *            the name of user task following the multi-instance in the normal flow
+     *        the name of user task following the multi-instance in the normal flow
      * @param exceptionFlowTaskName
-     *            the name of the user task reached by the exception flow
+     *        the name of the user task reached by the exception flow
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -240,24 +240,24 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         processBuilder.addTransition(normalFlowTaskName, "end");
         processBuilder.addTransition("timer", exceptionFlowTaskName);
 
-        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     /**
      * Deploy and enable a process with a timer boundary event attached to a loop activity
      * 
      * @param timerValue
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param loopMax
-     *            how many loops will be executed
+     *        how many loops will be executed
      * @param loopActivityName
-     *            the name of the loop activity
+     *        the name of the loop activity
      * @param normalFlowStepName
-     *            the name of the user task following the loop activity in the normal flow
+     *        the name of the user task following the loop activity in the normal flow
      * @param exceptionFlowStepName
-     *            the name of the user task reached by the exception flow
+     *        the name of the user task reached by the exception flow
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -279,7 +279,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
                 .addTransition("start", loopActivityName).addTransition(loopActivityName, normalFlowStepName).addTransition(normalFlowStepName, "end")
                 .addTransition("timer", exceptionFlowStepName);
 
-        return deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
     }
 
     // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events
@@ -293,7 +293,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 

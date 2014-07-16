@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,6 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
@@ -31,9 +32,15 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.scheduler.JobParameter;
+import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -44,24 +51,30 @@ import org.bonitasoft.engine.work.WorkService;
 public class BPMEventHandlingJob extends InternalJob {
 
     /**
-     * List of BPMN Event types that can be triggered multiple times for a single instance
+     * List of BPMN Event types that can be triggered multiple times for a single instance.
      */
-    private static final List<SBPMEventType> START_WAITING_MESSAGE_LIST = Arrays.asList(SBPMEventType.START_EVENT/*
-                                                                                                                  * , SBPMEventType.EVENT_SUB_PROCESS
-                                                                                                                  * // EVENT_SUB_PROCESS of type non-interrupted
-                                                                                                                  * should be considered as well, as soon as we
-                                                                                                                  * support them
-                                                                                                                  */);
+    //TODO EVENT_SUB_PROCESS of type non-interrupted should be considered as well, as soon as we support them
+    private static final List<SBPMEventType> START_WAITING_MESSAGE_LIST = Arrays.asList(SBPMEventType.START_EVENT); // , SBPMEventType.EVENT_SUB_PROCESS);
 
     private static final long serialVersionUID = 8929044925208984537L;
 
+    private int maxCouples = 1000;
+
     private transient EventInstanceService eventInstanceService;
 
-    private WorkService workService;
+    private transient WorkService workService;
+
+    private transient UserTransactionService transactionService;
+
+    private transient JobService jobService;
+
+    private transient SchedulerService schedulerService;
+
+    private transient TechnicalLoggerService loggerService;
 
     @Override
     public String getName() {
-        return "BPMEventHandlingJob";
+        return "BPMEventHandling";
     }
 
     @Override
@@ -72,27 +85,30 @@ public class BPMEventHandlingJob extends InternalJob {
     @Override
     public void execute() throws SJobExecutionException {
         try {
-            final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples();
-
-            //
-            final List<SMessageEventCouple> uniqueCouples = makeMessageUniqueCouples(potentialMessageCouples);
-
-            for (final SMessageEventCouple couple : uniqueCouples) {
-                final long messageInstanceId = couple.getMessageInstanceId();
-                final long waitingMessageId = couple.getWaitingMessageId();
-                final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
-
-                // Mark messages that will be treated as "treatment in progress":
-                final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
-                final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
-                markMessageAsInProgress(messageInstance);
-                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
-                    markWaitingMessageAsInProgress(waitingMsg);
-                }
-                workService.registerWork(WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMsg));
+            final List<SMessageEventCouple> uniqueCouples = getMessageUniqueCouples();
+            executeUniqueMessageCouplesWork(uniqueCouples);
+            if (uniqueCouples.size() == maxCouples) {
+                rescheduleJob();
             }
-        } catch (final SBonitaException e) {
+        } catch (final Exception e) {
             throw new SJobExecutionException(e);
+        }
+    }
+
+    private void executeUniqueMessageCouplesWork(final List<SMessageEventCouple> uniqueCouples) throws SBonitaException {
+        for (final SMessageEventCouple couple : uniqueCouples) {
+            final long messageInstanceId = couple.getMessageInstanceId();
+            final long waitingMessageId = couple.getWaitingMessageId();
+            final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
+
+            // Mark messages that will be treated as "treatment in progress":
+            final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
+            final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
+            markMessageAsInProgress(messageInstance);
+            if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
+                markWaitingMessageAsInProgress(waitingMsg);
+            }
+            workService.registerWork(WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMsg));
         }
     }
 
@@ -101,16 +117,18 @@ public class BPMEventHandlingJob extends InternalJob {
      * matching waiting message is arbitrary chosen.
      * In the case of <code>SWaitingMessageEvent</code> of types {@link SBPMEventType#START_EVENT} or {@link SBPMEventType#EVENT_SUB_PROCESS}, it can be
      * selected several times to trigger multiple instances.
-     * 
+     *
      * @param messageCouples
-     *            all the possible couples that match the potential correlation.
+     *        all the possible couples that match the potential correlation.
      * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
      */
-    protected List<SMessageEventCouple> makeMessageUniqueCouples(final List<SMessageEventCouple> messageCouples) {
-        final List<Long> takenMessages = new ArrayList<Long>(messageCouples.size());
-        final List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
-        final List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
-        for (final SMessageEventCouple couple : messageCouples) {
+    protected List<SMessageEventCouple> getMessageUniqueCouples() throws SEventTriggerInstanceReadException {
+        final List<Long> takenMessages = new ArrayList<Long>();
+        final List<Long> takenWaitings = new ArrayList<Long>();
+        final List<SMessageEventCouple> uniqueMessageCouples = new ArrayList<SMessageEventCouple>();
+
+        final List<SMessageEventCouple> potentialMessageCouples = getMessageEventCouples();
+        for (final SMessageEventCouple couple : potentialMessageCouples) {
             final long messageInstanceId = couple.getMessageInstanceId();
             final long waitingMessageId = couple.getWaitingMessageId();
             final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
@@ -120,16 +138,34 @@ public class BPMEventHandlingJob extends InternalJob {
                 if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
                     takenWaitings.add(waitingMessageId);
                 }
-                pairs.add(couple);
+                uniqueMessageCouples.add(couple);
             }
         }
-        return pairs;
+        return uniqueMessageCouples;
+    }
+
+    List<SMessageEventCouple> getMessageEventCouples() throws SEventTriggerInstanceReadException {
+        return eventInstanceService.getMessageEventCouples(0, maxCouples);
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-        eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
-        workService = getTenantServiceAccessor().getWorkService();
+        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+        setAttributes(tenantServiceAccessor, attributes);
+    }
+
+    void setAttributes(final TenantServiceAccessor tenantServiceAccessor, final Map<String, Serializable> attributes) throws SJobConfigurationException {
+        eventInstanceService = tenantServiceAccessor.getEventInstanceService();
+        workService = tenantServiceAccessor.getWorkService();
+        transactionService = tenantServiceAccessor.getUserTransactionService();
+        jobService = tenantServiceAccessor.getJobService();
+        schedulerService = tenantServiceAccessor.getSchedulerService();
+        loggerService = tenantServiceAccessor.getTechnicalLoggerService();
+
+        final Integer batchSize = (Integer) attributes.get(JobParameter.BATCH_SIZE.name());
+        if (batchSize != null) {
+            maxCouples = batchSize;
+        }
     }
 
     private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException {
@@ -143,6 +179,15 @@ public class BPMEventHandlingJob extends InternalJob {
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
+    }
+
+    private void rescheduleJob() throws Exception {
+        final ExecuteAgainJobSynchronization jobSynchronization = new ExecuteAgainJobSynchronization(getName(), jobService, schedulerService, loggerService);
+        transactionService.registerBonitaSynchronization(jobSynchronization);
+    }
+
+    protected int getMaxCouples() {
+        return maxCouples;
     }
 
 }

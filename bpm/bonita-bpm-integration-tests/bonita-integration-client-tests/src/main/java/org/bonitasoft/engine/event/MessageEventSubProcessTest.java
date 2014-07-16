@@ -73,17 +73,16 @@ public class MessageEventSubProcessTest extends EventsAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser("john", "bpm");
-        logout();
-        loginWith("john", "bpm");
-
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployAndEnableProcessWithCallActivity(final String targetProcessName, final String targetVersion) throws BonitaException {
@@ -99,14 +98,14 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         builder.addTransition("callActivity", "step2");
         builder.addTransition("step2", "end");
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
     }
 
     private ProcessDefinition deployAndEnableProcessWithMessageEventSubProcess() throws BonitaException {
         final ProcessDefinitionBuilder builder = buildParentProcess(false);
         buildSubProcess(builder, false, null);
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
     }
 
     private ProcessDefinition deployAndEnableProcessWithMessageEventSubProcessAndData() throws BonitaException {
@@ -118,7 +117,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         final ProcessDefinitionBuilder builder = buildParentProcess(true);
         buildSubProcess(builder, true, correlations);
         final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-1841", story = "transmit data to start message event of eventsubprocess")
@@ -137,7 +136,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
                 .addOperation(
                         new OperationBuilder().createSetDataOperation("aData", new ExpressionBuilder().createDataExpression("msgData", String.class.getName())));
         subProcessBuilder.addTransition("start", "stepInSubProcess");
-        final ProcessDefinition receiveProcess = deployAndEnableWithActor(receiveProcessBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition receiveProcess = deployAndEnableProcessWithActor(receiveProcessBuilder.done(), ACTOR_NAME, john);
 
         // create an other process that send a message
         final ProcessDefinitionBuilder sendProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("SendMsgProcess", "1.0");
@@ -254,7 +253,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         senderBuilder.addTransition(startName, THROW_MESSAGE_TASK_NAME);
         senderBuilder.addTransition(THROW_MESSAGE_TASK_NAME, PARENT_PROCESS_USER_TASK_NAME);
         senderBuilder.addTransition(PARENT_PROCESS_USER_TASK_NAME, endName);
-        final ProcessDefinition senderProcessDefinition = deployAndEnableWithActor(senderBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition senderProcessDefinition = deployAndEnableProcessWithActor(senderBuilder.done(), ACTOR_NAME, john);
 
         // Create and deploy Receiver process with SubProcess
         final ProcessDefinitionBuilder receiverBuilder = new ProcessDefinitionBuilder().createNewInstance(receiverProcessName, "1.0");
@@ -267,7 +266,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         subProcessBuilder.addStartEvent(SUB_PROCESS_START_NAME).addMessageEventTrigger(MESSAGE_NAME + 1);
         subProcessBuilder.addUserTask(SUB_PROCESS_USER_TASK_NAME, ACTOR_NAME);
         subProcessBuilder.addTransition(SUB_PROCESS_START_NAME, SUB_PROCESS_USER_TASK_NAME);
-        final ProcessDefinition receiverProcessDefinition = deployAndEnableWithActor(receiverBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithActor(receiverBuilder.done(), ACTOR_NAME, john);
 
         // Start and execute the Sender process
         final ProcessInstance processInstance = getProcessAPI().startProcess(senderProcessDefinition.getId());

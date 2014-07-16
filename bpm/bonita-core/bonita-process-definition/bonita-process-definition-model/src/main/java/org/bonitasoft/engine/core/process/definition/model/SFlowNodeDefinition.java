@@ -62,6 +62,13 @@ public interface SFlowNodeDefinition extends SNamedElement {
 
     /**
      * 
+     * @return
+     * @since 6.3
+     */
+    boolean hasConnectors();
+
+    /**
+     * 
      * @param name
      * @return
      * @since 6.1
@@ -83,4 +90,15 @@ public interface SFlowNodeDefinition extends SNamedElement {
     int getTransitionIndex(String transitionName);
 
     boolean isStartable();
+
+    boolean isParalleleOrInclusive();
+
+    boolean isExclusive();
+
+    boolean isInterrupting();
+
+    boolean isBoundaryEvent();
+
+    boolean isEventSubProcess();
+
 }

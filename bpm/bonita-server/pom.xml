@@ -34,11 +34,6 @@
 			<artifactId>bonita-actor-mapping-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
-			<artifactId>bonita-actor-mapping-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- API -->
 		<dependency>
@@ -72,11 +67,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.category</groupId>
 			<artifactId>bonita-category-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -628,7 +618,6 @@
 									<!-- Actor Mapping -->
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
-									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl-hibernate</include>
 									<!-- API -->
 									<include>org.bonitasoft.engine.api:bonita-server-api-http</include>
 									<!-- Archive -->
@@ -641,9 +630,6 @@
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
 									<!-- Category -->
-									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
 									<!-- Classloader -->

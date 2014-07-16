@@ -27,15 +27,15 @@ public class ManualTasksTest extends CommonAPITest {
     public void afterTest() throws BonitaException {
         deleteUser(USERNAME);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ManualTasksTest extends CommonAPITest {
         designProcessDefinition.addManualTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndAssigneIt("step2", processInstance, john);
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
@@ -71,7 +71,7 @@ public class ManualTasksTest extends CommonAPITest {
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step1", "step3");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndAssigneIt("step2", processInstance, john);
         waitForUserTaskAndAssigneIt("step3", processInstance, john);

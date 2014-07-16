@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.identity;
 
 import java.util.List;
-import java.util.Set;
 
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
@@ -55,10 +54,10 @@ public interface IdentityService {
      * Gets the role given by its identifier.
      * 
      * @param roleId
-     *            the role identifier
+     *        the role identifier
      * @return the role
      * @throws SRoleNotFoundException
-     *             occurs when the roleId does not refer to any role.
+     *         occurs when the roleId does not refer to any role.
      */
     SRole getRole(long roleId) throws SRoleNotFoundException;
 
@@ -66,10 +65,10 @@ public interface IdentityService {
      * Get the role given by its name.
      * 
      * @param roleName
-     *            The name of role
+     *        The name of role
      * @return the role
      * @throws SRoleNotFoundException
-     *             occurs when the roleName does not refer to any role.
+     *         occurs when the roleName does not refer to any role.
      */
     SRole getRoleByName(String roleName) throws SRoleNotFoundException;
 
@@ -77,10 +76,10 @@ public interface IdentityService {
      * Get the group by its path
      * 
      * @param groupPath
-     *            The group path
+     *        The group path
      * @return the group
      * @throws SGroupNotFoundException
-     *             Occurs when the groupPath does not refer to any group.
+     *         Occurs when the groupPath does not refer to any group.
      */
     SGroup getGroupByPath(String groupPath) throws SGroupNotFoundException;
 
@@ -96,10 +95,10 @@ public interface IdentityService {
      * Get roles by their ids
      * 
      * @param roleIds
-     *            the role identifiers
+     *        the role identifiers
      * @return a list of SRole objects
      * @throws SRoleNotFoundException
-     *             Occurs when roleId does not refer to any role.
+     *         Occurs when roleId does not refer to any role.
      */
     List<SRole> getRoles(List<Long> roleIds) throws SRoleNotFoundException;
 
@@ -107,9 +106,9 @@ public interface IdentityService {
      * Get roles in specific interval
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfRoles
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SRole objects
      * @throws SIdentityException
      */
@@ -119,13 +118,13 @@ public interface IdentityService {
      * Get roles in specific interval, The returned list is paginated
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfRoles
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            The field used by the order
+     *        The field used by the order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of paginated SRole objects
      * @throws SIdentityException
      */
@@ -135,10 +134,10 @@ public interface IdentityService {
      * Get group by its id
      * 
      * @param groupId
-     *            The group identifier
+     *        The group identifier
      * @return the group
      * @throws SGroupNotFoundException
-     *             occurs when the groupId does not refer to any group.
+     *         occurs when the groupId does not refer to any group.
      */
     SGroup getGroup(long groupId) throws SGroupNotFoundException;
 
@@ -151,21 +150,10 @@ public interface IdentityService {
     long getNumberOfGroups() throws SIdentityException;
 
     /**
-     * Get all groups having the specific name
-     * 
-     * @param groupName
-     *            The group name
-     * @return a set of SGroup object
-     * @throws SGroupNotFoundException
-     *             occurs when the groupName does not refer to any group.
-     */
-    Set<SGroup> getGroupsByName(String groupName) throws SGroupNotFoundException;
-
-    /**
      * Get groups for specific groupIds
      * 
      * @param groupIds
-     *            The group identifiers
+     *        The group identifiers
      * @return a list of SGroup object
      * @throws SGroupNotFoundException
      */
@@ -175,9 +163,9 @@ public interface IdentityService {
      * Get groups in a specific interval, this is used for pagination
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SGroup objects
      * @throws SIdentityException
      */
@@ -187,13 +175,13 @@ public interface IdentityService {
      * Get groups in specific interval, The returned list is paginated
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            The field used by the order
+     *        The field used by the order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of paginated SGroup objects
      * @throws SIdentityException
      */
@@ -203,31 +191,21 @@ public interface IdentityService {
      * Get number of child groups for the specific group
      * 
      * @param parentGroupId
-     *            The parent group identifier
+     *        The parent group identifier
      * @return the number of child groups
      * @throws SIdentityException
      */
     long getNumberOfGroupChildren(long parentGroupId) throws SIdentityException;
 
     /**
-     * Get all child groups for the specified group
-     * 
-     * @param parentGroupId
-     *            The parent group identifier
-     * @return a list of SGroup objects
-     * @throws SIdentityException
-     */
-    List<SGroup> getGroupChildren(long parentGroupId) throws SIdentityException;
-
-    /**
      * Get child groups in a specific interval for specific group, this is used for pagination
      * 
      * @param parentGroupId
-     *            The parent group identifier
+     *        The parent group identifier
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SGroup objects
      * @throws SIdentityException
      */
@@ -237,15 +215,15 @@ public interface IdentityService {
      * Get child groups in specific interval, The returned list is paginated
      * 
      * @param parentGroupId
-     *            The parent group identifier
+     *        The parent group identifier
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            The field used by the order
+     *        The field used by the order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of SGroup objects
      * @throws SIdentityException
      */
@@ -255,10 +233,10 @@ public interface IdentityService {
      * Get user by its id
      * 
      * @param userId
-     *            The user identifier
+     *        The user identifier
      * @return the user
      * @throws SUserNotFoundException
-     *             occurs when the userId does not refer to any user.
+     *         occurs when the userId does not refer to any user.
      */
     SUser getUser(long userId) throws SUserNotFoundException;
 
@@ -266,9 +244,9 @@ public interface IdentityService {
      * Checks whether the couple user/password is valid.
      * 
      * @param user
-     *            the user
+     *        the user
      * @param password
-     *            the password
+     *        the password
      * @return true if the couple user/password is valid; false otherwise
      */
     boolean chechCredentials(SUser user, String password);
@@ -277,10 +255,10 @@ public interface IdentityService {
      * Get user by its name
      * 
      * @param username
-     *            The user name
+     *        The user name
      * @return the user
      * @throws SUserNotFoundException
-     *             occurs when the user name does not refer to any user.
+     *         occurs when the user name does not refer to any user.
      */
     SUser getUserByUserName(String username) throws SUserNotFoundException;
 
@@ -296,10 +274,10 @@ public interface IdentityService {
      * Get users by their userIds
      * 
      * @param userIds
-     *            A list of user identifiers
+     *        A list of user identifiers
      * @return a list of SUser objects
      * @throws SUserNotFoundException
-     *             occurs when the userId does not refer to any user.
+     *         occurs when the userId does not refer to any user.
      */
     List<SUser> getUsers(List<Long> userIds) throws SUserNotFoundException;
 
@@ -307,10 +285,10 @@ public interface IdentityService {
      * Lists the users from their names.
      * 
      * @param userNames
-     *            the list of user names
+     *        the list of user names
      * @return the list of users
      * @throws SIdentityException
-     *             If an exception occurs when retrieving the users
+     *         If an exception occurs when retrieving the users
      */
     List<SUser> getUsersByUsername(List<String> userNames) throws SIdentityException;
 
@@ -318,9 +296,9 @@ public interface IdentityService {
      * Get users in a specific interval, this is used for pagination
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SUser objects
      * @throws SIdentityException
      */
@@ -330,13 +308,13 @@ public interface IdentityService {
      * Get users in specific interval, The returned list is paginated
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            The field used by the order
+     *        The field used by the order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of paginated SUser objects
      * @throws SIdentityException
      */
@@ -346,51 +324,35 @@ public interface IdentityService {
      * Get all users managed by a specific manager
      * 
      * @param managerId
-     *            The manager identifier, actually it is user identifier
+     *        The manager identifier, actually it is user identifier
+     * @param fromIndex
+     *        Index of the record to be retrieved from. First record has index 0
+     * @param numberMaxOfUsers
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SUser objects
      * @throws SIdentityException
      */
-    List<SUser> getUsersByManager(long managerId) throws SIdentityException;
-
-    /**
-     * Get all users delegated by a specific delegate
-     * 
-     * @param delegateId
-     *            The delegate identifier, actually it is user identifier
-     * @return a list of SUser objects
-     * @throws SIdentityException
-     */
-    List<SUser> getUsersByDelegee(long delegateId) throws SIdentityException;
+    List<SUser> getUsersByManager(long managerId, int fromIndex, int numberMaxOfUsers) throws SIdentityException;
 
     /**
      * Get total number of users for the given role
      * 
      * @param roleId
-     *            The identifier of role
+     *        The identifier of role
      * @return total number of users related to the given role
      * @throws SIdentityException
      */
     long getNumberOfUsersByRole(long roleId) throws SIdentityException;
 
     /**
-     * Get total users for the given role
-     * 
-     * @param roleId
-     *            The identifier of the role
-     * @return a list of SUser object
-     * @throws SIdentityException
-     */
-    List<SUser> getUsersByRole(long roleId) throws SIdentityException;
-
-    /**
      * Get users in a specific interval for the given role, this is used for pagination
      * 
      * @param roleId
-     *            The identifier of the role
+     *        The identifier of the role
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SUser objects
      * @throws SIdentityException
      */
@@ -400,15 +362,15 @@ public interface IdentityService {
      * Get users in specific interval for given role, The returned list is paginated
      * 
      * @param roleId
-     *            The identifier of the role
+     *        The identifier of the role
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            The field used by the order
+     *        The field used by the order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of paginated SUser objects
      * @throws SIdentityException
      */
@@ -418,31 +380,21 @@ public interface IdentityService {
      * Get total number of users for the given group
      * 
      * @param groupId
-     *            The identifier of the group
+     *        The identifier of the group
      * @return total number of users in the given group
      * @throws SIdentityException
      */
     long getNumberOfUsersByGroup(long groupId) throws SIdentityException;
 
     /**
-     * Get total users for the given group
-     * 
-     * @param groupId
-     *            Identifier of the group
-     * @return a list of SUser objects
-     * @throws SIdentityException
-     */
-    List<SUser> getUsersByGroup(long groupId) throws SIdentityException;
-
-    /**
      * Get users in a specific interval for the given group, this is used for pagination
      * 
      * @param groupId
-     *            Identifier of the group
+     *        Identifier of the group
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SUser objects
      * @throws SIdentityException
      */
@@ -452,15 +404,15 @@ public interface IdentityService {
      * Get users in specific interval for given group, The returned list is paginated
      * 
      * @param groupId
-     *            Identifier of the group
+     *        Identifier of the group
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @param field
-     *            The field used by the order
+     *        The field used by the order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of SUser objects
      * @throws SIdentityException
      */
@@ -470,7 +422,7 @@ public interface IdentityService {
      * Get user memberships for given group
      * 
      * @param groupId
-     *            Identifier of the group
+     *        Identifier of the group
      * @param maxResults
      * @param startIndex
      * @return a list of SUserMembership objects
@@ -482,7 +434,7 @@ public interface IdentityService {
      * Get user memberships for given role
      * 
      * @param roleId
-     *            Identifier of the role
+     *        Identifier of the role
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
@@ -492,7 +444,7 @@ public interface IdentityService {
      * Get userMembership by given id
      * 
      * @param userMembershipId
-     *            The identifier of userMembership
+     *        The identifier of userMembership
      * @return a SUserMembership object
      * @throws SIdentityException
      */
@@ -502,11 +454,11 @@ public interface IdentityService {
      * Get user membership of specific user, group and role
      * 
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @param groupId
-     *            The identifier of group
+     *        The identifier of group
      * @param roleId
-     *            The identifier of role
+     *        The identifier of role
      * @return a SUserMembership object
      * @throws SIdentityException
      */
@@ -516,11 +468,11 @@ public interface IdentityService {
      * Get light user membership of specific user, group and role
      * 
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @param groupId
-     *            The identifier of group
+     *        The identifier of group
      * @param roleId
-     *            The identifier of role
+     *        The identifier of role
      * @return a SUserMembership object without userName, groupName and roleName
      * @throws SIdentityException
      */
@@ -530,7 +482,7 @@ public interface IdentityService {
      * Get userMembership by given id
      * 
      * @param userMembershipIds
-     *            The identifier of userMembership
+     *        The identifier of userMembership
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
@@ -540,9 +492,9 @@ public interface IdentityService {
      * Get userMemberships in a specific interval, this is used for pagination
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUserMemberships
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
@@ -552,11 +504,11 @@ public interface IdentityService {
      * Get userMemberships in a specific interval with specific order, this is used for pagination
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUserMemberships
-     *            Number of result we want to get. Maximum number of result returned
+     *        Number of result we want to get. Maximum number of result returned
      * @param orderByOption
-     *            OrderByOption object containing order by information
+     *        OrderByOption object containing order by information
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
@@ -566,7 +518,7 @@ public interface IdentityService {
      * Get customUserInfoDefinition by its id
      * 
      * @param customUserInfoDefinitionId
-     *            The identifier of customUserInfoDefinition
+     *        The identifier of customUserInfoDefinition
      * @return the customUserInfoDefinition
      * @throws SIdentityException
      */
@@ -576,10 +528,12 @@ public interface IdentityService {
      * Get custom user info value by its id
      * 
      * @param customUserInfoValueId
-     *            The identifier of the custom user info value
+     *        The identifier of the custom user info value
      * @return the profileMetadataValue
-     * @throws SCustomUserInfoValueNotFoundException if no custom user info value is found for the given id
-     * @throws SCustomUserInfoValueReadException if an exception occurs while trying to get the custom user info value
+     * @throws SCustomUserInfoValueNotFoundException
+     *         if no custom user info value is found for the given id
+     * @throws SCustomUserInfoValueReadException
+     *         if an exception occurs while trying to get the custom user info value
      */
     SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException;
 
@@ -587,21 +541,26 @@ public interface IdentityService {
      * Get a custom user info definition by its name
      * 
      * @param name
-     *            The name custom user info definition name
+     *        The name custom user info definition name
      * @return the custom user info definition identified by the given name
-     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
-     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     * @throws SCustomUserInfoDefinitionNotFoundException
+     *         if there is no custom user info definition for the given name
+     * @throws SCustomUserInfoDefinitionReadException
+     *         if an exception occurs when trying to retrieve the custom user info definition
      */
-    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException, SCustomUserInfoDefinitionReadException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException,
+            SCustomUserInfoDefinitionReadException;
 
     /**
      * Verify if there is a custom user info for the given name
      * 
      * @param name
-     *            The name custom user info definition name
+     *        The name custom user info definition name
      * @return the custom user info definition identified by the given name
-     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
-     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     * @throws SCustomUserInfoDefinitionNotFoundException
+     *         if there is no custom user info definition for the given name
+     * @throws SCustomUserInfoDefinitionReadException
+     *         if an exception occurs when trying to retrieve the custom user info definition
      */
     boolean hasCustomUserInfoDefinition(String name) throws SCustomUserInfoDefinitionReadException;
 
@@ -615,9 +574,9 @@ public interface IdentityService {
 
     /**
      * Get total number of custom user info value
-     *
+     * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return the total number of custom user info value
      * @throws SIdentityException
      */
@@ -627,7 +586,7 @@ public interface IdentityService {
      * Get customUserInfoDefinition by their ids
      * 
      * @param customUserInfoDefinitionIds
-     *            A list of identifiers of customUserInfoDefinition
+     *        A list of identifiers of customUserInfoDefinition
      * @return a list of SCustomUserInfoDefinition objects corresponding to parameters
      * @throws SIdentityException
      */
@@ -637,7 +596,7 @@ public interface IdentityService {
      * Get profileMetadataValues by their ids
      * 
      * @param customUserInfoValueIds
-     *            A list of identifiers of profileMetadataValue
+     *        A list of identifiers of profileMetadataValue
      * @return a list of SCustomUserInfoValue objects corresponding to parameters
      * @throws SIdentityException
      */
@@ -647,20 +606,32 @@ public interface IdentityService {
      * Get custom user info in a specific interval, this is used for pagination
      * 
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param maxResults
-     *            Number of result we want to get. Maximum number of result returned
+     *        Number of result we want to get. Maximum number of result returned
      * @return a list of SCustomUserInfo object
      * @throws SIdentityException
      */
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int maxResults) throws SIdentityException;
-    
-    
+
+    /**
+     * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
+     * @param userInfoName The user information name.
+     * @param userInfoValue The user information value.
+     * @param usePartialMatch Defines whether the custom user information value should use a partial match. 
+     * @param fromIndex The index of the first record to be retrieved. First record has index 0.
+     * @param maxResults The max results to be retrieved. 
+     * @return the list of user identifiers containing the chosen custom user information with the given value.
+     * @throws SIdentityException
+     * @since 6.3.2
+     */
+    List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException;
+
     /**
      * Search custom user info values according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return a list of SCustomUserInfoValue objects
      * @throws SBonitaSearchException
      */
@@ -670,11 +641,11 @@ public interface IdentityService {
      * Get userMemberships in a specific interval for a user, this is used for pagination
      * 
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfMemberships
-     *            Number of result we want to get. Maximum number of result returned
+     *        Number of result we want to get. Maximum number of result returned
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
@@ -684,15 +655,15 @@ public interface IdentityService {
      * Get userMemberships in a specific interval for a user in specific order, this is used for pagination
      * 
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfMemberships
-     *            Number of result we want to get. Maximum number of result returned
+     *        Number of result we want to get. Maximum number of result returned
      * @param field
-     *            The field user to do order
+     *        The field user to do order
      * @param order
-     *            ASC or DESC
+     *        ASC or DESC
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
@@ -701,35 +672,23 @@ public interface IdentityService {
 
     /**
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @param fromIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberPerPage
-     *            Number of result we want to get. Maximum number of result returned
+     *        Number of result we want to get. Maximum number of result returned
      * @param orderByOption
-     *            OrderByOption object containing order information
+     *        OrderByOption object containing order information
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
     List<SUserMembership> getUserMembershipsOfUser(long userId, int fromIndex, int numberPerPage, OrderByOption orderByOption) throws SIdentityException;
 
     /**
-     * Get all userMemberships for specific user
-     * 
-     * @param userId
-     *            The identifier of user
-     * @return a list of SUserMembership objects
-     * @throws SUserNotFoundException
-     *             occurs if no user has id corresponding to parameter userId
-     * @throws SIdentityException
-     */
-    List<SUserMembership> getUserMembershipsOfUser(long userId) throws SIdentityException;
-
-    /**
      * Get total number of userMemberships for specific user
      * 
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @return total number of userMemberships for the specific user
      * @throws SIdentityException
      */
@@ -747,7 +706,7 @@ public interface IdentityService {
      * Create user in DB for give user
      * 
      * @param user
-     *            The user object
+     *        The user object
      * @return the created use
      * @throws SUserCreationException
      */
@@ -757,9 +716,9 @@ public interface IdentityService {
      * Update user according to the descriptor
      * 
      * @param user
-     *            The user will be updated
+     *        The user will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SUserUpdateException
      */
     void updateUser(SUser user, EntityUpdateDescriptor descriptor) throws SUserUpdateException;
@@ -768,9 +727,9 @@ public interface IdentityService {
      * Update user according to the descriptor
      * 
      * @param user
-     *            The user will be updated
+     *        The user will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @param isPasswordEncrypted
      * @throws SUserUpdateException
      */
@@ -781,19 +740,22 @@ public interface IdentityService {
      * Create custom user info definition in DB for a server given custom user info definition
      * 
      * @param customUserInfo
-     *            SCustomUserInfoDefinition object
-     * @throws SCustomUserInfoDefinitionAlreadyExistsException TODO
-     * @throws SCustomUserInfoDefinitionCreationException TODO
+     *        SCustomUserInfoDefinition object
+     * @throws SCustomUserInfoDefinitionAlreadyExistsException
+     *         TODO
+     * @throws SCustomUserInfoDefinitionCreationException
+     *         TODO
      */
-    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException;
+    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException,
+            SCustomUserInfoDefinitionCreationException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor
      * 
      * @param customUserInfo
-     *            The customUserInfoDefinition will be updated
+     *        The customUserInfoDefinition will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SIdentityException
      */
     void updateCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo, EntityUpdateDescriptor descriptor) throws SIdentityException;
@@ -801,9 +763,8 @@ public interface IdentityService {
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
      * 
-     *
      * @param customUserInfo
-     *            A profileMetadataValue object
+     *        A profileMetadataValue object
      * @throws SIdentityException
      */
     SCustomUserInfoValue createCustomUserInfoValue(SCustomUserInfoValue customUserInfo) throws SIdentityException;
@@ -812,9 +773,9 @@ public interface IdentityService {
      * Update profileMetadataValue according to the descriptor
      * 
      * @param customUserInfo
-     *            The profileMetadataValue will be updated
+     *        The profileMetadataValue will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SIdentityException
      */
     void updateCustomUserInfoValue(SCustomUserInfoValue customUserInfo, EntityUpdateDescriptor descriptor) throws SIdentityException;
@@ -823,7 +784,7 @@ public interface IdentityService {
      * Create role in DB for the given role
      * 
      * @param role
-     *            A role object
+     *        A role object
      * @throws SIdentityException
      */
     void createRole(SRole role) throws SIdentityException;
@@ -832,9 +793,9 @@ public interface IdentityService {
      * Update role according to the descriptor
      * 
      * @param role
-     *            The role will be updated
+     *        The role will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SIdentityException
      */
     void updateRole(SRole role, EntityUpdateDescriptor descriptor) throws SIdentityException;
@@ -843,7 +804,7 @@ public interface IdentityService {
      * Create group in DB for the given group object
      * 
      * @param group
-     *            A group object
+     *        A group object
      * @throws SGroupCreationException
      */
     void createGroup(SGroup group) throws SGroupCreationException;
@@ -852,9 +813,9 @@ public interface IdentityService {
      * Update group according to the descriptor
      * 
      * @param group
-     *            The group will be updated
+     *        The group will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SIdentityException
      */
     void updateGroup(SGroup group, EntityUpdateDescriptor descriptor) throws SIdentityException;
@@ -863,7 +824,7 @@ public interface IdentityService {
      * Create userMembership in DB for the given userMembership object
      * 
      * @param userMembership
-     *            A userMembership object
+     *        A userMembership object
      * @throws SUserMembershipCreationException
      */
     void createUserMembership(SUserMembership userMembership) throws SUserMembershipCreationException;
@@ -872,9 +833,9 @@ public interface IdentityService {
      * Update userMembership according to the descriptor
      * 
      * @param userMembership
-     *            The userMembership will be updated
+     *        The userMembership will be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SIdentityException
      */
     void updateUserMembership(SUserMembership userMembership, EntityUpdateDescriptor descriptor) throws SIdentityException;
@@ -883,7 +844,7 @@ public interface IdentityService {
      * Delete the specific user
      * 
      * @param user
-     *            The user will be deleted
+     *        The user will be deleted
      * @throws SUserDeletionException
      */
     void deleteUser(SUser user) throws SUserDeletionException;
@@ -892,7 +853,7 @@ public interface IdentityService {
      * Delete user by its id
      * 
      * @param userId
-     *            The identifier of user
+     *        The identifier of user
      * @throws SUserDeletionException
      */
     void deleteUser(long userId) throws SUserDeletionException;
@@ -909,7 +870,7 @@ public interface IdentityService {
      * Delete the specific custom user info
      * 
      * @param metadataDefinition
-     *            The custom user info object will be deleted
+     *        The custom user info object will be deleted
      * @throws SIdentityException
      */
     void deleteCustomUserInfoDefinition(SCustomUserInfoDefinition metadataDefinition) throws SIdentityException;
@@ -918,7 +879,7 @@ public interface IdentityService {
      * Delete the id specified custom user info
      * 
      * @param customUserInfoDefinitionId
-     *            The identifier of custom user info
+     *        The identifier of custom user info
      * @throws SIdentityException
      */
     void deleteCustomUserInfoDefinition(long customUserInfoDefinitionId) throws SIdentityException;
@@ -927,7 +888,7 @@ public interface IdentityService {
      * Delete the specific profileMetadataValue
      * 
      * @param customUserInfo
-     *            The profileMetadataValue object will be deleted
+     *        The profileMetadataValue object will be deleted
      * @throws SIdentityException
      */
     void deleteCustomUserInfoValue(SCustomUserInfoValue customUserInfo) throws SIdentityException;
@@ -936,7 +897,7 @@ public interface IdentityService {
      * Delete the id specified profileMetadataValue
      * 
      * @param customUserInfoValueId
-     *            The identifier of profileMetadataValue
+     *        The identifier of profileMetadataValue
      * @throws SIdentityException
      */
     void deleteCustomUserInfoValue(long customUserInfoValueId) throws SIdentityException;
@@ -945,7 +906,7 @@ public interface IdentityService {
      * Delete the specific role
      * 
      * @param role
-     *            The role will be deleted
+     *        The role will be deleted
      * @throws SRoleDeletionException
      */
     void deleteRole(SRole role) throws SRoleDeletionException;
@@ -954,9 +915,9 @@ public interface IdentityService {
      * Delete the id specified role
      * 
      * @param roleId
-     *            The role identifier
+     *        The role identifier
      * @throws SRoleNotFoundException
-     *             Error occurs when no role found with the specific roleId
+     *         Error occurs when no role found with the specific roleId
      * @throws SRoleDeletionException
      */
     void deleteRole(long roleId) throws SRoleNotFoundException, SRoleDeletionException;
@@ -973,7 +934,7 @@ public interface IdentityService {
      * Delete the specific group
      * 
      * @param group
-     *            The group will be deleted
+     *        The group will be deleted
      * @throws SGroupDeletionException
      */
     void deleteGroup(SGroup group) throws SGroupDeletionException;
@@ -982,9 +943,9 @@ public interface IdentityService {
      * Delete the id specified group
      * 
      * @param groupId
-     *            The identifier of group
+     *        The identifier of group
      * @throws SGroupNotFoundException
-     *             Error occurs when no group found with the specific groupId
+     *         Error occurs when no group found with the specific groupId
      * @throws SGroupDeletionException
      */
     void deleteGroup(long groupId) throws SGroupNotFoundException, SGroupDeletionException;
@@ -1001,7 +962,7 @@ public interface IdentityService {
      * Delete the specific userMembership
      * 
      * @param userMembership
-     *            The userMembership will be deleted
+     *        The userMembership will be deleted
      * @throws SMembershipDeletionException
      */
     void deleteUserMembership(SUserMembership userMembership) throws SMembershipDeletionException;
@@ -1019,7 +980,7 @@ public interface IdentityService {
      * Delete the id specified userMembership
      * 
      * @param userMembershipId
-     *            The identifier of userMembership
+     *        The identifier of userMembership
      * @throws SMembershipDeletionException
      */
     void deleteUserMembership(long userMembershipId) throws SMembershipDeletionException;
@@ -1036,7 +997,7 @@ public interface IdentityService {
      * Get total number of users according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return the satisfied user number
      * @throws SBonitaSearchException
      */
@@ -1046,7 +1007,7 @@ public interface IdentityService {
      * Search users according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return a list of SUser objects
      * @throws SBonitaSearchException
      */
@@ -1056,7 +1017,7 @@ public interface IdentityService {
      * Get total number of roles according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return the satisfied role number
      * @throws SBonitaSearchException
      */
@@ -1066,7 +1027,7 @@ public interface IdentityService {
      * Search roles according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return a list of SRole objects
      * @throws SBonitaSearchException
      */
@@ -1076,7 +1037,7 @@ public interface IdentityService {
      * Get total number of groups according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return the group number
      * @throws SBonitaSearchException
      */
@@ -1086,7 +1047,7 @@ public interface IdentityService {
      * Search groups according to specific query options
      * 
      * @param options
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return a list of SGroup objects
      * @throws SBonitaSearchException
      */
@@ -1096,9 +1057,9 @@ public interface IdentityService {
      * Get total number of userMemberships contains specific group and role
      * 
      * @param groupId
-     *            The identifier of group
+     *        The identifier of group
      * @param roleId
-     *            The identifier of role
+     *        The identifier of role
      * @return the number of userMemberships
      * @throws SIdentityException
      */
@@ -1108,7 +1069,7 @@ public interface IdentityService {
      * Get light userMembership by its id
      * 
      * @param userMembershipId
-     *            The identifier of userMembership
+     *        The identifier of userMembership
      * @return a SUserMembership object without userName, groupName and roleName
      * @throws SIdentityException
      */
@@ -1118,9 +1079,9 @@ public interface IdentityService {
      * Get light userMembership in a specific interval, this is used for pagination
      * 
      * @param startIndex
-     *            Index of the record to be retrieved from. First record has index 0
+     *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfElements
-     *            Number of result we want to get. Maximum number of result returned.
+     *        Number of result we want to get. Maximum number of result returned.
      * @return a list of SUserMembership objects without userName, groupName and roleName
      * @throws SIdentityException
      */
@@ -1130,7 +1091,7 @@ public interface IdentityService {
      * delete children groups of the given group if there is some
      * 
      * @param groupId
-     *            The index of the group to delete
+     *        The index of the group to delete
      * @throws SGroupDeletionException
      * @throws SGroupNotFoundException
      */
@@ -1140,12 +1101,12 @@ public interface IdentityService {
      * Return the user contact info for a specific user.
      * 
      * @param userId
-     *            the ID of the user to retrieve the contact info from
+     *        the ID of the user to retrieve the contact info from
      * @param isPersonal
-     *            Do we want personal contact information (or professional) ?
+     *        Do we want personal contact information (or professional) ?
      * @return the corresponding SContactInfo, if found
      * @throws SIdentityException
-     *             if a Read problem occurred
+     *         if a Read problem occurred
      */
     SContactInfo getUserContactInfo(long userId, boolean isPersonal) throws SIdentityException;
 
@@ -1153,7 +1114,7 @@ public interface IdentityService {
      * Create user contact information for given data
      * 
      * @param contactInfo
-     *            The user contact information object
+     *        The user contact information object
      * @return
      *         The contact info created
      * @throws SUserCreationException
@@ -1164,9 +1125,9 @@ public interface IdentityService {
      * Update user contact information according to the descriptor
      * 
      * @param contactInfo
-     *            The user contact information to be updated
+     *        The user contact information to be updated
      * @param descriptor
-     *            The update description
+     *        The update description
      * @throws SUserUpdateException
      */
     void updateUserContactInfo(SContactInfo contactInfo, EntityUpdateDescriptor descriptor) throws SIdentityException;
@@ -1175,7 +1136,7 @@ public interface IdentityService {
      * Create user in DB for given user and
      * 
      * @param user
-     *            The user object
+     *        The user object
      * @throws SUserCreationException
      */
     @Deprecated

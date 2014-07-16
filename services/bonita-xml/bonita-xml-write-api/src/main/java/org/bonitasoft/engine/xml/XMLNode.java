@@ -41,6 +41,10 @@ public class XMLNode {
         this.attributes.put(name, value);
     }
 
+    public void addAttribute(final String name, final boolean value) {
+        this.attributes.put(name, new Boolean(value).toString());
+    }
+
     public void addChild(final XMLNode node) {
         if (node != null) {
             this.childNodes.add(node);

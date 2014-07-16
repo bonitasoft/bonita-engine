@@ -245,34 +245,6 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         transactionService.complete();
     }
 
-    @Test
-    public void addProcessDefinitionToCategory() throws Exception {
-        // generate the meaningful of ProcessDefinition id
-        final SProcessDefinition processDefinition = createSProcessDefinition("processName", "test category");
-
-        final String name = "categoryName";
-        final String description = "test add process to category";
-        transactionService.begin();
-        // create category
-        final SCategory category = categoryService.createCategory(name, description);
-        assertNotNull(category);
-        assertEquals(name, category.getName());
-        assertEquals(description, category.getDescription());
-        final long processDefinitionId = processDefinition.getId();
-        categoryService.addProcessDefinitionToCategory(category.getId(), processDefinitionId);
-        // test
-        final List<Long> processDefinitionIds = categoryService.getProcessDefinitionIdsOfCategory(category.getId());
-        assertNotNull(processDefinitionIds);
-        assertEquals(1, processDefinitionIds.size());
-        assertEquals(processDefinitionId, processDefinitionIds.get(0).longValue());
-        // delete
-        categoryService.deleteCategory(category.getId());
-        transactionService.complete();
-
-        // Clean-up
-        deleteSProcessDefinition(processDefinition);
-    }
-
     @Test(expected = SCategoryNotFoundException.class)
     public void addProcessDefinitionToCategoryWithSCategoryNotFoundException() throws Exception {
         // generate the meaningful of ProcessDefinition id
@@ -287,35 +259,6 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
             // Clean-up
             deleteSProcessDefinition(processDefinition);
         }
-    }
-
-    @Test
-    public void addprocessDefinitionsToCategory() throws Exception {
-        // generate a meaningful processDefinition ids
-        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(3, "processName", "test add process definitions to Category");
-
-        final String name = "categoryName";
-        final String description = "test add processes to category";
-        transactionService.begin();
-        // create category
-        final SCategory category = categoryService.createCategory(name, description);
-        assertNotNull(category);
-        assertEquals(name, category.getName());
-        assertEquals(description, category.getDescription());
-        for (final SProcessDefinition processDefinition : processDefinitions) {
-            categoryService.addProcessDefinitionToCategory(category.getId(), processDefinition.getId());
-        }
-        // test
-        final List<Long> retrievedProcessDefinitionIds = categoryService.getProcessDefinitionIdsOfCategory(category.getId());
-        assertNotNull(retrievedProcessDefinitionIds);
-        assertEquals(3, retrievedProcessDefinitionIds.size());
-        // assertEquals(processDefinitionIds.get(0).longValue(), retrievedProcessDefinitionIds.get(0).longValue());
-        // delete
-        categoryService.deleteCategory(category.getId());
-        transactionService.complete();
-
-        // Clean-up
-        deleteSProcessDefinitions(processDefinitions);
     }
 
     @Test
@@ -428,46 +371,6 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
         // Clean-up
         deleteSProcessDefinitions(processDefinitions);
-    }
-
-    @Test
-    public void getProcessDefinitionIdsOfCategory() throws Exception {
-        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(3, "processName", "test get process definition ids of category");
-
-        final String name = "categoryName";
-        final String description = "test get process ids of category";
-        transactionService.begin();
-        // create category
-        final SCategory category = categoryService.createCategory(name, description);
-        assertNotNull(category);
-        assertEquals(name, category.getName());
-        assertEquals(description, category.getDescription());
-        // generate the meaningful process definition ids and delete them in the end
-        for (final SProcessDefinition processDefinition : processDefinitions) {
-            categoryService.addProcessDefinitionToCategory(category.getId(), processDefinition.getId());
-        }
-
-        // test
-        final List<Long> retrievedProcessDefinitionIds = categoryService.getProcessDefinitionIdsOfCategory(category.getId());
-        assertNotNull(retrievedProcessDefinitionIds);
-        assertEquals(3, retrievedProcessDefinitionIds.size());
-        assertEquals(processDefinitions.get(0).getId().longValue(), processDefinitions.get(0).getId().longValue());
-        // delete
-        categoryService.deleteCategory(category.getId());
-        transactionService.complete();
-
-        // Clean-up
-        deleteSProcessDefinitions(processDefinitions);
-    }
-
-    @Test
-    public void getProcessDefinitionIdsOfUnknowCategory() throws Exception {
-        final long categoryId = 1;
-
-        transactionService.begin();
-        final List<Long> processDefinitionIdsOfCategory = categoryService.getProcessDefinitionIdsOfCategory(categoryId);
-        transactionService.complete();
-        assertEquals(0, processDefinitionIdsOfCategory.size());
     }
 
     @Test

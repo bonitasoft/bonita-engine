@@ -81,6 +81,7 @@
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
 		<constructor-arg name="containerRegistry" ref="containerRegistry"/>
 		<constructor-arg name="processInstanceService" ref="processInstanceService"/>
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>

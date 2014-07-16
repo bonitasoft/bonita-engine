@@ -23,12 +23,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
-			<artifactId>bonita-actor-mapping-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Archive -->
 		<dependency>
@@ -58,18 +52,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.category</groupId>
 			<artifactId>bonita-category-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

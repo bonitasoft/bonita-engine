@@ -51,10 +51,12 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         this.groupId = groupId;
         this.roleId = roleId;
         this.memberType = memberType;
+
     }
 
     @Override
     public void execute() throws SBonitaException {
+        profileService.updateProfileMetaData(profileId);
         SUser user = null;
         SGroup group = null;
         SRole role = null;
@@ -63,7 +65,6 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         }
         if (groupId != null && groupId > 0) {
             group = identityService.getGroup(groupId);
-
         }
         if (roleId != null && roleId > 0) {
             role = identityService.getRole(roleId);
@@ -72,15 +73,12 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
             case USER:
                 sProfileMember = profileService.addUserToProfile(profileId, userId, user.getUserName(), user.getLastName(), user.getUserName());
                 break;
-
             case GROUP:
                 sProfileMember = profileService.addGroupToProfile(profileId, groupId, group.getName(), group.getParentPath());
                 break;
-
             case ROLE:
                 sProfileMember = profileService.addRoleToProfile(profileId, roleId, role.getName());
                 break;
-
             default:
                 sProfileMember = profileService.addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
                 break;

@@ -30,6 +30,11 @@ public final class UpdateRecord extends Record {
 
     private final Object oldValue;
 
+    private UpdateRecord(final PersistentObject entity, final Object oldValue) {
+        super(entity);
+        this.oldValue = oldValue;
+    }
+
     public static UpdateRecord buildSetFields(final PersistentObject entity, final Map<String, Object> fields) {
         final UpdateRecord updateRecord = new UpdateRecord(entity, null);
         updateRecord.addFields(fields);
@@ -50,16 +55,11 @@ public final class UpdateRecord extends Record {
         return updateRecord;
     }
 
-    private UpdateRecord(final PersistentObject entity, final Object oldValue) {
-        super(entity);
-        this.oldValue = oldValue;
-    }
-
     public void addField(final String fieldName, final Object fieldValue) {
-        if (this.fields == null) {
-            this.fields = new HashMap<String, Object>();
+        if (fields == null) {
+            fields = new HashMap<String, Object>();
         }
-        this.fields.put(fieldName, fieldValue);
+        fields.put(fieldName, fieldValue);
     }
 
     public void addFields(final Map<String, Object> fields) {

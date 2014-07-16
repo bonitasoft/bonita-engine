@@ -28,6 +28,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
@@ -106,7 +107,8 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         final long processDefinitionId = 123L;
         SProcessInstance sProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(sProcessInstance);
-        final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(null);
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+        final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(queryOptions);
         transactionService.complete();
 
         // first test with one process:
@@ -119,7 +121,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
             sProcessInstance = sProcessInstanceBuilder.createNewInstance("process instance " + i, processDefinitionId).done();
             processInstanceService.createProcessInstance(sProcessInstance);
         }
-        final long numberOfProcessInstances = processInstanceService.getNumberOfProcessInstances(null);
+        final long numberOfProcessInstances = processInstanceService.getNumberOfProcessInstances(queryOptions);
         transactionService.complete();
         assertEquals(101, numberOfProcessInstances);
 
@@ -184,7 +186,8 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
         // retrieve the number of process instances:
         transactionService.begin();
-        final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(null);
+        final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+        final long processInstanceNumber = processInstanceService.getNumberOfProcessInstances(queryOptions);
         transactionService.complete();
 
         // Check that this number is 0:

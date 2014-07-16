@@ -101,12 +101,12 @@ public class EntityMemberCommandsTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        logout();
+        logoutOnTenant();
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Create", "Delete" }, story = "Create new entity member and delete it.", jira = "")

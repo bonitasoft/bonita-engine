@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -122,13 +122,13 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     private JobDetail getJobDetail(final long jobId, final long tenantId, final String jobName, final boolean disallowConcurrentExecution) {
-        Class<? extends QuartzJob> clazz = null;
+        Class<? extends QuartzJob> jobClass = null;
         if (disallowConcurrentExecution) {
-            clazz = NonConcurrentQuartzJob.class;
+            jobClass = NonConcurrentQuartzJob.class;
         } else {
-            clazz = ConcurrentQuartzJob.class;
+            jobClass = ConcurrentQuartzJob.class;
         }
-        final JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobName, String.valueOf(tenantId)).build();
+        final JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, String.valueOf(tenantId)).build();
         jobDetail.getJobDataMap().put("tenantId", String.valueOf(tenantId));
         jobDetail.getJobDataMap().put("jobId", String.valueOf(jobId));
         jobDetail.getJobDataMap().put("jobName", jobName);
@@ -416,20 +416,20 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     @Override
     public void pauseJobs(final long tenantId) throws SSchedulerException {
-        GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
+        final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
         try {
             scheduler.pauseTriggers(groupEquals);
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
         }
     }
 
     @Override
     public void resumeJobs(final long tenantId) throws SSchedulerException {
-        GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
+        final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
         try {
             scheduler.resumeTriggers(groupEquals);
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
         }
     }

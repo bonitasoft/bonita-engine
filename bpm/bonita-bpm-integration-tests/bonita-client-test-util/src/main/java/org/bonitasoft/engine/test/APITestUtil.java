@@ -1,9 +1,21 @@
+/**
+ * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -13,13 +25,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -64,12 +74,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.DocumentBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptor;
@@ -77,7 +83,7 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
-import org.bonitasoft.engine.connector.Connector;
+import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -88,9 +94,6 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
@@ -101,19 +104,12 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
-import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
@@ -141,39 +137,27 @@ import org.slf4j.LoggerFactory;
  * @author Frederic Bouquet
  * @author Celine Souchet
  */
-public class APITestUtil {
+public class APITestUtil extends PlatformTestUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(APITestUtil.class);
-
-    public static final String SUPERVISOR_ID_KEY = "supervisorId";
-
-    public static final String ROLE_ID_KEY = "roleId";
-
-    public static final String GROUP_ID_KEY = "groupId";
-
-    public static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
-
-    public static final String DEFAULT_TENANT = "default";
-
-    public static final String ACTOR_NAME = "Employee actor";
-
-    public static final String PROCESS_VERSION = "1.0";
-
-    public static final String PROCESS_NAME = "ProcessName";
-
-    public static final String DESCRIPTION = "Coding all-night-long";
-
-    public static final String PASSWORD = "bpm";
-
-    public static final String USERNAME = "william.jobs";
-
-    public static final String GROUP_NAME = "R&D";
-
-    public static final String ROLE_NAME = "Developper";
 
     public static final int DEFAULT_REPEAT_EACH = 500;
 
     public static final int DEFAULT_TIMEOUT;
+
+    public static final String ACTOR_NAME = BuildTestUtil.ACTOR_NAME;
+
+    public static final String PROCESS_VERSION = BuildTestUtil.PROCESS_VERSION;
+
+    public static final String PROCESS_NAME = BuildTestUtil.PROCESS_NAME;
+
+    public static final String PASSWORD = BuildTestUtil.PASSWORD;
+
+    public static final String USERNAME = BuildTestUtil.USERNAME;
+
+    public static final String GROUP_NAME = BuildTestUtil.GROUP_NAME;
+
+    public static final String ROLE_NAME = BuildTestUtil.ROLE_NAME;
 
     private APISession session;
 
@@ -199,16 +183,27 @@ public class APITestUtil {
     @After
     public void clearSynchroRepository() {
         try {
-            login();
+            loginOnDefaultTenantWithDefaultTechnicalLogger();
             ClientEventUtil.clearRepo(getCommandAPI());
-            logout();
+            logoutOnTenant();
         } catch (final Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void loginWith(final String userName, final String password) throws BonitaException {
-        setSession(loginTenant(userName, password));
+    public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
+        final LoginAPI loginAPI = getLoginAPI();
+        setSession(loginAPI.login(userName, password));
+        setAPIs();
+    }
+
+    public void loginOnDefaultTenantWithDefaultTechnicalLogger() throws BonitaException {
+        final LoginAPI loginAPI = getLoginAPI();
+        setSession(loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
+        setAPIs();
+    }
+
+    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
@@ -216,17 +211,9 @@ public class APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
-    public void login() throws BonitaException {
-        setSession(loginDefaultTenant());
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-    }
-
-    public void logout() throws BonitaException {
-        logoutTenant(getSession());
+    public void logoutOnTenant() throws BonitaException {
+        final LoginAPI loginAPI = getLoginAPI();
+        loginAPI.logout(session);
         setSession(null);
         setIdentityAPI(null);
         setProcessAPI(null);
@@ -236,13 +223,13 @@ public class APITestUtil {
     }
 
     public void logoutThenlogin() throws BonitaException {
-        logout();
-        login();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     public void logoutThenloginAs(final String userName, final String password) throws BonitaException {
-        logout();
-        loginWith(userName, password);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(userName, password);
     }
 
     public User addMappingAndActor(final String actorName, final String userName, final String password, final ProcessDefinition processDefinition)
@@ -312,8 +299,8 @@ public class APITestUtil {
 
     public User createUserAndLogin(final String userName, final String password) throws BonitaException {
         final User user = getIdentityAPI().createUser(userName, password);
-        logout();
-        loginWith(userName, password);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(userName, password);
         return user;
     }
 
@@ -374,31 +361,6 @@ public class APITestUtil {
                 getIdentityAPI().getRoleByName(roleName).getId());
     }
 
-    public List<String> initActorAndDescription(final ProcessDefinitionBuilder processBuilder, final int nbActor) {
-        final List<String> actorList = new ArrayList<String>();
-        for (int i = 1; i <= nbActor; i++) {
-            final String actorName = "actor" + i;
-            processBuilder.addActor(actorName).addDescription(DESCRIPTION + i);
-            actorList.add(actorName);
-        }
-        return actorList;
-    }
-
-    /**
-     * delete all the object used by method ...SupervisorBy
-     * 
-     * @param map
-     * @param userId
-     * @throws Exception
-     */
-    public void deleteRoleGroupSupervisor(final Map<String, Object> map, final long userId) throws BonitaException {
-        deleteSupervisor(((ProcessSupervisor) map.get("supervisorByRole")).getSupervisorId());
-        deleteSupervisor(((ProcessSupervisor) map.get("supervisorByGroup")).getSupervisorId());
-        getIdentityAPI().deleteUserMembership(userId, ((Group) map.get(GROUP_ID_KEY)).getId(), ((Role) map.get(ROLE_ID_KEY)).getId());
-        getIdentityAPI().deleteRole(((Role) map.get(ROLE_ID_KEY)).getId());
-        getIdentityAPI().deleteGroup(((Group) map.get(GROUP_ID_KEY)).getId());
-    }
-
     public void deleteUserAndProcess(final String johnName, final ProcessDefinition definition) throws BonitaException {
         deleteUser(johnName);
         deleteProcess(definition);
@@ -451,71 +413,93 @@ public class APITestUtil {
         return getProcessAPI().deployAndEnableProcess(businessArchive);
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
             throws BonitaException {
-        return deployAndEnableWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
+        return deployAndEnableProcessWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final List<User> users)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
+            final List<User> users)
             throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        return deployAndEnableWithActor(businessArchive, actorName, users);
+        return deployAndEnableProcessWithActor(businessArchive, actorName, users);
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final List<User> users)
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final String actorName, final List<User> users)
             throws AlreadyExistsException, ProcessDeployException, ActorNotFoundException, CreationException, ProcessDefinitionNotFoundException,
             ProcessEnablementException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         for (final User user : users) {
             getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
         }
-        getProcessAPI().enableProcess(processDefinition.getId());
+        enableProcess(processDefinition);
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
+    public ProcessDefinition deployAndEnableProcessWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final User user, final Map<String, String> parameters) throws BonitaException {
-        return deployAndEnableWithActorAndParameters(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user), parameters);
+        return deployAndEnableProcessWithActorAndParameters(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user), parameters);
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
             final List<User> users) throws BonitaException {
-        return deployAndEnableWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
+        return deployAndEnableProcessWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
                 actorsName, users);
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final List<String> actorsName, final List<User> users)
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final List<String> actorsName, final List<User> users)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         for (int i = 0; i < users.size(); i++) {
             getProcessAPI().addUserToActor(actorsName.get(i), processDefinition, users.get(i).getId());
         }
+        enableProcess(processDefinition);
+        return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final Map<String, List<User>> actorUsers)
+            throws BonitaException {
+        return deployAndEnableProcessWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
+                actorUsers);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final Map<String, List<User>> actorUsers)
+            throws BonitaException {
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        for (final Entry<String, List<User>> actorUser : actorUsers.entrySet()) {
+            final String actorName = actorUser.getKey();
+            final List<User> users = actorUser.getValue();
+            for (final User user : users) {
+                getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
+            }
+        }
+
+        enableProcess(processDefinition);
+        return processDefinition;
+    }
+
+    private void enableProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
         try {
             processAPI.enableProcess(processDefinition.getId());
         } catch (final ProcessEnablementException e) {
             final List<Problem> problems = processAPI.getProcessResolutionProblems(processDefinition.getId());
             throw new ProcessEnablementException("not resolved: " + problems);
         }
-        return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final User user) throws BonitaException {
-        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorName), Collections.singletonList(user));
+    public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final String actorName, final User user)
+            throws BonitaException {
+        return deployAndEnableProcessWithActor(businessArchive, Collections.singletonList(actorName), Collections.singletonList(user));
     }
 
-    public ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
+    public ProcessDefinition deployAndEnableProcessWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
             final List<User> users, final Map<String, String> parameters) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         final BusinessArchive businessArchive = businessArchiveBuilder.setParameters(parameters).setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        for (int i = 0; i < users.size(); i++) {
-            getProcessAPI().addUserToActor(actorsName.get(i), processDefinition, users.get(i).getId());
-        }
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
+        return deployAndEnableProcessWithActor(businessArchive, actorsName, users);
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group group)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group group)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -524,7 +508,8 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Group... groups)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
+            final Group... groups)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -535,7 +520,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -544,7 +529,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role... roles)
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role... roles)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
@@ -555,13 +540,76 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role,
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final Role role,
             final Group group) throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         addMappingOfActorsForRoleAndGroup(actorName, role.getId(), group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final long userId)
+            throws BonitaException {
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        getProcessAPI().addUserToActor(actorName, processDefinition, userId);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+        return deployAndEnableProcess(businessArchiveBuilder.done());
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String name,
+            final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
+        return deployAndEnableProcessWithConnector(processDefinitionBuilder, Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
+            final User user, final String name, final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
+                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+            final Map<String, String> parameters) throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+        if (parameters != null) {
+            businessArchiveBuilder.setParameters(parameters);
+        }
+        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies,
+            final List<BarResource> userFilters) throws BonitaException {
+        final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
+                connectorImplementations, generateConnectorDependencies, userFilters);
+        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), actorName, user);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user, final Map<String, String> parameters, final String name, final Class<? extends AbstractConnector> clazz,
+            final String jarName) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
+                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), parameters);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
+            final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
+            throws BonitaException {
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+                generateFilterDependencies, userFilters);
     }
 
     public void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
@@ -662,15 +710,6 @@ public class APITestUtil {
         return getIdentityAPI().createRole(roleName);
     }
 
-    public Operation buildAssignOperation(final String dataInstanceName, final String expressionContent, final ExpressionType expressionType,
-            final String returnType) throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(expressionContent)
-                .setExpressionType(expressionType).setReturnType(returnType).done();
-        return new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
-                .setRightOperand(expression).done();
-    }
-
     public void assignAndExecuteStep(final ActivityInstance activityInstance, final long userId) throws BonitaException {
         assignAndExecuteStep(activityInstance.getId(), userId);
     }
@@ -763,10 +802,9 @@ public class APITestUtil {
     public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final String stateName) throws Exception {
         final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, stateName,
                 getProcessAPI());
-        waitForArchivedActivity.waitUntil();
+        assertTrue(waitForArchivedActivity.waitUntil());
         final ArchivedActivityInstance archivedActivityInstance = waitForArchivedActivity.getArchivedActivityInstance();
         assertNotNull(archivedActivityInstance);
-        assertEquals(stateName, archivedActivityInstance.getState());
         return archivedActivityInstance;
     }
 
@@ -780,7 +818,8 @@ public class APITestUtil {
     }
 
     @Deprecated
-    private void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
+    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state)
+            throws Exception {
         final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
                 processInstance, getProcessAPI(), state);
         assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
@@ -799,13 +838,17 @@ public class APITestUtil {
     }
 
     public void waitForProcessToBeInState(final ProcessInstance processInstance, final ProcessInstanceState state) throws Exception {
-        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(processInstance.getId(), state.getId()),
+        waitForProcessToBeInState(processInstance.getId(), state);
+    }
+
+    public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state) throws Exception {
+        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
                 DEFAULT_TIMEOUT);
     }
 
     @Deprecated
     public void waitForProcessToFinish(final ProcessInstance processInstance, final String state) throws Exception {
-        waitForProcessToFinish(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, state);
+        waitForProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, state);
     }
 
     @Deprecated
@@ -875,6 +918,12 @@ public class APITestUtil {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
                 ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.getFailedState()), DEFAULT_TIMEOUT);
         return getFlowNodeInstance(activityId);
+    }
+
+    public void waitForFlowNodeInFailedState(final String flowNodeInstanceName) throws Exception {
+        final long failedTaskId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
+                ClientEventUtil.getTaskInState(TestStates.getFailedState(), flowNodeInstanceName), DEFAULT_TIMEOUT);
+        assertNotNull(failedTaskId);
     }
 
     public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final long userId) throws Exception {
@@ -1017,240 +1066,16 @@ public class APITestUtil {
         return waitForEvent;
     }
 
-    public void deletePlatformStructure() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        platformAPI.deletePlatform();
-        platformLoginAPI.logout(session);
-    }
-
-    public void deleteStopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
-        final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
-        platformAPI.deletePlatform();
-        logoutPlatform(session);
-    }
-
-    public void createPlatformStructure() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        createPlatformStructure(platformAPI, false);
-        platformLoginAPI.logout(session);
-    }
-
-    public PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return PlatformAPIAccessor.getPlatformAPI(session);
-    }
-
-    private void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
-        if (platformAPI.isPlatformCreated()) {
-            if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
-                stopPlatformAndTenant(platformAPI, deployCommands);
-            }
-            platformAPI.cleanPlatform();
-            platformAPI.deletePlatform();
-        }
-        platformAPI.createPlatform();
-    }
-
-    public void createInitializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
-        final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        createPlatformStructure(platformAPI, deployCommands);
-        initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
-        logoutPlatform(session);
-    }
-
-    public void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
-        final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
-        logoutPlatform(session);
-    }
-
-    public void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
-        platformAPI.initializePlatform();
-        platformAPI.startNode();
-
-        if (deployCommands) {
-            final APISession loginDefaultTenant = loginDefaultTenant();
-            ClientEventUtil.deployCommand(loginDefaultTenant);
-            logoutTenant(loginDefaultTenant);
-        }
-    }
-
-    public void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
-        final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
-        logoutPlatform(session);
-    }
-
-    public void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
-        if (platformAPI.isNodeStarted()) {
-            stopPlatformAndTenant(platformAPI, undeployCommands);
-            cleanPlatform(platformAPI);
-        }
-    }
-
-    public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
-        if (undeployCommands) {
-            final APISession loginDefaultTenant = loginDefaultTenant();
-            ClientEventUtil.undeployCommand(loginDefaultTenant);
-            logoutTenant(loginDefaultTenant);
-        }
-
-        platformAPI.stopNode();
-    }
-
-    public static void cleanPlatform(final PlatformAPI platformAPI) throws BonitaException {
-        platformAPI.cleanPlatform();
-    }
-
-    public PlatformSession loginPlatform() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
-        return platformLoginAPI.login("platformAdmin", "platform");
-    }
-
-    public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
-        return PlatformAPIAccessor.getPlatformLoginAPI();
-    }
-
-    public void logoutPlatform(final PlatformSession session) throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
-        platformLoginAPI.logout(session);
-    }
-
-    public APISession loginDefaultTenant() throws BonitaException {
-        return loginTenant("install", "install");
-    }
-
-    public APISession loginTenant(final String userName, final String password) throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
-        return loginAPI.login(userName, password);
-    }
-
-    public LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return TenantAPIAccessor.getLoginAPI();
-    }
-
-    public void logoutTenant(final APISession session) throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
-        loginAPI.logout(session);
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator, final boolean parallelActivities)
-            throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
-        if (!isHuman.isEmpty() && isHuman.contains(true)) {
-            processBuilder.addActor(actorName);
-            if (addActorInitiator) {
-                processBuilder.setActorInitiator(actorName);
-            }
-        }
-        ActivityDefinitionBuilder activityDefinitionBuilder = null;
-        for (int i = 0; i < stepNames.size(); i++) {
-            final String stepName = stepNames.get(i);
-            if (isHuman.get(i)) {
-                if (activityDefinitionBuilder != null) {
-                    activityDefinitionBuilder = activityDefinitionBuilder.addUserTask(stepName, actorName);
-                } else {
-                    activityDefinitionBuilder = processBuilder.addUserTask(stepName, actorName);
-                }
-            } else {
-                if (activityDefinitionBuilder != null) {
-                    activityDefinitionBuilder = activityDefinitionBuilder.addAutomaticTask(stepName);
-                } else {
-                    activityDefinitionBuilder = processBuilder.addAutomaticTask(stepName);
-                }
-            }
-        }
-        TransitionDefinitionBuilder transitionDefinitionBuilder = null;
-        if (!parallelActivities) {
-            for (int i = 0; i < stepNames.size() - 1; i++) {
-                if (transitionDefinitionBuilder != null) {
-                    transitionDefinitionBuilder = transitionDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
-                } else {
-                    assert activityDefinitionBuilder != null;
-                    transitionDefinitionBuilder = activityDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
-                }
-            }
-        }
-        final DesignProcessDefinition processDefinition;
-        if (transitionDefinitionBuilder == null) {
-            processDefinition = processBuilder.done();
-        } else {
-            processDefinition = transitionDefinitionBuilder.getProcess();
-        }
-        return processDefinition;
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator)
-            throws InvalidProcessDefinitionException {
-        return createProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, actorName, addActorInitiator, false);
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
-        return createProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, ACTOR_NAME, false);
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final List<String> stepNames, final List<Boolean> isHuman)
-            throws InvalidProcessDefinitionException {
-        return createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION, stepNames, isHuman, ACTOR_NAME, false);
-    }
-
     public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
             final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
         final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
-        for (int i = 0; i < nbProcess; i++) {
-            String processName = PROCESS_NAME;
-            if (i >= 0 && i < 10) {
-                processName += "0";
-            }
-            final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION + i,
-                    stepNames, isHuman);
-            processDefinitions.add(deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user));
+        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
+                isHuman);
+
+        for (DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
+            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
         }
         return processDefinitions;
-    }
-
-    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeploy(final int nbProcess, final List<String> stepNames,
-            final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
-        final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
-        for (int i = 0; i < nbProcess; i++) {
-            String processName = PROCESS_NAME;
-            if (i >= 0 && i < 10) {
-                processName += "0";
-            }
-            final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION + i,
-                    stepNames, isHuman);
-            processDefinitions.add(deployAndEnableProcess(designProcessDefinition));
-        }
-        return processDefinitions;
-    }
-
-    public User createUserOnDefaultTenant(final String userName, final String password) throws BonitaException {
-        final APISession session = loginDefaultTenant();
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-        final User user = identityAPI.createUser(userName, password);
-        assertNull(user.getLastConnection());
-        logoutTenant(session);
-        return user;
-    }
-
-    public DesignProcessDefinition createProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition() throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-
-        // 1 instance of process def:
-        return processBuilder.addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME)
-                .addTransition("step1", "step2").addTransition("step1", "step3").addTransition("step1", "step4").getProcess();
     }
 
     @Deprecated
@@ -1403,40 +1228,6 @@ public class APITestUtil {
         assertTrue(searchArchivedActivities.getCount() == 0);
     }
 
-    public SearchOptionsBuilder buildSearchOptions(final long processDefId, final int pageIndex, final int numberOfResults, final String orderByField,
-            final Order order) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(pageIndex, numberOfResults);
-        builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefId);
-        builder.sort(orderByField, order);
-        return builder;
-    }
-
-    public SearchOptionsBuilder buildSearchOptions(final int pageIndex, final int numberOfResults, final String orderByField, final Order order) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(pageIndex, numberOfResults);
-        builder.sort(orderByField, order);
-        return builder;
-    }
-
-    public Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
-            throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
-                .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done();
-        final Expression expression = new ExpressionBuilder().createConstantStringExpression(newConstantValue);
-        final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
-                .setRightOperand(expression).done();
-        return operation;
-    }
-
-    public Operation buildIntegerOperation(final String dataInstanceName, final int newConstantValue) throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final Expression expression = new ExpressionBuilder().createConstantIntegerExpression(newConstantValue);
-        final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
-                .setRightOperand(expression).done();
-        return operation;
-    }
-
     public void skipTask(final long activityId) throws UpdateException {
         getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
@@ -1452,21 +1243,10 @@ public class APITestUtil {
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
             final boolean isTransient)
             throws InvalidExpressionException, UpdateException {
-        final Operation stringOperation = buildStringOperation(dataName, updatedValue, isTransient);
+        final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
         getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
-    }
-
-    public Operation buildOperation(final String dataName, final boolean isTransient, final OperatorType operatorType, final String operator,
-            final Expression rightOperand) {
-        final OperationBuilder operationBuilder = new OperationBuilder().createNewInstance();
-        operationBuilder.setOperator(operator);
-        operationBuilder.setRightOperand(rightOperand);
-        operationBuilder.setType(operatorType);
-        operationBuilder.setLeftOperand(new LeftOperandBuilder().createNewInstance(dataName)
-                .setType(isTransient ? LeftOperand.TYPE_TRANSIENT_DATA : LeftOperand.TYPE_DATA).done());
-        return operationBuilder.done();
     }
 
     public List<String> checkNoCategories() throws DeletionException {
@@ -1712,37 +1492,6 @@ public class APITestUtil {
         this.session = session;
     }
 
-    public byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
-            final String implementationVersion, final String implementationClassname) {
-        final StringBuilder stb = new StringBuilder();
-        stb.append("<connectorImplementation>");
-        stb.append("");
-        stb.append("<definitionId>" + definitionId + "</definitionId>");
-        stb.append("<definitionVersion>" + definitionVersion + "</definitionVersion>");
-        stb.append("<implementationClassname>" + implementationClassname + "</implementationClassname>");
-        stb.append("<implementationId>" + implementationId + "</implementationId>");
-        stb.append("<implementationVersion>" + implementationVersion + "</implementationVersion>");
-        stb.append("</connectorImplementation>");
-        return stb.toString().getBytes();
-    }
-
-    public void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
-        resources.add(buildBarResource(clazz, name));
-    }
-
-    public BarResource buildBarResource(final Class<?> clazz, final String name) throws IOException {
-        final byte[] data = IOUtil.generateJar(clazz);
-        return new BarResource(name, data);
-    }
-
-    public void addConnectorToBusinessArchive(final BusinessArchiveBuilder businessArchiveBuilder, final Class<? extends Connector> clazz) throws IOException {
-        final String fileBaseName = clazz.getSimpleName();
-        final String connectorImplResource = "/" + clazz.getName().replaceAll("\\.", "/") + ".impl";
-        final byte[] descByteArray = IOUtil.getAllContentFrom(clazz.getResourceAsStream(connectorImplResource));
-        businessArchiveBuilder.addConnectorImplementation(new BarResource(fileBaseName + ".impl", descByteArray));
-        businessArchiveBuilder.addClasspathResource(buildBarResource(clazz, fileBaseName + ".jar"));
-    }
-
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
@@ -1753,12 +1502,12 @@ public class APITestUtil {
 
     public void buildAndAttachDocument(final ProcessInstance processInstance) throws BonitaException {
         final String documentName = String.valueOf(System.currentTimeMillis());
-        final Document doc = buildDocument(documentName);
+        final Document doc = BuildTestUtil.buildDocument(documentName);
         buildAndAttachDocument(processInstance, documentName, doc.getContentFileName());
     }
 
     public void buildAndAttachDocument(final ProcessInstance processInstance, final String documentName, final String fileName) throws BonitaException {
-        final Document doc = buildDocument(documentName);
+        final Document doc = BuildTestUtil.buildDocument(documentName);
         getProcessAPI().attachDocument(processInstance.getId(), documentName, fileName, doc.getContentMimeType(), documentName.getBytes());
     }
 
@@ -1773,24 +1522,11 @@ public class APITestUtil {
         return attachments.get(0);
     }
 
-    public ProcessInstance deployAndEnableWithActorAndStartIt(final BusinessArchive businessArchive, final User user) throws BonitaException {
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
+    public ProcessInstance deployAndEnableProcessWithActorAndStartIt(final BusinessArchive businessArchive, final User user) throws BonitaException {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, BuildTestUtil.ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue(processInstance != null);
         return processInstance;
-    }
-
-    public Document buildDocument(final String documentName) {
-        final String now = String.valueOf(System.currentTimeMillis());
-        final String fileName = now + ".txt";
-        final DocumentBuilder builder = new DocumentBuilder().createNewInstance(documentName, false);
-        builder.setFileName(fileName);
-        builder.setContentMimeType("plain/text");
-        return builder.done();
-    }
-
-    public byte[] generateContent(final Document doc) {
-        return doc.getName().getBytes();
     }
 
     /**

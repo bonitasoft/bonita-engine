@@ -16,7 +16,7 @@ package org.bonitasoft.engine.profile.xml;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.profile.ExportedProfileMappingBuilder;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.xml.ElementBinding;
@@ -48,7 +48,7 @@ public class ProfileMappingBinding extends ElementBinding {
         } else if ("roles".equals(name)) {
             profileMappingBuilder.setRoles((List<String>) value);
         } else if ("memberships".equals(name)) {
-            profileMappingBuilder.setMemberships((List<BEntry<String, String>>) value);
+            profileMappingBuilder.setMemberships((List<Pair<String, String>>) value);
         }
     }
 

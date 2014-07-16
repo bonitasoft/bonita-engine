@@ -69,7 +69,7 @@ public class SendTaskTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -78,7 +78,7 @@ public class SendTaskTest extends CommonAPITest {
         if (user != null) {
             getIdentityAPI().deleteUser(user.getId());
         }
-        logout();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName, final String messageName, final String targetProcess,

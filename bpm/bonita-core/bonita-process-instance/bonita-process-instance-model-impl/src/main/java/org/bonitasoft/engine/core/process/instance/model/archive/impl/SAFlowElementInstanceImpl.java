@@ -46,7 +46,7 @@ public abstract class SAFlowElementInstanceImpl extends SANamedElementImpl imple
     public SAFlowElementInstanceImpl(final SFlowElementInstance flowElementInstance) {
         super(flowElementInstance.getName(), flowElementInstance.getId());
         rootContainerId = flowElementInstance.getRootContainerId();
-        parentContainerId = flowElementInstance.getRootContainerId();
+        parentContainerId = flowElementInstance.getParentContainerId();
         logicalGroup1 = flowElementInstance.getLogicalGroup(0);
         logicalGroup2 = flowElementInstance.getLogicalGroup(1);
         logicalGroup3 = flowElementInstance.getLogicalGroup(2);

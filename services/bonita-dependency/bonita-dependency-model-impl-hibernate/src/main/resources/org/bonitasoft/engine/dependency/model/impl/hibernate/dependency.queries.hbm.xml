@@ -32,14 +32,7 @@
 		SELECT dependencymapping
 		FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
 	</query>
-
-	<query name="getDependencyMappingsByArtifact">
-		SELECT dependencymapping
-		FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
-		WHERE dependencymapping.artifactId = :artifactId
-		AND dependencymapping.artifactType = :artifactType
-	</query>
-
+	
 	<query name="getDependencyMappingsByDependency">
     	SELECT dependencymapping
     	FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
@@ -51,7 +44,6 @@
 		FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
 		WHERE dependencymapping.artifactId = :artifactId
 		AND dependencymapping.artifactType = :artifactType
-		ORDER BY dependencymapping.id
 	</query>
 
 </hibernate-mapping>

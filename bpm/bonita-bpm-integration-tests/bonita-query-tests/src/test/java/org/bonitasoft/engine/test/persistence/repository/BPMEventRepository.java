@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
-import static org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl.*;
+import static org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl.*;
 
 import java.util.List;
 

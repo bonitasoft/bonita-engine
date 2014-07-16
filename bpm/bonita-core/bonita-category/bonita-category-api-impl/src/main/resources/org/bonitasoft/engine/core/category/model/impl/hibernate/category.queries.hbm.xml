@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<!-- category -->
+
+	<query name="getCategoryByName">
+		SELECT category
+		FROM org.bonitasoft.engine.core.category.model.impl.SCategoryImpl AS category
+		WHERE category.name = :name
+	</query>
+
+	<query name="getNumberOfCategory">
+		SELECT COUNT(category)
+		FROM org.bonitasoft.engine.core.category.model.impl.SCategoryImpl AS category
+	</query>
+
+	<query name="getCategories">
+		SELECT category
+		FROM org.bonitasoft.engine.core.category.model.impl.SCategoryImpl AS category
+	</query>
+
+	<query name="getCategoriesOfProcess">
+		SELECT category
+		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping,
+		     org.bonitasoft.engine.core.category.model.impl.SCategoryImpl AS category
+		WHERE categorymapping.processId = :processId
+		AND category.id = categorymapping.categoryId
+	</query>
+	
+	<query name="getCategoriesUnrelatedToProcess">
+		SELECT category
+		FROM org.bonitasoft.engine.core.category.model.impl.SCategoryImpl AS category
+		WHERE category.id NOT IN (
+			SELECT categorymapping.categoryId
+			FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+			WHERE categorymapping.processId = :processId)
+	</query>
+	
+	<query name="getNumberOfCategoriesUnrelatedToProcess">
+		SELECT COUNT(category)
+		FROM org.bonitasoft.engine.core.category.model.impl.SCategoryImpl AS category
+		WHERE category.id NOT IN (
+			SELECT categorymapping.categoryId
+			FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+			WHERE categorymapping.processId = :processId)
+	</query>
+	
+	<!--                                         Category Mapping                                            -->
+	<query name="searchSProcessCategoryMapping">
+		SELECT categorymapping
+		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+	</query>
+	
+	<query name="getCategoryMappingOfProcessAndCategories">
+		SELECT categorymapping
+		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		WHERE categorymapping.processId = :processDefinitionId
+		AND categorymapping.categoryId IN (:categoryIds)
+	</query>
+	
+	<query name="getNumberOfCategoriesOfProcess">
+		SELECT COUNT(categorymapping)
+		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		WHERE categorymapping.processId = :processId
+	</query>
+    
+    <query name="getNumberOfProcessDefinitionsOfCategory">
+        SELECT COUNT(categorymapping)
+        FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+        WHERE categorymapping.categoryId = :categoryId
+    </query>
+
+	<query name="getNumberOfCategorizedProcessIds">
+		SELECT COUNT(categorymapping)
+		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		WHERE categorymapping.processId IN (:processIds)
+	</query>
+
+	<query name="isCategoryExistsInProcess">
+		SELECT COUNT(categorymapping)
+		FROM org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl AS categorymapping
+		WHERE categorymapping.processId = :processDefinitionId
+		AND categorymapping.categoryId = :categoryId
+	</query>
+    
+</hibernate-mapping>

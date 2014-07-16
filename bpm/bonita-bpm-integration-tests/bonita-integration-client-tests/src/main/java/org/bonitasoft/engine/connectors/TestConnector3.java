@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,9 +16,18 @@ package org.bonitasoft.engine.connectors;
 import org.bonitasoft.engine.connector.AbstractConnector;
 
 /**
- * @author SÃ©bastien Chevassu
+ * @author Sebastien Chevassu
+ * @author Celine Souchet
  */
 public class TestConnector3 extends AbstractConnector {
+
+    public static final String INPUT1 = "input1";
+
+    public static final String INPUT2 = "input2";
+
+    public static final String INPUT3 = "input3";
+
+    public static final String INPUT4 = "input4";
 
     @Override
     public void validateInputParameters() {
@@ -28,24 +37,24 @@ public class TestConnector3 extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() {
 
-        final String input1Value = (String) getInputParameter("input1");
+        final String input1Value = (String) getInputParameter(INPUT1);
         if (input1Value != null) {
-            VariableStorage.getInstance().setVariable("input1", input1Value);
+            VariableStorage.getInstance().setVariable(INPUT1, input1Value);
         }
 
-        final String input2Value = (String) getInputParameter("input2");
+        final String input2Value = (String) getInputParameter(INPUT2);
         if (input2Value != null) {
-            VariableStorage.getInstance().setVariable("input2", input2Value);
+            VariableStorage.getInstance().setVariable(INPUT2, input2Value);
         }
 
-        final String input3Value = (String) getInputParameter("input3");
+        final String input3Value = (String) getInputParameter(INPUT3);
         if (input3Value != null) {
-            VariableStorage.getInstance().setVariable("input3", input3Value);
+            VariableStorage.getInstance().setVariable(INPUT3, input3Value);
         }
 
-        final String input4Value = (String) getInputParameter("input4");
+        final String input4Value = (String) getInputParameter(INPUT4);
         if (input4Value != null) {
-            VariableStorage.getInstance().setVariable("input4", input4Value);
+            VariableStorage.getInstance().setVariable(INPUT4, input4Value);
         }
     }
 

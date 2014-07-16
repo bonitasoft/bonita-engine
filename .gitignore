@@ -6,5 +6,6 @@ FILEPATH.*.db
 dependency-reduced-pom.xml
 Temporary*.java
 *.iml
+.idea
 *.orig
 engine-it.exec

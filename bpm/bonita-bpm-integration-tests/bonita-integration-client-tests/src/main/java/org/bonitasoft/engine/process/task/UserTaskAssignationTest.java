@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.process.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -16,9 +17,9 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -55,15 +56,15 @@ public class UserTaskAssignationTest extends CommonAPITest {
         deleteUser(JOHN);
         deleteUser(JACK);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
     @Test
@@ -230,8 +231,8 @@ public class UserTaskAssignationTest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition.getId());
 
         // login as jack
-        logout();
-        loginWith(JACK, "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(JACK, "bpm");
 
         // before assign
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
@@ -272,7 +273,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step2", actorName);
         designProcessDefinition.addTransition("step1", "step2");
 
-        return deployAndEnableWithActor(designProcessDefinition.done(), actorName, john);
+        return deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, john);
     }
 
     @Test
@@ -368,7 +369,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jaakko);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jaakko);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -395,7 +396,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jaakko);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jaakko);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -422,7 +423,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", role);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", role);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -449,7 +450,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -482,7 +483,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         String activityName = "step1";
         designProcessDefinition.addActor(actorName);
         designProcessDefinition.addUserTask(activityName, actorName);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), actorName, users);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, users);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask(activityName, processInstance);
 
@@ -511,7 +512,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -550,7 +551,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final UserTaskDefinitionBuilder definitionBuilder = designProcessDefinition.addUserTask("step2", "acme");
         definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter("acme", jaakko, designProcessDefinition, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, "acme", jaakko, "TestFilter");
         getProcessAPI().addUserToActor("acme", processDefinition, jack.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -590,7 +591,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         designProcessDefinition.addActor("emca");
         designProcessDefinition.addUserTask("step1", "acme");
         designProcessDefinition.addUserTask("step2", "emca");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), Arrays.asList("acme", "emca"),
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), Arrays.asList("acme", "emca"),
                 Arrays.asList(jaakko, jack));
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
@@ -616,7 +617,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", role);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", role);
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
         assertEquals(1, possibleUsers.size());
@@ -629,28 +630,35 @@ public class UserTaskAssignationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
+    @Cover(jira = "ENGINE-1823, BS-8854", classes = { User.class, HumanTaskDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task", "users for actor" })
     @Test
     public void getPossibleUsersOfTaskDefinitionGroupActor() throws Exception {
+        //given
         final Group group = createGroup("group");
         final Role role = createRole("role");
         final User jaakko = createUser("jaakko", "bpm");
-        createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
+        final User pato = createUser("pato", "bpm");
+        getIdentityAPI().addUserMembership(jaakko.getId(), role.getId(), group.getId());
+        getIdentityAPI().addUserMembership(pato.getId(), group.getId(), role.getId());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
 
+        //when
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
-        assertEquals(1, possibleUsers.size());
-        assertEquals(jaakko, possibleUsers.get(0));
+        List<Long> userIdsForActor = getProcessAPI().getUserIdsForActor(processDefinition.getId(), "acme", 0, 10);
 
+        //then
+        assertThat(possibleUsers).containsExactly(jaakko, pato);
+        assertThat(userIdsForActor).containsExactly(jaakko.getId(), pato.getId());
+        
         // cleanup:
         deleteGroups(group);
         deleteRoles(role);
-        deleteUser(jaakko);
+        deleteUsers(jaakko, pato);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -668,7 +676,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
 
         List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 10);
         assertEquals(2, possibleUsers.size());
@@ -701,7 +709,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jack);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jack);
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step83", 0, 10);
         assertEquals(0, possibleUsers.size());
@@ -742,7 +750,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final UserTaskDefinitionBuilder definitionBuilder = designProcessDefinition.addUserTask("step2", "acme");
         definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter("acme", jaakko, designProcessDefinition, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, "acme", jaakko, "TestFilter");
         getProcessAPI().addUserToActor("acme", processDefinition, jack.getId());
 
         List<User> possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 0, 2);
@@ -759,5 +767,5 @@ public class UserTaskAssignationTest extends CommonAPITest {
         deleteUser(jaakko);
         disableAndDeleteProcess(processDefinition);
     }
-
+    
 }

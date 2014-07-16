@@ -108,15 +108,18 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         final FilterOption filterOption = new FilterOption(SADocumentMapping.class, "processInstanceId", instanceId);
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(filterOption);
-        final QueryOptions queryOptions = new QueryOptions(filters, null);
-        List<SADocumentMapping> documents;
+        final QueryOptions queryOptions = new QueryOptions(0, 100, null, filters, null);
+
         try {
-            documents = documentMappingService.searchArchivedDocuments(queryOptions);
+            List<SADocumentMapping> documents = documentMappingService.searchArchivedDocuments(queryOptions);
+            while (!documents.isEmpty()) {
+                for (final SADocumentMapping document : documents) {
+                    documentMappingService.delete(document);
+                }
+                documents = documentMappingService.searchArchivedDocuments(queryOptions);
+            }
         } catch (final SBonitaSearchException e) {
             throw new SDocumentMappingDeletionException(e);
-        }
-        for (final SADocumentMapping document : documents) {
-            documentMappingService.delete(document);
         }
     }
 
@@ -228,10 +231,12 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
             throw new SDocumentException("Unable to list documents of process instance: " + processInstanceId, e);
         }
     }
-    
-    private List<SProcessDocument> getDocumentsOfProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int numberPerPage) throws SDocumentException {
+
+    private List<SProcessDocument> getDocumentsOfProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int numberPerPage)
+            throws SDocumentException {
         try {
-            final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstanceOrderedById(processInstanceId, fromIndex, numberPerPage);
+            final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstanceOrderedById(processInstanceId, fromIndex,
+                    numberPerPage);
             if (docMappings != null && !docMappings.isEmpty()) {
                 final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
                 for (final SDocumentMapping docMapping : docMappings) {

@@ -36,33 +36,33 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  */
 public interface FlowNodeInstanceService {
 
-    static final String FLOWNODE_INSTANCE = "FLOWNODE_INSTANCE";
+    String FLOWNODE_INSTANCE = "FLOWNODE_INSTANCE";
 
-    static final String ARCHIVED_FLOWNODE_INSTANCE = "ARCHIVED_FLOWNODE_INSTANCE";
+    String ARCHIVED_FLOWNODE_INSTANCE = "ARCHIVED_FLOWNODE_INSTANCE";
 
-    static final String ACTIVITYINSTANCE_STATE = "ACTIVITYINSTANCE_STATE";
+    String ACTIVITYINSTANCE_STATE = "ACTIVITYINSTANCE_STATE";
 
-    static final String ACTIVITY_INSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
+    String ACTIVITY_INSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
 
-    static final String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION";
+    String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION";
 
-    static final String LOOPINSTANCE_LOOPMAX_MODIFIED = "LOOPINSTANCE_LOOPMAX_MODIFIED";
+    String LOOPINSTANCE_LOOPMAX_MODIFIED = "LOOPINSTANCE_LOOPMAX_MODIFIED";
 
-    static final String MULTIINSTANCE_LOOPCARDINALITY_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
+    String MULTIINSTANCE_LOOPCARDINALITY_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
 
-    static final String MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
+    String MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
 
-    static final String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED";
+    String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED";
 
-    static final String ACTIVITYINSTANCE_DISPLAY_NAME = "ACTIVITYINSTANCE_DISPLAY_NAME";
+    String ACTIVITYINSTANCE_DISPLAY_NAME = "ACTIVITYINSTANCE_DISPLAY_NAME";
 
-    static final String STATE_CATEGORY = "STATE_CATEGORY";
+    String STATE_CATEGORY = "STATE_CATEGORY";
 
-    static final String EXECUTED_BY_MODIFIED = "EXECUTED_BY_MODIFIED";
+    String EXECUTED_BY_MODIFIED = "EXECUTED_BY_MODIFIED";
 
-    static final String EXECUTED_BY_SUBSTITUTE_MODIFIED = "EXECUTED_BY_SUBSTITUTE_MODIFIED";
+    String EXECUTED_BY_SUBSTITUTE_MODIFIED = "EXECUTED_BY_SUBSTITUTE_MODIFIED";
 
-    static final String EXPECTED_END_DATE_MODIFIED = "EXPECTED_END_DATE_MODIFIED";
+    String EXPECTED_END_DATE_MODIFIED = "EXPECTED_END_DATE_MODIFIED";
 
     /**
      * @param flowNodeInstanceId
@@ -91,13 +91,6 @@ public interface FlowNodeInstanceService {
      */
     void setState(SFlowNodeInstance flowNodeInstance, FlowNodeState state) throws SFlowNodeModificationException;
 
-    /**
-     * @param rootContainerId
-     * @return
-     * @throws SFlowNodeReadException
-     * @since 6.0
-     */
-    List<SFlowNodeInstance> getActiveFlowNodes(long rootContainerId) throws SFlowNodeReadException;
 
     /**
      * @param flowNodeInstance
@@ -151,7 +144,6 @@ public interface FlowNodeInstanceService {
             throws SBonitaSearchException;
 
     /**
-     * 
      * @param entityClass
      * @param searchOptions
      * @return
@@ -161,7 +153,6 @@ public interface FlowNodeInstanceService {
     List<SFlowNodeInstance> searchFlowNodeInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
-     * 
      * @param entityClass
      * @param searchOptions
      * @return
@@ -232,8 +223,7 @@ public interface FlowNodeInstanceService {
      * @return The list of paginated results, according to the QueryOptions search criteria
      * @since 6.0
      */
-    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(Class<T> entityClass, QueryOptions queryOptions)
-            throws SBonitaSearchException;
+    <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstances(Class<T> entityClass, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria, for a specific supervisor.
@@ -248,8 +238,7 @@ public interface FlowNodeInstanceService {
      * @since 6.3
      */
     List<SAFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedBy(long supervisorId, Class<? extends SAFlowNodeInstance> entityClass,
-            QueryOptions queryOptions)
-            throws SBonitaSearchException;
+            QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * @param flowNodeInstance
@@ -278,13 +267,12 @@ public interface FlowNodeInstanceService {
     SAFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId) throws SFlowNodeReadException, SFlowNodeNotFoundException;
 
     /**
-     * 
      * @param sourceObjectFlowNodeInstanceId
      *            The source identifier of the flow node instance
      * @return The last archived flow node
      * @since 6.3
      */
-    public <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
+    <T extends SAFlowNodeInstance> T getLastArchivedFlowNodeInstance(final Class<T> entityClass, final long sourceObjectFlowNodeInstanceId)
             throws SBonitaSearchException;
 
     /**
@@ -293,12 +281,6 @@ public interface FlowNodeInstanceService {
      */
     void setExecuting(SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException;
 
-    /**
-     * @param queryOptions
-     * @return
-     * @throws SFlowNodeReadException
-     */
-    List<SFlowNodeInstance> getFlowNodeInstancesToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
     /**
      * @param saFlowNodeInstance
@@ -332,5 +314,17 @@ public interface FlowNodeInstanceService {
      * @since 6.3
      */
     long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException;
+
+
+    /**
+     * retrieve ids of elements that need to be restarted
+     * Called on start node to set the flag to tell the engine to restart these flow nodes
+     * Should not be called when the engine is started!
+     * 
+     * @param queryOptions
+     * @return
+     * @throws SFlowNodeReadException
+     */
+    List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
 
 }

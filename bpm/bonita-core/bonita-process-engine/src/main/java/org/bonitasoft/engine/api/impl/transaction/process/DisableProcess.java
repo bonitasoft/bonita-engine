@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,12 +21,14 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 
@@ -34,6 +36,7 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class DisableProcess implements TransactionContent {
 
@@ -85,10 +88,14 @@ public final class DisableProcess implements TransactionContent {
         }
     }
 
-    private void deleteWaitingEvents() throws SEventTriggerInstanceReadException, SWaitingEventModificationException {
-        final List<SWaitingEvent> waitingEvents = eventInstanceService.getStartWaitingEvents(processId);
-        for (final SWaitingEvent startEvent : waitingEvents) {
-            eventInstanceService.deleteWaitingEvent(startEvent);
+    private void deleteWaitingEvents() throws SWaitingEventModificationException, SBonitaSearchException {
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
+        List<SWaitingEvent> waitingEvents = eventInstanceService.searchStartWaitingEvents(processId, queryOptions);
+        while (!waitingEvents.isEmpty()) {
+            for (final SWaitingEvent startEvent : waitingEvents) {
+                eventInstanceService.deleteWaitingEvent(startEvent);
+            }
+            waitingEvents = eventInstanceService.searchStartWaitingEvents(processId, queryOptions);
         }
     }
 

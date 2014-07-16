@@ -2,6 +2,7 @@ package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
@@ -34,20 +36,18 @@ import org.junit.Test;
 
 public class ProcessArchiveTest extends CommonAPILocalTest {
 
-    private static final String JOHN = "john";
-
     private User john;
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser(JOHN, "bpm");
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
                 new ExpressionBuilder().createConstantStringExpression("updated a value"));
         processDefinitionBuilder.addShortTextData("activityData", new ExpressionBuilder().createConstantStringExpression("activityDataBalue")).getProcess();
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -100,10 +100,10 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
-                assertTrue(saActDataInstances.size() > 0);
-                List<SADataInstance> saProcDataInstances = dataInstanceService.getSADataInstances(processDataInstance.getId());
-                assertTrue(saProcDataInstances.size() > 0);
+                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
+                assertNotNull(saActDataInstances);
+                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                assertNotNull(saProcDataInstances);
 
                 return null;
             }
@@ -120,22 +120,20 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
-                List<SADataInstance> saProcDataInstances = dataInstanceService.getSADataInstances(processDataInstance.getId());
-                assertEquals(toString(saActDataInstances), 0, saActDataInstances.size());
-                assertEquals(0, saProcDataInstances.size());
+                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
+                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                assertNull(saActDataInstances);
+                assertNull(saProcDataInstances);
                 return null;
             }
 
-            private String toString(final List<SADataInstance> saActDataInstances) {
+            private String toString(final SADataInstance saDataInstance) {
                 final StringBuilder stb = new StringBuilder("[");
-                for (final SADataInstance saDataInstance : saActDataInstances) {
-                    stb.append("name=");
-                    stb.append(saDataInstance.getName());
-                    stb.append("value=");
-                    stb.append(saDataInstance.getValue());
-                    stb.append(", ");
-                }
+                stb.append("name=");
+                stb.append(saDataInstance.getName());
+                stb.append("value=");
+                stb.append(saDataInstance.getValue());
+                stb.append(" ");
                 stb.append("]");
                 return stb.toString();
             }
@@ -154,7 +152,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Long call() throws Exception {
-                return transitionService.getNumberOfArchivedTransitionInstances(null);
+                return transitionService.getNumberOfArchivedTransitionInstances(QueryOptions.countQueryOptions());
             }
         };
 
@@ -162,7 +160,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0").addActor("actor")
                 .addAutomaticTask("step1").addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -188,14 +186,14 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final SCommentService commentService = tenantAccessor.getCommentService();
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, "bpm");
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
@@ -212,8 +210,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                assertEquals(3, commentService.getNumberOfComments(null));
-                assertEquals(0, commentService.getNumberOfArchivedComments(null));
+                assertEquals(3, commentService.getNumberOfComments(QueryOptions.countQueryOptions()));
+                assertEquals(0, commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions()));
                 return null;
             }
         });
@@ -230,9 +228,9 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                assertEquals(0, commentService.getNumberOfComments(null));
+                assertEquals(0, commentService.getNumberOfComments(QueryOptions.countQueryOptions()));
                 // 3 comments + 3 system comments
-                assertEquals(6, commentService.getNumberOfArchivedComments(null));
+                assertEquals(6, commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions()));
                 return null;
             }
         });
@@ -244,8 +242,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
             @Override
             public Void call() throws Exception {
-                assertEquals(0, commentService.getNumberOfComments(null));
-                assertEquals(0, commentService.getNumberOfArchivedComments(null));
+                assertEquals(0, commentService.getNumberOfComments(QueryOptions.countQueryOptions()));
+                assertEquals(0, commentService.getNumberOfArchivedComments(QueryOptions.countQueryOptions()));
                 return null;
             }
         });
@@ -254,16 +252,23 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Test
     public void archivedFlowNodeInstance() throws Exception {
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
                 .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
-        final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
+
+        final ProcessDefinitionBuilder callingProcess = new ProcessDefinitionBuilder().createNewInstance("Caller", "1.0");
+        callingProcess.addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("ProcessToDelete"),
+                new ExpressionBuilder().createConstantStringExpression("1.0"));
+
+        final ProcessDefinition callingProcessDef = deployAndEnableProcess(callingProcess.getProcess());
+
+        final ProcessInstance p1 = getProcessAPI().startProcess(callingProcessDef.getId());
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());
         waitForProcessToFinish(p1);
@@ -273,20 +278,25 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         assertEquals("My Display Description", archivedUserTask.getDisplayDescription());
         assertEquals("My Display Name", archivedUserTask.getDisplayName());
         assertEquals("step1", archivedUserTask.getName());
+        assertEquals(archivedUserTask.getParentContainerId(), userTask.getParentContainerId());
+        assertEquals(archivedUserTask.getRootContainerId(), userTask.getRootContainerId());
+        assertEquals(archivedUserTask.getFlownodeDefinitionId(), userTask.getFlownodeDefinitionId());
+        assertEquals(archivedUserTask.getType(), userTask.getType());
         disableAndDeleteProcess(processDefinition);
+        disableAndDeleteProcess(callingProcessDef);
     }
 
     @Test
     public void getArchivedFlowNodeInstance() throws Exception {
-        logout();
-        loginWith("john", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addDescription("My Description")
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("My Display Name"))
                 .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("My Display Description"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());

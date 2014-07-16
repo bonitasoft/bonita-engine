@@ -15,7 +15,6 @@ package org.bonitasoft.engine.work;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.ExecutorService;
 
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -26,13 +25,13 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
 
     private final Collection<BonitaWork> works;
 
-    protected final ExecutorService executorService;
+    protected final BonitaExecutorService executorService;
 
     private boolean executed = false;
 
     private long tenantId;
 
-    public AbstractWorkSynchronization(final ExecutorService executorService, final SessionAccessor sessionAccessor) {
+    public AbstractWorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor) {
         super();
         this.executorService = executorService;
         works = new HashSet<BonitaWork>();

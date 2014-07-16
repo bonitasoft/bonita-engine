@@ -149,41 +149,6 @@ public class CategoryServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategorizedProcessIds(java.util.List)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
-    @Test
-    public final void getCategorizedProcessIds() throws SCategoryException, SBonitaReadException {
-        final List<SCategory> sCategories = new ArrayList<SCategory>();
-        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
-
-        final List<Long> processIds = new ArrayList<Long>();
-        processIds.add(14654L);
-        Assert.assertEquals(sCategories, categoryServiceImpl.getCategorizedProcessIds(processIds));
-    }
-
-    @Test
-    public final void getCategorizedProcessIdsWithNullList() throws SCategoryException {
-        Assert.assertTrue(categoryServiceImpl.getCategorizedProcessIds(null).isEmpty());
-    }
-
-    @Test
-    public final void getCategorizedProcessIdsWithEmptyList() throws SCategoryException {
-        Assert.assertTrue(categoryServiceImpl.getCategorizedProcessIds(new ArrayList<Long>()).isEmpty());
-    }
-
-    @Test(expected = SCategoryException.class)
-    public final void getCategorizedProcessIdsThrowException() throws SBonitaReadException, SCategoryException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
-
-        final List<Long> processIds = new ArrayList<Long>();
-        processIds.add(14654L);
-        categoryServiceImpl.getCategorizedProcessIds(processIds);
-    }
-
-    /**
      * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategoryByName(java.lang.String)}.
      * 
      * @throws SCategoryNotFoundException
@@ -307,27 +272,6 @@ public class CategoryServiceImplTest {
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
         categoryServiceImpl.getNumberOfCategorizedProcessIds(processIds);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getProcessDefinitionIdsOfCategory(long)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
-    @Test
-    public final void getProcessDefinitionIdsOfCategory() throws SCategoryException, SBonitaReadException {
-        final List<SCategory> sCategories = new ArrayList<SCategory>();
-        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
-
-        Assert.assertEquals(sCategories, categoryServiceImpl.getProcessDefinitionIdsOfCategory(54894L));
-    }
-
-    @Test(expected = SCategoryException.class)
-    public final void getProcessDefinitionIdsOfCategoryThrowException() throws SBonitaReadException, SCategoryException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
-
-        categoryServiceImpl.getProcessDefinitionIdsOfCategory(54894L);
     }
 
     /**

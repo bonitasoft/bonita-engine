@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.process.task;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,8 +48,6 @@ import org.springframework.util.CollectionUtils;
 
 public class PendingTasksTest extends CommonAPITest {
 
-    private static final String JOHN = "john";
-
     private static final String JACK = "jack";
 
     private User john;
@@ -56,17 +56,17 @@ public class PendingTasksTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
-        john = createUser(JOHN, "bpm");
-        jack = createUser(JACK, "bpm");
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        john = createUser(USERNAME, PASSWORD);
+        jack = createUser(JACK, PASSWORD);
     }
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
+        deleteUser(USERNAME);
         deleteUser(JACK);
         VariableStorage.clearAll();
-        logout();
+        logoutOnTenant();
     }
 
     @Test
@@ -123,12 +123,10 @@ public class PendingTasksTest extends CommonAPITest {
     public void getPendingHumanTaskInstancesInTwoProcesses() throws Exception {
         // 1. create a user 'test'
         User test;
-        final String USERNAME = "jack";
-        final String PASSWORD = "bpm";
         try {
-            test = getIdentityAPI().getUserByUserName(USERNAME);
+            test = getIdentityAPI().getUserByUserName(JACK);
         } catch (final UserNotFoundException e) {
-            test = getIdentityAPI().createUser(USERNAME, PASSWORD);
+            test = getIdentityAPI().createUser(JACK, PASSWORD);
         }
         final long userId = test.getId();
         // 2. install two processes
@@ -172,8 +170,6 @@ public class PendingTasksTest extends CommonAPITest {
 
     @Test
     public void getPendingHumanTaskInstancePriorityAndExpectedEndDate() throws Exception {
-        final User user = createUser(USERNAME, PASSWORD);
-
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final TaskPriority priority = TaskPriority.HIGHEST;
         final int oneDay = 24 * 60 * 60 * 1000;
@@ -183,12 +179,12 @@ public class PendingTasksTest extends CommonAPITest {
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDesignDefinition).done();
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
         final Date before = new Date();
         Thread.sleep(100);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("deliver", startProcess);
-        final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
+        final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
         Thread.sleep(100);
         final Date after = new Date();
         assertEquals(1, activityInstances.size());
@@ -197,7 +193,6 @@ public class PendingTasksTest extends CommonAPITest {
         final long time = humanTaskInstance.getExpectedEndDate().getTime();
         assertTrue(before.getTime() + oneDay < time && time < after.getTime() + oneDay);
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user);
     }
 
     @Test
@@ -224,8 +219,8 @@ public class PendingTasksTest extends CommonAPITest {
         final long taskId = task.getId();
         getProcessAPI().assignUserTask(taskId, user1.getId());
         getProcessAPI().assignUserTask(taskId, user2.getId());
-        logout();
-        loginWith("login1", "password");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("login1", "password");
         assertEquals(1, getProcessAPI().getAssignedHumanTaskInstances(user2.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());
         assertEquals(0, getProcessAPI().getAssignedHumanTaskInstances(user1.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());
         deleteUser(user1);
@@ -241,7 +236,7 @@ public class PendingTasksTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1");
         processBuilder.addActor("myActor");
         processBuilder.addUserTask(taskName, "myActor");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), "myActor", user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), "myActor", user);
         getProcessAPI().startProcess(processDefinition.getId());
         waitForPendingTasks(user.getId(), 1);
 
@@ -264,7 +259,7 @@ public class PendingTasksTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor("myActor");
         processBuilder.addUserTask("Request", "myActor");
-        return deployAndEnableWithActor(processBuilder.done(), "myActor", user1);
+        return deployAndEnableProcessWithActor(processBuilder.done(), "myActor", user1);
     }
 
     @Test
@@ -388,16 +383,16 @@ public class PendingTasksTest extends CommonAPITest {
             "human task" })
     @Test
     public void searchPossibleUsersOfTaskUserActor() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jaakko);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jaakko);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -419,16 +414,16 @@ public class PendingTasksTest extends CommonAPITest {
             "human task" })
     @Test
     public void searchPossibleUsersOfTaskUserActorWithoutMembership() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         // createUserMembership(jack.getUserName(), role.getName(), group.getName());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", jaakko);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jaakko);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -452,16 +447,16 @@ public class PendingTasksTest extends CommonAPITest {
             "human task" })
     @Test
     public void searchPossibleUsersOfTaskRoleActor() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", role);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", role);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -485,16 +480,16 @@ public class PendingTasksTest extends CommonAPITest {
             "human task" })
     @Test
     public void searchPossibleUsersOfTaskGroupActor() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         createUserMembership(jaakko.getUserName(), role.getName(), group.getPath());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -517,7 +512,7 @@ public class PendingTasksTest extends CommonAPITest {
     @Cover(jira = "BS-6798", classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "possible users", "pagination" })
     @Test
     public void searchPossibleUsersOfTaskShouldReturnAllUsersInThePaginationRange() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Role role = createRole("role");
         final int USER_LIST_SIZE = 21;
@@ -533,7 +528,7 @@ public class PendingTasksTest extends CommonAPITest {
         String activityName = "step1";
         designProcessDefinition.addActor(actorName);
         designProcessDefinition.addUserTask(activityName, actorName);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), actorName, users);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, users);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask(activityName, processInstance);
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 30);
@@ -556,18 +551,18 @@ public class PendingTasksTest extends CommonAPITest {
             "human task" })
     @Test
     public void searchPossibleUsersOfTaskSubGroupActor() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Group group2 = createGroup("gr", group.getPath());
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         createUserMembership(jack.getUserName(), role.getName(), group.getPath());
         createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -602,11 +597,11 @@ public class PendingTasksTest extends CommonAPITest {
             "possible users", "human task" })
     @Test
     public void searchPossibleUsersOfFilteredTask() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Group group2 = createGroup("gr", group.getPath());
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
         createUserMembership(jack.getUserName(), role.getName(), group2.getPath());
 
@@ -618,7 +613,7 @@ public class PendingTasksTest extends CommonAPITest {
         final UserTaskDefinitionBuilder definitionBuilder = designProcessDefinition.addUserTask("step2", "acme");
         definitionBuilder.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter("acme", jaakko, designProcessDefinition, "TestFilter");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, "acme", jaakko, "TestFilter");
         getProcessAPI().addUserToActor("acme", processDefinition, jack.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -645,18 +640,18 @@ public class PendingTasksTest extends CommonAPITest {
             "possible users", "human task" })
     @Test
     public void searchPossibleUsersShouldReturnThoseStartingWithSearchedNamed() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Group group2 = createGroup("gr", group.getPath());
         final Role role = createRole("role");
-        final User jaakko = createUser("jaakko", "bpm");
+        final User jaakko = createUser("jaakko", PASSWORD);
         createUserMembership(jack.getUserName(), role.getName(), group.getPath());
         createUserMembership(jaakko.getUserName(), role.getName(), group2.getPath());
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("assign", "5.0");
         designProcessDefinition.addActor("acme");
         designProcessDefinition.addUserTask("step1", "acme");
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "acme", group);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
 
@@ -692,7 +687,7 @@ public class PendingTasksTest extends CommonAPITest {
             "human task" })
     @Test
     public void getPossibleUsersOfUnknownTask() throws Exception {
-        loginWith(JOHN, "bpm");
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 

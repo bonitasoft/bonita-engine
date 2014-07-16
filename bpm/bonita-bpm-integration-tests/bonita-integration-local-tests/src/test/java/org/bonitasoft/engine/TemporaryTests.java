@@ -1,13 +1,12 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.process.document.DocumentIntegrationTest;
+import org.bonitasoft.engine.process.ProcessManagementTest;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        DocumentIntegrationTest.class
+        ProcessManagementTest.class
 })
 public class TemporaryTests extends LocalIntegrationTests {
 

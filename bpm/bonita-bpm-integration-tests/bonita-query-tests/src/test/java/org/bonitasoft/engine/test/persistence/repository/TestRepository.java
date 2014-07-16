@@ -15,10 +15,14 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstance
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
 import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
 import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
@@ -26,6 +30,7 @@ import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -44,6 +49,12 @@ public class TestRepository {
 
     protected Session getSession() {
         return sessionFactory.getCurrentSession();
+    }
+    
+    protected Session getSessionWithTenantFilter() {
+        Session session = getSession();
+        session.enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        return session;
     }
 
     protected Query getNamedQuery(final String queryName) {
@@ -122,4 +133,15 @@ public class TestRepository {
         return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(),
                 new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }
+    
+    public SCustomUserInfoDefinition add(final SCustomUserInfoDefinitionImpl infoDef) {
+        getSession().save(infoDef);
+        return (SCustomUserInfoDefinition) getSession().get(infoDef.getClass(), new PersistentObjectId(infoDef.getId(), infoDef.getTenantId()));
+    }
+    
+    public SCustomUserInfoValue add(final SCustomUserInfoValueImpl infoValue) {
+        getSession().save(infoValue);
+        return (SCustomUserInfoValue) getSession().get(infoValue.getClass(), new PersistentObjectId(infoValue.getId(), infoValue.getTenantId()));
+    }
+    
 }

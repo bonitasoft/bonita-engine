@@ -34,7 +34,6 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -53,6 +52,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,7 +74,7 @@ public class ProfileServiceImplForProfileEntryTest {
     private TechnicalLoggerService logger;
 
     @Mock
-    private ReadPersistenceService persistenceService;
+    private PersistenceService persistenceService;
 
     @Mock
     private QueriableLoggerService queriableLoggerService;
@@ -107,7 +107,7 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     private SProfileEntry createProfileEntry(final long id) {
-        SProfileEntryImpl entry = new SProfileEntryImpl();
+        final SProfileEntryImpl entry = new SProfileEntryImpl();
         entry.setId(id);
         return entry;
     }
@@ -353,8 +353,8 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntry sProfileEntry = createProfileEntry(3);
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
         sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setCustom(true).setPage("page").setParentId(5858)
-                .setProfileId(9)
-                .setType("type");
+        .setProfileId(9)
+        .setType("type");
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));

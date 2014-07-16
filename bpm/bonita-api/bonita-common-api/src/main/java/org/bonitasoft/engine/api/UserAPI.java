@@ -20,6 +20,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.ContactData;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Users: creation, deletion, certain
@@ -51,16 +53,16 @@ public interface UserAPI {
      * The password can't be empty.
      * 
      * @param userName
-     *            The name of the user
+     *        The name of the user
      * @param password
-     *            The password of the user
+     *        The password of the user
      * @return The created user
      * @throws AlreadyExistsException
-     *             If the name is already taken by an existing user
+     *         If the name is already taken by an existing user
      * @throws CreationException
-     *             If an exception occurs during the user creation
+     *         If an exception occurs during the user creation
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     User createUser(String userName, String password) throws AlreadyExistsException, CreationException;
@@ -70,20 +72,20 @@ public interface UserAPI {
      * The password can't be empty.
      * 
      * @param userName
-     *            The name of the user
+     *        The name of the user
      * @param password
-     *            The password of the user
+     *        The password of the user
      * @param firstName
-     *            The first name of the user
+     *        The first name of the user
      * @param lastName
-     *            The last name of the user
+     *        The last name of the user
      * @return The created user
      * @throws AlreadyExistsException
-     *             If the name is already taken by an existing user
+     *         If the name is already taken by an existing user
      * @throws CreationException
-     *             If an exception occurs during the user creation
+     *         If an exception occurs during the user creation
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     User createUser(String userName, String password, String firstName, String lastName) throws AlreadyExistsException, CreationException;
@@ -93,14 +95,14 @@ public interface UserAPI {
      * It takes the values of the creator in order to create the user.
      * 
      * @param creator
-     *            The user to create
+     *        The user to create
      * @return The created user
      * @throws AlreadyExistsException
-     *             If the name is already taken by an existing user
+     *         If the name is already taken by an existing user
      * @throws CreationException
-     *             If an exception occurs during the user creation
+     *         If an exception occurs during the user creation
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     User createUser(UserCreator creator) throws AlreadyExistsException, CreationException;
@@ -109,16 +111,16 @@ public interface UserAPI {
      * Updates the user according to the updater values.
      * 
      * @param userId
-     *            The identifier of the user
+     *        The identifier of the user
      * @param updater
-     *            The user updater
+     *        The user updater
      * @return The updated user
      * @throws UserNotFoundException
-     *             If the user identifier does not refer to an existing user
+     *         If the user identifier does not refer to an existing user
      * @throws UpdateException
-     *             If an exception occurs during the user update
+     *         If an exception occurs during the user update
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     User updateUser(long userId, UserUpdater updater) throws UserNotFoundException, UpdateException;
@@ -127,11 +129,11 @@ public interface UserAPI {
      * Deletes the user.
      * 
      * @param userId
-     *            The identifier of the user
+     *        The identifier of the user
      * @throws DeletionException
-     *             If an exception occurs during the user deletion
+     *         If an exception occurs during the user deletion
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteUser(long userId) throws DeletionException;
@@ -140,11 +142,11 @@ public interface UserAPI {
      * Deletes the user.
      * 
      * @param userName
-     *            The name of the user
+     *        The name of the user
      * @throws DeletionException
-     *             If an exception occurs during the user deletion
+     *         If an exception occurs during the user deletion
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteUser(String userName) throws DeletionException;
@@ -153,11 +155,11 @@ public interface UserAPI {
      * Deletes the users.
      * 
      * @param userIds
-     *            The identifiers of the users
+     *        The identifiers of the users
      * @throws DeletionException
-     *             If an exception occurs during the user deletion
+     *         If an exception occurs during the user deletion
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteUsers(List<Long> userIds) throws DeletionException;
@@ -167,14 +169,14 @@ public interface UserAPI {
      * It throws a {@link UserNotFoundException} if the user identifier equals the technical user identifier (-1).
      * 
      * @param userId
-     *            The identifier of the user
+     *        The identifier of the user
      * @return The searched user
      * @throws UserNotFoundException
-     *             If the user identifier does not refer to an existing user
+     *         If the user identifier does not refer to an existing user
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *         If an exception occurs during the user retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     User getUser(long userId) throws UserNotFoundException;
@@ -183,14 +185,14 @@ public interface UserAPI {
      * Retrieves the user.
      * 
      * @param userName
-     *            The name of the user
+     *        The name of the user
      * @return The role
      * @throws UserNotFoundException
-     *             If the user name does not refer to an existing user
+     *         If the user name does not refer to an existing user
      * @throws RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     User getUserByUserName(String userName) throws UserNotFoundException;
@@ -199,14 +201,14 @@ public interface UserAPI {
      * Retrieves the professional details of the user.
      * 
      * @param userId
-     *            The identifier of the user
+     *        The identifier of the user
      * @return The user and the professional details
      * @throws UserNotFoundException
-     *             If the user identifier does not refer to an existing user, or is -1 (the technical user identifier)
+     *         If the user identifier does not refer to an existing user, or is -1 (the technical user identifier)
      * @throws RetrieveException
-     *             If an exception occurs while retrieving the user
+     *         If an exception occurs while retrieving the user
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
     UserWithContactData getUserWithProfessionalDetails(long userId) throws UserNotFoundException;
@@ -215,16 +217,16 @@ public interface UserAPI {
      * Retrieves the contact data (personal or professional) of the user.
      * 
      * @param userId
-     *            The identifier of the user
+     *        The identifier of the user
      * @param personal
-     *            true if the contact data is the personal one
+     *        true if the contact data is the personal one
      * @return The contact data
      * @throws UserNotFoundException
-     *             If the user name does not refer to an existing user
+     *         If the user name does not refer to an existing user
      * @throws RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     ContactData getUserContactData(long userId, boolean personal) throws UserNotFoundException;
@@ -234,9 +236,9 @@ public interface UserAPI {
      * 
      * @return The total number of users
      * @throws RetrieveException
-     *             If an exception occurs during the count retrieving
+     *         If an exception occurs during the count retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     long getNumberOfUsers();
@@ -245,16 +247,16 @@ public interface UserAPI {
      * Retrieves the paginated list of users. It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param startIndex
-     *            The start index
+     *        The start index
      * @param maxResults
-     *            The max number of users
+     *        The max number of users
      * @param criterion
-     *            The sorting criterion
+     *        The sorting criterion
      * @return The paginated list of users
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *         If an exception occurs during the user retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     List<User> getUsers(int startIndex, int maxResults, UserCriterion criterion);
@@ -264,12 +266,12 @@ public interface UserAPI {
      * If a user does not exists, no exception is thrown and no value is added in the map.
      * 
      * @param userIds
-     *            The identifiers of the users
+     *        The identifiers of the users
      * @return The users
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *         If an exception occurs during the user retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Map<Long, User> getUsers(List<Long> userIds);
@@ -279,12 +281,12 @@ public interface UserAPI {
      * If a user does not exists, no exception is thrown and no value is added in the map.
      * 
      * @param userNames
-     *            The names of the users
-     * @return The users
+     *        The names of the users
+     * @return The users ordered by the user name ascending
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *         If an exception occurs during the user retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
     Map<String, User> getUsersByUsernames(List<String> userNames);
@@ -293,12 +295,12 @@ public interface UserAPI {
      * Searches users according to the criteria containing in the options.
      * 
      * @param options
-     *            The search criteria
+     *        The search criteria
      * @return The search result
      * @throws SearchException
-     *             If an exception occurs during the user searching
+     *         If an exception occurs during the user searching
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     SearchResult<User> searchUsers(SearchOptions options) throws SearchException;
@@ -307,12 +309,12 @@ public interface UserAPI {
      * Returns the total number of users of the role.
      * 
      * @param roleId
-     *            The identifier of the role
+     *        The identifier of the role
      * @return The total number of users of the role
      * @throws RetrieveException
-     *             If an exception occurs during the count retrieving
+     *         If an exception occurs during the count retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     long getNumberOfUsersInRole(long roleId);
@@ -322,18 +324,18 @@ public interface UserAPI {
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param roleId
-     *            The identifier of the role
+     *        The identifier of the role
      * @param startIndex
-     *            The start index
+     *        The start index
      * @param maxResults
-     *            The max number of roles
+     *        The max number of roles
      * @param criterion
-     *            The sorting criterion
+     *        The sorting criterion
      * @return The paginated list of roles
      * @throws RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     List<User> getUsersInRole(long roleId, int startIndex, int maxResults, UserCriterion criterion);
@@ -342,13 +344,13 @@ public interface UserAPI {
      * Returns the total number of users of the group.
      * 
      * @param groupId
-     *            The identifier of the group
+     *        The identifier of the group
      * @return The total number of users of the group
      * @throws BonitaException
      * @throws RetrieveException
-     *             If an exception occurs during the count retrieving
+     *         If an exception occurs during the count retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     long getNumberOfUsersInGroup(long groupId) throws BonitaException;
@@ -358,20 +360,38 @@ public interface UserAPI {
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param groupId
-     *            The identifier of the group
+     *        The identifier of the group
      * @param startIndex
-     *            The start index
+     *        The start index
      * @param maxResults
-     *            The max number of groups
+     *        The max number of groups
      * @param criterion
-     *            The sorting criterion
+     *        The sorting criterion
      * @return The paginated list of groups
      * @throws RetrieveException
-     *             If an exception occurs during the group retrieving
+     *         If an exception occurs during the group retrieving
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     List<User> getUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion);
+    
+    /**
+     * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
+     * 
+     * @param infoName
+     *            The custom user information name
+     * @param infoValue
+     *            The custom user information value
+     * @param usePartialMatch
+     *            Defines whether the custom user information value should use a partial match.
+     * @param startIndex
+     *            The start index (the first valid value is zero)
+     * @param maxResults
+     *            The max number of user identifiers to be retrieved
+     * @return the list of user identifiers containing the chosen custom user information with the given value.
+     * @since 6.3.2
+     */
+    List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults);
 
 }

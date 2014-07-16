@@ -28,7 +28,9 @@ public class SetServiceStateTest {
     public void callShouldRefreshClassloaderOnCurrentTenant() throws Exception {
         // given:
         long tenantId = 635434L;
-        SetServiceState setServiceState = spy(new SetServiceState(tenantId, mock(ServiceStrategy.class)));
+        ServiceStrategy mock = mock(ServiceStrategy.class);
+        doReturn(true).when(mock).shouldRefreshClassLoaders();
+        SetServiceState setServiceState = spy(new SetServiceState(tenantId, mock));
         PlatformServiceAccessor platformAccessor = mock(PlatformServiceAccessor.class);
         TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         DependencyService dependencyService = mock(DependencyService.class);
@@ -53,7 +55,9 @@ public class SetServiceStateTest {
     public void callShouldRefreshClassloaderOfProcesses() throws Exception {
         // given:
         long tenantId = 635434L;
-        SetServiceState setServiceState = spy(new SetServiceState(tenantId, mock(ServiceStrategy.class)));
+        ServiceStrategy mock = mock(ServiceStrategy.class);
+        doReturn(true).when(mock).shouldRefreshClassLoaders();
+        SetServiceState setServiceState = spy(new SetServiceState(tenantId, mock));
         PlatformServiceAccessor platformAccessor = mock(PlatformServiceAccessor.class);
         TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         DependencyService dependencyService = mock(DependencyService.class);

@@ -339,7 +339,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     // charles
     @Override
-    public List<SConnectorInstance> searchConnetorInstances(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SConnectorInstance> searchConnectorInstances(final QueryOptions searchOptions) throws SBonitaSearchException {
         try {
             return persistenceService.searchEntity(SConnectorInstance.class, searchOptions, null);
         } catch (final SBonitaReadException e) {

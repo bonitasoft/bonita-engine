@@ -48,12 +48,12 @@ public class ActorPermissionCommandTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @After
     public void after() throws BonitaException {
-        logout();
+        logoutOnTenant();
     }
 
     private void cleanup(final long userId, final List<Long> processDefinitionIds) throws BonitaException {
@@ -106,7 +106,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     public void testIsAllowedToStartProcesses() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
-        loginWith(userName, "bpm");
+        loginOnDefaultTenantWith(userName, "bpm");
         final String ACTOR_NAME1 = "ActorMenu";
         final String ACTOR_NAME2 = "ActorElias";
         final String ACTOR_NAME3 = "ActorBap";
@@ -157,7 +157,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     public void testIsAllowedToStartProcess() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
-        loginWith(userName, "bpm");
+        loginOnDefaultTenantWith(userName, "bpm");
         final String ACTOR_NAME1 = "ActorMenu";
         final String ACTOR_NAME2 = "ActorElias";
         final String ACTOR_NAME3 = "ActorBap";
@@ -202,7 +202,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     public void testIsAllowedToSeeOverviewFormForInitiatorActor() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
-        loginWith(userName, "bpm");
+        loginOnDefaultTenantWith(userName, "bpm");
 
         final List<Long> processDefinitionIds = new ArrayList<Long>(2);
         final List<Long> processInstanceIds = new ArrayList<Long>(2);
@@ -210,14 +210,14 @@ public class ActorPermissionCommandTest extends CommonAPITest {
             final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                     "SearchOpenProcessInstancesInvolvingUser", "14." + i);
             if (i == 1) {
-                designProcessDefinition.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION);
+                designProcessDefinition.setActorInitiator(ACTOR_NAME);
             }
-            designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+            designProcessDefinition.addActor(ACTOR_NAME);
             designProcessDefinition.addAutomaticTask("step1");
             designProcessDefinition.addUserTask("step2", ACTOR_NAME);
             designProcessDefinition.addTransition("step1", "step2");
             // assign pending task to jack
-            final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, manu);
+            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, manu);
             final long processDefinitionId = processDefinition.getId();
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
@@ -247,12 +247,12 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         // create process
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
                 "14.3");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step1");
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
@@ -276,18 +276,18 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         // create process
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
                 "14.3");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step1");
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        logout();
-        loginWith("jack", "bpm");
+        logoutOnTenant();
+        loginOnDefaultTenantWith("jack", "bpm");
 
         final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
