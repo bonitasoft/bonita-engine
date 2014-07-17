@@ -22,8 +22,9 @@ CREATE TABLE arch_process_instance (
   stringIndex5 VARCHAR(50),
   PRIMARY KEY (tenantid, id)
 );
-
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
+CREATE INDEX idx2_arch_process_instance ON arch_process_instance (tenantId, processDefinitionId, archiveDate);
+CREATE INDEX idx3_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, callerId, stateId);
 
 CREATE TABLE arch_flownode_instance (
   tenantid BIGINT NOT NULL,

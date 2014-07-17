@@ -43,7 +43,9 @@ import org.junit.Test;
  */
 public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends CommonAPITest {
 
-    private List<ProcessDefinition> processDefinitions;
+    private List<ProcessDefinition> enabledProcessDefinitions;
+
+    private List<ProcessDefinition> disabledProcessDefinitions;
 
     private List<User> users = null;
 
@@ -57,7 +59,8 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
 
     @After
     public void afterTest() throws BonitaException {
-        disableAndDeleteProcess(processDefinitions);
+        disableAndDeleteProcess(enabledProcessDefinitions);
+        deleteProcess(disabledProcessDefinitions);
         deleteCategories(categories);
         deleteUserMemberships(userMemberships);
         deleteUsers(users);
@@ -94,7 +97,8 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(4).getId(), groups.get(0).getId(), roles.get(1).getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(5).getId(), groups.get(1).getId(), roles.get(0).getId()));
 
-        processDefinitions = new ArrayList<ProcessDefinition>(4);
+        enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
+        disabledProcessDefinitions = new ArrayList<ProcessDefinition>(1);
         createProcessesDefForSearchProcessUserCanStart();
     }
 
@@ -110,8 +114,8 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         categoryIds.add(categories.get(0).getId());
         categoryIds.add(categories.get(1).getId());
         categoryIds.add(categories.get(2).getId());
-        getProcessAPI().addCategoriesToProcess(processDefinitions.get(0).getId(), categoryIds);
-        categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitions.get(0).getId(), 0, 10, CategoryCriterion.NAME_ASC);
+        getProcessAPI().addCategoriesToProcess(enabledProcessDefinitions.get(0).getId(), categoryIds);
+        categories = getProcessAPI().getCategoriesOfProcessDefinition(enabledProcessDefinitions.get(0).getId(), 0, 10, CategoryCriterion.NAME_ASC);
         assertTrue(!categories.isEmpty());
 
         // Get all process definitions:
@@ -119,15 +123,15 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.ASC);
         SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(8, searchRes0.getCount());
-        assertEquals(processDefinitions.get(1).getId(), searchRes0.getResult().get(1).getProcessId());
-        assertEquals(processDefinitions.get(0).getId(), searchRes0.getResult().get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes0.getResult().get(1).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(0).getId(), searchRes0.getResult().get(0).getProcessId());
 
         // Get all process definitions with no category associated:
         optsBuilder = new SearchOptionsBuilder(0, 7);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.ASC);
         searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfos(optsBuilder.done());
         assertEquals(7, searchRes0.getCount());
-        assertEquals(processDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
     }
 
     @Test
@@ -135,7 +139,7 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(4).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
-        assertEquals(processDefinitions.get(5).getName(), searchRes.getResult().get(0).getName());
+        assertEquals(enabledProcessDefinitions.get(4).getName(), searchRes.getResult().get(0).getName());
     }
 
     @Test
@@ -143,7 +147,7 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(5).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
-        assertEquals(processDefinitions.get(6).getName(), searchRes.getResult().get(0).getName());
+        assertEquals(enabledProcessDefinitions.get(5).getName(), searchRes.getResult().get(0).getName());
     }
 
     @Test
@@ -151,9 +155,9 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(3).getId(), searchOptionsBuilder.done());
         assertEquals(3, searchRes.getCount());
-        assertEquals(processDefinitions.get(5).getName(), searchRes.getResult().get(0).getName()); // from group
-        assertEquals(processDefinitions.get(6).getName(), searchRes.getResult().get(1).getName()); // from role
-        assertEquals(processDefinitions.get(7).getName(), searchRes.getResult().get(2).getName()); // from role and group
+        assertEquals(enabledProcessDefinitions.get(4).getName(), searchRes.getResult().get(0).getName()); // from group
+        assertEquals(enabledProcessDefinitions.get(5).getName(), searchRes.getResult().get(1).getName()); // from role
+        assertEquals(enabledProcessDefinitions.get(6).getName(), searchRes.getResult().get(2).getName()); // from role and group
     }
 
     @Test
@@ -163,7 +167,7 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         searchOptionsBuilder.searchTerm("My_Process2"); // use name as term
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
-        assertEquals(processDefinitions.get(1).getId(), searchRes.getResult().get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes.getResult().get(0).getProcessId());
     }
 
     @Test
@@ -173,12 +177,12 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchUncategorizedProcessDeploymentInfosUserCanStart(users.get(0).getId(),
                 searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
-        assertEquals(processDefinitions.get(0).getName(), searchRes.getResult().get(0).getName());
+        assertEquals(enabledProcessDefinitions.get(0).getName(), searchRes.getResult().get(0).getName());
 
         searchRes = getProcessAPI().searchUncategorizedProcessDeploymentInfosUserCanStart(users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(2, searchRes.getCount());
-        assertEquals(processDefinitions.get(1).getName(), searchRes.getResult().get(0).getName());
-        assertEquals(processDefinitions.get(2).getName(), searchRes.getResult().get(1).getName());
+        assertEquals(enabledProcessDefinitions.get(1).getName(), searchRes.getResult().get(0).getName());
+        assertEquals(enabledProcessDefinitions.get(2).getName(), searchRes.getResult().get(1).getName());
 
         // user associated to a process without actor initiator
         searchRes = getProcessAPI().searchUncategorizedProcessDeploymentInfosUserCanStart(users.get(2).getId(), searchOptionsBuilder.done());
@@ -190,19 +194,19 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor1, true);
         final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, actor1, users.get(0));
-        processDefinitions.add(processDefinition1);
+        enabledProcessDefinitions.add(processDefinition1);
 
         // create process2
         final String actor2 = "Actor2";
         final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, actor2, users.get(1));
-        processDefinitions.add(processDefinition2);
+        enabledProcessDefinitions.add(processDefinition2);
 
         final DesignProcessDefinition designProcessDefinition3 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process3", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, actor2, users.get(1));
-        processDefinitions.add(processDefinition3);
+        enabledProcessDefinitions.add(processDefinition3);
 
         // process not enabled
         final DesignProcessDefinition designProcessDefinition4 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process4", "1.0",
@@ -210,31 +214,31 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStartTest extends C
         final ProcessDefinition processDefinition4 = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition4).done());
         getProcessAPI().addUserToActor(actor2, processDefinition4, users.get(1).getId());
-        processDefinitions.add(processDefinition4);
+        disabledProcessDefinitions.add(processDefinition4);
 
         // process without actor initiator
         final DesignProcessDefinition designProcessDefinition5 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process5", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, false);
         final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, actor2, users.get(2));
-        processDefinitions.add(processDefinition5);
+        enabledProcessDefinitions.add(processDefinition5);
 
         // actor initiator is a group
         final DesignProcessDefinition designProcessDefinition6 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process6", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition6 = deployAndEnableProcessWithActor(designProcessDefinition6, actor2, groups.get(0));
-        processDefinitions.add(processDefinition6);
+        enabledProcessDefinitions.add(processDefinition6);
 
         // actor initiator is a role
         final DesignProcessDefinition designProcessDefinition7 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process7", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition7 = deployAndEnableProcessWithActor(designProcessDefinition7, actor2, roles.get(0));
-        processDefinitions.add(processDefinition7);
+        enabledProcessDefinitions.add(processDefinition7);
 
         // actor initiator is a membership
         final DesignProcessDefinition designProcessDefinition8 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process8", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor2, true);
         final ProcessDefinition processDefinition8 = deployAndEnableProcessWithActor(designProcessDefinition8, actor2, roles.get(0), groups.get(0));
-        processDefinitions.add(processDefinition8);
+        enabledProcessDefinitions.add(processDefinition8);
     }
 
 }
