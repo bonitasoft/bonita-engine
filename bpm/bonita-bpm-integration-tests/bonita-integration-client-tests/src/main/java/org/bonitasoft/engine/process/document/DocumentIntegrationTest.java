@@ -122,6 +122,33 @@ public class DocumentIntegrationTest extends CommonAPITest {
             disableAndDeleteProcess(pi.getProcessDefinitionId());
         }
     }
+    @Test
+    public void removeADocument() throws BonitaException {
+        final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
+        Document attachment;
+        try {
+            //given
+            final String documentName = "newDocument";
+            final Document doc = buildReferenceToExternalDocument();
+            attachment = getProcessAPI().attachDocument(pi.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), new byte[]{1,2,3});
+
+            //when
+            Document document = getProcessAPI().removeDocument(attachment.getId());
+
+            //then
+            assertEquals("removeDocument should return the removed document",attachment, document);
+            try{
+                getProcessAPI().getDocument(attachment.getId());
+                fail("should not be able to find document after deletion");
+            }catch(DocumentNotFoundException e){
+                //ok
+            }
+            //TODO check content is deleted?
+
+        } finally {
+            disableAndDeleteProcess(pi.getProcessDefinitionId());
+        }
+    }
 
     @Test
     public void attachADocumentAndItsContentToProcessInstanceTest() throws BonitaException {

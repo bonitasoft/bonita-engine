@@ -2,6 +2,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Arrays.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -18,9 +19,16 @@ import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
+import org.bonitasoft.engine.bpm.document.impl.DocumentImpl;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
+import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentDeletionException;
+import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.model.impl.SProcessDocumentImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -33,6 +41,8 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.document.SDocumentNotFoundException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
@@ -41,6 +51,7 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -114,7 +125,7 @@ public class ProcessAPIImplTest {
 
         processAPI.updateProcessDataInstance("foo", processInstanceId, "go");
 
-        verify(processAPI).updateProcessDataInstances(eq(processInstanceId), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(processInstanceId), eq(Collections.<String, Serializable>singletonMap("foo", "go")));
     }
 
     @Test
@@ -191,7 +202,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void replayingAFailedJobShouldExecuteAgainSchedulerServiceWithSomeParameters() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("anyparam", (Serializable) Boolean.FALSE);
         long jobDescriptorId = 544L;
@@ -391,6 +402,69 @@ public class ProcessAPIImplTest {
             // then ok
         }
 
+
     }
+
+    @Test
+    public void should_removeDocument_call_the_service() throws Exception {
+        //given
+        ProcessDocumentService processDocumentService = mock(ProcessDocumentService.class);
+        when(tenantAccessor.getProcessDocumentService()).thenReturn(processDocumentService);
+
+
+        SProcessDocumentImpl sProcessDocument = new SProcessDocumentImpl();
+        sProcessDocument.setId(123l);
+
+        doReturn(sProcessDocument).when(processDocumentService).getDocument(123l);
+
+        //when
+        Document removeDocument = processAPI.removeDocument(123l);
+
+        //then
+        assertThat(ModelConvertor.toDocument(sProcessDocument)).isEqualTo(removeDocument);
+        verify(processDocumentService, times(1)).removeDocument(sProcessDocument);
+
+    }
+
+
+    @Test
+    public void should_removeDocument_throw_DocumentNotFoundException() throws Exception {
+        //given
+        ProcessDocumentService processDocumentService = mock(ProcessDocumentService.class);
+        when(tenantAccessor.getProcessDocumentService()).thenReturn(processDocumentService);
+        doThrow(SDocumentNotFoundException.class).when(processDocumentService).getDocument(123l);
+
+        //when
+        try {
+            processAPI.removeDocument(123l);
+            fail("should not succeed if document does not exists");
+        } catch (DocumentNotFoundException e) {
+            //ok
+        }
+        //then
+        verify(processDocumentService, times(0)).removeDocument(any(SProcessDocument.class));
+    }
+
+
+    @Test
+    public void should_removeDocument_throw_DeletionException() throws Exception {
+        //given
+        ProcessDocumentService processDocumentService = mock(ProcessDocumentService.class);
+        when(tenantAccessor.getProcessDocumentService()).thenReturn(processDocumentService);
+        SProcessDocumentImpl sProcessDocument = new SProcessDocumentImpl();
+        sProcessDocument.setId(123l);
+        doReturn(sProcessDocument).when(processDocumentService).getDocument(123l);
+        doThrow(SProcessDocumentDeletionException.class).when(processDocumentService).removeDocument(sProcessDocument);
+
+        //when
+        try {
+            processAPI.removeDocument(123l);
+            fail("should not succeed if document does not exists");
+        } catch (DeletionException e) {
+            //ok
+        }
+        //then: exception
+    }
+
 
 }

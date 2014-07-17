@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.document.DocumentCriterion;
 import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -147,7 +148,21 @@ public interface DocumentAPI {
 
     /**
      * Get the document with the specified identifier.
-     * 
+     *
+     * @param documentId
+     *            The identifier of the document to retrieve
+     * @return a document object
+     * @throws DocumentNotFoundException
+     *             when the document identifier does not refer to an existing document
+     * @throws InvalidSessionException
+     *             when the session is not valid
+     * @since 6.4
+     */
+    Document getDocument(long documentId) throws DocumentNotFoundException;
+
+    /**
+     * Remove the document with the specified identifier and returns it.
+     *
      * @param documentId
      *            The identifier of the document to retrieve
      * @return a document object
@@ -157,7 +172,7 @@ public interface DocumentAPI {
      *             when the session is not valid
      * @since 6.0
      */
-    Document getDocument(long documentId) throws DocumentNotFoundException;
+    Document removeDocument(long documentId) throws DocumentNotFoundException, DeletionException;
 
     /**
      * Get the latest version of all documents attached to the specified process instance.
@@ -187,7 +202,7 @@ public interface DocumentAPI {
      * Get content of the document with the specified identifier.
      * 
      * @param storageId
-     *            the id of the document to retrive the content from
+     *            the id of the document to retrieve the content from
      * @return document content as a byte array
      * @throws DocumentNotFoundException
      *             when the specified documentId does not refer to an existing document
