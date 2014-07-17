@@ -50,7 +50,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-model-impl</artifactId>
+			<artifactId>bonita-dependency-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

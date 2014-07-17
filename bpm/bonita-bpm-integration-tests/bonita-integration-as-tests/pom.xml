@@ -16,13 +16,12 @@
 
 	<properties>
 		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
-		<bonita.home>${project.build.directory}/bonita</bonita.home>
-		<bonita.version></bonita.version>
-		<!-- TESTS DIRS -->
-		<test.class>org.bonitasoft.engine.BPMRemoteTestsForServers</test.class>
 		<report.results>${distrib.dir}/target/testresults</report.results>
+        <bonita.home>${distrib.dir}/resources/home/</bonita.home>
 		<report.xml>${report.results}/xml</report.xml>
+        <report.xml>${report.results}/xml</report.xml>
 		<surefire.reports>${project.build.directory}/surefire-reports</surefire.reports>
+        <test.class>org.bonitasoft.engine.BPMRemoteTestsForServers</test.class>
 	</properties>
 
 	<dependencies>
@@ -50,67 +49,59 @@
 		<profile>
 			<id>package-all</id>
 			<modules>
+				<module>bonita-deploy-ear3</module>
+				<module>bonita-deploy-war</module>
 				<module>bonita-integration-jboss5</module>
 				<module>bonita-integration-tomcat6</module>
 				<module>bonita-integration-tomcat7</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>jboss</id>
+			<modules>
+				<module>bonita-deploy-ear3</module>
+				<module>bonita-integration-jboss5</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>tomcat6</id>
+			<modules>
+				<module>bonita-deploy-war</module>
+				<module>bonita-integration-tomcat6</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>tomcat7</id>
+			<modules>
+				<module>bonita-deploy-war</module>
+				<module>bonita-integration-tomcat7</module>
+			</modules>
+		</profile>
 	</profiles>
-
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-failsafe-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack</id>
-						<phase>prepare-package</phase>
 						<goals>
-							<goal>unpack</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
 						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.bonitasoft.engine</groupId>
-									<artifactId>bonita-engine-deploy</artifactId>
-									<version>${project.version}</version>
-									<type>zip</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${distrib.dir}</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
 					</execution>
-					<execution>
-						<id>copy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
+                </executions>
 						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.h2database</groupId>
-									<artifactId>h2</artifactId>
-									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>mysql</groupId>
-									<artifactId>mysql-connector-java</artifactId>
-									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.postgresql</groupId>
-									<artifactId>postgresql</artifactId>
-									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-							</artifactItems>
+                    <systemProperties>
+                        <property>
+                            <name>bonita.home</name>
+                            <value>${bonita.home}</value>
+                        </property>
+                    </systemProperties>
 						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
+
 	</build>
 
 </project>

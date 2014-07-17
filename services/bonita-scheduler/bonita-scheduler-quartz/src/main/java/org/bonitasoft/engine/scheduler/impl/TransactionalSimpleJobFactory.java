@@ -46,7 +46,7 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
 
     @Override
     public Job newJob(final TriggerFiredBundle bundle, final Scheduler scheduler) throws SchedulerException {
-        final Job newJob = super.newJob(bundle, scheduler);;
+        final Job newJob = super.newJob(bundle, scheduler);
         if (newJob instanceof QuartzJob) {
             final QuartzJob quartzJob = (QuartzJob) newJob;
             final JobDataMap jobDataMap = bundle.getJobDetail().getJobDataMap();

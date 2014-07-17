@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -22,7 +23,8 @@
 		<tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
 		<tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
 		<tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
-		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip
+        </tomcat.url>
 		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
@@ -101,14 +103,56 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy2</id>
-								<phase>package</phase>
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.bonitasoft.engine</groupId>
+                                            <artifactId>bonita-home</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/resources</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy</id>
+                                <phase>prepare-package</phase>
 								<goals>
 									<goal>copy</goal>
 								</goals>
 								<configuration>
 									<artifactItems>
 										<artifactItem>
+                                            <groupId>org.bonitasoft.engine</groupId>
+                                            <artifactId>bonita-deploy-war</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>war</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/war</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.h2database</groupId>
+                                            <artifactId>h2</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>mysql</groupId>
+                                            <artifactId>mysql-connector-java</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.postgresql</groupId>
+                                            <artifactId>postgresql</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
 											<groupId>org.bonitasoft.tomcat</groupId>
 											<artifactId>bonita-tomcat-h2-listener</artifactId>
 											<outputDirectory>${project.build.directory}/driver</outputDirectory>
@@ -157,77 +201,105 @@
 								<inherited>false</inherited>
 								<configuration>
 									<target>
-										<taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath" />
-										<available property="tomcat.present" file="${tomcat.zip.folder}/${tomcat.name}.zip" />
+                                        <taskdef name="if" classname="${if.task}"
+                                                 classpathref="maven.runtime.classpath"/>
+                                        <available property="tomcat.present"
+                                                   file="${tomcat.zip.folder}/${tomcat.name}.zip"/>
 										<if>
 											<not>
-												<isset property="tomcat.present" />
+                                                <isset property="tomcat.present"/>
 											</not>
 											<then>
-												<get src="${tomcat.url}" dest="${tomcat.zip.folder}/${tomcat.name}.zip" />
+                                                <get src="${tomcat.url}"
+                                                     dest="${tomcat.zip.folder}/${tomcat.name}.zip"/>
 											</then>
 										</if>
-										<unzip dest="${project.build.directory}" src="${tomcat.zip.folder}/${tomcat.name}.zip" />
+                                        <unzip dest="${project.build.directory}"
+                                               src="${tomcat.zip.folder}/${tomcat.name}.zip"/>
 										<!-- override global context XML file in order to declare the datasources and the Transaction Manager -->
 										<copy todir="${tomcat.conf.dir}">
-											<fileset dir="tomcat/conf" />
+                                            <fileset dir="tomcat/conf"/>
 										</copy>
 
 										<!-- Update database configuration -->
-										<property file="tomcat/${db.vendor}/database.properties" />
-										<concat destfile="${tomcat.conf.dir}/bitronix-resources.properties" append="true">
-											<fileset file="tomcat/${db.vendor}/ds.properties" />
+                                        <property file="tomcat/${db.vendor}/database.properties"/>
+                                        <concat destfile="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                append="true">
+                                            <fileset file="tomcat/${db.vendor}/ds.properties"/>
 										</concat>
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.datasource.class#" value="${db.datasource.class}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.server.name#" value="${db.server.name}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.server.port#" value="${db.server.port}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.database.name#" value="${db.database.name}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.url#" value="${db.url}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.user#" value="${db.user}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.password#" value="${db.password}" />
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.driver.class#" value="${db.driver.class}" />
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.url#" value="${db.url}" />
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.user#" value="${db.user}" />
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.password#" value="${db.password}" />
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.datasource.class#" value="${db.datasource.class}"/>
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.server.name#" value="${db.server.name}"/>
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.server.port#" value="${db.server.port}"/>
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.database.name#" value="${db.database.name}"/>
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.url#" value="${db.url}"/>
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.user#" value="${db.user}"/>
+                                        <replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+                                                 token="#db.password#" value="${db.password}"/>
+                                        <replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
+                                                 token="#db.driver.class#" value="${db.driver.class}"/>
+                                        <replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
+                                                 token="#db.url#" value="${db.url}"/>
+                                        <replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
+                                                 token="#db.user#" value="${db.user}"/>
+                                        <replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
+                                                 token="#db.password#" value="${db.password}"/>
+
 
 										<!-- Replace server.xml by specific file for H2 -->
 										<if>
-											<equals arg1="${db.vendor}" arg2="h2" />
+                                            <equals arg1="${db.vendor}" arg2="h2"/>
 											<then>
 												<copy todir="${tomcat.conf.dir}" overwrite="true">
 													<fileset dir="tomcat/${db.vendor}">
-														<include name="server.xml" />
+                                                        <include name="server.xml"/>
 													</fileset>
 												</copy>
-												<replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#" value="${db.server.port}" />
+                                                <replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#"
+                                                         value="${db.server.port}"/>
 											</then>
 											
 										</if>
 										
-										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
-										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
-										<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
-										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8009&quot;" value="&lt;Connector port=&quot;${server.ajp.port}&quot;" />
+                                        <replace file="${tomcat.conf.dir}/server.xml"
+                                                 token="&lt;Connector port=&quot;8080&quot;"
+                                                 value="&lt;Connector port=&quot;${provider.port}&quot;"/>
+                                        <replace file="${tomcat.conf.dir}/server.xml"
+                                                 token="&lt;Server port=&quot;8005&quot;"
+                                                 value="&lt;Server port=&quot;${server.port}&quot;"/>
+                                        <replace file="${tomcat.conf.dir}/server.xml"
+                                                 token="redirectPort=&quot;8443&quot;"
+                                                 value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;"/>
+                                        <replace file="${tomcat.conf.dir}/server.xml"
+                                                 token="&lt;Connector port=&quot;8009&quot;"
+                                                 value="&lt;Connector port=&quot;${server.ajp.port}&quot;"/>
 
 										<copy todir="${tomcat.home}/lib">
 											<fileset dir="target/driver">
-												<include name="*jar" />
+                                                <include name="*jar"/>
 											</fileset>
 											<fileset dir="target/tx-manager">
-												<include name="*jar" />
+                                                <include name="*jar"/>
 											</fileset>
 											<fileset dir="lib">
-												<include name="*jar" />
+                                                <include name="*jar"/>
 											</fileset>
 										</copy>
-										<copy tofile="${tomcat.deploy.dir}/bonita.war" file="${distrib.dir}/war/bonita-deploy-war-${project.version}.war" />
+                                        <copy tofile="${tomcat.deploy.dir}/bonita.war"
+                                              file="${distrib.dir}/war/bonita-deploy-war-${project.version}.war"/>
 
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
-											<fileset dir="${distrib.dir}/resources/home/" />
+                                            <fileset dir="${distrib.dir}/resources/home/"/>
 										</copy>
 
-										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
+                                        <copy file="${basedir}/client/bonita-client.properties"
+                                              todir="${bonita.home}/client/conf" overwrite="true"/>
 									</target>
 								</configuration>
 							</execution>
@@ -294,6 +366,7 @@
 						<configuration>
 							<container>
 								<containerId>tomcat6x</containerId>
+                                <type>installed</type>
 								<home>${tomcat.home}</home>
 								<systemProperties>
 									<bonita.home>${bonita.home}</bonita.home>
@@ -301,11 +374,14 @@
 									<db.vendor>${db.vendor}</db.vendor>
 
 									<file.encoding>${project.build.sourceEncoding}</file.encoding>
-									<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                                    <javax.xml.parsers.DocumentBuilderFactory>
+                                        com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                    </javax.xml.parsers.DocumentBuilderFactory>
 
 									<!-- Bitronix properties -->
 									<btm.root>${tomcat.home}</btm.root>
-									<bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
+                                    <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties
+                                    </bitronix.tm.configuration>
 								</systemProperties>
 							</container>
 							<configuration>
@@ -316,7 +392,6 @@
 									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 								</properties>
 							</configuration>
-							<wait>false</wait>
 						</configuration>
 					</plugin>
 				</plugins>
