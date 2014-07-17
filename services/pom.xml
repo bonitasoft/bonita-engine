@@ -25,8 +25,8 @@
 		<module>bonita-work</module>
 		<module>bonita-connector-executor-timedout</module>
 		<module>bonita-authentication</module>
-		<module>bonita-session</module>
-		<module>bonita-platform-session</module>
+		<module>bonita-session-clustered</module>
+		<module>bonita-platform-session-clustered</module>
 		<module>bonita-monitoring</module>
 		<module>bonita-builder-sp</module>
 		<module>bonita-page</module>
