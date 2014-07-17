@@ -235,6 +235,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
 
+
         final PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
         try {
@@ -247,8 +248,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             try {
                 checkPlatformVersion(platformAccessor);
-                startPlatformServices(platformAccessor);
                 final List<STenant> tenants = getTenants(platformAccessor);
+                startPlatformServices(platformAccessor);
                 boolean mustRestartElements;
                 if (mustRestartElements = !isNodeStarted()) {
                     // restart handlers of tenant are executed before any service start
@@ -366,7 +367,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     private void startScheduler(final PlatformServiceAccessor platformAccessor) throws SSchedulerException, SBonitaException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-
         if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
             schedulerService.start();
         }
@@ -405,10 +405,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws SSchedulerException, SBonitaException {
+    private void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws  SBonitaException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final List<PlatformLifecycleService> servicesToStart = platformConfiguration.getLifecycleServices();
         for (final PlatformLifecycleService serviceWithLifecycle : servicesToStart) {

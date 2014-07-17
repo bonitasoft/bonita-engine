@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+
+	<query name="getPlatformDependencyByName">
+		SELECT pdependency
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
+		WHERE pdependency.name = :name
+	</query>
+
+	<query name="getPlatformDependenciesById">
+		SELECT pdependency
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
+		WHERE pdependency.id IN (:ids)
+	</query>
+  
+	<query name="getPlatformDependencies">
+		SELECT pdependency
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
+	</query>
+
+	<query name="getPlatformDependencyMappings">
+		SELECT pdependencymapping
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl AS pdependencymapping
+	</query>
+
+	<query name="getPlatformDepencencyMappingsByArtifact">
+		SELECT pdependencymapping
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl AS pdependencymapping
+		WHERE pdependencymapping.artifactId = :artifactId
+		AND pdependencymapping.artifactType = :artifactType
+	</query>
+
+	<query name="getPlatformDependencyMappingsByDependency">
+    	SELECT pdependencymapping
+    	FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl AS pdependencymapping
+    	WHERE pdependencymapping.dependencyId = :dependencyId
+	</query>
+
+	<query name="getPlatformDependencyIds">
+		SELECT pdependencymapping.dependencyId
+		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl AS pdependencymapping
+		WHERE pdependencymapping.artifactId = :artifactId
+		AND pdependencymapping.artifactType = :artifactType
+		ORDER BY pdependencymapping.id ASC
+	</query>
+
+</hibernate-mapping>

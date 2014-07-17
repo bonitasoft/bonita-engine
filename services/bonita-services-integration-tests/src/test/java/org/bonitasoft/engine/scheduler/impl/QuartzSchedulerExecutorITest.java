@@ -18,10 +18,8 @@ import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
-import org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
-import org.bonitasoft.engine.scheduler.job.VariableStorageByTenant;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
@@ -325,74 +323,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final boolean deleted = schedulerService.delete("MyJob");
         getTransactionService().complete();
         assertFalse(deleted);
-    }
-
-    @Test
-    public void testMultiTenancy() throws Exception {
-        VariableStorageByTenant.clearAll();
-        IncrementVariableJobWithMultiTenancy.setSessionAccessor(getSessionAccessor());
-        final Date now = new Date(System.currentTimeMillis() + 10000000);
-        final String variableName = "testMultiTenancy";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementVariableJobWithMultiTenancy.class.getName(), "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, 10);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        Thread.sleep(2000);
-        final long defaultTenant = getTenantIdFromSession();
-        assertNull(VariableStorageByTenant.getInstance(defaultTenant).getVariableValue(variableName));
-        assertNull(VariableStorageByTenant.getInstance(tenant1).getVariableValue(variableName));
-
-        List<String> jobs = schedulerService.getJobs();
-        assertNotNull(jobs);
-        assertEquals(1, jobs.size());
-
-        // change tenant
-        getTransactionService().begin();
-        changeToTenant1();
-
-        jobs = schedulerService.getJobs();
-        assertEquals(0, jobs.size());
-
-        changeToDefaultTenant();
-        TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-        jobs = schedulerService.getJobs();
-        getTransactionService().complete();
-        assertEquals(1, jobs.size());
-    }
-
-    @Test
-    public void testMultiTenantJobs() throws Exception {
-        VariableStorageByTenant.clearAll();
-        IncrementVariableJobWithMultiTenancy.setSessionAccessor(getSessionAccessor());
-        final Date now = new Date(System.currentTimeMillis());
-        final String variableName = "testMultiTenancy";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, 10);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        Thread.sleep(2000);
-
-        final long defaultTenant = getTenantIdFromSession();
-        assertNotNull(VariableStorageByTenant.getInstance(defaultTenant).getVariableValue(variableName));
-        assertNull(VariableStorageByTenant.getInstance(tenant1).getVariableValue(variableName));
-
-        getTransactionService().begin();
-        final List<String> jobs = schedulerService.getJobs();
-        getTransactionService().complete();
-        assertEquals(0, jobs.size());// job id completed
     }
 
     private long getTenantIdFromSession() throws Exception {
