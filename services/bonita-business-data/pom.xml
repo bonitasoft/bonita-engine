@@ -16,5 +16,6 @@
 	<modules>
 		<module>bonita-business-data-api</module>
 		<module>bonita-business-data-impl</module>
+		<module>bonita-business-data-client-resources</module>
 	</modules>
 </project>
