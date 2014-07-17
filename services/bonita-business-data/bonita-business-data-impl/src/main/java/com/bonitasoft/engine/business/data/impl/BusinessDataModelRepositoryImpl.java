@@ -66,6 +66,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String SERVER_DAO_JAR_NAME = "bdm-server-dao.jar";
 
+    private static final String BOM_NAME = "bom.zip";
+
     private final DependencyService dependencyService;
 
     private final SchemaManager schemaManager;
@@ -101,7 +103,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
-        List<SDependency> searchBDMDependencies = searchBDMDependencies();
+        final List<SDependency> searchBDMDependencies = searchBDMDependencies();
         if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
             return String.valueOf(searchBDMDependencies.get(0).getId());
         }
@@ -132,7 +134,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createClientBDMZip(model);
-        long bdmVersion = createAndDeployServerBDMJar(tenantId, model, bdmZip);
+        final long bdmVersion = createAndDeployServerBDMJar(tenantId, model, bdmZip);
         return String.valueOf(bdmVersion);
     }
 
@@ -204,6 +206,14 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         // Build jar with DAO
         final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
+
+        try {
+            resources.put(BOM_NAME, new BusinessObjectModelConverter().zip(model));
+        } catch (final JAXBException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final SAXException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
 
         return IOUtil.generateZip(resources);
     }
