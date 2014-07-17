@@ -58,6 +58,13 @@
 				<module>bonita-integration-tomcat7</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>jboss</id>
+			<modules>
+				<module>bonita-deploy-ear3</module>
+				<module>bonita-integration-jboss5</module>
+			</modules>
+		</profile>
 	</profiles>
 	<build>
 		<plugins>
