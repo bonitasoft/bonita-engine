@@ -44,32 +44,36 @@ public class ServerBDMCodeGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObjectModel bom = new BusinessObjectModel();
         serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
-        destDir = Files.newTemporaryFolder();
+        final File tmpFolder = File.createTempFile(ServerBDMCodeGeneratorTest.class.getSimpleName(), "", Files.temporaryFolder());
+        tmpFolder.delete();
+        destDir = Files.newFolder(tmpFolder.getAbsolutePath());
     }
 
     @After
     public void tearDown() throws Exception {
-        Files.delete(destDir);
+        if (destDir != null) {
+            Files.delete(destDir);
+        }
     }
 
     @Test
     public void toDaoImplClassnameShouldAddPointServerToLastPackagePart() throws Exception {
-        BusinessObject myBo = new BusinessObject();
+        final BusinessObject myBo = new BusinessObject();
         myBo.setQualifiedName("com.bonitasoft.business.domain.Stool");
 
-        String daoImplClassname = new ServerBDMCodeGenerator(new BusinessObjectModel()).toDaoImplClassname(myBo);
+        final String daoImplClassname = new ServerBDMCodeGenerator(new BusinessObjectModel()).toDaoImplClassname(myBo);
 
         assertThat(daoImplClassname).isEqualTo("com.bonitasoft.business.domain.server.StoolDAOImpl");
     }
 
     @Test
     public void toDaoImplClassnameShouldAddPointServerOnDefaultPackageBO() throws Exception {
-        BusinessObject myBo = new BusinessObject();
+        final BusinessObject myBo = new BusinessObject();
         myBo.setQualifiedName("Zucchini");
 
-        String daoImplClassname = new ServerBDMCodeGenerator(new BusinessObjectModel()).toDaoImplClassname(myBo);
+        final String daoImplClassname = new ServerBDMCodeGenerator(new BusinessObjectModel()).toDaoImplClassname(myBo);
 
         assertThat(daoImplClassname).isEqualTo("server.ZucchiniDAOImpl");
     }
@@ -121,7 +125,7 @@ public class ServerBDMCodeGeneratorTest {
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
         employeeBO.getFields().add(nameField);
-        UniqueConstraint uniqueConstraint = new UniqueConstraint();
+        final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setName("uniqueName");
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         employeeBO.setUniqueConstraints(Arrays.asList(uniqueConstraint));
