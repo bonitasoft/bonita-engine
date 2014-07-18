@@ -63,7 +63,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     public void buildJavaModelFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
-        final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this);
+        final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this,bom);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final JDefinedClass entity = entityCodeGenerator.addEntity(bo);
             addDAO(bo, entity);

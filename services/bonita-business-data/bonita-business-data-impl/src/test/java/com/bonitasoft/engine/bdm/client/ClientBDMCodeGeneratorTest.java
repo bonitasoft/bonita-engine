@@ -262,6 +262,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator.generate(destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeListComposition.java");
+        assertFilesAreEqual("Skill.java", "Skill.java");
     }
 
     @Test
@@ -352,7 +353,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
         
-        System.out.println(FileUtils.readFileToString(file));
         assertThat(file).hasContentEqualTo(expected);
     }
 

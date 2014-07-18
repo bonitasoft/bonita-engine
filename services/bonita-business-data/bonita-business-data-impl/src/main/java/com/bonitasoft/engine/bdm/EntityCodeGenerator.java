@@ -27,6 +27,7 @@ import javax.persistence.Version;
 
 import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
@@ -47,9 +48,11 @@ import com.sun.codemodel.JMethod;
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;
+	private BusinessObjectModel bom;
 
-    public EntityCodeGenerator(final CodeGenerator codeGenerator) {
+    public EntityCodeGenerator(final CodeGenerator codeGenerator, BusinessObjectModel bom) {
         this.codeGenerator = codeGenerator;
+        this.bom = bom;
     }
 
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
@@ -95,6 +98,11 @@ public class EntityCodeGenerator {
         // Add provided queries
         for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
             addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
+        }
+        
+        // Add method for lazy fields
+        for (final Query query : BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo)) {
+        	addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
         }
 
         // Add custom queries
