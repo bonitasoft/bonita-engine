@@ -14,6 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -39,8 +42,10 @@ import org.mockito.stubbing.Answer;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.impl.SMultiRefBusinessDataInstanceImpl;
+import com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl;
 import com.bonitasoft.engine.operation.pojo.Employee;
 import com.bonitasoft.engine.operation.pojo.InvalidTravel;
 import com.bonitasoft.engine.operation.pojo.Travel;
@@ -65,11 +70,11 @@ public class BusinessDataLeftOperandHandlerTest {
 
     @Test
     public void updateShouldSetReferenceForNonNullBizDataId() throws Exception {
-        BusinessDataLeftOperandHandler spy = spy(leftOperandHandler);
-        SRefBusinessDataInstance refBiz = mock(SRefBusinessDataInstance.class);
-        Long bizDataId = 98744L;
+        final BusinessDataLeftOperandHandler spy = spy(leftOperandHandler);
+        final SSimpleRefBusinessDataInstance refBiz = mock(SSimpleRefBusinessDataInstance.class);
+        final Long bizDataId = 98744L;
         doReturn(refBiz).when(spy).getRefBusinessDataInstance(eq("myBizData"), eq(9L), eq("some container"));
-        Peticion bizData = new Peticion(bizDataId);
+        final Peticion bizData = new Peticion(bizDataId);
         doReturn(bizData).when(repository).merge(eq(bizData));
 
         spy.update(createLeftOperand("myBizData"), bizData, 9L, "some container");
@@ -106,7 +111,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final long processInstanceId = 76846321l;
 
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
-        final SRefBusinessDataInstance refBizDataInstance = mock(SRefBusinessDataInstance.class);
+        final SSimpleRefBusinessDataInstance refBizDataInstance = mock(SSimpleRefBusinessDataInstance.class);
         when(leftOperand.getName()).thenReturn("unused");
         when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
         when(refBusinessDataService.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(refBizDataInstance);
@@ -138,16 +143,16 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
         final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
         final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
-        SLeftOperand leftOperand = createLeftOperand(bizDataName);
+        final SLeftOperand leftOperand = createLeftOperand(bizDataName);
         // when:
-        Object retrieve = spy.retrieve(leftOperand, expressionContext);
+        final Object retrieve = spy.retrieve(leftOperand, expressionContext);
 
         // then:
         assertThat(retrieve).isEqualTo(myTravel);
     }
 
     private SLeftOperand createLeftOperand(final String bizDataName) {
-        SLeftOperandImpl leftOperand = new SLeftOperandImpl();
+        final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName(bizDataName);
         return leftOperand;
     }
@@ -156,11 +161,13 @@ public class BusinessDataLeftOperandHandlerTest {
     public void shouldUpdate_ThrowAnSOperationExecutionException() throws Exception {
         // given:
         final InvalidTravel myTravel = new InvalidTravel();
-
+        final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final BusinessDataLeftOperandHandler spy = spy(leftOperandHandler);
         doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
+        doReturn(refInstance).when(spy).getRefBusinessDataInstance(anyString(), anyLong(), anyString());
         final SLeftOperand leftOp = mock(SLeftOperand.class);
         when(leftOp.getName()).thenReturn("bizData");
+
         spy.update(leftOp, new Object(), 1L, "");
     }
 
@@ -170,8 +177,22 @@ public class BusinessDataLeftOperandHandlerTest {
     }
 
     @Test
+    public void getBusinessDataReturnTheBusinessData() throws Exception {
+        final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
+        final String bizDataName = "employee";
+        final int processInstanceId = 457;
+        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        when(refInstance.getDataId()).thenReturn(45l);
+        when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
+
+        leftOperandHandler.getBusinessData(bizDataName, processInstanceId);
+
+        verify(repository).findById(Employee.class, 45l);
+    }
+
+    @Test
     public void getBusinessDataCreateAnInstanceIfNoReferenceExists() throws Exception {
-        final SRefBusinessDataInstance refInstance = mock(SRefBusinessDataInstance.class);
+        final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
         when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
@@ -188,7 +209,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsWrong() throws Exception {
-        final SRefBusinessDataInstance refInstance = mock(SRefBusinessDataInstance.class);
+        final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
         when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
@@ -200,7 +221,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsAnInterface() throws Exception {
-        final SRefBusinessDataInstance refInstance = mock(SRefBusinessDataInstance.class);
+        final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
         when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
@@ -208,6 +229,38 @@ public class BusinessDataLeftOperandHandlerTest {
         when(refInstance.getDataClassName()).thenReturn(List.class.getName());
 
         leftOperandHandler.getBusinessData(bizDataName, processInstanceId);
+    }
+
+    @Test
+    public void getMultiBusinessDataReturnTheBusinessData() throws Exception {
+        final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
+        final String bizDataName = "employee";
+        final int processInstanceId = 457;
+        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        when(refInstance.getDataIds()).thenReturn(Arrays.asList(45l));
+        when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
+
+        leftOperandHandler.getBusinessData(bizDataName, processInstanceId);
+
+        verify(repository).findByIds(Employee.class, Arrays.asList(45l));
+    }
+
+    @Test
+    public void getMultiBusinessDataCreateAnInstanceIfNoReferenceExists() throws Exception {
+        final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
+        final String bizDataName = "employee";
+        final int processInstanceId = 457;
+        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        when(refInstance.getDataIds()).thenReturn(new ArrayList<Long>());
+        when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
+
+        final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId);
+        assertThat(employees).hasSize(1);
+        final Employee employee = employees.get(0);
+        assertThat(employee).isNotNull();
+        assertThat(employee.getPersistenceId()).isNull();
+        assertThat(employee.getFirstName()).isNull();
+        assertThat(employee.getLastName()).isNull();
     }
 
     @Test
@@ -221,10 +274,10 @@ public class BusinessDataLeftOperandHandlerTest {
     @Test
     public void should_update_update_business_data() throws Exception {
         // given: business data having id and ref having the same id
-        SLeftOperand leftOperand = createLeftOperand("bizData");
-        Peticion bizData = new Peticion(123456789L);
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(123456789L);
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456789L);
+        final SSimpleRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456789L);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
         doReturn(bizData).when(repository).merge(bizData);
 
@@ -236,8 +289,8 @@ public class BusinessDataLeftOperandHandlerTest {
         verify(refBusinessDataService, times(0)).updateRefBusinessDataInstance(eq(ref), anyLong());
     }
 
-    private SRefBusinessDataInstanceImpl createRefBusinessDataInstance(final Long dataId) {
-        SRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SRefBusinessDataInstanceImpl();
+    private SSimpleRefBusinessDataInstanceImpl createRefBusinessDataInstance(final Long dataId) {
+        final SSimpleRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SSimpleRefBusinessDataInstanceImpl();
         sRefBusinessDataInstanceImpl.setDataId(dataId);
         return sRefBusinessDataInstanceImpl;
     }
@@ -245,11 +298,11 @@ public class BusinessDataLeftOperandHandlerTest {
     @Test
     public void should_update_insert_business_data() throws Exception {
         // given: business data having null id and ref having null id
-        SLeftOperand leftOperand = createLeftOperand("bizData");
-        Peticion bizData = new Peticion(null);
-        Peticion mergedBizData = new Peticion(123456789L);
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(null);
+        final Peticion mergedBizData = new Peticion(123456789L);
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
+        final SSimpleRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
         doReturn(mergedBizData).when(repository).merge(bizData);
 
@@ -264,10 +317,10 @@ public class BusinessDataLeftOperandHandlerTest {
     @Test
     public void should_update_attach_business_data() throws Exception {
         // given: business data having not null id and ref having null id
-        SLeftOperand leftOperand = createLeftOperand("bizData");
-        Peticion bizData = new Peticion(123456789L);
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(123456789L);
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
+        final SSimpleRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
         doReturn(bizData).when(repository).merge(bizData);
 
@@ -280,13 +333,33 @@ public class BusinessDataLeftOperandHandlerTest {
     }
 
     @Test
+    public void should_update_attach_multi_business_data() throws Exception {
+        final SLeftOperand leftOperand = createLeftOperand("employees");
+        final List<Peticion> peticions = new ArrayList<Peticion>();
+        final Peticion bizData = new Peticion(123456789L);
+        peticions.add(bizData);
+        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
+        final SMultiRefBusinessDataInstanceImpl ref = mock(SMultiRefBusinessDataInstanceImpl.class);
+        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("employees", 123l);
+        doReturn(bizData).when(repository).merge(bizData);
+
+        // when
+        leftOperandHandler.update(leftOperand, peticions, 1, "cont");
+
+        // then
+        verify(repository).merge(bizData);
+        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, Arrays.asList(123456789L));
+    }
+
+    @Test
+    @Ignore
     public void should_update_throw_exception_if_we_update_a_ref_with_an_already_existing_business_data() throws Exception {
         // given: business data having null id and ref having not null id
-        SLeftOperand leftOperand = createLeftOperand("bizData");
-        Peticion bizData = new Peticion(null);
-        Peticion mergedBizData = new Peticion(123456789L);
+        final SLeftOperand leftOperand = createLeftOperand("bizData");
+        final Peticion bizData = new Peticion(null);
+        final Peticion mergedBizData = new Peticion(123456789L);
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456L);
+        final SSimpleRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456L);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
         doReturn(mergedBizData).when(repository).merge(bizData);
 

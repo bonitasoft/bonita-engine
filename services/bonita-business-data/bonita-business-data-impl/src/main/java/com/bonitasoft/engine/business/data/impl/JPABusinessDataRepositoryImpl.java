@@ -135,6 +135,20 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return copy(entity);
     }
 
+    @Override
+    public <T extends Entity> List<T> findByIds(final Class<T> entityClass, final List<Long> primaryKeys) {
+        final List<T> entities = new ArrayList<T>();
+        final EntityManager em = getEntityManager();
+        for (final Long primaryKey : primaryKeys) {
+            final T entity = em.find(entityClass, primaryKey);
+            if (entity != null) {
+                em.detach(entity);
+                entities.add(copy(entity));
+            }
+        }
+        return entities;
+    }
+
     @SuppressWarnings("unchecked")
     protected <T extends Entity> T copy(final T entity) {
         try {
@@ -251,5 +265,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             }
         }
     }
+
 
 }

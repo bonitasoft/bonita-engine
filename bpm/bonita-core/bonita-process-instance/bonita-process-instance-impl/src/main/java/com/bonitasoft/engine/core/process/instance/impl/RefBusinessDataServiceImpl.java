@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.core.process.instance.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -37,7 +38,9 @@ import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceCreationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDataInstanceLogBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDataInstanceLogBuilderFactory;
 import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilderExt;
@@ -119,11 +122,24 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Long dataId)
+    public void updateRefBusinessDataInstance(final SSimpleRefBusinessDataInstance refBusinessDataInstance, final Long dataId)
+            throws SRefBusinessDataInstanceModificationException {
+        final Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("dataId", dataId);
+        updateRefBusinessDataInstance(refBusinessDataInstance, fields);
+    }
+
+    @Override
+    public void updateRefBusinessDataInstance(final SMultiRefBusinessDataInstance refBusinessDataInstance, final List<Long> dataIds)
+            throws SRefBusinessDataInstanceModificationException {
+        final Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("dataIds", dataIds);
+        updateRefBusinessDataInstance(refBusinessDataInstance, fields);
+    }
+
+    public void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Map<String, Object> fields)
             throws SRefBusinessDataInstanceModificationException {
         try {
-            final Map<String, Object> fields = new HashMap<String, Object>();
-            fields.put("dataId", dataId);
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(refBusinessDataInstance, fields);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(REF_BUSINESS_DATA_INSTANCE, EventActionType.UPDATED)) {

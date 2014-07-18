@@ -10,11 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package com.bonitasoft.engine.operation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -31,11 +34,13 @@ import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 
 /**
  * @author Baptiste Mesta
- * 
+ * @author Matthieu Chaffotte
  */
 public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
@@ -55,7 +60,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
     protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
             throws SFlowNodeNotFoundException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+        final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
         return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
     }
 
@@ -67,15 +72,27 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        checkIsValidBusinessData(newValue);
-        Entity newBusinessDataValue = (Entity) newValue;
         try {
-            SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
-            Long businessDataId = newBusinessDataValue.getPersistenceId();
-            if (businessDataId != null || refBusinessDataInstance.getDataId() == null) {
-                Entity businessData = businessDataRepository.merge(newBusinessDataValue);
-                if (!businessData.getPersistenceId().equals(refBusinessDataInstance.getDataId())) {
-                    refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
+            final SRefBusinessDataInstance reference = getRefBusinessDataInstance(sLeftOperand.getName(),
+                    containerId, containerType);
+            checkIsValidBusinessData(reference, newValue);
+            if (newValue instanceof Entity) {
+                final Entity newBusinessDataValue = (Entity) newValue;
+                final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
+                final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
+                if (!businessData.getPersistenceId().equals(simpleRef.getDataId())) {
+                    refBusinessDataService.updateRefBusinessDataInstance(simpleRef, businessData.getPersistenceId());
+                }
+            } else {
+                final List<Entity> newBusinessDataValue = (List<Entity>) newValue;
+                final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+                final List<Long> businessDataIds = new ArrayList<Long>();
+                for (final Entity entity : newBusinessDataValue) {
+                    final Entity businessData = businessDataRepository.merge(entity);
+                    businessDataIds.add(businessData.getPersistenceId());
+                }
+                if (!multiRef.getDataIds().containsAll(businessDataIds) || multiRef.getDataIds().size() != businessDataIds.size()) {
+                    refBusinessDataService.updateRefBusinessDataInstance(multiRef, businessDataIds);
                 }
             }
         } catch (final SBonitaException e) {
@@ -83,25 +100,38 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-    private void checkIsValidBusinessData(final Object newValue) throws SOperationExecutionException {
+    private void checkIsValidBusinessData(final SRefBusinessDataInstance reference, final Object newValue) throws SOperationExecutionException {
         if (newValue == null) {
             throw new SOperationExecutionException("Unable to insert/update a null business data");
         }
-        if (!(newValue instanceof Entity)) {
+        if (reference instanceof SSimpleRefBusinessDataInstance && !(newValue instanceof Entity)) {
             throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
+        }
+        if (reference instanceof SMultiRefBusinessDataInstance && !(newValue instanceof List)) {
+            throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + List.class.getName()));
         }
     }
 
     protected Object getBusinessData(final String bizDataName, final long processInstanceId) throws SBonitaReadException {
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
-            final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
-                    .loadClass(refBusinessDataInstance.getDataClassName());
-            final Long dataId = refBusinessDataInstance.getDataId();
-            if (dataId != null) {
-                return businessDataRepository.findById(dataClass, dataId);
+            final SRefBusinessDataInstance reference = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
+            final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(reference.getDataClassName());
+            if (reference instanceof SSimpleRefBusinessDataInstance) {
+                final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
+                final Long dataId = simpleRef.getDataId();
+                if (dataId != null) {
+                    return businessDataRepository.findById(dataClass, dataId);
+                } else {
+                    return dataClass.newInstance();
+                }
             } else {
-                return dataClass.newInstance();
+                final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+                final List<Long> dataIds = multiRef.getDataIds();
+                if (!dataIds.isEmpty()) {
+                    return businessDataRepository.findByIds(dataClass, dataIds);
+                } else {
+                    return Arrays.asList(dataClass.newInstance());
+                }
             }
         } catch (final Exception e) {
             throw new SBonitaReadException(e);
@@ -110,22 +140,19 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
     @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
-        Map<String, Object> inputValues = expressionContext.getInputValues();
-        String businessDataName = sLeftOperand.getName();
-        Long containerId = expressionContext.getContainerId();
-        String containerType = expressionContext.getContainerType();
+        final Map<String, Object> inputValues = expressionContext.getInputValues();
+        final String businessDataName = sLeftOperand.getName();
+        final Long containerId = expressionContext.getContainerId();
+        final String containerType = expressionContext.getContainerType();
         try {
             if (inputValues.get(businessDataName) == null) {
                 long processInstanceId;
-                processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId,
-                        containerType);
-
+                processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
                 return getBusinessData(businessDataName, processInstanceId);
-
             }
-        } catch (SFlowNodeNotFoundException e) {
+        } catch (final SFlowNodeNotFoundException e) {
             throwBonitaReadException(businessDataName, e);
-        } catch (SFlowNodeReadException e) {
+        } catch (final SFlowNodeReadException e) {
             throwBonitaReadException(businessDataName, e);
         }
         return null;

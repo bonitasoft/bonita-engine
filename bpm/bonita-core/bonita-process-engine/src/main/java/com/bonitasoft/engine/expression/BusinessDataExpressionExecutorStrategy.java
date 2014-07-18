@@ -26,12 +26,15 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 
 /**
  * @author Colin Puy
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -64,17 +67,24 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
         try {
             processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.CONTAINER_ID_KEY),
                     (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY));
-            SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
-            Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
-            return businessDataRepository.findById(bizClass, refBusinessDataInstance.getDataId());
-        } catch (SBonitaReadException e) {
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(
+                    bizDataName, processInstanceId);
+            final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
+                final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
+                return businessDataRepository.findById(bizClass, reference.getDataId());
+            } else {
+                final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
+                return businessDataRepository.findByIds(bizClass, reference.getDataIds());
+            }
+        } catch (final SBonitaReadException e) {
             throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + bizDataName, expression.getName());
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             if (processInstanceId != -1) {
                 e.setProcessInstanceIdOnContext(processInstanceId);
             }
             throw new SExpressionEvaluationException(e, expression.getName());
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             throw new SExpressionEvaluationException(e, expression.getName());
         }
     }
@@ -82,9 +92,9 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        List<Object> bizDatas = new ArrayList<Object>(expressions.size());
-        List<String> alreadyEvaluatedExpressionContent = new ArrayList<String>();
-        for (SExpression expression : expressions) {
+        final List<Object> bizDatas = new ArrayList<Object>(expressions.size());
+        final List<String> alreadyEvaluatedExpressionContent = new ArrayList<String>();
+        for (final SExpression expression : expressions) {
             if (!alreadyEvaluatedExpressionContent.contains(expression.getContent())) {
                 bizDatas.add(evaluate(expression, context, resolvedExpressions, containerState));
                 alreadyEvaluatedExpressionContent.add(expression.getContent());
