@@ -80,12 +80,13 @@ CREATE TABLE arch_flownode_instance (
   PRIMARY KEY (tenantid, id)
 )
 GO
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(kind, logicalGroup2, executedBy)
+GO
 CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind)
 GO
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId,rootContainerId, parentContainerId)
 GO
-CREATE INDEX idx_workedon_kind_lg2_executedBy ON arch_flownode_instance(kind, logicalGroup2, executedBy)
-GO
+
 
 CREATE TABLE arch_transition_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
