@@ -141,8 +141,6 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
      	  JInvocation deserialize = null;
         if (isCollection) {
         	deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(serial, executeQuery)).arg(entityClassExpression);
-//            final JClass list = getModel().ref(List.class);
-//            invocation = omVar.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
         } else {
         	deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(serial, executeQuery)).arg(entityClassExpression);
         }
