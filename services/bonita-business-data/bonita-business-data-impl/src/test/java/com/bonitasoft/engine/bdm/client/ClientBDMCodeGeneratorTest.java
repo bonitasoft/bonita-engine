@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
@@ -51,7 +52,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
             destDir = Files.newTemporaryFolder();
         } catch (final FilesException fe) {
             System.err.println("Seems we cannot create temporary folder. Retrying...");
-            destDir = Files.newTemporaryFolder();
+            final String tempFileName = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
+            destDir = Files.newFolder(concat(Files.temporaryFolderPath(), tempFileName));
         }
     }
 
