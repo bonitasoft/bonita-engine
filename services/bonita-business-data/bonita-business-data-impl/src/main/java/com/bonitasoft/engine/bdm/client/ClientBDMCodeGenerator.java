@@ -30,6 +30,7 @@ import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -133,25 +134,20 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Execute command
         final JInvocation executeQuery = commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef);
         final JClass serial = getModel().ref(byte[].class);
-        final JClass omClass = getModel().ref(ObjectMapper.class);
-        final JInvocation omObject = JExpr._new(omClass);
-        final JVar omVar = tryBody.decl(omClass, "mapper", omObject);
-        final JClass deserFeatureClass = getModel().ref(DeserializationFeature.class);
-        tryBody.add(omVar.invoke("configure").arg(deserFeatureClass.staticRef("FAIL_ON_UNKNOWN_PROPERTIES")).arg(JExpr.FALSE));
-
-        final JExpression invocation;
-        final JClass ref = getModel().ref(returnType);
-        final JExpression entityClassExpression = JExpr.dotclass(ref);
+        
+        JFieldRef deserializerFieldRef = JExpr.ref("deserializer");
+       
+        final JExpression entityClassExpression = JExpr.dotclass(getModel().ref(returnType));
+     	  JInvocation deserialize = null;
         if (isCollection) {
-            final JClass list = getModel().ref(List.class);
-            invocation = omVar.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
-        } else if (method.type().binaryName().equals(returnType)) {
-            invocation = entityClassExpression;
+        	deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(serial, executeQuery)).arg(entityClassExpression);
+//            final JClass list = getModel().ref(List.class);
+//            invocation = omVar.invoke("getTypeFactory").invoke("constructCollectionType").arg(JExpr.dotclass(list)).arg(entityClassExpression);
         } else {
-            invocation = JExpr.dotclass(getModel().ref(method.type().binaryName()));
+        	deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(serial, executeQuery)).arg(entityClassExpression);
         }
-        final JInvocation deserialize = omVar.invoke("readValue").arg(JExpr.cast(serial, executeQuery)).arg(invocation);
-        tryBody._return(JExpr.cast(method.type(), deserialize));
+      
+        tryBody._return(deserialize);
 
         final JClass exceptionClass = getModel().ref(Exception.class);
         final JCatchBlock catchBlock = tryBlock._catch(exceptionClass);

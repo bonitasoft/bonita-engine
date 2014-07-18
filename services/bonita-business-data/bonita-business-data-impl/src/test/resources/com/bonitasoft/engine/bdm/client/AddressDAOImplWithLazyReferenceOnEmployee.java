@@ -3,8 +3,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.bonitasoft.engine.bdm.BusinessObjectDeserializer;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bonitasoft.engine.session.APISession;
 
 public class AddressDAOImpl
@@ -31,9 +29,7 @@ public class AddressDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("street", street);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return ((List<Address> ) mapper.readValue(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), mapper.getTypeFactory().constructCollectionType(List.class, Address.class)));
+            return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -51,9 +47,7 @@ public class AddressDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("city", city);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return ((List<Address> ) mapper.readValue(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), mapper.getTypeFactory().constructCollectionType(List.class, Address.class)));
+            return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -70,9 +64,7 @@ public class AddressDAOImpl
             commandParameters.put("maxResults", maxResults);
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return ((List<Address> ) mapper.readValue(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), mapper.getTypeFactory().constructCollectionType(List.class, Address.class)));
+            return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
