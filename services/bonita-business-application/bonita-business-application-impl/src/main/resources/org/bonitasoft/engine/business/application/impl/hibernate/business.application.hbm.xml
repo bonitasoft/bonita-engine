@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.business.application.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantId">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SBusinessApplicationImpl" table="business_app">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="name" column="name" />
+		<property name="version" column="version" />
+		<property name="path" column="path" />
+		<property name="description" column="description" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SBusinessApplicationPageImpl" table="business_app_page">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="businessAppId" column="name" />
+		<property name="pageId" column="pageId" />
+		<filter name="tenantFilter" />
+	</class>
+
+</hibernate-mapping>
