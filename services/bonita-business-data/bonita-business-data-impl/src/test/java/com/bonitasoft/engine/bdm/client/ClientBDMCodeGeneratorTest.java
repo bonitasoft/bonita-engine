@@ -6,6 +6,7 @@ import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aRelationField;
 import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Strings.concat;
 
 import java.io.File;
 import java.io.IOException;
