@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.proxy;
+package com.bonitasoft.engine.bdm.dao.proxy;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -14,7 +14,7 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.bdm.BusinessObjectDeserializer;
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;

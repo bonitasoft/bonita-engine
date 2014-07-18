@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.bonitasoft.engine.bdm.proxy;
+package com.bonitasoft.engine.bdm.dao.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.bdm.dao.proxy.LazyLoader;
 import com.bonitasoft.engine.bdm.proxy.model.Employee;
 
 /**

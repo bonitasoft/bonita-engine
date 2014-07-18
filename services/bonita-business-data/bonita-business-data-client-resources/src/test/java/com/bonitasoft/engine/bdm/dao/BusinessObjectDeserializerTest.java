@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm;
+package com.bonitasoft.engine.bdm.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer;
 import com.bonitasoft.engine.bdm.proxy.model.Child;
 
 public class BusinessObjectDeserializerTest {

@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.proxy;
+package com.bonitasoft.engine.bdm.dao.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.bdm.dao.proxy.LazyLoader;
+import com.bonitasoft.engine.bdm.dao.proxy.Proxyfier;
 import com.bonitasoft.engine.bdm.proxy.assertion.ProxyAssert;
 import com.bonitasoft.engine.bdm.proxy.model.TestEntity;
 
