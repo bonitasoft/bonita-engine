@@ -2,6 +2,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.bonitasoft.engine.bdm.BusinessObjectDeserializer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bonitasoft.engine.session.APISession;
@@ -11,9 +12,11 @@ public class AddressDAOImpl
 {
 
     private APISession session;
+    private BusinessObjectDeserializer deserializer;
 
     public AddressDAOImpl(APISession session) {
         this.session = session;
+        this.deserializer = new BusinessObjectDeserializer();
     }
 
     public List<Address> findByStreet(String street, int startIndex, int maxResults) {

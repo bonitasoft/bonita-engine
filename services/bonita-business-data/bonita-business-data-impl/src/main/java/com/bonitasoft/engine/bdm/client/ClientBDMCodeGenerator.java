@@ -59,7 +59,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
 
-        createSessionConstructor(implClass);
+        createConstructor(implClass);
 
         // Add method for provided queries
         for (final Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
@@ -77,13 +77,19 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         addNewInstanceMethodBody(method, entity);
     }
 
-    private void createSessionConstructor(final JDefinedClass implClass) {
+    private void createConstructor(final JDefinedClass implClass) {
         final JClass apiSessionJClass = getModel().ref("org.bonitasoft.engine.session.APISession");
         implClass.field(JMod.PRIVATE, apiSessionJClass, "session");
+        
+        final JClass deserializerClass = getModel().ref("com.bonitasoft.engine.bdm.BusinessObjectDeserializer");
+        implClass.field(JMod.PRIVATE, deserializerClass, "deserializer");
+        
         final JMethod constructor = implClass.constructor(JMod.PUBLIC);
         constructor.param(apiSessionJClass, "session");
+        
         final JBlock body = constructor.body();
         body.assign(JExpr.refthis("session"), JExpr.ref("session"));
+        body.assign(JExpr.refthis("deserializer"), JExpr._new(deserializerClass));
     }
 
     private void addQueryMethodBody(final String entityName, final JMethod method, final String queryName, final String returnType) {

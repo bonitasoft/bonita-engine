@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Files;
 import org.assertj.core.util.FilesException;
 import org.junit.After;
@@ -348,7 +349,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-
+        
+        System.out.println(FileUtils.readFileToString(file));
         assertThat(file).hasContentEqualTo(expected);
     }
 
