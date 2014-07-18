@@ -17,6 +17,22 @@ public class AddressDAOImpl
         this.deserializer = new BusinessObjectDeserializer();
     }
 
+    public Address findByCity(String city) {
+        try {
+            org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            commandParameters.put("queryName", "Address.findByCity");
+            commandParameters.put("returnType", "Address");
+            commandParameters.put("returnsList", false);
+            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            queryParameters.put("city", city);
+            commandParameters.put("queryParameters", ((Serializable) queryParameters));
+            return deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     public List<Address> findByStreet(String street, int startIndex, int maxResults) {
         try {
             org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
@@ -28,24 +44,6 @@ public class AddressDAOImpl
             commandParameters.put("maxResults", maxResults);
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("street", street);
-            commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public List<Address> findByCity(String city, int startIndex, int maxResults) {
-        try {
-            org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
-            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Address.findByCity");
-            commandParameters.put("returnType", "Address");
-            commandParameters.put("returnsList", true);
-            commandParameters.put("startIndex", startIndex);
-            commandParameters.put("maxResults", maxResults);
-            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
-            queryParameters.put("city", city);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
             return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
         } catch (Exception e) {

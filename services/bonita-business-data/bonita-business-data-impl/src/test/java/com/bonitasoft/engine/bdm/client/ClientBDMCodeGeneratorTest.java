@@ -288,7 +288,9 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithLazyAggregation() throws Exception {
-        final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO()).build();
+        BusinessObject addressBO = addressBO();
+        addressBO.addUniqueConstraint("city", "city");
+		final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);

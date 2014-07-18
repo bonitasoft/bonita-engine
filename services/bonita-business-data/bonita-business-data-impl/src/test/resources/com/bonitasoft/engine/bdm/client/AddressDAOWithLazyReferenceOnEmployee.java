@@ -6,9 +6,9 @@ public interface AddressDAO
 {
 
 
-    public List<Address> findByStreet(String street, int startIndex, int maxResults);
+    public Address findByCity(String city);
 
-    public List<Address> findByCity(String city, int startIndex, int maxResults);
+    public List<Address> findByStreet(String street, int startIndex, int maxResults);
 
     public List<Address> find(int startIndex, int maxResults);
 
