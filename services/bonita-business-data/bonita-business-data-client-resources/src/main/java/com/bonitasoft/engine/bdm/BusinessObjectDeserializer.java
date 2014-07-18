@@ -42,15 +42,21 @@ public class BusinessObjectDeserializer {
         typeFactory = mapper.getTypeFactory();
     }
 
-    public Object deserialize(final byte[] serializedResult, final JavaType targetType) throws JsonParseException, JsonMappingException, IOException {
-        return mapper.readValue(serializedResult, targetType);
+    @SuppressWarnings("unchecked")
+	public <T> T deserialize(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
+        return (T) mapper.readValue(serializedResult, createJavaType(targetType));
+    }
+    
+    @SuppressWarnings("unchecked")
+	public <T> List<T> deserializeList(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
+        return (List<T>) mapper.readValue(serializedResult, createListJavaType(targetType));
     }
 
-    public JavaType createListJavaType(final Type elementType) {
+    private JavaType createListJavaType(final Type elementType) {
         return typeFactory.constructCollectionType(List.class, createJavaType(elementType));
     }
 
-    public JavaType createJavaType(final Type elementType) {
+    private JavaType createJavaType(final Type elementType) {
         return typeFactory.constructType(elementType);
     }
 

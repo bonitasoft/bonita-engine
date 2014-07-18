@@ -17,7 +17,6 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bdm.BusinessObjectDeserializer;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class LazyLoader {
@@ -45,15 +44,15 @@ public class LazyLoader {
     }
 
     private Object deserialize(final Method method, final byte[] serializedResult) throws IOException, JsonParseException, JsonMappingException {
-        JavaType javaType = null;
+        Class<?> javaType = null;
         if (returnsAList(method)) {
             final ParameterizedType listType = (ParameterizedType) method.getGenericReturnType();
-            javaType = deserializer.createListJavaType(listType.getActualTypeArguments()[0]);
+            javaType = (Class<?>) listType.getActualTypeArguments()[0];
+            return deserializer.deserializeList(serializedResult,  javaType);
         } else {
-            javaType = deserializer.createJavaType(method.getReturnType());
+            javaType = method.getReturnType();
+            return deserializer.deserialize(serializedResult,  javaType);
         }
-
-        return deserializer.deserialize(serializedResult, javaType);
     }
 
     protected Map<String, Serializable> createCommandParameters(final Method method, final long persistenceId) {
