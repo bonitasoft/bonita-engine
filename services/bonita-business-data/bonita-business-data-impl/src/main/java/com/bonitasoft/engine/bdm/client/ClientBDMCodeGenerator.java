@@ -13,7 +13,6 @@ import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationR
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
@@ -21,8 +20,6 @@ import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
@@ -133,16 +130,14 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
         // Execute command
         final JInvocation executeQuery = commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef);
-        final JClass serial = getModel().ref(byte[].class);
-        
+        final JClass byteArrayClass = getModel().ref(byte[].class);
         JFieldRef deserializerFieldRef = JExpr.ref("deserializer");
-       
         final JExpression entityClassExpression = JExpr.dotclass(getModel().ref(returnType));
-     	  JInvocation deserialize = null;
+     	JInvocation deserialize = null;
         if (isCollection) {
-        	deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(serial, executeQuery)).arg(entityClassExpression);
+        	deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
         } else {
-        	deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(serial, executeQuery)).arg(entityClassExpression);
+        	deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
         }
       
         tryBody._return(deserialize);
