@@ -78,6 +78,7 @@ public class JDBCJobListener extends AbstractJobListener {
     @Override
     public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
         final JobDetail jobDetail = context.getJobDetail();
+
         if (isEmptyJob(context)) {
             return;
         }

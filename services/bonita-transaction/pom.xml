@@ -17,6 +17,5 @@
 	<modules>
 		<module>bonita-transaction-api</module>
 		<module>bonita-transaction-impl</module>
-		<module>bonita-transaction-test</module>
 	</modules>
 </project>
