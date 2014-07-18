@@ -182,7 +182,6 @@ CREATE TABLE pending_mapping (
 );
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
 
-
 CREATE TABLE hidden_activity (
 	tenantid BIGINT NOT NULL,
   	id BIGINT NOT NULL,
@@ -207,6 +206,7 @@ CREATE TABLE breakpoint (
 CREATE TABLE ref_biz_data_inst (
 	tenantid BIGINT NOT NULL,
   	id BIGINT NOT NULL,
+  	kind VARCHAR(10) NOT NULL,
   	name VARCHAR(255) NOT NULL,
   	proc_inst_id BIGINT NOT NULL,
   	data_id INT NULL,
@@ -214,3 +214,13 @@ CREATE TABLE ref_biz_data_inst (
   	UNIQUE (tenantid, proc_inst_id, name),
   	PRIMARY KEY (tenantid, id)
 );
+
+CREATE TABLE multi_biz_data (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	idx BIGINT NOT NULL,
+  	data_id BIGINT NOT NULL,
+  	PRIMARY KEY (tenantid, id, data_id)
+);
+
+ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;

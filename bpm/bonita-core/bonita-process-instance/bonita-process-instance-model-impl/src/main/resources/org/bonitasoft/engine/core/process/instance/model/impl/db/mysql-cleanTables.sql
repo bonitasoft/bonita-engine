@@ -18,4 +18,6 @@ DELETE FROM process_instance;
 
 DELETE FROM breakpoint;
 
+DELETE FROM multi_biz_data;
+
 DELETE FROM ref_biz_data_inst;

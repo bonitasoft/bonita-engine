@@ -49,7 +49,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * Builder to define a process.
- * 
+ *
  * @author Baptiste Mesta
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
@@ -71,7 +71,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Initiates the building of a new {@link DesignProcessDefinition} with the given name and version. This method is the entry point of this builder. It must
      * be called before any other method. The <code>DesignProcessDefinition</code> building will be completed when the method {@link #done()} or
      * {@link #getProcess()} is called.
-     * 
+     *
      * @param name
      *            the process name
      * @param version
@@ -90,7 +90,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Validates the process consistency and return it
-     * 
+     *
      * @return the process being build
      * @throws InvalidProcessDefinitionException
      *             when the process definition is inconsistent. The exception contains causes
@@ -285,7 +285,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 if (loopCharacteristics.getDataOutputItemRef() != null && !loopCharacteristics.getDataOutputItemRef().isEmpty()
                         && (loopCharacteristics.getLoopDataOutputRef() == null || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
                     designErrors
-                            .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
+                    .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
                 }
                 // TODO add validation on data existence
             }
@@ -369,7 +369,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    void addError(final String error) {
+    protected void addError(final String error) {
         designErrors.add(error);
     }
 
@@ -386,7 +386,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Sets the process display name. When set, It is used to replace the name in the Bonita BPM Portal
-     * 
+     *
      * @param name
      *            display name
      * @return
@@ -398,7 +398,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Sets the process display description
-     * 
+     *
      * @param description
      *            display description
      * @return
@@ -536,7 +536,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
         return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue)
-                .isLongText();
+        .isLongText();
     }
 
     @Override
@@ -582,7 +582,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Adds an actor on this process
-     * 
+     *
      * @param actorName
      *            actor name
      * @see #addActor(String, boolean)
@@ -593,7 +593,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Adds an actor on this process
-     * 
+     *
      * @param name
      *            actor name
      * @param initiator
@@ -606,7 +606,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Adds an actor initiator on this process. The actor initiator is the one that will start the process.
-     * 
+     *
      * @param actorName
      * @return
      */
@@ -621,7 +621,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     /**
      * Validates the process consistency and return it
-     * 
+     *
      * @return
      *         the process being build
      * @throws InvalidProcessDefinitionException

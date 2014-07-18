@@ -188,7 +188,7 @@ public class XMLProcessDefinition {
 
     public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
-    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "isMultiple";
+    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "multiple";
 
     public static final String INDEX = "index";
 
@@ -445,7 +445,7 @@ public class XMLProcessDefinition {
             fillConnectorNode(connectorNode, connector);
             connectorsNode.addChild(connectorNode);
         }
-        List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
+        final List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
         if (!businessDataDefinitions.isEmpty()) {
             final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
             flowElements.addChild(businessDataDefinitionsNode);

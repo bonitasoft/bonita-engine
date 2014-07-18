@@ -31,7 +31,7 @@ public class SBusinessDataDefinitionImpl implements SBusinessDataDefinition {
 
     private SExpression defaultValueExpression;
 
-    private boolean isMultiple;
+    private boolean multiple;
 
     public SBusinessDataDefinitionImpl() {
         super();
@@ -75,11 +75,11 @@ public class SBusinessDataDefinitionImpl implements SBusinessDataDefinition {
 
     @Override
     public boolean isMultiple() {
-        return this.isMultiple;
+        return multiple;
     }
 
-    public void setMultiple(boolean isMultiple) {
-        this.isMultiple = isMultiple;
+    public void setMultiple(final boolean multiple) {
+        this.multiple = multiple;
     }
 
 }

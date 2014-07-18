@@ -8,4 +8,5 @@ DROP TABLE message_instance;
 DROP TABLE hidden_activity;
 DROP TABLE token;
 DROP TABLE breakpoint;
+DROP TABLE multi_biz_data;
 DROP TABLE ref_biz_data_inst;

@@ -31,7 +31,7 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
 
     private String className;
 
-    private boolean isMultiple = false;
+    private boolean multiple = false;
 
     private Expression defaultValueExpression;
 
@@ -67,17 +67,18 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
         this.className = className;
     }
 
+    @Override
     public boolean isMultiple() {
-        return isMultiple;
+        return multiple;
     }
 
-    public void setMultiple(boolean isMultiple) {
-        this.isMultiple = isMultiple;
+    public void setMultiple(final boolean multiple) {
+        this.multiple = multiple;
     }
 
     @Override
     public String toString() {
-        return "BusinessDataDefinitionImpl [description=" + description + ", type=" + type + ", className=" + className + ", isMultiple=" + isMultiple
+        return "BusinessDataDefinitionImpl [description=" + description + ", type=" + type + ", className=" + className + ", multiple=" + multiple
                 + ", defaultValueExpression=" + defaultValueExpression + "]";
     }
 
@@ -85,45 +86,57 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((className == null) ? 0 : className.hashCode());
-        result = prime * result + ((defaultValueExpression == null) ? 0 : defaultValueExpression.hashCode());
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + (isMultiple ? 1231 : 1237);
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + (className == null ? 0 : className.hashCode());
+        result = prime * result + (defaultValueExpression == null ? 0 : defaultValueExpression.hashCode());
+        result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (multiple ? 1231 : 1237);
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        BusinessDataDefinitionImpl other = (BusinessDataDefinitionImpl) obj;
+        }
+        final BusinessDataDefinitionImpl other = (BusinessDataDefinitionImpl) obj;
         if (className == null) {
-            if (other.className != null)
+            if (other.className != null) {
                 return false;
-        } else if (!className.equals(other.className))
+            }
+        } else if (!className.equals(other.className)) {
             return false;
+        }
         if (defaultValueExpression == null) {
-            if (other.defaultValueExpression != null)
+            if (other.defaultValueExpression != null) {
                 return false;
-        } else if (!defaultValueExpression.equals(other.defaultValueExpression))
+            }
+        } else if (!defaultValueExpression.equals(other.defaultValueExpression)) {
             return false;
+        }
         if (description == null) {
-            if (other.description != null)
+            if (other.description != null) {
                 return false;
-        } else if (!description.equals(other.description))
+            }
+        } else if (!description.equals(other.description)) {
             return false;
-        if (isMultiple != other.isMultiple)
+        }
+        if (multiple != other.multiple) {
             return false;
+        }
         if (type == null) {
-            if (other.type != null)
+            if (other.type != null) {
                 return false;
-        } else if (!type.equals(other.type))
+            }
+        } else if (!type.equals(other.type)) {
             return false;
+        }
         return true;
     }
 

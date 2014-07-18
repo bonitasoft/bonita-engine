@@ -406,7 +406,7 @@
 					<xs:element name="defaultValue" type="definition:Expression" minOccurs="0" />
 				</xs:all>
  				<xs:attribute name="className" type="xs:string" />
- 				<xs:attribute name="isMultiple" type="xs:boolean" default="false" />
+ 				<xs:attribute name="multiple" type="xs:boolean" default="false" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

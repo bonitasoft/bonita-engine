@@ -72,7 +72,7 @@ public class ServerModelConvertor {
                         .setName(operation.getLeftOperand().getName())
                         .setType(operation.getLeftOperand().getType())
                         .done())
-                .done();
+                        .done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -98,7 +98,7 @@ public class ServerModelConvertor {
             return builder.done();
         } else {
             final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-            SDataDefinitionBuilder builder = null; 
+            SDataDefinitionBuilder builder = null;
             if (dataDefinition instanceof TextDataDefinition) {
                 final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
                 builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
@@ -116,6 +116,7 @@ public class ServerModelConvertor {
         final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
         builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());
+        builder.setMultiple(businessDataDefinition.isMultiple());
         return builder.done();
     }
 
