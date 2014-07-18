@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.proxy;
+package com.bonitasoft.engine.bdm.proxy.model;
 
 import static java.util.Arrays.asList;
 

@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.proxy;
+package com.bonitasoft.engine.bdm.proxy.assertion;
 
 import static javassist.util.proxy.ProxyFactory.isProxyClass;
 

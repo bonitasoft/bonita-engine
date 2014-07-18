@@ -31,6 +31,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.bdm.proxy.model.Employee;
+
 /**
  * @author Romain Bioteau
  *

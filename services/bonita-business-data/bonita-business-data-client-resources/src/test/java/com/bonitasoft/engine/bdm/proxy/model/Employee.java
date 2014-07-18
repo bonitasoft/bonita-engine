@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.proxy;
+package com.bonitasoft.engine.bdm.proxy.model;
 
 import java.util.ArrayList;
 import java.util.List;
