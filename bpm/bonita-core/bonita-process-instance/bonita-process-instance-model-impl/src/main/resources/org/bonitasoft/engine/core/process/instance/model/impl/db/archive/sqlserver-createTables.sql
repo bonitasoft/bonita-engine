@@ -23,8 +23,11 @@ CREATE TABLE arch_process_instance (
   PRIMARY KEY (tenantid, id)
 )
 GO
-
-CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId,sourceObjectId, rootProcessInstanceId, callerId)
+CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId)
+GO
+CREATE INDEX idx2_arch_process_instance ON arch_process_instance (tenantId, processDefinitionId, archiveDate)
+GO
+CREATE INDEX idx3_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, callerId, stateId)
 GO
 
 CREATE TABLE arch_flownode_instance (
