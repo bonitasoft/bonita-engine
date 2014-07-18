@@ -75,6 +75,6 @@ clean xbean-classloader
 clean xmlpull
 clean xpp3_min
 clean xstream
-sleep 30 s
+sleep 30s
 done
 
