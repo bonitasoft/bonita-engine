@@ -11,12 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.bonitasoft.engine.bdm.Entity;
+
 /**
  * 
  */
 @javax.persistence.Entity(name = "Person")
 @Table(name = "PERSON")
-public class Person implements com.bonitasoft.engine.bdm.Entity {
+public class Person implements Entity {
 
     @Id
     @GeneratedValue

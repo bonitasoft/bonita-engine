@@ -67,7 +67,9 @@
 				<!-- platform -->
 				<entry key="org.bonitasoft.engine.platform.model.SPlatform" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
 				<entry key="org.bonitasoft.engine.platform.model.STenant" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
-				<entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
+				<entry key="org.bonitasoft.engine.dependency.model.SPlatformDependency" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" />
+			    <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" />
+                <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
 				<!-- services -->
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
@@ -322,8 +324,8 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="read-write" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="read-write" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write" />

@@ -25,12 +25,12 @@ public class SPOrganizationTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Encrypted password" }, jira = "ENGINE-1371")

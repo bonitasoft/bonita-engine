@@ -27,12 +27,12 @@ public class MonitoringAPITest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Cover(classes = MonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "User" }, story = "Get number of users.", jira = "")

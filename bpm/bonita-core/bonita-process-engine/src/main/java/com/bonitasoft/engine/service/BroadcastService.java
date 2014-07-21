@@ -39,4 +39,6 @@ public interface BroadcastService {
      */
     <T> Map<String, TaskResult<T>> execute(Callable<T> callable, Long tenantId);
 
+    void submit(Callable<?> callable);
+
 }

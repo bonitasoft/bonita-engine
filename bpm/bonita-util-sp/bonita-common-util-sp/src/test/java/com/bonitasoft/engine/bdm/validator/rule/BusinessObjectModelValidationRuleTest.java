@@ -1,72 +1,65 @@
 /**
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- *
+ * 
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
+import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
- *
+ * 
  */
 public class BusinessObjectModelValidationRuleTest {
 
-	private BusinessObjectModelValidationRule businessObjectModelValidationRule;
+    private BusinessObjectModelValidationRule businessObjectModelValidationRule;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		businessObjectModelValidationRule = new BusinessObjectModelValidationRule();
-	}
+    @Before
+    public void setUp() throws Exception {
+        businessObjectModelValidationRule = new BusinessObjectModelValidationRule();
+    }
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
+    @Test
+    public void should_apply_to_businessObjectModel() throws Exception {
+        assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObject())).isFalse();
+        assertThat(businessObjectModelValidationRule.appliesTo(new SimpleField())).isFalse();
+        assertThat(businessObjectModelValidationRule.appliesTo(new UniqueConstraint())).isFalse();
 
-	@Test
-	public void shoudAppliesTo_UniqueConstraint() throws Exception {
-		assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObjectModel())).isTrue();
-		assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObject())).isFalse();
-		assertThat(businessObjectModelValidationRule.appliesTo(new Field())).isFalse();
-		assertThat(businessObjectModelValidationRule.appliesTo(new UniqueConstraint())).isFalse();
-	}
+        assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObjectModel())).isTrue();
+    }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void shouddCheckRule_throw_IllegalArgumentException() throws Exception {
+        businessObjectModelValidationRule.checkRule(new SimpleField());
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void shouddCheckRule_throw_IllegalArgumentException() throws Exception {
-		businessObjectModelValidationRule.checkRule(new Field());
-	}
-	
-	@Test
-	public void shoudCheckRule_returns_valid_status() throws Exception {
-		BusinessObjectModel bom = new BusinessObjectModel();
-		BusinessObject bo = new BusinessObject();
-		bom.addBusinessObject(bo);
-		ValidationStatus validationStatus = businessObjectModelValidationRule.checkRule(bom);
-		assertThat(validationStatus.isOk()).isTrue();
-	}
-	
-	@Test
-	public void shoudCheckRule_returns_error_status() throws Exception {
-		BusinessObjectModel bom = new BusinessObjectModel();
-		ValidationStatus validationStatus = businessObjectModelValidationRule.checkRule(bom);
-		assertThat(validationStatus.isOk()).isFalse();
-	}
+    @Test
+    public void should_validate_that_bom_has_at_least_one_businessObject() throws Exception {
+        BusinessObjectModel bom = new BusinessObjectModel();
+
+        ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
+
+        assertThat(validationStatus).isNotOk();
+    }
+
+    @Test
+    public void should_return_a_valid_status_when_bom_is_valid() throws Exception {
+        BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(new BusinessObject());
+
+        ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
+
+        assertThat(validationStatus).isOk();
+    }
 }

@@ -89,7 +89,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl</artifactId>
+			<artifactId>bonita-platform-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -107,13 +107,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl</artifactId>
+			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl</artifactId>
+			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

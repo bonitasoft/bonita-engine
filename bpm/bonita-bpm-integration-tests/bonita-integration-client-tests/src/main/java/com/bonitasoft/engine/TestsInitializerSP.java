@@ -56,7 +56,7 @@ public class TestsInitializerSP extends TestsInitializer {
         } catch (Exception e) {
             Logger logger = LoggerFactory.getLogger(BonitaSuiteRunner.class);
             logger.error("unable to create platform", e);
-            final PlatformSession session = testUtil.loginPlatform();
+            final PlatformSession session = testUtil.loginOnPlatform();
             final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.stopNode();
             platformAPI.cleanPlatform();

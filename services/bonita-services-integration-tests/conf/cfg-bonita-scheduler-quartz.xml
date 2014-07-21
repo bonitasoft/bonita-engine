@@ -20,6 +20,7 @@
 		<prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
       </props>
 		</constructor-arg>
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">

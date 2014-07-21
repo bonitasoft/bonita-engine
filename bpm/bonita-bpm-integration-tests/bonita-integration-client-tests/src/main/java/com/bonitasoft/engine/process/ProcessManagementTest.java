@@ -54,24 +54,24 @@ public class ProcessManagementTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-        logout();
+       logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
     }
 
     @Test
     public void searchArchivedSubTasks() throws Exception {
-        logout();
-        loginWith(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final String userTaskName = "userTask";
         processBuilder.addActor(ACTOR_NAME).addDescription("test process with archived sub tasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
 
         // make userTask1 as parentTask
@@ -142,11 +142,11 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription("test process with sub task").addUserTask("userTask0", ACTOR_NAME)
                 .addUserTask("userTask1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         final User jack = createUser("jack", "bpm");
-        logout();
-        loginWith(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final User user = getIdentityAPI().getUserByUserName(getSession().getUserName());
@@ -208,13 +208,13 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
     @Test
     public void executingSubTasks() throws Exception {
-        logout();
-        loginWith(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final String userTaskName = "userTask";
         processBuilder.addActor(ACTOR_NAME).addDescription("test process with archived sub tasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         getProcessAPI().startProcess(john.getId(), processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 20, 1000, true, 1, john);
@@ -261,13 +261,13 @@ public class ProcessManagementTest extends CommonAPISPTest {
     public void createHumanTaskAndExecutingItWithOtherUser() throws Exception {
         final User userWhoCreateTheManualTask = createUser("userWhoCreateTheManualTask", PASSWORD);
 
-        logout();
-        loginWith("userWhoCreateTheManualTask", PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith("userWhoCreateTheManualTask", PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final String userTaskName = "userTask";
         processBuilder.addActor(ACTOR_NAME).addDescription("test process with archived sub tasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, userWhoCreateTheManualTask);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, userWhoCreateTheManualTask);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(userTaskName, processInstance, userWhoCreateTheManualTask);
 
@@ -276,8 +276,8 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 new Date(System.currentTimeMillis()), TaskPriority.NORMAL);
         final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
 
-        logout();
-        loginWith(USERNAME, PASSWORD);
+       logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         // archive sub task:
         // archive first children tasks:
@@ -297,12 +297,12 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
     // @Test
     public void executeTaskShouldCancelSubtasks() throws Exception {
-        loginWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
         final String userTaskName = "userTask";
         processBuilder.addActor(ACTOR_NAME).addDescription("test Archive Task Should Archive Subtasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         getProcessAPI().startProcess(john.getId(), processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
         assertTrue("Expected activity not found", checkNbPendingTaskOf.waitUntil());
@@ -373,23 +373,23 @@ public class ProcessManagementTest extends CommonAPISPTest {
     @Test
     public void getProcessInstancesWithLabelOnStringIndex() throws Exception {
         ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask("step1", ACTOR_NAME);
         processBuilder.setStringIndex(1, "Label1", null);
         processBuilder.setStringIndex(2, "Label2", null);
         processBuilder.setStringIndex(3, "Label3", null);
         processBuilder.setStringIndex(4, "Label4", null);
         processBuilder.setStringIndex(5, "Label5", null);
-        final ProcessDefinition process1 = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition process1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("2" + PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask("step1", ACTOR_NAME);
         processBuilder.setStringIndex(1, "LabelBis1", null);
         processBuilder.setStringIndex(2, "LabelBis2", null);
         processBuilder.setStringIndex(3, "LabelBis3", null);
         processBuilder.setStringIndex(4, "LabelBis4", null);
         processBuilder.setStringIndex(5, "LabelBis5", null);
-        final ProcessDefinition process2 = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition process2 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         startProcessAndWaitForTask(process1.getId(), "step1");
         startProcessAndWaitForTask(process2.getId(), "step1");
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
@@ -415,13 +415,13 @@ public class ProcessManagementTest extends CommonAPISPTest {
     @Test
     public void getProcessInstancesWithStringIndex() throws Exception {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask("step1", ACTOR_NAME);
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         processBuilder.setStringIndex(1, "Label1", expressionBuilder.createConstantStringExpression("Value1"));
         processBuilder.setStringIndex(2, "Label2", expressionBuilder.createGroovyScriptExpression("script", "return \"a\"+\"b\";", String.class.getName()));
         processBuilder.setStringIndex(3, "Label3", null);
-        final ProcessDefinition process1 = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition process1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         startProcessAndWaitForTask(process1.getId(), "step1");
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
         assertEquals(1, processInstances.size());

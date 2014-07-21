@@ -11,7 +11,7 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="dependency" />
-				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMappingImpl" value="dependencymapping" />
+				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="dependencymapping" />
 			</map>
 		</property>
 	</bean>

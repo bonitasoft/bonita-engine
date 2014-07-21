@@ -43,10 +43,12 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -60,6 +62,9 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.profile.ImportPolicy;
+import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -75,6 +80,7 @@ import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
 import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -88,8 +94,10 @@ import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.platform.TenantUpdater;
 import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
+import com.bonitasoft.engine.profile.ProfilesImporterExt;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -312,6 +320,18 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.api.impl.PlatformAPIImpl#importProfiles(org.bonitasoft.engine.profile.ProfileService,
+     * org.bonitasoft.engine.identity.IdentityService, java.util.List, org.bonitasoft.engine.service.TenantServiceAccessor)
+     */
+    @Override
+    protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
+            final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
+        PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
+        new ProfilesImporterExt(profileService, identityService, pageService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
     private void createCustomPageExamples(final TenantServiceAccessor tenantServiceAccessor) throws CreationException {
@@ -709,6 +729,21 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     public void startNode() throws StartNodeException {
         LicenseChecker.getInstance().checkLicence();
         super.startNode();
+    }
+
+    @Override
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public void stopNode() throws StopNodeException {
+        super.stopNode();
+        try {
+            final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            BroadcastService broadcastService = platformAccessor.getBroadcastService();
+            broadcastService.submit(new NotifyNodeStoppedTask());
+        } catch (Exception e) {
+            throw new StopNodeException(e);
+        }
+
     }
 
     public void stopNode(final String message) throws StopNodeException {

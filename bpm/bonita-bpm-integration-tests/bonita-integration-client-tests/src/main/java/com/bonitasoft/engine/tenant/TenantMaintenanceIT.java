@@ -64,7 +64,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     @Before
     public void before() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     private void disableAndDeleteProcess(final long tenantId, final long processDefinitionId) throws Exception {
@@ -142,16 +142,17 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
                 .setType(OperatorType.ASSIGNMENT).done();
 
         final ProcessDefinitionBuilderExt processDefinitionBuilderExt = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processDefinitionBuilderExt.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefinitionBuilderExt.addActor(ACTOR_NAME);
         processDefinitionBuilderExt.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorEngineExecutionContext(processDefinitionBuilderExt, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(processDefinitionBuilderExt,
+                ACTOR_NAME, user);
 
         // when: put in maintenance the tenant
         getTenantManagementAPI().pause();
 
         // when: we stop and start the node
         stopAndStartPlatform();
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         // when: resume the tenant
         getTenantManagementAPI().resume();
@@ -219,7 +220,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
                 .addAutomaticTask("step1")
                 .addEndEvent("end event").getProcess();
 
-        return deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, getSession().getUserId());
+        return deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, getSession().getUserId());
     }
 
     private void pauseTenant(final long tenantId) throws BonitaException, UpdateException {

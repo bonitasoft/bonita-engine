@@ -1,18 +1,13 @@
-/**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **
- * @since 6.2
- */
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *
+ *@since 6.2
+ *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
 import java.util.ArrayList;
@@ -32,7 +27,9 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -58,23 +55,16 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
-    protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
-            throws SFlowNodeNotFoundException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-        return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
-    }
-
     @Override
     public String getType() {
         return SLeftOperand.TYPE_BUSINESS_DATA;
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
-            final SRefBusinessDataInstance reference = getRefBusinessDataInstance(sLeftOperand.getName(),
-                    containerId, containerType);
+            final SRefBusinessDataInstance reference = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
             checkIsValidBusinessData(reference, newValue);
             if (newValue instanceof Entity) {
                 final Entity newBusinessDataValue = (Entity) newValue;
@@ -83,18 +73,23 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                 if (!businessData.getPersistenceId().equals(simpleRef.getDataId())) {
                     refBusinessDataService.updateRefBusinessDataInstance(simpleRef, businessData.getPersistenceId());
                 }
+                return businessData;
             } else {
                 final List<Entity> newBusinessDataValue = (List<Entity>) newValue;
                 final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
                 final List<Long> businessDataIds = new ArrayList<Long>();
+                final List<Entity> updated = new ArrayList<Entity>();
                 for (final Entity entity : newBusinessDataValue) {
                     final Entity businessData = businessDataRepository.merge(entity);
                     businessDataIds.add(businessData.getPersistenceId());
+                    updated.add(businessData);
                 }
                 if (!multiRef.getDataIds().containsAll(businessDataIds) || multiRef.getDataIds().size() != businessDataIds.size()) {
                     refBusinessDataService.updateRefBusinessDataInstance(multiRef, businessDataIds);
                 }
+                return updated;
             }
+
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
@@ -112,6 +107,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected Object getBusinessData(final String bizDataName, final long processInstanceId) throws SBonitaReadException {
         try {
             final SRefBusinessDataInstance reference = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
@@ -139,6 +135,47 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
+    public void delete(final SLeftOperand sLeftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
+        try {
+            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
+            removeBusinessData(refBusinessDataInstance);
+            dereferenceBusinessData(refBusinessDataInstance);
+        } catch (final Exception e) {
+            throw new SOperationExecutionException(e);
+        }
+    }
+
+    protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
+        final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+        return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void removeBusinessData(final SRefBusinessDataInstance reference) throws ClassNotFoundException, SBusinessDataNotFoundException {
+        final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(reference.getDataClassName());
+        if (reference instanceof SSimpleRefBusinessDataInstance) {
+            final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
+            final Entity entity = businessDataRepository.findById(dataClass, simpleRef.getDataId());
+            businessDataRepository.remove(entity);
+        } else {
+            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            for (final Long dataId : multiRef.getDataIds()) {
+                final Entity entity = businessDataRepository.findById(dataClass, dataId);
+                businessDataRepository.remove(entity);
+            }
+        }
+    }
+
+    protected void dereferenceBusinessData(final SRefBusinessDataInstance reference) throws SRefBusinessDataInstanceModificationException {
+        if (reference instanceof SSimpleRefBusinessDataInstance) {
+            refBusinessDataService.updateRefBusinessDataInstance((SSimpleRefBusinessDataInstance) reference, null);
+        } else {
+            refBusinessDataService.updateRefBusinessDataInstance((SMultiRefBusinessDataInstance) reference, new ArrayList<Long>());
+        }
+    }
+
+    @Override
     public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
         final String businessDataName = sLeftOperand.getName();
@@ -146,8 +183,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         final String containerType = expressionContext.getContainerType();
         try {
             if (inputValues.get(businessDataName) == null) {
-                long processInstanceId;
-                processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+                final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
                 return getBusinessData(businessDataName, processInstanceId);
             }
         } catch (final SFlowNodeNotFoundException e) {
@@ -160,6 +196,11 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
     private void throwBonitaReadException(final String businessDataName, final Exception e) throws SBonitaReadException {
         throw new SBonitaReadException("Unable to retrieve the context for business data " + businessDataName, e);
+    }
+
+    @Override
+    public boolean supportBatchUpdate() {
+        return false;
     }
 
 }

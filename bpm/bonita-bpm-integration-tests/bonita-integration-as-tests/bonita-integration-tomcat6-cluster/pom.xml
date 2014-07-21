@@ -13,10 +13,12 @@
 
 
 	<properties>
+		<cluster.group>mycluster</cluster.group>
 		<bonita.home.classifier>performance-cluster</bonita.home.classifier>
 		<tomcat.version>6.0.37</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
-		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip
+        </tomcat.url>
 		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
 
 		<server1.port>8386</server1.port>
@@ -47,14 +49,47 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy2</id>
-								<phase>package</phase>
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.bonitasoft.engine</groupId>
+                                            <artifactId>bonita-home-sp</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>${bonita.home.classifier}</classifier>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/resources</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy</id>
+                                <phase>prepare-package</phase>
 								<goals>
 									<goal>copy</goal>
 								</goals>
 								<configuration>
 									<artifactItems>
 										<artifactItem>
+                                            <groupId>com.bonitasoft.engine</groupId>
+                                            <artifactId>bonita-deploy-war-sp</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>war</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/war</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.h2database</groupId>
+                                            <artifactId>h2</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
 											<groupId>org.bonitasoft.tomcat</groupId>
 											<artifactId>bonita-tomcat-h2-listener</artifactId>
 											<outputDirectory>${project.build.directory}/driver</outputDirectory>
@@ -111,71 +146,79 @@
 								<configuration>
 									<target>
 										<taskdef name="if" classname="${if.task}"
-											classpathref="maven.runtime.classpath" />
+                                                 classpathref="maven.runtime.classpath"/>
 										<available property="tomcat.present"
-											file="${tomcat.zip.folder}/${tomcat.name}.zip" />
+                                                   file="${tomcat.zip.folder}/${tomcat.name}.zip"/>
 										<if>
 											<not>
-												<isset property="tomcat.present" />
+                                                <isset property="tomcat.present"/>
 											</not>
 											<then>
-												<get src="${tomcat.url}" dest="${tomcat.zip.folder}/${tomcat.name}.zip" />
+                                                <get src="${tomcat.url}"
+                                                     dest="${tomcat.zip.folder}/${tomcat.name}.zip"/>
 											</then>
 										</if>
-										<unzip dest="${project.build.directory}" src="${tomcat.zip.folder}/${tomcat.name}.zip" />
+                                        <unzip dest="${project.build.directory}"
+                                               src="${tomcat.zip.folder}/${tomcat.name}.zip"/>
 										<!-- move to folder node1 -->
 										<move todir="${tomcat1.home}">
-											<fileset dir="${project.build.directory}/${tomcat.name}" />
+                                            <fileset dir="${project.build.directory}/${tomcat.name}"/>
 										</move>
 										<!-- override global context XML file in order to declare the datasources 
 											and the Transaction Manager -->
 										<copy todir="${tomcat1.conf.dir}">
-											<fileset dir="tomcat/conf" />
+                                            <fileset dir="tomcat/conf"/>
 										</copy>
 										<copy todir="${tomcat1.home}/lib">
 											<fileset dir="target/driver">
-												<include name="*jar" />
+                                                <include name="*jar"/>
 											</fileset>
 											<fileset dir="target/tx-manager">
-												<include name="*jar" />
+                                                <include name="*jar"/>
 											</fileset>
 										</copy>
 										<copy tofile="${tomcat1.deploy.dir}/bonita.war"
-											file="${distrib.dir}/war/bonita-deploy-war-sp-${project.version}.war" />
+                                              file="${distrib.dir}/war/bonita-deploy-war-sp-${project.version}.war"/>
 
 										<!-- duplicate to node2 -->
 										<copy todir="${tomcat2.home}">
-											<fileset dir="${tomcat1.home}" />
+                                            <fileset dir="${tomcat1.home}"/>
 										</copy>
 
 										<!-- change ports for both nodes -->
-										<replace file="${tomcat1.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;"
-											value="&lt;Connector port=&quot;${provider1.port}&quot;" />
-										<replace file="${tomcat1.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;"
-											value="&lt;Server port=&quot;${server1.port}&quot;" />
-										<replace file="${tomcat1.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;"
-											value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
+                                        <replace file="${tomcat1.conf.dir}/server.xml"
+                                                 token="&lt;Connector port=&quot;8080&quot;"
+                                                 value="&lt;Connector port=&quot;${provider1.port}&quot;"/>
+                                        <replace file="${tomcat1.conf.dir}/server.xml"
+                                                 token="&lt;Server port=&quot;8005&quot;"
+                                                 value="&lt;Server port=&quot;${server1.port}&quot;"/>
+                                        <replace file="${tomcat1.conf.dir}/server.xml"
+                                                 token="redirectPort=&quot;8443&quot;"
+                                                 value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;"/>
 
-										<replace file="${tomcat2.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;"
-											value="&lt;Connector port=&quot;${provider2.port}&quot;" />
-										<replace file="${tomcat2.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;"
-											value="&lt;Server port=&quot;${server2.port}&quot;" />
-										<replace file="${tomcat2.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;"
-											value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
+                                        <replace file="${tomcat2.conf.dir}/server.xml"
+                                                 token="&lt;Connector port=&quot;8080&quot;"
+                                                 value="&lt;Connector port=&quot;${provider2.port}&quot;"/>
+                                        <replace file="${tomcat2.conf.dir}/server.xml"
+                                                 token="&lt;Server port=&quot;8005&quot;"
+                                                 value="&lt;Server port=&quot;${server2.port}&quot;"/>
+                                        <replace file="${tomcat2.conf.dir}/server.xml"
+                                                 token="redirectPort=&quot;8443&quot;"
+                                                 value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;"/>
 										<replaceregexp file="${tomcat2.conf.dir}/server.xml"
-											byline="true" replace="" match=".*H2Listener.*" />
+                                                       byline="true" replace="" match=".*H2Listener.*"/>
 
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
-											<fileset dir="${distrib.dir}/resources/home/" />
+                                            <fileset dir="${distrib.dir}/resources/home/"/>
 										</copy>
 
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
-											<fileset dir="${user.home}/lic" includes="*.lic" />
+                                            <fileset dir="${user.home}/lic" includes="*.lic"/>
 										</copy>
 
 										<copy file="${basedir}/client/bonita-client.properties"
-											todir="${bonita.home}/client/conf" overwrite="true" />
+                                              todir="${bonita.home}/client/conf" overwrite="true"/>
 									</target>
 								</configuration>
 							</execution>
@@ -198,18 +241,22 @@
 										<containerId>tomcat6x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
-											<!-- in order to identify on which node we are  -->
+											<!-- in order to identify on which node we are -->
 											<node.name>Node1</node.name>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
-											<logback.configurationFile>${tomcat1.conf.dir}/logback.xml</logback.configurationFile>
+                                            <logback.configurationFile>${tomcat1.conf.dir}/logback.xml
+                                            </logback.configurationFile>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
-											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
 
 											<!-- Bitronix properties -->
 											<btm.root>${tomcat1.home}</btm.root>
-											<bitronix.tm.configuration>${tomcat1.home}/conf/btm-config.properties</bitronix.tm.configuration>
+                                            <bitronix.tm.configuration>${tomcat1.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
 										</systemProperties>
 									</container>
 									<configuration>
@@ -217,9 +264,15 @@
 										<home>${tomcat1.home}</home>
 										<properties>
 											<cargo.servlet.port>${provider1.port}</cargo.servlet.port>
+											<cargo.jvmargs>
+												-Dbonita.cluster.group.name=${cluster.group}
+											<!---Xdebug
+												-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001
+												-Xnoagent
+												-Djava.compiler=NONE-->
+											</cargo.jvmargs>
 										</properties>
 									</configuration>
-									<wait>false</wait>
 								</configuration>
 							</execution>
 							<execution>
@@ -233,16 +286,19 @@
 										<containerId>tomcat6x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
-											<!-- in order to identify on which node we are  -->
+											<!-- in order to identify on which node we are -->
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
-											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
 
 											<!-- Bitronix properties -->
 											<btm.root>${tomcat1.home}</btm.root>
-											<bitronix.tm.configuration>${tomcat1.home}/conf/btm-config.properties</bitronix.tm.configuration>
+                                            <bitronix.tm.configuration>${tomcat1.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
 										</systemProperties>
 									</container>
 									<configuration>
@@ -252,7 +308,6 @@
 											<cargo.servlet.port>${provider1.port}</cargo.servlet.port>
 										</properties>
 									</configuration>
-									<wait>false</wait>
 								</configuration>
 							</execution>
 
@@ -272,13 +327,18 @@
 											<node.name>Node2</node.name>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
-											<logback.configurationFile>${tomcat2.conf.dir}/logback.xml</logback.configurationFile>
+                                            <logback.configurationFile>${tomcat2.conf.dir}/logback.xml
+                                            </logback.configurationFile>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
-											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
 
 											Bitronix properties
 											<btm.root>${tomcat2.home}</btm.root>
-											<bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties</bitronix.tm.configuration>
+                                            <bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
+											<hazelcast.jmx>true</hazelcast.jmx>
 										</systemProperties>
 									</container>
 									<configuration>
@@ -286,9 +346,15 @@
 										<home>${tomcat2.home}</home>
 										<properties>
 											<cargo.servlet.port>${provider2.port}</cargo.servlet.port>
+											<cargo.jvmargs>
+												-Dbonita.cluster.group.name=${cluster.group}
+												<!-- -Xdebug
+												-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
+												-Xnoagent
+												-Djava.compiler=NONE -->
+											</cargo.jvmargs>
 										</properties>
 									</configuration>
-									<wait>false</wait>
 								</configuration>
 							</execution>
 							<execution>
@@ -306,11 +372,14 @@
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
-											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
 
 											<!-- Bitronix properties -->
 											<btm.root>${tomcat2.home}</btm.root>
-											<bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties</bitronix.tm.configuration>
+                                            <bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
 										</systemProperties>
 									</container>
 									<configuration>
@@ -320,7 +389,6 @@
 											<cargo.servlet.port>${provider2.port}</cargo.servlet.port>
 										</properties>
 									</configuration>
-									<wait>false</wait>
 								</configuration>
 							</execution>
 						</executions>
@@ -401,35 +469,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-	  <pluginManagement>
-	    <plugins>
-	      <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-	      <plugin>
-	        <groupId>org.eclipse.m2e</groupId>
-	        <artifactId>lifecycle-mapping</artifactId>
-	        <version>1.0.0</version>
-	        <configuration>
-	          <lifecycleMappingMetadata>
-	            <pluginExecutions>
-	              <pluginExecution>
-	                <pluginExecutionFilter>
-	                  <groupId>org.apache.maven.plugins</groupId>
-	                  <artifactId>maven-dependency-plugin</artifactId>
-	                  <versionRange>[2.7,)</versionRange>
-	                  <goals>
-	                    <goal>unpack</goal>
-	                  </goals>
-	                </pluginExecutionFilter>
-	                <action>
-	                  <ignore></ignore>
-	                </action>
-	              </pluginExecution>
-	            </pluginExecutions>
-	          </lifecycleMappingMetadata>
-	        </configuration>
-	      </plugin>
-	    </plugins>
-	  </pluginManagement>
-	</build>
 </project>
