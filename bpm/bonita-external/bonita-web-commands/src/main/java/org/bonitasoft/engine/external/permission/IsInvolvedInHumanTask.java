@@ -43,9 +43,9 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public class IsInvolvedInHumanTask extends CommandWithParameters {
 
-    private static final String USER_ID_KEY = "USER_ID_KEY";
+    protected static final String USER_ID_KEY = "USER_ID_KEY";
 
-    private static final String HUMAN_TASK_INSTANCE_ID_KEY = "HUMAN_TASK_INSTANCE_ID_KEY";
+    protected static final String HUMAN_TASK_INSTANCE_ID_KEY = "HUMAN_TASK_INSTANCE_ID_KEY";
 
     /**
      * @return a Boolean :
@@ -90,16 +90,28 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             }
         }
 
-        final SSession session = SessionInfos.getSession();
+        final SSession session = getCurrentSession();
         if (session.getUserId() == assigneeId) {
+            //if user has the current task assigned
             return true;
-        } else if (userId != -1 && assigneeId != 0L) {
+        } else if (userId != session.getUserId()) {
+            //in case we are performing a Do For (task assigned or not, we don't care
             return true;
         } else if (assigneeId == 0L) {
+            //in case we are not in do for, we check actor mapping
             final SActor actor = actorMappingService.getActor(actorId);
             return actor.getScopeId() == processDefinitionId;
         }
         return false;
+    }
+
+    /**
+     * method created for stubbing purpose
+     * 
+     * @return current session
+     */
+    protected SSession getCurrentSession() {
+        return SessionInfos.getSession();
     }
 
 }
