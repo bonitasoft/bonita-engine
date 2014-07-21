@@ -57,10 +57,10 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="servicesResolver" ref="servicesResolver" />
+		<constructor-arg name="batchSize" value="1000" />
 	</bean>
-	
-	<bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver">
-	</bean>
+
+	<bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
 
 	<bean id="db-bonita-scheduler-quartz" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/scheduler/${db.vendor}-createQuartzTables.sql" />

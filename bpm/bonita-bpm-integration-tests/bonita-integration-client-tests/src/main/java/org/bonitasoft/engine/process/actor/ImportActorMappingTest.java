@@ -55,12 +55,12 @@ public class ImportActorMappingTest extends CommonAPITest {
         }
         deleteProcess(processDefinition);
         getIdentityAPI().deleteOrganization();
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+         loginOnDefaultTenantWithDefaultTechnicalLogger();
     }
 
     @Test
@@ -186,7 +186,7 @@ public class ImportActorMappingTest extends CommonAPITest {
         final Role role = createRole("dev");
 
         final ProcessDefinitionBuilder processBuilder = createProcessDefinitionBuilder();
-        processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
+        processDefinition = deployAndEnableProcessWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
         getProcessAPI().importActorMapping(processDefinition.getId(), xmlToByteArray("complexActorMapping2.xml"));
 
         getAndCheckActors(user, rd, role, processDefinition);
@@ -288,7 +288,7 @@ public class ImportActorMappingTest extends CommonAPITest {
      */
     private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final String xmlFileName) throws Exception {
         final ProcessDefinitionBuilder processBuilder = createProcessDefinitionBuilder();
-        processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
+        processDefinition = deployAndEnableProcessWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
 
         getProcessAPI().importActorMapping(processDefinition.getId(), xmlToByteArray(xmlFileName));
     }

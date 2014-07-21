@@ -50,6 +50,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -75,6 +76,8 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  * @author Celine Souchet
  */
 public class DependencyServiceImpl implements DependencyService {
+
+    private static final int BATCH_SIZE = 100;
 
     private final ReadPersistenceService persistenceService;
 
@@ -189,7 +192,7 @@ public class DependencyServiceImpl implements DependencyService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAllDependencies"));
         }
-        final QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SDependency.class, "id", OrderByType.ASC);
         List<SDependency> dependencies;
         do {
             try {
@@ -211,7 +214,7 @@ public class DependencyServiceImpl implements DependencyService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAllDependencyMappings"));
         }
-        final QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
         List<SDependencyMapping> dependencyMappings;
         do {
             dependencyMappings = getDependencyMappings(queryOptions);
@@ -362,7 +365,7 @@ public class DependencyServiceImpl implements DependencyService {
         NullCheckingUtil.checkArgsNotNull(ids);
         try {
             final SelectListDescriptor<SDependency> desc = new SelectListDescriptor<SDependency>("getDependenciesByIds", CollectionUtil.buildSimpleMap("ids",
-                    ids), SDependency.class, QueryOptions.allResultsQueryOptions());
+                    ids), SDependency.class, QueryOptions.countQueryOptions());
             final List<SDependency> listSDependency = persistenceService.selectList(desc);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
@@ -401,16 +404,19 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions) throws SDependencyException {
+    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final int startIndex, final int maxResult)
+            throws SDependencyException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyIds"));
         }
-        NullCheckingUtil.checkArgsNotNull(artifactId, artifactType);
+        NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, startIndex, maxResult);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult);
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("artifactId", artifactId);
             parameters.put("artifactType", artifactType);
-            final SelectListDescriptor<Long> desc = new SelectListDescriptor<Long>("getDependencyIds", parameters, SDependency.class, Long.class, queryOptions);
+            final SelectListDescriptor<Long> desc = new SelectListDescriptor<Long>("getDependencyIds", parameters, SDependencyMapping.class, Long.class,
+                    queryOptions);
             final List<Long> listIds = persistenceService.selectList(desc);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyIds"));
@@ -467,32 +473,6 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
             }
             throw new SDependencyException("Can't get dependency mappings", e);
-        }
-    }
-
-    @Override
-    public List<SDependencyMapping> getDependencyMappings(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions)
-            throws SDependencyException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyMappings"));
-        }
-        NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, queryOptions);
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>();
-            parameters.put("artifactId", artifactId);
-            parameters.put("artifactType", artifactType);
-            final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<SDependencyMapping>("getDependencyMappingsByArtifact", parameters,
-                    SDependencyMapping.class, queryOptions);
-            final List<SDependencyMapping> listSDependencyMapping = persistenceService.selectList(desc);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyMappings"));
-            }
-            return listSDependencyMapping;
-        } catch (final SBonitaReadException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
-            }
-            throw new SDependencyException("Can't get dependency mappings by artifact: " + artifactType + ", " + artifactId, e);
         }
     }
 
@@ -554,7 +534,7 @@ public class DependencyServiceImpl implements DependencyService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependency, descriptor);
             recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(dependency.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateDependency");
-            QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+            QueryOptions queryOptions = new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
             List<SDependencyMapping> dependencyMappings;
             final long updateTimeStamp = System.currentTimeMillis();
             do {
@@ -612,7 +592,7 @@ public class DependencyServiceImpl implements DependencyService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeDisconnectedDependencyMappings"));
         }
-        QueryOptions loopQueryOptions = QueryOptions.defaultQueryOptions();
+        QueryOptions loopQueryOptions = new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
         List<SDependencyMapping> dependencyMappings;
         final List<SDependencyMapping> result = new ArrayList<SDependencyMapping>();
         do {
@@ -680,23 +660,23 @@ public class DependencyServiceImpl implements DependencyService {
 
     @Override
     public void deleteDependencies(final long id, final ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException {
-        QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
-        final ArrayList<Long> allDependencyIds = new ArrayList<Long>();
-        List<Long> dependencyIds;
-        do {
-            dependencyIds = getDependencyIds(id, type, queryOptions);
-            allDependencyIds.addAll(dependencyIds);
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (dependencyIds.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-        for (final Long dependencyId : allDependencyIds) {
-            final List<SDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId, QueryOptions.defaultQueryOptions());
-            if (dependencyMappings.size() == 1) {// only when the dependency is linked only to on element
-                final SDependencyMapping dependencyMapping = dependencyMappings.get(0);
-                deleteDependencyMapping(dependencyMapping);
-                deleteDependency(dependencyId);
-            }
-        }
+        final QueryOptions queryOptionsForMapping = new QueryOptions(0, 2, SDependencyMapping.class, "id", OrderByType.ASC);
+        int fromIndex = 0;
 
+        List<Long> dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        while (!dependencyIds.isEmpty()) {
+            for (final Long dependencyId : dependencyIds) {
+                final List<SDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId, queryOptionsForMapping);
+                if (dependencyMappings.size() == 1) {// only when the dependency is linked only to on element
+                    final SDependencyMapping dependencyMapping = dependencyMappings.get(0);
+                    deleteDependencyMapping(dependencyMapping);
+                    deleteDependency(dependencyId);
+                } else {
+                    fromIndex++;
+                }
+            }
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        }
     }
 
     private void refreshLocalClassLoader(final SDependencyMapping dependencyMapping) throws SDependencyException {
@@ -706,23 +686,17 @@ public class DependencyServiceImpl implements DependencyService {
     private Map<String, byte[]> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         int fromIndex = 0;
-        final int pageSize = QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
         List<Long> dependencyIds = null;
-
         do {
-            // final OrderByOption orderByOption = new OrderByOption(SDependency.class, "id", OrderByType.ASC);
-            // final QueryOptions queryOptions = new QueryOptions(fromIndex, pageSize, Arrays.asList(orderByOption));
-            final QueryOptions queryOptions = new QueryOptions(fromIndex, pageSize);
-
-            dependencyIds = getDependencyIds(id, type, queryOptions);
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
             if (dependencyIds != null && dependencyIds.size() > 0) {
                 final List<SDependency> dependencies = getDependencies(dependencyIds);
                 for (final SDependency dependency : dependencies) {
                     resources.put(dependency.getFileName(), dependency.getValue());
                 }
             }
-            fromIndex = fromIndex + pageSize;
-        } while (dependencyIds.size() == pageSize);
+            fromIndex = fromIndex + BATCH_SIZE;
+        } while (dependencyIds.size() == BATCH_SIZE);
         return resources;
     }
 
@@ -739,8 +713,10 @@ public class DependencyServiceImpl implements DependencyService {
     @Override
     public void updateDependenciesOfArtifact(final long id, final ScopeType type, final List<SDependency> dependencies) throws SDependencyException {
         final Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
-        final List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
-        if (!dependencyIds.isEmpty()) {
+        int fromIndex = 0;
+
+        List<Long> dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        while (!dependencyIds.isEmpty()) {
             final List<SDependency> currentDependencies = getDependencies(dependencyIds);
             for (final SDependency currentDependency : currentDependencies) {
                 if (!newDependenciesByName.containsKey(currentDependency.getName())) {
@@ -752,7 +728,10 @@ public class DependencyServiceImpl implements DependencyService {
                 // remove from list
                 newDependenciesByName.remove(currentDependency.getName());
             }
+            fromIndex = fromIndex + BATCH_SIZE;
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
         }
+
         // all artifact that are still here must be created
         for (final SDependency sDependency : newDependenciesByName.values()) {
             createForArtifact(id, type, sDependency);
@@ -776,7 +755,8 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     private void delete(final SDependency dependency) throws SDependencyException, SDependencyDeletionException {
-        final SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), QueryOptions.defaultQueryOptions()).get(0);
+        final QueryOptions queryOptions = new QueryOptions(0, 10, SDependencyMapping.class, "id", OrderByType.ASC);
+        final SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), queryOptions).get(0);
         deleteDependencyMapping(sDependencyMapping);
         deleteDependency(dependency);
     }

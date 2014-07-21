@@ -6,6 +6,7 @@ import org.bonitasoft.engine.cache.CacheServiceTest;
 import org.bonitasoft.engine.classloader.ClassLoaderServiceTest;
 import org.bonitasoft.engine.command.CommandServiceIntegrationTest;
 import org.bonitasoft.engine.continuation.WorkServiceTest;
+import org.bonitasoft.engine.data.instance.TransientDataInstanceServiceIT;
 import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImplIT;
 import org.bonitasoft.engine.dependency.DependencyServiceTest;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
@@ -39,6 +40,7 @@ import org.junit.runners.Suite.SuiteClasses;
         SessionServiceTest.class,
         PlatformSessionServiceTest.class,
         DataInstanceServiceImplIT.class,
+        TransientDataInstanceServiceIT.class,
         DependencyServiceTest.class,
         WorkServiceTest.class,
 

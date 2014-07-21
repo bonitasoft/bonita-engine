@@ -17,7 +17,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -46,6 +48,9 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperatorType;
 
 /**
  * Builder to define a process.
@@ -194,6 +199,20 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             }
             if (activity instanceof SendTaskDefinition && ((SendTaskDefinition) activity).getMessageTrigger().getTargetProcess() == null) {
                 addError("The send task " + activity.getName() + " hasn't target");
+            }
+            final List<Operation> operations = activity.getOperations();
+
+            final Map<String, Boolean> leftOperandUpdates = new HashMap<String, Boolean>();
+            for (final Operation operation : operations) {
+                final LeftOperand leftOperand = operation.getLeftOperand();
+                final Boolean update = leftOperandUpdates.get(leftOperand.getName());
+                final Boolean updateOperator = operation.getType() != OperatorType.DELETION;
+                if (update == null) {
+                    leftOperandUpdates.put(leftOperand.getName(), updateOperator);
+                } else if (update && !updateOperator) {
+                    addError("In activity " + activity.getName() + ". It is not possible to modify and delete the leftOperand " + leftOperand.getName()
+                            + " through the same activty");
+                }
             }
         }
     }

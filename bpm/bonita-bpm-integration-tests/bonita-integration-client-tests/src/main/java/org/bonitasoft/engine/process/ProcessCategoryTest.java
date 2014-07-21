@@ -30,6 +30,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -58,12 +59,12 @@ public class ProcessCategoryTest extends CommonAPITest {
         for (final ProcessDefinition processDefinitionId : processDefinitions) {
             deleteProcess(processDefinitionId);
         }
-        logout();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         categories = new ArrayList<Category>();
         processDefinitions = new ArrayList<ProcessDefinition>();
     }
@@ -85,8 +86,8 @@ public class ProcessCategoryTest extends CommonAPITest {
     @Test
     public void createCategoryWithCreatorAsAnID() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-        logout();
-        loginWith(USERNAME, PASSWORD);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final Category category = getProcessAPI().createCategory(name, description);
         categories.add(category);
@@ -245,7 +246,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         final Category category = getProcessAPI().createCategory(name, description);
         categories.add(category);
         // test
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertEquals(0, processDeploymentInfos.size());
     }
 
@@ -303,7 +305,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         processDefinitions.add(processDefinition);
         // test
         getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null).get(0);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC).get(0);
         assertEquals(processDefinition.getName(), processDeploymentInfo.getName());
         assertEquals(processDefinition.getVersion(), processDeploymentInfo.getVersion());
     }
@@ -340,7 +343,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         }
         // test
         getProcessAPI().addProcessDefinitionsToCategory(categoryId, processDefinitionIds);
-        final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
         assertNotNull(processDeploymentInfoList);
         assertEquals(3, processDeploymentInfoList.size());
     }
@@ -536,7 +540,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
         getProcessAPI().removeAllProcessDefinitionsFromCategory(category.getId());
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertNotNull(processDeploymentInfos);
         assertEquals(0, processDeploymentInfos.size());
     }
@@ -556,7 +561,8 @@ public class ProcessCategoryTest extends CommonAPITest {
         getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
         getProcessAPI().removeProcessDefinitionsFromCategory(category.getId(), 0, 2);
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
+                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
         assertNotNull(processDeploymentInfos);
         assertEquals(1, processDeploymentInfos.size());
     }
@@ -682,8 +688,8 @@ public class ProcessCategoryTest extends CommonAPITest {
             throws InvalidBusinessArchiveFormatException, ProcessDeployException, InvalidProcessDefinitionException, AlreadyExistsException {
         final List<ProcessDefinition> processDefinitionList = new ArrayList<ProcessDefinition>();
         for (int i = 1; i <= count; i++) {
-            final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, version + i,
-                    Arrays.asList("step1"), Arrays.asList(true));
+            final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
+                    version + i, Arrays.asList("step1"), Arrays.asList(true));
             final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                     .done();
             processDefinitionList.add(getProcessAPI().deploy(businessArchive));

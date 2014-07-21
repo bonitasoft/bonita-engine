@@ -18,7 +18,6 @@ import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
-import org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -139,10 +138,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
         try {
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger1);
+            schedulerService.schedule(jobDescriptor2, parameters2, trigger1);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test(expected = SSchedulerException.class)
@@ -166,10 +165,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
         try {
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
+            schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test(expected = SSchedulerException.class)
@@ -193,10 +192,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
 
         schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
         try {
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
+            schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -226,10 +225,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new OneExecutionTrigger(null, now, 10);
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -245,24 +244,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseARepeatTriggerWithANullName() throws Throwable {
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger(null, now, 10, 1000, 100);
-        getTransactionService().begin();
-        try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger1);
-        } finally {
-        getTransactionService().complete();
-    }
     }
 
     @Test
@@ -292,10 +273,10 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Trigger trigger = new UnixCronTrigger(null, now, 10, "0/1 * * * * ?");
         getTransactionService().begin();
         try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
+            schedulerService.schedule(jobDescriptor, parameters, trigger);
         } finally {
-        getTransactionService().complete();
-    }
+            getTransactionService().complete();
+        }
     }
 
     @Test
@@ -308,113 +289,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
         final Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?");
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseRepeatTriggerDueToNegativeCount() throws Throwable {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob1").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, -2, 100);
-        getTransactionService().begin();
-        try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        } finally {
-        getTransactionService().complete();
-    }
-    }
-
-    @Test
-    public void testCanUseRepeatTriggerDueToInfiniteCount() throws Exception {
-        final Date now = new Date();
-        final String variableName = "myVar";
-
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, -1, 100);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseRepeatTriggerDueToZeroInterval() throws Throwable {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, 0);
-        getTransactionService().begin();
-        try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        } finally {
-        getTransactionService().complete();
-    }
-
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseRepeatTriggerDueToNegativeInterval() throws Throwable {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, -1);
-        getTransactionService().begin();
-        try {
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        } finally {
-        getTransactionService().complete();
-    }
-    }
-
-    @Test
-    public void testCannotUseRepeatTriggerDueToIntervalOfOneMS() throws Exception {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, 1);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-    }
-
-    @Test
-    public void testCanDefineNegativePriorityOfAJob() throws Exception {
-        final Date now = new Date();
-        final String variableName = "testCanDefineNegativePriorityOfAJob";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, -10);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
@@ -449,104 +323,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final boolean deleted = schedulerService.delete("MyJob");
         getTransactionService().complete();
         assertFalse(deleted);
-    }
-
-    @Test
-    public void testDeleteAGroupOfJobs() throws Exception {
-        final Date now = new Date();
-
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "job1").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "job2").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
-
-        final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 10000, 1000);
-        final Trigger trigger2 = new RepeatXTimesTrigger("trigger2", now, 10, 10000, 1000);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        getTransactionService().complete();
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
-        assertEquals(2, schedulerService.getJobs().size());
-        getTransactionService().complete();
-        getTransactionService().begin();
-        schedulerService.deleteJobs();
-        assertEquals(0, schedulerService.getJobs().size());
-        getTransactionService().complete();
-    }
-
-    @Test
-    public void testMultiTenancy() throws Exception {
-        VariableStorage.clearAll();
-        IncrementVariableJobWithMultiTenancy.setSessionAccessor(getSessionAccessor());
-        final Date now = new Date(System.currentTimeMillis() + 10000000);
-        final String variableName = "testMultiTenancy";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementVariableJobWithMultiTenancy.class.getName(), "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, 10);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        Thread.sleep(2000);
-        final long defaultTenant = getTenantIdFromSession();
-        assertNull(VariableStorage.getInstance(defaultTenant).getVariableValue(variableName));
-        assertNull(VariableStorage.getInstance(tenant1).getVariableValue(variableName));
-
-        List<String> jobs = schedulerService.getJobs();
-        assertNotNull(jobs);
-        assertEquals(1, jobs.size());
-
-        // change tenant
-        getTransactionService().begin();
-        changeToTenant1();
-
-        jobs = schedulerService.getJobs();
-        assertEquals(0, jobs.size());
-
-        changeToDefaultTenant();
-        TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-        jobs = schedulerService.getJobs();
-        getTransactionService().complete();
-        assertEquals(1, jobs.size());
-    }
-
-    @Test
-    public void testMultiTenantJobs() throws Exception {
-        VariableStorage.clearAll();
-        IncrementVariableJobWithMultiTenancy.setSessionAccessor(getSessionAccessor());
-        final Date now = new Date(System.currentTimeMillis());
-        final String variableName = "testMultiTenancy";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, 10);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        Thread.sleep(2000);
-
-        final long defaultTenant = getTenantIdFromSession();
-        assertNotNull(VariableStorage.getInstance(defaultTenant).getVariableValue(variableName));
-        assertNull(VariableStorage.getInstance(tenant1).getVariableValue(variableName));
-
-        getTransactionService().begin();
-        final List<String> jobs = schedulerService.getJobs();
-        getTransactionService().complete();
-        assertEquals(0, jobs.size());// job id completed
     }
 
     private long getTenantIdFromSession() throws Exception {
@@ -588,18 +364,27 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().complete();
         Thread.sleep(500);
 
-        getTransactionService().begin();
         // change tenant
         final long defaultTenant = getTenantIdFromSession();
+        getTransactionService().begin();
         changeToTenant1();
+        getTransactionService().complete();
 
+        getTransactionService().begin();
         schedulerService.deleteJobs();
+        getTransactionService().complete();
+
         Thread.sleep(200);
+
+        getTransactionService().begin();
         final WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 2);
-        assertTrue(wf.waitFor());
+        final boolean waitFor = wf.waitFor();
+        getTransactionService().complete();
+
+        assertTrue(waitFor);
 
         TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-        getTransactionService().complete();
+
     }
 
     @Test

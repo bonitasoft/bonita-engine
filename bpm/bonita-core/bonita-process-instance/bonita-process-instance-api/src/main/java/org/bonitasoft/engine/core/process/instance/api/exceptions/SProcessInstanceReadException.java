@@ -26,6 +26,10 @@ public class SProcessInstanceReadException extends SBonitaException {
 
     private static final long serialVersionUID = -5549277707760652364L;
 
+    public SProcessInstanceReadException(final Throwable cause) {
+        super(formatMessage(cause), cause);
+    }
+
     private static final String formatMessage(final Throwable cause) {
         String message = null;
         if (cause instanceof SBonitaReadException) {
@@ -35,10 +39,6 @@ public class SProcessInstanceReadException extends SBonitaException {
             }
         }
         return message;
-    }
-
-    public SProcessInstanceReadException(final Throwable cause) {
-        super(formatMessage(cause), cause);
     }
 
 }

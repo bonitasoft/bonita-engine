@@ -36,6 +36,8 @@ public interface StatelessJob extends Serializable {
 
     String JOB_COMPLETED = "JOB_COMPLETED";
 
+    String JOB_DESCRIPTOR_ID = "JOB_DESCRIPTOR_ID";
+
     /**
      * Gets the job name.
      * 

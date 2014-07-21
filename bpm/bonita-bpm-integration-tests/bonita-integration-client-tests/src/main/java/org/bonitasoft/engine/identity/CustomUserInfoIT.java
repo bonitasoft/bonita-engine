@@ -31,20 +31,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 public class CustomUserInfoIT extends CommonAPITest {
-    
+
     private static String DEFAULT_NAME = "Skills";
 
     private User user;
 
     @Before
     public void before() throws BonitaException {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = getIdentityAPI().createUser("john", "doe");
     }
 
@@ -57,94 +56,99 @@ public class CustomUserInfoIT extends CommonAPITest {
             deleteUserInfo(definitions);
         } while (definitions.size() == pageSize);
         getIdentityAPI().deleteUser(user.getId());
-        logout();
+        logoutOnTenant();
     }
-    
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info definition", "Creation" })
+
+    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
+            "Custom user info definition", "Creation" })
     @Test
     public void createCustomUserInfoDefinition_should_return_the_new_created_object() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(DEFAULT_NAME, "The user skills.");
 
-        //when
+        // when
         CustomUserInfoDefinition info = getIdentityAPI().createCustomUserInfoDefinition(creator);
 
-        //then
+        // then
         assertThat(info.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(info.getDescription()).isEqualTo("The user skills.");
     }
-    
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info definition", "get list" })
+
+    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
+            "Custom user info definition", "get list" })
     @Test
     public void getCustomUserInfoDefinitions_return_objects_according_to_pagination_size_and_ordered_by_name_asc() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(DEFAULT_NAME));
         CustomUserInfoDefinition a = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("A"));
         CustomUserInfoDefinition b = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("B"));
         int pagegSize = 2;
-        
-        //when
+
+        // when
         List<CustomUserInfoDefinition> definitions = getIdentityAPI().getCustomUserInfoDefinitions(0, pagegSize);
-        
-        //then (first page)
+
+        // then (first page)
         assertThat(definitions).containsExactly(a, b);
-        
-        //when
+
+        // when
         definitions = getIdentityAPI().getCustomUserInfoDefinitions(2, pagegSize);
-        
-        //then (second page)
+
+        // then (second page)
         assertThat(definitions).containsExactly(skills);
     }
 
-    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info", "get list" })
+    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info",
+            "get list" })
     @Test
     public void getCustomUserInfo_should_return_all_info_even_when_value_is_null() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinition job = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
         CustomUserInfoDefinition skill = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("skill"));
         getIdentityAPI().setCustomUserInfoValue(skill.getId(), user.getId(), "java");
 
-        //when
+        // when
         List<CustomUserInfo> infoPage1 = getIdentityAPI().getCustomUserInfo(user.getId(), 0, 1);
         List<CustomUserInfo> infoPage2 = getIdentityAPI().getCustomUserInfo(user.getId(), 1, 1);
 
-        //then
+        // then
         assertThat(infoPage1.get(0).getDefinition()).isEqualTo(job);
         assertThat(infoPage1.get(0).getValue()).isEqualTo(null);
         assertThat(infoPage2.get(0).getDefinition()).isEqualTo(skill);
         assertThat(infoPage2.get(0).getValue()).isEqualTo("java");
     }
 
-    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info", "set value" })
+    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info",
+            "set value" })
     @Test
     public void setCustomUserInfoValue_should_delete_CustomUserInfoValue_when_set_to_null() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinition job = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
         getIdentityAPI().setCustomUserInfoValue(job.getId(), user.getId(), "code slayer");
         CustomUserInfoDefinition skill = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("skill"));
         getIdentityAPI().setCustomUserInfoValue(skill.getId(), user.getId(), "java");
 
-        //when
+        // when
         getIdentityAPI().setCustomUserInfoValue(skill.getId(), user.getId(), null);
 
-        //then
+        // then
         List<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(new SearchOptionsBuilder(0, 10).done()).getResult();
         assertThat(values.get(0).getDefinitionId()).isEqualTo(job.getId());
         assertThat(values.get(0).getUserId()).isEqualTo(user.getId());
         assertThat(values.get(0).getValue()).isEqualTo("code slayer");
     }
 
-    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info", "set value" })
+    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info",
+            "set value" })
     @Test
     public void setCustomUserInfoValue_should_update_CustomUserInfoValue_when_one_already_exist() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinition job = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("job"));
         getIdentityAPI().setCustomUserInfoValue(job.getId(), user.getId(), "code slayer");
 
-        //when
+        // when
         getIdentityAPI().setCustomUserInfoValue(job.getId(), user.getId(), "or not");
 
-        //then
+        // then
         List<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(new SearchOptionsBuilder(0, 10).done()).getResult();
         assertThat(values.get(0).getDefinitionId()).isEqualTo(job.getId());
         assertThat(values.get(0).getUserId()).isEqualTo(user.getId());
@@ -157,51 +161,74 @@ public class CustomUserInfoIT extends CommonAPITest {
         }
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info definition", "Deletion" })
+    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
+            "Custom user info definition", "Deletion" })
     @Test
     public void deleteCustomUserInfoDefinition_should_delete_definition_and_values_from_database() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
         getIdentityAPI().setCustomUserInfoValue(info.getId(), user.getId(), "Java");
         assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).containsExactly(info);
         SearchOptions searchOptions = new SearchOptionsBuilder(0, 1).done();
         assertThat(getIdentityAPI().searchCustomUserInfoValues(searchOptions).getCount()).isEqualTo(1);
 
-        //when
+        // when
         getIdentityAPI().deleteCustomUserInfoDefinition(info.getId());
         List<CustomUserInfoDefinition> definitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
         SearchResult<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
 
-        //then
+        // then
         assertThat(definitions).isEmpty();
         assertThat(values.getCount()).isEqualTo(0);
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info value", "User deletion" })
+    @Cover(classes = { CustomUserInfoValue.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info value", "User deletion" })
     @Test
     public void deleteUser_should_delete_related_custom_user_info_value_from_database() throws Exception {
-        //given
+        // given
         CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
         User user = createUser("user.with.custom.user.info", "bpm");
         getIdentityAPI().setCustomUserInfoValue(info.getId(), user.getId(), "Java");
         assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).containsExactly(info);
         SearchOptions searchOptions = new SearchOptionsBuilder(0, 1).done();
         assertThat(getIdentityAPI().searchCustomUserInfoValues(searchOptions).getCount()).isEqualTo(1);
-        
-        //when
+
+        // when
         getIdentityAPI().deleteUser(user.getId());
         List<CustomUserInfoDefinition> definitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
         SearchResult<CustomUserInfoValue> values = getIdentityAPI().searchCustomUserInfoValues(searchOptions);
-        
-        //then
+
+        // then
         assertThat(definitions.size()).isEqualTo(1);
         assertThat(values.getCount()).isEqualTo(0);
     }
-
 
     private CustomUserInfoDefinition createDefinition(String name) throws CreationException {
         CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(name);
         return getIdentityAPI().createCustomUserInfoDefinition(creator);
     }
 
+    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoValue.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-8842", keywords = { "Custom user info value", "Users" })
+    @Test
+    public void getUserIdsWithCustomUserInfo_should_return_only_users_with_the_given_user_info() throws Exception {
+        //given
+        User user2 = createUser("jack", "bpm");
+        CustomUserInfoDefinition info = createDefinition(DEFAULT_NAME);
+        getIdentityAPI().setCustomUserInfoValue(info.getId(), user.getId(), "Java");
+        getIdentityAPI().setCustomUserInfoValue(info.getId(), user2.getId(), "C++");
+        
+        //when
+        List<Long> userIdsExactMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "C++", false, 0, 10);
+        List<Long> userIdsExactMatchNoResults = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", false, 0, 10);
+        List<Long> userIdsPartialMatch = getIdentityAPI().getUserIdsWithCustomUserInfo(DEFAULT_NAME, "av", true, 0, 10);
+
+        //then
+        assertThat(userIdsExactMatch).containsExactly(user2.getId());
+        assertThat(userIdsExactMatchNoResults).isEmpty();
+        assertThat(userIdsPartialMatch).containsExactly(user.getId());
+        
+        //clean
+        deleteUser(user2);
+    }
+    
 }

@@ -13,8 +13,12 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.Scheduler;
@@ -33,9 +37,11 @@ import org.quartz.spi.TriggerFiredBundle;
 public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
 
     private final SchedulerServiceImpl schedulerService;
+    private final TechnicalLoggerService logger;
 
-    public TransactionalSimpleJobFactory(final SchedulerServiceImpl schedulerService) {
+    public TransactionalSimpleJobFactory(final SchedulerServiceImpl schedulerService, final TechnicalLoggerService logger) {
         this.schedulerService = schedulerService;
+        this.logger = logger;
     }
 
     @Override
@@ -50,13 +56,37 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
             final JobIdentifier jobIdentifier = new JobIdentifier(jobId, tenantId, jobName);
             try {
                 quartzJob.setBosJob(schedulerService.getPersistedJob(jobIdentifier));
-            } catch (final SSchedulerException e) {
-                throw new org.quartz.SchedulerException("unable to create the BOS job", e);
+            } catch (final Throwable t) {
+                if (isInternalCronJob(jobName)) {
+                    logExecutionIgnored(bundle, jobName, t);
+                    quartzJob.setBosJob(null);
+                } else {
+                    throw new org.quartz.SchedulerException("unable to create the BOS job", t);
+                }
             }
             return quartzJob;
         }
         // FIXME a job that is not a BOS job was scheduled... not possible
         return newJob;
+    }
+
+    private void logExecutionIgnored(final TriggerFiredBundle bundle, final String jobName, final Throwable t) {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            final StringBuilder stb = new StringBuilder();
+            stb.append("Unable to create the BOS job '");
+            stb.append(jobName);
+            stb.append("'. Ignoring this execution. Next fire time is: ");
+            stb.append(bundle.getNextFireTime());
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, stb.toString());
+        }
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Unable to crete the BOS job due to: ", t);
+        }
+    }
+
+    private boolean isInternalCronJob(final String jobName) {
+        final List<String> internalCronJobs = Arrays.asList("BPMEventHandling", "CleanInvalidSessions", "InsertBatchLogsJob", "DeleteBatchJob");
+        return internalCronJobs.contains(jobName);
     }
 
 }

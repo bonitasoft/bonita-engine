@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api.impl;
@@ -21,11 +21,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.impl.transaction.profile.CreateProfileMember;
-import org.bonitasoft.engine.api.impl.transaction.profile.DeleteProfileMember;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetNumberOfProfileMembers;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetProfile;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileEntry;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetProfilesForUser;
 import org.bonitasoft.engine.api.impl.transaction.profile.ProfileMemberUtils;
 import org.bonitasoft.engine.command.SGroupProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.command.SRoleProfileMemberAlreadyExistsException;
@@ -40,8 +35,11 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileMember;
@@ -50,7 +48,7 @@ import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -86,32 +84,34 @@ public class ProfileAPIImpl implements ProfileAPI {
     public Profile getProfile(final long id) throws ProfileNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-
-        SProfile profile;
-
-        final GetProfile getProfileTransaction = new GetProfile(profileService, id);
         try {
-            getProfileTransaction.execute();
-            profile = getProfileTransaction.getResult();
+            return ModelConvertor.toProfile(profileService.getProfile(id));
         } catch (final SProfileNotFoundException e) {
             throw new ProfileNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
         }
 
-        return ModelConvertor.toProfile(profile);
     }
 
     @Override
+    @Deprecated
     public List<Profile> getProfilesForUser(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-        final GetProfilesForUser getProfilesForUser = new GetProfilesForUser(profileService, userId);
         try {
-            getProfilesForUser.execute();
-            final List<SProfile> profiles = getProfilesForUser.getResult();
-            return ModelConvertor.toProfiles(profiles);
-        } catch (final SBonitaException e) {
+            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, 0, 1000, "name", OrderByType.ASC));
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    @Override
+    public List<Profile> getProfilesForUser(final long userId, final int startIndex, final int maxResults, final ProfileCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProfileService profileService = tenantAccessor.getProfileService();
+        try {
+            return ModelConvertor.toProfiles(profileService.searchProfilesOfUser(userId, startIndex, maxResults, criterion.getField(),
+                    OrderByType.valueOf(criterion.getOrder().name())));
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
     }
@@ -155,10 +155,8 @@ public class ProfileAPIImpl implements ProfileAPI {
     public Map<Long, Long> getNumberOfProfileMembers(final List<Long> profileIds) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-        final GetNumberOfProfileMembers numberOfProfileMembers = new GetNumberOfProfileMembers(profileIds, profileService);
         try {
-            numberOfProfileMembers.execute();
-            final List<SProfileMember> listOfProfileMembers = numberOfProfileMembers.getResult();
+            final List<SProfileMember> listOfProfileMembers = profileService.getProfileMembers(profileIds);
             final Map<Long, SProfileMember> profileMembers = new HashMap<Long, SProfileMember>();
             final Map<Long, Long> result = new HashMap<Long, Long>();
             for (final SProfileMember p : listOfProfileMembers) {
@@ -245,37 +243,40 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        final GetProfileEntry getProfileEntryTransaction = new GetProfileEntry(profileService, id);
         try {
-            getProfileEntryTransaction.execute();
-        } catch (final SBonitaException e) {
+            return ModelConvertor.toProfileEntry(profileService.getProfileEntry(id));
+        } catch (final SProfileEntryNotFoundException e) {
             throw new ProfileEntryNotFoundException(e);
         }
 
-        return ModelConvertor.toProfileEntry(getProfileEntryTransaction.getResult());
     }
 
     @Override
-    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId) throws CreationException,
+    public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId)
+            throws CreationException,
             AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
-        final MemberType memberType = getMemberType(userId, groupId, roleId);
-        final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId, memberType);
         try {
-            checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
-        } catch (final SBonitaException e1) {
-            throw new AlreadyExistsException(e1);
-        }
-        try {
+            final MemberType memberType = getMemberType(userId, groupId, roleId);
+            final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId,
+                    memberType);
+            try {
+                checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
+            } catch (final SBonitaException e1) {
+                throw new AlreadyExistsException(e1);
+            }
             createProfileMember.execute();
-            ProfileMember profileMember = ModelConvertor.toProfileMember(createProfileMember.getResult());
-            return profileMember;
+            return convertToProfileMember(createProfileMember);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
+
+    }
+
+    protected ProfileMember convertToProfileMember(final CreateProfileMember createProfileMember) {
+        return ModelConvertor.toProfileMember(createProfileMember.getResult());
     }
 
     @Override
@@ -341,13 +342,13 @@ public class ProfileAPIImpl implements ProfileAPI {
 
     public MemberType getMemberType(final Long userId, final Long groupId, final Long roleId) throws CreationException {
         MemberType memberType = null;
-        if (userId != null) {
+        if (isPositiveLong(userId)) {
             memberType = MemberType.USER;
-        } else if (groupId != null && roleId == null) {
+        } else if (isPositiveLong(groupId) && !isPositiveLong(roleId)) {
             memberType = MemberType.GROUP;
-        } else if (roleId != null && groupId == null) {
+        } else if (isPositiveLong(roleId) && !isPositiveLong(groupId)) {
             memberType = MemberType.ROLE;
-        } else if (roleId != null && groupId != null) {
+        } else if (isPositiveLong(roleId) && isPositiveLong(groupId)) {
             memberType = MemberType.MEMBERSHIP;
         } else {
             final StringBuilder stb = new StringBuilder("Parameters map must contain at least one of entries: ");
@@ -361,18 +362,28 @@ public class ProfileAPIImpl implements ProfileAPI {
         return memberType;
     }
 
+    private boolean isPositiveLong(final Long value) {
+        return value != null && value > 0;
+    }
+
     @Override
-    public void deleteProfileMember(final Long profilMemberId) throws DeletionException {
+    public void deleteProfileMember(final Long profileMemberId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-
-        final DeleteProfileMember deleteUserProfileTransaction = new DeleteProfileMember(profileService, profilMemberId);
-
         try {
-            deleteUserProfileTransaction.execute();
+            // add a lock because the update profile call getProfile then update profile -> deadlock...
+            final SProfileMember profileMember = profileService.getProfileMemberWithoutDisplayName(profileMemberId);
+            profileService.updateProfileMetaData(profileMember.getProfileId());
+            profileService.deleteProfileMember(profileMember.getId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
+
+    }
+
+    protected long getUserIdFromSession() {
+        final long updatedById = SessionInfos.getUserIdFromSession();
+        return updatedById;
     }
 
 }

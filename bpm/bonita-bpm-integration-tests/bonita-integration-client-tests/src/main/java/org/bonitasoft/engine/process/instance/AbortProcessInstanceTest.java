@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.process.instance;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -14,7 +13,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
 import org.junit.Test;
 
 public class AbortProcessInstanceTest extends AbstractProcessInstanceTest {
@@ -49,9 +47,7 @@ public class AbortProcessInstanceTest extends AbstractProcessInstanceTest {
         final int loopCardinality = 2;
         final ProcessDefinition parentProcess = deployProcessWithMultiInstanceCallActivity(loopCardinality, targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
-
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(50, 5000, loopCardinality + 1, getProcessAPI());
-        assertTrue(checkNbOfProcessInstances.waitUntil());
+        checkNbOfProcessInstances(loopCardinality + 1);
 
         // execute task1 of a target process instance
         final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(true, 2 * loopCardinality, pedro).getPendingHumanTaskInstances();

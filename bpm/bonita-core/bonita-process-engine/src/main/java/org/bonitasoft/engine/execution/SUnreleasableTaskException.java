@@ -20,13 +20,10 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  */
 public class SUnreleasableTaskException extends SBonitaException {
 
-    /**
-     * @param string
-     */
+    private static final long serialVersionUID = 2845399803318977578L;
+
     public SUnreleasableTaskException(final String string) {
         super(string);
     }
-
-    private static final long serialVersionUID = 2845399803318977578L;
 
 }

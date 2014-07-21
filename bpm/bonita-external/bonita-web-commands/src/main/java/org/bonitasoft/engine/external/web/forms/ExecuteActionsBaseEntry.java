@@ -111,12 +111,6 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
     }
 
-    @Deprecated
-    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        return processDefinitionService.getProcessDefinition(processDefinitionId);
-    }
-
     protected SProcessDefinition getProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();

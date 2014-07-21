@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.category;
 
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.Sort;
+
 /**
  * Criterion to sort categories
  * 
@@ -25,11 +28,32 @@ public enum CategoryCriterion {
     /**
      * By ascending name
      */
-    NAME_ASC,
+    NAME_ASC("name", Order.ASC),
 
     /**
      * By descending name
      */
-    NAME_DESC;
+    NAME_DESC("name", Order.DESC);
+
+    private final String field;
+
+    private final Order order;
+
+    CategoryCriterion(final String field, final Order order) {
+        this.field = field;
+        this.order = order;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public Sort getSort() {
+        return new Sort(order, field);
+    }
 
 }

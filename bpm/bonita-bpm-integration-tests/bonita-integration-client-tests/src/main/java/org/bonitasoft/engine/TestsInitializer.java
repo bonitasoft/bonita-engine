@@ -62,14 +62,14 @@ public class TestsInitializer {
 
     private void checkThreadsAreStopped() throws InterruptedException {
         System.out.println("Checking if all Threads are stopped");
-        Set<Thread> keySet = Thread.getAllStackTraces().keySet();
-        Iterator<Thread> iterator = keySet.iterator();
-        ArrayList<Thread> list = new ArrayList<Thread>();
+        final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
+        final Iterator<Thread> iterator = keySet.iterator();
+        final ArrayList<Thread> list = new ArrayList<Thread>();
         while (iterator.hasNext()) {
-            Thread thread = iterator.next();
-            if (isEngine(thread)) {
+            final Thread thread = iterator.next();
+            if (isEngine(thread) && !thread.getName().startsWith("net.sf.ehcache.CacheManager")) {
                 // wait for the thread to die
-                thread.join(5000);
+                thread.join(10000);
                 // if still alive print it
                 if (thread.isAlive()) {
                     list.add(thread);
@@ -77,21 +77,25 @@ public class TestsInitializer {
             }
         }
         if (!list.isEmpty()) {
+            for (final Thread thread : list) {
+                System.out.println("thread is still alive:" + thread.getName());
+                System.err.println(thread.getStackTrace());
+            }
             throw new IllegalStateException("Some threads are still active : " + list);
         }
         System.out.println("All engine threads are stopped properly");
     }
 
     private boolean isEngine(final Thread thread) {
-        String name = thread.getName();
-        ThreadGroup threadGroup = thread.getThreadGroup();
+        final String name = thread.getName();
+        final ThreadGroup threadGroup = thread.getThreadGroup();
         if (threadGroup != null && threadGroup.getName().equals("system")) {
             return false;
         }
-        List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
+        final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */);
-        for (String prefix : startWithFilter) {
+                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */);
+        for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return false;
             }
@@ -103,7 +107,7 @@ public class TestsInitializer {
         System.out.println("=====================================================");
         System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
         System.out.println("=====================================================");
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         setupBonitaHome();
         setupSpringContext();
         initPlatformAndTenant();
@@ -122,6 +126,7 @@ public class TestsInitializer {
                 throw new IllegalStateException("variable 'bonita.home' must be set");
             }
             final File destDir = new File(TMP_BONITA_HOME);
+            System.out.println("Using BONITA_HOME: " + destDir.getAbsolutePath());
             FileUtils.deleteDirectory(destDir);
             FileUtils.copyDirectory(new File(bonitaHome), destDir);
             System.setProperty(BONITA_HOME, destDir.getAbsolutePath());
@@ -147,8 +152,8 @@ public class TestsInitializer {
     private void closeSpringContext() {
         try {
             // if in local we try to unload engine
-            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            Class<?> initializerClass = contextClassLoader.loadClass(getInitializerListenerClassName());
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            final Class<?> initializerClass = contextClassLoader.loadClass(getInitializerListenerClassName());
             initializerClass.getMethod("unload").invoke(null);
         } catch (final Exception e) {
             System.out.println("Unable to execute the unload handler, maybe test are not local: " + e.getMessage());

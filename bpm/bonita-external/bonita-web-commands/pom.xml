@@ -15,12 +15,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-model</artifactId>
+			<artifactId>bonita-command-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model</artifactId>
+			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -33,5 +33,16 @@
 			<artifactId>bonita-expression-resolver-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>

@@ -124,11 +124,11 @@ public interface ProfileService {
      * Get all profiles of the user by userId
      * 
      * @param userId
-     * @return a list of sProfile
+     * @return A list of sProfile
      * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfile> getProfilesOfUser(long userId) throws SBonitaReadException;
+    List<SProfile> searchProfilesOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
 
     /**
      * Get profile entry by its id
@@ -215,10 +215,10 @@ public interface ProfileService {
      * @param userName
      * @return sProfileMember
      * @throws SProfileMemberCreationException
-     *             TODO
      * @since 6.0
      */
-    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileMemberCreationException;
+    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName)
+            throws SProfileMemberCreationException;
 
     /**
      * Add a group to exist profile
@@ -384,7 +384,7 @@ public interface ProfileService {
      * @throws SBonitaSearchException
      * @since 6.0
      */
-    List<SProfileMember> getNumberOfProfileMembers(List<Long> profileIds) throws SBonitaSearchException;
+    List<SProfileMember> getProfileMembers(List<Long> profileIds) throws SBonitaSearchException;
 
     /**
      * Get profile by given name
@@ -404,7 +404,7 @@ public interface ProfileService {
      * @return a list of profileMembers
      * @throws SProfileMemberNotFoundException
      */
-    List<SProfileMember> getSProfileMembers(long profileId) throws SProfileMemberNotFoundException;
+    List<SProfileMember> getProfileMembers(long profileId, QueryOptions queryOptions) throws SProfileMemberNotFoundException;
 
     /**
      * Get a list of profileEntries by the given profileId and parentId
@@ -454,5 +454,37 @@ public interface ProfileService {
      * @throws SBonitaSearchException
      */
     List<SProfileEntry> searchProfileEntries(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * @param profile
+     * @throws SProfileMemberDeletionException
+     * @since 6.3.1
+     */
+    void deleteAllProfileMembersOfProfile(SProfile profile) throws SProfileMemberDeletionException;
+
+    /**
+     * @param profile
+     * @throws SProfileEntryDeletionException
+     * @since 6.3.1
+     */
+    void deleteAllProfileEntriesOfProfile(SProfile profile) throws SProfileEntryDeletionException;
+
+    /**
+     * 
+     * @param profileMemberId
+     * @return
+     * @throws SProfileMemberNotFoundException
+     * @since 6.3.1
+     */
+    SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException;
+
+    /**
+     * updates profile metaData fields lastUpdateDate and lastUpdatedBy for a given profile
+     * 
+     * @param profileId
+     * @throws SProfileUpdateException
+     *             when given profileId is not found
+     */
+    void updateProfileMetaData(final long profileId) throws SProfileUpdateException;
 
 }

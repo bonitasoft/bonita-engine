@@ -72,7 +72,7 @@ public abstract class AbstractProfileTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        login();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
 
         user1 = createUser("userName1", "User1Pwd", "User1FirstName", "User1LastName");
         user2 = createUser("userName2", "User2Pwd", "User2FirstName", "User2LastName");
@@ -91,6 +91,7 @@ public abstract class AbstractProfileTest extends CommonAPITest {
         // Restoring up default profiles before tests:
         final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
+        xmlStream.close();
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
@@ -122,11 +123,12 @@ public abstract class AbstractProfileTest extends CommonAPITest {
         // Clean profiles
         final InputStream xmlStream = AbstractProfileTest.class.getResourceAsStream("CleanProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
+        xmlStream.close();
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
         importParameters.put("xmlContent", xmlContent);
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
 
-        logout();
+        logoutOnTenant();
     }
 
 }

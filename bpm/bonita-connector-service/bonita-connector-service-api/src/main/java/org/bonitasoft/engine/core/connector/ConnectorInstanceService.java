@@ -154,7 +154,7 @@ public interface ConnectorInstanceService {
      * @param searchOptions
      * @return
      */
-    List<SConnectorInstance> searchConnetorInstances(QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SConnectorInstance> searchConnectorInstances(QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * @param connectorInstance

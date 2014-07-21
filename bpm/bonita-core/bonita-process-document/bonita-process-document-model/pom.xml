@@ -15,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model</artifactId>
+			<artifactId>bonita-document-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

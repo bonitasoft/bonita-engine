@@ -43,6 +43,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
+import org.bonitasoft.engine.scheduler.JobParameter;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -88,6 +89,8 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final ServicesResolver servicesResolver;
 
+    private final int batchSize;
+
     /**
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
@@ -95,6 +98,12 @@ public class SchedulerServiceImpl implements SchedulerService {
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
             final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
             final ServicesResolver servicesResolver) {
+        this(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver, 1000);
+    }
+
+    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
+            final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
+            final ServicesResolver servicesResolver, final int batchSize) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
@@ -106,6 +115,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
         schedulerExecutor.setBOSSchedulerService(this);
+        this.batchSize = batchSize;
     }
 
     private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
@@ -248,6 +258,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void start() throws SSchedulerException, SFireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "start");
+        logger.log(getClass(),TechnicalLogSeverity.INFO,"Start scheduler");
         schedulerExecutor.start();
         eventService.fireEvent(schedulStarted);
         logAfterMethod(TechnicalLogSeverity.TRACE, "start");
@@ -361,13 +372,14 @@ public class SchedulerServiceImpl implements SchedulerService {
             for (final SJobParameter sJobParameterImpl : parameters) {
                 parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
             }
+            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID,jobIdentifier.getId());
+            parameterMap.put(JobParameter.BATCH_SIZE.name(), batchSize);
             statelessJob.setAttributes(parameterMap);
             if (servicesResolver != null) {
                 injectServices(statelessJob);
             }
-            final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
+            return new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
                     sessionAccessor, transactionService);
-            return jobWrapper;
         }
     }
 

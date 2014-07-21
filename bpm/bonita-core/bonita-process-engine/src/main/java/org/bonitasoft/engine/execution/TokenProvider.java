@@ -20,10 +20,9 @@ import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface TokenProvider {
 
-    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException;
+    TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException;
 
 }

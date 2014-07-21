@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package org.bonitasoft.engine.commons;
@@ -20,7 +20,6 @@ import java.util.Map;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
 
@@ -30,18 +29,18 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
 
     private R right;
 
-    /**
-     * @param left
-     * @param right
-     */
     public Pair(final L left, final R right) {
         this.left = left;
         this.right = right;
     }
 
-    public static <L, R> Pair<L, R> of(final L left, final R right)
-    {
+    public static <L, R> Pair<L, R> of(final L left, final R right) {
         return new Pair<L, R>(left, right);
+    }
+
+    public static <L, R> Pair<L, R> pair(final L left, final R right)
+    {
+        return of(left, right);
     }
 
     public L getLeft() {
@@ -83,7 +82,7 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
             return false;
         }
         @SuppressWarnings("unchecked")
-        Pair<L, R> other = (Pair<L, R>) obj;
+        final Pair<L, R> other = (Pair<L, R>) obj;
         if (left == null) {
             if (other.left != null) {
                 return false;
@@ -108,7 +107,7 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
 
     @Override
     public R setValue(final R right) {
-        R oldRight = this.right;
+        final R oldRight = this.right;
         this.right = right;
         return oldRight;
     }

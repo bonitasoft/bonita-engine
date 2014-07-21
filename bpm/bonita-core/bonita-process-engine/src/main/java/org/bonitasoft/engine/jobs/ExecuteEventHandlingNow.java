@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -23,25 +24,22 @@ import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * 
  * Convenience command to execute the event handling job now. Internal use only.
- * 
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 public class ExecuteEventHandlingNow extends TenantCommand {
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
-        BPMEventHandlingJob bpmEventHandlingJob = new BPMEventHandlingJob();
+        final BPMEventHandlingJob bpmEventHandlingJob = new BPMEventHandlingJob();
         try {
-            bpmEventHandlingJob.setAttributes(null);
+            bpmEventHandlingJob.setAttributes(Collections.<String, Serializable> emptyMap());
             bpmEventHandlingJob.execute();
-        } catch (SJobConfigurationException e) {
+        } catch (final SJobConfigurationException e) {
             throw new SCommandExecutionException("unable to execute event handling", e);
-        } catch (SJobExecutionException e) {
+        } catch (final SJobExecutionException e) {
             throw new SCommandExecutionException("unable to execute event handling", e);
         }
         return null;
