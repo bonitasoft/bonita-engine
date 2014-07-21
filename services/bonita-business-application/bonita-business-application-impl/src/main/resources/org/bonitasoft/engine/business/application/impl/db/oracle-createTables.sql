@@ -14,9 +14,7 @@ CREATE TABLE business_app_page (
   id NUMBER(19, 0) NOT NULL,
   businessAppId NUMBER(19, 0) NOT NULL,
   pageId NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantId, name),
+  UNIQUE (tenantId, businessAppId, pageId),
   PRIMARY KEY (tenantId, id)
 );
 
-ALTER TABLE business_app_page ADD CONSTRAINT fk_bus_app_id FOREIGN KEY (tenantid, businessAppId) REFERENCES business_app (tenantid, id) ON DELETE CASCADE;
-ALTER TABLE business_app_page ADD CONSTRAINT fk_page_id FOREIGN KEY (tenantid, pageId) REFERENCES page (tenantid, id);

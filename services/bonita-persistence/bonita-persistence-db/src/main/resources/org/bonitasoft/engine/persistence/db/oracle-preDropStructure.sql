@@ -7,6 +7,12 @@ ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId;
 ALTER TABLE custom_usr_inf_def DROP CONSTRAINT fk_custom_usr_inf_def_tenantId;
 ALTER TABLE custom_usr_inf_val DROP CONSTRAINT fk_custom_usr_inf_val_tenantId;
 
+-- business application
+ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
+
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_ADocMap_tenId;
 ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_AFln_tenId;
 ALTER TABLE arch_process_comment DROP CONSTRAINT fk_AProcCom_tenId;

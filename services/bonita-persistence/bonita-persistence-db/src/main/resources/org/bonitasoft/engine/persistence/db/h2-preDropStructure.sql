@@ -46,6 +46,13 @@ ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId;
 -- ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_process_instanceId;
 
+-- business application
+ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
+
+
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_tenantId;

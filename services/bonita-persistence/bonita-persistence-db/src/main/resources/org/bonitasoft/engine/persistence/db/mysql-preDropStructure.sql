@@ -43,6 +43,11 @@ ALTER TABLE waiting_event DROP FOREIGN KEY fk_waiting_event_tenantId;
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_profileId;
 ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_profileId;
 
+-- business application
+ALTER TABLE business_app DROP FOREIGN KEY  fk_app_tenantId;
+ALTER TABLE business_app_page DROP FOREIGN KEY fk_app_page_tenantId;
+ALTER TABLE business_app_page DROP FOREIGN KEY fk_bus_app_id;
+ALTER TABLE business_app_page DROP FOREIGN KEY fk_page_id;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_arch_document_mapping_tenantId;

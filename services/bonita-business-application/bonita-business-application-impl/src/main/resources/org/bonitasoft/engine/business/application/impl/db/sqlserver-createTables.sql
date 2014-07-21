@@ -15,12 +15,9 @@ CREATE TABLE business_app_page (
   id NUMERIC(19, 0) NOT NULL,
   businessAppId NUMERIC(19, 0) NOT NULL,
   pageId NUMERIC(19, 0) NOT NULL,
-  UNIQUE (tenantId, name),
+  UNIQUE (tenantId, businessAppId, pageId),
   PRIMARY KEY (tenantId, id)
 )
 GO
 
-ALTER TABLE business_app_page ADD CONSTRAINT fk_bus_app_id FOREIGN KEY (tenantid, businessAppId) REFERENCES business_app (tenantid, id) ON DELETE CASCADE
-GO
-ALTER TABLE business_app_page ADD CONSTRAINT fk_page_id FOREIGN KEY (tenantid, pageId) REFERENCES page (tenantid, id)
-GO
+-- forein keys are create in bonita-persistence-db/postCreateStructure.sql
