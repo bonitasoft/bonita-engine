@@ -8,5 +8,5 @@ DROP TABLE message_instance cascade constraints purge;
 DROP TABLE hidden_activity cascade constraints purge;
 DROP TABLE token cascade constraints purge;
 DROP TABLE breakpoint cascade constraints purge;
-DROP TABLE multi_biz_datacascade constraints purge;
+DROP TABLE multi_biz_data cascade constraints purge;
 DROP TABLE ref_biz_data_inst cascade constraints purge;
