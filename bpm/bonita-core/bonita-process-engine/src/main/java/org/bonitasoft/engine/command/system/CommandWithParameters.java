@@ -35,6 +35,10 @@ public abstract class CommandWithParameters extends TenantCommand {
         }
     }
 
+    protected <T> T getParameter(final Map<String, Serializable> parameters, final String parameterName) throws SCommandParameterizationException {
+        return getParameter(parameters, parameterName, "An error occurred while parsing " + parameterName);
+    }
+
     protected Long getLongMandadoryParameter(final Map<String, Serializable> parameters, final String field) throws SCommandParameterizationException {
         final String message = "Parameters map must contain an entry " + field + " with a long value.";
         return getMandatoryParameter(parameters, field, message);

@@ -1088,8 +1088,25 @@ public interface ProcessManagementAPI {
      * @throws SearchException
      *             if an exception occurs when getting the processes.
      * @since 6.0
+     * @deprecated since 6.3.3
+     * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanStart(long, SearchOptions)}
      */
+    @Deprecated
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(long userId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Searches for the number and the list of processes that the user can start.
+     * 
+     * @param userId
+     *            the identifier of the user.
+     * @param searchOptions
+     *            the search criteria.
+     * @return the number and the list of processes that the user can start.
+     * @throws SearchException
+     *             if an exception occurs when getting the processes.
+     * @since 6.3.3
+     */
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanStart(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Searches for the number and the list of process definitions.
@@ -1670,7 +1687,7 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     List<User> getPossibleUsersOfHumanTask(long processDefinitionId, String humanTaskName, int startIndex, int maxResults);
-    
+
     /**
      * Retrieves the list of user identifiers for the given actor and process.
      * 
