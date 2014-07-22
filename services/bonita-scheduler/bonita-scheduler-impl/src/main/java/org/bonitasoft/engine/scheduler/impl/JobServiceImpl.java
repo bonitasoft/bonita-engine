@@ -357,4 +357,18 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+	@Override
+	public void deleteAllJobDescriptors() throws SJobDescriptorDeletionException {
+		final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, null, filters, null);
+        try {
+            final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
+            for (final SJobDescriptor sJobDescriptor : jobDescriptors) {
+                deleteJobDescriptor(sJobDescriptor);
+            }
+        } catch (final SBonitaSearchException e) {
+            throw new SJobDescriptorDeletionException(e);
+        }
+	}
+
 }
