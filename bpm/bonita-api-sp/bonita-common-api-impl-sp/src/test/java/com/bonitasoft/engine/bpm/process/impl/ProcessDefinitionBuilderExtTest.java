@@ -47,4 +47,14 @@ public class ProcessDefinitionBuilderExtTest {
         builder.done();
     }
 
+    @Test
+    public void validMultiBusinessDataUsedWithoutADefaultExpression() throws InvalidExpressionException,
+            InvalidProcessDefinitionException {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "0.0.1");
+        builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME);
+        builder.done();
+    }
+
 }

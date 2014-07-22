@@ -71,7 +71,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
         final List<BusinessDataDefinition> businessDataDefinitions = process.getProcessContainer().getBusinessDataDefinitions();
         for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
             final Expression defaultValueExpression = businessDataDefinition.getDefaultValueExpression();
-            if (businessDataDefinition.isMultiple() && !defaultValueExpression.getReturnType().equals(List.class.getName())) {
+            if (businessDataDefinition.isMultiple() && defaultValueExpression != null && !defaultValueExpression.getReturnType().equals(List.class.getName())) {
                 addError("The return type of the initial value expression of the multiple business data: '" + businessDataDefinition.getName() + "' must be "
                         + List.class.getName());
             }
