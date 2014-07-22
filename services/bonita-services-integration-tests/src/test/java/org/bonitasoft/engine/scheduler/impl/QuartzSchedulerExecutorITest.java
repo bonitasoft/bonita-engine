@@ -2,7 +2,6 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -215,20 +214,20 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
 
     @Test(expected = SSchedulerException.class)
     public void testCannotUseAOneShotTriggerWithANullName() throws Throwable {
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testDoNotExecuteAFutureJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger(null, now, 10);
-        getTransactionService().begin();
-        try {
-            schedulerService.schedule(jobDescriptor, parameters, trigger);
-        } finally {
-            getTransactionService().complete();
-        }
+    	final Date now = new Date();
+    	final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+    			.createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
+    	final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+    	parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testDoNotExecuteAFutureJob").done());
+    	parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
+    	parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
+    	final Trigger trigger = new OneExecutionTrigger(null, now, 10);
+    	getTransactionService().begin();
+    	try {
+    		schedulerService.schedule(jobDescriptor, parameters, trigger);
+    	} finally {
+    		getTransactionService().complete();
+    	}
     }
 
     @Test
@@ -325,10 +324,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         assertFalse(deleted);
     }
 
-    private long getTenantIdFromSession() throws Exception {
-        return getSessionAccessor().getTenantId();
-    }
-
     private void changeToTenant1() throws STenantNotFoundException, Exception {
         final long tenant1 = getPlatformService().getTenantByName("tenant1").getId();
         TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), tenant1);
@@ -338,141 +333,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final long defaultTenant = getPlatformService().getTenantByName("default").getId();
         TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
     }
-
-    @Test
-    public void testCannotDeleteAGroupOfJobsFromAnotherTenant() throws Exception {
-        final String jobName1 = "MyJob1";
-        final String jobName2 = "MyJob2";
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "IncrementVariableJob1").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("event1", now, 10, 1000, 100);
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "IncrementVariableJob2").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName2).done());
-        final Trigger trigger2 = new RepeatXTimesTrigger("event2", now, 10, 1000, 100);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        getTransactionService().complete();
-        Thread.sleep(50);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
-        getTransactionService().complete();
-        Thread.sleep(500);
-
-        // change tenant
-        final long defaultTenant = getTenantIdFromSession();
-        getTransactionService().begin();
-        changeToTenant1();
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        schedulerService.deleteJobs();
-        getTransactionService().complete();
-
-        Thread.sleep(200);
-
-        getTransactionService().begin();
-        final WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 2);
-        final boolean waitFor = wf.waitFor();
-        getTransactionService().complete();
-
-        assertTrue(waitFor);
-
-        TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-
-    }
-
-    @Test
-    public void testOnlyGetTenantJobs() throws Exception {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "1").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "2").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 1000, 100);
-        final Trigger trigger2 = new RepeatXTimesTrigger("trigger2", now, 10, 1000, 100);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        getTransactionService().complete();
-        Thread.sleep(50);
-
-        getTransactionService().begin();
-        // change tenant
-        final long defaultTenant = getTenantIdFromSession();
-        changeToTenant1();
-        schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        Thread.sleep(200);
-
-        List<String> jobs = schedulerService.getJobs();
-        assertNotNull(jobs);
-        assertEquals(1, jobs.size());
-        assertEquals("2", jobs.get(0));
-
-        TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-
-        jobs = schedulerService.getJobs();
-        assertNotNull(jobs);
-        assertEquals(1, jobs.size());
-        assertEquals("1", jobs.get(0));
-
-        schedulerService.deleteJobs();
-
-        // delete tenant1 groups
-        changeToTenant1();
-        schedulerService.deleteJobs();
-
-        TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-        getTransactionService().complete();
-    }
-
-    // test is too long and just test quartz...
-    // @Test
-    // public void should_pause_and_resume_jobs_of_a_tenant_reexecute_all_missed_job() throws Exception {
-    // IncrementItselfJob.reset();
-    // final String jobName = "ReleaseWaitersJob";
-    // Date now = new Date();
-    // SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-    // .createNewInstance(IncrementItselfJob.class.getName(), jobName + "1").done();
-    // List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-    // parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
-    // parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "1").done());
-    // Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?", MisfireRestartPolicy.ALL);
-    //
-    // // trigger it
-    // getTransactionService().begin();
-    // schedulerService.schedule(jobDescriptor, parameters, trigger);
-    // getTransactionService().complete();
-    // // pause
-    // getTransactionService().begin();
-    // schedulerService.pauseJobs(defaultTenantId);
-    // getTransactionService().complete();
-    // Thread.sleep(2000);
-    // // resume after 3s
-    // getTransactionService().begin();
-    // schedulerService.resumeJobs(defaultTenantId);
-    // getTransactionService().complete();
-    // Thread.sleep(2000);
-    //
-    // // there should be more than 5 execution after 5sec because 3 jobs had to execute themselves before
-    // assertTrue(IncrementItselfJob.getValue() > 2);
-    // }
 
     /*
      * We must ensure that:

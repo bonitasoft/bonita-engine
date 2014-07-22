@@ -49,8 +49,7 @@ public class QuartzSchedulerExecutorITest {
     @Before
     public void setUp() throws Exception {
         scheduler = StdSchedulerFactory.getDefaultScheduler();
-        quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, new ArrayList<AbstractJobListener>(), sessionAccessor, transactionService,
-                false);
+        quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, new ArrayList<AbstractJobListener>(), transactionService, false);
         when(schedulerFactory.getScheduler()).thenReturn(scheduler);
         quartzSchedulerExecutor.start();
     }
