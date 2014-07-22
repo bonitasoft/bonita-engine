@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.session.InvalidSessionException;
+
 import com.bonitasoft.engine.monitoring.MonitoringException;
 
 /**
@@ -44,10 +46,10 @@ public interface MonitoringAPI {
     long getNumberOfExecutingProcesses() throws MonitoringException;
 
     /**
-     * Get the number of all users on the organization of the tenant where you are logged.
-     * If no users there, return 0
+     * Get the number of users in the organization of the current tenant.
+     * If there are no users return 0
      * 
-     * @return The total number of user
+     * @return The number of users
      * @throws MonitoringException
      *         occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
