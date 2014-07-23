@@ -15,7 +15,6 @@ import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
@@ -117,117 +116,20 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         assertNull(storage.getVariableValue(variableName));
     }
 
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseTheSameTriggerWithTwoJobs() throws Throwable {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob1").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob2").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 1000, 100);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        try {
-            schedulerService.schedule(jobDescriptor2, parameters2, trigger1);
-        } finally {
-            getTransactionService().complete();
-        }
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseTheSameTriggerNameAndGroupWithTwoJobs() throws Throwable {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob1").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob2").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 1000, 100);
-        final Trigger trigger2 = new RepeatXTimesTrigger("trigger1", now, 5, 80, 1000);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        try {
-            schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
-        } finally {
-            getTransactionService().complete();
-        }
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseTheSameJobNameInTheSameGroup() throws Throwable {
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
-        parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "second").done());
-        parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("trigger1", now, 10, 1000, 100);
-        final Trigger trigger2 = new RepeatXTimesTrigger("trigger2", now, 5, 80, 1000);
-        getTransactionService().begin();
-
-        schedulerService.schedule(jobDescriptor1, parameters1, trigger1);
-        try {
-            schedulerService.schedule(jobDescriptor2, parameters2, trigger2);
-        } finally {
-            getTransactionService().complete();
-        }
-    }
-
     @Test
     public void testCanUseAJobWithANullGroup() throws Exception {
-        final Date now = new Date();
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
+        
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testDoNotExecuteAFutureJob").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("testCanUseAJobWithANullGroup", now, 10, 1000, 100);
+        
+        final Trigger trigger1 = new RepeatXTimesTrigger("testCanUseAJobWithANullGroup", new Date(), 10, 1000, 100);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger1);
         getTransactionService().complete();
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseAOneShotTriggerWithANullName() throws Throwable {
-    	final Date now = new Date();
-    	final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-    			.createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-    	final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-    	parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testDoNotExecuteAFutureJob").done());
-    	parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
-    	parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-    	final Trigger trigger = new OneExecutionTrigger(null, now, 10);
-    	getTransactionService().begin();
-    	try {
-    		schedulerService.schedule(jobDescriptor, parameters, trigger);
-    	} finally {
-    		getTransactionService().complete();
-    	}
     }
 
     @Test
@@ -251,31 +153,17 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+        
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testCanUseARepeatTriggerWithANullGroup").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
+        
         final Trigger trigger1 = new RepeatXTimesTrigger("trig", now, 10, 1000, 100);
+        
+        
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger1);
         getTransactionService().complete();
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testCannotUseACronTriggerWithANullName() throws Throwable {
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", "first").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new UnixCronTrigger(null, now, 10, "0/1 * * * * ?");
-        getTransactionService().begin();
-        try {
-            schedulerService.schedule(jobDescriptor, parameters, trigger);
-        } finally {
-            getTransactionService().complete();
-        }
     }
 
     @Test
