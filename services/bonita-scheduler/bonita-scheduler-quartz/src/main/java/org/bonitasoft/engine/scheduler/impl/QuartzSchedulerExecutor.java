@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.quartz.JobKey.jobKey;
-import static org.quartz.TriggerKey.triggerKey;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 import java.lang.reflect.Field;
