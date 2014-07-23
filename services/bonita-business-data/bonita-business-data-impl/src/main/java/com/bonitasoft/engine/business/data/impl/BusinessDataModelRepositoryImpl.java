@@ -218,9 +218,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
 
         //Client DAO impl dependencies
-        final InputStream resourceAsStream = BusinessDataModelRepositoryImpl.class.getResourceAsStream("/javassist-3.18.1-GA.jar.res");
-        resources.put("javassist-3.18.1-GA.jar", IOUtil.getAllContentFrom(resourceAsStream));
-        resourceAsStream.close();
+        InputStream resourceAsStream = null;
+        try {
+            resourceAsStream = BusinessDataModelRepositoryImpl.class.getResourceAsStream("/javassist-3.18.1-GA.jar.res");
+            resources.put("javassist-3.18.1-GA.jar", IOUtil.getAllContentFrom(resourceAsStream));
+        } finally {
+            if (resourceAsStream != null) {
+                resourceAsStream.close();
+            }
+        }
 
         return IOUtil.generateZip(resources);
     }
