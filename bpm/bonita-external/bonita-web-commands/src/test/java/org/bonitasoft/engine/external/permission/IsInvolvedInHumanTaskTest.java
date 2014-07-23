@@ -28,6 +28,7 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.model.SSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,11 +57,15 @@ public class IsInvolvedInHumanTaskTest {
     @Spy
     IsInvolvedInHumanTask isInvolvedInHumanTask = new IsInvolvedInHumanTask();
 
+    @Mock
+    SSession session;
+
     @Before
     public void setup() throws Exception {
         when(serviceAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(activityInstanceService.getHumanTaskInstance(anyLong())).thenReturn(humanTaskInstance);
         when(serviceAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        doReturn(session).when(isInvolvedInHumanTask).getCurrentSession();
     }
 
     /**
@@ -80,7 +85,7 @@ public class IsInvolvedInHumanTaskTest {
     public final void should_throw_exception_when_Execute_with_non_existent_user() throws SCommandParameterizationException, SCommandExecutionException {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -2l);
 
         // When
         isInvolvedInHumanTask.execute(parameters, serviceAccessor);
@@ -91,9 +96,10 @@ public class IsInvolvedInHumanTaskTest {
     SCommandExecutionException {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 4l);
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
+        when(session.getUserId()).thenReturn(4l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
@@ -106,9 +112,10 @@ public class IsInvolvedInHumanTaskTest {
     SCommandExecutionException {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
+        when(session.getUserId()).thenReturn(5l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
@@ -121,9 +128,9 @@ public class IsInvolvedInHumanTaskTest {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 4l);
-        parameters.put(IsInvolvedInHumanTask.DO_FOR_KEY, true);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
+        when(session.getUserId()).thenReturn(4l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
@@ -137,8 +144,9 @@ public class IsInvolvedInHumanTaskTest {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
-        parameters.put(IsInvolvedInHumanTask.DO_FOR_KEY, true);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
+
+        when(session.getUserId()).thenReturn(4l);
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
@@ -149,9 +157,10 @@ public class IsInvolvedInHumanTaskTest {
             throws Exception {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
+        when(session.getUserId()).thenReturn(5l);
         final long actorId = 888L;
         final long scopeId = 99L;
         when(humanTaskInstance.getActorId()).thenReturn(actorId);
@@ -171,9 +180,10 @@ public class IsInvolvedInHumanTaskTest {
             throws Exception {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
+        when(session.getUserId()).thenReturn(5l);
         final long actorId = 888L;
         final long scopeId = 99L;
         final long otherScopeId = 100L;
@@ -195,9 +205,9 @@ public class IsInvolvedInHumanTaskTest {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 22l);
-        parameters.put(IsInvolvedInHumanTask.DO_FOR_KEY, true);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
+        when(session.getUserId()).thenReturn(22l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(9l);
 
         // When
