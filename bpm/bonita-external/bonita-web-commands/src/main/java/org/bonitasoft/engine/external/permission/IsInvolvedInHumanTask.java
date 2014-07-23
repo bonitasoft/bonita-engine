@@ -43,9 +43,11 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public class IsInvolvedInHumanTask extends CommandWithParameters {
 
-    private static final String USER_ID_KEY = "USER_ID_KEY";
+    protected static final String USER_ID_KEY = "USER_ID_KEY";
 
-    private static final String HUMAN_TASK_INSTANCE_ID_KEY = "HUMAN_TASK_INSTANCE_ID_KEY";
+    protected static final String DO_FOR_KEY = "DO_FOR_KEY";
+
+    protected static final String HUMAN_TASK_INSTANCE_ID_KEY = "HUMAN_TASK_INSTANCE_ID_KEY";
 
     /**
      * @return a Boolean :
@@ -57,15 +59,16 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             throws SCommandParameterizationException, SCommandExecutionException {
         final long userId = getLongMandadoryParameter(parameters, USER_ID_KEY);
         final long humanTaskInstanceId = getLongMandadoryParameter(parameters, HUMAN_TASK_INSTANCE_ID_KEY);
+        final boolean doFor = parameters.get(DO_FOR_KEY) != null ? (Boolean) parameters.get(DO_FOR_KEY) : false;
 
         try {
-            return isInvolvedInHumanTask(userId, humanTaskInstanceId, serviceAccessor);
+            return isInvolvedInHumanTask(userId, humanTaskInstanceId, doFor, serviceAccessor);
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException("Error executing command 'Boolean IsInvolvedInHumanTask(long userId, long humanTaskInstanceId)'", e);
         }
     }
 
-    private Boolean isInvolvedInHumanTask(final long userId, final long humanTaskInstanceId, final TenantServiceAccessor serviceAccessor)
+    private Boolean isInvolvedInHumanTask(final long userId, final long humanTaskInstanceId, final boolean doFor, final TenantServiceAccessor serviceAccessor)
             throws SActivityInstanceNotFoundException, SActivityReadException, SActorNotFoundException, SBonitaReadException {
         final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
@@ -90,16 +93,27 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             }
         }
 
-        final SSession session = SessionInfos.getSession();
-        if (session.getUserId() == assigneeId) {
+        if (userId == assigneeId) {
+            //if user has the current task assigned
             return true;
-        } else if (userId != -1 && assigneeId != 0L) {
+        } else if (doFor) {
+            //in case we are performing a Do For (task assigned or not, we don't care
             return true;
         } else if (assigneeId == 0L) {
+            //in case we are not in do for, we check actor mapping
             final SActor actor = actorMappingService.getActor(actorId);
             return actor.getScopeId() == processDefinitionId;
         }
         return false;
+    }
+
+    /**
+     * method created for stubbing purpose
+     * 
+     * @return current session
+     */
+    protected SSession getCurrentSession() {
+        return SessionInfos.getSession();
     }
 
 }

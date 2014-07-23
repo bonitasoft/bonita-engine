@@ -50,11 +50,17 @@ public class RestartProcessHandler implements TenantRestartHandler {
     public class ExecuteProcesses implements Callable<Object> {
 
         private final WorkService workService;
+
         private final TechnicalLoggerService logger;
+
         private final ActivityInstanceService activityInstanceService;
+
         private final ProcessDefinitionService processDefinitionService;
+
         private final ProcessInstanceService processInstanceService;
+
         private final ProcessExecutor processExecutor;
+
         private final Iterator<Long> iterator;
 
         public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger, final ActivityInstanceService activityInstanceService,
@@ -218,8 +224,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
      */
     private void restartConnector(final SProcessDefinition processDefinition, final SProcessInstance processInstance, final ConnectorEvent event,
             final ProcessExecutor processExecutor) throws SBonitaException {
-        processExecutor.executeConnectors(processDefinition, processInstance, event);
-
+        processExecutor.executeConnectors(processDefinition, processInstance, event, null);
     }
 
 }

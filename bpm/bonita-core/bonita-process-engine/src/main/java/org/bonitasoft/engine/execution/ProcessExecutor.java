@@ -49,11 +49,13 @@ public interface ProcessExecutor extends ContainerExecutor {
             SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
             List<ConnectorDefinitionWithInputValues> connectors, long callerId, FlowNodeSelector selector) throws SProcessInstanceCreationException;
 
-    boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent) throws SBonitaException;
+    boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
+            FlowNodeSelector selector) throws SBonitaException;
 
     SProcessInstance startElements(final SProcessInstance sProcessInstance, FlowNodeSelector selector) throws SProcessInstanceCreationException,
             SFlowNodeExecutionException, SFlowNodeReadException;
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;
+
 }

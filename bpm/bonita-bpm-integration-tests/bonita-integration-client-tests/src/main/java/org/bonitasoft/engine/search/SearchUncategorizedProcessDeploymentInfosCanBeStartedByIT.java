@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.search;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.List;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
+import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -39,7 +41,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest {
+public class SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT extends CommonAPITest {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 
@@ -47,7 +49,7 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
 
     private List<User> users = null;
 
-    private List<Category> categories = null;
+    private List<Category> categories;
 
     private List<Group> groups = null;
 
@@ -71,8 +73,10 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
     @Before
     public void beforeTest() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
-        // create users
-        users = new ArrayList<User>(2);
+
+        categories = new ArrayList<Category>();
+
+        users = new ArrayList<User>(6);
         users.add(createUser("chicobento", "bpm"));
         users.add(createUser("cebolinha", "bpm"));
         users.add(createUser("cascao", "bpm"));
@@ -80,56 +84,58 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
         users.add(createUser("monica", "bpm"));
         users.add(createUser("dorinha", "bpm"));
 
-        // create groups
         groups = new ArrayList<Group>(2);
         groups.add(createGroup("group1"));
         groups.add(createGroup("group2"));
 
-        // create roles
         roles = new ArrayList<Role>(2);
         roles.add(createRole("role1"));
         roles.add(createRole("role2"));
 
-        // create user memberships
         userMemberships = new ArrayList<UserMembership>(3);
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(3).getId(), groups.get(0).getId(), roles.get(0).getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(4).getId(), groups.get(0).getId(), roles.get(1).getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(5).getId(), groups.get(1).getId(), roles.get(0).getId()));
 
-        // create processes
         enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
         disabledProcessDefinitions = new ArrayList<ProcessDefinition>(1);
         createProcessesDefForSearchProcessUserCanStart();
-
-        categories = new ArrayList<Category>(3);
-        categories.add(getProcessAPI().createCategory("category1", "the first known category"));
-        categories.add(getProcessAPI().createCategory("category2", "the second known category"));
-        categories.add(getProcessAPI().createCategory("category3", "the third known category"));
-        getProcessAPI().addProcessDefinitionToCategory(categories.get(0).getId(), enabledProcessDefinitions.get(2).getId());
-        getProcessAPI().addProcessDefinitionToCategory(categories.get(1).getId(), enabledProcessDefinitions.get(2).getId());
-        getProcessAPI().addProcessDefinitionToCategory(categories.get(1).getId(), enabledProcessDefinitions.get(1).getId());
-        getProcessAPI().addProcessDefinitionToCategory(categories.get(2).getId(), enabledProcessDefinitions.get(3).getId());
     }
 
     @Test
-    public void searchProcessDefinitionsUserCanStart() throws Exception {
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(0).getId(), searchOptionsBuilder.done());
-        assertEquals(1, searchRes.getCount());
-        assertEquals(enabledProcessDefinitions.get(0).getName(), searchRes.getResult().get(0).getName());
+    public void searchUncategorizedProcessDefinitions() throws Exception {
+        loginOnDefaultTenantWith("chicobento", "bpm");
 
-        searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
-        assertEquals(2, searchRes.getCount());
-        assertEquals(enabledProcessDefinitions.get(1).getName(), searchRes.getResult().get(0).getName());
-        assertEquals(enabledProcessDefinitions.get(2).getName(), searchRes.getResult().get(1).getName());
+        // add categories to processDefinition1
+        categories.add(getProcessAPI().createCategory("category1", "categoryDescription1"));
+        categories.add(getProcessAPI().createCategory("category2", "categoryDescription2"));
+        categories.add(getProcessAPI().createCategory("category3", "categoryDescription3"));
+        final ArrayList<Long> categoryIds = new ArrayList<Long>();
+        categoryIds.add(categories.get(0).getId());
+        categoryIds.add(categories.get(1).getId());
+        categoryIds.add(categories.get(2).getId());
+        getProcessAPI().addCategoriesToProcess(enabledProcessDefinitions.get(0).getId(), categoryIds);
+        categories = getProcessAPI().getCategoriesOfProcessDefinition(enabledProcessDefinitions.get(0).getId(), 0, 10, CategoryCriterion.NAME_ASC);
+        assertTrue(!categories.isEmpty());
 
-        // user associated to a process without actor initiator
-        searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(2).getId(), searchOptionsBuilder.done());
-        assertEquals(0, searchRes.getCount());
+        // Get all process definitions:
+        SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 5);
+        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.ASC);
+        SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        assertEquals(8, searchRes0.getCount());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes0.getResult().get(1).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(0).getId(), searchRes0.getResult().get(0).getProcessId());
+
+        // Get all process definitions with no category associated:
+        optsBuilder = new SearchOptionsBuilder(0, 7);
+        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.ASC);
+        searchRes0 = getProcessAPI().searchUncategorizedProcessDeploymentInfos(optsBuilder.done());
+        assertEquals(7, searchRes0.getCount());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
     }
 
     @Test
-    public void searchProcessDefinitionsUserCanStartFromGroup() throws Exception {
+    public void searchUncategorizedProcessDefinitionsUserCanStartFromGroup() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(4).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
@@ -137,7 +143,7 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
     }
 
     @Test
-    public void searchProcessDefinitionsUserCanStartFromRole() throws Exception {
+    public void searchUncategorizedProcessDefinitionsUserCanStartFromRole() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(5).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
@@ -145,7 +151,7 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
     }
 
     @Test
-    public void searchProcessDefinitionsUserCanStartFromRoleAndGroup() throws Exception {
+    public void searchUncategorizedProcessDefinitionsUserCanStartFromRoleAndGroup() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(3).getId(), searchOptionsBuilder.done());
         assertEquals(3, searchRes.getCount());
@@ -155,7 +161,7 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
     }
 
     @Test
-    public void searchProcessDefinitionsUserCanStartWithSearchTerm() throws Exception {
+    public void searchUncategorizedProcessDefinitionsUserCanStartWithSearchTearm() throws Exception {
         // test term
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.searchTerm("My_Process2"); // use name as term
@@ -165,20 +171,22 @@ public class SearchProcessDeploymentInfosUserCanStartTest extends CommonAPITest 
     }
 
     @Test
-    public void searchProcessDefinitionsUserCanStartWithFilter() throws Exception {
-        // test filter on process name
-        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        searchOptionsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.NAME, "My_Process2");
-        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
+    public void searchUncategorizedProcessDefinitionsUserCanStart() throws Exception {
+        // test uncategorized process definitions.
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
+        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchUncategorizedProcessDeploymentInfosUserCanStart(users.get(0).getId(),
+                searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
-        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes.getResult().get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(0).getName(), searchRes.getResult().get(0).getName());
 
-        // test filter category
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        searchOptionsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, categories.get(0).getId());
-        searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
-        assertEquals(1, searchRes.getCount());
-        assertEquals(enabledProcessDefinitions.get(2).getId(), searchRes.getResult().get(0).getProcessId());
+        searchRes = getProcessAPI().searchUncategorizedProcessDeploymentInfosUserCanStart(users.get(1).getId(), searchOptionsBuilder.done());
+        assertEquals(2, searchRes.getCount());
+        assertEquals(enabledProcessDefinitions.get(1).getName(), searchRes.getResult().get(0).getName());
+        assertEquals(enabledProcessDefinitions.get(2).getName(), searchRes.getResult().get(1).getName());
+
+        // user associated to a process without actor initiator
+        searchRes = getProcessAPI().searchUncategorizedProcessDeploymentInfosUserCanStart(users.get(2).getId(), searchOptionsBuilder.done());
+        assertEquals(0, searchRes.getCount());
     }
 
     private void createProcessesDefForSearchProcessUserCanStart() throws BonitaException {

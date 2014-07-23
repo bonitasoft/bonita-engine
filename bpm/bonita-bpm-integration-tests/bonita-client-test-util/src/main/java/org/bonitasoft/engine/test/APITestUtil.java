@@ -57,6 +57,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
@@ -171,7 +172,7 @@ public class APITestUtil extends PlatformTestUtil {
     private ThemeAPI themeAPI;
 
     static {
-        String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
+        final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
@@ -419,7 +420,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final List<User> users)
-            throws BonitaException {
+                    throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableProcessWithActor(businessArchive, actorName, users);
     }
@@ -509,7 +510,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final Group... groups)
-            throws BonitaException {
+                    throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         for (final Group group : groups) {
@@ -606,7 +607,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
-            throws BonitaException {
+                    throws BonitaException {
         return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
@@ -849,8 +850,28 @@ public class APITestUtil extends PlatformTestUtil {
     @Deprecated
     private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
         final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
+        if (!waitUntil) {
+            printFlowNodes(processInstance);
+            printArchivedFlowNodes(processInstance);
+        }
         assertTrue("Process was not finished", waitUntil);
         return waitUntil;
+    }
+
+    protected void printArchivedFlowNodes(final ProcessInstance processInstance) throws SearchException {
+        System.err.println("Archived flownodes: ");
+        final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
+                new SearchOptionsBuilder(0, 100).filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId())
+                .done()).getResult();
+        System.err.println(archivedFlowNodeInstances);
+    }
+
+    protected void printFlowNodes(final ProcessInstance processInstance) throws SearchException {
+        System.err.println("Active flownodes: ");
+        final List<FlowNodeInstance> flownodes = getProcessAPI().searchFlowNodeInstances(
+                new SearchOptionsBuilder(0, 100).filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId()).done())
+                .getResult();
+        System.err.println(flownodes);
     }
 
     @Deprecated
@@ -940,19 +961,19 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final long processInstanceId, final long userId) throws Exception,
-            UpdateException {
+    UpdateException {
         final ActivityInstance activityInstance = waitForUserTask(taskName, processInstanceId);
         getProcessAPI().assignUserTask(activityInstance.getId(), userId);
         return activityInstance;
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
-            UpdateException {
+    UpdateException {
         return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), userId);
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
-            UpdateException {
+    UpdateException {
         return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), user.getId());
     }
 
@@ -1067,7 +1088,7 @@ public class APITestUtil extends PlatformTestUtil {
         final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
                 isHuman);
 
-        for (DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
+        for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
             processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
         }
         return processDefinitions;
@@ -1154,8 +1175,8 @@ public class APITestUtil extends PlatformTestUtil {
     @Deprecated
     private CheckNbOfHumanTasks checkNbOfHumanTasks(final int repeatEach, final int timeout, final int nbHumanTaks) throws Exception {
         final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, false, nbHumanTaks, new SearchOptionsBuilder(0, 15)
-                .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
-                .done(), getProcessAPI());
+        .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
+        .done(), getProcessAPI());
         final boolean waitUntil = checkNbOfHumanTasks.waitUntil();
         assertTrue("Expected " + nbHumanTaks + " Human tasks in ready state, but found " + checkNbOfHumanTasks.getHumanTaskInstances().getCount(), waitUntil);
         return checkNbOfHumanTasks;
@@ -1237,7 +1258,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
             final boolean isTransient)
-            throws InvalidExpressionException, UpdateException {
+                    throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
@@ -1526,7 +1547,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     /**
      * tell the engine to run BPMEventHandlingjob now
-     * 
+     *
      * @throws CommandParameterizationException
      * @throws CommandExecutionException
      * @throws CommandNotFoundException
