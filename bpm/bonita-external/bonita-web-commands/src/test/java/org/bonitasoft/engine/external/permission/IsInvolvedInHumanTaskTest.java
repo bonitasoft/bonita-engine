@@ -28,7 +28,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.model.SSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,15 +56,11 @@ public class IsInvolvedInHumanTaskTest {
     @Spy
     IsInvolvedInHumanTask isInvolvedInHumanTask = new IsInvolvedInHumanTask();
 
-    @Mock
-    SSession session;
-
     @Before
     public void setup() throws Exception {
         when(serviceAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(activityInstanceService.getHumanTaskInstance(anyLong())).thenReturn(humanTaskInstance);
         when(serviceAccessor.getActorMappingService()).thenReturn(actorMappingService);
-        doReturn(session).when(isInvolvedInHumanTask).getCurrentSession();
     }
 
     /**
@@ -96,15 +91,13 @@ public class IsInvolvedInHumanTaskTest {
     SCommandExecutionException {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 10l);
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 4l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(4l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
-        verify(session, times(1)).getUserId();
         verify(humanTaskInstance, times(1)).getAssigneeId();
     }
 
@@ -116,12 +109,10 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(5l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(false);
-        verify(session, times(2)).getUserId();
         verify(humanTaskInstance, times(1)).getAssigneeId();
     }
 
@@ -130,14 +121,13 @@ public class IsInvolvedInHumanTaskTest {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 4l);
+        parameters.put(IsInvolvedInHumanTask.DO_FOR_KEY, true);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(4l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
-        verify(session, times(1)).getUserId();
         verify(humanTaskInstance, times(1)).getAssigneeId();
     }
 
@@ -147,13 +137,11 @@ public class IsInvolvedInHumanTaskTest {
         // Given
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
+        parameters.put(IsInvolvedInHumanTask.DO_FOR_KEY, true);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
-
-        when(session.getUserId()).thenReturn(4l);
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
-        verify(session, times(2)).getUserId();
     }
 
     @Test
@@ -164,7 +152,6 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(5l);
         final long actorId = 888L;
         final long scopeId = 99L;
         when(humanTaskInstance.getActorId()).thenReturn(actorId);
@@ -176,7 +163,6 @@ public class IsInvolvedInHumanTaskTest {
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
-        verify(session, times(2)).getUserId();
         verify(sActor, times(1)).getScopeId();
     }
 
@@ -188,7 +174,6 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(5l);
         final long actorId = 888L;
         final long scopeId = 99L;
         final long otherScopeId = 100L;
@@ -201,7 +186,21 @@ public class IsInvolvedInHumanTaskTest {
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(false);
-        verify(session, times(2)).getUserId();
         verify(sActor, times(1)).getScopeId();
+    }
+
+    @Test
+    public final void should_return_true_when_admin_user_wants_to_execute_assigned_task_in_do_for_when_he_is_not_in_actor_mapping()
+            throws Exception {
+        // Given
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 22l);
+        parameters.put(IsInvolvedInHumanTask.DO_FOR_KEY, true);
+        parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
+
+        when(humanTaskInstance.getAssigneeId()).thenReturn(9l);
+
+        // When
+        assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
     }
 }
