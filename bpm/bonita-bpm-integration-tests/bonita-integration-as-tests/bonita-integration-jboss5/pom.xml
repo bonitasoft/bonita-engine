@@ -227,11 +227,6 @@
                                                 <include name="${db.vendor}-ds.xml"/>
                                             </fileset>
                                         </copy>
-                                        <copy todir="${jboss.conf.dir}/bootstrap">
-                                            <fileset dir="jboss/server/default/conf/bootstrap">
-                                                <include name="vfs.xml"/>
-											</fileset>
-										</copy>
 										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.ip#" value="${database.ip}" />
 										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.port#" value="${database.port}" />
 										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.user#" value="${database.user}" />
