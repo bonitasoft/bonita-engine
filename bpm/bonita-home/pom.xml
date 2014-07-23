@@ -145,6 +145,12 @@
                                     <version>2.2.3</version>
                                     <type>jar</type>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>javassist</groupId>
+                                    <artifactId>javassist</artifactId>
+                                    <version>3.18.1-GA</version>
+                                    <type>jar</type>
+                                </artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/common/home/server/platform/data-management/compilation-dependencies</outputDirectory>
 						</configuration>
