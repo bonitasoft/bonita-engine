@@ -13,6 +13,7 @@ import static java.util.Arrays.asList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -207,6 +208,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
 
+        //Add bom.xml
         try {
             resources.put(BOM_NAME, new BusinessObjectModelConverter().zip(model));
         } catch (final JAXBException e) {
@@ -214,6 +216,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         } catch (final SAXException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
+
+        //Client DAO impl dependencies
+        final InputStream resourceAsStream = BusinessDataModelRepositoryImpl.class.getResourceAsStream("/javassist-3.18.1-GA.jar.res");
+        resources.put("javassist-3.18.1-GA.jar", IOUtil.getAllContentFrom(resourceAsStream));
+        resourceAsStream.close();
 
         return IOUtil.generateZip(resources);
     }
