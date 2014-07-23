@@ -64,13 +64,13 @@ public class ProcessDeploymentInfoQueriesTest {
 
     private static final long JACK_ID = 63L;
 
-    private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN = 98L;
+    private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN = 111L;
 
-    private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS = 98238L;
+    private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS = 112L;
 
-    private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB = 128L;
+    private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB = 113L;
 
-    private static final long PROCESS_DEFINITION_ID_NOT_SUPERVISED = 871L;
+    private static final long PROCESS_DEFINITION_ID_NOT_SUPERVISED = 114L;
 
     private static final long ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN = 963L;
 
@@ -529,6 +529,147 @@ public class ProcessDeploymentInfoQueriesTest {
         // When
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
                 .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+
+        // Then
+        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);
+    }
+
+    // All (for admin)
+    // Supervised By
+    @Test
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
+        // Given
+        buildAndAddAssignedTasks();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(3);
+    }
+
+    @Test
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_pending_tasks_for_a_user() {
+        // Given
+        buildAndAddTasksWithPendingMappingForUser();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(numberOfUsers).isEqualTo(3);
+    }
+
+    @Test
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_pending_tasks_for_a_actor_with_a_user_as_member() {
+        // Given
+        buildAndAddTasksWithPendingMappingForActorMappedToUser();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(numberOfUsers).isEqualTo(3);
+    }
+
+    @Test
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_pending_tasks_for_a_actor_with_a_membership_mapped_to_a_user_as_member() {
+        // Given
+        buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(numberOfUsers).isEqualTo(3);
+    }
+
+    @Test
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_not_count_the_hidden_human() {
+        // Given
+        buildAndAddAssigneeAndHiddenTask();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(0);
+    }
+
+    @Test
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
+        // Given
+        buildAndAddAssignedTasks();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(3);
+        assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
+    }
+
+    @Test
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_pending_tasks_for_a_user() {
+        // Given
+        buildAndAddTasksWithPendingMappingForUser();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(3);
+        assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
+    }
+
+    @Test
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_pending_tasks_for_a_actor_with_a_user_as_member() {
+        // Given
+        buildAndAddTasksWithPendingMappingForActorMappedToUser();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(3);
+        assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
+    }
+
+    @Test
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_pending_tasks_for_a_actor_with_a_membership_mapped_to_a_user_as_member() {
+        // Given
+        buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+
+        // Then
+        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(3);
+        assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
+    }
+
+    @Test
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_not_count_the_hidden_human() {
+        // Given
+        buildAndAddAssigneeAndHiddenTask();
+        buildAndAddSupervisorMappedToUser();
+
+        // When
+        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
 
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);

@@ -398,6 +398,7 @@ import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfos;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedBy;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosStartedBy;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
@@ -3836,6 +3837,23 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
         final SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy searcher = new SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(
                 processDefinitionService, searchDescriptor, searchOptions, supervisorId);
+        try {
+            searcher.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        return searcher.getResult();
+    }
+
+    @Override
+    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
+        final SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks searcher = new SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(
+                processDefinitionService, searchDescriptor, searchOptions);
         try {
             searcher.execute();
         } catch (final SBonitaException sbe) {

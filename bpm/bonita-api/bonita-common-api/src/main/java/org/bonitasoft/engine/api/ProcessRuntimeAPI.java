@@ -2260,4 +2260,19 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(long supervisorId, SearchOptions searchOptions)
             throws SearchException;
 
+    /**
+     * Search all process definitions that have instances with one or more human tasks assigned/pending for a user.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param userId
+     *            The identifier of the user.
+     * @param searchOptions
+     *            The search criterion.
+     * @return The list of process definitions
+     * @throws SearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+
 }

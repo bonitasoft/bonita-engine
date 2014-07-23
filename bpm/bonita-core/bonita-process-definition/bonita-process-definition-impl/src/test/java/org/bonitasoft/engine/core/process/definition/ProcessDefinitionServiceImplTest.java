@@ -1369,4 +1369,63 @@ public class ProcessDefinitionServiceImplTest {
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(userId, options);
     }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(long, org.bonitasoft.engine.persistence.QueryOptions)}
+     * .
+     */
+    @Test
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenReturn(
+                new ArrayList<SProcessDefinitionDeployInfo>());
+
+        // When
+        final List<SProcessDefinitionDeployInfo> result = processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+
+        // Then
+        assertNotNull(result);
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksThrowException() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenThrow(
+                new SBonitaReadException(""));
+
+        // When
+        processDefinitionServiceImpl.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(org.bonitasoft.engine.persistence.QueryOptions)}
+     * .
+     */
+    @Test
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenReturn(1L);
+
+        // When
+        final long result = processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+
+        // Then
+        assertEquals(1L, result);
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksThrowException() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", options, null)).thenThrow(
+                new SBonitaReadException(""));
+
+        // When
+        processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+    }
 }

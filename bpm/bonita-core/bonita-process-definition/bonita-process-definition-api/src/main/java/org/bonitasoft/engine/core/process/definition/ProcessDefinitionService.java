@@ -685,14 +685,14 @@ public interface ProcessDefinitionService {
             throws SBonitaSearchException;
 
     /**
-     * Search all process definitions supervised by a specific user, that have instances with one or more human tasks assigned/pending.
+     * Get the total number of the process definitions supervised by a specific user, that have instances with one or more human tasks assigned/pending.
      * The tasks are in stable state, not in terminal/executing state.
      * 
      * @param userId
      *            The identifier of the user.
      * @param queryOptions
      *            The QueryOptions object containing some query conditions
-     * @return The list of process definitions
+     * @return The number of the process definition
      * @throws SBonitaSearchException
      *             if an exception occurs when getting the process deployment information.
      * @since 6.3.3
@@ -714,5 +714,31 @@ public interface ProcessDefinitionService {
      */
     List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(long userId, QueryOptions queryOptions)
             throws SBonitaSearchException;
+
+    /**
+     * Get the total number of the process definitions that have instances with one or more human tasks assigned/pending.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param queryOptions
+     *            The QueryOptions object containing some query conditions
+     * @return The number of the process definition
+     * @throws SBonitaSearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * Search all process definitions that have instances with one or more human tasks assigned/pending.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param queryOptions
+     *            The QueryOptions object containing some query conditions
+     * @return The list of process definitions
+     * @throws SBonitaSearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(QueryOptions queryOptions) throws SBonitaSearchException;
 
 }

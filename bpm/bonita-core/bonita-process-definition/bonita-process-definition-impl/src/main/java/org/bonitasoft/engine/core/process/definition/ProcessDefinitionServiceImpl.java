@@ -1127,4 +1127,23 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
+    @Override
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
 }

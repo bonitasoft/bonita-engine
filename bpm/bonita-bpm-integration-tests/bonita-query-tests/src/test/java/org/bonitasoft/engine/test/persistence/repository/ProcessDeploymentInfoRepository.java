@@ -43,4 +43,18 @@ public class ProcessDeploymentInfoRepository extends TestRepository {
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks");
+        namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY process_definition.id");
+        return namedQuery.list();
+    }
+
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks");
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
 }
