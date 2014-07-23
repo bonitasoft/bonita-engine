@@ -63,7 +63,7 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
 
             final Set<Expression> exps = expressions.keySet();
             for (Expression exp : exps) {
-                final Map<String, Serializable> partialContext = expressions.get(exp);
+                final Map<String, Serializable> partialContext = getPartialContext(exp);
                 context.setSerializableInputValues(partialContext);
                 final SExpression sexp = ServerModelConvertor.convertExpression(exp);
                 final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);
@@ -71,6 +71,10 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
             }
         }
 
+    }
+
+    protected Map<String, Serializable> getPartialContext(Expression exp) {
+        return expressions.get(exp);
     }
 
     @Override
