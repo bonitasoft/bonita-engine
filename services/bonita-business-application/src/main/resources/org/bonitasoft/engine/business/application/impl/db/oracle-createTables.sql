@@ -4,7 +4,7 @@ CREATE TABLE business_app (
   name VARCHAR2(50) NOT NULL,
   version VARCHAR2(50) NOT NULL,
   path VARCHAR2(255) NOT NULL,
-  description VARCHAR22(1024),
+  description VARCHAR2(1024),
   UNIQUE (tenantId, name, version),
   PRIMARY KEY (tenantId, id)
 );
