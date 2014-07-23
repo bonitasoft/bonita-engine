@@ -60,6 +60,10 @@ public class ProcessDeploymentInfoQueriesTest {
 
     private static final long BOB_ID = 697L;
 
+    private static final long PAUL_ID = 94L;
+
+    private static final long JACK_ID = 63L;
+
     private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN = 98L;
 
     private static final long PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS = 98238L;
@@ -83,6 +87,8 @@ public class ProcessDeploymentInfoQueriesTest {
     public void before() {
         repository.add(aUser().withId(JOHN_ID).build());
         repository.add(aUser().withId(BOB_ID).build());
+        repository.add(aUser().withId(PAUL_ID).build());
+        repository.add(aUser().withId(JACK_ID).build());
 
         // Create process supervised by john
         final String processNameSupervisedByJohn = "Process supervised by John";
@@ -126,7 +132,7 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddAssignedTasks();
 
         // When
-        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
@@ -138,7 +144,7 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddTasksWithPendingMappingForUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(numberOfUsers).isEqualTo(1);
@@ -150,7 +156,7 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(numberOfUsers).isEqualTo(1);
@@ -162,7 +168,7 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(numberOfUsers).isEqualTo(1);
@@ -174,7 +180,7 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddAssigneeAndHiddenTask();
 
         // When
-        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(0);
@@ -187,7 +193,7 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // When
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(1);
@@ -201,7 +207,7 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // When
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(1);
@@ -215,7 +221,7 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // When
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(1);
@@ -229,7 +235,7 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // When
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(1);
@@ -243,7 +249,7 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // When
         final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JOHN_ID);
+                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);
@@ -535,7 +541,10 @@ public class ProcessDeploymentInfoQueriesTest {
     }
 
     private void buildAndAddSupervisorMappedToUserMembershipMappedToUser() {
-        buildAndAddUserMemberships(GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, GROUP_FOR_SUPERVISOR_FOR_BOB_ID);
+        final long roleId = 1295L;
+        repository.add(aUserMembership().forUser(JOHN_ID).memberOf(GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, roleId).build());
+        repository.add(aUserMembership().forUser(BOB_ID).memberOf(GROUP_FOR_SUPERVISOR_FOR_BOB_ID, roleId).build());
+
         repository.add(new SProcessSupervisorImpl(3, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN, -1, GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, -1));
         repository.add(new SProcessSupervisorImpl(4, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS, -1, GROUP_FOR_SUPERVISOR_FOR_JOHN_ID, -1));
         repository.add(new SProcessSupervisorImpl(5, 1, PROCESS_DEFINITION_ID_SUPERVISED_BY_BOB, -1, GROUP_FOR_SUPERVISOR_FOR_BOB_ID, -1));
@@ -544,72 +553,74 @@ public class ProcessDeploymentInfoQueriesTest {
     private void buildAndAddAssignedTasks() {
         // Tasks OK assigned to John
         repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN).withAssigneeId(JACK_ID).build());
         repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN).withAssigneeId(JACK_ID).build());
         repository.add(aUserTask().withName("normalTask3").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN).withAssigneeId(JACK_ID).build());
 
         // Tasks KO assigned to john & OK not assigned
         repository.add(aUserTask().withName("deletedTask").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(true)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JACK_ID).build());
         repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JACK_ID).build());
         repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JACK_ID).build());
         repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JOHN_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).withAssigneeId(JACK_ID).build());
         buildAndAddNormalTask("normalTask1", ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS);
 
         // Tasks OK assigned to Bob
         repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_BOB).withAssigneeId(BOB_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_BOB).withAssigneeId(PAUL_ID).build());
 
         // Tasks OK assigned to Bob, process not supervised
         repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
-                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_NOT_SUPERVISED).withAssigneeId(BOB_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_NOT_SUPERVISED).withAssigneeId(PAUL_ID).build());
     }
 
     private void buildAndAddTasksWithPendingMappingForUser() {
         // Tasks OK not assigned & pending for John
         final SFlowNodeInstance normalTask1 = buildAndAddNormalTask("normalTask1", ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN);
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(normalTask1.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(normalTask1.getId()).build());
         final SFlowNodeInstance normalTask2 = buildAndAddNormalTask("normalTask2", ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN);
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(normalTask2.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(normalTask2.getId()).build());
         final SFlowNodeInstance normalTask3 = buildAndAddNormalTask("normalTask3", ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN);
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(normalTask3.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(normalTask3.getId()).build());
 
         // Tasks KO not assigned & pending for john, and OK not assigned & not pending
         final SFlowNodeInstance deletedTask = buildAndAddDeletedTask();
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(deletedTask.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(deletedTask.getId()).build());
         final SFlowNodeInstance executingTask = buildAndAddExecutingTask();
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(executingTask.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(executingTask.getId()).build());
         final SFlowNodeInstance notStableTask = buildAndAddNotStableTask();
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(notStableTask.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(notStableTask.getId()).build());
         final SFlowNodeInstance terminalTask = buildAndAddTerminalTask();
-        repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(terminalTask.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(JACK_ID).withActivityId(terminalTask.getId()).build());
         buildAndAddNormalTask("normalTask1", ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS);
 
         // Tasks OK not assigned & pending for Bob
         final SFlowNodeInstance normalTask4 = buildAndAddNormalTask("normalTask1", ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_BOB);
-        repository.add(aPendingActivityMapping().withUserId(BOB_ID).withActivityId(normalTask4.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(PAUL_ID).withActivityId(normalTask4.getId()).build());
 
         // Tasks OK not assigned & pending for Bob, process not supervised
         final SFlowNodeInstance normalTask5 = buildAndAddNormalTask("normalTask1", ROOT_PROCESS_INSTANCE_ID_NOT_SUPERVISED);
-        repository.add(aPendingActivityMapping().withUserId(BOB_ID).withActivityId(normalTask5.getId()).build());
+        repository.add(aPendingActivityMapping().withUserId(PAUL_ID).withActivityId(normalTask5.getId()).build());
     }
 
     private void buildAndAddTasksWithPendingMappingForActorMappedToUser() {
         final SActor actorForJohn = repository.add(anActor().build());
-        repository.add(anActorMember().forActor(actorForJohn).withUserId(JOHN_ID).build());
+        repository.add(anActorMember().forActor(actorForJohn).withUserId(JACK_ID).build());
         final SActor actorForBob = repository.add(anActor().build());
-        repository.add(anActorMember().forActor(actorForBob).withUserId(BOB_ID).build());
+        repository.add(anActorMember().forActor(actorForBob).withUserId(PAUL_ID).build());
 
         buildAndAddTasksWithPendingMappingForActor(actorForJohn, actorForBob);
     }
 
     private void buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser() {
-        buildAndAddUserMemberships(GROUP_FOR_JOHN_ID, GROUP_FOR_BOB_ID);
+        final long roleId = 1235L;
+        repository.add(aUserMembership().forUser(JACK_ID).memberOf(GROUP_FOR_JOHN_ID, roleId).build());
+        repository.add(aUserMembership().forUser(PAUL_ID).memberOf(GROUP_FOR_BOB_ID, roleId).build());
 
         final SActor actorForJohn = repository.add(anActor().build());
         repository.add(anActorMember().forActor(actorForJohn).withGroupId(GROUP_FOR_JOHN_ID).build());
@@ -618,12 +629,6 @@ public class ProcessDeploymentInfoQueriesTest {
         repository.add(anActorMember().forActor(actorForBob).withGroupId(GROUP_FOR_BOB_ID).build());
 
         buildAndAddTasksWithPendingMappingForActor(actorForJohn, actorForBob);
-    }
-
-    private void buildAndAddUserMemberships(final long groupForJohnId, final long groupForBobId) {
-        final long roleId = 1235L;
-        repository.add(aUserMembership().forUser(JOHN_ID).memberOf(groupForJohnId, roleId).build());
-        repository.add(aUserMembership().forUser(BOB_ID).memberOf(groupForBobId, roleId).build());
     }
 
     private void buildAndAddTasksWithPendingMappingForActor(final SActor actorForJohn, final SActor actorForBob) {
@@ -658,11 +663,11 @@ public class ProcessDeploymentInfoQueriesTest {
     private void buildAndAddAssigneeAndHiddenTask() {
         final SUserTaskInstanceImpl activity = (SUserTaskInstanceImpl) repository.add(aUserTask().withName("normalTask1").withStateExecuting(false)
                 .withStable(true).withTerminal(false).withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN)
-                .withAssigneeId(JOHN_ID).build());
+                .withAssigneeId(JACK_ID).build());
 
         final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl = new SHiddenTaskInstanceImpl();
         sHiddenTaskInstanceImpl.setActivityId(activity.getId());
-        sHiddenTaskInstanceImpl.setUserId(JOHN_ID);
+        sHiddenTaskInstanceImpl.setUserId(JACK_ID);
         sHiddenTaskInstanceImpl.setTenantId(1L);
         sHiddenTaskInstanceImpl.setId(48L);
         repository.add(sHiddenTaskInstanceImpl);

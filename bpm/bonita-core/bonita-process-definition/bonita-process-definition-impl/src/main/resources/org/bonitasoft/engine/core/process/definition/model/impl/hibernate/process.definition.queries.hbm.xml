@@ -870,7 +870,8 @@
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
         	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
+        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR EXISTS (
@@ -891,7 +892,7 @@
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
-			a.assigneeId > 0
+			a.assigneeId = user.id
 			OR ( 
 				a.assigneeId = 0
 				AND EXISTS (
@@ -899,7 +900,7 @@
 					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
 					WHERE mapping.activityId = a.id
 					AND ( 
-						mapping.userId = :userId
+						mapping.userId = user.id
 						OR EXISTS (
 							SELECT actor.id
 							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
@@ -907,18 +908,18 @@
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND ( 
-								actormember.userId = :userId
-		 	  					OR EXISTS (
+								actormember.userId = user.id
+			 	  				OR EXISTS (
 									SELECT um.id
 									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-									WHERE um.userId = :userId
+									WHERE um.userId = user.id
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
 										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
-		     				)
+			     			)
 						)
 					)
 				)
@@ -928,16 +929,17 @@
 			SELECT h.id
 			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
 			WHERE a.id = h.activityId
-			AND h.userId = :userId
+			AND h.userId = user.id
 		)
     </query>
 	
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy">
         SELECT DISTINCT(process_definition)
-      	FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
+        FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
         	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
+        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR EXISTS (
@@ -958,7 +960,7 @@
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
-			a.assigneeId > 0
+			a.assigneeId = user.id
 			OR ( 
 				a.assigneeId = 0
 				AND EXISTS (
@@ -966,7 +968,7 @@
 					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
 					WHERE mapping.activityId = a.id
 					AND ( 
-						mapping.userId = :userId
+						mapping.userId = user.id
 						OR EXISTS (
 							SELECT actor.id
 							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
@@ -974,18 +976,18 @@
 							WHERE mapping.actorId = actor.id
 							AND  actor.id = actormember.actorId
 							AND ( 
-								actormember.userId = :userId
-		 	  					OR EXISTS (
+								actormember.userId = user.id
+			 	  				OR EXISTS (
 									SELECT um.id
 									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-									WHERE um.userId = :userId
+									WHERE um.userId = user.id
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
 										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
 										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
 									)
 								)
-		     				)
+			     			)
 						)
 					)
 				)
@@ -995,7 +997,7 @@
 			SELECT h.id
 			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
 			WHERE a.id = h.activityId
-			AND h.userId = :userId
+			AND h.userId = user.id
 		)
     </query>
     
