@@ -395,13 +395,14 @@ import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingU
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUsersManagedBy;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfos;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedBy;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy;
 import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosStartedBy;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosUserCanStart;
-import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosUsersManagedByCanStart;
+import org.bonitasoft.engine.search.process.SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
 import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfos;
+import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosCanBeStartedBy;
 import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosSupervisedBy;
-import org.bonitasoft.engine.search.process.SearchUncategorizedProcessDeploymentInfosUserCanStart;
 import org.bonitasoft.engine.search.supervisor.SearchArchivedHumanTasksSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchAssignedTasksSupervisedBy;
 import org.bonitasoft.engine.search.supervisor.SearchProcessDeploymentInfosSupervised;
@@ -1574,8 +1575,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final Set<Long> actorIds = getActorsForUser(userId, actorMappingService, definitionService);
             final List<SHumanTaskInstance> pendingTasks = activityInstanceService.getPendingTasks(userId, actorIds, startIndex, maxResults,
-                    orderAndField.getField(),
-                    orderAndField.getOrder());
+                    orderAndField.getField(), orderAndField.getOrder());
             return ModelConvertor.toHumanTaskInstances(pendingTasks, flowNodeStateManager);
         } catch (final SBonitaException e) {
             return Collections.emptyList();
@@ -2306,9 +2306,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(humanTaskInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinitionId);
-        final FilterResult result = userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(),
-                processClassloader, expressionContext, actorName);
-        return result;
+        return userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(), processClassloader,
+                expressionContext, actorName);
     }
 
     private void cleanPendingMappingsAndUnassignHumanTask(final long userTaskId, final SHumanTaskInstance humanTaskInstance) throws SFlowNodeNotFoundException,
@@ -3763,13 +3762,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanStart(final long userId, final SearchOptions searchOptions)
+    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedBy(final long userId, final SearchOptions searchOptions)
             throws RetrieveException, SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
-        final SearchProcessDeploymentInfosUserCanStart transactionSearch = new SearchProcessDeploymentInfosUserCanStart(processDefinitionService,
+        final SearchProcessDeploymentInfosCanBeStartedBy transactionSearch = new SearchProcessDeploymentInfosCanBeStartedBy(processDefinitionService,
                 searchDescriptor, searchOptions, userId);
         try {
             transactionSearch.execute();
@@ -3783,17 +3782,17 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final long userId, final SearchOptions searchOptions) throws RetrieveException,
             SearchException {
-        return searchProcessDeploymentInfosCanStart(userId, searchOptions);
+        return searchProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
     @Override
-    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final SearchOptions searchOptions)
-            throws SearchException {
+    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final long managerUserId,
+            final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
-        final SearchProcessDeploymentInfosUsersManagedByCanStart transactionSearch = new SearchProcessDeploymentInfosUsersManagedByCanStart(
+        final SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy transactionSearch = new SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy(
                 processDefinitionService, searchDescriptor, searchOptions, managerUserId);
         try {
             transactionSearch.execute();
@@ -3801,6 +3800,30 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         return transactionSearch.getResult();
+    }
+
+    @Deprecated
+    @Override
+    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final SearchOptions searchOptions)
+            throws SearchException {
+        return searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
+    }
+
+    @Override
+    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(final long userId,
+            final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
+        final SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser searcher = new SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(
+                processDefinitionService, searchDescriptor, searchOptions, userId);
+        try {
+            searcher.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        return searcher.getResult();
     }
 
     @Override
@@ -4011,15 +4034,22 @@ public class ProcessAPIImpl implements ProcessAPI {
         return supervisorService.searchProcessSupervisors(new QueryOptions(0, 1, oderByOptions, filterOptions, null));
     }
 
+    @Deprecated
     @Override
     public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(final long userId, final SearchOptions searchOptions)
+            throws SearchException {
+        return searchUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
+    }
+
+    @Override
+    public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosCanBeStartedBy(final long userId, final SearchOptions searchOptions)
             throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
-        final SearchUncategorizedProcessDeploymentInfosUserCanStart transactionSearch = new SearchUncategorizedProcessDeploymentInfosUserCanStart(
+        final SearchUncategorizedProcessDeploymentInfosCanBeStartedBy transactionSearch = new SearchUncategorizedProcessDeploymentInfosCanBeStartedBy(
                 processDefinitionService, searchDescriptor, searchOptions, userId);
         try {
             transactionSearch.execute();
@@ -5735,8 +5765,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final int startIndex, final int maxResults) throws SActorNotFoundException, SBonitaReadException {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final SActor actor = actorMappingService.getActor(actorName, processDefinitionId);
-        final List<Long> userIds = actorMappingService.getPossibleUserIdsOfActorId(actor.getId(), startIndex, maxResults);
-        return userIds;
+        return actorMappingService.getPossibleUserIdsOfActorId(actor.getId(), startIndex, maxResults);
     }
 
     @Override
@@ -5755,8 +5784,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchUserDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchUserDescriptor();
         final SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo searcher = new SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(
-                humanTaskInstanceId, activityInstanceService,
-                searchDescriptor, searchOptions);
+                humanTaskInstanceId, activityInstanceService, searchDescriptor, searchOptions);
         try {
             searcher.execute();
         } catch (final SBonitaException sbe) {

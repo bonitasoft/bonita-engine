@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosUsersManagedByCanStartTest extends CommonAPITest {
+public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT extends CommonAPITest {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 

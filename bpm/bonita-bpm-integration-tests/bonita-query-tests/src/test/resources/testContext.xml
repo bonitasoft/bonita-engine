@@ -14,14 +14,22 @@
        <property name="dataSource" ref="dataSource" />
        <property name="mappingResources">
            <list>
+           	   <value>/org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
+               <value>/org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
+               
                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
                
                <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
                <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
+               
                <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
+               
+               <value>/org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
+               
                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
+
                
                <!-- GLUPSSSS Needed by process instance queries -->
                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
@@ -42,6 +50,10 @@
    </bean>
     
    <bean id="processInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+   
+   <bean id="processDeploymentInfoRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
     

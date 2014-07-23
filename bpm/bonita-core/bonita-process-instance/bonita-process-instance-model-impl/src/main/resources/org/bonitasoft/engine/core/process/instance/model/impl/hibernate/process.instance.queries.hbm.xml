@@ -1383,8 +1383,6 @@
         ORDER BY MIN(user.userName)
     </query>
     
-    
-
 	<query name="getNumberOfSUserWhoCanStartPendingTask">
 	   SELECT count(DISTINCT user)
 	   FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,

@@ -24,15 +24,15 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
 
 /**
- * @author Zhang Bole
+ * @author Elias Ricken de Medeiros
  */
-public class SearchUncategorizedProcessDeploymentInfosUserCanStart extends AbstractProcessDeploymentInfoSearchEntity {
+public class SearchProcessDeploymentInfosCanBeStartedBy extends AbstractProcessDeploymentInfoSearchEntity {
 
     private final ProcessDefinitionService processDefinitionService;
 
     private final long userId;
 
-    public SearchUncategorizedProcessDeploymentInfosUserCanStart(final ProcessDefinitionService processDefinitionService,
+    public SearchProcessDeploymentInfosCanBeStartedBy(final ProcessDefinitionService processDefinitionService,
             final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options, final long userId) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
@@ -41,12 +41,12 @@ public class SearchUncategorizedProcessDeploymentInfosUserCanStart extends Abstr
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDefinitionService.getNumberOfUncategorizedProcessDeploymentInfosUserCanStart(userId, searchOptions);
+        return processDefinitionService.getNumberOfProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
     @Override
     public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDefinitionService.searchUncategorizedProcessDeploymentInfosUserCanStart(userId, searchOptions);
+        return processDefinitionService.searchProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
 }
