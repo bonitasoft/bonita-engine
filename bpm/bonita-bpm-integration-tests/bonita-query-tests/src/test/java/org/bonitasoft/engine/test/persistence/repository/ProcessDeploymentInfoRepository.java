@@ -14,16 +14,31 @@ public class ProcessDeploymentInfoRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SProcessDefinitionDeployInfo> searchProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksForUser(final long userId) {
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(final long userId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        final Query namedQuery = getNamedQuery("searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksForUser");
+        final Query namedQuery = getNamedQuery("searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor");
         namedQuery.setParameter("userId", userId);
         return namedQuery.list();
     }
 
-    public long getNumberOfProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksForUser(final long userId) {
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(final long userId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        final Query namedQuery = getNamedQuery("getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksForUser");
+        final Query namedQuery = getNamedQuery("getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor");
+        namedQuery.setParameter("userId", userId);
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(final long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy");
+        namedQuery.setParameter("userId", userId);
+        return namedQuery.list();
+    }
+
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(final long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy");
         namedQuery.setParameter("userId", userId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }

@@ -26,13 +26,13 @@ import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescripto
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser extends AbstractProcessDeploymentInfoSearchEntity {
+public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor extends AbstractProcessDeploymentInfoSearchEntity {
 
     private final ProcessDefinitionService processDefinitionService;
 
     private final long userId;
 
-    public SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(final ProcessDefinitionService processDefinitionService,
+    public SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(final ProcessDefinitionService processDefinitionService,
             final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options, final long userId) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
@@ -40,13 +40,13 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser 
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDefinitionService.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(userId, searchOptions);
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return processDefinitionService.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(userId, queryOptions);
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDefinitionService.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(userId, searchOptions);
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return processDefinitionService.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(userId, queryOptions);
     }
 
 }
