@@ -19,7 +19,6 @@ package org.bonitasoft.engine.test.persistence.builder;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 
-
 /**
  * @author Julien Reboul
  *
@@ -29,6 +28,10 @@ public class UserTaskInstanceBuilder extends ActivityInstanceBuilder<SUserTaskIn
     public static UserTaskInstanceBuilder aUserTask() {
         return new UserTaskInstanceBuilder();
     }
+
+    private long assigneeId;
+
+    private long actorId = 10;
 
     @Override
     UserTaskInstanceBuilder getThisBuilder() {
@@ -41,9 +44,25 @@ public class UserTaskInstanceBuilder extends ActivityInstanceBuilder<SUserTaskIn
 
     @Override
     SUserTaskInstanceImpl _build() {
-        final SUserTaskInstanceImpl callActivityInstanceImpl = new SUserTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, 10,
+        final SUserTaskInstanceImpl userTaskInstanceImpl = new SUserTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId,
                 STaskPriority.NORMAL, logicalGroup1, logicalGroup2);
-        return callActivityInstanceImpl;
+        userTaskInstanceImpl.setAssigneeId(assigneeId);
+        return userTaskInstanceImpl;
+    }
+
+    public UserTaskInstanceBuilder withRootProcessInstanceId(final long rootProcessInstanceId) {
+        this.logicalGroup2 = rootProcessInstanceId;
+        return this;
+    }
+
+    public UserTaskInstanceBuilder withAssigneeId(final long assigneeId) {
+        this.assigneeId = assigneeId;
+        return this;
+    }
+
+    public UserTaskInstanceBuilder withActorId(final long actorId) {
+        this.actorId = actorId;
+        return this;
     }
 
 }
