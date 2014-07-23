@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.session.APISession;
 
@@ -72,7 +71,38 @@ public class LazyLoader {
         final String targetEntityName = getTargetEntityNameFrom(method);
         final String sourceEntityName = getSourceEntityNameFrom(method);
         final String name = toFieldName(method.getName());
-        return targetEntityName + ".find" + name + "By" + sourceEntityName + WordUtils.capitalize(Field.PERSISTENCE_ID);
+        return targetEntityName + ".find" + name + "By" + sourceEntityName + capitalize(Field.PERSISTENCE_ID);
+    }
+
+    private static String capitalize(final String str, final char... delimiters) {
+        final int delimLen = delimiters == null ? -1 : delimiters.length;
+        if (str == null || str.isEmpty() || delimLen == 0) {
+            return str;
+        }
+        final char[] buffer = str.toCharArray();
+        boolean capitalizeNext = true;
+        for (int i = 0; i < buffer.length; i++) {
+            final char ch = buffer[i];
+            if (isDelimiter(ch, delimiters)) {
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                buffer[i] = Character.toTitleCase(ch);
+                capitalizeNext = false;
+            }
+        }
+        return new String(buffer);
+    }
+
+    private static boolean isDelimiter(final char ch, final char[] delimiters) {
+        if (delimiters == null) {
+            return Character.isWhitespace(ch);
+        }
+        for (final char delimiter : delimiters) {
+            if (ch == delimiter) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String toFieldName(final String methodName) {
