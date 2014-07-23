@@ -2,7 +2,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.bonitasoft.engine.bdm.BusinessObjectDeserializer;
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer;
+import com.bonitasoft.engine.bdm.dao.proxy.LazyLoader;
+import com.bonitasoft.engine.bdm.dao.proxy.Proxyfier;
 import org.bonitasoft.engine.session.APISession;
 
 public class AddressDAOImpl
@@ -11,10 +13,13 @@ public class AddressDAOImpl
 
     private APISession session;
     private BusinessObjectDeserializer deserializer;
+    private Proxyfier proxyfier;
 
     public AddressDAOImpl(APISession session) {
         this.session = session;
         this.deserializer = new BusinessObjectDeserializer();
+        LazyLoader lazyLoader = new LazyLoader(session);
+        this.proxyfier = new Proxyfier(lazyLoader);
     }
 
     public Address findByCity(String city) {
@@ -27,7 +32,7 @@ public class AddressDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("city", city);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
+            return proxyfier.proxify(deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -45,7 +50,7 @@ public class AddressDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("street", street);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
+            return proxyfier.proxify(deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -62,7 +67,7 @@ public class AddressDAOImpl
             commandParameters.put("maxResults", maxResults);
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class);
+            return proxyfier.proxify(deserializer.deserializeList(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

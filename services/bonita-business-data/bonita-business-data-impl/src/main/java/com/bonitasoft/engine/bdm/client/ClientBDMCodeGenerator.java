@@ -82,8 +82,8 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JClass deserializerClass = getModel().ref("com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer");
         implClass.field(JMod.PRIVATE, deserializerClass, "deserializer");
 
-        //        final JClass proxyfierClass = getModel().ref("com.bonitasoft.engine.bdm.dao.proxy.Proxyfier");
-        //        implClass.field(JMod.PRIVATE, proxyfierClass, "proxyfier");
+        final JClass proxyfierClass = getModel().ref("com.bonitasoft.engine.bdm.dao.proxy.Proxyfier");
+        implClass.field(JMod.PRIVATE, proxyfierClass, "proxyfier");
 
         final JMethod constructor = implClass.constructor(JMod.PUBLIC);
         constructor.param(apiSessionJClass, "session");
@@ -91,7 +91,9 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JBlock body = constructor.body();
         body.assign(JExpr.refthis("session"), JExpr.ref("session"));
         body.assign(JExpr.refthis("deserializer"), JExpr._new(deserializerClass));
-
+        final JClass lazyLoaderClass = getModel().ref("com.bonitasoft.engine.bdm.dao.proxy.LazyLoader");
+        final JVar lazyLoaderRef = body.decl(lazyLoaderClass, "lazyLoader", JExpr._new(lazyLoaderClass).arg(JExpr.ref("session")));
+        body.assign(JExpr.refthis("proxyfier"), JExpr._new(proxyfierClass).arg(lazyLoaderRef));
     }
 
     private void addQueryMethodBody(final String entityName, final JMethod method, final String queryName, final String returnType) {
@@ -136,6 +138,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JInvocation executeQuery = commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef);
         final JClass byteArrayClass = getModel().ref(byte[].class);
         final JFieldRef deserializerFieldRef = JExpr.ref("deserializer");
+        final JFieldRef proxyfierFieldRef = JExpr.ref("proxyfier");
         final JExpression entityClassExpression = JExpr.dotclass(getModel().ref(returnType));
         JInvocation deserialize = null;
         if (isCollection) {
@@ -144,7 +147,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
             deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
         }
 
-        tryBody._return(deserialize);
+        tryBody._return(proxyfierFieldRef.invoke("proxify").arg(deserialize));
 
         final JClass exceptionClass = getModel().ref(Exception.class);
         final JCatchBlock catchBlock = tryBlock._catch(exceptionClass);

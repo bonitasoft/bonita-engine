@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Files;
 import org.assertj.core.util.FilesException;
 import org.junit.After;
@@ -289,9 +288,9 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Test
     public void addListReferenceWithLazyAggregation() throws Exception {
-        BusinessObject addressBO = addressBO();
+        final BusinessObject addressBO = addressBO();
         addressBO.addUniqueConstraint("city", "city");
-		final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO).build();
+        final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
         bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
@@ -352,7 +351,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-        
         assertThat(file).hasContentEqualTo(expected);
     }
 
