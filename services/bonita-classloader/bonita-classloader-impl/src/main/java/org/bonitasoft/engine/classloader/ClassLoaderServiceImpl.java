@@ -133,7 +133,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void removeLocalClassLoader(final String type, final long id) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeLocalClassLoader"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeLocalClassLoader")
+                    + ": Removing local classloader for type " + type + " of id " + id);
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
         final String key = getKey(type, id);
