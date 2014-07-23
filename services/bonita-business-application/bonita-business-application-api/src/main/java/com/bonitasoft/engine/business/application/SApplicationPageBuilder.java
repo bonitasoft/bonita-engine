@@ -6,25 +6,15 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package org.bonitasoft.engine.business.application;
+package com.bonitasoft.engine.business.application;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public interface SApplicationBuilderFactory {
+public interface SApplicationPageBuilder {
 
-    SApplicationBuilder createNewInstance(String name, String version, String path);
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getVersionKey();
-
-    String getPathKey();
-
-    String getDescriptionKey();
+    SApplicationPage done();
 
 }

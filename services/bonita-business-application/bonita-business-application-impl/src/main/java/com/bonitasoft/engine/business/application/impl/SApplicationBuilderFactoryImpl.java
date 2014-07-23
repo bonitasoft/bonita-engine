@@ -11,10 +11,10 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl;
 
-import org.bonitasoft.engine.business.application.SApplicationBuilder;
-import org.bonitasoft.engine.business.application.SApplicationBuilderFactory;
+import com.bonitasoft.engine.business.application.SApplicationBuilder;
+import com.bonitasoft.engine.business.application.SApplicationBuilderFactory;
 
 
 /**

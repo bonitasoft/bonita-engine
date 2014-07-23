@@ -6,11 +6,11 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package org.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl;
 
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
-import org.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplication;
 
 
 /**

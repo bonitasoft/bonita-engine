@@ -6,19 +6,25 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package org.bonitasoft.engine.business.application;
-
-import org.bonitasoft.engine.persistence.PersistentObject;
+package com.bonitasoft.engine.business.application;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public interface SApplicationPage extends PersistentObject {
+public interface SApplicationBuilderFactory {
 
-    long getApplicationId();
+    SApplicationBuilder createNewInstance(String name, String version, String path);
 
-    long getPageId();
+    String getIdKey();
+
+    String getNameKey();
+
+    String getVersionKey();
+
+    String getPathKey();
+
+    String getDescriptionKey();
 
 }

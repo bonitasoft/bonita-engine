@@ -11,27 +11,33 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl;
 
-import org.bonitasoft.engine.business.application.SApplicationPage;
-import org.bonitasoft.engine.business.application.SApplicationPageBuilder;
+import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationBuilder;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class SApplicationPageBuilderImpl implements SApplicationPageBuilder {
+public class SApplicationBuilderImpl implements SApplicationBuilder {
 
-    private final SApplicationPageImpl applicationPage;
+    private final SApplicationImpl application;
 
-    public SApplicationPageBuilderImpl(final SApplicationPageImpl applicationPage) {
-        this.applicationPage = applicationPage;
+    public SApplicationBuilderImpl(final SApplicationImpl application) {
+        this.application = application;
     }
 
     @Override
-    public SApplicationPage done() {
-        return applicationPage;
+    public SApplication done() {
+        return application;
+    }
+
+    @Override
+    public SApplicationBuilder setDescription(final String description) {
+        application.setDescription(description);
+        return this;
     }
 
 }

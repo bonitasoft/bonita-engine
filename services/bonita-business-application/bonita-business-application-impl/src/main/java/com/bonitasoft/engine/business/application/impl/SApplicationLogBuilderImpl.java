@@ -11,14 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatoryFieldsException;
 
-import org.bonitasoft.engine.business.application.SApplicationLogBuilder;
+import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
 
 /**
  * @author Elias Ricken de Medeiros

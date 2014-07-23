@@ -6,16 +6,14 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package org.bonitasoft.engine.business.application;
-
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEActionFactory;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilderFactory;
+package com.bonitasoft.engine.business.application;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public interface SApplicationLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
+public interface SApplicationPageBuilderFactory {
+
 
 }
