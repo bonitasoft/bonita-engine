@@ -12,7 +12,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SApplication extends PersistentObject {
 
