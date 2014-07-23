@@ -46,7 +46,7 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
 
     @Override
     protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
-            ParserConfigurationException, SAXException {
+    ParserConfigurationException, SAXException {
         final List<BusinessObject> entities = bom.getBusinessObjects();
         final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
         for (final BusinessObject businessObject : entities) {
@@ -62,6 +62,11 @@ public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
         final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
         final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
         IOUtil.write(new File(directory, "bom.xml"), bomXML);
+    }
+
+    @Override
+    protected void addClientResources(final File directory) throws ClassNotFoundException {
+        // Do nothing
     }
 
 }

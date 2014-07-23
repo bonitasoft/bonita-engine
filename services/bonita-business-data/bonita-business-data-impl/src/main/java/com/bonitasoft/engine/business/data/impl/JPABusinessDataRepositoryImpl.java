@@ -214,4 +214,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         }
     }
 
+    @Override
+    public Entity merge(final Entity entity) {
+        if (entity != null) {
+            return getEntityManager().merge(entity);
+        }
+        return null;
+    }
+
 }

@@ -82,10 +82,20 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     void remove(Entity entity);
 
     /**
+     * Reconnect the given entity with the persistence unit
+     * 
+     * @param entity
+     *        the entity to reconnect.
+     * @return the connected entity.
+     */
+    Entity merge(Entity entity);
+
+    /**
      * Retrieves the <code>Set</code> of known Entity class names in this Business Data Repository.
      *
      * @return the <code>Set</code> of known Entity class names, as qualified class names.
      */
     Set<String> getEntityClassNames();
+
 
 }

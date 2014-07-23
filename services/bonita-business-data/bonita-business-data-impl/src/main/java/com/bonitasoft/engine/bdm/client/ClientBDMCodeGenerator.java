@@ -52,7 +52,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-            ClassNotFoundException {
+    ClassNotFoundException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -78,16 +78,20 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
     private void createConstructor(final JDefinedClass implClass) {
         final JClass apiSessionJClass = getModel().ref("org.bonitasoft.engine.session.APISession");
         implClass.field(JMod.PRIVATE, apiSessionJClass, "session");
-        
-        final JClass deserializerClass = getModel().ref("com.bonitasoft.engine.bdm.BusinessObjectDeserializer");
+
+        final JClass deserializerClass = getModel().ref("com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer");
         implClass.field(JMod.PRIVATE, deserializerClass, "deserializer");
-        
+
+        //        final JClass proxyfierClass = getModel().ref("com.bonitasoft.engine.bdm.dao.proxy.Proxyfier");
+        //        implClass.field(JMod.PRIVATE, proxyfierClass, "proxyfier");
+
         final JMethod constructor = implClass.constructor(JMod.PUBLIC);
         constructor.param(apiSessionJClass, "session");
-        
+
         final JBlock body = constructor.body();
         body.assign(JExpr.refthis("session"), JExpr.ref("session"));
         body.assign(JExpr.refthis("deserializer"), JExpr._new(deserializerClass));
+
     }
 
     private void addQueryMethodBody(final String entityName, final JMethod method, final String queryName, final String returnType) {
@@ -131,15 +135,15 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Execute command
         final JInvocation executeQuery = commandApiRef.invoke("execute").arg("executeBDMQuery").arg(commandParametersRef);
         final JClass byteArrayClass = getModel().ref(byte[].class);
-        JFieldRef deserializerFieldRef = JExpr.ref("deserializer");
+        final JFieldRef deserializerFieldRef = JExpr.ref("deserializer");
         final JExpression entityClassExpression = JExpr.dotclass(getModel().ref(returnType));
-     	JInvocation deserialize = null;
+        JInvocation deserialize = null;
         if (isCollection) {
-        	deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
+            deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
         } else {
-        	deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
+            deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
         }
-      
+
         tryBody._return(deserialize);
 
         final JClass exceptionClass = getModel().ref(Exception.class);
