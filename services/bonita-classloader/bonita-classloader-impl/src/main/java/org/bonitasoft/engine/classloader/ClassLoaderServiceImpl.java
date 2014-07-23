@@ -145,7 +145,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeLocalClassLoader"));
         }
-        // TODO FIXME else log
     }
 
     private String getGlobalTemporaryFolder() {
