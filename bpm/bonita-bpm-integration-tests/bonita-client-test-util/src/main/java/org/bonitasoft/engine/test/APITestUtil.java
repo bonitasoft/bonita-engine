@@ -776,6 +776,10 @@ public class APITestUtil extends PlatformTestUtil {
         getProcessAPI().deleteSupervisor(id);
     }
 
+    public void deleteSupervisor(final ProcessSupervisor supervisor) throws BonitaException {
+        getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
+    }
+
     @Deprecated
     public List<HumanTaskInstance> waitForPendingTasks(final long userId, final int nbPendingTasks) throws Exception {
         final WaitForPendingTasks waitUntil = new WaitForPendingTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbPendingTasks, userId, getProcessAPI());

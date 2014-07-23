@@ -1740,20 +1740,4 @@ public interface ProcessManagementAPI {
      */
     List<Long> getUserIdsForActor(long processDefinitionId, String actorName, int startIndex, int maxResults);
 
-    /**
-     * Search all process definitions that have instances with one or more human tasks assigned/pending for a specific user.
-     * The tasks are in stable state, not in terminal/executing state.
-     * 
-     * @param userId
-     *            The identifier of the user.
-     * @param searchOptions
-     *            The search criterion.
-     * @return The list of process definitions
-     * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
-     * @since 6.3.3
-     */
-    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(long userId, SearchOptions searchOptions)
-            throws SearchException;
-
 }
