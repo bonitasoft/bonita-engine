@@ -27,8 +27,8 @@ public class AddressDAOImpl
             org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.findByCity");
-            commandParameters.put("returnType", "Address");
             commandParameters.put("returnsList", false);
+            commandParameters.put("returnType", "Address");
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("city", city);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
@@ -43,8 +43,8 @@ public class AddressDAOImpl
             org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.findByStreet");
-            commandParameters.put("returnType", "Address");
             commandParameters.put("returnsList", true);
+            commandParameters.put("returnType", "Address");
             commandParameters.put("startIndex", startIndex);
             commandParameters.put("maxResults", maxResults);
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
@@ -61,8 +61,8 @@ public class AddressDAOImpl
             org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.find");
-            commandParameters.put("returnType", "Address");
             commandParameters.put("returnsList", true);
+            commandParameters.put("returnType", "Address");
             commandParameters.put("startIndex", startIndex);
             commandParameters.put("maxResults", maxResults);
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
