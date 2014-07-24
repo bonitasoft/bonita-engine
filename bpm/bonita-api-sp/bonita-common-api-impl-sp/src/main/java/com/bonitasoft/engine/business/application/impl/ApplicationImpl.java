@@ -28,7 +28,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
 
     private static final long serialVersionUID = -5393587887795907117L;
     private String version;
-    private String url;
+    private String path;
     private String iconPath;
     private Date creationDate;
     private long createdBy;
@@ -46,8 +46,8 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     }
 
     @Override
-    public String getURL() {
-        return url;
+    public String getPath() {
+        return path;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
         result = prime * result + (status == null ? 0 : status.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
-        result = prime * result + (url == null ? 0 : url.hashCode());
+        result = prime * result + (path == null ? 0 : path.hashCode());
         result = prime * result + (version == null ? 0 : version.hashCode());
         return result;
     }
@@ -141,11 +141,11 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         if (updatedBy != other.updatedBy) {
             return false;
         }
-        if (url == null) {
-            if (other.url != null) {
+        if (path == null) {
+            if (other.path != null) {
                 return false;
             }
-        } else if (!url.equals(other.url)) {
+        } else if (!path.equals(other.path)) {
             return false;
         }
         if (version == null) {
@@ -160,7 +160,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
 
     @Override
     public String toString() {
-        return "ApplicationImpl [version=" + version + ", url=" + url + ", iconPath=" + iconPath + ", creationDate=" + creationDate + ", createdBy="
+        return "ApplicationImpl [version=" + version + ", url=" + path + ", iconPath=" + iconPath + ", creationDate=" + creationDate + ", createdBy="
                 + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", status=" + status + ", name=" + getName()
                 + ", id=" + getId() + "]";
     }
