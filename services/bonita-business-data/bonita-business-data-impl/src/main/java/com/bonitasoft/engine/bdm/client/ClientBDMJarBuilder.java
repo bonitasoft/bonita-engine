@@ -46,6 +46,8 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
         addResourceForClass(directory, "com.bonitasoft.engine.bdm.dao.proxy.Proxyfier");
         addResourceForClass(directory, "com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer");
         addResourceForClass(directory, "com.bonitasoft.engine.bdm.dao.utils.Capitalizer");
+        addResourceForClass(directory, "com.bonitasoft.engine.bdm.dao.utils.BDMQueryCommandParameters");
+        addResourceForClass(directory, "com.bonitasoft.engine.bdm.dao.utils.EntityGetter");
     }
 
 }
