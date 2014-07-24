@@ -104,7 +104,12 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     @AfterClass
     public static void cleanTestClass() throws IOException {
-        FileUtils.deleteDirectory(clientFolder);
+        try{
+            FileUtils.deleteDirectory(clientFolder);
+        } catch (final Exception e) {
+            clientFolder.deleteOnExit();
+        }
+
     }
 
     @Before
