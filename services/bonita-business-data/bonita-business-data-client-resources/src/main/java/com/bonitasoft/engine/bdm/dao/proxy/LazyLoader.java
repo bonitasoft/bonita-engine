@@ -14,6 +14,7 @@ import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer;
+import com.bonitasoft.engine.bdm.dao.utils.Capitalizer;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -71,38 +72,7 @@ public class LazyLoader {
         final String targetEntityName = getTargetEntityNameFrom(method);
         final String sourceEntityName = getSourceEntityNameFrom(method);
         final String name = toFieldName(method.getName());
-        return targetEntityName + ".find" + name + "By" + sourceEntityName + capitalize(Field.PERSISTENCE_ID);
-    }
-
-    private static String capitalize(final String str, final char... delimiters) {
-        final int delimLen = delimiters == null ? -1 : delimiters.length;
-        if (str == null || str.isEmpty() || delimLen == 0) {
-            return str;
-        }
-        final char[] buffer = str.toCharArray();
-        boolean capitalizeNext = true;
-        for (int i = 0; i < buffer.length; i++) {
-            final char ch = buffer[i];
-            if (isDelimiter(ch, delimiters)) {
-                capitalizeNext = true;
-            } else if (capitalizeNext) {
-                buffer[i] = Character.toTitleCase(ch);
-                capitalizeNext = false;
-            }
-        }
-        return new String(buffer);
-    }
-
-    private static boolean isDelimiter(final char ch, final char[] delimiters) {
-        if (delimiters == null) {
-            return Character.isWhitespace(ch);
-        }
-        for (final char delimiter : delimiters) {
-            if (ch == delimiter) {
-                return true;
-            }
-        }
-        return false;
+        return targetEntityName + ".find" + name + "By" + sourceEntityName + Capitalizer.capitalize(Field.PERSISTENCE_ID);
     }
 
     private String toFieldName(final String methodName) {

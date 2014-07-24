@@ -24,14 +24,12 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.bonitasoft.engine.session.APISession;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.bdm.dao.proxy.LazyLoader;
 import com.bonitasoft.engine.bdm.proxy.model.Employee;
 
 /**
@@ -46,25 +44,18 @@ public class LazyLoaderTest {
 
     private LazyLoader lazyLoader;
 
-    /**
-     * @throws java.lang.Exception
-     */
     @Before
     public void setUp() throws Exception {
         lazyLoader = new LazyLoader(apiSession);
     }
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
     public void should_getQueryNameForMethod_returns_a_valid_name() throws Exception {
         final Method method = Employee.class.getDeclaredMethod("getEmployees");
-        assertThat(lazyLoader.getQueryNameFor(method)).isEqualTo("Employee.findEmployeesByEmployeePersistenceId");
+        
+        Serializable name = lazyLoader.getQueryNameFor(method);
+        
+		assertThat(name).isEqualTo("Employee.findEmployeesByEmployeePersistenceId");
     }
 
     @SuppressWarnings("unchecked")
