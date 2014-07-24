@@ -68,19 +68,19 @@ public abstract class FieldBuilder {
     }
 
     public static Field anAggregationField(final String name, final BusinessObject reference) {
-        RelationField relationField = aRelationField(name, reference);
+        final RelationField relationField = aRelationField(name, reference);
         relationField.setType(Type.AGGREGATION);
         return relationField;
     }
 
     public static Field aCompositionField(final String name, final BusinessObject reference) {
-        RelationField relationField = aRelationField(name, reference);
+        final RelationField relationField = aRelationField(name, reference);
         relationField.setType(Type.COMPOSITION);
         return relationField;
     }
 
     private static RelationField aRelationField(final String name, final BusinessObject reference) {
-        RelationField relationField = new RelationField();
+        final RelationField relationField = new RelationField();
         relationField.setName(name);
         relationField.setReference(reference);
         return relationField;
@@ -110,6 +110,7 @@ public abstract class FieldBuilder {
         field.setCollection(collection);
         return this;
     }
+
 
     public Field build() {
         return field;
@@ -143,6 +144,11 @@ public abstract class FieldBuilder {
         public SimpleFieldBuilder notNullable() {
             return (SimpleFieldBuilder) super.notNullable();
         }
+
+        public FieldBuilder withLength(final int length) {
+            ((SimpleField) field).setLength(length);
+            return this;
+        }
     }
 
     public static class RelationFieldBuilder extends FieldBuilder {
@@ -171,7 +177,7 @@ public abstract class FieldBuilder {
             return this;
         }
 
-        public RelationFieldBuilder fetchType(FetchType fetchType) {
+        public RelationFieldBuilder fetchType(final FetchType fetchType) {
             ((RelationField) field).setFetchType(fetchType);
             return this;
         }
@@ -191,7 +197,7 @@ public abstract class FieldBuilder {
             return (RelationFieldBuilder) super.multiple(collection);
         }
 
-        public RelationFieldBuilder referencing(BusinessObject bo) {
+        public RelationFieldBuilder referencing(final BusinessObject bo) {
             ((RelationField) field).setReference(bo);
             return this;
         }

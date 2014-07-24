@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.business.data;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,8 +63,6 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -170,8 +170,11 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @After
     public void tearDown() throws Exception {
-        FileUtils.deleteDirectory(clientFolder);
-
+        try {
+            FileUtils.deleteDirectory(clientFolder);
+        } catch (final Exception e) {
+            clientFolder.deleteOnExit();
+        }
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
@@ -642,7 +645,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
                                         new ExpressionBuilder().createConstantStringExpression("Plop")))
                                         .addOperation(
                                                 new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setLastName", String.class.getName(),
-                                                        new ExpressionBuilder().createConstantStringExpression("Péuigrec")))
+                                new ExpressionBuilder().createConstantStringExpression("Péuigrec")))
                                                         .addOperation(
                                                                 new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setLastName", String.class.getName(),
                                                                         new ExpressionBuilder().createConstantStringExpression("Plip")));

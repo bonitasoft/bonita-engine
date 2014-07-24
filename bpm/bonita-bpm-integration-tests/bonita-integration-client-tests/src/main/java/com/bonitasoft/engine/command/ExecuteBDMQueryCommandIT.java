@@ -1,5 +1,10 @@
 package com.bonitasoft.engine.command;
 
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aRelationField;
+import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aSimpleField;
+import static com.bonitasoft.engine.bdm.model.builder.QueryBuilder.aQuery;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -33,9 +38,8 @@ import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.business.data.ClassloaderRefresher;
 import com.bonitasoft.engine.io.IOUtils;
@@ -50,6 +54,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.BonitaEmployee";
 
+    private static final String ADDRESS_QUALIF_CLASSNAME = "org.bonita.pojo.BonitaAddress";
+
     private static final String RETURNS_LIST = "returnsList";
 
     private static final String QUERY_PARAMETERS = "queryParameters";
@@ -62,6 +68,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     private static final String QUERY_NAME = "queryName";
 
+
     protected User businessUser;
 
     private ClassLoader contextClassLoader;
@@ -69,30 +76,23 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     private static File clientFolder;
 
     private BusinessObjectModel buildBOM() {
-        final SimpleField firstName = new SimpleField();
-        firstName.setName("firstName");
-        firstName.setType(FieldType.STRING);
-        firstName.setLength(Integer.valueOf(10));
-
-        final SimpleField lastName = new SimpleField();
-        lastName.setName("lastName");
-        lastName.setType(FieldType.STRING);
-        lastName.setNullable(Boolean.FALSE);
-
-        final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
-        employee.addField(firstName);
-        employee.addField(lastName);
-        employee.setDescription("Describe a simple employee");
-        // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
-
-        employee.addQuery("getNoEmployees", "SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'", List.class.getName());
-        final Query query = employee.addQuery("getEmployeeByFirstNameAndLastName",
-                "SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName", EMPLOYEE_QUALIF_CLASSNAME);
-        query.addQueryParameter("firstName", String.class.getName());
-        query.addQueryParameter("lastName", String.class.getName());
-        final BusinessObjectModel model = new BusinessObjectModel();
-        model.addBusinessObject(employee);
+        final BusinessObject addressBO = aBO(ADDRESS_QUALIF_CLASSNAME).withField(aSimpleField().withName("street").ofType(FieldType.STRING).build()).build();
+        final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee").
+                withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build()).
+                withField(aSimpleField().withName("lastName").ofType(FieldType.STRING).notNullable().build()).
+                withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build()).
+                withQuery(
+                        aQuery().withName("getNoEmployees")
+                        .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'")
+                        .withReturnType(List.class.getName()).build()).
+                        withQuery(
+                                aQuery().withName("getEmployeeByFirstNameAndLastName")
+                                .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName")
+                                .withReturnType(EMPLOYEE_QUALIF_CLASSNAME)
+                                .withQueryParameter("firstName", String.class.getName())
+                                .withQueryParameter("lastName", String.class.getName()).build())
+                                .build();
+        final BusinessObjectModel model = aBOM().withBOs(addressBO, employee).build();
         return model;
     }
 
@@ -129,8 +129,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
         loadClientJars();
 
-        addEmployee("Romain", "Bioteau");
-        addEmployee("Jules", "Bioteau");
+        addEmployee("Romain", "Bioteau", "54, Grand Rue", "38 , Gabrile Péri");
+        addEmployee("Jules", "Bioteau", "78 , Colonel Bougault");
         addEmployee("Matthieu", "Chaffotte");
     }
 
@@ -217,6 +217,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         assertThat(employee.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
         assertThat(employee.getClass().getMethod("getFirstName", new Class[0]).invoke(employee)).isEqualTo("Romain");
         assertThat(employee.getClass().getMethod("getLastName", new Class[0]).invoke(employee)).isEqualTo("Bioteau");
+        final Object invoke = employee.getClass().getMethod("getAddresses", new Class[0]).invoke(employee);
+        assertThat(invoke).isInstanceOf(List.class);
+        assertThat((List<?>) invoke).isEmpty();
     }
 
     @Test(expected = CommandExecutionException.class)
@@ -238,9 +241,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
     }
 
-    public void addEmployee(final String firstName, final String lastName) throws Exception {
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; BonitaEmployee e = new BonitaEmployee(); e.firstName = '" + firstName + "'; e.lastName = '" + lastName + "'; return e;",
+    public void addEmployee(final String firstName, final String lastName, final String... addresses) throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
+                createNewEmployeeScriptContent(firstName, lastName, addresses),
                 EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
@@ -258,6 +261,39 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         getProcessAPI().executeFlowNode(userTask.getId());
 
         disableAndDeleteProcess(definition.getId());
+    }
+
+    private String createNewEmployeeScriptContent(final String firstName, final String lastName, final String... addresses) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("import ");
+        sb.append(EMPLOYEE_QUALIF_CLASSNAME);
+        sb.append("\n");
+        sb.append("import ");
+        sb.append(ADDRESS_QUALIF_CLASSNAME);
+        sb.append("\n");
+        sb.append("BonitaEmployee e = new BonitaEmployee();");
+        sb.append("\n");
+        sb.append("e.firstName =");
+        sb.append( "'" + firstName + "'");
+        sb.append("\n");
+        sb.append("e.lastName =");
+        sb.append("'" + lastName + "'");
+        sb.append("\n");
+        if (addresses != null) {
+            for (int i = 0; i < addresses.length; i++) {
+                final String addressVar = "a" + String.valueOf(i);
+                sb.append("BonitaAddress " + addressVar + " = new BonitaAddress();");
+                sb.append("\n");
+                sb.append(addressVar + ".street =");
+                sb.append("'" + addresses[i] + "'");
+                sb.append("\n");
+                sb.append("e.addToAddresses(" + addressVar + ")");
+                sb.append("\n");
+            }
+        }
+
+        sb.append("return e;");
+        return sb.toString();
     }
 
     private Serializable deserializeSimpleResult(final byte[] result) throws Exception {

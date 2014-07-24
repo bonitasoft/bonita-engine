@@ -62,13 +62,13 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Add method for provided queries
         for (final Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
+            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName(), q.getReturnType());
         }
 
         // Add method for queries
         for (final Query q : bo.getQueries()) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName());
+            addQueryMethodBody(entity.name(), method, q.getName(), entity.fullName(), q.getReturnType());
         }
 
         final JMethod method = createMethodForNewInstance(bo, entity, implClass);
@@ -96,7 +96,8 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         body.assign(JExpr.refthis("proxyfier"), JExpr._new(proxyfierClass).arg(lazyLoaderRef));
     }
 
-    private void addQueryMethodBody(final String entityName, final JMethod method, final String queryName, final String returnType) {
+    private void addQueryMethodBody(final String entityName, final JMethod method, final String queryName, final String entityClassName,
+            final String queryReturnType) {
         final JBlock body = method.body();
 
         final JTryBlock tryBlock = body._try();
@@ -115,7 +116,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         hashMapClass = hashMapClass.narrow(String.class, Serializable.class);
         final JVar commandParametersRef = tryBody.decl(mapClass, "commandParameters", JExpr._new(hashMapClass));
         tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("queryName")).arg(JExpr.lit(entityName + "." + queryName));
-        tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("returnType")).arg(JExpr.lit(returnType));
+
 
         // Set if should returns a List or a single value
         boolean isCollection = false;
@@ -126,9 +127,12 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("returnsList")).arg(JExpr.lit(isCollection));
 
         if (isCollection) {
+            tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("returnType")).arg(JExpr.lit(entityClassName));
             for (final String param : FORBIDDEN_PARAMETER_NAMES) {
                 tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit(param)).arg(JExpr.ref(param));
             }
+        } else {
+            tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("returnType")).arg(JExpr.lit(queryReturnType));
         }
 
         // Add query parameters
@@ -139,15 +143,22 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JClass byteArrayClass = getModel().ref(byte[].class);
         final JFieldRef deserializerFieldRef = JExpr.ref("deserializer");
         final JFieldRef proxyfierFieldRef = JExpr.ref("proxyfier");
-        final JExpression entityClassExpression = JExpr.dotclass(getModel().ref(returnType));
+        JExpression entityClassExpression = null;
+        if (isCollection) {
+            entityClassExpression = JExpr.dotclass(getModel().ref(entityClassName));
+        } else {
+            entityClassExpression = JExpr.dotclass(getModel().ref(queryReturnType));
+        }
         JInvocation deserialize = null;
         if (isCollection) {
             deserialize = deserializerFieldRef.invoke("deserializeList").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
-        } else {
+            tryBody._return(proxyfierFieldRef.invoke("proxify").arg(deserialize));
+        } else if (queryReturnType.equals(entityClassName)) {
             deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
+            tryBody._return(proxyfierFieldRef.invoke("proxify").arg(deserialize));
+        } else {
+            tryBody._return(JExpr.cast(getModel().ref(queryReturnType), executeQuery));
         }
-
-        tryBody._return(proxyfierFieldRef.invoke("proxify").arg(deserialize));
 
         final JClass exceptionClass = getModel().ref(Exception.class);
         final JCatchBlock catchBlock = tryBlock._catch(exceptionClass);
