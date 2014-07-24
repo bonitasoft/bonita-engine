@@ -27,7 +27,9 @@ import java.util.zip.ZipOutputStream;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.SessionInfos;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
@@ -133,6 +135,8 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderF
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
+import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevelExt;
+import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchivedExt;
 import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelExt;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
@@ -757,7 +761,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
-     * 
+     *
      * @param operationsInputValues
      * @throws ConnectorExecutionException
      */
@@ -930,7 +934,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
-     * 
+     *
      * @param operationsInputValues
      * @throws ConnectorExecutionException
      */
@@ -1179,4 +1183,24 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         return new EvaluateExpressionsInstanceLevelExt(expressions, containerId, containerType, processDefinitionId, expressionService, getTenantAccessor()
                 .getBusinessDataRepository());
     }
+
+    @Override
+    protected EvaluateExpressionsDefinitionLevel createDefinitionLevelExpressionEvaluator(
+            final Map<Expression, Map<String, Serializable>> expressionsAndTheirPartialContext, final long processDefinitionId,
+            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
+        return new EvaluateExpressionsDefinitionLevelExt(expressionsAndTheirPartialContext, processDefinitionId, expressionResolverService,
+                processDefinitionService, getTenantAccessor()
+                .getBusinessDataRepository());
+    }
+
+    @Override
+    protected EvaluateExpressionsInstanceLevelAndArchived createInstanceAndArchivedLevelExpressionEvaluator(
+            final Map<Expression, Map<String, Serializable>> expressions, final long containerId, final String containerType, final long processDefinitionId,
+            final long time,
+            final ExpressionResolverService expressionService) {
+        return new EvaluateExpressionsInstanceLevelAndArchivedExt(expressions, containerId, containerType, processDefinitionId, time, expressionService,
+                getTenantAccessor()
+                .getBusinessDataRepository());
+    }
+
 }

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -32,17 +32,16 @@ import com.bonitasoft.engine.business.data.BusinessDataRepository;
  * @author Romain Bioteau
  *
  */
-public class EvaluateExpressionsInstanceLevelExt extends EvaluateExpressionsInstanceLevel {
+public class EvaluateExpressionsInstanceLevelAndArchivedExt extends EvaluateExpressionsInstanceLevelAndArchived {
 
     private final EntityMerger entityMerger;
 
-    public EvaluateExpressionsInstanceLevelExt(final Map<Expression, Map<String, Serializable>> expressions, final long containerId,
+    public EvaluateExpressionsInstanceLevelAndArchivedExt(final Map<Expression, Map<String, Serializable>> expressions, final long containerId,
             final String containerType,
-            final long processDefinitionId, final ExpressionResolverService expressionService, final BusinessDataRepository bdrService) {
-        super(expressions, containerId, containerType, processDefinitionId, expressionService);
+            final long processDefinitionId, final long time, final ExpressionResolverService expressionService, final BusinessDataRepository bdrService) {
+        super(expressions, containerId, containerType, processDefinitionId, time, expressionService);
         entityMerger = new EntityMerger(bdrService);
     }
-
 
     @Override
     protected Map<String, Serializable> getPartialContext(final Map<Expression, Map<String, Serializable>> expressions, final Expression exp) {
@@ -58,5 +57,7 @@ public class EvaluateExpressionsInstanceLevelExt extends EvaluateExpressionsInst
 
         return result;
     }
+
+
 
 }
