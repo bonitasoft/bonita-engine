@@ -13,7 +13,9 @@ import org.junit.runners.Suite.SuiteClasses;
         SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT.class,
         SearchProcessDeploymentInfosCanBeStartedByIT.class,
         SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT.class,
-        SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUserIT.class
+        SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForIT.class,
+        SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByIT.class,
+        SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksIT.class
 })
 public class SearchEntitiesTests {
 
