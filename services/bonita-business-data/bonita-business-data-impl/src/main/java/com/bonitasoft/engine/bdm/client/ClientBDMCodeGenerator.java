@@ -18,7 +18,6 @@ import java.util.Map;
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
@@ -41,8 +40,8 @@ import com.sun.codemodel.JVar;
  */
 public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
-    public ClientBDMCodeGenerator(final BusinessObjectModel bom) {
-        super(bom);
+    public ClientBDMCodeGenerator() {
+        super();
     }
 
     @Override

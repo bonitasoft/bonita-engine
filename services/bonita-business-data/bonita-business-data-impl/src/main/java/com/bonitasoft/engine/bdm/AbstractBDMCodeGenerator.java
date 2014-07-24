@@ -13,11 +13,8 @@ import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationR
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.commons.lang3.text.WordUtils;
 
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
@@ -34,9 +31,7 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
@@ -52,17 +47,24 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     private static final String NEW_INSTANCE_METHOD_NAME = "newInstance";
 
-    protected final BusinessObjectModel bom;
-
-    public AbstractBDMCodeGenerator(final BusinessObjectModel bom) {
+    public AbstractBDMCodeGenerator() {
         super();
+    }
+
+    public void generateBom(BusinessObjectModel bom, final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
+        final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
+        final ValidationStatus validationStatus = validator.validate(bom);
+        if (!validationStatus.isOk()) {
+            throw new BusinessObjectModelValidationException(validationStatus);
+        }
+        buildJavaModelFromBom(bom);
+        super.generate(destDir);
+    }
+
+    private void buildJavaModelFromBom(BusinessObjectModel bom) throws JClassAlreadyExistsException, ClassNotFoundException {
         if (bom == null) {
             throw new IllegalArgumentException("bom is null");
         }
-        this.bom = bom;
-    }
-
-    public void buildJavaModelFromBom() throws JClassAlreadyExistsException, ClassNotFoundException {
         final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this,bom);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final JDefinedClass entity = entityCodeGenerator.addEntity(bo);
@@ -101,41 +103,6 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
     }
 
     protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
-
-    protected void addCopyConstructor(final JDefinedClass entityClass, final BusinessObject bo) {
-        final JMethod copyConstructor = entityClass.constructor(JMod.PUBLIC);
-        final JVar param = copyConstructor.param(entityClass, WordUtils.uncapitalize(entityClass.name()));
-        final JBlock copyBody = copyConstructor.body();
-        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_ID), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceId"));
-        copyBody.assign(JExpr.refthis(Field.PERSISTENCE_VERSION), JExpr.invoke(JExpr.ref(param.name()), "getPersistenceVersion"));
-        for (final Field field : bo.getFields()) {
-            if (field.isCollection() != null && field.isCollection()) {
-                final JClass fieldClass = toJavaClass(field);
-                final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
-                if (field instanceof SimpleField) {
-                    copyBody.assign(JExpr.refthis(field.getName()),
-                            JExpr._new(arrayListFieldClazz).arg(JExpr.invoke(JExpr.ref(param.name()), getGetterName(field))));
-                } else {
-                    copyBody.assign(JExpr.refthis(field.getName()), JExpr._new(arrayListFieldClazz));
-                    final JForEach forEach = copyBody.forEach(fieldClass, "i", JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
-                    forEach.body().invoke(JExpr.refthis(field.getName()), "add").arg(JExpr._new(fieldClass).arg(forEach.var()));
-                }
-            } else {
-                copyBody.assign(JExpr.refthis(field.getName()), JExpr.invoke(JExpr.ref(param.name()), getGetterName(field)));
-            }
-        }
-    }
-
-    @Override
-    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
-        final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
-        final ValidationStatus validationStatus = validator.validate(bom);
-        if (!validationStatus.isOk()) {
-            throw new BusinessObjectModelValidationException(validationStatus);
-        }
-        buildJavaModelFromBom();
-        super.generate(destDir);
-    }
 
     protected JDefinedClass createDAOInterface(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
         final String daoInterfaceClassName = toDaoInterfaceClassname(bo);

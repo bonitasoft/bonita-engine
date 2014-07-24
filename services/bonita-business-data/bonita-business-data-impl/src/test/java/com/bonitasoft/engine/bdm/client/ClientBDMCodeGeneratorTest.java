@@ -47,8 +47,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Before
     public void setUp() {
-        final BusinessObjectModel bom = new BusinessObjectModel();
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
         try {
             destDir = Files.newTemporaryFolder();
         } catch (final FilesException fe) {
@@ -61,17 +60,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     @After
     public void tearDown() throws Exception {
         FileUtils.deleteDirectory(destDir);
-    }
-
-    @Test
-    public void shouldbuildAstFromBom_FillModel() throws Exception {
-        final BusinessObjectModel bom = new BusinessObjectModel();
-        final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("Employee");
-        bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.buildJavaModelFromBom();
-        assertThat(bdmCodeGenerator.getModel()._getClass("Employee")).isNotNull();
     }
 
     @Test
@@ -125,8 +113,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
         final String daoContent = readGeneratedDAOInterface();
         assertThat(daoContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
     }
@@ -150,8 +138,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.getQueries().add(query);
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
         final String daoContent = readGeneratedDAOInterface();
 
         assertThat(daoContent).contains("public List<Employee> getEmployeesByNameAndAge(Integer miEdad, String myName, int startIndex, int maxResults)");
@@ -201,8 +189,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.addUniqueConstraint("TOTO", "firstName", "lastName");
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
     }
 
     private String readGeneratedDAOInterface() throws IOException {
@@ -234,8 +222,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.addIndex("IDX_1", "firstName, lastName");
         model.addBusinessObject(employeeBO);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(model, destDir);
 
         assertFilesAreEqual("Employee.java", "Employee.java");
     }
@@ -245,8 +233,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final RelationField aggregation = aRelationField().withName("address").composition().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.java");
     }
@@ -257,8 +245,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final RelationField lazy = aRelationField().withName("skills").composition().multiple().lazy().referencing(skillBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(eager, lazy);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeListComposition.java");
         assertFilesAreEqual("Skill.java", "Skill.java");
@@ -269,8 +257,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final RelationField aggregation = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.java");
     }
@@ -280,8 +268,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
         assertFilesAreEqual("Employee.java", "EmployeeListAggregation.java");
     }
@@ -293,8 +281,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
         assertFilesAreEqual("AddressDAO.java", "AddressDAOWithLazyReferenceOnEmployee.java");
         assertFilesAreEqual("AddressDAOImpl.java", "AddressDAOImplWithLazyReferenceOnEmployee.java");
@@ -304,8 +292,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     public void addList() throws Exception {
         final BusinessObjectModel model = build();
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(model, destDir);
 
         assertFilesAreEqual("Forecast.java", "ForecastList.java");
     }

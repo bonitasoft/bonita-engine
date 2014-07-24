@@ -20,7 +20,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
@@ -42,8 +41,8 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private static final String SERVER_DAO_PACKAGE_NAME = "server.";
 
-    public ServerBDMCodeGenerator(final BusinessObjectModel bom) {
-        super(bom);
+    public ServerBDMCodeGenerator() {
+        super();
     }
 
     @Override
