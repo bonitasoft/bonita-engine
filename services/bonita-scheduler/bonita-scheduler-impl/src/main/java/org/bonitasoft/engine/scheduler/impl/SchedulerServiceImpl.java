@@ -15,7 +15,6 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -172,14 +170,14 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void executeAgain(final long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantId(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
     }
 
     @Override
     public void executeAgain(final long jobDescriptorId, final List<SJobParameter> parameters) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         jobService.setJobParameters(getTenantId(), jobDescriptor.getId(), parameters);
-        schedulerExecutor.executeAgain(jobDescriptorId, getTenantId(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
+        schedulerExecutor.executeAgain(jobDescriptorId, getTenantIdAsString(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
     }
 
     private SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException {
@@ -198,7 +196,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private void internalSchedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "internalSchedule");
-        final long tenantId = getTenantId();
+        final String tenantId = getTenantIdAsString();
         final SSchedulerQueriableLogBuilder schedulingLogBuilder = getLogBuilder(ActionType.SCHEDULED, "Scheduled job with name " + jobDescriptor.getJobName(),
                 jobDescriptor.getJobName());
         try {
@@ -231,6 +229,10 @@ public class SchedulerServiceImpl implements SchedulerService {
             throw new SSchedulerException(e);
         }
         return tenantId;
+    }
+    
+    private String getTenantIdAsString() throws SSchedulerException {
+        return String.valueOf(getTenantId());
     }
 
     @Override
@@ -274,18 +276,18 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public void pauseJobs(final long tenantId) throws SSchedulerException {
-        schedulerExecutor.pauseJobs(tenantId);
+        schedulerExecutor.pauseJobs(String.valueOf(tenantId));
     }
 
     @Override
     public void resumeJobs(final long tenantId) throws SSchedulerException {
-        schedulerExecutor.resumeJobs(tenantId);
+        schedulerExecutor.resumeJobs(String.valueOf(tenantId));
     }
 
     @Override
     public boolean delete(final String jobName) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "delete");
-        final boolean delete = schedulerExecutor.delete(jobName);
+        final boolean delete = schedulerExecutor.delete(jobName, String.valueOf(getTenantId()));
         jobService.deleteJobDescriptorByJobName(jobName);
         logAfterMethod(TechnicalLogSeverity.TRACE, "delete");
         return delete;
@@ -294,24 +296,15 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void deleteJobs() throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "deleteJobs");
-        schedulerExecutor.deleteJobs();
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        final QueryOptions queryOptions = new QueryOptions(0, 100, null, filters, null);
-        try {
-            final List<SJobDescriptor> jobDescriptors = jobService.searchJobDescriptors(queryOptions);
-            for (final SJobDescriptor sJobDescriptor : jobDescriptors) {
-                jobService.deleteJobDescriptor(sJobDescriptor);
-            }
-        } catch (final SBonitaSearchException sbse) {
-            throw new SSchedulerException(sbse);
-        }
+        schedulerExecutor.deleteJobs(String.valueOf(getTenantId()));
+        jobService.deleteAllJobDescriptors();
         logAfterMethod(TechnicalLogSeverity.TRACE, "deleteJobs");
     }
 
     @Override
     public List<String> getJobs() throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getJobs");
-        final List<String> list = schedulerExecutor.getJobs();
+        final List<String> list = schedulerExecutor.getJobs(String.valueOf(getTenantId()));
         logAfterMethod(TechnicalLogSeverity.TRACE, "getJobs");
         return list;
     }
@@ -397,7 +390,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public boolean isStillScheduled(final SJobDescriptor jobDescriptor) throws SSchedulerException {
-        return schedulerExecutor.isStillScheduled(getTenantId(), jobDescriptor.getJobName());
+        return schedulerExecutor.isStillScheduled(getTenantIdAsString(), jobDescriptor.getJobName());
     }
 
     @Override

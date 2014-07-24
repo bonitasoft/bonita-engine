@@ -33,30 +33,28 @@ public interface SchedulerExecutor {
 
     void shutdown() throws SSchedulerException;
 
-    void reschedule(String triggerName, Trigger newTrigger) throws SSchedulerException;
-
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
-    boolean delete(String jobName) throws SSchedulerException;
+    boolean delete(String jobName, String groupName) throws SSchedulerException;
 
-    void deleteJobs() throws SSchedulerException;
+    void deleteJobs(String groupName) throws SSchedulerException;
 
-    List<String> getJobs() throws SSchedulerException;
+    List<String> getJobs(String groupName) throws SSchedulerException;
 
     void setBOSSchedulerService(SchedulerServiceImpl schedulerService);
 
     List<String> getAllJobs() throws SSchedulerException;
 
-    void executeNow(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+    void executeNow(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
 
-    void schedule(long jobId, long tenantId, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
+    void schedule(long jobId, String groupName, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
 
-    boolean isStillScheduled(long tenantId, String jobName) throws SSchedulerException;
+    boolean isStillScheduled(String groupName, String jobName) throws SSchedulerException;
 
-    void executeAgain(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+    void executeAgain(long jobId, String groupName, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
 
-    void pauseJobs(long tenantId) throws SSchedulerException;
+    void pauseJobs(String groupName) throws SSchedulerException;
 
-    void resumeJobs(long tenantId) throws SSchedulerException;
+    void resumeJobs(String groupName) throws SSchedulerException;
 
 }

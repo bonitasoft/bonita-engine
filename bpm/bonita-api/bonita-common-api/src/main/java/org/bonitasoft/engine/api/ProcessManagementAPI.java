@@ -1088,8 +1088,25 @@ public interface ProcessManagementAPI {
      * @throws SearchException
      *             if an exception occurs when getting the processes.
      * @since 6.0
+     * @deprecated since 6.3.3
+     * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)}
      */
+    @Deprecated
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(long userId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Searches for the number and the list of processes that the user can start.
+     * 
+     * @param userId
+     *            the identifier of the user.
+     * @param searchOptions
+     *            the search criteria.
+     * @return the number and the list of processes that the user can start.
+     * @throws SearchException
+     *             if an exception occurs when getting the processes.
+     * @since 6.3.3
+     */
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Searches for the number and the list of process definitions.
@@ -1157,6 +1174,7 @@ public interface ProcessManagementAPI {
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
+    @Deprecated
     /**
      * Searches the number and the list of processes that the user can start which have no category.
      * 
@@ -1168,8 +1186,24 @@ public interface ProcessManagementAPI {
      * @throws SearchException
      *             if an exception occurs when searching the process deployment information.
      * @since 6.0
+     * @deprecated since 6.3.3 @see {@link ProcessManagementAPI#searchUncategorizedProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)}
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(long userId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Searches the number and the list of processes that the user can start which have no category.
+     * 
+     * @param userId
+     *            the identifier of the user.
+     * @param searchOptions
+     *            the search criteria.
+     * @return the number and the list of uncategorized processes that the user can start.
+     * @throws SearchException
+     *             if an exception occurs when searching the process deployment information.
+     * @since 6.3.3
+     */
+    SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosCanBeStartedBy(long userId, SearchOptions searchOptions)
+            throws SearchException;
 
     /**
      * Returns the process deployment information of the process definitions.
@@ -1380,7 +1414,6 @@ public interface ProcessManagementAPI {
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * TODO do not understand the behaviour of this
      * Search for all process definitions that can be started by users who report to the specified manager.
      * 
      * @param managerUserId
@@ -1392,8 +1425,28 @@ public interface ProcessManagementAPI {
      * @throws SearchException
      *             if an exception occurs when getting the process deployment information.
      * @since 6.0
+     * @deprecated 6.3.3
+     * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long, SearchOptions)}
      */
+    @Deprecated
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(long managerUserId, SearchOptions searchOptions)
+            throws SearchException;
+
+    /**
+     * TODO do not understand the behaviour of this
+     * Search for all process definitions that can be started by users managed by a specific user.
+     * 
+     * @param managerUserId
+     *            the identifier of the manager.
+     * @param searchOptions
+     *            the search crtierion.
+     * @return
+     *         the list of process definitions that have at least one initiator who is mapped to a user to who reports to the specified manager.
+     * @throws SearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long managerUserId, SearchOptions searchOptions)
             throws SearchException;
 
     /**
@@ -1670,7 +1723,7 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     List<User> getPossibleUsersOfHumanTask(long processDefinitionId, String humanTaskName, int startIndex, int maxResults);
-    
+
     /**
      * Retrieves the list of user identifiers for the given actor and process.
      * 

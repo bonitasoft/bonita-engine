@@ -1,11 +1,13 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -147,6 +149,23 @@ public class JobServiceImplTest {
 
     }
 
+    @Test
+	public void should_delete_all_job_descriptors_for_a_given_tenant() throws Exception {
+    	List<SJobDescriptor> descriptors = asList(sJobDescriptor, sJobDescriptor);
+    	when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenReturn(descriptors);
+    	
+    	jobService.deleteAllJobDescriptors();
+    	
+    	verify(jobService, times(2)).deleteJobDescriptor(sJobDescriptor);
+	}
+    
+    @Test(expected = SJobDescriptorDeletionException.class)
+	public void should_throw_exception_if_error_occurs_when_deleting_all_job_descriptors() throws Exception {
+    	when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaSearchException("error"));
+    	
+    	jobService.deleteAllJobDescriptors();
+	}
+
     @Test(expected = IllegalArgumentException.class)
     public void createJobDescriptor_should_check_bad_job_descriptor() throws Exception {
         //given
@@ -286,7 +305,6 @@ public class JobServiceImplTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test(expected = SJobDescriptorReadException.class)
     public void getJobDescriptor_should_throw_exception() throws Exception {
         //given
@@ -299,7 +317,6 @@ public class JobServiceImplTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getJobDescriptor_should_return_jobDescriptor() throws Exception {
         //given
@@ -313,7 +330,6 @@ public class JobServiceImplTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getNumberOfJobDescriptors() throws Exception {
         //given
@@ -324,7 +340,6 @@ public class JobServiceImplTest {
         assertThat(numberOfJobDescriptors).isEqualTo(RETURNED);
     }
 
-    @SuppressWarnings("unchecked")
     @Test(expected = SBonitaSearchException.class)
     public void getNumberOfJobDescriptors_should_throw_exception() throws Exception {
         //given
@@ -337,7 +352,6 @@ public class JobServiceImplTest {
         //then
     }
 
-    @SuppressWarnings("unchecked")
     @Test(expected = SBonitaSearchException.class)
     public void searchJobDescriptors_should_throw_exception() throws Exception {
         //given
@@ -350,7 +364,6 @@ public class JobServiceImplTest {
         //then exception
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void searchJobDescriptors() throws Exception {
         //when

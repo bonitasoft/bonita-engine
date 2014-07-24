@@ -205,7 +205,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     public void setFlowNodeDefinitionId(long flowNodeDefinitionId) {
         this.flowNodeDefinitionId = flowNodeDefinitionId;
     }
-    
+
     @Override
     public boolean mustExecuteOnAbortOrCancelProcess() {
         return isStable();
@@ -303,10 +303,10 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
 
     @Override
     public String toString() {
-        return "SFlowNodeInstanceImpl [stateId=" + stateId + ", stateName=" + stateName + ", previousStateId=" + previousStateId + ", reachedStateDate="
-                + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", displayName=" + displayName + ", displayDescription=" + displayDescription
-                + ", tokenCount=" + tokenCount + ", loopCounter=" + loopCounter + ", executedBy=" + executedBy + ", deleted=" + deleted + ", stateExecuting="
-                + stateExecuting + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";
+        return "SFlowNodeInstanceImpl [name=" + getName() + ", stateId=" + stateId + ", stateName=" + stateName + ", previousStateId=" + previousStateId
+                + ", reachedStateDate=" + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", displayName=" + displayName + ", displayDescription="
+                + displayDescription + ", tokenCount=" + tokenCount + ", loopCounter=" + loopCounter + ", executedBy=" + executedBy + ", deleted=" + deleted
+                + ", stateExecuting=" + stateExecuting + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";
     }
 
 }
