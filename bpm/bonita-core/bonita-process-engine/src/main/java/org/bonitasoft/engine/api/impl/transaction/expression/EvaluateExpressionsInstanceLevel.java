@@ -62,19 +62,14 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
             context.setProcessDefinitionId(processDefinitionId);
 
             final Set<Expression> exps = expressions.keySet();
-            for (Expression exp : exps) {
-                final Map<String, Serializable> partialContext = getPartialContext(exp);
+            for (final Expression exp : exps) {
+                final Map<String, Serializable> partialContext = getPartialContext(expressions, exp);
                 context.setSerializableInputValues(partialContext);
                 final SExpression sexp = ServerModelConvertor.convertExpression(exp);
                 final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);
                 results.put(buildName(exp), res);// MAYBE instead of exp.getNAME
             }
         }
-
-    }
-
-    protected Map<String, Serializable> getPartialContext(Expression exp) {
-        return expressions.get(exp);
     }
 
     @Override
