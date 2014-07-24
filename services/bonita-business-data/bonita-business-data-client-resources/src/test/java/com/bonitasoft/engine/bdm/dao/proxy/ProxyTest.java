@@ -95,7 +95,7 @@ public class ProxyTest {
     }
 
     @Test
-    public void should_return_a_when_calling_a_getter_returning_an_entity() throws Exception {
+    public void should_return_a_proxy_when_calling_a_getter_returning_an_entity() throws Exception {
         TestEntity entity = proxyfier.proxify(new TestEntity());
 
         TestEntity eagerEntity = entity.getEagerEntity();
@@ -104,7 +104,7 @@ public class ProxyTest {
     }
 
     @Test
-    public void should_not_return_a_when_calling_a_getter_not_returning_an_entity() throws Exception {
+    public void should_not_return_a_proxy_when_calling_a_getter_not_returning_an_entity() throws Exception {
         TestEntity entity = proxyfier.proxify(new TestEntity());
         entity.setName("aName");
 
