@@ -1,8 +1,8 @@
 package com.bonitasoft.engine.bdm;
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anIntegerField;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.anIntegerField;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;

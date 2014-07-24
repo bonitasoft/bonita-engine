@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.model.builder;
+package com.bonitasoft.engine.bdm.builder;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Index;

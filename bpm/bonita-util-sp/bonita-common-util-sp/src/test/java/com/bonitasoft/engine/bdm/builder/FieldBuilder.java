@@ -6,7 +6,7 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.bdm.model.builder;
+package com.bonitasoft.engine.bdm.builder;
 
 import static com.bonitasoft.engine.bdm.model.field.FieldType.BOOLEAN;
 import static com.bonitasoft.engine.bdm.model.field.FieldType.DATE;

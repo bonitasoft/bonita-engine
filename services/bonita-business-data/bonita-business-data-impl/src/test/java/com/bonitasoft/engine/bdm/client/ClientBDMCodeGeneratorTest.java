@@ -1,10 +1,10 @@
 package com.bonitasoft.engine.bdm.client;
 
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aRelationField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aRelationField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Strings.concat;
 
@@ -26,11 +26,11 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.CompilableCode;
+import com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
-import com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;

@@ -75,7 +75,6 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try {
-            System.out.println(mapper.writeValueAsString(result));
             return mapper.writeValueAsBytes(result);
         } catch (final JsonProcessingException jpe) {
             throw new SCommandExecutionException(jpe);

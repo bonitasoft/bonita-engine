@@ -1,10 +1,10 @@
 package com.bonitasoft.engine.command;
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aRelationField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aSimpleField;
-import static com.bonitasoft.engine.bdm.model.builder.QueryBuilder.aQuery;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aRelationField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aSimpleField;
+import static com.bonitasoft.engine.bdm.builder.QueryBuilder.aQuery;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;

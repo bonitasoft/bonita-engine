@@ -2,6 +2,7 @@ package com.bonitasoft.engine.bdm.proxy.model;
 
 import static java.util.Arrays.asList;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.bonitasoft.engine.bdm.Entity;
@@ -17,13 +18,18 @@ public class TestEntity implements Entity {
         return new TestEntity();
     }
 
-    public void setLazyEntity(TestEntity entity) {
+    public void setLazyEntity(final TestEntity entity) {
         this.entity = entity;
     }
 
     @LazyLoaded
     public TestEntity getLazyEntity() {
         return entity;
+    }
+
+    @LazyLoaded
+    public List<TestEntity> getLazyEntityList() {
+        return Collections.emptyList();
     }
 
     public List<TestEntity> getEagerEntities() {
@@ -34,7 +40,7 @@ public class TestEntity implements Entity {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -51,4 +57,5 @@ public class TestEntity implements Entity {
     public Long getPersistenceVersion() {
         return 0L;
     }
+
 }

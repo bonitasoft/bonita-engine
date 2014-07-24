@@ -8,9 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model.field;
 
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
 import static com.bonitasoft.engine.bdm.model.assertion.FieldAssert.assertThat;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Ignore;
@@ -64,7 +64,7 @@ public class RelationFieldTest {
 
         assertThat(field).canBeMarshalled();
     }
-    
+
     @Test
     public void should_not_be_marshallizable_whitout_fetchType() throws Exception {
         final RelationField field = new RelationField();
@@ -73,22 +73,22 @@ public class RelationFieldTest {
         field.setReference(aBo);
 
         field.setFetchType(null);
-        
+
         assertThat(field).cannotBeMarshalled();
     }
-    
+
     @Test
     public void should_have_a_default_fetchType_to_eager() throws Exception {
         final RelationField field = new RelationField();
-        
+
         assertThat(field.getFetchType()).isEqualTo(FetchType.EAGER);
     }
-    
+
     @Test
     public void can_be_lazy() throws Exception {
         final RelationField field = new RelationField();
         field.setFetchType(FetchType.LAZY);
-        
+
         assertThat(field.getFetchType()).isEqualTo(FetchType.LAZY);
     }
 }
