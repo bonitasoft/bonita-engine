@@ -375,6 +375,7 @@ import org.bonitasoft.engine.search.comment.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.connector.SearchArchivedConnectorInstance;
 import org.bonitasoft.engine.search.connector.SearchConnectorInstances;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessSupervisorDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
@@ -411,6 +412,8 @@ import org.bonitasoft.engine.search.supervisor.SearchProcessDeploymentInfosSuper
 import org.bonitasoft.engine.search.supervisor.SearchSupervisors;
 import org.bonitasoft.engine.search.task.SearchArchivedTasks;
 import org.bonitasoft.engine.search.task.SearchArchivedTasksManagedBy;
+import org.bonitasoft.engine.search.task.SearchAssignedAndPendingHumanTasks;
+import org.bonitasoft.engine.search.task.SearchAssignedAndPendingHumanTasksFor;
 import org.bonitasoft.engine.search.task.SearchAssignedTaskManagedBy;
 import org.bonitasoft.engine.search.task.SearchHumanTaskInstances;
 import org.bonitasoft.engine.search.task.SearchPendingHiddenTasks;
@@ -5825,6 +5828,42 @@ public class ProcessAPIImpl implements ProcessAPI {
             searcher.execute();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
+        }
+        return searcher.getResult();
+    }
+
+    @Override
+    public SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId,
+            final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final SearchHumanTaskInstanceDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor();
+        final SearchAssignedAndPendingHumanTasksFor searcher = new SearchAssignedAndPendingHumanTasksFor(activityInstanceService, flowNodeStateManager,
+                searchDescriptor, rootProcessDefinitionId, userId, searchOptions);
+        try {
+            searcher.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        return searcher.getResult();
+    }
+
+    @Override
+    public SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final SearchHumanTaskInstanceDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor();
+        final SearchAssignedAndPendingHumanTasks searcher = new SearchAssignedAndPendingHumanTasks(activityInstanceService, flowNodeStateManager,
+                searchDescriptor, rootProcessDefinitionId, searchOptions);
+        try {
+            searcher.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
         }
         return searcher.getResult();
     }
