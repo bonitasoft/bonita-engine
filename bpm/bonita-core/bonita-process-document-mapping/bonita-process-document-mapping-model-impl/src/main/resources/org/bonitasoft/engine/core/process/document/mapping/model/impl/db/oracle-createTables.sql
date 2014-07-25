@@ -7,7 +7,7 @@ CREATE TABLE document_mapping (
   documentCreationDate NUMBER(19, 0) NOT NULL,
   documentHasContent NUMBER(1)  NOT NULL,
   documentContentFileName VARCHAR2(255),
-  documentContentMimeType VARCHAR2(50),
+  documentContentMimeType VARCHAR2(255),
   contentStorageId VARCHAR2(50),
   documentURL VARCHAR2(255),
   PRIMARY KEY (tenantid, ID)
