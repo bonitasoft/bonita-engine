@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.AdditionalMatchers.not;
@@ -20,14 +21,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -43,32 +44,14 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuartzSchedulerExecutorTest {
 
-    private static final int GOOD_COUNT = 1;
-
-    private static final int BAD_COUNT = -2;
-
-    private static final int GOOD_INTERVAL = 1;
-
-    private static final int BAD_INTERVAL = -1;
-
-    private static final int GOOD_PRIORITY = -1;
-
-    private static final String GOOD_TRIGGER_NAME = "triggerName";
-
-    private static final String BAD_TRIGGER_NAME = null;
-
     @Mock
     private BonitaSchedulerFactory schedulerFactory;
-
-    @Mock
-    private ReadSessionAccessor sessionAccessor;
 
     @Mock
     private TransactionService transactionService;
@@ -78,9 +61,6 @@ public class QuartzSchedulerExecutorTest {
 
     @Mock
     private Scheduler scheduler;
-
-    @Mock
-    private STenantIdNotSetException sTenantIdNotSetException;
 
     private QuartzSchedulerExecutor quartzSchedulerExecutor;
 
@@ -92,9 +72,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     private QuartzSchedulerExecutor initQuartzScheduler(final boolean useOptimization) throws SSchedulerException {
-        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, new ArrayList<AbstractJobListener>(), sessionAccessor,
-                transactionService,
-                useOptimization);
+        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, new ArrayList<AbstractJobListener>(), transactionService, useOptimization);
         quartz.setBOSSchedulerService(schedulerService);
         quartz.start();
         return quartz;
@@ -105,112 +83,106 @@ public class QuartzSchedulerExecutorTest {
         quartzSchedulerExecutor.shutdown();
     }
 
-    @Test(expected = SSchedulerException.class)
-    public void should_scheduler_check_RepeatTrigger_with_bad_interval_param() throws Exception {
+    private Set<JobKey> newSet(JobKey... jobKeys) {
+		HashSet<JobKey> set = new HashSet<JobKey>();
+		set.addAll(asList(jobKeys));
+		return set;
+	}
+    
+    private class TestRepeatTrigger implements RepeatTrigger {
+    	private MisfireRestartPolicy misfireRestartPolicy;
+		private String triggerName;
+		private int interval;
+		private int count;
 
-        //given
-        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = getRepeatTrigger(new Date(), GOOD_TRIGGER_NAME, BAD_INTERVAL,
-                GOOD_COUNT,
-                GOOD_PRIORITY,
-                MisfireRestartPolicy.ONE);
-        // when
-        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", trigger, true);
+		public TestRepeatTrigger(final String triggerName, final int interval, final int count, final MisfireRestartPolicy misfireRestartPolicy) {
+			this.triggerName = triggerName;
+			this.interval = interval;
+			this.count = count;
+			this.misfireRestartPolicy = misfireRestartPolicy;
+		}
+		
+		public TestRepeatTrigger(final String triggerName, final int interval, final int count) {
+			this.triggerName = triggerName;
+			this.interval = interval;
+			this.count = count;
+			this.misfireRestartPolicy = MisfireRestartPolicy.ONE;
+		}
+    	
+    	@Override
+        public Date getStartDate() {
+            return new Date();
+        }
 
-        //then exception
+        @Override
+        public int getPriority() {
+            return -1;
+        }
+
+        @Override
+        public String getName() {
+            return triggerName;
+        }
+
+        @Override
+        public MisfireRestartPolicy getMisfireHandlingPolicy() {
+            return misfireRestartPolicy;
+        }
+
+        @Override
+        public long getInterval() {
+            return interval;
+        }
+
+        @Override
+        public int getCount() {
+            return count;
+        }
+    }
+
+	@Test(expected = SSchedulerException.class)
+    public void should_check_RepeatTrigger_with_bad_interval_param() throws Exception {
+		int badInterval = -1;
+        RepeatTrigger trigger = new TestRepeatTrigger("triggerName", badInterval, 1);
+
+        quartzSchedulerExecutor.schedule(1l, "2", "jobName", trigger, true);
     }
 
     @Test(expected = SSchedulerException.class)
-    public void should_scheduler_check_RepeatTrigger_with_bad_name_param() throws Exception {
+    public void should_check_RepeatTrigger_with_bad_name_param() throws Exception {
+    	String badTriggerName = null;
+    	RepeatTrigger trigger = new TestRepeatTrigger(badTriggerName, 1, 1);
 
-        //given
-        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = getRepeatTrigger(new Date(), BAD_TRIGGER_NAME, GOOD_INTERVAL, GOOD_COUNT,
-                GOOD_PRIORITY,
-                MisfireRestartPolicy.ONE);
-        // when
-        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", trigger, true);
-
-        //then exception
+    	quartzSchedulerExecutor.schedule(1l, "2", "jobName", trigger, true);
     }
 
     @Test(expected = SSchedulerException.class)
-    public void should_scheduler_check_RepeatTrigger_with_bad_count_param() throws Exception {
+    public void should_check_RepeatTrigger_with_bad_count_param() throws Exception {
+    	int badCount = -2;
+    	RepeatTrigger trigger = new TestRepeatTrigger("triggerName", 1, badCount);
 
-        //given
-        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = getRepeatTrigger(new Date(), GOOD_TRIGGER_NAME, GOOD_INTERVAL, BAD_COUNT,
-                GOOD_PRIORITY,
-                MisfireRestartPolicy.ONE);
-        // when
-        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", trigger, true);
-
-        //then exception
-    }
-
-    private org.bonitasoft.engine.scheduler.trigger.RepeatTrigger getRepeatTrigger(final Date now, final String triggerName, final int interval,
-            final int count,
-            final int priority, final MisfireRestartPolicy misfireRestartPolicy) {
-        final org.bonitasoft.engine.scheduler.trigger.RepeatTrigger trigger = new RepeatTrigger() {
-
-            @Override
-            public Date getStartDate() {
-                return now;
-            }
-
-            @Override
-            public int getPriority() {
-                return priority;
-            }
-
-            @Override
-            public String getName() {
-                return triggerName;
-            }
-
-            @Override
-            public MisfireRestartPolicy getMisfireHandlingPolicy() {
-                return misfireRestartPolicy;
-            }
-
-            @Override
-            public long getInterval() {
-                return interval;
-            }
-
-            @Override
-            public int getCount() {
-                return count;
-            }
-        };
-        return trigger;
+    	quartzSchedulerExecutor.schedule(1l, "2", "jobName", trigger, true);
     }
 
     @Test
-    public void test_delete_job_delete_it_based_on_name_and_tenant_id() throws Exception {
-        when(sessionAccessor.getTenantId()).thenReturn(1l);
-
-        quartzSchedulerExecutor.delete("timerjob");
-
-        verify(scheduler).deleteJob(eq(new JobKey("timerjob", "1")));
-    }
-
-    @Test
-    public void should_pauseJobs_of_tenan_pause_group_of_jobs() throws Exception {
-        quartzSchedulerExecutor.pauseJobs(123l);
+    public void should_pause_jobs_for_a_given_tenant() throws Exception {
+        quartzSchedulerExecutor.pauseJobs("123");
 
         final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(123l));
         verify(scheduler, times(1)).pauseTriggers(groupEquals);
     }
 
     @SuppressWarnings("unchecked")
-    @Test(expected = SSchedulerException.class)
-    public void should_pauseJobs_of_tenant_pause_group_of_jobs_when_quartz_throw_exception() throws Exception {
-        doThrow(SchedulerException.class).when(scheduler).pauseTriggers((GroupMatcher<TriggerKey>) any());
+	@Test(expected = SSchedulerException.class)
+    public void should_throw_exception_if_error_occurs_when_pausing_jobs() throws Exception {
+        doThrow(SchedulerException.class).when(scheduler).pauseTriggers(any(GroupMatcher.class));
 
-        quartzSchedulerExecutor.pauseJobs(123l);
+        quartzSchedulerExecutor.pauseJobs("123");
     }
 
     @Test
-    public void should_resumeJobs_of_tenan_pause_group_of_jobs() throws Exception {
-        quartzSchedulerExecutor.resumeJobs(123l);
+    public void should_resume_jobs_for_a_given_tenant() throws Exception {
+        quartzSchedulerExecutor.resumeJobs("123");
 
         final GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(123l));
         verify(scheduler, times(1)).resumeTriggers(groupEquals);
@@ -218,10 +190,10 @@ public class QuartzSchedulerExecutorTest {
 
     @SuppressWarnings("unchecked")
     @Test(expected = SSchedulerException.class)
-    public void should_resumeJobs_of_tenant_pause_group_of_jobs_when_quartz_throw_exception() throws Exception {
-        doThrow(SchedulerException.class).when(scheduler).resumeTriggers((GroupMatcher<TriggerKey>) any());
+    public void should_throw_exception_if_error_occurs_when_resuming_jobs() throws Exception {
+        doThrow(SchedulerException.class).when(scheduler).resumeTriggers(any(GroupMatcher.class));
 
-        quartzSchedulerExecutor.resumeJobs(123l);
+        quartzSchedulerExecutor.resumeJobs("123");
     }
 
     @Test
@@ -264,161 +236,93 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test
-    public void deleteJobs_delete_only_job_of_tenant() throws Exception {
-        // given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        final HashSet<JobKey> jobKeyList = getJoblist1();
-        final HashSet<JobKey> jobKeyList2 = getJoblist2();
+	public void should_delete_job_for_a_given_name_and_group() throws Exception {
+    	JobKey job = jobKey("aName", "aGroup");
+	
+	    quartzSchedulerExecutor.delete(job.getName(), job.getGroup());
+	
+	    verify(scheduler).deleteJob(job);
+	}
 
-        doReturn(jobKeyList).when(scheduler).getJobKeys(jobGroupEquals(123 + ""));
-        doReturn(jobKeyList2).when(scheduler).getJobKeys(not(eq(jobGroupEquals(123 + ""))));
+	@Test(expected = SSchedulerException.class)
+	public void should_throw_exception_when_error_occurs_in_job_deletion() throws Exception {
+		JobKey job = jobKey("aName", "aGroup");
+	    when(scheduler.deleteJob(job)).thenThrow(new SchedulerException());
 
-        // when
-        quartzSchedulerExecutor.deleteJobs();
+	    quartzSchedulerExecutor.delete(job.getName(), job.getGroup());
+	}
 
-        // then
-        verify(scheduler).deleteJob(jobKey("job1", "123"));
-        verify(scheduler).deleteJob(jobKey("job2", "123"));
-        verify(scheduler, never()).deleteJob(jobKey("job3", "123"));
-        verify(scheduler, never()).deleteJob(jobKey("job4", "123"));
-        verify(scheduler, never()).deleteJob(jobKey("job3", "124"));
-        verify(scheduler, never()).deleteJob(jobKey("job4", "124"));
+	@Test
+    public void should_delete_jobs_for_a_given_job_group() throws Exception {
+		String groupName = "aGroup";
+		JobKey toBeDeleted = jobKey("job1", groupName);
+		JobKey toBeDeletedAlso = jobKey("job2", groupName);
+		JobKey notToBeDeleted = jobKey("job1", "anotherGroup");
+        when(scheduler.getJobKeys(jobGroupEquals(groupName))).thenReturn(newSet(toBeDeleted, toBeDeletedAlso));
+        when(scheduler.getJobKeys(not(eq(jobGroupEquals(groupName))))).thenReturn(newSet(notToBeDeleted));
+
+        quartzSchedulerExecutor.deleteJobs(groupName);
+
+        verify(scheduler).deleteJob(toBeDeleted);
+        verify(scheduler).deleteJob(toBeDeletedAlso);
+        verify(scheduler, never()).deleteJob(notToBeDeleted);
+    }
+	
+	@SuppressWarnings("unchecked")
+	@Test(expected = SSchedulerException.class)
+	public void should_throw_exception_when_error_occurs_in_jobs_deletion() throws Exception {
+	    doThrow(SchedulerException.class).when(scheduler).getJobKeys(any(GroupMatcher.class));
+	
+	    quartzSchedulerExecutor.deleteJobs("aGroupName");
+	}
+
+	@Test
+    public void should_get_job_names_for_a_given_group_name() throws Exception {
+    	String groupName = "aGroup";
+		JobKey toBeRetrieved = jobKey("job1", groupName);
+		JobKey toBeRetrievedAlso = jobKey("job2", groupName);
+		JobKey notToBeRetrieved = jobKey("job1", "anotherGroup");
+		when(scheduler.getJobKeys(jobGroupEquals(groupName))).thenReturn(newSet(toBeRetrieved, toBeRetrievedAlso));
+        when(scheduler.getJobKeys(not(eq(jobGroupEquals(groupName))))).thenReturn(newSet(notToBeRetrieved));
+
+        List<String> jobs = quartzSchedulerExecutor.getJobs(groupName);
+
+        assertThat(jobs).containsOnly(toBeRetrieved.getName(), toBeRetrievedAlso.getName());
     }
 
-    @Test(expected = SSchedulerException.class)
-    public void deleteJob_with_scheduler_exception() throws Exception {
-        //given
-        doThrow(SchedulerException.class).when(scheduler).deleteJob(any(JobKey.class));
-        //when
-        quartzSchedulerExecutor.delete("jobName");
-        //then
-    }
+	@Test(expected = SSchedulerException.class)
+	public void should_throw_exception_when_error_occurs_on_job_names_fetching() throws Exception {
+		String groupName = "aGroup";
+	    doThrow(SchedulerException.class).when(scheduler).getJobKeys(jobGroupEquals(groupName));
 
-    @Test(expected = SSchedulerException.class)
-    public void deleteJob_with_tenant_exception() throws Exception {
-        //given
+	    quartzSchedulerExecutor.getJobs(groupName);
+	}
 
-        doThrow(sTenantIdNotSetException).when(sessionAccessor).getTenantId();
-        //when
-        quartzSchedulerExecutor.delete("jobName");
-        //then exception
-    }
+	@Test
+    public void should_get_job_names_for_all_group_name() throws Exception {
+		JobKey job1 = jobKey("job1", "aGroup");
+		JobKey job2 = jobKey("job2", "aGroup");
+		JobKey job3 = jobKey("job3", "anotherGroup");
+        doReturn(newSet(job1, job2, job3)).when(scheduler).getJobKeys(jobGroupStartsWith(""));
 
-    @SuppressWarnings("unchecked")
-    @Test(expected = SSchedulerException.class)
-    public void deleteJobs_with_scheduler_exception() throws Exception {
-        //given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        doThrow(SchedulerException.class).when(scheduler).getJobKeys(any(GroupMatcher.class));
+        List<String> jobs = quartzSchedulerExecutor.getAllJobs();
 
-        //when
-        quartzSchedulerExecutor.deleteJobs();
-
-        //then exception
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void deleteJobs_with_tenant_exception() throws Exception {
-        //        given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        doThrow(sTenantIdNotSetException).when(sessionAccessor).getTenantId();
-
-        //when
-        quartzSchedulerExecutor.deleteJobs();
-
-        //then exception
-    }
-
-    @Test
-    public void getJobs() throws Exception {
-        // given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        final HashSet<JobKey> jobKeyList = getJoblist1();
-        final HashSet<JobKey> jobKeyList2 = getJoblist2();
-
-        doReturn(jobKeyList).when(scheduler).getJobKeys(jobGroupEquals(123 + ""));
-        doReturn(jobKeyList2).when(scheduler).getJobKeys(not(eq(jobGroupEquals(123 + ""))));
-
-        // when
-        final List<String> jobs = quartzSchedulerExecutor.getJobs();
-
-        // then
-        assertThat(jobs).as("should have 2 jobs").hasSameSizeAs(jobKeyList);
-    }
-
-    @Test
-    public void getAllJobsJobs() throws Exception {
-        // given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        final HashSet<JobKey> jobKeyListAll = getJobListListAll();
-
-        doReturn(jobKeyListAll).when(scheduler).getJobKeys(jobGroupStartsWith(""));
-
-        // when
-        final List<String> jobs = quartzSchedulerExecutor.getAllJobs();
-
-        // then
-        assertThat(jobs).as("should have alljobs jobs").hasSize(5);
+        assertThat(jobs).containsOnly(job1.getName(), job2.getName(), job3.getName());
     }
 
     @SuppressWarnings("unchecked")
     @Test(expected = SSchedulerException.class)
-    public void getAllJobsJobs_with_scheduler_exception() throws Exception {
-        // given
+    public void should_throw_exception_when_error_occurs_on_all_job_names_fetching() throws Exception {
         doThrow(SchedulerException.class).when(scheduler).getJobKeys(any(GroupMatcher.class));
 
-        // when
         quartzSchedulerExecutor.getAllJobs();
-
-        // then exception
-
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void getJobs_with_tenant_exception() throws Exception {
-        // given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        final HashSet<JobKey> jobKeyList = getJoblist1();
-        final HashSet<JobKey> jobKeyList2 = getJoblist2();
-
-        doReturn(jobKeyList).when(scheduler).getJobKeys(jobGroupEquals(123 + ""));
-        doReturn(jobKeyList2).when(scheduler).getJobKeys(not(eq(jobGroupEquals(123 + ""))));
-        doThrow(sTenantIdNotSetException).when(sessionAccessor).getTenantId();
-
-        // when
-        final List<String> jobs = quartzSchedulerExecutor.getJobs();
-
-        // then
-        assertThat(jobs).as("should have 2 jobs").hasSameSizeAs(jobKeyList);
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void getJobs_with_scheduler_exception() throws Exception {
-        // given
-        doReturn(123l).when(sessionAccessor).getTenantId();
-        final HashSet<JobKey> jobKeyList = getJoblist1();
-        final HashSet<JobKey> jobKeyList2 = getJoblist2();
-
-        doReturn(jobKeyList2).when(scheduler).getJobKeys(not(eq(jobGroupEquals(123 + ""))));
-        doThrow(SchedulerException.class).when(scheduler).getJobKeys(jobGroupEquals(123 + ""));
-
-        // when
-        final List<String> jobs = quartzSchedulerExecutor.getJobs();
-
-        // then
-        assertThat(jobs).as("should have 2 jobs").hasSameSizeAs(jobKeyList);
     }
 
     @Test(expected = SSchedulerException.class)
     public void should_not_start_twice() throws Exception {
-        // given
         doReturn(true).when(scheduler).isStarted();
 
-        // when
         quartzSchedulerExecutor.start();
-
-        // then exception
-
     }
 
     @Test
@@ -433,22 +337,29 @@ public class QuartzSchedulerExecutorTest {
 
     @Test
     public void schedule_with_optimisation() throws Exception {
-        //given
-        final QuartzSchedulerExecutor executor =
-                quartzSchedulerExecutor = initQuartzScheduler(true);
+        final QuartzSchedulerExecutor executor = quartzSchedulerExecutor = initQuartzScheduler(true);
 
-        //when
         scheduleJob(executor, true, 1);
-
     }
 
-    @Test(expected = SSchedulerException.class)
+    private void scheduleJob(final QuartzSchedulerExecutor executor, final boolean disallowConcurrentExecution, final int expectedOptimizationCall)
+	        throws Exception {
+	
+	    //when
+	    executor.schedule(1l, "2", "jobName", new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), disallowConcurrentExecution);
+	
+	    //then
+	    verify(scheduler).scheduleJob(any(JobDetail.class), any(org.quartz.Trigger.class));
+	    verify(transactionService, times(expectedOptimizationCall)).registerBonitaSynchronization(any(BonitaTransactionSynchronization.class));
+	}
+
+	@Test(expected = SSchedulerException.class)
     public void schedule_with_exception() throws Exception {
         //given
-        doThrow(SchedulerException.class).when(scheduler).scheduleJob(any(JobDetail.class), any(Trigger.class));
+        doThrow(SchedulerException.class).when(scheduler).scheduleJob(any(JobDetail.class), any(org.quartz.Trigger.class));
 
         //when
-        quartzSchedulerExecutor.schedule(1l, 2l, "jobName", new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), true);
+        quartzSchedulerExecutor.schedule(1l, "2", "jobName", new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), true);
 
         //then exception
 
@@ -456,15 +367,8 @@ public class QuartzSchedulerExecutorTest {
 
     @Test
     public void executeNow_should_schedule_job() throws Exception {
-        final long jobId = 1l;
-        final long tenantId = 2l;
-        final String jobName = "jobName";
-        final boolean disallowConcurrentExecution = false;
+        quartzSchedulerExecutor.executeNow(1L, "2", "jobName", false);
 
-        //when
-        quartzSchedulerExecutor.executeNow(jobId, tenantId, jobName, disallowConcurrentExecution);
-
-        //then
         verify(scheduler, times(1)).addJob(any(JobDetail.class), anyBoolean());
         verify(scheduler, times(1)).triggerJob(any(JobKey.class));
 
@@ -472,69 +376,20 @@ public class QuartzSchedulerExecutorTest {
 
     @Test(expected = SSchedulerException.class)
     public void executeNow_with_exception() throws Exception {
-        final long jobId = 1l;
-        final long tenantId = 2l;
-        final String jobName = "jobName";
-        final boolean disallowConcurrentExecution = false;
-        //given
         doThrow(SchedulerException.class).when(scheduler).triggerJob(any(JobKey.class));
 
-        //when
-        quartzSchedulerExecutor.executeNow(jobId, tenantId, jobName, disallowConcurrentExecution);
-
-        //then exception
-
-    }
-
-    private void scheduleJob(final QuartzSchedulerExecutor executor, final boolean disallowConcurrentExecution, final int expectedOptimizationCall)
-            throws Exception {
-
-        //when
-        executor.schedule(1l, 2l, "jobName", new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), disallowConcurrentExecution);
-
-        //then
-        verify(scheduler).scheduleJob(any(JobDetail.class), any(Trigger.class));
-        verify(transactionService, times(expectedOptimizationCall)).registerBonitaSynchronization(any(BonitaTransactionSynchronization.class));
-    }
-
-    private HashSet<JobKey> getJoblist1() {
-        final HashSet<JobKey> jobKeyList = new HashSet<JobKey>();
-        jobKeyList.add(new JobKey("job1", "123"));
-        jobKeyList.add(new JobKey("job2", "123"));
-        return jobKeyList;
-    }
-
-    private HashSet<JobKey> getJoblist2() {
-        final HashSet<JobKey> jobKeyList2 = new HashSet<JobKey>();
-        jobKeyList2.add(new JobKey("job3", "124"));
-        jobKeyList2.add(new JobKey("job4", "124"));
-        jobKeyList2.add(new JobKey("job5", "124"));
-        return jobKeyList2;
-    }
-
-    private HashSet<JobKey> getJobListListAll() {
-        final HashSet<JobKey> jobKeyListAll = new HashSet<JobKey>();
-        jobKeyListAll.add(new JobKey("job1", "123"));
-        jobKeyListAll.add(new JobKey("job2", "123"));
-        jobKeyListAll.add(new JobKey("job3", "124"));
-        jobKeyListAll.add(new JobKey("job4", "124"));
-        jobKeyListAll.add(new JobKey("job5", "124"));
-        return jobKeyListAll;
+        quartzSchedulerExecutor.executeNow(1l, "2", "jobName", false);
     }
 
     @Test
     public void schedule_should_use_tenant_id_as_group_in_job_details() throws Exception {
-        //given
-        final long tenantId = 3L;
-        final org.bonitasoft.engine.scheduler.trigger.Trigger trigger = getRepeatTrigger(new Date(), "trigger", GOOD_INTERVAL, GOOD_COUNT, GOOD_PRIORITY,
-                MisfireRestartPolicy.NONE);
+        final String tenantId = "3";
+        final Trigger trigger = new TestRepeatTrigger("trigger", 1, 1,  MisfireRestartPolicy.NONE);
 
-        //when
         quartzSchedulerExecutor.schedule(10L, tenantId, "myJob", trigger, true);
 
-        //then
         final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
-        verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(Trigger.class));
+        verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(org.quartz.Trigger.class));
         final String group = jobDetailCaptor.getValue().getKey().getGroup();
         assertThat(group).isEqualTo(String.valueOf(tenantId));
     }
@@ -542,51 +397,40 @@ public class QuartzSchedulerExecutorTest {
 
     @Test
     public void schedule_should_store_tenant_id_in_jobDataMap() throws Exception {
-        //given
-        final long tenantId = 3L;
-        final org.bonitasoft.engine.scheduler.trigger.Trigger trigger = getRepeatTrigger(new Date(), "trigger", GOOD_INTERVAL, GOOD_COUNT, GOOD_PRIORITY,
-                MisfireRestartPolicy.NONE);
+        final String tenantId = "3";
+        final Trigger trigger = new TestRepeatTrigger("trigger", 1, 1,  MisfireRestartPolicy.NONE);
 
-        //when
         quartzSchedulerExecutor.schedule(10L, tenantId, "myJob", trigger, true);
 
-        //then
         final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
-        verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(Trigger.class));
+        verify(scheduler, times(1)).scheduleJob(jobDetailCaptor.capture(), any(org.quartz.Trigger.class));
         final JobDataMap dataMap = jobDetailCaptor.getValue().getJobDataMap();
-        assertThat(dataMap.get("tenantId")).isEqualTo(String.valueOf(tenantId));
+        assertThat(dataMap.get("tenantId")).isEqualTo(tenantId);
     }
 
     @Test
     public void executeNow_should_store_tenant_id_in_jobDataMap() throws Exception {
-        //given
-        final long tenantId = 3L;
+        final String tenantId = "3";
 
-        //when
         quartzSchedulerExecutor.executeNow(10L, tenantId, "myJob", true);
 
-        //then
         final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
         verify(scheduler, times(1)).addJob(jobDetailCaptor.capture(), anyBoolean());
         final JobDataMap dataMap = jobDetailCaptor.getValue().getJobDataMap();
-        assertThat(dataMap.get("tenantId")).isEqualTo(String.valueOf(tenantId));
+        assertThat(dataMap.get("tenantId")).isEqualTo(tenantId);
         verify(scheduler, times(1)).triggerJob(any(JobKey.class));
     }
 
     @Test
     public void executeNow_should_use_tenant_id_as_group_in_job_details() throws Exception {
-        //given
-        final long tenantId = 3L;
+        final String tenantId = "3";
 
-        //when
         quartzSchedulerExecutor.executeNow(10L, tenantId, "myJob", true);
 
-        //then
         final ArgumentCaptor<JobDetail> jobDetailCaptor = ArgumentCaptor.forClass(JobDetail.class);
         verify(scheduler, times(1)).addJob(jobDetailCaptor.capture(), anyBoolean());
         final String group = jobDetailCaptor.getValue().getKey().getGroup();
         assertThat(group).isEqualTo(String.valueOf(tenantId));
-
         verify(scheduler, times(1)).triggerJob(any(JobKey.class));
     }
 

@@ -354,7 +354,7 @@ public class ActorMappingServiceImplTest {
      * @throws SBonitaReadException
      */
     @Test
-    public final void getActorsLongIntIntStringOrderByType() throws SBonitaReadException {
+    public final void getActors() throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(0, 100, SActor.class, "id", OrderByType.ASC);
         final List<SActor> actors = new ArrayList<SActor>(3);
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);

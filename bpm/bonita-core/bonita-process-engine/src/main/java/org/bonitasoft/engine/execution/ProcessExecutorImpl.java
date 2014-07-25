@@ -411,8 +411,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public boolean executeConnectors(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance, final ConnectorEvent activationEvent)
-            throws SBonitaException {
+    public boolean executeConnectors(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance, final ConnectorEvent activationEvent,
+            final FlowNodeSelector selectorForConnectorOnEnter) throws SBonitaException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final long processDefinitionId = processDefinition.getId();
         final List<SConnectorDefinition> connectors = processContainer.getConnectors(activationEvent);
@@ -422,10 +422,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (nextConnectorInstance != null) {
                 for (final SConnectorDefinition sConnectorDefinition : connectors) {
                     if (sConnectorDefinition.getName().equals(nextConnectorInstance.getName())) {
-                        final Long connectorInstanceId = nextConnectorInstance.getId();
-                        final String connectorDefinitionName = sConnectorDefinition.getName();
                         workService.registerWork(WorkFactory.createExecuteConnectorOfProcess(processDefinitionId, sProcessInstance.getId(),
-                                sProcessInstance.getRootProcessInstanceId(), connectorInstanceId, connectorDefinitionName, activationEvent));
+                                sProcessInstance.getRootProcessInstanceId(), nextConnectorInstance.getId(), sConnectorDefinition.getName(), activationEvent,
+                                selectorForConnectorOnEnter));
                         return true;
                     }
                 }
@@ -582,8 +581,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected boolean initialize(final long userId, final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
-            final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
-            throws BonitaHomeNotSetException, IOException, InvalidEvaluationConnectorConditionException, SBonitaException {
+            final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
+            final FlowNodeSelector selectorForConnectorOnEnter) throws BonitaHomeNotSetException, IOException,
+            InvalidEvaluationConnectorConditionException, SBonitaException {
         // Create SDataInstances
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
         createDocuments(sProcessDefinition, sProcessInstance, userId);
@@ -598,7 +598,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Create connectors
         bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
 
-        return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER);
+        return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, selectorForConnectorOnEnter);
     }
 
     protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId)
@@ -708,7 +708,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 if (ProcessInstanceState.COMPLETING.getId() == sProcessInstance.getStateId()) {
                     processInstanceState = ProcessInstanceState.COMPLETED;
                 } else {
-                    if (executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_FINISH)) {
+                    if (executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_FINISH, null)) {
                         // some connectors were trigger
                         processInstanceState = ProcessInstanceState.COMPLETING;
                     } else {
@@ -913,9 +913,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
 
-            final SFlowElementContainerDefinition processContainer = selector.getContainer();
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
-                    operations != null ? new ArrayList<SOperation>(operations) : operations, context, processContainer, connectors);
+                    operations != null ? new ArrayList<SOperation>(operations) : operations, context, selector.getContainer(), connectors,
+                    selector);
             try {
                 handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
             } catch (final SProcessInstanceCreationException e) {
