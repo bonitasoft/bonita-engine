@@ -474,7 +474,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getNumberOfProcessDeploymentInfo(final ActivationState activationState) throws SProcessDefinitionReadException {
+    public long getNumberOfProcessDeploymentInfosByActivationState(final ActivationState activationState) throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("activationState", (Object) activationState.name());
         final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<Long>("getNumberOfProcessDefinitionsInActivationState", parameters,
                 SProcessDefinitionDeployInfo.class);
@@ -597,8 +597,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public void updateProcessDefinitionDeployInfo(final long processId, final EntityUpdateDescriptor descriptor) throws SProcessDefinitionNotFoundException,
-            SProcessDeploymentInfoUpdateException {
+    public SProcessDefinitionDeployInfo updateProcessDefinitionDeployInfo(final long processId, final EntityUpdateDescriptor descriptor)
+            throws SProcessDefinitionNotFoundException, SProcessDeploymentInfoUpdateException {
         SProcessDefinitionDeployInfo processDefinitionDeployInfo;
         try {
             processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
@@ -619,6 +619,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "updateProcessDeploymentInfo");
             throw new SProcessDeploymentInfoUpdateException(e);
         }
+        return processDefinitionDeployInfo;
     }
 
     private UpdateRecord getUpdateRecord(final EntityUpdateDescriptor descriptor, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
@@ -667,7 +668,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfos(final long userId, final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosCanBeStartedBy(final long userId, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
         try {
             return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UserCanStart", searchOptions,
                     Collections.singletonMap(USER_ID, (Object) userId));
@@ -677,7 +679,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getNumberOfProcessDeploymentInfos(final long userId, final QueryOptions countOptions) throws SBonitaSearchException {
+    public long getNumberOfProcessDeploymentInfosCanBeStartedBy(final long userId, final QueryOptions countOptions) throws SBonitaSearchException {
         try {
             return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UserCanStart", countOptions,
                     Collections.singletonMap(USER_ID, (Object) userId));
@@ -687,7 +689,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final QueryOptions searchOptions)
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final long managerUserId,
+            final QueryOptions searchOptions)
             throws SBonitaSearchException {
         try {
             return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", searchOptions,
@@ -698,7 +701,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getNumberOfProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final QueryOptions countOptions)
+    public long getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedBy(final long managerUserId, final QueryOptions countOptions)
             throws SBonitaSearchException {
         try {
             return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", countOptions,
@@ -769,7 +772,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(final long userId, final QueryOptions searchOptions)
+    public List<SProcessDefinitionDeployInfo> searchUncategorizedProcessDeploymentInfosCanBeStartedBy(final long userId, final QueryOptions searchOptions)
             throws SBonitaSearchException {
         try {
             return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, UNCATEGORIZED_USERCANSTART_SUFFIX, searchOptions,
@@ -780,7 +783,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getNumberOfUncategorizedProcessDeploymentInfosUserCanStart(final long userId, final QueryOptions countOptions) throws SBonitaSearchException {
+    public long getNumberOfUncategorizedProcessDeploymentInfosCanBeStartedBy(final long userId, final QueryOptions countOptions) throws SBonitaSearchException {
         try {
             return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, UNCATEGORIZED_USERCANSTART_SUFFIX, countOptions,
                     Collections.singletonMap(USER_ID, (Object) userId));
@@ -1073,6 +1076,71 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(PROCESS_DEFINITION_ID, (Object) processDefinitionId);
             return persistenceService.searchEntity(SUser.class, WHOCANSTART_PROCESS_SUFFIX, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(final long userId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor", queryOptions,
+                    parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(final long userId,
+            final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksFor", queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(final long userId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksSupervisedBy", queryOptions,
+                    parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(final long userId,
+            final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasksSupervisedBy", queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
         }

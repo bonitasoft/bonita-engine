@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -39,14 +41,19 @@ import org.bonitasoft.engine.command.helper.designer.Gateway;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
 import org.bonitasoft.engine.command.helper.designer.UserTask;
 import org.bonitasoft.engine.command.helper.expectation.TestUtils;
+import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,15 +63,21 @@ import org.junit.Test;
  * Date: 11/12/13
  * Time: 09:45
  */
-public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
+public class AdvancedStartProcessCommandIT extends CommonAPITest {
 
-    User john;
+    private static final String CONNECTOR_OUTPUT_NAME = "output1";
 
-    SimpleProcessDesigner designer = new SimpleProcessDesigner(getProcessDefinitionBuilder());
+    private static final String CONNECTOR_INPUT_NAME = "input1";
 
-    TestUtils wrapper = new TestUtils(this);
+    private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
 
-    ProcessDeployer processDeployer = getProcessDeployer();
+    private User john;
+
+    private final SimpleProcessDesigner designer = new SimpleProcessDesigner(getProcessDefinitionBuilder());
+
+    private final TestUtils wrapper = new TestUtils(this);
+
+    private final ProcessDeployer processDeployer = getProcessDeployer();
 
     @Before
     public void beforeTest() throws BonitaException {
@@ -84,14 +97,14 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_start_a_sequential_process() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new UserTask("step 2"))
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
+        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
 
         process.expect("step 2").toBeReady();
         process.expect("start", "step 1").toNotHaveArchives();
@@ -99,17 +112,17 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_start_a_sequential_process_with_variables() throws Exception {
-        ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
+        final ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
         builder.addShortTextData("variable", new ExpressionBuilder().createConstantStringExpression("default"));
-        SimpleProcessDesigner designer = new SimpleProcessDesigner(builder);
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final SimpleProcessDesigner designer = new SimpleProcessDesigner(builder);
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new UserTask("step 2"))
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(),
+        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(),
                 "step 2",
                 Arrays.asList(createSetDataOperation("variable", "Done!")),
                 Collections.<String, Serializable> emptyMap());
@@ -119,7 +132,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_be_able_to_start_a_sequential_process_with_a_document() throws Exception {
-        ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
+        final ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
         builder.addDocumentDefinition("document");
         ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
@@ -128,7 +141,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(),
+        final TestUtils.Process process = startProcess(john.getId(),
                 processDefinition.getId(),
                 "step 2",
                 Collections.singletonList(new OperationBuilder().createSetDocument("document",
@@ -141,14 +154,14 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_be_able_to_start_a_process_with_a_parallel_split() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("split", GatewayType.PARALLEL))
                 .then(new UserTask("step 2"), new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
+        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
         process.execute(john, "step 1", "step 2", "step 3");
 
         process.isExpected().toFinish();
@@ -157,14 +170,14 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_be_able_to_start_a_process_with_an_exclusive_merge() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"), new UserTask("step 2"))
                 .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
+        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
         process.execute(john, "step 2", "step 3");
 
         process.isExpected().toFinish();
@@ -174,7 +187,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_be_able_to_start_a_process_with_an_exclusive_split() throws Exception {
-        Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
+        final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
@@ -184,7 +197,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                         new UserTask("step 3").when("exclusive", meet(condition)))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
+        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
         process.execute(john, "step 1", "step 3");
 
         process.isExpected().toFinish();
@@ -194,7 +207,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     @Test
     public void should_be_able_to_start_a_process_before_an_inclusive() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("inclusive 1", GatewayType.INCLUSIVE))
@@ -203,39 +216,32 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .then(new UserTask("step 4"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
+        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
         process.execute(john, "step 1", "step 2", "step 3", "step 4");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
     }
 
-    private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {
+    private Operation createSetDataOperation(final String name, final String value) throws InvalidExpressionException {
         return new OperationBuilder().createSetDataOperation(name, new ExpressionBuilder().createConstantStringExpression(value));
     }
 
     private ProcessDefinitionBuilder getProcessDefinitionBuilder() {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("Designed by designer", "1.0")
                 .addActor("actor")
                 .addDescription("Coding all-night-long");
         return builder;
     }
 
-    private TestUtils.Process startProcess(long startedBy,
-            long processDefinitionId,
-            String activityName) throws Exception {
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final String activityName) throws Exception {
         return startProcess(startedBy, processDefinitionId, activityName, null, null);
     }
 
-    private TestUtils.Process startProcess(
-            long startedBy,
-            long processDefinitionId,
-            String activityName,
-            List<Operation> operations,
-            Map<String, Serializable> context) throws Exception {
-
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final String activityName, final List<Operation> operations,
+            final Map<String, Serializable> context) throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("started_by", startedBy);
         parameters.put("process_definition_id", processDefinitionId);
         parameters.put("activity_name", activityName);
@@ -262,5 +268,36 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 disableAndDeleteProcess(processDefinition);
             }
         };
+    }
+
+    @Cover(classes = { CommandAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "AdvancedStartProcessCommand",
+            "Connector", "Enter" }, jira = "BS-9188")
+    @Test
+    public void advancedStartProcessCommandWithConnectorOnEnterOnProcess() throws Exception {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addShortTextData("outputOfConnector", null);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
+                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("a"))
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, john,
+                "TestConnectorWithOutput.impl", TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
+
+        // Start the process with the command on the step2
+        final Map<String, Serializable> parametersCommand = new HashMap<String, Serializable>();
+        parametersCommand.put("started_by", john.getId());
+        parametersCommand.put("process_definition_id", processDefinition.getId());
+        parametersCommand.put("activity_name", "step2");
+        // command API execution
+        getCommandAPI().execute("advancedStartProcessCommand", parametersCommand);
+
+        waitForUserTask("step2");
+
+        // Clean
+        disableAndDeleteProcess(processDefinition);
     }
 }

@@ -30,13 +30,13 @@ import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescripto
  * @author Celine Souchet
  * 
  */
-public class SearchProcessDeploymentInfosUsersManagedByCanStart extends AbstractProcessDeploymentInfoSearchEntity {
+public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy extends AbstractProcessDeploymentInfoSearchEntity {
 
     private final ProcessDefinitionService processDefinitionService;
 
     private final long managerUserId;
 
-    public SearchProcessDeploymentInfosUsersManagedByCanStart(final ProcessDefinitionService processDefinitionService,
+    public SearchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final ProcessDefinitionService processDefinitionService,
             final SearchProcessDefinitionsDescriptor searchEntitiesDescriptor, final SearchOptions options, final long managerUserId) {
         super(searchEntitiesDescriptor, options);
         this.processDefinitionService = processDefinitionService;
@@ -45,12 +45,12 @@ public class SearchProcessDeploymentInfosUsersManagedByCanStart extends Abstract
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDefinitionService.getNumberOfProcessDeploymentInfosUsersManagedByCanStart(managerUserId, searchOptions);
+        return processDefinitionService.getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
     }
 
     @Override
     public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDefinitionService.searchProcessDeploymentInfosUsersManagedByCanStart(managerUserId, searchOptions);
+        return processDefinitionService.searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
     }
 
 }

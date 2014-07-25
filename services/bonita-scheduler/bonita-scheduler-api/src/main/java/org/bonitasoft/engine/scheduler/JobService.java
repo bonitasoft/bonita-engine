@@ -83,6 +83,14 @@ public interface JobService {
     void deleteJobDescriptor(SJobDescriptor sJobDescriptor) throws SJobDescriptorDeletionException;
     
     /**
+     * Delete all job descriptors  for a specific tenant
+     * 
+     * @throws SJobDescriptorDeletionException	
+     * @since 6.4
+     */
+    void deleteAllJobDescriptors() throws SJobDescriptorDeletionException;
+    
+    /**
      * Delete a job descriptor corresponding to the given job name
      * 
      * @param jobName name of job we want the jobDsecriptor to be deleted
