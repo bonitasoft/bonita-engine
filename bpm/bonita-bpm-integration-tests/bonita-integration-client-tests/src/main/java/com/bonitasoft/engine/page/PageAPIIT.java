@@ -248,10 +248,9 @@ public class PageAPIIT extends CommonAPISPTest {
         final Page returnedPage = getPageAPI().getPage(pageId);
 
         // then
-        checkPageContentContainsProperties(returnedPageContent, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        checkPageContentContainsProperties(returnedPageContent, DISPLAY_NAME, PAGE_DESCRIPTION);
         assertThat(returnedPage.getLastModificationDate()).as("last modification date should be modified ").isAfter(
                 page.getLastModificationDate());
-
     }
 
     @Test
@@ -347,12 +346,10 @@ public class PageAPIIT extends CommonAPISPTest {
         // when
         final byte[] pageContent = getPageAPI().getPageContent(page.getId());
         // then
-        checkPageContentContainsProperties(pageContent, pageName, DISPLAY_NAME, pageDescription);
-
+        checkPageContentContainsProperties(pageContent, DISPLAY_NAME, pageDescription);
     }
 
-    private void checkPageContentContainsProperties(final byte[] content, final String page, final String displayName, final String description
-            ) {
+    private void checkPageContentContainsProperties(final byte[] content, final String displayName, final String description) {
         Map<String, String> contentAsMap = null;
         try {
             contentAsMap = unzip(content);
