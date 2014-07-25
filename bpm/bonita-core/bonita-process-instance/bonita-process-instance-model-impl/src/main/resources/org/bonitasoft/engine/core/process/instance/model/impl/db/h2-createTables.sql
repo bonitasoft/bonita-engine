@@ -33,7 +33,6 @@ CREATE TABLE token (
   parent_ref_id BIGINT NULL,
   PRIMARY KEY (tenantid, id)
 );
-
 CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
 
 CREATE TABLE flownode_instance (

@@ -79,7 +79,8 @@ public class WorkFactoryTest {
 
     @Test
     public void createExecuteConnectorOfProcess() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER);
+        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                null);
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 

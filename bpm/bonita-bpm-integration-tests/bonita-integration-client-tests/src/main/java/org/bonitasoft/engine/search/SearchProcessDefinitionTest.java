@@ -46,13 +46,16 @@ import org.junit.Test;
  */
 public class SearchProcessDefinitionTest extends CommonAPITest {
 
-    private List<ProcessDefinition> processDefinitions;
+    private List<ProcessDefinition> enabledProcessDefinitions;
+
+    private List<ProcessDefinition> disabledProcessDefinitions;
 
     private User user;
 
     @After
     public void afterTest() throws BonitaException {
-        disableAndDeleteProcess(processDefinitions);
+        disableAndDeleteProcess(enabledProcessDefinitions);
+        deleteProcess(disabledProcessDefinitions);
         deleteUser(user.getId());
 
         logoutOnTenant();
@@ -65,7 +68,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
-        processDefinitions = new ArrayList<ProcessDefinition>(2);
+        enabledProcessDefinitions = new ArrayList<ProcessDefinition>(2);
+        disabledProcessDefinitions = new ArrayList<ProcessDefinition>(2);
     }
 
     @Test
@@ -76,16 +80,16 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
                 Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
-        processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user));
-        final ProcessInstance pi1 = getProcessAPI().startProcess(userId, processDefinitions.get(0).getId());
+        enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user));
+        final ProcessInstance pi1 = getProcessAPI().startProcess(userId, enabledProcessDefinitions.get(0).getId());
         waitForUserTask("step1", pi1);
 
         // create process2
         final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2",
                 PROCESS_VERSION,
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, user));
-        final ProcessInstance pi2 = getProcessAPI().startProcess(userId, processDefinitions.get(1).getId());
+        enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, user));
+        final ProcessInstance pi2 = getProcessAPI().startProcess(userId, enabledProcessDefinitions.get(1).getId());
         waitForUserTask("step1", pi2);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
@@ -93,9 +97,9 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId, builder.done());
         assertEquals(2, searchRes.getCount());
         final List<ProcessDeploymentInfo> processDeploymentInfos = searchRes.getResult();
-        assertEquals("The first process definition must be " + designProcessDefinition1.getName(), processDefinitions.get(0).getId(),
+        assertEquals("The first process definition must be " + designProcessDefinition1.getName(), enabledProcessDefinitions.get(0).getId(),
                 processDeploymentInfos.get(0).getProcessId());
-        assertEquals("The second process definition must be " + designProcessDefinition2.getName(), processDefinitions.get(1).getId(),
+        assertEquals("The second process definition must be " + designProcessDefinition2.getName(), enabledProcessDefinitions.get(1).getId(),
                 processDeploymentInfos.get(1).getProcessId());
 
         // test search in order
@@ -106,8 +110,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final List<ProcessDeploymentInfo> processDeploymentInfos1 = searchRes1.getResult();
         assertNotNull(processDeploymentInfos1);
         assertEquals(2, processDeploymentInfos1.size());
-        assertEquals(processDefinitions.get(1).getId(), processDeploymentInfos1.get(0).getProcessId());
-        assertEquals(processDefinitions.get(0).getId(), processDeploymentInfos1.get(1).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), processDeploymentInfos1.get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(0).getId(), processDeploymentInfos1.get(1).getProcessId());
 
         // test term
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 5);
@@ -117,7 +121,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final List<ProcessDeploymentInfo> processDeploymentInfos2 = searchRes2.getResult();
         assertNotNull(processDeploymentInfos2);
         assertEquals(1, processDeploymentInfos2.size());
-        assertEquals(processDefinitions.get(1).getId(), processDeploymentInfos2.get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), processDeploymentInfos2.get(0).getProcessId());
 
         // test filter
         final SearchOptionsBuilder builder3 = new SearchOptionsBuilder(0, 5);
@@ -127,7 +131,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final List<ProcessDeploymentInfo> processDeploymentInfos3 = searchRes3.getResult();
         assertNotNull(processDeploymentInfos3);
         assertEquals(1, processDeploymentInfos3.size());
-        assertEquals(processDefinitions.get(1).getId(), processDeploymentInfos3.get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), processDeploymentInfos3.get(0).getProcessId());
     }
 
     @Test
@@ -141,8 +145,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(2, searchRes0.getCount());
         // reverse order:
-        assertEquals(processDefinitions.get(0).getId(), searchRes0.getResult().get(1).getProcessId());
-        assertEquals(processDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(0).getId(), searchRes0.getResult().get(1).getProcessId());
+        assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes0.getResult().get(0).getProcessId());
 
         // partial term search
         optsBuilder = new SearchOptionsBuilder(0, 5);
@@ -183,7 +187,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         // create 1 disabled process
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("plop",
                 PROCESS_VERSION, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        processDefinitions.add(getProcessAPI().deploy(designProcessDefinition));
+        disabledProcessDefinitions.add(getProcessAPI().deploy(designProcessDefinition));
 
         // Filter on version
         SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 10);
@@ -199,7 +203,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         optsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.ACTIVATION_STATE, ActivationState.ENABLED.name());
         searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(5, searchResult.getCount());
-        assertFalse("Don't have to contain the process definition \"plop\" !!", searchResult.getResult().contains(processDefinitions.get(5)));
+        assertFalse("Don't have to contain the process definition \"plop\" !!", searchResult.getResult().contains(enabledProcessDefinitions.get(4)));
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "Apostrophe" }, jira = "ENGINE-366")
@@ -217,7 +221,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
     private void searchProcessDefinitions(final String processName, final String processVersion) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
         processBuilder.addActor(ACTOR_NAME);
-        processDefinitions.add(deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user));
+        enabledProcessDefinitions.add(deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user));
 
         // Get all process definitions, reverse order:
         final SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 10);
@@ -249,7 +253,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
             }
             final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
                     PROCESS_VERSION + i, Arrays.asList("step1_" + i, "step2_" + i), Arrays.asList(true, true));
-            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user));
+            enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user));
         }
     }
 

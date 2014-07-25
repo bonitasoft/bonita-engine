@@ -22,8 +22,9 @@ CREATE TABLE arch_process_instance (
   stringIndex5 VARCHAR2(50),
   PRIMARY KEY (tenantid, id)
 );
-
-CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId,sourceObjectId, rootProcessInstanceId, callerId);
+CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
+CREATE INDEX idx2_arch_process_instance ON arch_process_instance (tenantId, processDefinitionId, archiveDate);
+CREATE INDEX idx3_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, callerId, stateId);
 
 CREATE TABLE arch_flownode_instance (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -74,7 +75,7 @@ CREATE TABLE arch_flownode_instance (
   interrupting NUMBER(1),
   PRIMARY KEY (tenantid, id)
 );
-CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance (tenantId, kind, logicalGroup2, executedBy);
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(kind, logicalGroup2, executedBy);
 CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId,rootContainerId, parentContainerId);
 

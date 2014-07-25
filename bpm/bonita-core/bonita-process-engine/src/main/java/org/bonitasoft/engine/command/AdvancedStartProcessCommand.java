@@ -70,17 +70,15 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
         final Map<String, Serializable> context = getContext(parameters);
         final List<Operation> operations = getOperations(parameters);
 
-        ProcessInstance processInstance;
         try {
             validateInputs(serviceAccessor, processDefinitionId, activityNames);
 
-            processInstance = startProcess(processDefinitionId, activityNames, startedBy, context, operations);
+            return startProcess(processDefinitionId, activityNames, startedBy, context, operations);
         } catch (final SCommandExecutionException e) {
             throw e;
         } catch (final Exception e) {
             throw new SCommandExecutionException(e);
         }
-        return processInstance;
     }
 
     private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
@@ -109,31 +107,23 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
     }
 
     private Long getStartedBy(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getMandatory(STARTED_BY, parameters);
+        return getLongMandadoryParameter(parameters, STARTED_BY);
     }
 
     private Long getProcessDefinitionId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getMandatory(PROCESS_DEFINITION_ID, parameters);
+        return getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID);
     }
 
     private List<Operation> getOperations(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return get(OPERATIONS, parameters);
+        return getParameter(parameters, OPERATIONS);
     }
 
     private Map<String, Serializable> getContext(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return get(CONTEXT, parameters);
+        return getParameter(parameters, CONTEXT);
     }
 
     private String getActivityName(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getMandatory(ACTIVITY_NAME, parameters);
-    }
-
-    private <T> T get(final String parameter, final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getParameter(parameters, parameter, "An error occurred while parsing " + parameter);
-    }
-
-    private <T> T getMandatory(final String parameter, final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getMandatoryParameter(parameters, parameter, "Missing mandatory field: " + parameter);
+        return getStringMandadoryParameter(parameters, ACTIVITY_NAME);
     }
 
 }

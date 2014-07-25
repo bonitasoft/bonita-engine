@@ -129,10 +129,8 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition)
             throws SCacheException {
-        UserFilterImplementationDescriptor descriptor;
-        descriptor = (UserFilterImplementationDescriptor) cacheService.get(FILTER_CACHE_NAME,
+        return (UserFilterImplementationDescriptor) cacheService.get(FILTER_CACHE_NAME,
                 getUserFilterImplementationIdInCache(processDefinitionId, sUserFilterDefinition.getUserFilterId(), sUserFilterDefinition.getVersion()));
-        return descriptor;
     }
 
     private String getUserFilterImplementationIdInCache(final long processDefinitionId, final String userFilterId, final String version) {

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -45,7 +46,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public void deleteProcessDefinition(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
         final DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processDefinitionId);
         deleteProcess.execute();
@@ -88,8 +89,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
-                SessionInfos.getUserNameFromSession());
+                SessionInfos.getUserNameFromSession(), classLoaderService);
         transactionContent.execute();
     }
 

@@ -24,8 +24,8 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -63,7 +63,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -610,7 +610,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
 
         // Test if step1 state is FAILED
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedHumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
         final List<ActivityInstance> activities = getProcessAPI().searchActivities(searchOptionsBuilder.done()).getResult();
         assertEquals("Step1 must be failed, but was <" + activities.get(0).getState() + ">", ActivityStates.FAILED_STATE, activities.get(0).getState());
 

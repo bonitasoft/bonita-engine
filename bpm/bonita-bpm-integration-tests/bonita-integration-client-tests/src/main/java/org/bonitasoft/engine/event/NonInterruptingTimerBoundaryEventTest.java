@@ -60,13 +60,6 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "Non-interrupting" }, story = "Execute timer boundary event not triggerd.", jira = "ENGINE-1042")
-    @Test
-    public void testNonInterruptTimerBoundaryEventNotTriggered() throws Exception {
-        boundaryEventNotTriggered(false);
-    }
-
     @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupting",
             "Timer", "Call Activity" }, story = "Execute timer boundary event triggered on call activity.", jira = "ENGINE-1042")
     @Test
@@ -106,13 +99,6 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         disableAndDeleteProcess(targetProcessDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Non-interrupting",
-            "Timer", "Call Activity" }, story = "Non-interrupting timer boundary event not triggered on call activity.", jira = "ENGINE-1042")
-    @Test
-    public void testNonInterruptTimerBoundaryEventNotTriggeredOnCallActivity() throws Exception {
-        executeTimerBoundaryEventNotTriggeredOnCallActivity(false);
-    }
-
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
             "Non-interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute non-interrupting timer boundary event triggered on sequential multi-instance.", jira = "ENGINE-1042")
     @Test
@@ -149,13 +135,6 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
     }
 
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
-            "Non-interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute interrupting timer boundary event not triggered on sequential multi-instance", jira = "ENGINE-1042")
-    @Test
-    public void testNonInterruptTimerBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
-        timerBoundaryEventNotTriggeredOnSequentialMultiInstance(false);
-    }
-
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
             "Non-interrupting", "Timer", "MultiInstance", "Parallel" }, story = "Non-interrupting timer boundary event attached to parallel multi-instance.", jira = "ENGINE-1042")
     @Test
     public void testNonInterruptTimerBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
@@ -186,13 +165,6 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
 
         // clean up
         disableAndDeleteProcess(processDefinition.getId());
-    }
-
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "non-interrupting", "MultiInstance", "Parallel" }, story = "Non interrupting timer boundary event not triggered on parallel multi-instance (normal flow)", jira = "ENGINE-1042")
-    @Test
-    public void testNonInterruptTimerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
-        timerBoundaryEventNotTriggeredOnParallelMultiInstance(false);
     }
 
     @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Non-interrupging",
@@ -227,13 +199,6 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
 
         // clean up
         disableAndDeleteProcess(processDefinition.getId());
-    }
-
-    @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Non-interruping",
-            "Timer", "Loop activity", "Normal flow" }, story = "Non interrupting timer boundary event not triggered on loop activity", jira = "ENGINE-1042")
-    @Test
-    public void testNonInterruptTimerBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
-        timerBoundaryEventNotTriggeredOnLoopActivity(false);
     }
 
 }

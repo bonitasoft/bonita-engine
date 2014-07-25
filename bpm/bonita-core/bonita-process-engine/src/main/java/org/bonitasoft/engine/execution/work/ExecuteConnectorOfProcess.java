@@ -62,13 +62,17 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     private final ConnectorEvent activationEvent;
 
+    private final FlowNodeSelector selectorForConnectorOnEnter;
+
     ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
-            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
+            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
+            final FlowNodeSelector selectorForConnectorOnEnter) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(processInstanceId,
                 DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId));
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;
+        this.selectorForConnectorOnEnter = selectorForConnectorOnEnter;
     }
 
     @Override
@@ -86,10 +90,12 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent);
+        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent,
+                selectorForConnectorOnEnter);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
-                FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartFlowNodeFilter());
+                final FlowNodeSelector selector = selectorForConnectorOnEnter != null ? selectorForConnectorOnEnter : new FlowNodeSelector(sProcessDefinition,
+                        new StartFlowNodeFilter());
                 processExecutor.startElements(intTxProcessInstance, selector);
             } else {
                 processExecutor.handleProcessCompletion(sProcessDefinition, intTxProcessInstance, false);
