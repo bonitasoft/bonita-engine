@@ -47,6 +47,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutorImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
@@ -103,7 +104,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     @Override
     protected boolean initialize(final long userId, final SProcessDefinition sDefinition, final SProcessInstance sInstance,
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
-            final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
+            final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
+            final FlowNodeSelector selectorForConnectorOnEnter)
                     throws SProcessInstanceCreationException {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
@@ -156,7 +158,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
 
-            return executeConnectors(sDefinition, sInstance, ConnectorEvent.ON_ENTER);
+            return executeConnectors(sDefinition, sInstance, ConnectorEvent.ON_ENTER, selectorForConnectorOnEnter);
         } catch (final SProcessInstanceCreationException e) {
             throw e;
         } catch (final SBonitaException e) {
