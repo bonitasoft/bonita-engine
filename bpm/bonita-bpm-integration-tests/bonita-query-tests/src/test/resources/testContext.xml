@@ -16,6 +16,8 @@
            <list>
                <value>/com/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
                <value>/com/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
+               <value>/com/bonitasoft/engine/business/application/impl/hibernate/business.application.hbm.xml</value>
+               <value>/com/bonitasoft/engine/business/application/impl/hibernate/business.application.queries.hbm.xml</value>
            </list>
        </property>
        <property name="hibernateProperties">
@@ -32,6 +34,10 @@
    </bean>
     
    <bean id="processInstanceRepository" class="com.bonitasoft.engine.test.persistence.repository.PageRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+
+   <bean id="applicationRepository" class="com.bonitasoft.engine.test.persistence.repository.ApplicationRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
 
