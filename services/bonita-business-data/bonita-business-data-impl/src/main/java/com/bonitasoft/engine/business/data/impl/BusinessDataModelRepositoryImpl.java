@@ -65,8 +65,6 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String DAO_JAR_NAME = "bdm-dao.jar";
 
-    private static final String SERVER_DAO_JAR_NAME = "bdm-server-dao.jar";
-
     private static final String BOM_NAME = "bom.zip";
 
     private final DependencyService dependencyService;

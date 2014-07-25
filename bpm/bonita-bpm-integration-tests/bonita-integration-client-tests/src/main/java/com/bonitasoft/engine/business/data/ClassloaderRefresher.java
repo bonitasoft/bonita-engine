@@ -66,7 +66,7 @@ public class ClassloaderRefresher {
                 }
                 if (file.getName().contains("javassist")) {
                     try {
-                        contextClassLoader.loadClass("javassist.util.proxy.Proxy");
+                        contextClassLoader.loadClass("javassist.util.proxy.MethodFilter");
                     } catch (final ClassNotFoundException e1) {
                         FileUtils.writeByteArrayToFile(file, e.getValue());
                         urls.add(file.toURI().toURL());
