@@ -12,7 +12,7 @@
         <property name="className" value="${db.datasource.class}" />
         <property name="uniqueName" value="java:comp/env/bonitaDS" /> <!--  Is it really useful and/or used ?  --> 
         <property name="maxPoolSize" value="1" />
-        <property name="maxPoolSize" value="7" />
+        <property name="minPoolSize" value="7" />
         <property name="driverProperties" ref="driverProperties">
         </property>
     </bean>  
