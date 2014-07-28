@@ -8,7 +8,7 @@ CREATE TABLE arch_document_mapping (
   documentCreationDate BIGINT NOT NULL,
   documentHasContent BOOLEAN NOT NULL,
   documentContentFileName VARCHAR(255),
-  documentContentMimeType VARCHAR(50),
+  documentContentMimeType VARCHAR(255),
   contentStorageId VARCHAR(50),
   documentURL VARCHAR(255),
   archiveDate BIGINT NOT NULL,
