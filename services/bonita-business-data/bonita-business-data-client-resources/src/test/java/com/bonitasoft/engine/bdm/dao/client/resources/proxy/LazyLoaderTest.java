@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.dao.proxy;
+package com.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -19,8 +19,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.bdm.dao.utils.BDMQueryCommandParameters;
-import com.bonitasoft.engine.bdm.dao.utils.EntityGetter;
+import com.bonitasoft.engine.bdm.dao.client.resources.proxy.LazyLoader;
+import com.bonitasoft.engine.bdm.dao.client.resources.utils.BDMQueryCommandParameters;
+import com.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 import com.bonitasoft.engine.bdm.proxy.model.Child;
 import com.bonitasoft.engine.bdm.proxy.model.Parent;
 

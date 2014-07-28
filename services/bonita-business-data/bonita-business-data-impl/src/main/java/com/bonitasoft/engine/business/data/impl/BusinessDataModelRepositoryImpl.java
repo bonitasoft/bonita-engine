@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
+import com.bonitasoft.engine.bdm.client.ResourcesLoader;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -195,7 +196,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     protected byte[] generateClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException, IOException {
         final JDTCompiler compiler = new JDTCompiler();
-        AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, compilationPath);
+        AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader(), compilationPath);
 
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         // Build jar with Model
@@ -203,7 +204,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         resources.put(MODEL_JAR_NAME, modelJarContent);
 
         // Build jar with DAO
-        builder = new ClientBDMJarBuilder(compiler, compilationPath);;
+        builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader(), compilationPath);;
         final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
 

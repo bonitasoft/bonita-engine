@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.dao.proxy;
+package com.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -11,9 +11,9 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer;
-import com.bonitasoft.engine.bdm.dao.utils.BDMQueryCommandParameters;
-import com.bonitasoft.engine.bdm.dao.utils.EntityGetter;
+import com.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer;
+import com.bonitasoft.engine.bdm.dao.client.resources.utils.BDMQueryCommandParameters;
+import com.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 
 public class LazyLoader {
 

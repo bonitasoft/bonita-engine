@@ -1,8 +1,10 @@
-package com.bonitasoft.engine.bdm.dao.utils;
+package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+
+import com.bonitasoft.engine.bdm.dao.client.resources.utils.Capitalizer;
 
 public class CapitalizerTest {
 

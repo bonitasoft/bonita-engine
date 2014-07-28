@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.dao.proxy;
+package com.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

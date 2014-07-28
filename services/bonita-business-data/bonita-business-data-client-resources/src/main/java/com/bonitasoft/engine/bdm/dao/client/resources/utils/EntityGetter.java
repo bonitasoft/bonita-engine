@@ -1,6 +1,6 @@
-package com.bonitasoft.engine.bdm.dao.utils;
+package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
-import static com.bonitasoft.engine.bdm.dao.utils.Capitalizer.capitalize;
+import static com.bonitasoft.engine.bdm.dao.client.resources.utils.Capitalizer.capitalize;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;

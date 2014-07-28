@@ -40,6 +40,8 @@ import com.sun.codemodel.JVar;
  */
 public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
+    private static final String CLIENT_RESOURCES_PACKAGES = "com.bonitasoft.engine.bdm.dao.client.resources";
+            
     public ClientBDMCodeGenerator() {
         super();
     }
@@ -78,10 +80,10 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JClass apiSessionJClass = getModel().ref("org.bonitasoft.engine.session.APISession");
         implClass.field(JMod.PRIVATE, apiSessionJClass, "session");
 
-        final JClass deserializerClass = getModel().ref("com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer");
+        final JClass deserializerClass = getModel().ref(CLIENT_RESOURCES_PACKAGES + ".BusinessObjectDeserializer");
         implClass.field(JMod.PRIVATE, deserializerClass, "deserializer");
 
-        final JClass proxyfierClass = getModel().ref("com.bonitasoft.engine.bdm.dao.proxy.Proxyfier");
+        final JClass proxyfierClass = getModel().ref(CLIENT_RESOURCES_PACKAGES + ".proxy.Proxyfier");
         implClass.field(JMod.PRIVATE, proxyfierClass, "proxyfier");
 
         final JMethod constructor = implClass.constructor(JMod.PUBLIC);
@@ -90,7 +92,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JBlock body = constructor.body();
         body.assign(JExpr.refthis("session"), JExpr.ref("session"));
         body.assign(JExpr.refthis("deserializer"), JExpr._new(deserializerClass));
-        final JClass lazyLoaderClass = getModel().ref("com.bonitasoft.engine.bdm.dao.proxy.LazyLoader");
+        final JClass lazyLoaderClass = getModel().ref(CLIENT_RESOURCES_PACKAGES + ".proxy.LazyLoader");
         final JVar lazyLoaderRef = body.decl(lazyLoaderClass, "lazyLoader", JExpr._new(lazyLoaderClass).arg(JExpr.ref("session")));
         body.assign(JExpr.refthis("proxyfier"), JExpr._new(proxyfierClass).arg(lazyLoaderRef));
     }

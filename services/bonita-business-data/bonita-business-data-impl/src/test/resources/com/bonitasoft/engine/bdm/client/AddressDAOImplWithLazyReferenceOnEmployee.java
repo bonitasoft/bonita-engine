@@ -2,9 +2,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.bonitasoft.engine.bdm.dao.BusinessObjectDeserializer;
-import com.bonitasoft.engine.bdm.dao.proxy.LazyLoader;
-import com.bonitasoft.engine.bdm.dao.proxy.Proxyfier;
+import com.bonitasoft.engine.bdm.dao.client.resources.BusinessObjectDeserializer;
+import com.bonitasoft.engine.bdm.dao.client.resources.proxy.LazyLoader;
+import com.bonitasoft.engine.bdm.dao.client.resources.proxy.Proxyfier;
+import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.session.APISession;
 
 public class AddressDAOImpl
@@ -24,7 +25,7 @@ public class AddressDAOImpl
 
     public Address findByCity(String city) {
         try {
-            org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.findByCity");
             commandParameters.put("returnsList", false);
@@ -40,7 +41,7 @@ public class AddressDAOImpl
 
     public List<Address> findByStreet(String street, int startIndex, int maxResults) {
         try {
-            org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.findByStreet");
             commandParameters.put("returnsList", true);
@@ -58,7 +59,7 @@ public class AddressDAOImpl
 
     public List<Address> find(int startIndex, int maxResults) {
         try {
-            org.bonitasoft.engine.api.CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.find");
             commandParameters.put("returnsList", true);

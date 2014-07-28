@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.dao.utils;
+package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 import com.bonitasoft.engine.bdm.proxy.model.Address;
 import com.bonitasoft.engine.bdm.proxy.model.Employee;
 

@@ -339,6 +339,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
+        
+        System.out.println(FileUtils.readFileToString(file));
         assertThat(file).hasContentEqualTo(expected);
     }
 

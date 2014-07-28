@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.dao.utils;
+package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
 import java.io.Serializable;
 import java.util.HashMap;
