@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
+import static com.bonitasoft.engine.io.IOUtils.createTempDirectory;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -22,7 +25,6 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.compiler.JDTCompiler;
-import com.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Matthieu Chaffotte
@@ -50,21 +52,17 @@ public abstract class AbstractBDMJarBuilder {
      */
     public byte[] build(final BusinessObjectModel bom, final IOFileFilter fileFilter) throws SBusinessDataRepositoryDeploymentException {
         try {
-            final File tmpBDMDirectory = createBDMTmpDir();
+            final File tmpBDMDirectory = createTempDirectory("bdm");
             try {
                 addSourceFilesToDirectory(bom, tmpBDMDirectory);
                 compiler.compile(tmpBDMDirectory, new File(dependencyPath));
                 return generateJar(tmpBDMDirectory, fileFilter);
             } finally {
-                FileUtils.deleteDirectory(tmpBDMDirectory);
+                deleteDirectory(tmpBDMDirectory);
             }
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
-    }
-
-    private File createBDMTmpDir() throws IOException {
-        return IOUtils.createTempDirectory("bdm");
     }
 
     protected void addSourceFilesToDirectory(final BusinessObjectModel bom, final File directory) throws CodeGenerationException {
