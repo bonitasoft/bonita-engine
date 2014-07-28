@@ -144,10 +144,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddTasksWithPendingMappingForUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -156,10 +156,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -168,10 +168,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddTasksWithPendingMappingForActorMappedToUserMembershipMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -289,10 +289,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -302,10 +302,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUserMembershipMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -315,10 +315,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -328,10 +328,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUserMembershipMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -341,10 +341,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -354,10 +354,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUserMembershipMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(1);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
     }
 
     @Test
@@ -535,7 +535,6 @@ public class ProcessDeploymentInfoQueriesTest {
     }
 
     // All (for admin)
-    // Supervised By
     @Test
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
         // Given
@@ -556,10 +555,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(3);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(3);
     }
 
     @Test
@@ -569,10 +568,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(3);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(3);
     }
 
     @Test
@@ -582,10 +581,10 @@ public class ProcessDeploymentInfoQueriesTest {
         buildAndAddSupervisorMappedToUser();
 
         // When
-        long numberOfUsers = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
+        long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
 
         // Then
-        assertThat(numberOfUsers).isEqualTo(3);
+        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(3);
     }
 
     @Test

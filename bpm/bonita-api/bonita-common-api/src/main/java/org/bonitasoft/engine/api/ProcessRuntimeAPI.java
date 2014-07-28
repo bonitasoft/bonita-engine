@@ -1253,6 +1253,36 @@ public interface ProcessRuntimeAPI {
     SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
+     * Search the assigned and pending human tasks for the specified user, on the specified root process definition, corresponding to the options.
+     * 
+     * @param rootProcessDefinitionId
+     *            The identifier of the root process definition
+     * @param userId
+     *            The identifier of the user
+     * @param searchOptions
+     *            The search conditions and the options for sorting and paging the results.
+     * @return The assigned and pending human tasks
+     * @throws SearchException
+     * @since 6.3.3
+     */
+    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId,
+            final SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Search the assigned and pending human tasks for any user, on the specified root process definition, corresponding to the options.
+     * 
+     * @param rootProcessDefinitionId
+     *            The identifier of the root process definition
+     * @param searchOptions
+     *            The search conditions and the options for sorting and paging the results.
+     * @return The assigned and pending human tasks
+     * @throws SearchException
+     * @since 6.3.3
+     */
+    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final SearchOptions searchOptions)
+            throws SearchException;
+
+    /**
      * Get the number of assigned and pending overdue tasks for the specified users.
      *
      * @param userIds
