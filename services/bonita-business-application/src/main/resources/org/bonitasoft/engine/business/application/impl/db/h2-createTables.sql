@@ -10,7 +10,7 @@ CREATE TABLE business_app (
   createdBy BIGINT NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
   updatedBy BIGINT NOT NULL,
-  status VARCHAR(30) NOT NULL,
+  state VARCHAR(30) NOT NULL,
   UNIQUE (tenantId, name, version),
   PRIMARY KEY (tenantId, id)
 );
