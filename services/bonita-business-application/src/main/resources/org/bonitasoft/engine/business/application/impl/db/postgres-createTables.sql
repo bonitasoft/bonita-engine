@@ -5,6 +5,12 @@ CREATE TABLE business_app (
   version VARCHAR(50) NOT NULL,
   path VARCHAR(255) NOT NULL,
   description TEXT,
+  iconPath VARCHAR(255) NOT NULL,
+  creationDate INT8 NOT NULL,
+  createdBy INT8 NOT NULL,
+  lastUpdateDate INT8 NOT NULL,
+  updatedBy INT8 NOT NULL,
+  status VARCHAR(30) NOT NULL,
   UNIQUE (tenantId, name, version),
   PRIMARY KEY (tenantId, id)
 );
