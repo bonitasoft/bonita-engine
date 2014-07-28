@@ -11,39 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package com.bonitasoft.engine.business.application.impl;
-
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationBuilder;
+package com.bonitasoft.engine.business.application;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class SApplicationBuilderImpl implements SApplicationBuilder {
+public enum SApplicationState {
+    ACTIVATED,
 
-    private final SApplicationImpl application;
-
-    public SApplicationBuilderImpl(final SApplicationImpl application) {
-        this.application = application;
-    }
-
-    @Override
-    public SApplication done() {
-        return application;
-    }
-
-    @Override
-    public SApplicationBuilder setDescription(final String description) {
-        application.setDescription(description);
-        return this;
-    }
-
-    @Override
-    public SApplicationBuilder setIconPath(final String iconPath) {
-        application.setIconPath(iconPath);
-        return this;
-    }
-
+    DEACTIVATED
 }

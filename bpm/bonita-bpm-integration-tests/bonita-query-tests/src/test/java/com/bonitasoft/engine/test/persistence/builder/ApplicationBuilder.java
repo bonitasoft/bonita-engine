@@ -13,6 +13,7 @@
  **/
 package com.bonitasoft.engine.test.persistence.builder;
 
+import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 
 
@@ -32,7 +33,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
 
     @Override
     SApplicationImpl _build() {
-        return new SApplicationImpl(name, version, path);
+        return new SApplicationImpl(name, version, path, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name());
     }
 
     public ApplicationBuilder withName(final String name) {

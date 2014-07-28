@@ -66,6 +66,8 @@ public class ApplicationAPIIT extends CommonAPISPTest {
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My Application", "1.0", "/myApplication");
+        creator.setDescription("This is my application");
+        creator.setIconPath("/icon.jpg");
 
         //when
         final Application application = applicationAPI.createApplication(creator);
@@ -76,6 +78,10 @@ public class ApplicationAPIIT extends CommonAPISPTest {
         assertThat(application.getVersion()).isEqualTo("1.0");
         assertThat(application.getPath()).isEqualTo("/myApplication");
         assertThat(application.getId()).isGreaterThan(0);
+        assertThat(application.getDescription()).isEqualTo("This is my application");
+        assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(application.getCreatedBy()).isEqualTo(user.getId());
+        assertThat(application.getUpdatedBy()).isEqualTo(user.getId());
 
         applicationAPI.deleteApplication(application.getId());
     }

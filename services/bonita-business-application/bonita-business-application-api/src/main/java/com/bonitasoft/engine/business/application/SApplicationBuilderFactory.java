@@ -15,7 +15,7 @@ package com.bonitasoft.engine.business.application;
  */
 public interface SApplicationBuilderFactory {
 
-    SApplicationBuilder createNewInstance(String name, String version, String path);
+    SApplicationBuilder createNewInstance(String name, String version, String path, final long createdBy);
 
     String getIdKey();
 
@@ -26,5 +26,17 @@ public interface SApplicationBuilderFactory {
     String getPathKey();
 
     String getDescriptionKey();
+
+    String getIconPathKey();
+
+    String getCreationDateKey();
+
+    String getCreatedByKey();
+
+    String getLastUpdatedDateKey();
+
+    String getUpdatedByKey();
+
+    String getStateKey();
 
 }

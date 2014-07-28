@@ -93,6 +93,6 @@ public interface Application extends BaseElement {
      *
      * @return the <code>Application</code> status
      */
-    String getStatus();
+    String getState();
 
 }

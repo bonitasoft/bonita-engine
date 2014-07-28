@@ -23,4 +23,15 @@ public interface SApplication extends PersistentObject {
 
     String getDescription();
 
+    String getIconPath();
+
+    long getCreationDate();
+
+    long getCreatedBy();
+
+    long getLastUpdateDate();
+
+    long getUpdatedBy();
+
+    String getState();
 }

@@ -43,6 +43,8 @@ import com.bonitasoft.engine.business.application.SApplication;
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationServiceImplTest {
 
+    private static final int CREATED_BY = 10;
+
     private static final String APPLICATION_NAME = "app";
 
     @Mock
@@ -67,7 +69,7 @@ public class ApplicationServiceImplTest {
     }
 
     private SApplication buildApplication(final String applicationName) {
-        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, "1.0", "/" + applicationName).done();
+        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, "1.0", "/" + applicationName, CREATED_BY).done();
     }
 
     @Test

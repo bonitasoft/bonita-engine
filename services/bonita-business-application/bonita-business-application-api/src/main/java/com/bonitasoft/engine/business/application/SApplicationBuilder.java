@@ -20,4 +20,6 @@ public interface SApplicationBuilder {
 
     SApplicationBuilder setDescription(String description);
 
+    SApplicationBuilder setIconPath(String iconPath);
+
 }

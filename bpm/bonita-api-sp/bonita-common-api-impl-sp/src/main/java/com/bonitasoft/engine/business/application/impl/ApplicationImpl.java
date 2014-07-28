@@ -34,7 +34,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private long createdBy;
     private Date lastUpdateDate;
     private long updatedBy;
-    private String status;
+    private String state;
 
     public ApplicationImpl(final String name, final String version, final String path, final String description) {
         super(name, description);
@@ -57,9 +57,17 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         return iconPath;
     }
 
+    public void setIconPath(final String iconPath) {
+        this.iconPath = iconPath;
+    }
+
     @Override
     public Date getCreationDate() {
         return creationDate;
+    }
+
+    public void setCreationDate(final Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     @Override
@@ -67,9 +75,17 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         return createdBy;
     }
 
+    public void setCreatedBy(final long createdBy) {
+        this.createdBy = createdBy;
+    }
+
     @Override
     public Date getLastUpdateDate() {
         return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(final Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 
     @Override
@@ -77,9 +93,17 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         return updatedBy;
     }
 
+    public void setUpdatedBy(final long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
     @Override
-    public String getStatus() {
-        return status;
+    public String getState() {
+        return state;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
     }
 
     @Override
@@ -90,7 +114,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
-        result = prime * result + (status == null ? 0 : status.hashCode());
+        result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
         result = prime * result + (path == null ? 0 : path.hashCode());
         result = prime * result + (version == null ? 0 : version.hashCode());
@@ -133,11 +157,11 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         } else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
             return false;
         }
-        if (status == null) {
-            if (other.status != null) {
+        if (state == null) {
+            if (other.state != null) {
                 return false;
             }
-        } else if (!status.equals(other.status)) {
+        } else if (!state.equals(other.state)) {
             return false;
         }
         if (updatedBy != other.updatedBy) {
@@ -163,7 +187,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     @Override
     public String toString() {
         return "ApplicationImpl [version=" + version + ", url=" + path + ", iconPath=" + iconPath + ", creationDate=" + creationDate + ", createdBy="
-                + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", status=" + status + ", name=" + getName()
+                + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", status=" + state + ", name=" + getName()
                 + ", id=" + getId() + "]";
     }
 

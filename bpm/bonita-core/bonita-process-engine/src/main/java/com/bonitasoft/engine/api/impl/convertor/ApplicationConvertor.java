@@ -14,6 +14,7 @@
 package com.bonitasoft.engine.api.impl.convertor;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -39,8 +40,10 @@ public class ApplicationConvertor {
         final String version = (String) fields.get(ApplicationField.VERSION);
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String path = (String) fields.get(ApplicationField.PATH);
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, version, path);
+        final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, version, path, creatorUserId);
         builder.setDescription(description);
+        builder.setIconPath(iconPath);
         return builder.done();
     }
 
@@ -48,6 +51,12 @@ public class ApplicationConvertor {
         final ApplicationImpl application = new ApplicationImpl(sApplication.getName(), sApplication.getVersion(), sApplication.getPath(),
                 sApplication.getDescription());
         application.setId(sApplication.getId());
+        application.setCreatedBy(sApplication.getCreatedBy());
+        application.setCreationDate(new Date(sApplication.getCreationDate()));
+        application.setUpdatedBy(sApplication.getUpdatedBy());
+        application.setLastUpdateDate(new Date(sApplication.getLastUpdateDate()));
+        application.setState(sApplication.getState());
+        application.setIconPath(sApplication.getIconPath());
         return application;
     }
 
