@@ -5,7 +5,7 @@ CREATE TABLE business_app (
   version VARCHAR(50) NOT NULL,
   path VARCHAR(255) NOT NULL,
   description LONGVARCHAR,
-  iconPath VARCHAR(255) NOT NULL,
+  iconPath VARCHAR(255),
   creationDate BIGINT NOT NULL,
   createdBy BIGINT NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
