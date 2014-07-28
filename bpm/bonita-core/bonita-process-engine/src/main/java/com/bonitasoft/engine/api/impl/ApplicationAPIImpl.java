@@ -13,14 +13,21 @@
  **/
 package com.bonitasoft.engine.api.impl;
 
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 
 /**
@@ -30,21 +37,36 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
-    public Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
-        // TODO Auto-generated method stub
-        return null;
+    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
+        final ApplicationAPIDelegate delegate = getDelegate();
+        return delegate.createApplication(applicationCreator);
+    }
+
+    private ApplicationAPIDelegate getDelegate() {
+        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationConvertor(), SessionInfos.getUserIdFromSession());
+        return delegate;
     }
 
     @Override
-    public Application getApplication(long applicationId) throws ApplicationNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+    public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
+        final ApplicationAPIDelegate delegate = getDelegate();
+        return delegate.getApplication(applicationId);
     }
 
     @Override
-    public void deleteApplication(long applicationId) throws DeletionException {
-        // TODO Auto-generated method stub
+    public void deleteApplication(final long applicationId) throws DeletionException {
+        final ApplicationAPIDelegate delegate = getDelegate();
+        delegate.deleteApplication(applicationId);
+    }
 
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long tenantId = sessionAccessor.getTenantId();
+            return TenantServiceSingleton.getInstance(tenantId);
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
     }
 
 }

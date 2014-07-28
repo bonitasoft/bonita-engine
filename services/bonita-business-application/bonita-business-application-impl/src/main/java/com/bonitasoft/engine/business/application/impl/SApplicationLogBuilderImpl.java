@@ -18,6 +18,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatoryFieldsException;
 
+import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
 
 /**
@@ -34,7 +35,7 @@ public class SApplicationLogBuilderImpl extends CRUDELogBuilder implements SAppl
 
     @Override
     protected String getActionTypePrefix() {
-        return "BUSINESS_APPLICATION";
+        return ApplicationService.APPLICATION;
     }
 
     @Override

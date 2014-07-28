@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,6 +43,8 @@ import com.bonitasoft.engine.business.application.SApplication;
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationServiceImplTest {
 
+    private static final String APPLICATION_NAME = "app";
+
     @Mock
     private Recorder recorder;
 
@@ -53,7 +54,6 @@ public class ApplicationServiceImplTest {
     @Mock
     private QueriableLoggerService queriableLogService;
 
-    @Mock
     private SApplication application;
 
     @InjectMocks
@@ -62,7 +62,12 @@ public class ApplicationServiceImplTest {
     @Before
     public void setUp() throws Exception {
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
-        given(application.getId()).willReturn(10L);
+        application = buildApplication(APPLICATION_NAME);
+        application.setId(10L);
+    }
+
+    private SApplication buildApplication(final String applicationName) {
+        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, "1.0", "/" + applicationName).done();
     }
 
     @Test
@@ -94,12 +99,11 @@ public class ApplicationServiceImplTest {
     @Test
     public void createApplication_should_throw_SObjectAlreadyExistsException_when_an_application_with_the_same_name_already_exists() throws Exception {
         //given
-        final String name = "app";
+        final String name = APPLICATION_NAME;
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByName", Collections.<String, Object> singletonMap("name",
                 name), SApplication.class))).willReturn(application);
 
-        final SApplication newApp = mock(SApplication.class);
-        given(newApp.getName()).willReturn(name);
+        final SApplication newApp = buildApplication(APPLICATION_NAME);
 
         //when
         try {

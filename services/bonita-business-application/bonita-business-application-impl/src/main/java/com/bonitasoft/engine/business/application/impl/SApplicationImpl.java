@@ -21,13 +21,17 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private static final long serialVersionUID = 4993767054990446857L;
 
-    private final String name;
+    private String name;
 
     private String description;
 
-    private final String version;
+    private String version;
 
-    private final String path;
+    private String path;
+
+    public SApplicationImpl() {
+        super();
+    }
 
     public SApplicationImpl(final String name, final String version, final String path) {
         super();

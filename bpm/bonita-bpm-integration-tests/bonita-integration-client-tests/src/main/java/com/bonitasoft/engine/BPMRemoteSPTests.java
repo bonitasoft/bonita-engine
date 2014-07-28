@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.ActivityTests;
+import com.bonitasoft.engine.business.application.ApplicationAPIIT;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
@@ -34,25 +35,26 @@ import com.bonitasoft.engine.tenant.TenantIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        PageAPIIT.class,
-        TenantIT.class,
-        NodeAPITest.class,
-        LogTest.class,
-        ExternalCommandsTestSP.class,
-        ActivityTests.class,
-        ProcessTests.class,
-        SupervisedTests.class,
-        ProfileAllSPITest.class,
-        RemoteConnectorExecutionTestSP.class,
-        MonitoringAPITest.class,
-        SearchEntitiesTests.class,
-        ReportingAPIIT.class,
-        ReportingSQLValidityIT.class,
-        PlatformMonitoringAPITest.class,
-        TenantIT.class,
-        OperationTest.class,
-        BDRepositoryIT.class,
-        ExecuteBDMQueryCommandIT.class
+    PageAPIIT.class,
+    ApplicationAPIIT.class,
+    TenantIT.class,
+    NodeAPITest.class,
+    LogTest.class,
+    ExternalCommandsTestSP.class,
+    ActivityTests.class,
+    ProcessTests.class,
+    SupervisedTests.class,
+    ProfileAllSPITest.class,
+    RemoteConnectorExecutionTestSP.class,
+    MonitoringAPITest.class,
+    SearchEntitiesTests.class,
+    ReportingAPIIT.class,
+    ReportingSQLValidityIT.class,
+    PlatformMonitoringAPITest.class,
+    TenantIT.class,
+    OperationTest.class,
+    BDRepositoryIT.class,
+    ExecuteBDMQueryCommandIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {

@@ -27,8 +27,8 @@ import com.bonitasoft.engine.business.application.Application;
 public class ApplicationImpl extends DescriptionElementImpl implements Application {
 
     private static final long serialVersionUID = -5393587887795907117L;
-    private String version;
-    private String path;
+    private final String version;
+    private final String path;
     private String iconPath;
     private Date creationDate;
     private long createdBy;
@@ -36,8 +36,10 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private long updatedBy;
     private String status;
 
-    public ApplicationImpl(final String name, final String description) {
+    public ApplicationImpl(final String name, final String version, final String path, final String description) {
         super(name, description);
+        this.version = version;
+        this.path = path;
     }
 
     @Override
