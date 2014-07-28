@@ -27,21 +27,37 @@ import org.junit.runners.Suite.SuiteClasses;
 
 // FIXME add platformtest suite
 @RunWith(Suite.class)
-@SuiteClasses({ CacheServiceTest.class, PersistenceTests.class, ArchiveServiceTest.class, ClassLoaderServiceTest.class, ExpressionServiceTest.class,
-    IdentityServiceTest.class, AuthenticationServiceTest.class, PlatformAuthenticationServiceTest.class, SessionServiceTest.class,
-    PlatformSessionServiceTest.class, DataInstanceServiceImplIT.class, TransientDataInstanceServiceIT.class, DependencyServiceTest.class,
-    WorkServiceTest.class,
+@SuiteClasses({
+        CacheServiceTest.class,
+        PersistenceTests.class,
+        ArchiveServiceTest.class,
+        ClassLoaderServiceTest.class,
+        ExpressionServiceTest.class,
+        IdentityServiceTest.class,
+        AuthenticationServiceTest.class,
+        PlatformAuthenticationServiceTest.class,
+        SessionServiceTest.class,
+        PlatformSessionServiceTest.class,
+        DataInstanceServiceImplIT.class,
+        TransientDataInstanceServiceIT.class,
+        DependencyServiceTest.class,
+        WorkServiceTest.class,
 
-    // -- SqlTest.class,
-    // -- Tests using the scheduler
-    RecorderTest.class, QuartzSchedulerExecutorITest.class,
-    // JobTest.class, ignored as this was the last test method in that class
-    CommandServiceIntegrationTest.class,
-    // DocumentServiceTest.class,
-    PlatformCommandServiceIntegrationTest.class, ProfileServiceTest.class, ParserTest.class, TenantManagementTest.class })
+        // -- SqlTest.class,
+        // -- Tests using the scheduler
+        RecorderTest.class,
+        QuartzSchedulerExecutorITest.class,
+        // JobTest.class, ignored as this was the last test method in that class
+        CommandServiceIntegrationTest.class,
+        // DocumentServiceTest.class,
+        PlatformCommandServiceIntegrationTest.class,
+        ProfileServiceTest.class,
+        ParserTest.class,
+        TenantManagementTest.class
+})
 /**
  * Do not run this test suite alone. Use AllTestsWithJNDI instead.
- *
+ * 
  * @author Emmanuel Duchastenier
  *
  */
