@@ -12,7 +12,6 @@ import static com.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationR
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -176,22 +175,4 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
             }
         }
     }
-
-    protected void addQueryParameters(final JMethod method, final JBlock body, final JClass mapClass, final JClass hashMapClass, final JVar commandParametersRef) {
-        if (!method.params().isEmpty()) {
-            final JVar queryParametersRef = body.decl(mapClass, "queryParameters", JExpr._new(hashMapClass));
-            for (final JVar param : method.params()) {
-                if (!FORBIDDEN_PARAMETER_NAMES.contains(param.name())) {
-                    body.invoke(queryParametersRef, "put").arg(JExpr.lit(param.name())).arg(param);
-                }
-            }
-            body.invoke(commandParametersRef, "put").arg(JExpr.lit("queryParameters")).arg(JExpr.cast(getModel().ref(Serializable.class), queryParametersRef));
-        }
-    }
-
-    protected static String suffixPackage(final String qualifiedName, final String packageSuffix) {
-        final int pointIdx = qualifiedName.lastIndexOf('.');
-        return qualifiedName.substring(0, pointIdx + 1) + packageSuffix + "." + qualifiedName.substring(pointIdx + 1);
-    }
-
 }

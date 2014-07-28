@@ -20,12 +20,6 @@ import com.sun.codemodel.JType;
 public class AbstractBDMCodeGeneratorTest {
 
     @Test
-    public void should_be_a_able_to_suffix_a_package_of_a_qualified_name() throws Exception {
-        final String suffixedPackage = AbstractBDMCodeGenerator.suffixPackage("a.qualified.name.Object", "suffixed");
-        assertThat(suffixedPackage).isEqualTo("a.qualified.name.suffixed.Object");
-    }
-
-    @Test
     public void should_createMethodForNewInstance_return_jmethod_with_valid_name_and_parameters() throws Exception {
         final AbstractBDMCodeGenerator abstractBDMCodeGenerator = mock(AbstractBDMCodeGenerator.class);
         when(abstractBDMCodeGenerator.createMethodForNewInstance(any(BusinessObject.class), any(JDefinedClass.class), any(JDefinedClass.class)))

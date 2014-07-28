@@ -167,6 +167,18 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         catchBody._throw(JExpr._new(iaeClass).arg(JExpr.ref(null, param)));
     }
 
+    protected void addQueryParameters(final JMethod method, final JBlock body, final JClass mapClass, final JClass hashMapClass, final JVar commandParametersRef) {
+        if (!method.params().isEmpty()) {
+            final JVar queryParametersRef = body.decl(mapClass, "queryParameters", JExpr._new(hashMapClass));
+            for (final JVar param : method.params()) {
+                if (!FORBIDDEN_PARAMETER_NAMES.contains(param.name())) {
+                    body.invoke(queryParametersRef, "put").arg(JExpr.lit(param.name())).arg(param);
+                }
+            }
+            body.invoke(commandParametersRef, "put").arg(JExpr.lit("queryParameters")).arg(JExpr.cast(getModel().ref(Serializable.class), queryParametersRef));
+        }
+    }
+    
     private String toDaoImplClassname(final BusinessObject bo) {
         return bo.getQualifiedName() + DAO_IMPL_SUFFIX;
     }
