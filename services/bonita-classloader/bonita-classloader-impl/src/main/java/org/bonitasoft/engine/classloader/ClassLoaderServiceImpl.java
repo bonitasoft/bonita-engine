@@ -58,6 +58,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
+        String temporaryFolderName = temporaryFolder;
         if (temporaryFolder.startsWith("${") && temporaryFolder.contains("}")) {
             final Pattern pattern = Pattern.compile("^(.*)\\$\\{(.*)\\}(.*)$");
             final Matcher matcher = pattern.matcher(temporaryFolder);
@@ -66,10 +67,10 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             sb.append(matcher.group(1));
             sb.append(System.getProperty(matcher.group(2)));
             sb.append(matcher.group(3));
-            this.temporaryFolder = sb.toString();
-        } else {
-            this.temporaryFolder = temporaryFolder;
+            temporaryFolderName = sb.toString();
         }
+
+        this.temporaryFolder = new File(temporaryFolderName, "bos-engine").getAbsolutePath();
     }
 
     private static final class ClassLoaderServiceMutex {
@@ -105,9 +106,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public ClassLoader getLocalClassLoader(final String type, final long id) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLocalClassLoader"));
-        }
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLocalClassLoader"));
         NullCheckingUtil.checkArgsNotNull(id, type);
         final String key = getKey(type, id);
         // here we have to manage the case of the "first" get to avoid creating 2 classloaders
@@ -124,27 +123,45 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 }
             }
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalClassLoader"));
-        }
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalClassLoader"));
         return localClassLoaders.get(key);
     }
 
     @Override
     public void removeLocalClassLoader(final String type, final long id) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeLocalClassLoader")
-                    + ": Removing local classloader for type " + type + " of id " + id);
-        }
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeLocalClassLoader")
+                + ": Removing local classloader for type " + type + " of id " + id);
         NullCheckingUtil.checkArgsNotNull(id, type);
+
+        // Remove the temporary folder
+        final String localTemporaryFolder = getLocalTemporaryFolder(type, id);
+        // new File(localTemporaryFolder).deleteOnExit();
+        deleteDirOnExit(new File(localTemporaryFolder));
+
+        // Remove the class loader
         final String key = getKey(type, id);
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
             localClassLoader.release();
             localClassLoaders.remove(key);
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeLocalClassLoader"));
+
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeLocalClassLoader"));
+    }
+
+    private static void deleteDirOnExit(File dir) {
+        // call deleteOnExit for the folder first, so it will get deleted last
+        dir.deleteOnExit();
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteDirOnExit(f);
+                }
+                else {
+                    f.deleteOnExit();
+                }
+            }
         }
     }
 
@@ -168,9 +185,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void removeAllLocalClassLoaders(final String application) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeAllLocalClassLoaders"));
-        }
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeAllLocalClassLoaders"));
         NullCheckingUtil.checkArgsNotNull(application);
         final Set<String> keySet = new HashSet<String>(localClassLoaders.keySet());
         for (final String key : keySet) {
@@ -182,9 +197,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 localClassLoaders.remove(key);
             }
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllLocalClassLoaders"));
-        }
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllLocalClassLoaders"));
     }
 
     public String getTemporaryFolder() {
