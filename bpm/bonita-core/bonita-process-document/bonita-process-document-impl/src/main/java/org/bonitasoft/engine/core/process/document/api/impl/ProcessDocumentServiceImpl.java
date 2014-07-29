@@ -207,7 +207,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         try {
             return documentService.getContent(documentStorageId);
         } catch (final Exception e) {
-            throw new SProcessDocumentContentNotFoundException(e.getMessage());
+            throw new SProcessDocumentContentNotFoundException(e);
         }
     }
 
@@ -223,10 +223,8 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
                     result.add(toProcessDocument(docMapping));
                 }
                 return result;
-            } else {
-                return Collections.emptyList();
             }
-
+            return Collections.emptyList();
         } catch (final SBonitaException e) {
             throw new SDocumentException("Unable to list documents of process instance: " + processInstanceId, e);
         }

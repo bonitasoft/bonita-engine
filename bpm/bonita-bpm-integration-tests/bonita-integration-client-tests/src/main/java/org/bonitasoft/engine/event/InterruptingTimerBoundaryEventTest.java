@@ -188,7 +188,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     @Test
     //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
-        final long timerDuration = 1500;
+        final long timerDuration = 2500;
         final int loopCardinality = 1;
         final boolean isSequential = true;
         final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
@@ -238,7 +238,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     @Test
     //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
-        final long timerDuration = 1500;
+        final long timerDuration = 2500;
         final int loopCardinality = 1;
         final boolean isSequential = false;
         final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
@@ -291,8 +291,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     @Test
     //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
-        final long timerDuration = 2000;
-        final int loopMax = 2;
+        final long timerDuration = 2500;
+        final int loopMax = 1;
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEventOnLoopActivity(timerDuration, true, loopMax, "step1", "step2",
                 "exceptionStep");
 

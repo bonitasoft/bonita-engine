@@ -15,10 +15,10 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
-
 
 /**
  * @author Elias Ricken de Medeiros
@@ -35,6 +35,40 @@ public class FlowNodeInstanceRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getFlowNodeInstanceIdsToRestart");
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());
+        return namedQuery.list();
+    }
+
+    public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId, final long userId) {
+        getSessionWithTenantFilter();
+        final Query namedQuery = getNamedQuery("getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor");
+        namedQuery.setParameter("userId", userId);
+        namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId, final long userId) {
+        getSessionWithTenantFilter();
+        Query namedQuery = getNamedQuery("searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor");
+        namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");
+        namedQuery.setParameter("userId", userId);
+        namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
+        return namedQuery.list();
+    }
+
+    public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(final long rootProcessDefinitionId) {
+        getSessionWithTenantFilter();
+        final Query namedQuery = getNamedQuery("getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess");
+        namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SHumanTaskInstance> searchSHumanTaskInstanceAssignedAndPendingByRootProcess(final long rootProcessDefinitionId) {
+        getSessionWithTenantFilter();
+        Query namedQuery = getNamedQuery("searchSHumanTaskInstanceAssignedAndPendingByRootProcess");
+        namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");
+        namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
         return namedQuery.list();
     }
 

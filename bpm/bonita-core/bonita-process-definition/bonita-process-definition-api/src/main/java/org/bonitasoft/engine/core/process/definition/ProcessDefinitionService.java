@@ -668,7 +668,7 @@ public interface ProcessDefinitionService {
      * @return The number of the process definition
      * @throws SBonitaSearchException
      */
-    long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all process definitions that have one or more human tasks assigned/pending for a specific user.
@@ -676,12 +676,69 @@ public interface ProcessDefinitionService {
      * 
      * @param userId
      *            The identifier of the user.
-     * @param searchOptions
+     * @param queryOptions
      *            The QueryOptions object containing some query conditions
      * @return The list of process definitions
      * @throws SBonitaSearchException
      */
-    List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForUser(long userId, QueryOptions queryOptions)
+    List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(long userId, QueryOptions queryOptions)
             throws SBonitaSearchException;
+
+    /**
+     * Get the total number of the process definitions supervised by a specific user, that have instances with one or more human tasks assigned/pending.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param userId
+     *            The identifier of the user.
+     * @param queryOptions
+     *            The QueryOptions object containing some query conditions
+     * @return The number of the process definition
+     * @throws SBonitaSearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * Search all process definitions supervised by a specific user, that have instances with one or more human tasks assigned/pending.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param userId
+     *            The identifier of the user.
+     * @param queryOptions
+     *            The QueryOptions object containing some query conditions
+     * @return The list of process definitions
+     * @throws SBonitaSearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(long userId, QueryOptions queryOptions)
+            throws SBonitaSearchException;
+
+    /**
+     * Get the total number of the process definitions that have instances with one or more human tasks assigned/pending.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param queryOptions
+     *            The QueryOptions object containing some query conditions
+     * @return The number of the process definition
+     * @throws SBonitaSearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    long getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * Search all process definitions that have instances with one or more human tasks assigned/pending.
+     * The tasks are in stable state, not in terminal/executing state.
+     * 
+     * @param queryOptions
+     *            The QueryOptions object containing some query conditions
+     * @return The list of process definitions
+     * @throws SBonitaSearchException
+     *             if an exception occurs when getting the process deployment information.
+     * @since 6.3.3
+     */
+    List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(QueryOptions queryOptions) throws SBonitaSearchException;
 
 }

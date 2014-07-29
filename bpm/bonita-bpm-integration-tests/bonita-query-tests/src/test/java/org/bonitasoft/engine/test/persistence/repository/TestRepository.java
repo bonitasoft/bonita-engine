@@ -30,6 +30,10 @@ import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
+import org.bonitasoft.engine.scheduler.model.SJobLog;
+import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
+import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
@@ -138,8 +142,7 @@ public class TestRepository {
 
     public SFlowNodeInstance add(final SFlowNodeInstanceImpl sFlowNode) {
         getSession().save(sFlowNode);
-        return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(),
-                new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
+        return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }
 
     public SHiddenTaskInstanceImpl add(final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl) {
@@ -156,6 +159,16 @@ public class TestRepository {
     public SCustomUserInfoValue add(final SCustomUserInfoValueImpl infoValue) {
         getSession().save(infoValue);
         return (SCustomUserInfoValue) getSession().get(infoValue.getClass(), new PersistentObjectId(infoValue.getId(), infoValue.getTenantId()));
+    }
+
+    public SJobLog addJobLog(final SJobLogImpl jobLog) {
+        getSession().save(jobLog);
+        return (SJobLog) getSession().get(jobLog.getClass(), new PersistentObjectId(jobLog.getId(), jobLog.getTenantId()));
+    }
+
+    public SJobDescriptor addJobDescriptor(final SJobDescriptorImpl jobDescriptor) {
+        getSession().save(jobDescriptor);
+        return (SJobDescriptor) getSession().get(jobDescriptor.getClass(), new PersistentObjectId(jobDescriptor.getId(), jobDescriptor.getTenantId()));
     }
 
 }
