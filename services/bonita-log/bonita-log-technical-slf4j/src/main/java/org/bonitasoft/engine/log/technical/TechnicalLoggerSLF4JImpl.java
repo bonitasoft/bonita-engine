@@ -67,58 +67,54 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
     @Override
     public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
-        if (isLoggable(callerClass, severity)) {
-            final Logger logger = getLogger(callerClass);
-            final String loggedMessage = getContextMessage() + message;
-            switch (severity) {
-                case TRACE:
-                    logger.trace(loggedMessage);
-                    break;
-                case DEBUG:
-                    logger.debug(loggedMessage);
-                    break;
-                case INFO:
-                    logger.info(loggedMessage);
-                    break;
-                case WARNING:
-                    logger.warn(loggedMessage);
-                    break;
-                case ERROR:
-                    logger.error(loggedMessage);
-                    break;
-                default:
-                    logger.error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
-                    logger.error(loggedMessage);
-                    break;
-            }
+        final Logger logger = getLogger(callerClass);
+        final String loggedMessage = getContextMessage() + message;
+        switch (severity) {
+            case TRACE:
+                logger.trace(loggedMessage);
+                break;
+            case DEBUG:
+                logger.debug(loggedMessage);
+                break;
+            case INFO:
+                logger.info(loggedMessage);
+                break;
+            case WARNING:
+                logger.warn(loggedMessage);
+                break;
+            case ERROR:
+                logger.error(loggedMessage);
+                break;
+            default:
+                logger.error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
+                logger.error(loggedMessage);
+                break;
         }
     }
 
     @Override
     public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
-        if (isLoggable(callerClass, severity)) {
-            final String loggedMessage = getContextMessage() + message;
-            switch (severity) {
-                case TRACE:
-                    getLogger(callerClass).trace(loggedMessage, t);
-                    break;
-                case DEBUG:
-                    getLogger(callerClass).debug(loggedMessage, t);
-                    break;
-                case INFO:
-                    getLogger(callerClass).info(loggedMessage, t);
-                    break;
-                case WARNING:
-                    getLogger(callerClass).warn(loggedMessage, t);
-                    break;
-                case ERROR:
-                    getLogger(callerClass).error(loggedMessage, t);
-                    break;
-                default:
-                    getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
-                    getLogger(callerClass).error(loggedMessage);
-                    break;
-            }
+        final String loggedMessage = getContextMessage() + message;
+        switch (severity) {
+            case TRACE:
+                getLogger(callerClass).trace(loggedMessage, t);
+                break;
+            case DEBUG:
+                getLogger(callerClass).debug(loggedMessage, t);
+                break;
+            case INFO:
+                getLogger(callerClass).info(loggedMessage, t);
+                break;
+            case WARNING:
+                getLogger(callerClass).warn(loggedMessage, t);
+                break;
+            case ERROR:
+                getLogger(callerClass).error(loggedMessage, t);
+                break;
+            default:
+                getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
+                getLogger(callerClass).error(loggedMessage);
+                break;
         }
     }
 
@@ -203,5 +199,10 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
     private String getTenantIdMessage() {
         return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
     }
+
+    // private String getUserNameMessage() {
+    // return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
+    // }
+    //
 
 }
