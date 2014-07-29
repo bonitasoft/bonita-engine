@@ -94,6 +94,10 @@ import org.bonitasoft.engine.services.PersistenceService;
  */
 public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl implements ActivityInstanceService {
 
+    private static final String ASSIGNED_AND_PENDING_BY_ROOT_PROCESS = "AssignedAndPendingByRootProcess";
+
+    private static final String ASSIGNED_AND_PENDING_BY_ROOT_PROCESS_FOR = "AssignedAndPendingByRootProcessFor";
+
     private static final String SUPERVISED_BY = "SupervisedBy";
 
     private static final String MANAGED_BY = "ManagedBy";
@@ -1123,6 +1127,53 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         try {
             final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", (Object) humanTaskInstanceId);
             return getPersistenceService().searchEntity(SUser.class, WHOCANSTART_PENDING_TASK_SUFFIX, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("userId", userId);
+            parameters.put("rootProcessDefinitionId", rootProcessDefinitionId);
+            return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, ASSIGNED_AND_PENDING_BY_ROOT_PROCESS_FOR, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("userId", userId);
+            parameters.put("rootProcessDefinitionId", rootProcessDefinitionId);
+            return getPersistenceService().searchEntity(SHumanTaskInstance.class, ASSIGNED_AND_PENDING_BY_ROOT_PROCESS_FOR, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
+            return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, ASSIGNED_AND_PENDING_BY_ROOT_PROCESS, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
+            return getPersistenceService().searchEntity(SHumanTaskInstance.class, ASSIGNED_AND_PENDING_BY_ROOT_PROCESS, queryOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
         }

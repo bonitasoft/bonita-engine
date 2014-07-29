@@ -118,7 +118,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         try {
             delete(get(id));
         } catch (final SDocumentMappingNotFoundException e) {
-            throw new SDocumentMappingDeletionException(e.getMessage(), e.getCause());
+            throw new SDocumentMappingDeletionException(e);
         }
     }
 

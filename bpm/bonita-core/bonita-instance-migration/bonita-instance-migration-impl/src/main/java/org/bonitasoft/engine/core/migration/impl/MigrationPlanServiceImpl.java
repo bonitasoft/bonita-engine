@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.core.migration.MigrationPlanService;
 import org.bonitasoft.engine.core.migration.exceptions.SInvalidMigrationPlanException;
 import org.bonitasoft.engine.core.migration.exceptions.SMigrationPlanCreationException;
@@ -133,7 +133,8 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         final InsertRecord insertRecord = new InsertRecord(descriptor);
         final SMigrationPlanDescriptorLogBuilderImpl logBuilder = getQueriableLog(ActionType.CREATED, ADDED_A_NEW_MIGRATION_PLAN);
         try {
-            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(MIGRATION_PLAN_DESCRIPTOR).setObject(descriptor)
+            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(MIGRATION_PLAN_DESCRIPTOR)
+                    .setObject(descriptor)
                     .done();
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(insertRecord.getEntity().getId(), SQueriableLog.STATUS_OK, logBuilder, "importMigrationPlan");
@@ -197,26 +198,25 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         }
         if (migrationPlan != null) {
             return migrationPlan;
-        } else {
-            final SMigrationPlanDescriptor selectById = getMigrationPlanDescriptor(id);
-            final byte[] content = selectById.getMigrationPlanContent();
-            final String contentAsString = new String(content);
-            StringReader xmlReader = new StringReader(contentAsString);
-            try {
-                parser.validate(xmlReader);
-                xmlReader = new StringReader(contentAsString);
-                final SMigrationPlan objectFromXML = (SMigrationPlan) parser.getObjectFromXML(xmlReader);
-                cacheService.store(MIGRATION_PLAN_CACHE_NAME, String.valueOf(id), objectFromXML);
-                return objectFromXML;
-            } catch (final IOException e) {
-                throw new SInvalidMigrationPlanException(e);
-            } catch (final SValidationException e) {
-                throw new SInvalidMigrationPlanException(e);
-            } catch (final SXMLParseException e) {
-                throw new SInvalidMigrationPlanException(e);
-            } catch (final SCacheException e) {
-                throw new SInvalidMigrationPlanException(e);
-            }
+        }
+        final SMigrationPlanDescriptor selectById = getMigrationPlanDescriptor(id);
+        final byte[] content = selectById.getMigrationPlanContent();
+        final String contentAsString = new String(content);
+        StringReader xmlReader = new StringReader(contentAsString);
+        try {
+            parser.validate(xmlReader);
+            xmlReader = new StringReader(contentAsString);
+            final SMigrationPlan objectFromXML = (SMigrationPlan) parser.getObjectFromXML(xmlReader);
+            cacheService.store(MIGRATION_PLAN_CACHE_NAME, String.valueOf(id), objectFromXML);
+            return objectFromXML;
+        } catch (final IOException e) {
+            throw new SInvalidMigrationPlanException(e);
+        } catch (final SValidationException e) {
+            throw new SInvalidMigrationPlanException(e);
+        } catch (final SXMLParseException e) {
+            throw new SInvalidMigrationPlanException(e);
+        } catch (final SCacheException e) {
+            throw new SInvalidMigrationPlanException(e);
         }
     }
 
@@ -225,14 +225,15 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         final SMigrationPlanDescriptor descriptor = getMigrationPlanDescriptor(id);
         final DeleteRecord deleteRecord = new DeleteRecord(descriptor);
         final SMigrationPlanDescriptorLogBuilderImpl logBuilder = getQueriableLog(ActionType.DELETED, DELETED_MIGRATION_PLAN);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(MIGRATION_PLAN_DESCRIPTOR).setObject(descriptor)
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(MIGRATION_PLAN_DESCRIPTOR)
+                .setObject(descriptor)
                 .done();
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(id, SQueriableLog.STATUS_OK, logBuilder, "deleteMigrationPlan");
         } catch (final SRecorderException e) {
             initiateLogBuilder(id, SQueriableLog.STATUS_FAIL, logBuilder, "deleteMigrationPlan");
-            throw new SMigrationPlanDeletionException(id);
+            throw new SMigrationPlanDeletionException(id, e);
         }
     }
 

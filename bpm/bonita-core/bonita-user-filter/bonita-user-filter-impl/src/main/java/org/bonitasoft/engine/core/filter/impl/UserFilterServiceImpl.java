@@ -197,7 +197,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                 }
             }
         } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home is not set.");
+            throw new BonitaRuntimeException("Bonita home is not set.", e);
         }
         return resolved;
     }

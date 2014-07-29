@@ -856,6 +856,89 @@ public class SearchActivityInstanceTest extends CommonAPITest {
     }
 
     @Test
+    public void searchAssignedAndPendingHumanTasks() throws Exception {
+        final User john = createUser("John", PASSWORD);
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME).addUserTask("task4", ACTOR_NAME).addUserTask("userTask5", ACTOR_NAME).getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, Arrays.asList(user, john));
+        // -------- start process and wait for tasks
+        final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("userTask1", pi0);
+        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
+        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
+        waitForUserTaskAndAssigneIt("task4", pi0, john);
+        waitForUserTask("userTask5", pi0);
+
+        // -------- test assigned & pending task search methods
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        SearchResult<HumanTaskInstance> searchHumanTaskInstances = getProcessAPI()
+                .searchAssignedAndPendingHumanTasks(processDefinition.getId(), builder.done());
+        assertEquals(5, searchHumanTaskInstances.getCount());
+        List<HumanTaskInstance> tasks = searchHumanTaskInstances.getResult();
+        assertEquals("task4", tasks.get(0).getName());
+        assertEquals("userTask1", tasks.get(1).getName());
+        assertEquals("userTask2", tasks.get(2).getName());
+
+        // -------- test assign task search methods
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, user.getId());
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchHumanTaskInstances = getProcessAPI().searchAssignedAndPendingHumanTasks(processDefinition.getId(), builder.done());
+        assertEquals(2, searchHumanTaskInstances.getCount());
+        tasks = searchHumanTaskInstances.getResult();
+        assertEquals("userTask2", tasks.get(0).getName());
+        assertEquals("userTask3", tasks.get(1).getName());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(john);
+    }
+
+    @Test
+    public void searchAssignedAndPendingHumanTasksFor() throws Exception {
+        final User john = createUser("John", PASSWORD);
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME).addUserTask("task4", ACTOR_NAME).addUserTask("userTask5", ACTOR_NAME).getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, Arrays.asList(user, john));
+        // -------- start process and wait for tasks
+        final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("userTask1", pi0);
+        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
+        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
+        waitForUserTaskAndAssigneIt("task4", pi0, john);
+        waitForUserTask("userTask5", pi0);
+
+        // -------- test pending task search methods
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        SearchResult<HumanTaskInstance> searchHumanTaskInstances = getProcessAPI()
+                .searchAssignedAndPendingHumanTasksFor(processDefinition.getId(), john.getId(), builder.done());
+        assertEquals(3, searchHumanTaskInstances.getCount());
+        List<HumanTaskInstance> tasks = searchHumanTaskInstances.getResult();
+        assertEquals("task4", tasks.get(0).getName());
+        assertEquals("userTask1", tasks.get(1).getName());
+        assertEquals("userTask5", tasks.get(2).getName());
+
+        // -------- test assign task search methods
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(HumanTaskInstanceSearchDescriptor.NAME, "userTask1");
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchHumanTaskInstances = getProcessAPI().searchAssignedAndPendingHumanTasksFor(processDefinition.getId(), john.getId(), builder.done());
+        assertEquals(1, searchHumanTaskInstances.getCount());
+        tasks = searchHumanTaskInstances.getResult();
+        assertEquals("userTask1", tasks.get(0).getName());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(john);
+    }
+
+    @Test
     public void searchPendingTasksManagedBy() throws Exception {
         // Create tasks, some to some users managed by "manager", some to other users with different manager.
         final User jack = createUser("jack", "bpm");
