@@ -16,7 +16,9 @@ http://www.springframework.org/schema/context	http://www.springframework.org/sch
     <bean id="bonitaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="dataSourceDependency">  
         <property name="className" value="${db.datasource.class}" />
         <property name="uniqueName" value="java:comp/env/bonitaDS" /> <!--  Is it really useful and/or used ?  --> 
-        <property name="maxPoolSize" value="10" />
+         <property name="minPoolSize" value="1" />
+        <property name="maxPoolSize" value="7" />
+		<property name="acquireIncrement" value="1" />
         <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false --> 
         <property name="driverProperties" ref="driverProperties">
         </property>

@@ -17,7 +17,6 @@ import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
-import org.bonitasoft.engine.scheduler.impl.JobTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorITest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
 import org.bonitasoft.engine.session.SessionServiceTest;
@@ -48,7 +47,7 @@ import org.junit.runners.Suite.SuiteClasses;
         // -- Tests using the scheduler
         RecorderTest.class,
         QuartzSchedulerExecutorITest.class,
-        JobTest.class,
+        // JobTest.class, ignored as this was the last test method in that class
         CommandServiceIntegrationTest.class,
         // DocumentServiceTest.class,
         PlatformCommandServiceIntegrationTest.class,

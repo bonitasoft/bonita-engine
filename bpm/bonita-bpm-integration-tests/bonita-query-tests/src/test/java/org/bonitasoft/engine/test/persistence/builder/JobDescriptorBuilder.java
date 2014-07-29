@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,23 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.migration.exceptions;
+package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 
 /**
- * @author Baptiste Mesta
- * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
-public class SMigrationPlanDeletionException extends SBonitaException {
+public class JobDescriptorBuilder extends PersistentObjectBuilder<SJobDescriptorImpl, JobDescriptorBuilder> {
 
-    private static final long serialVersionUID = 2516518174652732165L;
-
-    public SMigrationPlanDeletionException(final long id, final Exception e) {
-        super("Migration plan not found, id = " + id + ". ", e);
+    public static JobDescriptorBuilder aJobDescriptor() {
+        return new JobDescriptorBuilder();
     }
 
-    public SMigrationPlanDeletionException(final long id) {
-        super("migration plan not found, id = " + id);
+    @Override
+    JobDescriptorBuilder getThisBuilder() {
+        return this;
     }
+
+    @Override
+    SJobDescriptorImpl _build() {
+        return new SJobDescriptorImpl();
+    }
+
 }
