@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-reporting</artifactId>
 		<groupId>org.bonitasoft.engine.core.reporting</groupId>
-		<version>6.3.3.RC1</version>
+		<version>6.3.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-reporting-impl</artifactId>
