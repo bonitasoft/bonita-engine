@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,4 +35,6 @@ public interface SActivityDefinition extends SFlowNodeDefinition {
     List<SBoundaryEventDefinition> getBoundaryEventDefinitions();
 
     SBoundaryEventDefinition getBoundaryEventDefinition(String name) throws SBoundaryEventNotFoundException;
+
+    SBusinessDataDefinition getBusinessDataDefinition();
 }

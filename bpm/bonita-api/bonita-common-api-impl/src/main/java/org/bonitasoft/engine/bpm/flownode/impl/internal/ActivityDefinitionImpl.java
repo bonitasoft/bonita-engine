@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -39,6 +40,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     private LoopCharacteristics loopCharacteristics;
 
     private final List<BoundaryEventDefinition> boundaryEventDefinitions;
+
+    private BusinessDataDefinition businessDataDefinition;
 
     public ActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
@@ -91,10 +94,20 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     }
 
     @Override
+    public BusinessDataDefinition getBusinessDataDefinition() {
+        return businessDataDefinition;
+    }
+
+    public void setBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        this.businessDataDefinition = businessDataDefinition;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (boundaryEventDefinitions == null ? 0 : boundaryEventDefinitions.hashCode());
+        result = prime * result + (businessDataDefinition == null ? 0 : businessDataDefinition.hashCode());
         result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
         result = prime * result + (loopCharacteristics == null ? 0 : loopCharacteristics.hashCode());
         result = prime * result + (operations == null ? 0 : operations.hashCode());
@@ -118,6 +131,13 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
                 return false;
             }
         } else if (!boundaryEventDefinitions.equals(other.boundaryEventDefinitions)) {
+            return false;
+        }
+        if (businessDataDefinition == null) {
+            if (other.businessDataDefinition != null) {
+                return false;
+            }
+        } else if (!businessDataDefinition.equals(other.businessDataDefinition)) {
             return false;
         }
         if (dataDefinitions == null) {

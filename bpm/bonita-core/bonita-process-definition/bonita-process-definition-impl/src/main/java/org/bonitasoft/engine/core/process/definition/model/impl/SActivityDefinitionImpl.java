@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacterist
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBoundaryEventNotFoundException;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
@@ -53,11 +54,13 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
 
     private final List<SBoundaryEventDefinition> sBoundaryEventDefinitions = new ArrayList<SBoundaryEventDefinition>();
 
+    private SBusinessDataDefinition businessDataDefinition;
+
     public SActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
     }
 
-    public SActivityDefinitionImpl(final ActivityDefinition activityDefinition, 
+    public SActivityDefinitionImpl(final ActivityDefinition activityDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
         super(activityDefinition, transitionsMap);
 
@@ -77,6 +80,7 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
                 loopCharacteristics = new SMultiInstanceLoopCharacteristicsImpl((MultiInstanceLoopCharacteristics) loop);
             }
         }
+        businessDataDefinition = ServerModelConvertor.convertBusinessDataDefinition(activityDefinition.getBusinessDataDefinition());
 
         addBoundaryEvents(activityDefinition, transitionsMap);
     }
@@ -141,6 +145,15 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
 
     public void setLoopCharacteristics(final SLoopCharacteristics loopCharacteristics) {
         this.loopCharacteristics = loopCharacteristics;
+    }
+
+    @Override
+    public SBusinessDataDefinition getBusinessDataDefinition() {
+        return businessDataDefinition;
+    }
+
+    public void setBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
+        this.businessDataDefinition = businessDataDefinition;
     }
 
 }

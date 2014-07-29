@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -482,6 +482,11 @@ public class XMLProcessDefinition {
             }
             fillFlowNode(activityNode, activity);
             addDataDefinitionNodes(activity, activityNode);
+            final BusinessDataDefinition businessDataDefinition = activity.getBusinessDataDefinition();
+            if (businessDataDefinition != null) {
+                final XMLNode businessDataDefinitionNode = getBusinessDataDefinitionNode(businessDataDefinition);
+                activityNode.addChild(businessDataDefinitionNode);
+            }
             addOperationNodes(activity, activityNode);
             addLoopCharacteristics(activity, activityNode);
             addBoundaryEventDefinitionsNode(activity, activityNode);

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
@@ -36,6 +37,8 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
     protected LoopCharacteristics loopCharacteristics;
 
     private final List<BoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
+
+    private BusinessDataDefinition businessDataDefinition;
 
     @Override
     public void setChildObject(final String name, final Object value) {
@@ -58,6 +61,9 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
         if (XMLProcessDefinition.BOUNDARY_EVENT_NODE.equals(name)) {
             boundaryEventDefinitions.add((BoundaryEventDefinition) value);
         }
+        if (XMLProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
+            businessDataDefinition = (BusinessDataDefinition) value;
+        }
     }
 
     @Override
@@ -74,6 +80,9 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
             activity.setLoopCharacteristics(loopCharacteristics);
             for (final BoundaryEventDefinition boundaryEvent : boundaryEventDefinitions) {
                 activity.addBoundaryEventDefinition(boundaryEvent);
+            }
+            if (businessDataDefinition != null) {
+                activity.setBusinessDataDefinition(businessDataDefinition);
             }
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,14 +15,16 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
+import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
  * An Activity is work that is performed within a Business Process. An Activity can be atomic or non-atomic
  * (compound). The types of Activities that are a part of a Process are: {@link TaskDefinition}, {@link SubProcessDefinition}, and
  * {@link CallActivityDefinition}, which allows the inclusion of re-usable Tasks and Processes.
- * 
+ *
  * @author Baptiste Mesta
  * @author Feng Hui
  * @author Matthieu Chaffotte
@@ -34,6 +36,8 @@ public interface ActivityDefinition extends FlowNodeDefinition {
      * @return The list of loops on this activity
      */
     LoopCharacteristics getLoopCharacteristics();
+
+    BusinessDataDefinition getBusinessDataDefinition();
 
     /**
      * @return The list of the definition of datas on this activity
