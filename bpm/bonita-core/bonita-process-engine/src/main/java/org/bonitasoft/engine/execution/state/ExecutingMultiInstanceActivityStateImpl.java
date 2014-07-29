@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -156,8 +156,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;
                 if (shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
-                    createInnerInstances = InitializingMultiInstanceActivityStateImpl.createInnerInstances(bpmInstancesCreator, activityInstanceService,
-                            processDefinition.getId(), activityDefinition, flowNodeInstance, 1);
+                    createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(), activityDefinition, flowNodeInstance, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
                         containerRegistry.executeFlowNode(processDefinition.getId(), sFlowNodeInstance.getLogicalGroup(3), sFlowNodeInstance.getId(), null,
                                 null);
@@ -220,7 +219,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         final int numberOfActiveInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfActiveInstances();
         if (numberOfActiveInstances > 0) {
             stateBehaviors.executeChildrenActivities(flowNodeInstance);
-
         }
         return numberOfActiveInstances > 0;
     }

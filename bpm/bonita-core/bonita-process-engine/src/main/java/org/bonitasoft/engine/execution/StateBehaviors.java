@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -85,11 +85,13 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
@@ -196,7 +198,7 @@ public class StateBehaviors {
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, TokenService tokenService) {
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -379,7 +381,7 @@ public class StateBehaviors {
 
     /**
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
-     * 
+     *
      * @param processDefinition
      *        the process where the connectors are defined.
      * @param flowNodeInstance
@@ -393,7 +395,7 @@ public class StateBehaviors {
      */
     public BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteAndFlag(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnEnter, final boolean executeConnectorsOnFinish)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         try {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
@@ -429,7 +431,7 @@ public class StateBehaviors {
     }
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteOnFinish(final SFlowNodeDefinition flowNodeDefinition,
-            final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnFinish, boolean onEnterExecuted) throws SConnectorInstanceReadException,
+            final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnFinish, final boolean onEnterExecuted) throws SConnectorInstanceReadException,
             SActivityStateExecutionException {
         final List<SConnectorDefinition> connectorsOnFinish = flowNodeDefinition.getConnectors(ConnectorEvent.ON_FINISH);
         if (connectorsOnFinish.size() > 0 && executeConnectorsOnFinish) {
@@ -475,7 +477,7 @@ public class StateBehaviors {
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlagIfIsNextToExecute(final SFlowNodeInstance flowNodeInstance,
             final List<SConnectorDefinition> sConnectorDefinitions, final SConnectorInstance nextConnectorInstanceToExecute, final int flag)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         for (final SConnectorDefinition sConnectorDefinition : sConnectorDefinitions) {
             if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
                 return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, flag);
@@ -562,7 +564,7 @@ public class StateBehaviors {
     }
 
     private long getTargetProcessDefinitionId(final String callableElement, final String callableElementVersion) throws SProcessDefinitionReadException,
-            SProcessDefinitionNotFoundException {
+    SProcessDefinitionNotFoundException {
         if (callableElementVersion != null) {
             return processDefinitionService.getProcessDefinitionId(callableElement, callableElementVersion);
         }
@@ -732,7 +734,7 @@ public class StateBehaviors {
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
@@ -740,7 +742,7 @@ public class StateBehaviors {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
             workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId,
                     flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
-        } catch (SConnectorInstanceModificationException e) {
+        } catch (final SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
         } catch (final SWorkRegisterException e) {
             throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstanceId, e);
@@ -776,10 +778,10 @@ public class StateBehaviors {
     }
 
     private void createBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, SFlowElementsContainerType containerType, final SBoundaryEventDefinition boundaryEventDefinition)
-            throws SObjectReadException, SObjectNotFoundException, SObjectCreationException, SBonitaException, SObjectModificationException,
-            SFlowNodeReadException, SFlowNodeExecutionException {
-        TokenInfo tokenInfo = new BoundaryCreationTokenProvider(activityInstance, boundaryEventDefinition, tokenService).getOutputTokenInfo();
+            final long parentProcessInstanceId, final SFlowElementsContainerType containerType, final SBoundaryEventDefinition boundaryEventDefinition)
+                    throws SObjectReadException, SObjectNotFoundException, SObjectCreationException, SBonitaException, SObjectModificationException,
+                    SFlowNodeReadException, SFlowNodeExecutionException {
+        final TokenInfo tokenInfo = new BoundaryCreationTokenProvider(activityInstance, boundaryEventDefinition, tokenService).getOutputTokenInfo();
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
@@ -803,16 +805,13 @@ public class StateBehaviors {
 
     private boolean mustAddBoundaryEvents(final SActivityInstance activityInstance, final SActivityDefinition activityDefinition) {
         // avoid to add boundary events in children of multi instance
-        boolean mustAddBoundaries = activityDefinition != null
-                && !activityDefinition.getBoundaryEventDefinitions().isEmpty()
+        return activityDefinition != null && !activityDefinition.getBoundaryEventDefinitions().isEmpty()
                 && !isChildOfLoopOrMultiInstance(activityInstance, activityDefinition);
-        return mustAddBoundaries;
     }
 
     private boolean isChildOfLoopOrMultiInstance(final SActivityInstance activityInstance, final SActivityDefinition activityDefinition) {
         return activityDefinition.getLoopCharacteristics() != null
-                && !(SFlowNodeType.MULTI_INSTANCE_ACTIVITY.equals(activityInstance.getType()) || SFlowNodeType.LOOP_ACTIVITY.equals(activityInstance
-                        .getType()));
+                && !(SFlowNodeType.MULTI_INSTANCE_ACTIVITY.equals(activityInstance.getType()) || SFlowNodeType.LOOP_ACTIVITY.equals(activityInstance.getType()));
     }
 
     public void interruptAttachedBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance,
@@ -848,7 +847,7 @@ public class StateBehaviors {
     }
 
     private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef) throws SBonitaSearchException,
-            SWaitingEventModificationException {
+    SWaitingEventModificationException {
         if (!catchEventDef.getEventTriggers().isEmpty()) {
             interruptWaitingEvents(instanceId, SWaitingEvent.class);
         }
@@ -879,7 +878,7 @@ public class StateBehaviors {
     }
 
     private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass) throws SBonitaSearchException,
-            SWaitingEventModificationException {
+    SWaitingEventModificationException {
         final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventClass);
         final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventClass);
         long count = 0;
@@ -911,6 +910,27 @@ public class StateBehaviors {
                 }
             }
         }
+    }
+
+    public List<SFlowNodeInstance> createInnerInstances(final long processDefinitionId, final SActivityDefinition activity,
+            final SFlowNodeInstance flowNodeInstance, final int numberOfInstanceToCreate) throws SBonitaException {
+        final SMultiInstanceActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
+        final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
+        int nbOfcreatedInstances = 0;
+        final int nbOfInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfInstances();
+        final ArrayList<SFlowNodeInstance> createdInstances = new ArrayList<SFlowNodeInstance>();
+        for (int i = nbOfInstances; i < nbOfInstances + numberOfInstanceToCreate; i++) {
+            createdInstances.add(bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(),
+                    flowNodeInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, i,
+                    SStateCategory.NORMAL, -1, null));
+            nbOfcreatedInstances++;
+        }
+        final SMultiInstanceActivityInstance multiInstanceActivityInstance = (SMultiInstanceActivityInstance) flowNodeInstance;
+        activityInstanceService.addMultiInstanceNumberOfActiveActivities(multiInstanceActivityInstance, nbOfcreatedInstances);
+        final int tokenCount = multiInstanceActivityInstance.getTokenCount() + nbOfcreatedInstances;
+        activityInstanceService.setTokenCount(multiInstanceActivityInstance, tokenCount);
+        return createdInstances;
     }
 
 }
