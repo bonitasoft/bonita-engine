@@ -37,6 +37,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
@@ -210,6 +211,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TenantConfiguration getTenantConfiguration();
 
     <T> T lookup(String serviceName);
+
+    GatewayInstanceService getGatewayInstanceService();
 
     void destroy();
 

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package org.bonitasoft.engine.execution.work;
@@ -19,14 +19,28 @@ import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
+/**
+ * Restart flownodes that needs to be restarted in a single transaction, with a maximum of {@value #MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION}.
+ *
+ * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
+ */
 public class ExecuteFlowNodes implements Callable<Object> {
+
+    private static final int MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION = 20;
 
     private final WorkService workService;
 
@@ -34,25 +48,33 @@ public class ExecuteFlowNodes implements Callable<Object> {
 
     private final ActivityInstanceService activityInstanceService;
 
+    private final GatewayInstanceService gatewayInstanceService;
+
+    private final ProcessDefinitionService processDefinitionService;
+
     private final Iterator<Long> iterator;
 
-    public ExecuteFlowNodes(final WorkService workService, final TechnicalLoggerService logger, final ActivityInstanceService activityInstanceService,
-            final Iterator<Long> iterator) {
-        this.workService = workService;
-        this.logger = logger;
-        this.activityInstanceService = activityInstanceService;
+
+    public ExecuteFlowNodes(final TenantServiceAccessor tenantServiceAccessor, final Iterator<Long> iterator) {
+        workService = tenantServiceAccessor.getWorkService();
+        logger = tenantServiceAccessor.getTechnicalLoggerService();
+        activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
+        gatewayInstanceService = tenantServiceAccessor.getGatewayInstanceService();
+        processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         this.iterator = iterator;
     }
 
     @Override
     public Object call() throws Exception {
         try {
-            for (int i = 0; i < 20 && iterator.hasNext(); i++) {
+            for (int i = 0; i < MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION && iterator.hasNext(); i++) {
                 SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(iterator.next());
                 if (flowNodeInstance.isTerminal()) {
                     createNotifyChildFinishedWork(workService, logger, flowNodeInstance);
                 } else {
-                    createExecuteFlowNodeWork(workService, logger, flowNodeInstance);
+                    if (shouldExecuteFlownode(flowNodeInstance)) {
+                        createExecuteFlowNodeWork(workService, logger, flowNodeInstance);
+                    }
                 }
             }
             return null;
@@ -88,4 +110,30 @@ public class ExecuteFlowNodes implements Callable<Object> {
             logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, message);
         }
     }
+
+    /**
+     * Determines if the found flownode should be relaunched at restart or not. For now, only Gateways must not always be restarted under certain conditions.
+     *
+     * @param sFlowNodeInstance
+     *            the flownode to check
+     * @return true if the flownode should be relaunched because it has not finished its work in progress, false otherwise.
+     * @throws SBonitaException
+     *             in case of error.
+     */
+    protected boolean shouldExecuteFlownode(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+        try {
+            final boolean isGateway = SFlowNodeType.GATEWAY.equals(sFlowNodeInstance.getType());
+            if (isGateway) {
+                SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId());
+                return gatewayInstanceService.checkMergingCondition(processDefinition, (SGatewayInstance) sFlowNodeInstance);
+            }
+            return true;
+        } catch (final SBonitaException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            }
+            throw e;
+        }
+    }
+
 }
