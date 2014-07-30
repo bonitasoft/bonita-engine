@@ -1,7 +1,8 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -111,9 +112,9 @@ public class SchedulerServiceImplTest {
 
         final SQueriableLog sQueriableLog = mock(SQueriableLog.class);
         when(jobLogBuilder.done()).thenReturn(sQueriableLog);
-        
+
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
-        
+
         servicesResolver = mock(ServicesResolver.class);
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver);
     }
@@ -247,10 +248,16 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void schedule_should_use_tenantId_on_jobDescriptor_jobParameters_and_on_call_executor_schedule()
+    public void schedule_should_store_jobDescriptor_store_parameters_and_call_executor_schedule_using_tenantId()
             throws Exception {
         //given
+        final long jogDescriptorId = 7L;
+        final String jobName = "myJob";
+        final boolean disallowConcurrency = true;
         final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
+        given(jobDescriptor.getId()).willReturn(jogDescriptorId);
+        given(jobDescriptor.getJobName()).willReturn(jobName);
+        given(jobDescriptor.disallowConcurrentExecution()).willReturn(disallowConcurrency);
         given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
         final Trigger trigger = mock(Trigger.class);
         final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
@@ -260,8 +267,8 @@ public class SchedulerServiceImplTest {
 
         //then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
-        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
-        verify(schedulerExecutor, times(1)).schedule(anyLong(), eq(String.valueOf(TENANT_ID)), anyString(), eq(trigger), anyBoolean());
+        verify(jobService, times(1)).createJobParameters(parameters, TENANT_ID, jogDescriptorId);
+        verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger, disallowConcurrency);
     }
 
     @Test
@@ -280,14 +287,14 @@ public class SchedulerServiceImplTest {
         verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
         verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), anyString(), anyBoolean());
     }
-    
+
     @Test
-	public void should_delete_all_jobs_for_a_given_tenant() throws Exception {
-		schedulerService.deleteJobs();
-		
-		verify(schedulerExecutor).deleteJobs(String.valueOf(TENANT_ID));
-		verify(jobService).deleteAllJobDescriptors();
-	}
+    public void should_delete_all_jobs_for_a_given_tenant() throws Exception {
+        schedulerService.deleteJobs();
+
+        verify(schedulerExecutor).deleteJobs(String.valueOf(TENANT_ID));
+        verify(jobService).deleteAllJobDescriptors();
+    }
 
     private final class BeanThatNeedMyService implements StatelessJob {
 
