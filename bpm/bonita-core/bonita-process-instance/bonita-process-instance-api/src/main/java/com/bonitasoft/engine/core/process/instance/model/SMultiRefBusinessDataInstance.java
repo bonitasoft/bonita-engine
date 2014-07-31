@@ -8,17 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SRefBusinessDataInstance extends PersistentObject {
+public interface SMultiRefBusinessDataInstance extends SRefBusinessDataInstance {
 
-    String getName();
-
-    long getProcessInstanceId();
-
-    String getDataClassName();
+    List<Long> getDataIds();
 
 }

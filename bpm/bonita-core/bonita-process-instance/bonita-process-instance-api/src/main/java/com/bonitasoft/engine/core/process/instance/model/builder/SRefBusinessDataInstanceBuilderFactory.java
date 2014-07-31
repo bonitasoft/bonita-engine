@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model.builder;
 
+import java.util.List;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -15,12 +17,6 @@ public interface SRefBusinessDataInstanceBuilderFactory {
 
     SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, Long dataId, String dataClassName);
 
-    String getNameKey();
-
-    String getProcessInstanceIdKey();
-
-    String getDataIdKey();
-
-    String getDataClassNameKey();
+    SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, List<Long> dataIds, String dataClassName);
 
 }

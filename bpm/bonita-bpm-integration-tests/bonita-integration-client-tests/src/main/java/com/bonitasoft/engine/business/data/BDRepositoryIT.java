@@ -683,4 +683,52 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
+    @Test
+    public void deployABDRAndCreateAndUdpateAMultipleBusinessData() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
+                + " Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];", List.class.getName());
+
+        final Expression jackExpression = new ExpressionBuilder().createGroovyScriptExpression("createJack", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee jack = new Employee(); jack.firstName = 'Jack'; jack.lastName = 'Doe'; return jack;", EMPLOYEE_QUALIF_CLASSNAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression).setMultiple(true);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME)
+        .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployees", "add", Object.class.getName(), jackExpression));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+
+        final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
+        String employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
+
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForUserTask("step2", instance.getId());
+        employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John, Jack], lastName=[Doe, Doe, Doe]]");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    private String getEmployeesToString(final String businessDataName, final long processInstanceId) throws InvalidExpressionException {
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
+        final String expressionEmployee = "retrieve_Employee";
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee, "\"Employee [firstName=\" + " + businessDataName
+                        + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, List.class.getName())), null);
+        try {
+            final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+            return (String) evaluatedExpressions.get(expressionEmployee);
+        } catch (final ExpressionEvaluationException eee) {
+            System.err.println(eee.getMessage());
+            return null;
+        }
+    }
+
 }

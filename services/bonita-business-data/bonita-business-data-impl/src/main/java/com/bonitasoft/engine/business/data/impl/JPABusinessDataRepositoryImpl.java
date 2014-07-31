@@ -134,6 +134,20 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return entity;
     }
 
+    @Override
+    public <T extends Entity> List<T> findByIds(final Class<T> entityClass, final List<Long> primaryKeys) {
+        final List<T> entities = new ArrayList<T>();
+        final EntityManager em = getEntityManager();
+        for (final Long primaryKey : primaryKeys) {
+            final T entity = em.find(entityClass, primaryKey);
+            if (entity != null) {
+                em.detach(entity);
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         if (query == null) {
