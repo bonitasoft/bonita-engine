@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -28,14 +29,21 @@ public class ProxyTest {
 
     @InjectMocks
     private Proxyfier proxyfier;
-
+    
+    private TestEntity mockLazyLoaderToReturn(TestEntity entity) {
+        when(lazyLoader.load(any(Method.class), any(Long.class))).thenReturn(entity);
+        return entity;
+    }
+    
     @Test
     public void should_load_object_when_method_is_lazy_and_object_is_not_loaded() throws Exception {
+        TestEntity expectedEntity = mockLazyLoaderToReturn(new TestEntity());
         final TestEntity entity = proxyfier.proxify(new TestEntity());
 
-        entity.getLazyEntity();
+        TestEntity lazyEntity = entity.getLazyEntity();
 
         verify(lazyLoader).load(any(Method.class), any(Long.class));
+        assertThat(lazyEntity).isEqualTo(expectedEntity);
     }
 
     @Test
@@ -83,7 +91,7 @@ public class ProxyTest {
 
         verify(lazyLoader, times(1)).load(any(Method.class), any(Long.class));
     }
-
+    
     @Test
     public void should_not_load_object_for_a_non_lazy_loading_method() throws Exception {
         final TestEntity entity = proxyfier.proxify(new TestEntity());
@@ -95,12 +103,14 @@ public class ProxyTest {
 
     @Test
     public void should_not_load_object_that_has_been_set_by_a_setter() throws Exception {
+        TestEntity expectedEntity = new TestEntity();
         final TestEntity entity = proxyfier.proxify(new TestEntity());
 
-        entity.setLazyEntity(null);
-        entity.getLazyEntity();
+        entity.setLazyEntity(expectedEntity);
+        TestEntity lazyEntity = entity.getLazyEntity();
 
         verifyZeroInteractions(lazyLoader);
+        assertThat(lazyEntity).isEqualTo(expectedEntity);
     }
 
     @Test
