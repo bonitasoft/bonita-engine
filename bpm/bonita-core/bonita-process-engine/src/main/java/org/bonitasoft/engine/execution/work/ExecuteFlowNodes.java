@@ -54,7 +54,6 @@ public class ExecuteFlowNodes implements Callable<Object> {
 
     private final Iterator<Long> iterator;
 
-
     public ExecuteFlowNodes(final TenantServiceAccessor tenantServiceAccessor, final Iterator<Long> iterator) {
         workService = tenantServiceAccessor.getWorkService();
         logger = tenantServiceAccessor.getTechnicalLoggerService();
@@ -74,6 +73,12 @@ public class ExecuteFlowNodes implements Callable<Object> {
                 } else {
                     if (shouldExecuteFlownode(flowNodeInstance)) {
                         createExecuteFlowNodeWork(workService, logger, flowNodeInstance);
+                    } else {
+                        if (logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO)) {
+                            logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, "Flownode with name = <" + flowNodeInstance.getName()
+                                    + ">, and id = <" + flowNodeInstance.getId() + "> in state = <" + flowNodeInstance.getStateName()
+                                    + "> does not fullfill the restart conditions.");
+                        }
                     }
                 }
             }
