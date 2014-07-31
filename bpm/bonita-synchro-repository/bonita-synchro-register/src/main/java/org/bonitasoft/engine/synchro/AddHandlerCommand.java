@@ -27,6 +27,8 @@ public class AddHandlerCommand extends TenantCommand {
 
     private static final String GATEWAYINSTANCE_CREATED = "GATEWAYINSTANCE_CREATED";
 
+    private static final String GATEWAYINSTANCE_STATE_UPDATED = "GATEWAYINSTANCE_STATE_UPDATED";
+
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandExecutionException {
@@ -41,8 +43,11 @@ public class AddHandlerCommand extends TenantCommand {
                 eventService.addHandler(ACTIVITYINSTANCE_CREATED, new FlowNodeHandler(tenantId));
                 eventService.addHandler(EVENT_INSTANCE_CREATED, new FlowNodeHandler(tenantId));
             }
-            if (!containsHandler(eventService, GATEWAYINSTANCE_CREATED, FlowNodeHandler.class)) {
-                eventService.addHandler(GATEWAYINSTANCE_CREATED, new FlowNodeHandler(tenantId));
+            if (!containsHandler(eventService, GATEWAYINSTANCE_CREATED, GatewayHandler.class)) {
+                eventService.addHandler(GATEWAYINSTANCE_CREATED, new GatewayHandler(tenantId));
+            }
+            if (!containsHandler(eventService, GATEWAYINSTANCE_STATE_UPDATED, GatewayHandler.class)) {
+                eventService.addHandler(GATEWAYINSTANCE_STATE_UPDATED, new GatewayHandler(tenantId));
             }
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("system", true);
