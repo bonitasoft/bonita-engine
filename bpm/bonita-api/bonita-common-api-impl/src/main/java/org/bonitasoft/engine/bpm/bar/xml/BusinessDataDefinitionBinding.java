@@ -29,10 +29,13 @@ public class BusinessDataDefinitionBinding extends NamedElementBinding {
 
     protected String className;
 
+    protected boolean isMultiple;
+
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         className = attributes.get(XMLProcessDefinition.BUSINESS_DATA_DEFINITION_CLASS);
+        isMultiple = Boolean.valueOf(attributes.get(XMLProcessDefinition.BUSINESS_DATA_DEFINITION_IS_MULTIPLE));
     }
 
     @Override
@@ -56,6 +59,7 @@ public class BusinessDataDefinitionBinding extends NamedElementBinding {
             businessDataDefinitionImpl.setDescription(description);
         }
         businessDataDefinitionImpl.setClassName(className);
+        businessDataDefinitionImpl.setMultiple(isMultiple);
         return businessDataDefinitionImpl;
     }
 

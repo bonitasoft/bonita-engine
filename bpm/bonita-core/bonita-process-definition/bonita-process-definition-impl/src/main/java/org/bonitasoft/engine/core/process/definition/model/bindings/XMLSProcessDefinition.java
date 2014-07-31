@@ -220,6 +220,8 @@ public class XMLSProcessDefinition {
 
     public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
+    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "isMultiple";
+
     public static final String DATA_DEFINITION_TRANSIENT = "transient";
 
     public static final String EXPRESSION_NODE = "expression";
@@ -468,6 +470,7 @@ public class XMLSProcessDefinition {
         final XMLNode businessDataDefinitionNode = new XMLNode(BUSINESS_DATA_DEFINITION_NODE);
         businessDataDefinitionNode.addAttribute(NAME, businessDataDefinition.getName());
         businessDataDefinitionNode.addAttribute(BUSINESS_DATA_DEFINITION_CLASS, businessDataDefinition.getClassName());
+        businessDataDefinitionNode.addAttribute(BUSINESS_DATA_DEFINITION_IS_MULTIPLE, String.valueOf(businessDataDefinition.isMultiple()));
         if (businessDataDefinition.getDescription() != null) {
             businessDataDefinitionNode.addChild(DESCRIPTION, businessDataDefinition.getDescription());
         }

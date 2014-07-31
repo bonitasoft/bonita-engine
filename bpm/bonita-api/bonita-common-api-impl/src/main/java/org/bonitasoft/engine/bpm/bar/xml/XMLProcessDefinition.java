@@ -188,6 +188,8 @@ public class XMLProcessDefinition {
 
     public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
+    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "multiple";
+
     public static final String INDEX = "index";
 
     public static final String LABEL = "label";
@@ -443,7 +445,7 @@ public class XMLProcessDefinition {
             fillConnectorNode(connectorNode, connector);
             connectorsNode.addChild(connectorNode);
         }
-        List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
+        final List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
         if (!businessDataDefinitions.isEmpty()) {
             final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
             flowElements.addChild(businessDataDefinitionsNode);
@@ -865,6 +867,7 @@ public class XMLProcessDefinition {
         businessDataDefinitionNode = new XMLNode(BUSINESS_DATA_DEFINITION_NODE);
         businessDataDefinitionNode.addAttribute(NAME, businessDataDefinition.getName());
         businessDataDefinitionNode.addAttribute(DATA_DEFINITION_CLASS, businessDataDefinition.getClassName());
+        businessDataDefinitionNode.addAttribute(BUSINESS_DATA_DEFINITION_IS_MULTIPLE, String.valueOf(businessDataDefinition.isMultiple()));
         if (businessDataDefinition.getDescription() != null) {
             businessDataDefinitionNode.addChild(DESCRIPTION, businessDataDefinition.getDescription());
         }
