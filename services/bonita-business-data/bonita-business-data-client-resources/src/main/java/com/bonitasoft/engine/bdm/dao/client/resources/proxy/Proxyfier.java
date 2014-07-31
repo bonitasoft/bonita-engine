@@ -1,5 +1,6 @@
 package com.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,13 +72,25 @@ public class Proxyfier {
             Object invocationResult = thisMethod.invoke(entity, args);
 
             if (isGetterOrSetter(thisMethod)) {
-                if (shouldBeLoaded(thisMethod, invocationResult)) {
+                if (isGetter(thisMethod) && shouldBeLoaded(thisMethod, invocationResult)) {
                     invocationResult = lazyloader.load(thisMethod, entity.getPersistenceId());
+                    callSetterOnEntity(invocationResult, thisMethod);
                 }
                 alreadyLoaded.add(toFieldName(thisMethod.getName()));
             }
 
             return proxifyIfNeeded(invocationResult);
+        }
+
+        private void callSetterOnEntity(Object invocationResult, Method getter) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+            if (invocationResult != null) {
+                Method setter = getAssociatedSetter(invocationResult, getter);
+                setter.invoke(entity, invocationResult);
+            }
+        }
+        
+        private Method getAssociatedSetter(Object invocationResult, Method getter) throws NoSuchMethodException, SecurityException {
+            return entity.getClass().getMethod(getter.getName().replaceFirst("^get", "set"), invocationResult.getClass());
         }
 
         @SuppressWarnings("unchecked")
@@ -119,9 +132,13 @@ public class Proxyfier {
         }
 
         private boolean isGetterOrSetter(final Method method) {
-            return method.getName().startsWith("get") || method.getName().startsWith("set") && method.getName().length() > 3;
+            return isGetter(method) || method.getName().startsWith("set") && method.getName().length() > 3;
         }
-
+        
+        private boolean isGetter(final Method method) {
+            return method.getName().startsWith("get");
+        }
+        
         private String toFieldName(final String methodName) {
             if (methodName.startsWith("get") || methodName.startsWith("set") && methodName.length() > 3) {
                 return methodName.substring(3).toLowerCase();

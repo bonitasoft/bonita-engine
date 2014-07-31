@@ -84,12 +84,14 @@ public class ProxyTest {
 
     @Test
     public void should_not_load_object_which_has_been_already_lazy_loaded() throws Exception {
+        TestEntity expectedEntity = mockLazyLoaderToReturn(new TestEntity());
         final TestEntity entity = proxyfier.proxify(new TestEntity());
 
         entity.getLazyEntity();
-        entity.getLazyEntity();
+        TestEntity lazyEntity = entity.getLazyEntity();
 
         verify(lazyLoader, times(1)).load(any(Method.class), any(Long.class));
+        assertThat(lazyEntity).isEqualTo(expectedEntity);
     }
     
     @Test
