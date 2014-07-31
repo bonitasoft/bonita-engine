@@ -18,6 +18,9 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
@@ -67,6 +70,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
+    }
+
+    @Override
+    public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

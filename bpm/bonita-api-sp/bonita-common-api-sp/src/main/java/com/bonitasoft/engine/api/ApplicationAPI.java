@@ -16,6 +16,9 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
@@ -56,5 +59,14 @@ public interface ApplicationAPI {
      * @throws DeletionException if en error occurs during the deletion
      */
     void deleteApplication(long applicationId) throws DeletionException;
+
+    /**
+     * Searches for applications with specific search criteria.
+     *
+     * @param searchOptions the search options. See {@link SearchOptions} for details.
+     * @return a {@link SearchResult} containing the number and the list of applications matching with the search criteria.
+     * @throws SearchException
+     */
+    SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;
 
 }
