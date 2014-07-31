@@ -1145,36 +1145,6 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     }
 
     @Test
-    public void searchArchivedFlowNodeInstances() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance("EventSubProcess", "1.0");
-        processBuilder.addStartEvent("start");
-        processBuilder.addEndEvent("endSignal").addSignalEventTrigger("go");
-        processBuilder.addTransition("start", "endSignal");
-        final SubProcessDefinitionBuilder subProcessBuilder = processBuilder.addSubProcess("signalSubProcess", true).getSubProcessBuilder();
-        subProcessBuilder.addStartEvent("startSignal").addSignalEventTrigger("go");
-
-        final ProcessDefinition processDefinition = deployAndEnableProcess(processBuilder.getProcess());
-        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        Thread.sleep(2000);
-
-        // search
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
-        builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, instance.getId());
-        builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
-        builder.sort(ArchivedFlowNodeInstanceSearchDescriptor.DISPLAY_NAME, Order.ASC);
-
-        final SearchResult<ArchivedFlowNodeInstance> result = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
-        assertEquals(1, result.getCount());
-        assertNotNull(result.getResult().get(0));
-
-        final List<ProcessDeploymentInfo> infos = getProcessAPI().getProcessDeploymentInfos(0, 2, ProcessDeploymentInfoCriterion.NAME_ASC);
-        for (final ProcessDeploymentInfo info : infos) {
-            disableAndDeleteProcess(info.getProcessId());
-        }
-    }
-
-    @Test
     public void search_process_instances_in_all_states_retrieves_all_process_states() throws Exception {
         // deploy and start a process
         final ProcessDefinition simpleProcess = deployProcessWithHumanTask("step1");
