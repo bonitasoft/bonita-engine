@@ -82,15 +82,16 @@ public class Proxyfier {
             return proxifyIfNeeded(invocationResult);
         }
 
-        private void callSetterOnEntity(Object invocationResult, Method getter) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        private void callSetterOnEntity(final Object invocationResult, final Method getter) throws NoSuchMethodException, SecurityException,
+        IllegalAccessException, IllegalArgumentException, InvocationTargetException {
             if (invocationResult != null) {
-                Method setter = getAssociatedSetter(invocationResult, getter);
+                final Method setter = getAssociatedSetter(invocationResult, getter);
                 setter.invoke(entity, invocationResult);
             }
         }
-        
-        private Method getAssociatedSetter(Object invocationResult, Method getter) throws NoSuchMethodException, SecurityException {
-            return entity.getClass().getMethod(getter.getName().replaceFirst("^get", "set"), invocationResult.getClass());
+
+        private Method getAssociatedSetter(final Object invocationResult, final Method getter) throws NoSuchMethodException, SecurityException {
+            return entity.getClass().getMethod(getter.getName().replaceFirst("^get", "set"), getter.getReturnType());
         }
 
         @SuppressWarnings("unchecked")
@@ -134,11 +135,11 @@ public class Proxyfier {
         private boolean isGetterOrSetter(final Method method) {
             return isGetter(method) || method.getName().startsWith("set") && method.getName().length() > 3;
         }
-        
+
         private boolean isGetter(final Method method) {
             return method.getName().startsWith("get");
         }
-        
+
         private String toFieldName(final String methodName) {
             if (methodName.startsWith("get") || methodName.startsWith("set") && methodName.length() > 3) {
                 return methodName.substring(3).toLowerCase();
