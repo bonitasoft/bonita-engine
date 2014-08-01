@@ -14,6 +14,7 @@
 package com.bonitasoft.engine.business.application.impl;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -23,8 +24,10 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -152,5 +155,20 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
     }
+
+    @Override
+    public long getNumberOfApplications(final QueryOptions options) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SApplication.class, options, null);
+    }
+
+    @Override
+    public List<SApplication> searchApplications(final QueryOptions options) throws SBonitaSearchException {
+        try {
+            return persistenceService.searchEntity(SApplication.class, options, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
 
 }

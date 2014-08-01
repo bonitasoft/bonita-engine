@@ -21,9 +21,12 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
@@ -40,11 +43,14 @@ public class ApplicationAPIDelegate {
     private final TenantServiceAccessor accessor;
     private final ApplicationConvertor convertor;
     private final long loggedUserId;
+    private final SearchApplications searchApplications;
 
-    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor, final long loggedUserId) {
+    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor, final long loggedUserId,
+            final SearchApplications searchApplications) {
         this.accessor = accessor;
         this.convertor = convertor;
         this.loggedUserId = loggedUserId;
+        this.searchApplications = searchApplications;
     }
 
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
@@ -77,6 +83,15 @@ public class ApplicationAPIDelegate {
             applicationService.deleteApplication(applicationId);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
+        }
+    }
+
+    public SearchResult<Application> searchApplications() throws SearchException {
+        try {
+            searchApplications.execute();
+            return searchApplications.getResult();
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
         }
     }
 

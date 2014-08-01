@@ -1,8 +1,12 @@
 package com.bonitasoft.engine.api.impl.convertor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -10,6 +14,7 @@ import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationState;
+import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 
 
@@ -79,7 +84,24 @@ public class ApplicationConvertorTest {
         assertThat(application.getUpdatedBy()).isEqualTo(CREATOR_ID);
         assertThat(application.getLastUpdateDate()).isEqualTo(new Date(currentDate));
         assertThat(application.getState()).isEqualTo(state);
+    }
 
+    @Test
+    public void toApplicationList_should_call_toApplition_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
+        //given
+        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_VERSION, APP_PATH, System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp2 = new SApplicationImpl("app2", APP_VERSION, "/app2", System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
+        final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_PATH, APP_DESC);
+        final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, "/app2", APP_DESC);
+        final ApplicationConvertor convertorMock = spy(convertor);
+        doReturn(app1).when(convertorMock).toApplication(sApp1);
+        doReturn(app2).when(convertorMock).toApplication(sApp2);
+
+        //when
+        final List<Application> applications = convertorMock.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
+
+        //then
+        assertThat(applications).containsExactly(app1, app2);
     }
 
 }

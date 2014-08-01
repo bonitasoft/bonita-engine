@@ -3,15 +3,25 @@
 <hibernate-mapping auto-import="false">
 
     <query name="getApplicationById">
-        SELECT app
-        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS app
+        SELECT application
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
         WHERE id = :id
     </query>
 
     <query name="getApplicationByName">
-        SELECT app
-        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS app
+        SELECT application
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
         WHERE name = :name
+    </query>
+
+    <query name="getNumberOfSApplication">
+        SELECT count(application)
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
+    </query>
+
+    <query name="searchSApplication">
+        SELECT application
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
     </query>
 
 </hibernate-mapping>

@@ -14,7 +14,9 @@
 package com.bonitasoft.engine.api.impl.convertor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -58,6 +60,14 @@ public class ApplicationConvertor {
         application.setState(sApplication.getState());
         application.setIconPath(sApplication.getIconPath());
         return application;
+    }
+
+    public List<Application> toApplication(final List<SApplication> sApplications) {
+        final List<Application> applications = new ArrayList<Application>(sApplications.size());
+        for (final SApplication sApplication : sApplications) {
+            applications.add(toApplication(sApplication));
+        }
+        return applications;
     }
 
 }

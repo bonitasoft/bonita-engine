@@ -6,12 +6,15 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -20,7 +23,10 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -161,6 +167,47 @@ public class ApplicationServiceImplTest {
         final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
                 .setObject(application).done();
         verify(recorder, times(1)).recordDelete(new DeleteRecord(application), event);
+    }
+
+    @Test
+    public void getNumberOfApplications_should_return_the_result_of_persitenceService_getNumberOfEntities() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        final long count = 7;
+        given(persistenceService.getNumberOfEntities(SApplication.class, options, null)).willReturn(count);
+
+        //when
+        final long nbOfApp = applicationService.getNumberOfApplications(options);
+
+        //then
+        assertThat(nbOfApp).isEqualTo(count);
+    }
+
+    @Test
+    public void searchApplicatons_should_return_the_result_of_persitenceService_searchEntity() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        final List<SApplication> applications = new ArrayList<SApplication>(1);
+        applications.add(mock(SApplication.class));
+        given(persistenceService.searchEntity(SApplication.class, options, null)).willReturn(applications);
+
+        //when
+        final List<SApplication> retrievedApplications = applicationService.searchApplications(options);
+
+        //then
+        assertThat(retrievedApplications).isEqualTo(applications);
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void searchApplicatons_should_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        given(applicationService.searchApplications(options)).willThrow(new SBonitaReadException(""));
+
+        //when
+        applicationService.searchApplications(options);
+
+        //then exception
     }
 
 }

@@ -21,6 +21,10 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -120,6 +124,47 @@ public class ApplicationAPIIT extends CommonAPISPTest {
         } catch (final NotFoundException e) {
             //ok
         }
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
+    "no search term" })
+    @Test
+    public void searchApplications_without_filter_return_all_elements_based_on_pagination() throws Exception {
+        //given
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchResult<Application> firstPage = applicationAPI.searchApplications(buildSearchOptions(0, 2));
+
+        //then
+        assertThat(firstPage).isNotNull();
+        assertThat(firstPage.getCount()).isEqualTo(3);
+        assertThat(firstPage.getResult()).containsExactly(engineering, hr);
+
+        //when
+        final SearchResult<Application> secondPage = applicationAPI.searchApplications(buildSearchOptions(2, 2));
+
+        //then
+        assertThat(secondPage).isNotNull();
+        assertThat(secondPage.getCount()).isEqualTo(3);
+        assertThat(secondPage.getResult()).containsExactly(marketing);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+    }
+
+    private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
+        builder.sort(ApplicationSearchDescriptor.NAME, Order.ASC);
+        final SearchOptions options = builder.done();
+        return options;
     }
 
 }

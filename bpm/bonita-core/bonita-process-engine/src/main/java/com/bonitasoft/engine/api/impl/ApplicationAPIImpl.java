@@ -25,9 +25,11 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -46,7 +48,15 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private ApplicationAPIDelegate getDelegate() {
-        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationConvertor(), SessionInfos.getUserIdFromSession());
+        return getDelegate(null);
+    }
+    private ApplicationAPIDelegate getDelegate(final SearchOptions searchOptions) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchApplicationDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
+        final ApplicationConvertor convertor = new ApplicationConvertor();
+        final SearchApplications searchApplications = new SearchApplications(tenantAccessor.getApplicationService(), searchDescriptor, searchOptions, convertor);
+        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, convertor,
+                SessionInfos.getUserIdFromSession(), searchApplications);
         return delegate;
     }
 
@@ -74,8 +84,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
-        // TODO Auto-generated method stub
-        return null;
+        final ApplicationAPIDelegate delegate = getDelegate(searchOptions);
+        return delegate.searchApplications();
     }
 
 }

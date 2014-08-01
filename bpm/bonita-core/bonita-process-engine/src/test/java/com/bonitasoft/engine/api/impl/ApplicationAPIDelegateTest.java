@@ -14,7 +14,9 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
@@ -41,7 +44,13 @@ public class ApplicationAPIDelegateTest {
     private ApplicationConvertor convertor;
 
     @Mock
+    private SearchApplications searchApplications;
+
+    @Mock
     private ApplicationService applicationService;
+
+    @Mock
+    private SearchResult<Application> searchResult;
 
     private ApplicationAPIDelegate delegate;
 
@@ -59,7 +68,7 @@ public class ApplicationAPIDelegateTest {
 
     @Before
     public void setUp() throws Exception {
-        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID);
+        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications);
         given(accessor.getApplicationService()).willReturn(applicationService);
     }
 
@@ -168,6 +177,30 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.getApplication(APPLICATION_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void searchApplications_should_return_the_result_of_searchApplicatons_getResult() throws Exception {
+        //given
+        given(searchApplications.getResult()).willReturn(searchResult);
+
+        //when
+        final SearchResult<Application> retrievedSearchResult = delegate.searchApplications();
+
+        //then
+        assertThat(retrievedSearchResult).isEqualTo(searchResult);
+        verify(searchApplications, times(1)).execute();
+    }
+
+    @Test(expected = SearchException.class)
+    public void searchApplications_should_throw_SeachException_when_searchApplicatons_throws_SBonitaException() throws Exception {
+        //given
+        doThrow(new SBonitaReadException("")).when(searchApplications).execute();
+
+        //when
+        delegate.searchApplications();
 
         //then exception
     }

@@ -13,11 +13,15 @@
  **/
 package com.bonitasoft.engine.business.application;
 
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 
 /**
@@ -33,5 +37,9 @@ public interface ApplicationService {
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
+
+    long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
+
+    List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
 
 }
