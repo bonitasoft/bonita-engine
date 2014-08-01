@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
@@ -35,19 +36,20 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     private final List<DataDefinition> dataDefinitions;
 
+    private final List<BusinessDataDefinition> businessDataDefinitions;
+
     private final List<Operation> operations;
 
     private LoopCharacteristics loopCharacteristics;
 
     private final List<BoundaryEventDefinition> boundaryEventDefinitions;
 
-    private BusinessDataDefinition businessDataDefinition;
-
     public ActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
         dataDefinitions = new ArrayList<DataDefinition>();
         operations = new ArrayList<Operation>();
         boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
+        businessDataDefinitions = new ArrayList<BusinessDataDefinition>(3);
     }
 
     public ActivityDefinitionImpl(final String name) {
@@ -55,6 +57,7 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         dataDefinitions = new ArrayList<DataDefinition>();
         operations = new ArrayList<Operation>();
         boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
+        businessDataDefinitions = new ArrayList<BusinessDataDefinition>(3);
     }
 
     @Override
@@ -94,12 +97,12 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     }
 
     @Override
-    public BusinessDataDefinition getBusinessDataDefinition() {
-        return businessDataDefinition;
+    public List<BusinessDataDefinition> getBusinessDataDefinitions() {
+        return businessDataDefinitions;
     }
 
-    public void setBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
-        this.businessDataDefinition = businessDataDefinition;
+    public void addBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        businessDataDefinitions.add(businessDataDefinition);
     }
 
     @Override
@@ -107,7 +110,7 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (boundaryEventDefinitions == null ? 0 : boundaryEventDefinitions.hashCode());
-        result = prime * result + (businessDataDefinition == null ? 0 : businessDataDefinition.hashCode());
+        result = prime * result + (businessDataDefinitions == null ? 0 : businessDataDefinitions.hashCode());
         result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
         result = prime * result + (loopCharacteristics == null ? 0 : loopCharacteristics.hashCode());
         result = prime * result + (operations == null ? 0 : operations.hashCode());
@@ -133,11 +136,11 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         } else if (!boundaryEventDefinitions.equals(other.boundaryEventDefinitions)) {
             return false;
         }
-        if (businessDataDefinition == null) {
-            if (other.businessDataDefinition != null) {
+        if (businessDataDefinitions == null) {
+            if (other.businessDataDefinitions != null) {
                 return false;
             }
-        } else if (!businessDataDefinition.equals(other.businessDataDefinition)) {
+        } else if (!businessDataDefinitions.equals(other.businessDataDefinitions)) {
             return false;
         }
         if (dataDefinitions == null) {
@@ -162,6 +165,24 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
             return false;
         }
         return true;
+    }
+
+    @Override
+    public BusinessDataDefinition getBusinessDataDefinition(final String name) {
+        if (name == null) {
+            return null;
+        }
+        boolean found = false;
+        BusinessDataDefinition businessData = null;
+        final Iterator<BusinessDataDefinition> iterator = businessDataDefinitions.iterator();
+        while (iterator.hasNext() && !found) {
+            final BusinessDataDefinition currentBusinessData = iterator.next();
+            if (currentBusinessData.getName().equals(name)) {
+                found = true;
+                businessData = currentBusinessData;
+            }
+        }
+        return businessData;
     }
 
 }

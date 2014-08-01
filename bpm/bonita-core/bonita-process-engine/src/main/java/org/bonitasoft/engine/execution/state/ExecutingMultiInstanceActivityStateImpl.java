@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -40,9 +39,6 @@ import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityI
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -61,24 +57,17 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
 
     private final ExpressionResolverService expressionResolverService;
 
-    private final BPMInstancesCreator bpmInstancesCreator;
-
     private final ContainerRegistry containerRegistry;
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final DataInstanceService dataInstanceService;
-
     private final StateBehaviors stateBehaviors;
 
-    public ExecutingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService, final BPMInstancesCreator bpmInstancesCreator,
-            final ContainerRegistry containerRegistry, final ActivityInstanceService activityInstanceService, final DataInstanceService dataInstanceService,
-            final StateBehaviors stateBehaviors) {
+    public ExecutingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService, final ContainerRegistry containerRegistry,
+            final ActivityInstanceService activityInstanceService, final StateBehaviors stateBehaviors) {
         this.expressionResolverService = expressionResolverService;
-        this.bpmInstancesCreator = bpmInstancesCreator;
         this.containerRegistry = containerRegistry;
         this.activityInstanceService = activityInstanceService;
-        this.dataInstanceService = dataInstanceService;
         this.stateBehaviors = stateBehaviors;
     }
 
@@ -155,8 +144,8 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             if (miActivity.isSequential()) {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;
-                if (shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
-                    createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(), activityDefinition, flowNodeInstance, 1);
+                if (stateBehaviors.shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
+                    createInnerInstances = stateBehaviors.createInnerInstances(processDefinition.getId(), activityDefinition, miActivity, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
                         containerRegistry.executeFlowNode(processDefinition.getId(), sFlowNodeInstance.getLogicalGroup(3), sFlowNodeInstance.getId(), null,
                                 null);
@@ -198,20 +187,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
 
         } while (count > children.size());
         return hasChildren;
-    }
-
-    protected boolean shouldCreateANewInstance(final SMultiInstanceLoopCharacteristics loopCharacteristics, final int numberOfInstances,
-            final SMultiInstanceActivityInstance miActivityInstance) throws SDataInstanceException {
-        if (loopCharacteristics.getLoopCardinality() != null) {
-            return miActivityInstance.getLoopCardinality() > numberOfInstances;
-        }
-        final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
-        if (dataInstance != null) {
-            final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
-            return numberOfInstances < loopDataInputCollection.size();
-        }
-        return false;
     }
 
     @Override

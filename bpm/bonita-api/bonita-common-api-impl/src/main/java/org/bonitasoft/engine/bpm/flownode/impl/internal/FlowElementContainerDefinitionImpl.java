@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -385,6 +385,24 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
             return false;
         }
         return true;
+    }
+
+    @Override
+    public BusinessDataDefinition getBusinessDataDefinition(final String name) {
+        if (name == null) {
+            return null;
+        }
+        boolean found = false;
+        BusinessDataDefinition businessData = null;
+        final Iterator<BusinessDataDefinition> iterator = businessDataDefinitions.iterator();
+        while (iterator.hasNext() && !found) {
+            final BusinessDataDefinition currentBusinessData = iterator.next();
+            if (currentBusinessData.getName().equals(name)) {
+                found = true;
+                businessData = currentBusinessData;
+            }
+        }
+        return businessData;
     }
 
 }

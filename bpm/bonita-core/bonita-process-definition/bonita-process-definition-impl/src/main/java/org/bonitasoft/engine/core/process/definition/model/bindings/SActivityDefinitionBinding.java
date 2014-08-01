@@ -38,32 +38,26 @@ public abstract class SActivityDefinitionBinding extends SFlowNodeDefinitionBind
 
     private final List<SBoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<SBoundaryEventDefinition>(1);
 
-    private SBusinessDataDefinition businessDataDefinition;
+    private final List<SBusinessDataDefinition> businessDataDefinitions = new ArrayList<SBusinessDataDefinition>(3);
 
     @Override
     public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.OPERATION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.OPERATION_NODE.equals(name)) {
             operations.add((SOperation) value);
-        }
-        if (XMLSProcessDefinition.STANDARD_LOOP_CHARACTERISTICS_NODE.equals(name)
+        } else if (XMLSProcessDefinition.STANDARD_LOOP_CHARACTERISTICS_NODE.equals(name)
                 || XMLSProcessDefinition.MULTI_INSTANCE_LOOP_CHARACTERISTICS_NODE.equals(name)) {
             loopCharacteristics = (SLoopCharacteristics) value;
-        }
-        if (XMLSProcessDefinition.BOUNDARY_EVENT_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.BOUNDARY_EVENT_NODE.equals(name)) {
             boundaryEventDefinitions.add((SBoundaryEventDefinition) value);
-        }
-        if (XMLSProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
-            businessDataDefinition = (SBusinessDataDefinition) value;
+        } else if (XMLSProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
+            businessDataDefinitions.add((SBusinessDataDefinition) value);
         }
     }
 
@@ -81,8 +75,8 @@ public abstract class SActivityDefinitionBinding extends SFlowNodeDefinitionBind
             for (final SBoundaryEventDefinition boundaryEvent : boundaryEventDefinitions) {
                 activity.addBoundaryEventDefinition(boundaryEvent);
             }
-            if (businessDataDefinition != null) {
-                activity.setBusinessDataDefinition(businessDataDefinition);
+            for (final SBusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                activity.addBusinessDataDefinition(businessDataDefinition);
             }
         }
     }

@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -48,13 +49,13 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
 
     protected List<SDataDefinition> sDataDefinitions = new ArrayList<SDataDefinition>();
 
+    private final List<SBusinessDataDefinition> businessDataDefinitions = new ArrayList<SBusinessDataDefinition>();
+
     protected List<SOperation> sOperations = new ArrayList<SOperation>();
 
     protected SLoopCharacteristics loopCharacteristics;
 
     private final List<SBoundaryEventDefinition> sBoundaryEventDefinitions = new ArrayList<SBoundaryEventDefinition>();
-
-    private SBusinessDataDefinition businessDataDefinition;
 
     public SActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
@@ -68,6 +69,9 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
         for (final DataDefinition dataDefinition : dataDefinitions) {
             sDataDefinitions.add(ServerModelConvertor.convertDataDefinition(dataDefinition));
         }
+        for (final BusinessDataDefinition businessDataDefinition : activityDefinition.getBusinessDataDefinitions()) {
+            businessDataDefinitions.add(ServerModelConvertor.convertBusinessDataDefinition(businessDataDefinition));
+        }
         final List<Operation> operations = activityDefinition.getOperations();
         for (final Operation operation : operations) {
             sOperations.add(ServerModelConvertor.convertOperation(operation));
@@ -80,8 +84,6 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
                 loopCharacteristics = new SMultiInstanceLoopCharacteristicsImpl((MultiInstanceLoopCharacteristics) loop);
             }
         }
-        businessDataDefinition = ServerModelConvertor.convertBusinessDataDefinition(activityDefinition.getBusinessDataDefinition());
-
         addBoundaryEvents(activityDefinition, transitionsMap);
     }
 
@@ -148,12 +150,30 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
     }
 
     @Override
-    public SBusinessDataDefinition getBusinessDataDefinition() {
-        return businessDataDefinition;
+    public List<SBusinessDataDefinition> getBusinessDataDefinitions() {
+        return businessDataDefinitions;
     }
 
-    public void setBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
-        this.businessDataDefinition = businessDataDefinition;
+    public void addBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
+        businessDataDefinitions.add(businessDataDefinition);
+    }
+
+    @Override
+    public SBusinessDataDefinition getBusinessDataDefinition(final String name) {
+        if (name == null) {
+            return null;
+        }
+        boolean found = false;
+        SBusinessDataDefinition businessData = null;
+        final Iterator<SBusinessDataDefinition> iterator = businessDataDefinitions.iterator();
+        while (iterator.hasNext() && !found) {
+            final SBusinessDataDefinition currentBusinessData = iterator.next();
+            if (currentBusinessData.getName().equals(name)) {
+                found = true;
+                businessData = currentBusinessData;
+            }
+        }
+        return businessData;
     }
 
 }

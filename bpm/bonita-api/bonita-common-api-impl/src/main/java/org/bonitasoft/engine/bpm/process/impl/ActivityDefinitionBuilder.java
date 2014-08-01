@@ -302,7 +302,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Adds a Business Data on the activity. The activity must contain a {@link MultiInstanceLoopCharacteristics} using dataInput.
+     * Adds a Business Data on the activity. The activity must contain a {@link MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
      *
      * @param name the name of the business data
      * @param className complete name of class defining the Business Data Type
@@ -312,7 +312,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     public ActivityDefinitionBuilder addBusinessData(final String name, final String className) {
         final BusinessDataDefinitionImpl businessData = new BusinessDataDefinitionImpl(name, null);
         businessData.setClassName(className);
-        activity.setBusinessDataDefinition(businessData);
+        activity.addBusinessDataDefinition(businessData);
         return this;
     }
 

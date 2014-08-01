@@ -37,7 +37,10 @@ public interface ActivityDefinition extends FlowNodeDefinition {
      */
     LoopCharacteristics getLoopCharacteristics();
 
-    BusinessDataDefinition getBusinessDataDefinition();
+    /**
+     * @return The list of the definitions of business data of the activity.
+     */
+    List<BusinessDataDefinition> getBusinessDataDefinitions();
 
     /**
      * @return The list of the definition of datas on this activity
@@ -53,5 +56,7 @@ public interface ActivityDefinition extends FlowNodeDefinition {
      * @return The list of the definition of boundary events on this activity
      */
     List<BoundaryEventDefinition> getBoundaryEventDefinitions();
+
+    BusinessDataDefinition getBusinessDataDefinition(String name);
 
 }

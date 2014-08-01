@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,14 +21,6 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
-import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
-import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
-import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
-import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -43,7 +35,7 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<TransitionDefinition> getTransitions();
 
     /**
-     * 
+     *
      * @return A set of GatewayDefinition
      * @see #getGatewaysList()
      * @since 6.0
@@ -53,7 +45,7 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<GatewayDefinition> getGateways();
 
     /**
-     * 
+     *
      * @return A list of GatewayDefinition
      * @since 6.1
      */
@@ -78,7 +70,9 @@ public interface FlowElementContainerDefinition extends BaseElement {
     FlowNodeDefinition getFlowNode(long sourceId);
 
     FlowNodeDefinition getFlowNode(String sourceName);
-    
+
     List<BusinessDataDefinition> getBusinessDataDefinitions();
+
+    BusinessDataDefinition getBusinessDataDefinition(String name);
 
 }

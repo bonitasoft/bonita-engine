@@ -223,10 +223,11 @@ GO
 CREATE TABLE ref_biz_data_inst (
 	tenantid NUMERIC(19, 0) NOT NULL,
   	id NUMERIC(19, 0) NOT NULL,
-  	kind NVARCHAR(10) NOT NULL,
+  	kind NVARCHAR(15) NOT NULL,
   	name NVARCHAR(255) NOT NULL,
-  	proc_inst_id NUMERIC(19, 0) NOT NULL,
-  	data_id INT NULL,
+  	proc_inst_id NUMERIC(19, 0),
+  	fn_inst_id NUMERIC(19, 0),
+  	data_id INT,
   	data_classname NVARCHAR(255) NOT NULL,
   	UNIQUE (tenantid, proc_inst_id, name),
   	PRIMARY KEY (tenantid, id)

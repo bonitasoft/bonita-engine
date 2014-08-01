@@ -30,11 +30,13 @@ public interface SActivityDefinition extends SFlowNodeDefinition {
 
     List<SDataDefinition> getSDataDefinitions();
 
-    List<SOperation> getSOperations();
+    List<SBusinessDataDefinition> getBusinessDataDefinitions();
 
+    List<SOperation> getSOperations();
     List<SBoundaryEventDefinition> getBoundaryEventDefinitions();
 
     SBoundaryEventDefinition getBoundaryEventDefinition(String name) throws SBoundaryEventNotFoundException;
 
-    SBusinessDataDefinition getBusinessDataDefinition();
+    SBusinessDataDefinition getBusinessDataDefinition(String name);
+
 }

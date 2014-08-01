@@ -32,13 +32,13 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
 
     protected final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
 
+    private final List<BusinessDataDefinition> businessDataDefinitions = new ArrayList<BusinessDataDefinition>();
+
     protected final List<Operation> operations = new ArrayList<Operation>();
 
     protected LoopCharacteristics loopCharacteristics;
 
     private final List<BoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
-
-    private BusinessDataDefinition businessDataDefinition;
 
     @Override
     public void setChildObject(final String name, final Object value) {
@@ -62,7 +62,7 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
             boundaryEventDefinitions.add((BoundaryEventDefinition) value);
         }
         if (XMLProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
-            businessDataDefinition = (BusinessDataDefinition) value;
+            businessDataDefinitions.add((BusinessDataDefinition) value);
         }
     }
 
@@ -81,8 +81,8 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
             for (final BoundaryEventDefinition boundaryEvent : boundaryEventDefinitions) {
                 activity.addBoundaryEventDefinition(boundaryEvent);
             }
-            if (businessDataDefinition != null) {
-                activity.setBusinessDataDefinition(businessDataDefinition);
+            for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                activity.addBusinessDataDefinition(businessDataDefinition);
             }
         }
     }

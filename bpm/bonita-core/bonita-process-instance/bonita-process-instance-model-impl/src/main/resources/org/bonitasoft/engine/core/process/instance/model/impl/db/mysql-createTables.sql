@@ -206,10 +206,11 @@ CREATE TABLE breakpoint (
 CREATE TABLE ref_biz_data_inst (
 	tenantid BIGINT NOT NULL,
   	id BIGINT NOT NULL,
-  	kind VARCHAR(10) NOT NULL,
+  	kind VARCHAR(15) NOT NULL,
   	name VARCHAR(255) NOT NULL,
-  	proc_inst_id BIGINT NOT NULL,
-  	data_id INT NULL,
+  	proc_inst_id BIGINT,
+  	fn_inst_id BIGINT,
+  	data_id INT,
   	data_classname VARCHAR(255) NOT NULL,
   	UNIQUE (tenantid, proc_inst_id, name),
   	PRIMARY KEY (tenantid, id)

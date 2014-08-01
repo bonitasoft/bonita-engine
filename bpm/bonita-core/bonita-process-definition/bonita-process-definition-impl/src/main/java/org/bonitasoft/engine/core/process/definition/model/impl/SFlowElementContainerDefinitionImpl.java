@@ -522,6 +522,9 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     @Override
     public SBusinessDataDefinition getBusinessDataDefinition(final String name) {
+        if (name == null) {
+            return null;
+        }
         boolean found = false;
         SBusinessDataDefinition businessData = null;
         final Iterator<SBusinessDataDefinition> iterator = sBusinessDataDefinitions.iterator();

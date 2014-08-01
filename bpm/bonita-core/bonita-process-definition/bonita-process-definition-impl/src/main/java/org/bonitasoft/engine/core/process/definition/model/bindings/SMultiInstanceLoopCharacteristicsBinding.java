@@ -55,8 +55,7 @@ public class SMultiInstanceLoopCharacteristicsBinding extends ElementBinding {
     public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.MULTI_INSTANCE_LOOP_CARDINALITY.equals(name)) {
             loopCardinality = (SExpression) value;
-        }
-        if (XMLSProcessDefinition.MULTI_INSTANCE_COMPLETION_CONDITION.equals(name)) {
+        } else if (XMLSProcessDefinition.MULTI_INSTANCE_COMPLETION_CONDITION.equals(name)) {
             completionCondition = (SExpression) value;
         }
     }

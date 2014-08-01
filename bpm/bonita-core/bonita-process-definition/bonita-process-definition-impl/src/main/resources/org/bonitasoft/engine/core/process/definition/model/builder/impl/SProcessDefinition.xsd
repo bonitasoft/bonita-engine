@@ -188,7 +188,15 @@
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-                    <xs:element name="businessDataDefinition" minOccurs="0" type="definition:SBusinessDataDefinition" />
+                    <xs:element name="businessDataDefinitions">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:choice maxOccurs="1">
+                                    <xs:element name="businessDataDefinition" minOccurs="0" maxOccurs="2" type="definition:SBusinessDataDefinition" />
+                                </xs:choice>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
 					<xs:element name="operations" maxOccurs="1">
 						<xs:complexType>
 							<xs:sequence>

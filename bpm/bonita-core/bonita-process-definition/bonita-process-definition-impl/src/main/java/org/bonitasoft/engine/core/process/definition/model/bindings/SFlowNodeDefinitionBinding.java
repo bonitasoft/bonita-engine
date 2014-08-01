@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -51,23 +51,17 @@ public abstract class SFlowNodeDefinitionBinding extends SNamedElementBinding {
     public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.DISPLAY_DESCRIPTION.equals(name)) {
             displayDescription = (SExpression) value;
-        }
-        if (XMLSProcessDefinition.DISPLAY_DESCRIPTION_AFTER_COMPLETION.equals(name)) {
+        } else if (XMLSProcessDefinition.DISPLAY_DESCRIPTION_AFTER_COMPLETION.equals(name)) {
             displayDescriptionAfterCompletion = (SExpression) value;
-        }
-        if (XMLSProcessDefinition.DISPLAY_NAME.equals(name)) {
+        } else if (XMLSProcessDefinition.DISPLAY_NAME.equals(name)) {
             displayName = (SExpression) value;
-        }
-        if (XMLSProcessDefinition.CONNECTOR_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.CONNECTOR_NODE.equals(name)) {
             connectors.add((SConnectorDefinition) value);
-        }
-        if (XMLSProcessDefinition.INCOMING_TRANSITION.equals(name)) {
+        } else if (XMLSProcessDefinition.INCOMING_TRANSITION.equals(name)) {
             incomingTransitions.add((STransitionDefinition) value);
-        }
-        if (XMLSProcessDefinition.OUTGOING_TRANSITION.equals(name)) {
+        } else if (XMLSProcessDefinition.OUTGOING_TRANSITION.equals(name)) {
             outgoingTransitions.add((STransitionDefinition) value);
-        }
-        if (XMLSProcessDefinition.DEFAULT_TRANSITION.equals(name)) {
+        } else if (XMLSProcessDefinition.DEFAULT_TRANSITION.equals(name)) {
             defaultTransition = (STransitionDefinition) value;
         }
     }
