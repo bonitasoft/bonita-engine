@@ -2,7 +2,6 @@ package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -69,27 +68,6 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-    "Interrupting" }, story = "Execute timer boundary event not triggerd.", jira = "ENGINE-500")
-    @Test
-    // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
-    public void timerBoundaryEventNotTriggered() throws Exception {
-        final long timerDuration = 1000;
-        final ProcessDefinition processDefinition = deployProcessWithTimerBoundaryEvent(timerDuration, true, "step1", "exceptionStep", "step2");
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, getUser());
-
-        Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
-
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitForProcessToFinish(processInstance);
-
-        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
-
-        disableAndDeleteProcess(processDefinition);
-    }
-
     @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupting",
             "Timer", "Call Activity" }, story = "Execute timer boundary event triggered on call activity.", jira = "ENGINE-547")
     @Test
@@ -125,39 +103,6 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         disableAndDeleteProcess(targetProcessDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-    "Call Activity" }, story = "Interrupting timer boundary event not triggered on call activity.", jira = "ENGINE-547")
-    @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
-    public void timerBoundaryEventNotTriggeredOnCallActivity() throws Exception {
-        final long timerDuration = 2500;
-        final String simpleProcessName = "targetProcess";
-        final String simpleTaskName = "stepCA";
-        final String parentUserTaskName = "step2";
-        final String exceptionFlowTaskName = "exceptionStep";
-
-        // deploy a simple process p1
-        final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName, simpleTaskName);
-
-        // deploy a process, p2, with a call activity calling p1. The call activity has an interrupting timer boundary event
-        final ProcessDefinition processDefinition = deployAndEnbleProcessWithTimerBoundaryEventOnCallActivity(timerDuration, true, simpleProcessName,
-                parentUserTaskName, exceptionFlowTaskName);
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForUserTaskAndExecuteIt("stepCA", processInstance, getUser());
-
-        Thread.sleep(timerDuration + 500); // If stepCA wasn't be executed, the timer would triggered.
-
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), getUser().getId());
-        waitForProcessToFinish(processInstance);
-
-        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
-
-        disableAndDeleteProcess(processDefinition);
-        disableAndDeleteProcess(targetProcessDefinition);
-    }
-
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
             "Interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute interrupting timer boundary event triggered on sequential multi-instance.", jira = "ENGINE-547")
     @Test
@@ -181,29 +126,6 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
         disableAndDeleteProcess(processDefinition.getId());
-    }
-
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
-            "interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute interrupting timer boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
-    @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
-    public void timerBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
-        final long timerDuration = 2500;
-        final int loopCardinality = 1;
-        final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
-                isSequential, "step2", "exceptionStep");
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
-        Thread.sleep(timerDuration + 500); // if step1 wasn't be executed the timer would triggered
-
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitForProcessToFinish(processInstance);
-
-        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
-
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
@@ -233,30 +155,6 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "Interrupting", "MultiInstance", "Parallel" }, story = "Non-interrupting timer boundary event not triggered on parallel multi-instance (normal flow)", jira = "ENGINE-547")
-    @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
-    public void timerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
-        final long timerDuration = 2500;
-        final int loopCardinality = 1;
-        final boolean isSequential = false;
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
-                isSequential, "step2", "exceptionStep");
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
-
-        Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
-
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
-
-        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
-
-        disableAndDeleteProcess(processDefinition);
-    }
-
     @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupging",
             "Timer", "Loop activity" }, story = "Interrupting timer boundary event triggered on loop activity", jira = "ENGINE-547")
     @Test
@@ -284,29 +182,6 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         checkFlowNodeWasntExecuted(processInstance.getId(), normalFlowStepName);
 
         disableAndDeleteProcess(processDefinition.getId());
-    }
-
-    @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interruping",
-            "Timer", "Loop activity" }, story = "Execute timer boundary event not triggered on loop activity", jira = "ENGINE-547")
-    @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
-    public void timerBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
-        final long timerDuration = 2500;
-        final int loopMax = 1;
-        final ProcessDefinition processDefinition = deployProcessWithBoundaryEventOnLoopActivity(timerDuration, true, loopMax, "step1", "step2",
-                "exceptionStep");
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopMax);
-
-        Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
-
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
-
-        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Timer boundary event", "Data", "Long", "On process", "Human task",

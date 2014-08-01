@@ -909,9 +909,9 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(activityId);
     }
 
-    public void waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final String state,
+    public Long waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final String state,
             final boolean useRootProcessInstance) throws Exception {
-        waitForFlowNode(processInstance.getId(), state, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
+        return waitForFlowNode(processInstance.getId(), state, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
     }
 
     public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName, final String state) throws Exception {

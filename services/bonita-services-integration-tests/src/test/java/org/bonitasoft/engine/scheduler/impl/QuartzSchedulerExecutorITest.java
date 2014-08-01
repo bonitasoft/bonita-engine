@@ -1,6 +1,5 @@
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -23,7 +22,6 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -73,28 +71,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         assertTrue(schedulerService.isStopped());
         schedulerService.start();
         assertTrue(schedulerService.isStarted());
-    }
-
-    @Test
-    public void testExecuteOnceAJob() throws Exception {
-        IncrementItselfJob.reset();
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, 10, MisfireRestartPolicy.NONE);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        waitForIncrementJobToBeExecutedXTimes(1, 5000);
-        Thread.sleep(500);
-        assertEquals(1, IncrementItselfJob.getValue());
-    }
-
-    private void waitForIncrementJobToBeExecutedXTimes(final int x, final int timeout) throws InterruptedException {
-        assertTrue("Job was not executed " + x + " time(s)", new WaitForIncrementJobToHaveValue(timeout, x).waitFor());
     }
 
     @Test
