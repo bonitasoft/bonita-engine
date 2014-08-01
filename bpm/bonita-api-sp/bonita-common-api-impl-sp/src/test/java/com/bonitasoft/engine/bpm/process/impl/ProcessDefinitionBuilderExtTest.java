@@ -49,11 +49,62 @@ public class ProcessDefinitionBuilderExtTest {
 
     @Test
     public void validMultiBusinessDataUsedWithoutADefaultExpression() throws InvalidExpressionException,
-            InvalidProcessDefinitionException {
+    InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "0.0.1");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME);
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void invalidProcessDueToACallActivityMappingUsingASimpleBusinessData() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
+        builder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, null);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step", ACTOR_NAME).addMultiInstance(true, "myEmployee").addDataInputItemRef("employee");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void invalidProcessBecauseOfTheReferenceToTheDataOutputItemDoesNotReferToADataOfTheActivity() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.0");
+        builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME)
+        .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(2)).addDataOutputItemRef("newEmployee")
+        .addLoopDataOutputRef("myEmployees");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void invalidProcessBecauseOfTheReferenceToTheLoopDataOutputDoesNotReferToADataOfTheProcess() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.0");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME)
+        .addBusinessData("newEmployee", EMPLOYEE_QUALIF_CLASSNAME)
+        .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(2)).addDataOutputItemRef("newEmployee")
+        .addLoopDataOutputRef("myEmployees");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
+        builder.done();
+    }
+
+    @Test
+    public void validProcessWhenAllReferencesAreWellSet() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.0");
+        builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME)
+        .addBusinessData("newEmployee", EMPLOYEE_QUALIF_CLASSNAME)
+        .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(2)).addDataOutputItemRef("newEmployee")
+        .addLoopDataOutputRef("myEmployees");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
         builder.done();
     }
 

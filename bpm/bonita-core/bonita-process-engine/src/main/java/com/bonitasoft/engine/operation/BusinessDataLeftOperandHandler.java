@@ -21,8 +21,6 @@ import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.bdm.Entity;
@@ -30,7 +28,6 @@ import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
@@ -108,9 +105,9 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @SuppressWarnings("unchecked")
-    protected Object getBusinessData(final String bizDataName, final long processInstanceId) throws SBonitaReadException {
+    protected Object getBusinessData(final String businessDataName, final long containerId, final String containerType) throws SBonitaReadException {
         try {
-            final SRefBusinessDataInstance reference = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
+            final SRefBusinessDataInstance reference = getRefBusinessDataInstance(businessDataName, containerId, containerType);
             final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(reference.getDataClassName());
             if (reference instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
@@ -146,9 +143,16 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
-            throws SFlowNodeNotFoundException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-        return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
+            throws SBonitaException {
+        if ("PROCESS_INSTANCE".equals(containerType)) {
+            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, containerId);
+        }
+        try {
+            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(businessDataName, containerId);
+        } catch (final SBonitaException sbe) {
+            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -181,21 +185,10 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         final String businessDataName = sLeftOperand.getName();
         final Long containerId = expressionContext.getContainerId();
         final String containerType = expressionContext.getContainerType();
-        try {
-            if (inputValues.get(businessDataName) == null) {
-                final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-                return getBusinessData(businessDataName, processInstanceId);
-            }
-        } catch (final SFlowNodeNotFoundException e) {
-            throwBonitaReadException(businessDataName, e);
-        } catch (final SFlowNodeReadException e) {
-            throwBonitaReadException(businessDataName, e);
+        if (inputValues.get(businessDataName) == null) {
+            return getBusinessData(businessDataName, containerId, containerType);
         }
         return null;
-    }
-
-    private void throwBonitaReadException(final String businessDataName, final Exception e) throws SBonitaReadException {
-        throw new SBonitaReadException("Unable to retrieve the context for business data " + businessDataName, e);
     }
 
     @Override
