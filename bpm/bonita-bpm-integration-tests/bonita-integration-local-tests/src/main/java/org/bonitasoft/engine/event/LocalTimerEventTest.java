@@ -43,9 +43,6 @@ import org.junit.Test;
  */
 public class LocalTimerEventTest extends CommonAPILocalTest {
 
-    /**
-     *
-     */
     private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
 
     @Before
@@ -139,9 +136,11 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 
         //then
+        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getCancelledState(), false);
+        assertThat(containsTimerJob(jobName)).isFalse();
+
         waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
         checkWasntExecuted(processInstance, "step");
-        assertThat(containsTimerJob(jobName)).isFalse();
 
         disableAndDeleteProcess(definition);
     }
