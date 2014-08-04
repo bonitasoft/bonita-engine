@@ -41,7 +41,6 @@ public class ServerBDMJarBuilderTest {
     public void should_addPersistenceUnittestGetPersistenceFileContentFor() throws Exception {
         final JDTCompiler compiler = mock(JDTCompiler.class);
         final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler, null));
-        assertThat(builder.getBDMCodeGenerator(bom)).isInstanceOf(ServerBDMCodeGenerator.class);
 
         builder.addPersistenceFile(directory, bom);
 

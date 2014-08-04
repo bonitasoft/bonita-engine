@@ -69,13 +69,12 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      */
     <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
-    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters, final int startIndex,
-            final int maxResults);
+    <T extends Serializable> List<T> findList(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters, int startIndex, int maxResults);
 
     <T extends Serializable> T findByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
-    <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters, final int startIndex,
-            final int maxResults);
+    <T extends Serializable> List<T> findListByNamedQuery(String queryName, Class<T> resultClass, Map<String, Serializable> parameters, int startIndex,
+            int maxResults);
 
     /**
      * Saves or updates an entity in the Business Data Repository.
@@ -84,7 +83,7 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      *            the entity to save / update.
      * @return the freshly persisted entity.
      */
-    <T extends Entity> T merge(T entity);
+    void persist(Entity entity);
 
     /**
      * Removes an entity from the Business Data Repository.
@@ -92,7 +91,15 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @param entity
      *            the entity to remove.
      */
-    void remove(final Entity entity);
+    void remove(Entity entity);
+
+    /**
+     * Reconnect the given entity with the persistence unit
+     * @param entity
+     *        the entity to reconnect.
+     * @return the connected entity.
+     */
+    Entity merge(Entity entity);
 
     /**
      * Retrieves the <code>Set</code> of known Entity class names in this Business Data Repository.
@@ -100,5 +107,6 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @return the <code>Set</code> of known Entity class names, as qualified class names.
      */
     Set<String> getEntityClassNames();
+
 
 }

@@ -19,7 +19,7 @@ public class OnlyDAOImplementationFileFilter extends AbstractFileFilter {
 
     @Override
     public boolean accept(final File file) {
-        String name = file.getName();
-        return name.endsWith("DAOImpl.class");
+        final String name = file.getName();
+        return name.endsWith("DAOImpl.class") || file.getAbsolutePath().contains("com" + File.separator + "bonitasoft");
     }
 }

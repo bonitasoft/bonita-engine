@@ -30,5 +30,11 @@
             <artifactId>assertj-core</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util-sp</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+        </dependency>
 	</dependencies>
 </project>

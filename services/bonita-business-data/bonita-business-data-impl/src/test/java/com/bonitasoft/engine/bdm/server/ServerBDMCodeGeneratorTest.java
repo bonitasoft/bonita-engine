@@ -44,8 +44,7 @@ public class ServerBDMCodeGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        final BusinessObjectModel bom = new BusinessObjectModel();
-        serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
+        serverBDMCodeGenerator = new ServerBDMCodeGenerator();
         final File tmpFolder = File.createTempFile(ServerBDMCodeGeneratorTest.class.getSimpleName(), "", Files.temporaryFolder());
         tmpFolder.delete();
         destDir = Files.newFolder(tmpFolder.getAbsolutePath());
@@ -63,7 +62,7 @@ public class ServerBDMCodeGeneratorTest {
         final BusinessObject myBo = new BusinessObject();
         myBo.setQualifiedName("com.bonitasoft.business.domain.Stool");
 
-        final String daoImplClassname = new ServerBDMCodeGenerator(new BusinessObjectModel()).toDaoImplClassname(myBo);
+        final String daoImplClassname = new ServerBDMCodeGenerator().toDaoImplClassname(myBo);
 
         assertThat(daoImplClassname).isEqualTo("com.bonitasoft.business.domain.server.StoolDAOImpl");
     }
@@ -73,7 +72,7 @@ public class ServerBDMCodeGeneratorTest {
         final BusinessObject myBo = new BusinessObject();
         myBo.setQualifiedName("Zucchini");
 
-        final String daoImplClassname = new ServerBDMCodeGenerator(new BusinessObjectModel()).toDaoImplClassname(myBo);
+        final String daoImplClassname = new ServerBDMCodeGenerator().toDaoImplClassname(myBo);
 
         assertThat(daoImplClassname).isEqualTo("server.ZucchiniDAOImpl");
     }
@@ -89,8 +88,8 @@ public class ServerBDMCodeGeneratorTest {
         aField.setName("aField");
         aField.setType(FieldType.STRING);
         employeeBO.getFields().add(aField);
-        serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
-        serverBDMCodeGenerator.generate(destDir);
+        serverBDMCodeGenerator = new ServerBDMCodeGenerator();
+        serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
         assertThat(serverDaoImplContent).contains("public EmployeeDAOImpl(BusinessDataRepository businessDataRepository)",
@@ -108,8 +107,8 @@ public class ServerBDMCodeGeneratorTest {
         aField.setName("aField");
         aField.setType(FieldType.STRING);
         employeeBO.getFields().add(aField);
-        serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
-        serverBDMCodeGenerator.generate(destDir);
+        serverBDMCodeGenerator = new ServerBDMCodeGenerator();
+        serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
         assertThat(serverDaoImplContent).contains("public List<Employee> find(int startIndex, int maxResults)",
@@ -132,8 +131,8 @@ public class ServerBDMCodeGeneratorTest {
 
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
-        serverBDMCodeGenerator.generate(destDir);
+        serverBDMCodeGenerator = new ServerBDMCodeGenerator();
+        serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
         assertThat(serverDaoImplContent).contains("public Employee findByName(String name)",
@@ -151,8 +150,8 @@ public class ServerBDMCodeGeneratorTest {
 
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
-        serverBDMCodeGenerator.generate(destDir);
+        serverBDMCodeGenerator = new ServerBDMCodeGenerator();
+        serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
         assertThat(serverDaoImplContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)",
@@ -171,8 +170,8 @@ public class ServerBDMCodeGeneratorTest {
 
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        serverBDMCodeGenerator = new ServerBDMCodeGenerator(bom);
-        serverBDMCodeGenerator.generate(destDir);
+        serverBDMCodeGenerator = new ServerBDMCodeGenerator();
+        serverBDMCodeGenerator.generateBom(bom, destDir);
 
         final String serverDaoImplContent = readGeneratedServerDAOImpl();
         assertThat(serverDaoImplContent).contains("public Long howManyAreWe()",

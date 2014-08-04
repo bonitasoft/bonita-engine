@@ -61,6 +61,17 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
+//            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
+//            final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
+//            if (!businessData.getPersistenceId().equals(refBusinessDataInstance.getDataId())) {
+//                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
+//            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
+//            if (newBusinessDataValue.getPersistenceId() == null) {
+//                businessDataRepository.persist(newBusinessDataValue);
+//            }
+//            final Long businessDataId = newBusinessDataValue.getPersistenceId();
+//            if (!businessDataId.equals(refBusinessDataInstance.getDataId())) {
+//                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, newBusinessDataValue.getPersistenceId());
             final SRefBusinessDataInstance reference = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
             checkIsValidBusinessData(reference, newValue);
             if (newValue instanceof Entity) {
@@ -86,6 +97,8 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                 }
                 return updated;
             }
+//            return businessData;
+//            return newBusinessDataValue;
 
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
