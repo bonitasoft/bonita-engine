@@ -3,6 +3,7 @@ package com.bonitasoft.engine.bpm.process.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
@@ -69,6 +70,16 @@ public class ProcessDefinitionBuilderExtTest {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
+    public void invalidProcessBecauseOfTheReferenceToTheLoopDataInputItemDoesNotReferToADataOfTheActivity() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step", ACTOR_NAME).addMultiInstance(true, "myEmployee").addDataInputItemRef("employee");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
     public void invalidProcessBecauseOfTheReferenceToTheDataOutputItemDoesNotReferToADataOfTheActivity() throws Exception {
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.0");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
@@ -103,6 +114,29 @@ public class ProcessDefinitionBuilderExtTest {
         .addBusinessData("newEmployee", EMPLOYEE_QUALIF_CLASSNAME)
         .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(2)).addDataOutputItemRef("newEmployee")
         .addLoopDataOutputRef("myEmployees");
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
+        builder.done();
+    }
+
+    @Test
+    public void validProcessUsingAMultiInstanceActivityWithRefToActivityAndProcessVariables() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.0");
+        builder.addData("loopDataInput", List.class.getName(), null);
+        builder.addData("loopDataOutputRef", List.class.getName(), null);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("task1", ACTOR_NAME);
+        userTaskBuilder.addShortTextData("dataInputItemRef", null);
+        userTaskBuilder.addShortTextData("dataOutputItemRef", null);
+        userTaskBuilder.addMultiInstance(false, "loopDataInput").addDataInputItemRef("dataInputItemRef").addDataOutputItemRef("dataOutputItemRef")
+        .addLoopDataOutputRef("loopDataOutputRef");
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void invalidProcessBecauseOfTheActivityContainsABusinessDataButNotTheMultiInstanceBehaviour() throws Exception {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step", ACTOR_NAME).addBusinessData("employee", EMPLOYEE_QUALIF_CLASSNAME);
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
         builder.done();

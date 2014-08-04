@@ -12,12 +12,10 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.BusinessDataDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
@@ -66,12 +64,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
     }
 
     @Override
-    public DesignProcessDefinition done() throws InvalidProcessDefinitionException {
-        validateInitialValueOfBusinessData();
-        return super.done();
-    }
-
-    private void validateInitialValueOfBusinessData() {
+    protected void validateBusinessData() {
         final FlowElementContainerDefinition processContainer = process.getProcessContainer();
         final List<BusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
         for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
@@ -99,31 +92,42 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
             if (activity.getLoopCharacteristics() instanceof MultiInstanceLoopCharacteristics) {
                 final MultiInstanceLoopCharacteristics multiInstanceCharacteristics = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
                 final String loopDataInputRef = multiInstanceCharacteristics.getLoopDataInputRef();
-                if (loopDataInputRef != null && processContainer.getBusinessDataDefinition(loopDataInputRef) == null) {
-                    addError("The activity" + activity.getName() + "contains a reference " + loopDataInputRef
+                if (!isReferenceValid(loopDataInputRef)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + loopDataInputRef
                             + " for the loop data input to an unknown data");
                 }
                 final String dataInputItemRef = multiInstanceCharacteristics.getDataInputItemRef();
-                if (dataInputItemRef != null && activity.getBusinessDataDefinition(dataInputItemRef) == null) {
-                    addError("The activity" + activity.getName() + "contains a reference " + dataInputItemRef
+                if (!isReferenceValid(dataInputItemRef, activity)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + dataInputItemRef
                             + " for the data input item to an unknown data");
                 }
                 final String dataOutputItemRef = multiInstanceCharacteristics.getDataOutputItemRef();
-                if (dataOutputItemRef != null && activity.getBusinessDataDefinition(dataOutputItemRef) == null) {
-                    addError("The activity" + activity.getName() + "contains a reference " + dataOutputItemRef
-                            + " for the data input item to an unknown data");
+                if (!isReferenceValid(dataOutputItemRef, activity)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + dataOutputItemRef
+                            + " for the data output item to an unknown data");
                 }
                 final String loopDataOutputRef = multiInstanceCharacteristics.getLoopDataOutputRef();
-                if (loopDataOutputRef != null && processContainer.getBusinessDataDefinition(loopDataOutputRef) == null) {
-                    addError("The activity" + activity.getName() + "contains a reference " + loopDataOutputRef
+                if (!isReferenceValid(loopDataOutputRef)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + loopDataOutputRef
                             + " for the loop data input to an unknown data");
                 }
-
             } else if (!dataDefinitions.isEmpty()) {
                 addError("The activity " + activity.getName() + " contains business data but this activity does not have the multiple instance behaviour");
             }
         }
+    }
 
+    private boolean isReferenceValid(final String dataReference) {
+        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
+        return dataReference == null || processContainer.getBusinessDataDefinition(dataReference) != null
+                || processContainer.getDataDefinition(dataReference) != null;
+    }
+
+    private boolean isReferenceValid(final String dataReference, final ActivityDefinition activity) {
+        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
+        return dataReference == null || activity.getBusinessDataDefinition(dataReference) != null
+                || processContainer.getBusinessDataDefinition(dataReference) != null || activity.getDataDefinition(dataReference) != null
+                || processContainer.getDataDefinition(dataReference) != null;
     }
 
 }
