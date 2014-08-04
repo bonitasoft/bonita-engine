@@ -19,6 +19,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Romain Bioteau
  */
 public class BusinessDataDefinitionImpl extends NamedElementImpl implements BusinessDataDefinition {
 
@@ -29,6 +30,8 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     private String type;
 
     private String className;
+
+    private boolean multiple = false;
 
     private Expression defaultValueExpression;
 
@@ -45,14 +48,6 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     @Override
     public String getClassName() {
         return className;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(final String type) {
-        this.type = type;
     }
 
     @Override
@@ -73,12 +68,28 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     }
 
     @Override
+    public boolean isMultiple() {
+        return multiple;
+    }
+
+    public void setMultiple(final boolean multiple) {
+        this.multiple = multiple;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessDataDefinitionImpl [description=" + description + ", type=" + type + ", className=" + className + ", multiple=" + multiple
+                + ", defaultValueExpression=" + defaultValueExpression + "]";
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (className == null ? 0 : className.hashCode());
         result = prime * result + (defaultValueExpression == null ? 0 : defaultValueExpression.hashCode());
         result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (multiple ? 1231 : 1237);
         result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
@@ -116,6 +127,9 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
         } else if (!description.equals(other.description)) {
             return false;
         }
+        if (multiple != other.multiple) {
+            return false;
+        }
         if (type == null) {
             if (other.type != null) {
                 return false;
@@ -124,23 +138,6 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("BusinessDataDefinitionImpl [name=");
-        builder.append(getName());
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", type=");
-        builder.append(type);
-        builder.append(", className=");
-        builder.append(className);
-        builder.append(", defaultValueExpression=");
-        builder.append(defaultValueExpression);
-        builder.append("]");
-        return builder.toString();
     }
 
 }
