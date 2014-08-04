@@ -213,8 +213,12 @@ CREATE TABLE ref_biz_data_inst (
   	data_id INT,
   	data_classname VARCHAR(255) NOT NULL,
   	UNIQUE (tenantid, proc_inst_id, name),
+  	UNIQUE (tenantid, fn_inst_id, name),
   	PRIMARY KEY (tenantid, id)
 );
+
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE multi_biz_data (
 	tenantid INT8 NOT NULL,
