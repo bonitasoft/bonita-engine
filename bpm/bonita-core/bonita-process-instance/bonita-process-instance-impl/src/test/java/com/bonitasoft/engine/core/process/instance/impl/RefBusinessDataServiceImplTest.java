@@ -27,7 +27,7 @@ import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDa
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl;
+import com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl;
 import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilderExt;
 
 public class RefBusinessDataServiceImplTest {
@@ -52,8 +52,8 @@ public class RefBusinessDataServiceImplTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    private SRefBusinessDataInstance buildSRefBusinessDataInstance() {
-        final SRefBusinessDataInstanceImpl instance = new SRefBusinessDataInstanceImpl();
+    private SSimpleRefBusinessDataInstanceImpl buildSRefBusinessDataInstance() {
+        final SSimpleRefBusinessDataInstanceImpl instance = new SSimpleRefBusinessDataInstanceImpl();
         instance.setName("myLeaveRequest");
         instance.setDataId(45l);
         instance.setDataClassName("org.bonitasoft.LeaveRequest");
@@ -96,7 +96,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test
     public void updateRefBusinessData() throws Exception {
-        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
+        final SSimpleRefBusinessDataInstanceImpl refBusinessDataInstance = buildSRefBusinessDataInstance();
         final long dataId = 564654654654654l;
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);
@@ -109,7 +109,7 @@ public class RefBusinessDataServiceImplTest {
 
     @Test(expected = SRefBusinessDataInstanceModificationException.class)
     public void updateRefBusinessDataThrowException() throws Exception {
-        final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
+        final SSimpleRefBusinessDataInstanceImpl refBusinessDataInstance = buildSRefBusinessDataInstance();
         final long dataId = 564654654654654l;
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);

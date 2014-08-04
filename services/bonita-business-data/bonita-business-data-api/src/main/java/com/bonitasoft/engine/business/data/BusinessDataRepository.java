@@ -41,6 +41,18 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     <T extends Entity> T findById(Class<T> entityClass, Long primaryKey) throws SBusinessDataNotFoundException;
 
     /**
+     * Finds entities that is defined in a deployed Business Data Model. If a primary key does not match an existing entity no exception is thrown and nothing
+     * is added in the list.
+     *
+     * @param entityClass
+     *        the class of the entity to search for.
+     * @param primaryKeys
+     *        the primary keys.
+     * @return the list of found entities
+     */
+    <T extends Entity> List<T> findByIds(Class<T> entityClass, List<Long> primaryKeys);
+
+    /**
      * Finds an Entity that is defined in a deployed Business Data Model, through JPQL query.
      *
      * @param entityClass
@@ -83,7 +95,6 @@ public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
      * Reconnect the given entity with the persistence unit
-     * 
      * @param entity
      *        the entity to reconnect.
      * @return the connected entity.

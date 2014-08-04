@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.execution;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -124,14 +125,39 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 final SExpression expression = bdd.getDefaultValueExpression();
                 Long primaryKey = null;
                 if (expression != null) {
+                    Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                    businessData = businessDataRepository.merge(businessData);
+                    primaryKey = businessData.getPersistenceId();
+                Long primaryKey = null;
+                if (expression != null) {
                     final Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
                     businessDataRepository.persist(businessData);
                     primaryKey = businessData.getPersistenceId();
+                if (bdd.isMultiple()) {
+                    final List<Long> dataIds = new ArrayList<Long>();
+                    if (expression != null) {
+                        final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
+                        for (final Entity entity : businessData) {
+                            final Entity tmp = businessDataRepository.merge(entity);
+                            dataIds.add(tmp.getPersistenceId());
+                        }
+                    }
+                    final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), dataIds, bdd.getClassName())
+                            .done();
+                    refBusinessDataService.addRefBusinessDataInstance(instance);
+                } else {
+                    Long primaryKey = null;
+                    if (expression != null) {
+                        Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                        businessData = businessDataRepository.merge(businessData);
+                        primaryKey = businessData.getPersistenceId();
+                    }
+                    final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
+                            .done();
+                    refBusinessDataService.addRefBusinessDataInstance(instance);
                 }
-                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
-                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
-                        .done();
-                refBusinessDataService.addRefBusinessDataInstance(instance);
             }
             createDocuments(sDefinition, sInstance, userId);
             if (connectors != null) {
