@@ -61,6 +61,10 @@ public class ApplicationAPIIT extends CommonAPISPTest {
 
     @After
     public void tearDown() throws Exception {
+        final SearchResult<Application> searchResult = applicationAPI.searchApplications(new SearchOptionsBuilder(0, 1000).done());
+        for (final Application app : searchResult.getResult()) {
+            applicationAPI.deleteApplication(app.getId());
+        }
         logoutOnTenant();
         BPMTestSPUtil.deleteUserOnDefaultTenant(user);
     }
@@ -160,11 +164,124 @@ public class ApplicationAPIIT extends CommonAPISPTest {
         applicationAPI.deleteApplication(marketing.getId());
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on name",
+    "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_name() throws Exception {
+        //given
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationSearchDescriptor.NAME, "Engineering dashboard");
+
+        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(1);
+        assertThat(applications.getResult()).containsExactly(engineering);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on path",
+    "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_path() throws Exception {
+        //given
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationSearchDescriptor.PATH, "/hr");
+
+        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(1);
+        assertThat(applications.getResult()).containsExactly(hr);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on version",
+    "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_version() throws Exception {
+        //given
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "2.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "2.0", "/marketing");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
+
+        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(2);
+        assertThat(applications.getResult()).containsExactly(hr, marketing);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
+    "search term" })
+    @Test
+    public void searchApplications_can_use_search_term() throws Exception {
+        //given
+        final ApplicationCreator hrCreator = new ApplicationCreator("My HR dashboard", "2.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("My Marketing dashboard", "2.0", "/marketing");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.searchTerm("My");
+
+        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(2);
+        assertThat(applications.getResult()).containsExactly(hr, marketing);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+    }
+
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.NAME, Order.ASC);
+        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
         final SearchOptions options = builder.done();
         return options;
+    }
+
+    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
+        builder.sort(ApplicationSearchDescriptor.NAME, Order.ASC);
+        return builder;
     }
 
 }
