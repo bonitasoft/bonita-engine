@@ -63,6 +63,8 @@ public interface FlowElementContainerDefinition extends BaseElement {
 
     List<DataDefinition> getDataDefinitions();
 
+    DataDefinition getDataDefinition(String name);
+
     List<DocumentDefinition> getDocumentDefinitions();
 
     List<ConnectorDefinition> getConnectors();

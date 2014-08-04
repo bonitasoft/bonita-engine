@@ -15,9 +15,9 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
@@ -169,20 +169,12 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     @Override
     public BusinessDataDefinition getBusinessDataDefinition(final String name) {
-        if (name == null) {
-            return null;
-        }
-        boolean found = false;
-        BusinessDataDefinition businessData = null;
-        final Iterator<BusinessDataDefinition> iterator = businessDataDefinitions.iterator();
-        while (iterator.hasNext() && !found) {
-            final BusinessDataDefinition currentBusinessData = iterator.next();
-            if (currentBusinessData.getName().equals(name)) {
-                found = true;
-                businessData = currentBusinessData;
-            }
-        }
-        return businessData;
+        return ObjectSeeker.getNamedElement(businessDataDefinitions, name);
+    }
+
+    @Override
+    public DataDefinition getDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
 }

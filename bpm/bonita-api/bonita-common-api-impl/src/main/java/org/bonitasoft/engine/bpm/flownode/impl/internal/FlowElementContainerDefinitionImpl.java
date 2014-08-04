@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -389,20 +390,12 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     @Override
     public BusinessDataDefinition getBusinessDataDefinition(final String name) {
-        if (name == null) {
-            return null;
-        }
-        boolean found = false;
-        BusinessDataDefinition businessData = null;
-        final Iterator<BusinessDataDefinition> iterator = businessDataDefinitions.iterator();
-        while (iterator.hasNext() && !found) {
-            final BusinessDataDefinition currentBusinessData = iterator.next();
-            if (currentBusinessData.getName().equals(name)) {
-                found = true;
-                businessData = currentBusinessData;
-            }
-        }
-        return businessData;
+        return ObjectSeeker.getNamedElement(businessDataDefinitions, name);
+    }
+
+    @Override
+    public DataDefinition getDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
 }
