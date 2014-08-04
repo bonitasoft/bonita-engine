@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;

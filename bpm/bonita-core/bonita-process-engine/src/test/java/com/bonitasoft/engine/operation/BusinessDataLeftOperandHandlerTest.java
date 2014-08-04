@@ -6,10 +6,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -76,7 +74,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final Long bizDataId = 98744L;
         doReturn(refBiz).when(spy).getRefBusinessDataInstance(eq("myBizData"), eq(9L), eq("some container"));
         final Peticion bizData = new Peticion(bizDataId);
-        doNothing().when(repository).persist(eq(bizData));
+        doReturn(bizData).when(repository).merge(eq(bizData));
 
         spy.update(createLeftOperand("myBizData"), bizData, 9L, "some container");
 
@@ -87,7 +85,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
         private static final long serialVersionUID = 1L;
 
-        private Long id;
+        private final Long id;
 
         public Peticion(final Long id) {
             this.id = id;
@@ -96,10 +94,6 @@ public class BusinessDataLeftOperandHandlerTest {
         @Override
         public Long getPersistenceId() {
             return id;
-        }
-
-        public void setPersistenceId(final Long id) {
-            this.id = id;
         }
 
         @Override
@@ -112,7 +106,7 @@ public class BusinessDataLeftOperandHandlerTest {
     @Test
     public void insertBusinessData() throws SBonitaException {
         final long dataId = 789l;
-        final Employee employee = new Employee(null, 52L, "firstName", "lastName");
+        final Employee employee = new Employee(dataId, 52L, "firstName", "lastName");
         final long processInstanceId = 76846321l;
 
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
@@ -121,6 +115,7 @@ public class BusinessDataLeftOperandHandlerTest {
         when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
         when(refBusinessDataService.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(refBizDataInstance);
         when(refBizDataInstance.getDataId()).thenReturn(null);
+        when(repository.merge(employee)).thenReturn(employee);
         doAnswer(new Answer<Void>() {
 
             @Override
@@ -129,19 +124,10 @@ public class BusinessDataLeftOperandHandlerTest {
             }
 
         }).when(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
-        doAnswer(new Answer<Void>() {
-
-            @Override
-            public Void answer(final InvocationOnMock invocation) throws Throwable {
-                employee.setPersistenceId(dataId);
-                return null;
-            }
-
-        }).when(repository).persist(employee);
 
         leftOperandHandler.update(leftOperand, employee, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
 
-        verify(repository).persist(employee);
+        verify(repository).merge(employee);
         verify(refBusinessDataService).getRefBusinessDataInstance("unused", processInstanceId);
         verify(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
     }
@@ -246,13 +232,14 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
         final SSimpleRefBusinessDataInstance ref = createRefBusinessDataInstance(123456789L);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
+        doReturn(bizData).when(repository).merge(bizData);
 
         // when
         leftOperandHandler.update(leftOperand, bizData, 1, "cont");
 
         // then
-        verify(repository, never()).persist(bizData);
-        verify(refBusinessDataService, never()).updateRefBusinessDataInstance(eq(ref), anyLong());
+        verify(repository).merge(bizData);
+        verify(refBusinessDataService, times(0)).updateRefBusinessDataInstance(eq(ref), anyLong());
     }
 
     private SSimpleRefBusinessDataInstance createRefBusinessDataInstance(final Long dataId) {
@@ -266,24 +253,17 @@ public class BusinessDataLeftOperandHandlerTest {
         // given: business data having null id and ref having null id
         final SLeftOperand leftOperand = createLeftOperand("bizData");
         final Peticion bizData = new Peticion(null);
+        final Peticion mergedBizData = new Peticion(123456789L);
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
         final SSimpleRefBusinessDataInstance ref = createRefBusinessDataInstance(null);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
-        doAnswer(new Answer<Void>() {
-
-            @Override
-            public Void answer(final InvocationOnMock invocation) throws Throwable {
-                bizData.setPersistenceId(123456789L);
-                return null;
-            }
-
-        }).when(repository).persist(bizData);
+        doReturn(mergedBizData).when(repository).merge(bizData);
 
         // when
         leftOperandHandler.update(leftOperand, bizData, 1, "cont");
 
         // then
-        verify(repository).persist(bizData);
+        verify(repository, times(1)).merge(bizData);
         verify(refBusinessDataService, times(1)).updateRefBusinessDataInstance(ref, 123456789L);
     }
 
@@ -295,87 +275,14 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
         final SSimpleRefBusinessDataInstance ref = createRefBusinessDataInstance(null);
         doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
+        doReturn(bizData).when(repository).merge(bizData);
 
         // when
         leftOperandHandler.update(leftOperand, bizData, 1, "cont");
 
         // then
-        verify(repository, never()).persist(bizData);
+        verify(repository, times(1)).merge(bizData);
         verify(refBusinessDataService, times(1)).updateRefBusinessDataInstance(ref, 123456789L);
-    }
-
-    @Test
-    public void should_update_an_existing_reference_with_a_new_business_data() throws Exception {
-        // given: business data having null id and ref having not null id
-        final SLeftOperand leftOperand = createLeftOperand("bizData");
-        final Peticion bizData = new Peticion(null);
-        final Peticion mergedBizData = new Peticion(123456789L);
-        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456L);
-        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
-        doReturn(mergedBizData).when(repository).merge(bizData);
-
-        // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
-
-        // then
-        verify(repository).merge(bizData);
-        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
-    }
-
-    @Test
-    public void should_update_an_existing_reference_with_an_updated_business_data() throws Exception {
-        // given: business data having null id and ref having not null id
-        final SLeftOperand leftOperand = createLeftOperand("bizData");
-        final Peticion bizData = new Peticion(123456789L);
-        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(123456L);
-        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
-        doReturn(bizData).when(repository).merge(bizData);
-
-        // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
-
-        // then
-        verify(repository).merge(bizData);
-        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
-    }
-
-    @Test
-    public void should_update_a_new_reference_with_a_new_business_data() throws Exception {
-        // given: business data having null id and ref having not null id
-        final SLeftOperand leftOperand = createLeftOperand("bizData");
-        final Peticion bizData = new Peticion(null);
-        final Peticion mergedBizData = new Peticion(123456789L);
-        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
-        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
-        doReturn(mergedBizData).when(repository).merge(bizData);
-
-        // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
-
-        // then
-        verify(repository).merge(bizData);
-        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
-    }
-
-    @Test
-    public void should_update_a_new_reference_with_an_updated_business_data() throws Exception {
-        // given: business data having null id and ref having not null id
-        final SLeftOperand leftOperand = createLeftOperand("bizData");
-        final Peticion bizData = new Peticion(123456789L);
-        doReturn(123l).when(flowNodeInstanceService).getProcessInstanceId(1l, "cont");
-        final SRefBusinessDataInstanceImpl ref = createRefBusinessDataInstance(null);
-        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("bizData", 123l);
-        doReturn(bizData).when(repository).merge(bizData);
-
-        // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "cont");
-
-        // then
-        verify(repository).merge(bizData);
-        verify(refBusinessDataService).updateRefBusinessDataInstance(ref, 123456789L);
     }
 
     @Test
