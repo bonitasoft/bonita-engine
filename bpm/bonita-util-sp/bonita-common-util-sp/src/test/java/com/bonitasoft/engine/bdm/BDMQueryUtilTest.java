@@ -3,6 +3,7 @@ package com.bonitasoft.engine.bdm;
 import static ch.lambdaj.Lambda.extract;
 import static ch.lambdaj.Lambda.on;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,10 +13,12 @@ import org.junit.Test;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
  * @author Romain Bioteau
@@ -188,11 +191,64 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createDefaultQueryForFieldShouldGenerateOrderByPersistenceId() throws Exception {
+    public void createQueryContentForFieldShouldGenerateOrderByPersistenceId() throws Exception {
         // when:
         final String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new SimpleField());
         // then:
         assertThat(queryContent).contains("ORDER BY n.persistenceId");
     }
+
+    @Test
+    public void createDefaultQueryForLazyFieldShouldGenerateValidQuery() throws Exception {
+        //given:
+
+        final BusinessObject addressBo = new BusinessObject();
+        addressBo.setQualifiedName("org.bonita.Address");
+        final SimpleField streetField = new SimpleField();
+        streetField.setName("street");
+        streetField.setType(FieldType.STRING);
+        addressBo.addField(streetField);
+
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final SimpleField field = new SimpleField();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+
+        final RelationField f2 = new RelationField();
+        f2.setName("manager");
+        f2.setType(Type.AGGREGATION);
+        f2.setReference(bo);
+        f2.setFetchType(FetchType.LAZY);
+        bo.addField(f2);
+
+        final RelationField f3 = new RelationField();
+        f3.setName("addresses");
+        f3.setType(Type.COMPOSITION);
+        f3.setCollection(true);
+        f3.setReference(addressBo);
+        f3.setFetchType(FetchType.LAZY);
+        bo.addField(f3);
+
+        // when:
+        Query query = BDMQueryUtil.createQueryForLazyField(bo, f2);
+        // then:
+        assertThat(query).isNotNull();
+        assertThat(query.getName()).isEqualTo("findManagerByEmployeePersistenceId");
+        assertThat(query.getContent()).isEqualTo("SELECT e.manager\nFROM Employee e\nWHERE e.persistenceId= :persistenceId");
+        assertThat(query.getReturnType()).isEqualTo(bo.getQualifiedName());
+        assertThat(query.getQueryParameters()).extracting("name", "className").contains(tuple(Field.PERSISTENCE_ID, Long.class.getName()));
+
+        // when:
+        query = BDMQueryUtil.createQueryForLazyField(bo, f3);
+        // then:
+        assertThat(query).isNotNull();
+        assertThat(query.getName()).isEqualTo("findAddressesByEmployeePersistenceId");
+        assertThat(query.getContent()).isEqualTo("SELECT e.addresses\nFROM Employee e\nWHERE e.persistenceId= :persistenceId");
+        assertThat(query.getReturnType()).isEqualTo(List.class.getName());
+        assertThat(query.getQueryParameters()).extracting("name", "className").contains(tuple(Field.PERSISTENCE_ID, Long.class.getName()));
+    }
+
 
 }

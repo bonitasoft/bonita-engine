@@ -16,6 +16,7 @@ import java.util.Set;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
@@ -83,6 +84,9 @@ public class BusinessObjectModelValidator {
                 for (final QueryParameter p : q.getQueryParameters()) {
                     objectsToValidate.add(p);
                 }
+            }
+            for (final Index index : bo.getIndexes()) {
+                objectsToValidate.add(index);
             }
         }
         return objectsToValidate;

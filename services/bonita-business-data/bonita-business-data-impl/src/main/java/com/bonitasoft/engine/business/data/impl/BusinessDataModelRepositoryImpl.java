@@ -13,6 +13,7 @@ import static java.util.Arrays.asList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import org.xml.sax.SAXException;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
+import com.bonitasoft.engine.bdm.client.ResourcesLoader;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -64,7 +66,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String DAO_JAR_NAME = "bdm-dao.jar";
 
-    private static final String SERVER_DAO_JAR_NAME = "bdm-server-dao.jar";
+    private static final String BOM_NAME = "bom.zip";
 
     private final DependencyService dependencyService;
 
@@ -101,7 +103,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
-        List<SDependency> searchBDMDependencies = searchBDMDependencies();
+        final List<SDependency> searchBDMDependencies = searchBDMDependencies();
         if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
             return String.valueOf(searchBDMDependencies.get(0).getId());
         }
@@ -132,7 +134,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createClientBDMZip(model);
-        long bdmVersion = createAndDeployServerBDMJar(tenantId, model, bdmZip);
+        final long bdmVersion = createAndDeployServerBDMJar(tenantId, model, bdmZip);
         return String.valueOf(bdmVersion);
     }
 
@@ -194,7 +196,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     protected byte[] generateClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException, IOException {
         final JDTCompiler compiler = new JDTCompiler();
-        final AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, compilationPath);
+        AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader(), compilationPath);
 
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         // Build jar with Model
@@ -202,8 +204,29 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         resources.put(MODEL_JAR_NAME, modelJarContent);
 
         // Build jar with DAO
+        builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader(), compilationPath);;
         final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
+
+        //Add bom.xml
+        try {
+            resources.put(BOM_NAME, new BusinessObjectModelConverter().zip(model));
+        } catch (final JAXBException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final SAXException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+
+        //Client DAO impl dependencies
+        InputStream resourceAsStream = null;
+        try {
+            resourceAsStream = BusinessDataModelRepositoryImpl.class.getResourceAsStream("/javassist-3.18.1-GA.jar.res");
+            resources.put("javassist-3.18.1-GA.jar", IOUtil.getAllContentFrom(resourceAsStream));
+        } finally {
+            if (resourceAsStream != null) {
+                resourceAsStream.close();
+            }
+        }
 
         return IOUtil.generateZip(resources);
     }

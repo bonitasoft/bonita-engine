@@ -1,15 +1,14 @@
 /**
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * 
+ *
  */
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -19,14 +18,12 @@ import org.junit.Test;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
-import com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder;
-import com.bonitasoft.engine.bdm.model.builder.FieldBuilder;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
- * 
+ *
  */
 public class BusinessObjectValidationRuleTest {
 
@@ -53,19 +50,19 @@ public class BusinessObjectValidationRuleTest {
 
     @Test
     public void should_validate_that_qualified_name_is_not_null() throws Exception {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(null);
-        
-        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
-        
+
+        final ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
+
         assertThat(validationStatus).isNotOk();
     }
-    
+
     @Test
     public void shoudCheckRule_returns_valid_status() throws Exception {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo");
-        SimpleField field = new SimpleField();
+        final SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
@@ -78,13 +75,13 @@ public class BusinessObjectValidationRuleTest {
 
     @Test
     public void shoudCheckRule_returns_error_status() throws Exception {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus).isNotOk();
 
         bo.setQualifiedName("org.bonita.Bo 2");
-        SimpleField field = new SimpleField();
+        final SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         validationStatus = businessObjectValidationRule.validate(bo);
@@ -99,36 +96,36 @@ public class BusinessObjectValidationRuleTest {
 
     @Test
     public void shoudCheckRule_returns_error_status_for_duplicated_query_name() throws Exception {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
-        SimpleField field = new SimpleField();
+        final SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         bo.addQuery("toto", "titi", List.class.getName());
         bo.addQuery("toto", "titi", List.class.getName());
-        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
+        final ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus).isNotOk();
     }
 
     @Test
     public void shoudCheckRule_returns_error_status_for_duplicated_constraint_name() throws Exception {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
-        SimpleField field = new SimpleField();
+        final SimpleField field = new SimpleField();
         field.setName("firstName");
         bo.addField(field);
         bo.addUniqueConstraint("toto", "firstName");
         bo.addUniqueConstraint("toto", "firstName");
-        ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
+        final ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus).isNotOk();
     }
 
     @Test
     public void should_validate_that_simple_name_contain_no_underscore() throws Exception {
-        BusinessObject businessObject = aBO("Name_withUnderscore").withField(aBooleanField("field")).build();
-        
-        ValidationStatus validationStatus = businessObjectValidationRule.validate(businessObject);
-        
+        final BusinessObject businessObject = aBO("Name_withUnderscore").withField(aBooleanField("field")).build();
+
+        final ValidationStatus validationStatus = businessObjectValidationRule.validate(businessObject);
+
         assertThat(validationStatus).isNotOk();
     }
 }

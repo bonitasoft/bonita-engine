@@ -1,5 +1,10 @@
 package com.bonitasoft.engine.bdm.client;
 
+
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aRelationField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Strings.concat;
 
@@ -21,13 +26,13 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.CompilableCode;
+import com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
@@ -42,8 +47,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @Before
     public void setUp() {
-        final BusinessObjectModel bom = new BusinessObjectModel();
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
         try {
             destDir = Files.newTemporaryFolder();
         } catch (final FilesException fe) {
@@ -56,17 +60,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     @After
     public void tearDown() throws Exception {
         FileUtils.deleteDirectory(destDir);
-    }
-
-    @Test
-    public void shouldbuildAstFromBom_FillModel() throws Exception {
-        final BusinessObjectModel bom = new BusinessObjectModel();
-        final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("Employee");
-        bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.buildJavaModelFromBom();
-        assertThat(bdmCodeGenerator.getModel()._getClass("Employee")).isNotNull();
     }
 
     @Test
@@ -120,8 +113,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
         final String daoContent = readGeneratedDAOInterface();
         assertThat(daoContent).contains("public List<Employee> findByName(String name, int startIndex, int maxResults)");
     }
@@ -145,8 +138,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.getQueries().add(query);
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
         final String daoContent = readGeneratedDAOInterface();
 
         assertThat(daoContent).contains("public List<Employee> getEmployeesByNameAndAge(Integer miEdad, String myName, int startIndex, int maxResults)");
@@ -196,8 +189,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.addUniqueConstraint("TOTO", "firstName", "lastName");
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(employeeBO);
-        bdmCodeGenerator = new ClientBDMCodeGenerator(bom);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
     }
 
     private String readGeneratedDAOInterface() throws IOException {
@@ -229,60 +222,84 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         employeeBO.addIndex("IDX_1", "firstName, lastName");
         model.addBusinessObject(employeeBO);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(model, destDir);
 
-        assertFilesAreEqual("Employee.java", "Employee.test");
+        assertFilesAreEqual("Employee.java", "Employee.java");
     }
 
     @Test
     public void addSimpleReferenceWithComposition() throws Exception {
-        final BusinessObjectModel model = build(true, false);
+        final RelationField aggregation = aRelationField().withName("address").composition().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.test");
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.java");
     }
 
     @Test
     public void addListReferenceWithComposition() throws Exception {
-        final BusinessObjectModel model = build(true, true);
+        final RelationField eager = aRelationField().withName("addresses").composition().multiple().referencing(addressBO()).build();
+        final RelationField lazy = aRelationField().withName("skills").composition().multiple().lazy().referencing(skillBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(eager, lazy);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListComposition.test");
+        assertFilesAreEqual("Employee.java", "EmployeeListComposition.java");
+        assertFilesAreEqual("Skill.java", "Skill.java");
     }
 
     @Test
     public void addSimpleReferenceWithAggregation() throws Exception {
-        final BusinessObjectModel model = build(false, false);
+        final RelationField aggregation = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregation);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.test");
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.java");
     }
 
     @Test
     public void addListReferenceWithAggregation() throws Exception {
-        final BusinessObjectModel model = build(false, true);
+        final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().referencing(addressBO()).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.test");
+        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.java");
+    }
+
+    @Test
+    public void addListReferenceWithLazyAggregation() throws Exception {
+        final BusinessObject addressBO = addressBO();
+        addressBO.addUniqueConstraint("city", "city");
+        final RelationField aggregationMultiple = aRelationField().withName("addresses").aggregation().multiple().lazy().referencing(addressBO).build();
+        final BusinessObjectModel bom = employeeWithRelations(aggregationMultiple);
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(bom, destDir);
+
+        assertFilesAreEqual("AddressDAO.java", "AddressDAOWithLazyReferenceOnEmployee.java");
+        assertFilesAreEqual("AddressDAOImpl.java", "AddressDAOImplWithLazyReferenceOnEmployee.java");
     }
 
     @Test
     public void addList() throws Exception {
         final BusinessObjectModel model = build();
 
-        bdmCodeGenerator = new ClientBDMCodeGenerator(model);
-        bdmCodeGenerator.generate(destDir);
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(model, destDir);
 
-        assertFilesAreEqual("Forecast.java", "ForecastList.test");
+        assertFilesAreEqual("Forecast.java", "ForecastList.java");
+    }
+
+    private BusinessObject skillBO() {
+        return aBO("Skill").withField(aStringField("skill").build()).build();
     }
 
     private BusinessObjectModel build() {
@@ -300,52 +317,30 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         return model;
     }
 
-    private BusinessObjectModel build(final boolean composition, final boolean collection) {
-        final SimpleField street = new SimpleField();
-        street.setName("street");
-        street.setType(FieldType.STRING);
-        final SimpleField city = new SimpleField();
-        city.setName("city");
-        city.setType(FieldType.STRING);
-        final BusinessObject addressBO = new BusinessObject();
-        addressBO.setQualifiedName("Address");
-        addressBO.addField(street);
-        addressBO.addField(city);
-
-        final SimpleField field = new SimpleField();
-        field.setName("firstName");
-        field.setType(FieldType.STRING);
-        final RelationField address = new RelationField();
-        if (composition) {
-            address.setType(Type.COMPOSITION);
-        } else {
-            address.setType(Type.AGGREGATION);
+    private BusinessObjectModel employeeWithRelations(final RelationField... field) {
+        final BusinessObject employeeBO = employeeBO();
+        BusinessObjectModelBuilder aBom = aBOM().withBO(employeeBO);
+        for (final RelationField relationField : field) {
+            employeeBO.addField(relationField);
+            aBom = aBom.withBO(relationField.getReference());
         }
-        if (collection) {
-            address.setName("addresses");
-            address.setCollection(Boolean.TRUE);
-        } else {
-            address.setName("address");
-            address.setCollection(Boolean.FALSE);
-        }
-        address.setReference(addressBO);
+        return aBom.build();
+    }
 
-        final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("Employee");
-        employeeBO.addField(field);
-        employeeBO.addField(address);
+    private BusinessObject employeeBO() {
+        return aBO("Employee").withField(aStringField("firstName").build()).build();
+    }
 
-        final BusinessObjectModel model = new BusinessObjectModel();
-        model.addBusinessObject(employeeBO);
-        model.addBusinessObject(addressBO);
-        return model;
+    private BusinessObject addressBO() {
+        return aBO("Address").withField(aStringField("street").build()).withField(aStringField("city").build()).build();
     }
 
     private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws URISyntaxException, IOException {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-
+        
+        System.out.println(FileUtils.readFileToString(file));
         assertThat(file).hasContentEqualTo(expected);
     }
 

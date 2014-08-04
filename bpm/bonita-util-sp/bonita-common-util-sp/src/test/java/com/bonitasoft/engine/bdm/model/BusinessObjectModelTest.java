@@ -8,11 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model;
 
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static com.bonitasoft.engine.bdm.model.assertion.BusinessObjectModelAssert.assertThat;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aStringField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anAggregationField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
@@ -26,23 +26,23 @@ public class BusinessObjectModelTest {
 
     @Test
     public void cannot_be_marshalled_when_it_has_no_business_object() throws Exception {
-        BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+        final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
 
         assertThat(businessObjectModel).cannotBeMarshalled();
     }
 
     @Test
     public void can_be_marshalled_when_it_has_at_least_one_business_object() throws Exception {
-        BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+        final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
         businessObjectModel.addBusinessObject(aBO("aBo").withField(aStringField("aField").build()).build());
 
         assertThat(businessObjectModel).canBeMarshalled();
     }
-    
+
     @Test
     public void should_have_already_declared_business_object_in_relation_fields() throws Exception {
-        BusinessObject notInModelBO = aBO("notInModelBo").withField(aStringField("aField").build()).build();
-        BusinessObjectModel businessObjectModel = new BusinessObjectModel();
+        final BusinessObject notInModelBO = aBO("notInModelBo").withField(aStringField("aField").build()).build();
+        final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
         businessObjectModel.addBusinessObject(aBO("aBo").withField(anAggregationField("aggreg", notInModelBO)).build());
 
         assertThat(businessObjectModel).cannotBeMarshalled();
@@ -55,11 +55,11 @@ public class BusinessObjectModelTest {
 
     @Test
     public void should_list_distincts_business_object_class_names() throws Exception {
-        String aClassName = "aClassName";
-        String anotherClassName = "anotherClassName";
-        BusinessObjectModel bom = aBOM().withBOs(aBO(aClassName).build(), aBO(aClassName).build(), aBO(anotherClassName).build()).build();
+        final String aClassName = "aClassName";
+        final String anotherClassName = "anotherClassName";
+        final BusinessObjectModel bom = aBOM().withBOs(aBO(aClassName).build(), aBO(aClassName).build(), aBO(anotherClassName).build()).build();
 
-        Set<String> classNames = bom.getBusinessObjectsClassNames();
+        final Set<String> classNames = bom.getBusinessObjectsClassNames();
 
         assertThat(classNames).containsOnlyOnce(aClassName, anotherClassName);
     }

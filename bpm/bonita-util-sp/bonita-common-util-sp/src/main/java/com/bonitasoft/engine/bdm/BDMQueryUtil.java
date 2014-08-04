@@ -18,9 +18,11 @@ import java.util.Set;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.model.field.Field;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
@@ -176,6 +178,46 @@ public class BDMQueryUtil {
         return queries;
     }
 
+    public static Query createQueryForLazyField(final BusinessObject businessObject, final RelationField field) {
+        if (field == null) {
+            throw new IllegalArgumentException("field cannot be null");
+        }
+        final String name = createQueryNameForLazyField(businessObject, field);
+        final String content = createQueryContentForLazyField(businessObject.getQualifiedName(), field);
+        final Query q = new Query(name, content, field.getReference().getQualifiedName());
+        if(field.isCollection()){
+            q.setReturnType(List.class.getName());
+        }
+        q.addQueryParameter(Field.PERSISTENCE_ID, Long.class.getName());
+        return q;
+    }
+
+    public static String createQueryContentForLazyField(final String businessObjectName, final RelationField field) {
+        if (businessObjectName == null) {
+            throw new IllegalArgumentException("businessObjectName is null");
+        }
+        if (field == null) {
+            throw new IllegalArgumentException("field cannot be null");
+        }
+        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
+        final char var = Character.toLowerCase(simpleName.charAt(0));
+        final StringBuilder builder = new StringBuilder();
+        builder.append(SELECT).append(var).append(".").append(field.getName()).append("\n");
+        builder.append(FROM).append(simpleName).append(' ').append(var).append("\n");
+        builder.append(buildWhere(var, Field.PERSISTENCE_ID));
+        return builder.toString().trim();
+    }
+
+    public static String createQueryNameForLazyField(final BusinessObject businessObject, final RelationField field) {
+        final StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append("find");
+        nameBuilder.append(WordUtils.capitalize(field.getName()));
+        nameBuilder.append("By");
+        nameBuilder.append(getSimpleBusinessObjectName(businessObject.getQualifiedName()));
+        nameBuilder.append("PersistenceId");
+        return nameBuilder.toString();
+    }
+
     public static Set<String> getAllProvidedQueriesNameForBusinessObject(final BusinessObject businessObject) {
         final Set<String> queryNames = new HashSet<String>();
         for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
@@ -254,6 +296,21 @@ public class BDMQueryUtil {
         final StringBuilder builder = new StringBuilder();
         builder.append(ORDER_BY).append(tablePrefix).append('.').append(Field.PERSISTENCE_ID);
         return builder.toString();
+    }
+
+    public static List<Query> createProvidedQueriesForLazyField(final BusinessObjectModel bom, final BusinessObject bo) {
+        final List<Query> queries = new ArrayList<Query>();
+        for (final BusinessObject businessObject : bom.getBusinessObjects()) {
+            for (final Field f : businessObject.getFields()) {
+                if (f instanceof RelationField && ((RelationField) f).isLazy()) {
+                    if (((RelationField) f).getReference().equals(bo)) {
+                        final Query query = createQueryForLazyField(businessObject, (RelationField) f);
+                        queries.add(query);
+                    }
+                }
+            }
+        }
+        return queries;
     }
 
 }
