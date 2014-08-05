@@ -86,7 +86,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationPage createApplicationPage(final long pagedId, final long applicationId, final String name) throws AlreadyExistsException,
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
     CreationException {
         // TODO Auto-generated method stub
         return null;

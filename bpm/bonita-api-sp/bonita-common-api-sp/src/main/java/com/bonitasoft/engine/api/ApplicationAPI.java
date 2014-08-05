@@ -69,15 +69,15 @@ public interface ApplicationAPI {
 
     /**
      * Creates an {@link ApplicationPage} (association between a {@link Page} and an {@link Application}).
-     *
-     * @param pagedId the identifier of page to be associated to the application
+     * 
      * @param applicationId the identifier of the application where the page will be associated
+     * @param pagedId the identifier of page to be associated to the application
      * @param name the name that this page will take in this application. The name must be unique for a given application.
      * @return the created {@link ApplicationPage}
      * @throws AlreadyExistsException if the name is already used for another page on this application
      * @throws CreationException if an error occurs during the creation
      */
-    ApplicationPage createApplicationPage(long pagedId, long applicationId, String name) throws AlreadyExistsException, CreationException;
+    ApplicationPage createApplicationPage(long applicationId, long pagedId, String name) throws AlreadyExistsException, CreationException;
 
     /**
      * Retrieves the {@link ApplicationPage} for the given application name and application page name
