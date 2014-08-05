@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,6 +23,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
  */
 public class SBusinessDataDefinitionBinding extends SNamedElementBinding {
 
@@ -32,10 +33,13 @@ public class SBusinessDataDefinitionBinding extends SNamedElementBinding {
 
     protected String className;
 
+    protected boolean multiple;
+
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         className = attributes.get(XMLSProcessDefinition.BUSINESS_DATA_DEFINITION_CLASS);
+        multiple = Boolean.valueOf(attributes.get(XMLSProcessDefinition.BUSINESS_DATA_DEFINITION_IS_MULTIPLE));
     }
 
     @Override
@@ -60,6 +64,7 @@ public class SBusinessDataDefinitionBinding extends SNamedElementBinding {
             businessDataDefinitionImpl.setDescription(description);
         }
         businessDataDefinitionImpl.setDefaultValue(defaultValue);
+        businessDataDefinitionImpl.setMultiple(multiple);
         return businessDataDefinitionImpl.done();
     }
 

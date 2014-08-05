@@ -304,7 +304,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 if (loopCharacteristics.getDataOutputItemRef() != null && !loopCharacteristics.getDataOutputItemRef().isEmpty()
                         && (loopCharacteristics.getLoopDataOutputRef() == null || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
                     designErrors
-                            .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
+                    .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
                 }
                 // TODO add validation on data existence
             }
@@ -388,7 +388,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    void addError(final String error) {
+    protected void addError(final String error) {
         designErrors.add(error);
     }
 
@@ -555,7 +555,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
         return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue)
-                .isLongText();
+        .isLongText();
     }
 
     @Override

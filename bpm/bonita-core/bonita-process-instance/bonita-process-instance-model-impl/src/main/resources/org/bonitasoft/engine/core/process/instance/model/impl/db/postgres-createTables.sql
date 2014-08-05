@@ -206,6 +206,7 @@ CREATE TABLE breakpoint (
 CREATE TABLE ref_biz_data_inst (
 	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,
+  	kind VARCHAR(10) NOT NULL,
   	name VARCHAR(255) NOT NULL,
   	proc_inst_id INT8 NOT NULL,
   	data_id INT NULL,
@@ -213,3 +214,13 @@ CREATE TABLE ref_biz_data_inst (
   	UNIQUE (tenantid, proc_inst_id, name),
   	PRIMARY KEY (tenantid, id)
 );
+
+CREATE TABLE multi_biz_data (
+	tenantid INT8 NOT NULL,
+  	id INT8 NOT NULL,
+  	idx INT8 NOT NULL,
+  	data_id INT8 NOT NULL,
+  	PRIMARY KEY (tenantid, id, data_id)
+);
+
+ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;

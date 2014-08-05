@@ -35,4 +35,11 @@ public interface BusinessDataDefinition extends DescriptionElement {
      */
     Expression getDefaultValueExpression();
 
+    /**
+     * Returns if this business data is handled as a List.
+     * 
+     * @return true if this business data is handled as a List.
+     */
+    boolean isMultiple();
+
 }
