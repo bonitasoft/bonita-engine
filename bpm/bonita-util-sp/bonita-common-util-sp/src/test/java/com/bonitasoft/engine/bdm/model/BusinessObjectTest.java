@@ -8,10 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model;
 
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static com.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.assertThat;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aBooleanField;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.anAggregationField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class BusinessObjectTest {
 
     @Test
     public void could_have_simpleFields_and_relationFields() throws Exception {
-        BusinessObject businessObject = new BusinessObject();
+        final BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName("aQualifiedName");
         businessObject.addField(aBooleanField("aSimpleField"));
         businessObject.addField(anAggregationField("aggregationField", aBO("boName").withField(aBooleanField("aField")).build()));
@@ -56,7 +56,7 @@ public class BusinessObjectTest {
 
     @Test
     public void could_have_relationFields_referencing_itself() throws Exception {
-        BusinessObject bo = aBO("aBo").build();
+        final BusinessObject bo = aBO("aBo").build();
 
         bo.addField(anAggregationField("itselfRef", bo));
 
@@ -65,7 +65,7 @@ public class BusinessObjectTest {
 
     @Test
     public void could_have_optional_uniqueConstraints() throws Exception {
-        BusinessObject bo = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).build();
+        final BusinessObject bo = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).build();
 
         bo.addUniqueConstraint("const", "field1");
         bo.addUniqueConstraint("const2", "field2");
@@ -75,7 +75,7 @@ public class BusinessObjectTest {
 
     @Test
     public void could_have_optional_queries() throws Exception {
-        BusinessObject bo = aBO("aBo").withField(aBooleanField("field")).build();
+        final BusinessObject bo = aBO("aBo").withField(aBooleanField("field")).build();
 
         bo.addQuery("query", "select something from something", "returnType");
 

@@ -25,7 +25,6 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
 
-import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -130,8 +129,21 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         if (entity == null) {
             throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with id: " + primaryKey);
         }
-        em.detach(entity);
         return entity;
+    }
+
+    @Override
+    public <T extends Entity> List<T> findByIds(final Class<T> entityClass, final List<Long> primaryKeys) {
+        final List<T> entities = new ArrayList<T>();
+        final EntityManager em = getEntityManager();
+        for (final Long primaryKey : primaryKeys) {
+            final T entity = em.find(entityClass, primaryKey);
+            if (entity != null) {
+                em.detach(entity);
+                entities.add(entity);
+            }
+        }
+        return entities;
     }
 
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
@@ -144,10 +156,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
                 query.setParameter(parameter.getKey(), parameter.getValue());
             }
         }
-        final EntityManager em = getEntityManager();
         try {
-            final T entity = query.getSingleResult();
-            return detachEntity(em, resultClass, entity);
+            return query.getSingleResult();
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
         } catch (final NoResultException e) {
@@ -201,42 +211,30 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         }
         query.setFirstResult(startIndex);
         query.setMaxResults(maxResults);
-        final EntityManager em = getEntityManager();
-        final List<T> resultList = query.getResultList();
-        final List<T> copyList = new ArrayList<T>();
-        for (final T entity : resultList) {
-            copyList.add(detachEntity(em, resultClass, entity));
-        }
-        return copyList;
-    }
-
-    private <T> T detachEntity(final EntityManager em, final Class<T> resultClass, final T entity) {
-        if (ClassUtils.isPrimitiveOrWrapper(resultClass)) {
-            return entity;
-        } else {
-            em.detach(entity);
-            return entity;
-        }
-    }
-
-    @Override
-    public <T extends Entity> T merge(final T entity) {
-        if (entity != null) {
-            final EntityManager em = getEntityManager();
-            return em.merge(entity);
-        }
-        return null;
+        return query.getResultList();
     }
 
     @Override
     public void remove(final Entity entity) {
         if (entity != null && entity.getPersistenceId() != null) {
             final EntityManager em = getEntityManager();
-            final Entity attachedEntity = em.find(entity.getClass(), entity.getPersistenceId());
-            if (attachedEntity != null) {
-                em.remove(attachedEntity);
-            }
+            em.remove(entity);
         }
+    }
+
+    @Override
+    public void persist(final Entity entity) {
+        if (entity != null) {
+            getEntityManager().persist(entity);
+        }
+    }
+
+    @Override
+    public Entity merge(final Entity entity) {
+        if (entity != null) {
+            return getEntityManager().merge(entity);
+        }
+        return null;
     }
 
 }

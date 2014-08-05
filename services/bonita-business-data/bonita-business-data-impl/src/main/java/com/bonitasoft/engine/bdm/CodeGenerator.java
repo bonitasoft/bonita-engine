@@ -87,6 +87,9 @@ public class CodeGenerator {
     }
 
     public JDefinedClass addInterface(final String fullyqualifiedName) throws JClassAlreadyExistsException {
+        if(fullyqualifiedName.indexOf(".") == -1){
+            return model.rootPackage()._class(JMod.PUBLIC, fullyqualifiedName, ClassType.INTERFACE);
+        }
         return model._class(fullyqualifiedName, ClassType.INTERFACE);
     }
 
@@ -96,6 +99,10 @@ public class CodeGenerator {
             throw new IllegalArgumentException("Field type cannot be null");
         }
         return definedClass.field(JMod.PRIVATE, type, fieldName);
+    }
+
+    public JFieldVar addField(final JDefinedClass definedClass, final Field field) {
+        return addField(definedClass, field.getName(), toJavaClass(field));
     }
 
     public JFieldVar addField(final JDefinedClass definedClass, final String fieldName, final JClass type) {
@@ -187,7 +194,10 @@ public class CodeGenerator {
 
         final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
         final JVar adderParam = method.param(fieldClass, parameterName);
-        method.body().invoke(JExpr.ref(field.getName()), listMethodName).arg(adderParam);
+        final JMethod getterMethod = definedClass.getMethod(getGetterName(field), new JType[0]);
+        final JBlock body = method.body();
+        final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getterMethod));
+        method.body().add(decl.invoke(listMethodName).arg(adderParam));
         return method;
     }
 
@@ -203,7 +213,7 @@ public class CodeGenerator {
         return hashCodeMethod;
     }
 
-    public String getGetterName(final JFieldVar field) {
+    public String getGetterName(final JVar field) {
         final JType type = field.type();
         final boolean bool = Boolean.class.getName().equals(type.fullName());
         return getGetterName(bool, field.name());
@@ -225,7 +235,7 @@ public class CodeGenerator {
         return builder.toString();
     }
 
-    public String getSetterName(final JFieldVar field) {
+    public String getSetterName(final JVar field) {
         return "set" + WordUtils.capitalize(field.name());
     }
 

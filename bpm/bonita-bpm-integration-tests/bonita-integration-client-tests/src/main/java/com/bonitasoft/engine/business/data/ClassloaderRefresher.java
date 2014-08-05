@@ -43,15 +43,15 @@ public class ClassloaderRefresher {
      */
     public ClassLoader loadClientModelInClassloader(final byte[] clientZipContent, final ClassLoader contextClassLoader, final String modelClass,
             final File fsFolderToPutJars) throws IOException, MalformedURLException {
-        Map<String, byte[]> ressources = IOUtils.unzip(clientZipContent);
-        List<URL> urls = new ArrayList<URL>();
-        for (Entry<String, byte[]> e : ressources.entrySet()) {
-            File file = new File(fsFolderToPutJars, e.getKey());
+        final Map<String, byte[]> ressources = IOUtils.unzip(clientZipContent);
+        final List<URL> urls = new ArrayList<URL>();
+        for (final Entry<String, byte[]> e : ressources.entrySet()) {
+            final File file = new File(fsFolderToPutJars, e.getKey());
             if (file.getName().endsWith(".jar")) {
                 if (file.getName().contains("model")) {
                     try {
                         contextClassLoader.loadClass(modelClass);
-                    } catch (ClassNotFoundException e1) {
+                    } catch (final ClassNotFoundException e1) {
                         FileUtils.writeByteArrayToFile(file, e.getValue());
                         urls.add(file.toURI().toURL());
                     }
@@ -59,7 +59,15 @@ public class ClassloaderRefresher {
                 if (file.getName().contains("dao")) {
                     try {
                         contextClassLoader.loadClass(modelClass + "DAO");
-                    } catch (ClassNotFoundException e1) {
+                    } catch (final ClassNotFoundException e1) {
+                        FileUtils.writeByteArrayToFile(file, e.getValue());
+                        urls.add(file.toURI().toURL());
+                    }
+                }
+                if (file.getName().contains("javassist")) {
+                    try {
+                        contextClassLoader.loadClass("javassist.util.proxy.MethodFilter");
+                    } catch (final ClassNotFoundException e1) {
                         FileUtils.writeByteArrayToFile(file, e.getValue());
                         urls.add(file.toURI().toURL());
                     }

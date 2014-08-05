@@ -8,13 +8,14 @@ import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.bonitasoft.engine.bdm.Entity;
 
 /**
- * 
+ *
  */
 @javax.persistence.Entity(name = "Person")
 @Table(name = "PERSON")
@@ -29,6 +30,7 @@ public class Person implements Entity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "NICKNAMES", nullable = true, length = 15)
+    @OrderColumn
     private List<String> nickNames = new ArrayList<String>(10);
 
     public Person() {

@@ -37,8 +37,10 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -49,7 +51,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataExpressionExecutorStrategyTest {
@@ -90,11 +94,22 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
     private SRefBusinessDataInstance createARefBizDataInRepository(final SimpleBizData bizData, final String bizDataName, final long processInstanceId)
             throws Exception {
-        final SRefBusinessDataInstance refBizData = mock(SRefBusinessDataInstance.class);
+        final SSimpleRefBusinessDataInstance refBizData = mock(SSimpleRefBusinessDataInstance.class);
         when(refBizData.getDataClassName()).thenReturn(bizData.getClass().getName());
         when(refBizData.getName()).thenReturn(bizDataName);
         when(refBizData.getProcessInstanceId()).thenReturn(processInstanceId);
         when(refBizData.getDataId()).thenReturn(bizData.getId());
+        when(refBusinessDataService.getRefBusinessDataInstance(refBizData.getName(), processInstanceId)).thenReturn(refBizData);
+        return refBizData;
+    }
+
+    private SRefBusinessDataInstance createAMultiRefBizDataInRepository(final SimpleBizData bizData, final String bizDataName, final long processInstanceId)
+            throws Exception {
+        final SMultiRefBusinessDataInstance refBizData = mock(SMultiRefBusinessDataInstance.class);
+        when(refBizData.getDataClassName()).thenReturn(bizData.getClass().getName());
+        when(refBizData.getName()).thenReturn(bizDataName);
+        when(refBizData.getProcessInstanceId()).thenReturn(processInstanceId);
+        when(refBizData.getDataIds()).thenReturn(Arrays.asList(bizData.getId()));
         when(refBusinessDataService.getRefBusinessDataInstance(refBizData.getName(), processInstanceId)).thenReturn(refBizData);
         return refBizData;
     }
@@ -122,15 +137,45 @@ public class BusinessDataExpressionExecutorStrategyTest {
     @Test
     public void evaluate_on_a_process_instance_should_return_biz_data_instance_corresponding_to_data_name_and_processInstance_id() throws Exception {
         final SimpleBizData expectedBizData = createAbizDataInRepository();
-        final long proccessInstanceId = 1L;
-        final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, proccessInstanceId);
-        final HashMap<String, Object> context = buildBusinessDataExpressionContext(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
+        final long processInstanceId = 1L;
+        final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, processInstanceId);
+        final HashMap<String, Object> context = buildBusinessDataExpressionContext(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
-        when(flowNodeInstanceService.getProcessInstanceId(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(proccessInstanceId);
+        when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
 
         final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
 
         assertThat(fetchedBizData).isEqualTo(expectedBizData);
+    }
+
+    @Test(expected = SExpressionEvaluationException.class)
+    public void evaluate_on_a_process_instance_should_throw_an_exception_when_a_read_exception_occurs() throws Exception {
+        final SimpleBizData expectedBizData = createAbizDataInRepository();
+        final long processInstanceId = 1L;
+        final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, processInstanceId);
+        final HashMap<String, Object> context = buildBusinessDataExpressionContext(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
+        final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
+        when(refBusinessDataService.getRefBusinessDataInstance(refBizData.getName(), processInstanceId)).thenThrow(new SBonitaReadException("internal error"));
+        when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
+
+        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
+
+        assertThat(fetchedBizData).isEqualTo(expectedBizData);
+    }
+
+    @Test
+    public void evaluate_on_a_process_instance_should_return_list_of_biz_data_instance_corresponding_to_data_name_and_processInstance() throws Exception {
+        final SimpleBizData bizData = new SimpleBizData(457L);
+        final long proccessInstanceId = 1L;
+        final SRefBusinessDataInstance refBizData = createAMultiRefBizDataInRepository(bizData, "bizData", proccessInstanceId);
+        final HashMap<String, Object> context = buildBusinessDataExpressionContext(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
+        final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
+        when(businessDataRepository.findByIds(SimpleBizData.class, Arrays.asList(bizData.getId()))).thenReturn(Arrays.asList(bizData));
+        when(flowNodeInstanceService.getProcessInstanceId(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(proccessInstanceId);
+
+        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
+
+        assertThat(fetchedBizData).isEqualTo(Arrays.asList(bizData));
     }
 
     @Test
@@ -146,7 +191,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         try {
             businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
             fail("should throw Exception");
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             assertThat(((SBonitaException) e.getCause()).getContext().get(SExceptionContext.PROCESS_INSTANCE_ID)).isEqualTo(proccessInstanceId);
         }
     }

@@ -9,20 +9,14 @@
 package com.bonitasoft.engine.bdm.server;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
+import com.bonitasoft.engine.bdm.CodeGenerationException;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
@@ -36,32 +30,42 @@ import com.bonitasoft.engine.io.IOUtils;
 public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
 
     public ServerBDMJarBuilder(final JDTCompiler compiler, final String dependencyPath) {
-        super(compiler, dependencyPath);
+        super(new ServerBDMCodeGenerator(), compiler, dependencyPath);
     }
 
     @Override
-    protected AbstractBDMCodeGenerator getBDMCodeGenerator(final BusinessObjectModel bom) {
-        return new ServerBDMCodeGenerator(bom);
+    protected void addSourceFilesToDirectory(BusinessObjectModel bom, File directory) throws CodeGenerationException {
+        super.addSourceFilesToDirectory(bom, directory);
+        addPersistenceFile(directory, bom);
+        addBOMFile(directory, bom);
     }
-
-    @Override
-    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
-            ParserConfigurationException, SAXException {
-        final List<BusinessObject> entities = bom.getBusinessObjects();
-        final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
-        for (final BusinessObject businessObject : entities) {
-            builder.addClass(businessObject.getQualifiedName());
+    
+    /**
+     * protected for testing - must be changed
+     */
+    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws CodeGenerationException {
+        try {
+            final List<BusinessObject> entities = bom.getBusinessObjects();
+            final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
+            for (final BusinessObject businessObject : entities) {
+                builder.addClass(businessObject.getQualifiedName());
+            }
+            final Document document = builder.done();
+            final File metaInf = IOUtils.createSubDirectory(directory, "META-INF");
+            IOUtils.saveDocument(document, new File(metaInf, "persistence.xml"));
+        } catch (Exception e) {
+            throw new CodeGenerationException("Error when generating persistence.xml file", e);
         }
-        final Document document = builder.done();
-        final File metaInf = IOUtils.createSubDirectory(directory, "META-INF");
-        IOUtils.saveDocument(document, new File(metaInf, "persistence.xml"));
     }
 
-    @Override
-    protected void addBOMFile(final File directory, final BusinessObjectModel bom) throws IOException, JAXBException, SAXException {
-        final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
-        final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
-        IOUtil.write(new File(directory, "bom.xml"), bomXML);
+    private void addBOMFile(final File directory, final BusinessObjectModel bom) throws CodeGenerationException {
+        try {
+            final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
+            final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
+            IOUtil.write(new File(directory, "bom.xml"), bomXML);
+        } catch (Exception e) {
+            throw new CodeGenerationException("Error when adding business object model metadata to server jar", e);
+        }
     }
 
 }

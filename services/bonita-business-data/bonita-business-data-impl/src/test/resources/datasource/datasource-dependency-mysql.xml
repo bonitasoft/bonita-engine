@@ -1,15 +1,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/util 
-       http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
         <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
         <property name="properties">
-            <util:properties>
+            <props>
                 <prop key="db.hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
                 <prop key="db.datasource.classname">com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</prop>
                 <prop key="db.server.name">localhost</prop>
@@ -18,7 +15,7 @@
                 <prop key="db.user">root</prop>
                 <prop key="db.password">root</prop>
                 <prop key="db.url">jdbc:mysql://${db.server.name}:${db.server.port}/${db.database.name}?useUnicode=true&amp;characterEncoding=UTF-8</prop>
-            </util:properties>
+            </props>
         </property>
     </bean>
     
