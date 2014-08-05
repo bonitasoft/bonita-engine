@@ -129,10 +129,10 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="businessDataDefinitions" minOccurs="0">
+			<xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element type="definition:SBusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="unbounded" />
+						<xs:element type="definition:SBusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="2" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
