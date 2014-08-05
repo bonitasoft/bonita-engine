@@ -220,7 +220,7 @@ public class XMLSProcessDefinition {
 
     public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
-    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "isMultiple";
+    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "multiple";
 
     public static final String DATA_DEFINITION_TRANSIENT = "transient";
 
@@ -539,11 +539,13 @@ public class XMLSProcessDefinition {
     }
 
     private void addBusinessDataDefinitionNodes(final List<SBusinessDataDefinition> businessDataDefinitions, final XMLNode containerNode) {
-        final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
-        containerNode.addChild(businessDataDefinitionsNode);
-        for (final SBusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
-            final XMLNode businessDataDefinitionNode = createBusinessDataDefinitionNode(businessDataDefinition);
-            businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+        if (!businessDataDefinitions.isEmpty()) {
+            final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
+            containerNode.addChild(businessDataDefinitionsNode);
+            for (final SBusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                final XMLNode businessDataDefinitionNode = createBusinessDataDefinitionNode(businessDataDefinition);
+                businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+            }
         }
     }
 
