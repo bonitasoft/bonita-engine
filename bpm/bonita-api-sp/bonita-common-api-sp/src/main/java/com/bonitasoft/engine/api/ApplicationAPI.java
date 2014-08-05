@@ -23,6 +23,9 @@ import org.bonitasoft.engine.search.SearchResult;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.page.Page;
 
 /**
  * This API allows to list and manage Bonita Living Applications.
@@ -56,7 +59,7 @@ public interface ApplicationAPI {
      * Deletes an application by its identifier
      *
      * @param applicationId the page identifier
-     * @throws DeletionException if en error occurs during the deletion
+     * @throws DeletionException if an error occurs during the deletion
      */
     void deleteApplication(long applicationId) throws DeletionException;
 
@@ -65,8 +68,48 @@ public interface ApplicationAPI {
      *
      * @param searchOptions the search options. See {@link SearchOptions} for details.
      * @return a {@link SearchResult} containing the number and the list of applications matching with the search criteria.
-     * @throws SearchException
+     * @throws SearchException if an error occurs during search
      */
     SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Creates an {@link ApplicationPage} (association between a {@link Page} and an {@link Application}).
+     *
+     * @param pagedId the identifier of page to be associated to the application
+     * @param applicationId the identifier of the application where the page will be associated
+     * @param name the name that this page will take in this application. The name must be unique for a given application.
+     * @return the created {@link ApplicationPage}
+     * @throws AlreadyExistsException if the name is already used for another page on this application
+     * @throws CreationException if an error occurs during the creation
+     */
+    ApplicationPage createApplicationPage(long pagedId, long applicationId, String name) throws AlreadyExistsException, CreationException;
+
+    /**
+     * Retrieves the {@link ApplicationPage} for the given application name and application page name
+     *
+     * @param applicationName the application name
+     * @param applicationPageName the application page name
+     * @return the {@link ApplicationPage} for the given application name and application page name
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given application name and application page name
+     */
+    ApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws ApplicationPageNotFoundException;
+
+    /**
+     * Retrieves the {@link ApplicationPage} from its identifier
+     *
+     * @param applicationPageId the application page identifier
+     * @return the {@link ApplicationPage} from its identifier
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} for the given identifier
+     */
+    ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
+
+    /**
+     * Searches for application pages with specific search criteria.
+     *
+     * @param searchOptions the search options. See {@link SearchOptions} for details.
+     * @return SearchException a {@link SearchResult} containing the number and the list of application pages matching with the search criteria.
+     * @throws if an error occurs during search
+     */
+    SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException;
 
 }

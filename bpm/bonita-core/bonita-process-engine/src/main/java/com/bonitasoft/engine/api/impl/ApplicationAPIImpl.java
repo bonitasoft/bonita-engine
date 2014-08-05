@@ -29,6 +29,8 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -86,6 +88,31 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final ApplicationAPIDelegate delegate = getDelegate(searchOptions);
         return delegate.searchApplications();
+    }
+
+    @Override
+    public ApplicationPage createApplicationPage(final long pagedId, final long applicationId, final String name) throws AlreadyExistsException,
+    CreationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
