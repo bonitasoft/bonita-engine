@@ -69,7 +69,7 @@ public interface ApplicationAPI {
 
     /**
      * Creates an {@link ApplicationPage} (association between a {@link Page} and an {@link Application}).
-     * 
+     *
      * @param applicationId the identifier of the application where the page will be associated
      * @param pagedId the identifier of page to be associated to the application
      * @param name the name that this page will take in this application. The name must be unique for a given application.
@@ -97,6 +97,14 @@ public interface ApplicationAPI {
      * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} for the given identifier
      */
     ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
+
+    /**
+     * Deletes an {@link ApplicationPage} by its identifier
+     *
+     * @param applicationpPageId the {@link ApplicationPage} identifier
+     * @throws DeletionException if an error occurs during the deletion
+     */
+    void deleteApplicationPage(long applicationpPageId) throws DeletionException;
 
     /**
      * Searches for application pages with specific search criteria.

@@ -110,4 +110,10 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return null;
     }
 
+    @Override
+    public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
+        // TODO Auto-generated method stub
+
+    }
+
 }
