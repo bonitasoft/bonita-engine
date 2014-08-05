@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -59,16 +60,20 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
@@ -375,7 +380,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -417,7 +422,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -973,7 +978,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-            UserNotFoundException;
+    UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1143,7 +1148,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
@@ -2259,48 +2264,48 @@ public interface ProcessRuntimeAPI {
     SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, SearchOptions searchOptions);
 
     /**
-     * Search all process definitions that have instances with one or more human tasks assigned/pending for a specific user.
+     * Search process definitions that have instances with assigned or pending human tasks for a specific user.
      * The tasks are in stable state, not in terminal/executing state.
      * 
      * @param userId
-     *            The identifier of the user.
+     *        The identifier of the user.
      * @param searchOptions
-     *            The search criterion.
+     *        The search criterion.
      * @return The list of process definitions
      * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(long userId, SearchOptions searchOptions)
             throws SearchException;
 
     /**
-     * Search all process definitions supervised by a specific user, that have instances with one or more human tasks assigned/pending.
+     * Search process definitions supervised by a specific user, that have instances with assigned or pending human tasks.
      * The tasks are in stable state, not in terminal/executing state.
      * 
      * @param userId
-     *            The identifier of the user.
+     *        The identifier of the user.
      * @param searchOptions
-     *            The search criterion.
+     *        The search criterion.
      * @return The list of process definitions
      * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(long supervisorId, SearchOptions searchOptions)
             throws SearchException;
 
     /**
-     * Search all process definitions that have instances with one or more human tasks assigned/pending for a user.
+     * Search process definitions that have instances with assigned or pending human tasks.
      * The tasks are in stable state, not in terminal/executing state.
      * 
      * @param userId
-     *            The identifier of the user.
+     *        The identifier of the user.
      * @param searchOptions
-     *            The search criterion.
+     *        The search criterion.
      * @return The list of process definitions
      * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
