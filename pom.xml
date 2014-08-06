@@ -90,6 +90,9 @@
 				<module>bpm</module>
 				<module>services</module>
 			</modules>
+            <properties>
+                <create.sources.jar>false</create.sources.jar>
+            </properties>
 		</profile>
 		<profile>
 			<id>developer</id>
@@ -112,9 +115,11 @@
 
 		<profile>
 			<id>package</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+            <activation>
+                <property>
+                    <name>!publishArtifacts</name>
+                </property>
+            </activation>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>

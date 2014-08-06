@@ -17,6 +17,9 @@
 			<modules>
 		        <module>bonita-business-data</module>
 			</modules>
+            <properties>
+                <create.sources.jar>false</create.sources.jar>                                                                                                                                                                               
+            </properties>
 		</profile>
 		<profile>
 			<id>package</id>

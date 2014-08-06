@@ -13,8 +13,10 @@
 	<profiles>
 		<profile>
 			<id>package</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>                                                              
+            <activation>                                                                                                                                                                                                                     
+                <property>
+                    <name>!publishArtifacts</name>
+                </property>
             </activation>
 			<modules>
 		        <module>bonita-home</module>
@@ -37,6 +39,9 @@
 				<module>bonita-server</module>
 				<module>bonita-home</module>
 			</modules>
+            <properties>
+                <create.sources.jar>false</create.sources.jar>                                                                                                                                                                               
+            </properties>
 		</profile>
 		<profile>
 			<id>javadoc</id>
