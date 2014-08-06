@@ -10,7 +10,7 @@
 
 	<groupId>org.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine</artifactId>
-	<version>6.3.3</version>
+	<version>6.3.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita BPM Engine</name>
