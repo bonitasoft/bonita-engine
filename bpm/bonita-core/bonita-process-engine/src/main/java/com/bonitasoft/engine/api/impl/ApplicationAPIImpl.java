@@ -40,8 +40,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
-        final ApplicationAPIDelegate delegate = getDelegate();
-        return delegate.createApplication(applicationCreator);
+        return getDelegate().createApplication(applicationCreator);
     }
 
     private ApplicationAPIDelegate getDelegate() {
@@ -59,14 +58,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
-        final ApplicationAPIDelegate delegate = getDelegate();
-        return delegate.getApplication(applicationId);
+        return getDelegate().getApplication(applicationId);
     }
 
     @Override
     public void deleteApplication(final long applicationId) throws DeletionException {
-        final ApplicationAPIDelegate delegate = getDelegate();
-        delegate.deleteApplication(applicationId);
+        getDelegate().deleteApplication(applicationId);
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -81,8 +78,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
-        final ApplicationAPIDelegate delegate = getDelegate(searchOptions);
-        return delegate.searchApplications();
+        return getDelegate(searchOptions).searchApplications();
     }
 
     @Override
@@ -104,14 +100,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+        return getDelegate().getApplicationPage(applicationPageId);
     }
 
     @Override
     public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
-        // TODO Auto-generated method stub
-
+        getDelegate().deleteApplicationPage(applicationpPageId);
     }
 
 }

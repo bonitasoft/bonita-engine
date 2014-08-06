@@ -330,4 +330,64 @@ public class ApplicationAPIIT extends CommonAPISPTest {
         assertThat(retrievedAppPage).isEqualTo(appPage);
         applicationAPI.deleteApplication(application.getId());
     }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+    "get by id" })
+    @Test
+    public void getApplicationPage_byId_returns_the_applicationPage_corresponding_to_the_given_Id() throws Exception {
+        //given
+        final Page page = getAProvidedPage();
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+
+        //when
+        final ApplicationPage retrievedAppPage = applicationAPI.getApplicationPage(appPage.getId());
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(appPage);
+        applicationAPI.deleteApplication(application.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
+    "delete" })
+    @Test
+    public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
+        //given
+        final Page page = getAProvidedPage();
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+
+        //when
+        applicationAPI.deleteApplication(application.getId());
+
+        //then
+        try {
+            applicationAPI.getApplicationPage(appPage.getId());
+            fail("Not found expected");
+        } catch (final ApplicationPageNotFoundException e) {
+            //OK
+        }
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+            "delete" })
+    @Test
+    public void deleteApplicationPage_should_delete_applicationPage_with_the_given_id() throws Exception {
+        //given
+        final Page page = getAProvidedPage();
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+
+        //when
+        applicationAPI.deleteApplicationPage(appPage.getId());
+
+        //then
+        try {
+            applicationAPI.getApplicationPage(appPage.getId());
+            fail("Not found expected");
+        } catch (final ApplicationPageNotFoundException e) {
+            //OK
+        }
+    }
+
 }

@@ -60,6 +60,8 @@ public class ApplicationAPIDelegateTest {
 
     private final long APPLICATION_ID = 15;
 
+    private final long APPLICATION_PAGE_ID = 35;
+
     private final long PAGE_ID = 20;
 
     private final long LOGGED_USER_ID = 10;
@@ -145,6 +147,16 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = DeletionException.class)
     public void delete_Application_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException() throws Exception {
         doThrow(new SObjectModificationException()).when(applicationService).deleteApplication(APPLICATION_ID);
+
+        //when
+        delegate.deleteApplication(APPLICATION_ID);
+
+        //then exception
+    }
+
+    @Test(expected = DeletionException.class)
+    public void delete_Application_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+        doThrow(new SObjectNotFoundException()).when(applicationService).deleteApplication(APPLICATION_ID);
 
         //when
         delegate.deleteApplication(APPLICATION_ID);
@@ -286,6 +298,73 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+
+        //then exception
+    }
+
+    @Test
+    public void getApplicationPage_byId_should_return_the_result_of_applicationService_getApplicationPage_byId() throws Exception {
+        //given
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(applicationService.getApplicationPage(APPLICATION_PAGE_ID)).willReturn(sAppPage);
+        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+
+        //when
+        final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APPLICATION_PAGE_ID);
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(appPage);
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getApplicationPage_byId_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+        //given
+        given(applicationService.getApplicationPage(APPLICATION_PAGE_ID)).willThrow(new SBonitaReadException(""));
+
+        //when
+        delegate.getApplicationPage(APPLICATION_PAGE_ID);
+
+        //then exception
+    }
+
+    @Test(expected = ApplicationPageNotFoundException.class)
+    public void getApplicationPage_byId_should_throw_SObjectNotFoundException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
+        //given
+        given(applicationService.getApplicationPage(APPLICATION_PAGE_ID)).willThrow(new SObjectNotFoundException());
+
+        //when
+        delegate.getApplicationPage(APPLICATION_PAGE_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void deleteApplicationPage_should_call_applicationService_deleteApplicationPage() throws Exception {
+        //when
+        delegate.deleteApplicationPage(APPLICATION_PAGE_ID);
+
+        //then
+        verify(applicationService, times(1)).deleteApplicationPage(APPLICATION_PAGE_ID);
+    }
+
+    @Test(expected = DeletionException.class)
+    public void deleteApplicationPage_should_throw_DeletionException_when_applicationService_throws_SObjectModificationException() throws Exception {
+        doThrow(new SObjectModificationException()).when(applicationService).deleteApplicationPage(APPLICATION_PAGE_ID);
+
+        //when
+        delegate.deleteApplicationPage(APPLICATION_PAGE_ID);
+
+        //then exception
+    }
+
+    @Test(expected = DeletionException.class)
+    public void deleteApplicationPage_should_throw_DeletionException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+        doThrow(new SObjectNotFoundException()).when(applicationService).deleteApplicationPage(APPLICATION_PAGE_ID);
+
+        //when
+        delegate.deleteApplicationPage(APPLICATION_PAGE_ID);
 
         //then exception
     }

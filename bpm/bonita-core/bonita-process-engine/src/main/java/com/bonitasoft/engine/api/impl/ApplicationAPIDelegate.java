@@ -118,4 +118,23 @@ public class ApplicationAPIDelegate {
         }
     }
 
+    public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
+        try {
+            final SApplicationPage sApplicationPage = applicationService.getApplicationPage(applicationPageId);
+            return convertor.toApplicationPage(sApplicationPage);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationPageNotFoundException(e.getMessage());
+        }
+    }
+
+    public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
+        try {
+            applicationService.deleteApplicationPage(applicationpPageId);
+        } catch (final SBonitaException e) {
+            throw new DeletionException(e);
+        }
+    }
+
 }
