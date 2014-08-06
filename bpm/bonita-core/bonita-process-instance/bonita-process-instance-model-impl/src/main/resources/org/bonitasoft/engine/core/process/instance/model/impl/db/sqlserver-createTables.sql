@@ -234,7 +234,10 @@ CREATE TABLE ref_biz_data_inst (
   	PRIMARY KEY (tenantid, id)
 )
 GO
-
+CREATE UNIQUE INDEX uniq_ref_biz_data_proc ON ref_biz_data_inst(tenantid, proc_inst_id, name)
+GO
+CREATE UNIQUE INDEX uniq_ref_biz_data_fn ON ref_biz_data_inst(tenantid, fn_inst_id, name)
+GO
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE
 GO
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE
