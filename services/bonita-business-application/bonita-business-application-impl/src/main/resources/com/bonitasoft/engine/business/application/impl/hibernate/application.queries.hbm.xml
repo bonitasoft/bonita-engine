@@ -23,5 +23,29 @@
         SELECT application
         FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
     </query>
+    
+    <query name="getApplicationPageById">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+        WHERE id = :id
+    </query>
+
+    <query name="getApplicationPageByNameAndApplicationName">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+        WHERE applicationPage.name = :applicationPageName
+        AND applicationPage.applicationId IN (
+            SELECT application.id 
+            FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
+            WHERE application.name = :applicationName
+            )
+    </query>
+
+    <query name="getApplicationPageByNameAndApplicationId">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+        WHERE applicationPage.name = :applicationPageName
+        AND applicationPage.applicationId = :applicationId
+    </query>
 
 </hibernate-mapping>

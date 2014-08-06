@@ -21,14 +21,20 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
 
     private static final long serialVersionUID = -5213352950815372458L;
 
-    private final long applicationId;
+    private long applicationId;
 
-    private final long pageId;
+    private long pageId;
 
-    public SApplicationPageImpl(final long applicationId, final long pageId) {
+    private String name;
+
+    public SApplicationPageImpl() {
+    }
+
+    public SApplicationPageImpl(final long applicationId, final long pageId, final String name) {
         super();
         this.applicationId = applicationId;
         this.pageId = pageId;
+        this.name = name;
     }
 
     @Override
@@ -47,10 +53,16 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (int) (applicationId ^ applicationId >>> 32);
+        result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (int) (pageId ^ pageId >>> 32);
         return result;
     }
@@ -70,6 +82,13 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
         if (applicationId != other.applicationId) {
             return false;
         }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
         if (pageId != other.pageId) {
             return false;
         }
@@ -78,7 +97,7 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
 
     @Override
     public String toString() {
-        return "SBusinessApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", id=" + getId() + ", tenantId="
+        return "SApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", name=" + name + ", getId()=" + getId() + ", getTenantId()="
                 + getTenantId() + "]";
     }
 

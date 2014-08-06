@@ -12,22 +12,27 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
 
 
 public class ApplicationConvertorTest {
 
     private static final String ICON_PATH = "/icon.jpg";
     private static final int TENANT_ID = 1;
-    static final int ID = 11;
-    static final int CREATOR_ID = 16;
+    private static final int ID = 11;
+    private static final int CREATOR_ID = 16;
+    private static final int APPLICATION_ID = 20;
+    private static final int PAGE_ID = 30;
     private static final String APP_DESC = "app desc";
     private static final String APP_PATH = "/app";
     private static final String APP_VERSION = "1.0";
     private static final String APP_NAME = "app";
+    private static final String APP_PAGE_NAME = "firstPage";
     private final ApplicationConvertor convertor = new ApplicationConvertor();
 
     @Test
@@ -102,6 +107,23 @@ public class ApplicationConvertorTest {
 
         //then
         assertThat(applications).containsExactly(app1, app2);
+    }
+
+    @Test
+    public void toApplicationPage_should_map_all_server_fields() throws Exception {
+        //given
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        sAppPage.setId(ID);
+
+        //when
+        final ApplicationPage appPage = convertor.toApplicationPage(sAppPage);
+
+        //then
+        assertThat(appPage).isNotNull();
+        assertThat(appPage.getId()).isEqualTo(ID);
+        assertThat(appPage.getApplicationId()).isEqualTo(APPLICATION_ID);
+        assertThat(appPage.getPageId()).isEqualTo(PAGE_ID);
+        assertThat(appPage.getName()).isEqualTo(APP_PAGE_NAME);
     }
 
 }

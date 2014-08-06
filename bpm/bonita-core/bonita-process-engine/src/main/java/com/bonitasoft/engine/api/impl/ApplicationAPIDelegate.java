@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -25,8 +26,13 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.business.application.SApplicationPageBuilder;
+import com.bonitasoft.engine.business.application.SApplicationPageBuilderFactory;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -35,21 +41,20 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ApplicationAPIDelegate {
 
-    private final TenantServiceAccessor accessor;
     private final ApplicationConvertor convertor;
     private final long loggedUserId;
     private final SearchApplications searchApplications;
+    private final ApplicationService applicationService;
 
     public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor, final long loggedUserId,
             final SearchApplications searchApplications) {
-        this.accessor = accessor;
+        applicationService = accessor.getApplicationService();
         this.convertor = convertor;
         this.loggedUserId = loggedUserId;
         this.searchApplications = searchApplications;
     }
 
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
-        final ApplicationService applicationService = accessor.getApplicationService();
         try {
             final SApplication sApplication = applicationService.createApplication(convertor.buildSApplication(applicationCreator, loggedUserId));
             return convertor.toApplication(sApplication);
@@ -61,7 +66,6 @@ public class ApplicationAPIDelegate {
     }
 
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
-        final ApplicationService applicationService = accessor.getApplicationService();
         try {
             final SApplication sApplication = applicationService.getApplication(applicationId);
             return convertor.toApplication(sApplication);
@@ -73,7 +77,6 @@ public class ApplicationAPIDelegate {
     }
 
     public void deleteApplication(final long applicationId) throws DeletionException {
-        final ApplicationService applicationService = accessor.getApplicationService();
         try {
             applicationService.deleteApplication(applicationId);
         } catch (final SBonitaException e) {
@@ -87,6 +90,31 @@ public class ApplicationAPIDelegate {
             return searchApplications.getResult();
         } catch (final SBonitaException e) {
             throw new SearchException(e);
+        }
+    }
+
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,    CreationException {
+        final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
+        final SApplicationPageBuilder builder = factory.createNewInstance(applicationId, pagedId, name);
+        SApplicationPage sAppPage;
+        try {
+            sAppPage = applicationService.createApplicationPage(builder.done());
+            return convertor.toApplicationPage(sAppPage);
+        } catch (final SObjectCreationException e) {
+            throw new CreationException(e);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException(e.getMessage());
+        }
+    }
+
+    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
+        try {
+            final SApplicationPage sAppPage = applicationService.getApplicationPage(applicationName, applicationPageName);
+            return convertor.toApplicationPage(sAppPage);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationPageNotFoundException(e.getMessage());
         }
     }
 

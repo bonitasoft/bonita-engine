@@ -10,6 +10,9 @@
                 <entry key="APPLICATION_CREATED:INTERNAL" value="true" />
                 <entry key="APPLICATION_DELETED:INTERNAL" value="true" />
                 <entry key="APPLICATION_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_UPDATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
         		<entry key="CATEGORY_CREATED:INTERNAL" value="true" />

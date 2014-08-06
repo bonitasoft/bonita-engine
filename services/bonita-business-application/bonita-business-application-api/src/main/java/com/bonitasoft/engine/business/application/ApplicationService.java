@@ -32,6 +32,8 @@ public interface ApplicationService {
 
     String APPLICATION = "APPLICATION";
 
+    String APPLICATION_PAGE = "APPLICATION_PAGE";
+
     SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
@@ -42,4 +44,15 @@ public interface ApplicationService {
 
     List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
 
+    SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException;
+
+    SApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws SBonitaReadException, SObjectNotFoundException;
+
+    SApplicationPage getApplicationPage(long applicationPageId) throws SBonitaReadException, SObjectNotFoundException;
+
+    void deleteApplicationPage(long applicationpPageId) throws SObjectModificationException, SObjectNotFoundException;
+
+    long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException;
+
+    List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException;
 }

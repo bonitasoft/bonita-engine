@@ -88,14 +88,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
     CreationException {
-        // TODO Auto-generated method stub
-        return null;
+        return getDelegate().createApplicationPage(applicationId, pagedId, name);
     }
 
     @Override
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+        return getDelegate().getApplicationPage(applicationName, applicationPageName);
     }
 
     @Override

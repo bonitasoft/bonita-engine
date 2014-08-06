@@ -14,7 +14,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -39,11 +41,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -208,6 +212,121 @@ public class ApplicationServiceImplTest {
         applicationService.searchApplications(options);
 
         //then exception
+    }
+
+    private SApplicationPage buildApplicationPage(final long applicationId, final long pageId, final String name) {
+        return new SApplicationPageBuilderFactoryImpl().createNewInstance(applicationId, pageId, name).done();
+    }
+
+    @Test
+    public void createApplicationPage_should_call_recordInsert_and_return_created_object() throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
+        applicationPage.setId(15);
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION_PAGE)
+                .setObject(applicationPage).done();
+        final InsertRecord record = new InsertRecord(applicationPage);
+
+        //when
+        final SApplicationPage createdApplicationPage = applicationService.createApplicationPage(applicationPage);
+
+        //then
+        assertThat(createdApplicationPage).isEqualTo(applicationPage);
+        verify(recorder, times(1)).recordInsert(record, insertEvent);
+    }
+
+    @Test(expected = SObjectCreationException.class)
+    public void createApplicationPage_should_throw_SObjectCreationException_when_recorder_throws_SBonitaException() throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
+        applicationPage.setId(15);
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+        //when
+        applicationService.createApplicationPage(applicationPage);
+
+        //then exception
+    }
+
+    @Test(expected = SObjectAlreadyExistsException.class)
+    public void createApplicationPage_should_throw_SObjectAlreadyExistsException_when_an_applicationPage_with_the_same_name_in_the_same_application_exists()
+            throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
+        inputParameters.put("applicationId", 5);
+        inputParameters.put("applicationPageName", "mainDashBoard");
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByNameAndApplicationId", inputParameters,
+                SApplicationPage.class
+                ))).willReturn(applicationPage);
+
+        //when
+        final SApplicationPage applicationPageToCreate = buildApplicationPage(5, 16, "mainDashBoard");
+        applicationPageToCreate.setId(7);
+        applicationService.createApplicationPage(applicationPageToCreate);
+
+        //then exception
+    }
+
+    @Test
+    public void getApplicationPage_should_return_result_of_persitence_service_selectById() throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(10, 20, "myPage");
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, 10L))).willReturn(
+                applicationPage);
+
+        //when
+        final SApplicationPage retrievedAppPage = applicationService.getApplicationPage(10L);
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(applicationPage);
+    }
+
+    @Test
+    public void getApplicationPage_by_name_and_appName_should_return_result_of_persitence_service_selectOne() throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(10, 20, "myPage");
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
+        inputParameters.put("applicationName", "app");
+        inputParameters.put("applicationPageName", "firstPage");
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByNameAndApplicationName", inputParameters,
+                SApplicationPage.class
+                ))).willReturn(applicationPage);
+
+        //when
+        final SApplicationPage retrievedAppPage = applicationService.getApplicationPage("app", "firstPage");
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(applicationPage);
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void getApplicationPage_by_name_and_appName_should_throw_SObjectNotFoundException_when_persitence_service_selectOne_returns_null() throws Exception {
+        //given
+        given(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SApplicationPage>> any())).willReturn(null);
+
+        //when
+        applicationService.getApplicationPage("app", "firstPage");
+
+        //then exception
+    }
+
+    @Test
+    public void deleteApplicationPage_should_call_record_delete_with_applicationPage_idenfied_by_the_given_id() throws Exception {
+        //given
+        final long applicationPageId = 10L;
+        final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
+        applicationPage.setId(27);
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
+        .willReturn(applicationPage);
+
+        //when
+        applicationService.deleteApplicationPage(applicationPageId);
+
+        //then
+        final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
+                .setObject(applicationPage).done();
+        verify(recorder, times(1)).recordDelete(new DeleteRecord(applicationPage), event);
     }
 
 }

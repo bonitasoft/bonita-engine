@@ -21,4 +21,6 @@ public interface SApplicationPage extends PersistentObject {
 
     long getPageId();
 
+    String getName();
+
 }

@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
@@ -35,6 +36,8 @@ import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.page.Page;
+import com.bonitasoft.engine.page.PageSearchDescriptor;
 
 
 /**
@@ -284,4 +287,47 @@ public class ApplicationAPIIT extends CommonAPISPTest {
         return builder;
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page", "create" })
+    @Test
+    public void createApplicationPage_returns_applicationPage_based_on_the_given_parameters() throws Exception {
+        //given
+        final Page page = getAProvidedPage();
+
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+
+        //when
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+
+        //then
+        assertThat(appPage.getId()).isGreaterThan(0);
+        assertThat(appPage.getApplicationId()).isEqualTo(application.getId());
+        assertThat(appPage.getPageId()).isEqualTo(page.getId());
+        assertThat(appPage.getName()).isEqualTo("firstPage");
+        applicationAPI.deleteApplication(application.getId());
+    }
+
+    private Page getAProvidedPage() throws SearchException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
+        builder.filter(PageSearchDescriptor.PROVIDED, true);
+        final SearchResult<Page> pagesResult = getPageAPI().searchPages(builder.done());
+        final Page page = pagesResult.getResult().get(0);
+        return page;
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+    "get by name and application name" })
+    @Test
+    public void getApplicationPage_byNameAndAppName_returns_the_applicationPage_corresponding_to_the_given_parameters() throws Exception {
+        //given
+        final Page page = getAProvidedPage();
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+
+        //when
+        final ApplicationPage retrievedAppPage = applicationAPI.getApplicationPage(application.getName(), appPage.getName());
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(appPage);
+        applicationAPI.deleteApplication(application.getId());
+    }
 }

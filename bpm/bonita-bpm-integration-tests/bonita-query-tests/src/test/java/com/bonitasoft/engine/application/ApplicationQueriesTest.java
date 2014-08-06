@@ -14,6 +14,8 @@
 package com.bonitasoft.engine.application;
 
 import static com.bonitasoft.engine.test.persistence.builder.ApplicationBuilder.anApplication;
+import static com.bonitasoft.engine.test.persistence.builder.ApplicationPageBuilder.anApplicationPage;
+import static com.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
@@ -25,6 +27,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.test.persistence.repository.ApplicationRepository;
 
 /**
@@ -65,6 +69,61 @@ public class ApplicationQueriesTest {
 
         //then
         assertThat(retrievedApp).isEqualTo(application2);
+    }
+
+    @Test
+    public void getApplicationPageById_should_return_the_applicationPage_identified_by_the_given_id() throws Exception {
+        //given
+        final SApplication application1 = repository.add(anApplication().withName("app1").withVersion("1.0").withPath("/app1").build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
+        final SApplicationPage secondPageApp = repository.add(anApplicationPage().withName("SecondPage").withApplicationId(application1.getId())
+                .withPageId(page.getId()).build());
+        repository.add(anApplicationPage().withName("ThirdPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
+
+        //when
+        final SApplicationPage retrievedAppPage = repository.getApplicationPage(secondPageApp.getId());
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(secondPageApp);
+    }
+
+    @Test
+    public void getApplicationPageByNameAnApplicationName_should_return_the_applicationPage_with_the_given_name_in_the_given_application() throws Exception {
+        //given
+        final SApplication application1 = repository.add(anApplication().withName("app1").withVersion("1.0").withPath("/app1").build());
+        final SApplication application2 = repository.add(anApplication().withName("app2").withVersion("1.0").withPath("/app2").build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
+        final SApplicationPage secondPageApp1 = repository.add(anApplicationPage().withName("SecondPage").withApplicationId(application1.getId())
+                .withPageId(page.getId()).build());
+        repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application2.getId()).withPageId(page.getId()).build());
+        repository.add(anApplicationPage().withName("SecondPage").withApplicationId(application2.getId()).withPageId(page.getId()).build());
+
+        //when
+        final SApplicationPage retrievedAppPage = repository.getApplicationPageByNameAndApplicationName("app1", "SecondPage");
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(secondPageApp1);
+    }
+
+    @Test
+    public void getApplicationPageByNameAndApplicationId_should_return_the_applicationPage_with_the_given_name_in_the_given_application() throws Exception {
+        //given
+        final SApplication application1 = repository.add(anApplication().withName("app1").withVersion("1.0").withPath("/app1").build());
+        final SApplication application2 = repository.add(anApplication().withName("app2").withVersion("1.0").withPath("/app2").build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application1.getId()).withPageId(page.getId()).build());
+        final SApplicationPage secondPageApp1 = repository.add(anApplicationPage().withName("SecondPage").withApplicationId(application1.getId())
+                .withPageId(page.getId()).build());
+        repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application2.getId()).withPageId(page.getId()).build());
+        repository.add(anApplicationPage().withName("SecondPage").withApplicationId(application2.getId()).withPageId(page.getId()).build());
+
+        //when
+        final SApplicationPage retrievedAppPage = repository.getApplicationPageByNameAndApplicationId(application1.getId(), "SecondPage");
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(secondPageApp1);
     }
 
 }

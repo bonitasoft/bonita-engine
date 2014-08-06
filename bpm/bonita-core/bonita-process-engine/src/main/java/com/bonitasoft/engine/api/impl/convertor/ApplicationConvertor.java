@@ -19,10 +19,13 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationCreator.ApplicationField;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationBuilder;
 import com.bonitasoft.engine.business.application.SApplicationBuilderFactory;
+import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 
 
 /**
@@ -63,6 +66,13 @@ public class ApplicationConvertor {
             applications.add(toApplication(sApplication));
         }
         return applications;
+    }
+
+    public ApplicationPage toApplicationPage(final SApplicationPage sApplicationPage) {
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(sApplicationPage.getApplicationId(), sApplicationPage.getPageId(),
+                sApplicationPage.getName());
+        appPage.setId(sApplicationPage.getId());
+        return appPage;
     }
 
 }

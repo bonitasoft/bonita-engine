@@ -13,13 +13,13 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatoryFieldsException;
 
-import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
+import com.bonitasoft.engine.business.application.SApplicationPageLogBuilder;
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class SApplicationPageLogBuilderImpl extends CRUDELogBuilder implements SApplicationLogBuilder {
+public class SApplicationPageLogBuilderImpl extends CRUDELogBuilder implements SApplicationPageLogBuilder {
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
@@ -29,14 +29,14 @@ public class SApplicationPageLogBuilderImpl extends CRUDELogBuilder implements S
 
     @Override
     protected String getActionTypePrefix() {
-        return "BUSINESS_APPLICATION_PAGE";
+        return "APPLICATION_PAGE";
     }
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL
                 && log.getNumericIndex(SApplicationPageLogBuilderFactoryImpl.APPLICATION_PAGE_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: business application page identifier");
+            throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: application page identifier");
         }
     }
 

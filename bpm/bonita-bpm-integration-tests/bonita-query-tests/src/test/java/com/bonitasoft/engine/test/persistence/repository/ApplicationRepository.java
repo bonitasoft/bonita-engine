@@ -17,6 +17,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
 
 
 /**
@@ -39,6 +40,26 @@ public class ApplicationRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getApplicationByName");
         namedQuery.setParameter("name", name);
         return (SApplication) namedQuery.uniqueResult();
+    }
+
+    public SApplicationPage getApplicationPage(final long applicationPageId) {
+        final Query namedQuery = getNamedQuery("getApplicationPageById");
+        namedQuery.setParameter("id", applicationPageId);
+        return (SApplicationPage) namedQuery.uniqueResult();
+    }
+
+    public SApplicationPage getApplicationPageByNameAndApplicationName(final String applicationName, final String applicationPageName) {
+        final Query namedQuery = getNamedQuery("getApplicationPageByNameAndApplicationName");
+        namedQuery.setParameter("applicationName", applicationName);
+        namedQuery.setParameter("applicationPageName", applicationPageName);
+        return (SApplicationPage) namedQuery.uniqueResult();
+    }
+
+    public SApplicationPage getApplicationPageByNameAndApplicationId(final long applicationId, final String applicationPageName) {
+        final Query namedQuery = getNamedQuery("getApplicationPageByNameAndApplicationId");
+        namedQuery.setParameter("applicationId", applicationId);
+        namedQuery.setParameter("applicationPageName", applicationPageName);
+        return (SApplicationPage) namedQuery.uniqueResult();
     }
 
 }

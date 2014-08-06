@@ -20,7 +20,7 @@
 		<property name="createdBy" column="createdBy" />
 		<property name="lastUpdateDate" column="lastUpdateDate" />
 		<property name="updatedBy" column="updatedBy" />
-		<property name="state" column="state" />
+		<property name="state" column="state" />  
 		<filter name="tenantFilter" />
 	</class>
 
@@ -31,6 +31,7 @@
 		</composite-id>
 		<property name="applicationId" column="applicationId" />
 		<property name="pageId" column="pageId" />
+		<property name="name" column="name" />
 		<filter name="tenantFilter" />
 	</class>
 

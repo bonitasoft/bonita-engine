@@ -28,10 +28,14 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -56,9 +60,13 @@ public class ApplicationAPIDelegateTest {
 
     private final long APPLICATION_ID = 15;
 
+    private final long PAGE_ID = 20;
+
     private final long LOGGED_USER_ID = 10;
 
-    private static final String NAME = "app";
+    private static final String APP_NAME = "app";
+
+    private static final String APP_PAGE_NAME = "firstPage";
 
     private static final String VERSION = "1.0";
 
@@ -68,18 +76,18 @@ public class ApplicationAPIDelegateTest {
 
     @Before
     public void setUp() throws Exception {
-        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications);
         given(accessor.getApplicationService()).willReturn(applicationService);
+        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications);
     }
 
     @Test
-    public void createApplication_should_call_applicationService_add() throws Exception {
+    public void createApplication_should_call_applicationService_createApplication_and_return_created_application() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
         creator.setDescription(DESCRIPTION);
         final SApplicationImpl sApp = getDefaultApplication();
         sApp.setDescription(DESCRIPTION);
-        final ApplicationImpl application = new ApplicationImpl(NAME, VERSION, PATH, DESCRIPTION);
+        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, PATH, DESCRIPTION);
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(convertor.toApplication(sApp)).willReturn(application);
         given(applicationService.createApplication(sApp)).willReturn(sApp);
@@ -92,7 +100,7 @@ public class ApplicationAPIDelegateTest {
     }
 
     private SApplicationImpl getDefaultApplication() {
-        final SApplicationImpl sApp = new SApplicationImpl(NAME, VERSION, PATH, System.currentTimeMillis(), LOGGED_USER_ID,
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, VERSION, PATH, System.currentTimeMillis(), LOGGED_USER_ID,
                 SApplicationState.DEACTIVATED.name());
         return sApp;
     }
@@ -100,7 +108,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = AlreadyExistsException.class)
     public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
@@ -114,7 +122,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
@@ -147,7 +155,7 @@ public class ApplicationAPIDelegateTest {
     @Test
     public void getApplication_should_return_the_application_returned_by_applicationService_coverted() throws Exception {
         final SApplicationImpl sApp = getDefaultApplication();
-        final ApplicationImpl application = new ApplicationImpl(NAME, VERSION, PATH, null);
+        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, PATH, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
         given(convertor.toApplication(sApp)).willReturn(application);
 
@@ -201,6 +209,83 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.searchApplications();
+
+        //then exception
+    }
+
+    @Test
+    public void createApplicationPage_should_call_applicationService_createApplicationPage_and_return_created_applicationPage() throws Exception {
+        //given
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+        given(applicationService.createApplicationPage(sAppPage)).willReturn(sAppPage);
+
+        //when
+        final ApplicationPage createdAppPage = delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+
+        //then
+        assertThat(createdAppPage).isEqualTo(appPage);
+    }
+
+    @Test(expected = CreationException.class)
+    public void createApplicationPage_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
+        //given
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectCreationException());
+
+        //when
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+
+        //then exception
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void createApplicationPage_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
+        //given
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectAlreadyExistsException());
+
+        //when
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+
+        //then exception
+    }
+
+    @Test
+    public void getApplicationPage_byNameAndAppName_should_return_the_result_of_applicationService_getApplicationPage() throws Exception {
+        //given
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_NAME)).willReturn(sAppPage);
+        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+
+        //when
+        final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(appPage);
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getApplicationPage_byNameAndAppName_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+        //given
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_NAME)).willThrow(new SBonitaReadException(""));
+
+        //when
+        delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+
+        //then exception
+    }
+
+    @Test(expected = ApplicationPageNotFoundException.class)
+    public void getApplicationPage_byNameAndAppName_should_throw_SObjectNotFoundException_when_applicationService_throws_SObjectNotFoundException()
+            throws Exception {
+        //given
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_NAME)).willThrow(new SObjectNotFoundException());
+
+        //when
+        delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
 
         //then exception
     }
