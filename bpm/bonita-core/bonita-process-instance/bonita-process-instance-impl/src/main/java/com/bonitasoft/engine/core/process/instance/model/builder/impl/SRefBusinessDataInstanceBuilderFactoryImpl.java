@@ -8,9 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import java.util.List;
+
 import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDataInstanceBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDataInstanceBuilderFactory;
-import com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl;
+import com.bonitasoft.engine.core.process.instance.model.impl.SMultiRefBusinessDataInstanceImpl;
+import com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -19,7 +22,7 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
 
     @Override
     public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final Long dataId, final String dataClassName) {
-        final SRefBusinessDataInstanceImpl entity = new SRefBusinessDataInstanceImpl();
+        final SSimpleRefBusinessDataInstanceImpl entity = new SSimpleRefBusinessDataInstanceImpl();
         entity.setProcessInstanceId(processInstanceId);
         entity.setName(name);
         entity.setDataId(dataId);
@@ -28,23 +31,14 @@ public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessD
     }
 
     @Override
-    public String getNameKey() {
-        return "name";
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return "processInstanceId";
-    }
-
-    @Override
-    public String getDataIdKey() {
-        return "dataId";
-    }
-
-    @Override
-    public String getDataClassNameKey() {
-        return "dataClassName";
+    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final List<Long> dataIds,
+            final String dataClassName) {
+        final SMultiRefBusinessDataInstanceImpl entity = new SMultiRefBusinessDataInstanceImpl();
+        entity.setProcessInstanceId(processInstanceId);
+        entity.setName(name);
+        entity.setDataIds(dataIds);
+        entity.setDataClassName(dataClassName);
+        return new SRefBusinessDataInstanceBuilderImpl(entity);
     }
 
 }

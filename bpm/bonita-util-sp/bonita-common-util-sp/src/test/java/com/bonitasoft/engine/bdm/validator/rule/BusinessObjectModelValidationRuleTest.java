@@ -8,12 +8,17 @@ package com.bonitasoft.engine.bdm.validator.rule;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -46,20 +51,52 @@ public class BusinessObjectModelValidationRuleTest {
 
     @Test
     public void should_validate_that_bom_has_at_least_one_businessObject() throws Exception {
-        BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObjectModel bom = new BusinessObjectModel();
 
-        ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
+        final ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
 
         assertThat(validationStatus).isNotOk();
     }
 
     @Test
     public void should_return_a_valid_status_when_bom_is_valid() throws Exception {
-        BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(new BusinessObject());
 
-        ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
+        final ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
 
         assertThat(validationStatus).isOk();
+    }
+
+    @Test
+    public void should_return_a_error_status_when_bom_contains_invalid_query_names() throws Exception {
+        final BusinessObjectModel bom = new BusinessObjectModel();
+
+        final BusinessObject employee = new BusinessObject();
+        employee.setQualifiedName("Employee");
+        final BusinessObject address = new BusinessObject();
+        address.setQualifiedName("Address");
+
+        final SimpleField street = new SimpleField();
+        street.setName("street");
+        street.setType(FieldType.STRING);
+        address.addField(street);
+
+        final RelationField addresses = new RelationField();
+        addresses.setName("addresses");
+        addresses.setCollection(true);
+        addresses.setFetchType(FetchType.LAZY);
+        addresses.setReference(address);
+
+        employee.addField(addresses);
+
+        address.addQuery("findAddressesByEmployeePersistenceId", "", List.class.getName());//Duplicated query name
+
+        bom.addBusinessObject(employee);
+        bom.addBusinessObject(address);
+
+        final ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
+
+        assertThat(validationStatus).isNotOk();
     }
 }

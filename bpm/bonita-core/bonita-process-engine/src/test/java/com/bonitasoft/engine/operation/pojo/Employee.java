@@ -34,6 +34,10 @@ public class Employee implements Entity {
         return persistenceId;
     }
 
+    public void setPersistenceId(final Long id) {
+        persistenceId = id;
+    }
+
     @Override
     public Long getPersistenceVersion() {
         return persistenceVersion;

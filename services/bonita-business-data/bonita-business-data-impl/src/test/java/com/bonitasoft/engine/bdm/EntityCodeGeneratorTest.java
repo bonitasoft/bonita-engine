@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.FieldType;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
@@ -42,11 +43,13 @@ public class EntityCodeGeneratorTest {
     private EntityCodeGenerator entityCodeGenerator;
 
     private CodeGenerator codeGenerator;
+    
+    private BusinessObjectModel bom = new BusinessObjectModel();
 
     @Before
     public void setUp() {
         codeGenerator = new CodeGenerator();
-        entityCodeGenerator = new EntityCodeGenerator(codeGenerator);
+        entityCodeGenerator = new EntityCodeGenerator(codeGenerator,bom);
     }
 
     @Test

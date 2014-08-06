@@ -138,6 +138,13 @@ public class IOUtils {
         return createDirectory(subDir);
     }
 
+    public static File createDirectoryIfNotExists(File dir) {
+        if (!dir.exists()) {
+            return createDirectory(dir);
+        }
+        return dir;
+    }
+    
     private static File createDirectory(final File dir) {
         dir.delete();
         dir.mkdir();

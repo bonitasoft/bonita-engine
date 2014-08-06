@@ -27,5 +27,4 @@ public class RelationFieldAnnotatorTest {
 
         assertThat(joinColumnName).isEqualTo("SOMELONGNAMELONGERTHANTWEN_PID");
     }
-
 }

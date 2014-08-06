@@ -28,9 +28,9 @@ public class RelationField extends Field {
     public enum Type {
         AGGREGATION, COMPOSITION;
     }
-    
+
     public enum FetchType {
-        EAGER
+        EAGER, LAZY
     }
 
     @XmlAttribute(required = true)
@@ -42,7 +42,7 @@ public class RelationField extends Field {
 
     @XmlAttribute(required = true)
     private FetchType fetchType = FetchType.EAGER;
-    
+
     public Type getType() {
         return type;
     }
@@ -62,9 +62,13 @@ public class RelationField extends Field {
     public FetchType getFetchType() {
         return fetchType;
     }
-    
-    public void setFetchType(FetchType fetchType) {
+
+    public void setFetchType(final FetchType fetchType) {
         this.fetchType = fetchType;
+    }
+
+    public boolean isLazy() {
+        return fetchType == FetchType.LAZY;
     }
 
     @Override

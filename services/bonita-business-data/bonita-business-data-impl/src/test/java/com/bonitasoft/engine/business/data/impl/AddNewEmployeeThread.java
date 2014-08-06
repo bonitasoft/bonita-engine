@@ -25,7 +25,7 @@ public class AddNewEmployeeThread extends Thread {
 
             final Employee myEmployee = new Employee("John" + employeeId, "Doe");
             Thread.sleep(150);
-            repository.merge(myEmployee);
+            repository.persist(myEmployee);
 
             transaction.commit();
         } catch (final Exception e) {

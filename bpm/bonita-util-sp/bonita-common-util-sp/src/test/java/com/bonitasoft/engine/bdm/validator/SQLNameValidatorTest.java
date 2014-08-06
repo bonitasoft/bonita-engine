@@ -22,8 +22,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
-
 /**
  * @author Romain Bioteau
  *

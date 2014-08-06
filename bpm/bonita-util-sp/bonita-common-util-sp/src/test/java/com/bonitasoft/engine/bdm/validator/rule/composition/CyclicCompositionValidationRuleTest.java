@@ -8,11 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule.composition;
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.model.builder.FieldBuilder.aCompositionField;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aCompositionField;
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,25 +34,25 @@ public class CyclicCompositionValidationRuleTest {
 
     @Test
     public void should_validate_that_a_composite_object_cannot_have_one_of_its_ancestor_as_a_child() throws Exception {
-        BusinessObject daughter = aBO("daughter").build();
-        BusinessObject mother = aBO("mother").withField(aCompositionField("daughter", daughter)).build();
-        BusinessObject grandMother = aBO("grandMother").withField(aCompositionField("mother", mother)).build();
+        final BusinessObject daughter = aBO("daughter").build();
+        final BusinessObject mother = aBO("mother").withField(aCompositionField("daughter", daughter)).build();
+        final BusinessObject grandMother = aBO("grandMother").withField(aCompositionField("mother", mother)).build();
 
         daughter.addField(aCompositionField("forbiddenChild", grandMother));
-        BusinessObjectModel bom = aBOM().withBOs(grandMother, mother, daughter).build();
+        final BusinessObjectModel bom = aBOM().withBOs(grandMother, mother, daughter).build();
 
-        ValidationStatus validationStatus = rule.validate(bom);
+        final ValidationStatus validationStatus = rule.validate(bom);
 
         assertThat(validationStatus).isNotOk();
     }
 
     @Test
     public void should_validate_that_a_bo_cannot_compose_itself() throws Exception {
-        BusinessObject daughter = aBO("daughter").build();
+        final BusinessObject daughter = aBO("daughter").build();
         daughter.addField(aCompositionField("toto", daughter));
-        BusinessObjectModel bom = aBOM().withBOs(daughter).build();
+        final BusinessObjectModel bom = aBOM().withBOs(daughter).build();
 
-        ValidationStatus validationStatus = rule.validate(bom);
+        final ValidationStatus validationStatus = rule.validate(bom);
 
         assertThat(validationStatus).isNotOk();
     }
