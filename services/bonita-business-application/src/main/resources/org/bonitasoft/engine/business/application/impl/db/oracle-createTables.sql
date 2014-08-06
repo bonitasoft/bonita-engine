@@ -18,9 +18,10 @@ CREATE TABLE business_app (
 CREATE TABLE business_app_page (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  businessAppId NUMBER(19, 0) NOT NULL,
+  applicationId NUMBER(19, 0) NOT NULL,
   pageId NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantId, businessAppId, pageId),
+  name VARCHAR2(255),
+  UNIQUE (tenantId, applicationId, name),
   PRIMARY KEY (tenantId, id)
 );
 

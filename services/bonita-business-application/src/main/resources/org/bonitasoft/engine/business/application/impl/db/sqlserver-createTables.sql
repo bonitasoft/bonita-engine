@@ -19,9 +19,10 @@ GO
 CREATE TABLE business_app_page (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  businessAppId NUMERIC(19, 0) NOT NULL,
+  applicationId NUMERIC(19, 0) NOT NULL,
   pageId NUMERIC(19, 0) NOT NULL,
-  UNIQUE (tenantId, businessAppId, pageId),
+  name NVARCHAR(255),
+  UNIQUE (tenantId, applicationId, name),
   PRIMARY KEY (tenantId, id)
 )
 GO

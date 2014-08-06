@@ -46,7 +46,7 @@ ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileId FOREIGN KEY 
 -- business application
 ALTER TABLE business_app ADD CONSTRAINT fk_app_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE business_app_page ADD CONSTRAINT fk_app_page_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE business_app_page ADD CONSTRAINT fk_bus_app_id FOREIGN KEY (tenantid, businessAppId) REFERENCES business_app (tenantid, id) ON DELETE CASCADE;
+ALTER TABLE business_app_page ADD CONSTRAINT fk_bus_app_id FOREIGN KEY (tenantid, applicationId) REFERENCES business_app (tenantid, id) ON DELETE CASCADE;
 ALTER TABLE business_app_page ADD CONSTRAINT fk_page_id FOREIGN KEY (tenantid, pageId) REFERENCES page (tenantid, id);
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
