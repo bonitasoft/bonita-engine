@@ -375,22 +375,21 @@ public class IOUtil {
         if (!dir.isDirectory()) {
             throw new IOException("Unable to delete directory: " + dir + ", it is not a directory");
         }
-        final File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                deleteDir(files[i], attempts, sleepTime);
+        for (final File file : dir.listFiles()) {
+            if (file.isDirectory()) {
+                deleteDir(file, attempts, sleepTime);
             } else {
-                result = result && deleteFile(files[i], attempts, sleepTime);
+                result = result && deleteFile(file, attempts, sleepTime);
             }
         }
         result = result && deleteFile(dir, attempts, sleepTime);
         return result;
     }
 
-    public static boolean deleteFile(final File f, final int attempts, final long sleepTime) {
+    public static boolean deleteFile(final File file, final int attempts, final long sleepTime) {
         int retries = attempts;
         while (retries > 0) {
-            if (f.delete()) {
+            if (file.delete()) {
                 break;
             }
             retries--;

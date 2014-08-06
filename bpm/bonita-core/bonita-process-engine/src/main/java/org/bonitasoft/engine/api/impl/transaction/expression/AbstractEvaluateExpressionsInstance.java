@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.expression;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -26,5 +29,9 @@ public abstract class AbstractEvaluateExpressionsInstance {
             value = exp.getName() != null ? exp.getName() : exp.getContent();
         }
         return value;
+    }
+
+    protected Map<String, Serializable> getPartialContext(final Map<Expression, Map<String, Serializable>> expressions, final Expression exp) {
+        return expressions.get(exp);
     }
 }

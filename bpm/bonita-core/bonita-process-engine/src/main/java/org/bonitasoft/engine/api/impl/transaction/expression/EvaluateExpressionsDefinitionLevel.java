@@ -64,8 +64,8 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
             if (processDefinitionId != 0) {
                 final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 final Set<Expression> exps = expressionsAndTheirPartialContext.keySet();
-                for (Expression exp : exps) {
-                    Map<String, Serializable> inputValues = expressionsAndTheirPartialContext.get(exp);
+                for (final Expression exp : exps) {
+                    Map<String, Serializable> inputValues = getPartialContext(expressionsAndTheirPartialContext, exp);
                     if (inputValues == null) {
                         inputValues = new HashMap<String, Serializable>();
                     }
@@ -85,13 +85,13 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
         try {
             return (Serializable) expressionResolver.evaluate(sexp, context);
-        } catch (SExpressionTypeUnknownException e) {
+        } catch (final SExpressionTypeUnknownException e) {
             throw enrichExceptionContext(e, processDefinition);
-        } catch (SExpressionEvaluationException e) {
+        } catch (final SExpressionEvaluationException e) {
             throw enrichExceptionContext(e, processDefinition);
-        } catch (SExpressionDependencyMissingException e) {
+        } catch (final SExpressionDependencyMissingException e) {
             throw enrichExceptionContext(e, processDefinition);
-        } catch (SInvalidExpressionException e) {
+        } catch (final SInvalidExpressionException e) {
             throw enrichExceptionContext(e, processDefinition);
         }
     }

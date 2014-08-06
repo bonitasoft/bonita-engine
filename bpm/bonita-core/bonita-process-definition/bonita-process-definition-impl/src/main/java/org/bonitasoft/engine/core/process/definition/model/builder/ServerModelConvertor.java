@@ -71,9 +71,11 @@ public class ServerModelConvertor {
                 .setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
-                .setLeftOperand(
-                        BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                        .setType(operation.getLeftOperand().getType()).done()).done();
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                        .setName(operation.getLeftOperand().getName())
+                        .setType(operation.getLeftOperand().getType())
+                        .done())
+                .done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -117,6 +119,7 @@ public class ServerModelConvertor {
         final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
         builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());
+        builder.setMultiple(businessDataDefinition.isMultiple());
         return builder.done();
     }
 

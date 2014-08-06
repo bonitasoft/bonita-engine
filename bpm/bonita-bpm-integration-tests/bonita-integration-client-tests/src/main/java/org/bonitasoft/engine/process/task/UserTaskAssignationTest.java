@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -71,15 +70,12 @@ public class UserTaskAssignationTest extends CommonAPITest {
     public void getAssignedHumanTasksWithStartedState() throws Exception {
         final String actorName = "Commercial";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("getAssignedHumanTasksWithStartedState", "0.12", actorName, "Trade business");
-
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-
+        HumanTaskInstance pendingTask = waitForUserTask("step2", startProcess);
         assignAndExecuteStep(pendingTask, john.getId());
+
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        
         // Task is in STARTED state so should not be retrieved:
         assertEquals(0, toDoTasks.size());
         waitForProcessToFinish(startProcess);
@@ -87,15 +83,11 @@ public class UserTaskAssignationTest extends CommonAPITest {
     }
 
     @Test(expected = FlowNodeExecutionException.class)
-    public void cannotExecuteUnassignedTask() throws Exception {
+    public void cannotExecuteAnUnassignedTask() throws Exception {
         final String actorName = "Commercial";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("simple process", "0.12", actorName, "Trade business");
-
-        getProcessAPI().startProcess(processDefinition.getId());
-
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 2000, false, 1, john).waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
+        ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance pendingTask = waitForUserTask("step2", startProcess);
 
         try {
             // execute activity without assign it before, an exception is expected
@@ -130,21 +122,16 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String delivery = "Delivery men";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("executeConnectorOnStartOfAnAutomaticActivity", "1.0", delivery,
                 "Delivery all day and night long");
-
-        getProcessAPI().startProcess(processDefinition.getId());
-
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
+        ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance pendingTask = waitForUserTask("step2", process);
 
         getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
         try {
-
+            // No exception expected
             getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
-
     }
 
     @Test
@@ -152,18 +139,15 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String delivery = "Delivery men";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
 
-        getProcessAPI().startProcess(processDefinition.getId());
-        // before assign
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
-        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        assertEquals(1, pendingTasks.size());
-        final HumanTaskInstance pendingTask = pendingTasks.get(0);
+        ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance pendingTask = waitForUserTask("step2", process);
+        
         // after assign
         getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
         List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, toDoTasks.size());
         assertEquals(john.getId(), toDoTasks.get(0).getAssigneeId());
-        pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, pendingTasks.size());
         // after release
         getProcessAPI().releaseUserTask(toDoTasks.get(0).getId());
@@ -200,18 +184,14 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String delivery = "Delivery men";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
 
-        getProcessAPI().startProcess(processDefinition.getId());
-        // before assign
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
-        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        assertEquals(1, pendingTasks.size());
-        final HumanTaskInstance pendingTask = pendingTasks.get(0);
+        ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance pendingTask = waitForUserTask("step2", process);
         // after assign
         getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
         List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, toDoTasks.size());
         assertEquals(john.getId(), toDoTasks.get(0).getAssigneeId());
-        pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        List<HumanTaskInstance>  pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, pendingTasks.size());
         // after release
         getProcessAPI().releaseUserTask(toDoTasks.get(0).getId());
@@ -228,24 +208,20 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String delivery = "Delivery men";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
         // process started by john
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
 
         // login as jack
         logoutOnTenant();
         loginOnDefaultTenantWith(JACK, "bpm");
 
         // before assign
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
-        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        assertEquals(1, pendingTasks.size());
-        HumanTaskInstance pendingTask = pendingTasks.get(0);
+        HumanTaskInstance pendingTask = waitForUserTask("step2", process);
         // assign
         getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
         List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
         assertEquals(1, toDoTasks.size());
         assertEquals(jack.getId(), toDoTasks.get(0).getAssigneeId());
-        pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, pendingTasks.size());
         // release
         getProcessAPI().releaseUserTask(toDoTasks.get(0).getId());
@@ -281,11 +257,11 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String delivery = "Delivery men";
         // Run a process
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait until the first task appears
-        assertTrue("Fail to start process", new CheckNbPendingTaskOf(getProcessAPI(), 30, 2000, false, 1, john).waitUntil());
-        final Long taskId = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).get(0).getId();
+        HumanTaskInstance pendingTask = waitForUserTask("step2", process);
+        final Long taskId = pendingTask.getId();
 
         // First assign
         getProcessAPI().assignUserTask(taskId, john.getId());
@@ -317,13 +293,9 @@ public class UserTaskAssignationTest extends CommonAPITest {
 
         // Run a process
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
 
-        // Wait until the first task appears
-        if (!new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil()) {
-            fail("Fail to start process");
-        }
-        HumanTaskInstance task = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).get(0);
+        HumanTaskInstance task = waitForUserTask("step2", process);
         final Long taskId = task.getId();
         Date previousUpdateDate = task.getLastUpdateDate();
 
@@ -339,10 +311,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
 
         // Release
         getProcessAPI().releaseUserTask(taskId);
-        if (!new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil()) {
-            fail("Fail to release task");
-        }
-        task = getProcessAPI().getHumanTaskInstance(taskId);
+        task = waitForUserTask("step2", process);
         assertFalse("Last update date not updated during release", previousUpdateDate.equals(task.getLastUpdateDate()));
         previousUpdateDate = task.getLastUpdateDate();
 
