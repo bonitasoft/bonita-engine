@@ -236,7 +236,7 @@ GO
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data PRIMARY KEY (tenantid, id)
 GO
 
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT UNIQUE uk_ref_biz_data ON ref_biz_data_inst(name, proc_inst_id, fn_inst_id, tenantid )
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT uk_ref_biz_data UNIQUE(name, proc_inst_id, fn_inst_id, tenantid )
 GO
 
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE
