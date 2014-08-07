@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
@@ -36,15 +35,13 @@ import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.page.Page;
-import com.bonitasoft.engine.page.PageSearchDescriptor;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationAPIIT extends CommonAPISPTest {
+public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
     private ApplicationAPI applicationAPI;
 
@@ -285,109 +282,6 @@ public class ApplicationAPIIT extends CommonAPISPTest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.sort(ApplicationSearchDescriptor.NAME, Order.ASC);
         return builder;
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page", "create" })
-    @Test
-    public void createApplicationPage_returns_applicationPage_based_on_the_given_parameters() throws Exception {
-        //given
-        final Page page = getAProvidedPage();
-
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
-
-        //when
-        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
-
-        //then
-        assertThat(appPage.getId()).isGreaterThan(0);
-        assertThat(appPage.getApplicationId()).isEqualTo(application.getId());
-        assertThat(appPage.getPageId()).isEqualTo(page.getId());
-        assertThat(appPage.getName()).isEqualTo("firstPage");
-        applicationAPI.deleteApplication(application.getId());
-    }
-
-    private Page getAProvidedPage() throws SearchException {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
-        builder.filter(PageSearchDescriptor.PROVIDED, true);
-        final SearchResult<Page> pagesResult = getPageAPI().searchPages(builder.done());
-        final Page page = pagesResult.getResult().get(0);
-        return page;
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-    "get by name and application name" })
-    @Test
-    public void getApplicationPage_byNameAndAppName_returns_the_applicationPage_corresponding_to_the_given_parameters() throws Exception {
-        //given
-        final Page page = getAProvidedPage();
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
-        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
-
-        //when
-        final ApplicationPage retrievedAppPage = applicationAPI.getApplicationPage(application.getName(), appPage.getName());
-
-        //then
-        assertThat(retrievedAppPage).isEqualTo(appPage);
-        applicationAPI.deleteApplication(application.getId());
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-    "get by id" })
-    @Test
-    public void getApplicationPage_byId_returns_the_applicationPage_corresponding_to_the_given_Id() throws Exception {
-        //given
-        final Page page = getAProvidedPage();
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
-        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
-
-        //when
-        final ApplicationPage retrievedAppPage = applicationAPI.getApplicationPage(appPage.getId());
-
-        //then
-        assertThat(retrievedAppPage).isEqualTo(appPage);
-        applicationAPI.deleteApplication(application.getId());
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-    "delete" })
-    @Test
-    public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
-        //given
-        final Page page = getAProvidedPage();
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
-        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
-
-        //when
-        applicationAPI.deleteApplication(application.getId());
-
-        //then
-        try {
-            applicationAPI.getApplicationPage(appPage.getId());
-            fail("Not found expected");
-        } catch (final ApplicationPageNotFoundException e) {
-            //OK
-        }
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "delete" })
-    @Test
-    public void deleteApplicationPage_should_delete_applicationPage_with_the_given_id() throws Exception {
-        //given
-        final Page page = getAProvidedPage();
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
-        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
-
-        //when
-        applicationAPI.deleteApplicationPage(appPage.getId());
-
-        //then
-        try {
-            applicationAPI.getApplicationPage(appPage.getId());
-            fail("Not found expected");
-        } catch (final ApplicationPageNotFoundException e) {
-            //OK
-        }
     }
 
 }

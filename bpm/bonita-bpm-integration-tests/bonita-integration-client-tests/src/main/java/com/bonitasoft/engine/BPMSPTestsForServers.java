@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.TaskOnDemandTest;
-import com.bonitasoft.engine.business.application.ApplicationAPIIT;
+import com.bonitasoft.engine.business.application.ApplicationAPIITs;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
@@ -35,7 +35,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
     PageAPIIT.class,
-    ApplicationAPIIT.class,
+    ApplicationAPIITs.class,
     TenantIT.class,
     NodeAPITest.class,
     LogTest.class,
