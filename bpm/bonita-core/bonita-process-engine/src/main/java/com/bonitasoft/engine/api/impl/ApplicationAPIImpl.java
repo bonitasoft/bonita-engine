@@ -14,6 +14,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -106,6 +107,16 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
         getDelegate().deleteApplicationPage(applicationpPageId);
+    }
+
+    @Override
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException {
+        getDelegate().setApplicationHomePage(applicationId, applicationPageId);
+    }
+
+    @Override
+    public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
+        return getDelegate().getApplicationHomePage(applicationId);
     }
 
 }

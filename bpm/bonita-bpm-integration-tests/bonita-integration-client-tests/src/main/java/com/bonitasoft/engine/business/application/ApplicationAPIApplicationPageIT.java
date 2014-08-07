@@ -137,6 +137,25 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
         return page;
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
+    "set home page" })
+    @Test
+    public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
+        //given
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+
+        //when
+        applicationAPI.setApplicationHomePage(application.getId(), appPage.getId());
+
+        //then
+        final Application upToDateApp = applicationAPI.getApplication(application.getId());
+        assertThat(upToDateApp.getHomePageId()).isEqualTo(appPage.getId());
+
+        applicationAPI.deleteApplication(application.getId());
+
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
     "get by name and application name" })
     @Test
@@ -207,6 +226,25 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
         } catch (final ApplicationPageNotFoundException e) {
             //OK
         }
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
+    "set home page" })
+    @Test
+    public void getApplicationHomePage_should_return_application_homePage() throws Exception {
+        //given
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+        applicationAPI.setApplicationHomePage(application.getId(), appPage.getId());
+
+        //when
+        final ApplicationPage homePage = applicationAPI.getApplicationHomePage(application.getId());
+
+        //then
+        assertThat(homePage).isEqualTo(appPage);
+
+        applicationAPI.deleteApplication(application.getId());
+
     }
 
 }

@@ -27,57 +27,57 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
 
     @Override
     public String getIdKey() {
-        return "id";
+        return SApplicationFields.ID;
     }
 
     @Override
     public String getNameKey() {
-        return "name";
+        return SApplicationFields.NAME;
     }
 
     @Override
     public String getVersionKey() {
-        return "version";
+        return SApplicationFields.VERSION;
     }
 
     @Override
     public String getPathKey() {
-        return "path";
+        return SApplicationFields.PATH;
     }
 
     @Override
     public String getDescriptionKey() {
-        return "description";
+        return SApplicationFields.DESCRIPTION;
     }
 
     @Override
     public String getIconPathKey() {
-        return "iconPath";
+        return SApplicationFields.ICON_PATH;
     }
 
     @Override
     public String getCreationDateKey() {
-        return "creationDate";
+        return SApplicationFields.CREATION_DATE;
     }
 
     @Override
     public String getCreatedByKey() {
-        return "createdBy";
+        return SApplicationFields.CREATED_BY;
     }
 
     @Override
     public String getLastUpdatedDateKey() {
-        return "lastUpdateDate";
+        return SApplicationFields.LAST_UPDATE_DATE;
     }
 
     @Override
     public String getUpdatedByKey() {
-        return "updatedBy";
+        return SApplicationFields.UPDATED_BY;
     }
 
     @Override
     public String getStateKey() {
-        return "state";
+        return SApplicationFields.HOME_PAGE_ID;
     }
 
 }

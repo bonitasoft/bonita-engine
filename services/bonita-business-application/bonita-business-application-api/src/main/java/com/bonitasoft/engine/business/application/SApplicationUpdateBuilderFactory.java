@@ -8,33 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+
 
 /**
  * @author Elias Ricken de Medeiros
+ *
  */
-public interface SApplication extends PersistentObject {
+public interface SApplicationUpdateBuilderFactory {
 
-    String getName();
-
-    String getVersion();
-
-    String getPath();
-
-    String getDescription();
-
-    String getIconPath();
-
-    long getCreationDate();
-
-    long getCreatedBy();
-
-    long getLastUpdateDate();
-
-    long getUpdatedBy();
-
-    String getState();
-
-    long getHomePageId();
-
+    SApplicationUpdateBuilder createNewInstance(EntityUpdateDescriptor descriptor);
 }

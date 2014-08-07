@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.test.persistence.repository.ApplicationRepository;
 
@@ -124,6 +125,26 @@ public class ApplicationQueriesTest {
 
         //then
         assertThat(retrievedAppPage).isEqualTo(secondPageApp1);
+    }
+
+    @Test
+    public void getApplicationHomePage_should_return_the_applicationPage_with_set_as_home_page_for_the_given_application() throws Exception {
+        //given
+        final SApplication application = repository.add(anApplication().withName("app1").withVersion("1.0").withPath("/app1").build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final SApplicationPage firstPage = repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application.getId())
+                .withPageId(page.getId()).build());
+        repository.add(anApplicationPage().withName("SecondPage").withApplicationId(application.getId())
+                .withPageId(page.getId()).build());
+
+        ((SApplicationImpl) application).setHomePageId(firstPage.getId());
+        repository.update((SApplicationImpl) application);
+
+        //when
+        final SApplicationPage retrievedAppPage = repository.getApplicationHomePage(application.getId());
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(firstPage);
     }
 
 }

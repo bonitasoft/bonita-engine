@@ -90,4 +90,11 @@ public interface Application extends BaseElement {
      */
     String getState();
 
+    /**
+     * Retrieves the identifier of the {@link ApplicationPage} defined as home page for this application
+     *
+     * @return the identifier of the {@link ApplicationPage} defined as home page for this application
+     */
+    long getHomePageId();
+
 }

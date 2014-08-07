@@ -21,6 +21,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -37,7 +38,9 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
@@ -166,6 +169,25 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException {
+        final String methodName = "updateApplication";
+        final SApplicationLogBuilder logBuilder = getApplicationLog(ActionType.CREATED, "Updating application with id " + applicationId);
+        try {
+            final SApplication application = getApplication(applicationId);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
+                    updateDescriptor);
+            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
+                    .setObject(application).done();
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(applicationId, SQueriableLog.STATUS_OK, logBuilder, methodName);
+            return application;
+        } catch (final SBonitaException e) {
+            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
     public long getNumberOfApplications(final QueryOptions options) throws SBonitaReadException {
         return persistenceService.getNumberOfEntities(SApplication.class, options, null);
     }
@@ -274,6 +296,22 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public SApplicationPage getApplicationHomePage(final long applicationId) throws SBonitaReadException, SObjectNotFoundException {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
+        inputParameters.put("applicationId", applicationId);
+        final SApplicationPage applicationPage = persistenceService
+                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationHomePage", inputParameters, SApplicationPage.class));
+        if (applicationPage == null) {
+            final StringBuilder stb = new StringBuilder();
+            stb.append("No home page found for application with id '");
+            stb.append(applicationId);
+            stb.append("'.");
+            throw new SObjectNotFoundException(stb.toString());
+        }
+        return applicationPage;
+    }
+
+    @Override
     public long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException {
         // TODO Auto-generated method stub
         return 0;
@@ -284,5 +322,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         // TODO Auto-generated method stub
         return null;
     }
+
 
 }

@@ -57,6 +57,7 @@ public class ApplicationConvertor {
         application.setLastUpdateDate(new Date(sApplication.getLastUpdateDate()));
         application.setState(sApplication.getState());
         application.setIconPath(sApplication.getIconPath());
+        application.setHomePageId(sApplication.getHomePageId());
         return application;
     }
 

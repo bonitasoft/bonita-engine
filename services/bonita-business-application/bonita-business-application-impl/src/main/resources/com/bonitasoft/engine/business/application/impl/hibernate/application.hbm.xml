@@ -21,6 +21,7 @@
 		<property name="lastUpdateDate" column="lastUpdateDate" />
 		<property name="updatedBy" column="updatedBy" />
 		<property name="state" column="state" />  
+		<property name="homePageId" column="homePageId" />
 		<filter name="tenantFilter" />
 	</class>
 

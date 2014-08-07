@@ -32,13 +32,10 @@
 
     <query name="getApplicationPageByNameAndApplicationName">
         SELECT applicationPage
-        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
-        WHERE applicationPage.name = :applicationPageName
-        AND applicationPage.applicationId IN (
-            SELECT application.id 
-            FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
-            WHERE application.name = :applicationName
-            )
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage, com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
+        WHERE applicationPage.applicationId = application.id
+        AND applicationPage.name = :applicationPageName
+        AND application.name = :applicationName
     </query>
 
     <query name="getApplicationPageByNameAndApplicationId">
@@ -46,6 +43,14 @@
         FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
         WHERE applicationPage.name = :applicationPageName
         AND applicationPage.applicationId = :applicationId
+    </query>
+
+    <query name="getApplicationHomePage">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage, com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
+        WHERE applicationPage.applicationId = application.id 
+        AND applicationPage.id = application.homePageId
+        AND application.id = :applicationId
     </query>
 
 </hibernate-mapping>

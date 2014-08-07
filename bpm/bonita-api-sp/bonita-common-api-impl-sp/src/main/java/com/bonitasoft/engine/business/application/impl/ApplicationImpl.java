@@ -30,6 +30,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private Date lastUpdateDate;
     private long updatedBy;
     private String state;
+    private long homePageId;
 
     public ApplicationImpl(final String name, final String version, final String path, final String description) {
         super(name, description);
@@ -102,16 +103,26 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     }
 
     @Override
+    public long getHomePageId() {
+        return homePageId;
+    }
+
+    public void setHomePageId(final long homePageId) {
+        this.homePageId = homePageId;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
+        result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
+        result = prime * result + (path == null ? 0 : path.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
-        result = prime * result + (path == null ? 0 : path.hashCode());
         result = prime * result + (version == null ? 0 : version.hashCode());
         return result;
     }
@@ -138,6 +149,9 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         } else if (!creationDate.equals(other.creationDate)) {
             return false;
         }
+        if (homePageId != other.homePageId) {
+            return false;
+        }
         if (iconPath == null) {
             if (other.iconPath != null) {
                 return false;
@@ -152,6 +166,13 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         } else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
             return false;
         }
+        if (path == null) {
+            if (other.path != null) {
+                return false;
+            }
+        } else if (!path.equals(other.path)) {
+            return false;
+        }
         if (state == null) {
             if (other.state != null) {
                 return false;
@@ -160,13 +181,6 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
             return false;
         }
         if (updatedBy != other.updatedBy) {
-            return false;
-        }
-        if (path == null) {
-            if (other.path != null) {
-                return false;
-            }
-        } else if (!path.equals(other.path)) {
             return false;
         }
         if (version == null) {
@@ -181,9 +195,11 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
 
     @Override
     public String toString() {
-        return "ApplicationImpl [version=" + version + ", url=" + path + ", iconPath=" + iconPath + ", creationDate=" + creationDate + ", createdBy="
-                + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", status=" + state + ", name=" + getName()
-                + ", id=" + getId() + "]";
+        return "ApplicationImpl [id=" + getId() + ", name=" + getName() + ", version=" + version
+                + ", path=" + path + ", getDescription()=" + getDescription() + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", homePageId="
+                + homePageId + ", iconPath=" + iconPath
+                + ", lastUpdateDate=" + lastUpdateDate + ", state=" + state + ", updatedBy=" + updatedBy + "]";
     }
+
 
 }

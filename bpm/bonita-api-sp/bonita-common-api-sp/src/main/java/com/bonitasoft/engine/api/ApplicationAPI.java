@@ -12,6 +12,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -114,5 +115,23 @@ public interface ApplicationAPI {
      * @throws if an error occurs during search
      */
     SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Defines the home page for the application
+     *
+     * @param applicationId the {@link Application} identifier
+     * @param applicationPageId the identifier of the {@link ApplicationPage} to be used as home page
+     * @throws UpdateException if an error occurs during the home page definition
+     */
+    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException;
+
+    /**
+     * Retrieves the application home page
+     *
+     * @param applicationId the {@link Application} identifier
+     * @return the application home page
+     * @throws ApplicationPageNotFoundException if no home page is found for the given application
+     */
+    ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
 
 }

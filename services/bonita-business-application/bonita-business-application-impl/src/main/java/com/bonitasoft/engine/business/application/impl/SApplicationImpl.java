@@ -41,6 +41,8 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private String state;
 
+    private long homePageId;
+
     public SApplicationImpl() {
         super();
     }
@@ -121,12 +123,22 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     }
 
     @Override
+    public long getHomePageId() {
+        return homePageId;
+    }
+
+    public void setHomePageId(final long homePageId) {
+        this.homePageId = homePageId;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (int) (creationDate ^ creationDate >>> 32);
         result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
         result = prime * result + (name == null ? 0 : name.hashCode());
@@ -160,6 +172,9 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
                 return false;
             }
         } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (homePageId != other.homePageId) {
             return false;
         }
         if (iconPath == null) {
@@ -210,7 +225,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     public String toString() {
         return "SApplicationImpl [name=" + name + ", description=" + description + ", version=" + version + ", path=" + path + ", iconPath=" + iconPath
                 + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy
-                + ", status=" + state + ", getId()=" + getId() + ", getTenantId()=" + getTenantId() + "]";
+                + ", state=" + state + ", homePageId=" + homePageId + ", getId()=" + getId() + ", getTenantId()=" + getTenantId() + "]";
     }
 
 }

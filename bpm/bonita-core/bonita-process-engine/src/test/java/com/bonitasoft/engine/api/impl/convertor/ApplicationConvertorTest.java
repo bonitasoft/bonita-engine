@@ -28,6 +28,7 @@ public class ApplicationConvertorTest {
     private static final int CREATOR_ID = 16;
     private static final int APPLICATION_ID = 20;
     private static final int PAGE_ID = 30;
+    private static final int HOME_PAGE_ID = 130;
     private static final String APP_DESC = "app desc";
     private static final String APP_PATH = "/app";
     private static final String APP_VERSION = "1.0";
@@ -72,6 +73,7 @@ public class ApplicationConvertorTest {
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
         sApp.setIconPath(ICON_PATH);
+        sApp.setHomePageId(HOME_PAGE_ID);
 
         //when
         final Application application = convertor.toApplication(sApp);
@@ -89,6 +91,7 @@ public class ApplicationConvertorTest {
         assertThat(application.getUpdatedBy()).isEqualTo(CREATOR_ID);
         assertThat(application.getLastUpdateDate()).isEqualTo(new Date(currentDate));
         assertThat(application.getState()).isEqualTo(state);
+        assertThat(application.getHomePageId()).isEqualTo(HOME_PAGE_ID);
     }
 
     @Test

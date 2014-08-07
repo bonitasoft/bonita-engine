@@ -22,6 +22,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 
 /**
@@ -40,6 +41,8 @@ public interface ApplicationService {
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
+    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException;
+
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
 
     List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
@@ -49,6 +52,8 @@ public interface ApplicationService {
     SApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws SBonitaReadException, SObjectNotFoundException;
 
     SApplicationPage getApplicationPage(long applicationPageId) throws SBonitaReadException, SObjectNotFoundException;
+
+    SApplicationPage getApplicationHomePage(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplicationPage(long applicationpPageId) throws SObjectModificationException, SObjectNotFoundException;
 

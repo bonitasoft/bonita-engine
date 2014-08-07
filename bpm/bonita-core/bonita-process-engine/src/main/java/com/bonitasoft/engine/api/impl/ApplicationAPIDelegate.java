@@ -12,13 +12,16 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
@@ -33,6 +36,8 @@ import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationPageBuilder;
 import com.bonitasoft.engine.business.application.SApplicationPageBuilderFactory;
+import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.SApplicationUpdateBuilderFactory;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -81,6 +86,16 @@ public class ApplicationAPIDelegate {
             applicationService.deleteApplication(applicationId);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
+        }
+    }
+
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException {
+        final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(new EntityUpdateDescriptor());
+        updateBuilder.updateHomePageId(applicationPageId);
+        try {
+            applicationService.updateApplication(applicationId, updateBuilder.done());
+        } catch (final SObjectModificationException e) {
+            throw new UpdateException(e);
         }
     }
 
@@ -134,6 +149,18 @@ public class ApplicationAPIDelegate {
             applicationService.deleteApplicationPage(applicationpPageId);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
+        }
+    }
+
+    public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
+        SApplicationPage sHomePage;
+        try {
+            sHomePage = applicationService.getApplicationHomePage(applicationId);
+            return convertor.toApplicationPage(sHomePage);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationPageNotFoundException(e.getMessage());
         }
     }
 

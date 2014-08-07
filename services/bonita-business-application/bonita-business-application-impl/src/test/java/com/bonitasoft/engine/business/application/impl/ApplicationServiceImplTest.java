@@ -21,9 +21,11 @@ import java.util.Map;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -35,7 +37,9 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -171,6 +175,32 @@ public class ApplicationServiceImplTest {
         final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
                 .setObject(application).done();
         verify(recorder, times(1)).recordDelete(new DeleteRecord(application), event);
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void deleteApplication_should_throw_SObjectNotFoundException_when_no_application_with_the_given_id_is_found() throws Exception {
+        //given
+        final long applicationId = 10L;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(null);
+
+        //when
+        applicationService.deleteApplication(applicationId);
+
+        //then exception
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void deleteApplication_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
+        //given
+        final long applicationId = 10L;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
+                application);
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+        //when
+        applicationService.deleteApplication(applicationId);
+
+        //then exception
     }
 
     @Test
@@ -312,7 +342,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void deleteApplicationPage_should_call_record_delete_with_applicationPage_idenfied_by_the_given_id() throws Exception {
+    public void deleteApplicationPage_should_call_record_delete_with_applicationPage_identified_by_the_given_id() throws Exception {
         //given
         final long applicationPageId = 10L;
         final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
@@ -327,6 +357,75 @@ public class ApplicationServiceImplTest {
         final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
                 .setObject(applicationPage).done();
         verify(recorder, times(1)).recordDelete(new DeleteRecord(applicationPage), event);
+    }
+
+    @Test
+    public void updateApplicationPage_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
+        //given
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        updateDescriptor.addField("name", "newName");
+
+        final int applicationId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
+                application);
+
+        //when
+        final SApplication updatedApplication = applicationService.updateApplication(applicationId, updateDescriptor);
+
+        //then
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
+                updateDescriptor);
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
+                .setObject(application).done();
+        verify(recorder, times(1)).recordUpdate(updateRecord, updateEvent);
+        assertThat(updatedApplication).isEqualTo(application);
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateApplicationPage_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
+        //given
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        updateDescriptor.addField("name", "newName");
+        final int applicationId = 17;
+
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        //when
+        applicationService.updateApplication(applicationId, updateDescriptor);
+
+        //then exception
+    }
+
+    @Test
+    public void getApplicationHomePage_should_return_result_of_persitence_service_selectOne() throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(10, 20, "myPage");
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
+        inputParameters.put("applicationId", 100);
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationHomePage", inputParameters,
+                SApplicationPage.class
+                ))).willReturn(applicationPage);
+
+        //when
+        final SApplicationPage homePage = applicationService.getApplicationHomePage(100);
+
+        //then
+        assertThat(homePage).isEqualTo(applicationPage);
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void getApplicationHomePage_should_throw_SObjectNotFoundException_when_persitence_service_selectOne_returns_null() throws Exception {
+        //given
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
+        inputParameters.put("applicationId", 100);
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationHomePage", inputParameters,
+                SApplicationPage.class
+                ))).willReturn(null);
+
+        //when
+        applicationService.getApplicationHomePage(100);
+
+        //then exception
     }
 
 }

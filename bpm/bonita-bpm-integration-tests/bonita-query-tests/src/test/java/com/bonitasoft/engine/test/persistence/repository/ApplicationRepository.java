@@ -62,4 +62,10 @@ public class ApplicationRepository extends TestRepository {
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
+    public SApplicationPage getApplicationHomePage(final long applicationId) {
+        final Query namedQuery = getNamedQuery("getApplicationHomePage");
+        namedQuery.setParameter("applicationId", applicationId);
+        return (SApplicationPage) namedQuery.uniqueResult();
+    }
+
 }

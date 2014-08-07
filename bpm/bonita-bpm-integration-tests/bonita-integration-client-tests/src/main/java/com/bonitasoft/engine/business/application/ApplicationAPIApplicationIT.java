@@ -90,6 +90,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
         assertThat(application.getCreatedBy()).isEqualTo(user.getId());
         assertThat(application.getUpdatedBy()).isEqualTo(user.getId());
+        assertThat(application.getHomePageId()).isEqualTo(0);
 
         applicationAPI.deleteApplication(application.getId());
     }

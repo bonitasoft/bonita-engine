@@ -2,6 +2,8 @@ package com.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,7 +17,9 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +38,7 @@ import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
+import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -58,13 +63,13 @@ public class ApplicationAPIDelegateTest {
 
     private ApplicationAPIDelegate delegate;
 
-    private final long APPLICATION_ID = 15;
+    private static final long APPLICATION_ID = 15;
 
-    private final long APPLICATION_PAGE_ID = 35;
+    private static final long APPLICATION_PAGE_ID = 35;
 
-    private final long PAGE_ID = 20;
+    private static final long PAGE_ID = 20;
 
-    private final long LOGGED_USER_ID = 10;
+    private static final long LOGGED_USER_ID = 10;
 
     private static final String APP_NAME = "app";
 
@@ -160,6 +165,28 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.deleteApplication(APPLICATION_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void setApplicationHomePage_should_call_applicationService_update_application_with_homePageId_key() throws Exception {
+        //when
+        delegate.setApplicationHomePage(APPLICATION_ID, APPLICATION_PAGE_ID);
+
+        //then
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        updateDescriptor.addField(SApplicationFields.HOME_PAGE_ID, APPLICATION_PAGE_ID);
+        verify(applicationService, times(1)).updateApplication(APPLICATION_ID, updateDescriptor);
+    }
+
+    @Test(expected = UpdateException.class)
+    public void setApplicationHomePage_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
+        //given
+        given(applicationService.updateApplication(anyLong(), any(EntityUpdateDescriptor.class))).willThrow(new SObjectModificationException(""));
+
+        //when
+        delegate.setApplicationHomePage(APPLICATION_ID, APPLICATION_PAGE_ID);
 
         //then exception
     }
@@ -365,6 +392,43 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.deleteApplicationPage(APPLICATION_PAGE_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void getApplicationHomePage_should_return_the_result_of_applicationService_getApplicationHomePage() throws Exception {
+        //given
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(applicationService.getApplicationHomePage(APPLICATION_ID)).willReturn(sAppPage);
+        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+
+        //when
+        final ApplicationPage retrievedAppPage = delegate.getApplicationHomePage(APPLICATION_ID);
+
+        //then
+        assertThat(retrievedAppPage).isEqualTo(appPage);
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getApplicationHomePage_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
+        //given
+        given(applicationService.getApplicationHomePage(APPLICATION_ID)).willThrow(new SBonitaReadException(""));
+
+        //when
+        delegate.getApplicationHomePage(APPLICATION_ID);
+
+        //then exception
+    }
+
+    @Test(expected = ApplicationPageNotFoundException.class)
+    public void getApplicationHomePage_should_throw_ApplicationPageNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+        //given
+        given(applicationService.getApplicationHomePage(APPLICATION_ID)).willThrow(new SObjectNotFoundException(""));
+
+        //when
+        delegate.getApplicationHomePage(APPLICATION_ID);
 
         //then exception
     }

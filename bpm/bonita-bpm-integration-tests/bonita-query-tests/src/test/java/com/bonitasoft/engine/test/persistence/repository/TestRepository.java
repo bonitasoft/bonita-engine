@@ -59,4 +59,8 @@ public class TestRepository {
         return (SApplicationPage) getSession().get(applicationPage.getClass(),
                 new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
     }
+
+    public void update(final SApplicationImpl application) {
+        getSession().update(application);
+    }
 }
