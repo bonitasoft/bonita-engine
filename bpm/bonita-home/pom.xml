@@ -12,29 +12,6 @@
 
 	<name>Bonita Home</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-business-data-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-client-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
