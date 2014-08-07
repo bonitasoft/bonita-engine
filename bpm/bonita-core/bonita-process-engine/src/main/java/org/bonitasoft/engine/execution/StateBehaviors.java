@@ -329,7 +329,12 @@ public class StateBehaviors {
 
             final SUser user = identityService.getUser(userId);
             if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)) {
-                commentService.addSystemComment(flowNodeInstance.getRootContainerId(), "The task \"" + flowNodeInstance.getDisplayName() + "\" is now assigned to "
+                String taskName = flowNodeInstance.getDisplayName();
+                if (taskName == null) {
+                    taskName = flowNodeInstance.getName();
+                }
+                
+                commentService.addSystemComment(flowNodeInstance.getRootContainerId(), "The task \"" + taskName + "\" is now assigned to "
                         + user.getUserName());
             }
         }
