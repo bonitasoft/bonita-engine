@@ -19,7 +19,6 @@
                 </property>
             </activation>
 			<modules>
-		        <module>bonita-home</module>
 		        <module>bonita-external</module>
 		        <module>bonita-core</module>
 		        <module>bonita-common</module>
@@ -29,6 +28,7 @@
 		        <module>bonita-util-sp</module>
 		        <module>bonita-synchro-repository-sp</module>
 		        <module>bonita-api-sp</module>
+		        <module>bonita-home</module>
 			</modules>
 		</profile>
 		<profile>
@@ -52,7 +52,6 @@
 		<profile>
 			<id>tests</id>
 			<modules>
-		        <module>bonita-home</module>
 		        <module>bonita-external</module>
 		        <module>bonita-core</module>
 		        <module>bonita-common</module>
@@ -63,12 +62,12 @@
 		        <module>bonita-synchro-repository-sp</module>
 		        <module>bonita-api-sp</module>
 				<module>bonita-bpm-integration-tests</module>
+		        <module>bonita-home</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>package-all</id>
 			<modules>
-		        <module>bonita-home</module>
 		        <module>bonita-external</module>
 		        <module>bonita-core</module>
 		        <module>bonita-common</module>
@@ -79,6 +78,7 @@
 		        <module>bonita-synchro-repository-sp</module>
 		        <module>bonita-api-sp</module>
 				<module>bonita-bpm-integration-tests</module>
+		        <module>bonita-home</module>
 			</modules>
 		</profile>
 	</profiles>
