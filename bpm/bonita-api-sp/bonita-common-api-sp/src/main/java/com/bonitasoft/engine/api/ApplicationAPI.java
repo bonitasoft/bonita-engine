@@ -62,7 +62,7 @@ public interface ApplicationAPI {
      * Searches for applications with specific search criteria.
      *
      * @param searchOptions the search options. See {@link SearchOptions} for details.
-     * @return a {@link SearchResult} containing the number and the list of applications matching with the search criteria.
+     * @return a {@link SearchResult} containing the number and the list of applications matching the search criteria.
      * @throws SearchException if an error occurs during search
      */
     SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;
@@ -110,7 +110,7 @@ public interface ApplicationAPI {
      * Searches for application pages with specific search criteria.
      *
      * @param searchOptions the search options. See {@link SearchOptions} for details.
-     * @return SearchException a {@link SearchResult} containing the number and the list of application pages matching with the search criteria.
+     * @return SearchException a {@link SearchResult} containing the number and the list of application pages matching the search criteria.
      * @throws if an error occurs during search
      */
     SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException;
