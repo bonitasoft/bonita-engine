@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-integration-as-tests</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.3-SNAPSHOT</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-jboss5</artifactId>

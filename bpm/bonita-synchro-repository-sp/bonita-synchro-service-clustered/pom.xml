@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.synchro</groupId>
 		<artifactId>bonita-synchro-repository-sp</artifactId>
-		<version>6.3.3-SNAPSHOT</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-synchro-service-clustered</artifactId>

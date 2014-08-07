@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.data</groupId>
 		<artifactId>bonita-business-data</artifactId>
-		<version>6.3.3-SNAPSHOT</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-business-data-impl</artifactId>
