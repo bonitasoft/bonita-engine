@@ -938,9 +938,9 @@ public class MultiInstanceTest extends CommonAPITest {
         searchOptionsBuilder.filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId());
         searchOptionsBuilder.sort(SearchCommentsDescriptor.CONTENT, Order.ASC);
         final List<Comment> comments = getProcessAPI().searchComments(searchOptionsBuilder.done()).getResult();
-        assertEquals("The task \"step1\" is now assigned to " + jack.getUserName(), comments.get(0).getContent());
-        assertEquals("The task \"step1\" is now assigned to " + jenny.getUserName(), comments.get(1).getContent());
-        assertEquals("The task \"step1\" is now assigned to " + john.getUserName(), comments.get(2).getContent());
+        assertEquals("The task \"displayName\" is now assigned to " + jack.getUserName(), comments.get(0).getContent());
+        assertEquals("The task \"displayName\" is now assigned to " + jenny.getUserName(), comments.get(1).getContent());
+        assertEquals("The task \"displayName\" is now assigned to " + john.getUserName(), comments.get(2).getContent());
 
         disableAndDeleteProcess(processDefinition);
     }
