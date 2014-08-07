@@ -1047,7 +1047,7 @@
               <destFileName>${project.build.finalName}.jar</destFileName>
               <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
               <createDependencyReducedPom>true</createDependencyReducedPom>
-              <createSourcesJar>true</createSourcesJar>
+              <createSourcesJar>${create.sources.jar}</createSourcesJar>
             </configuration>
           </execution>
         </executions>

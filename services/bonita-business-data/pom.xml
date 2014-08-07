@@ -13,8 +13,29 @@
 
 	<name>Bonita Business Data</name>
 
-	<modules>
-		<module>bonita-business-data-api</module>
-		<module>bonita-business-data-impl</module>
-	</modules>
+	<profiles>
+        <profile>
+            <id>deploy</id>
+            <modules>
+		        <module>bonita-business-data-api</module>
+            </modules>
+            <properties>
+                <create.sources.jar>false</create.sources.jar>                                                                                                                                                                               
+            </properties>
+        </profile>
+        <profile>
+            <id>package</id>
+            <modules>
+		        <module>bonita-business-data-api</module>
+		        <module>bonita-business-data-impl</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tests</id>
+            <modules>
+		        <module>bonita-business-data-api</module>
+		        <module>bonita-business-data-impl</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

@@ -10,20 +10,39 @@
 	<artifactId>bpm</artifactId>
 	<packaging>pom</packaging>
 
-	<modules>
-		<module>bonita-home</module>
-		<module>bonita-external</module>
-		<module>bonita-core</module>
-		<module>bonita-common</module>
-		<module>bonita-client</module>
-		<module>bonita-server</module>
-		<module>bonita-deploy</module>
-		<module>bonita-util-sp</module>
-		<module>bonita-synchro-repository-sp</module>
-		<module>bonita-api-sp</module>
-	</modules>
-
 	<profiles>
+		<profile>
+			<id>package</id>
+            <activation>                                                                                                                                                                                                                     
+                <property>
+                    <name>!publishArtifacts</name>
+                </property>
+            </activation>
+			<modules>
+		        <module>bonita-home</module>
+		        <module>bonita-external</module>
+		        <module>bonita-core</module>
+		        <module>bonita-common</module>
+		        <module>bonita-client</module>
+		        <module>bonita-server</module>
+		        <module>bonita-deploy</module>
+		        <module>bonita-util-sp</module>
+		        <module>bonita-synchro-repository-sp</module>
+		        <module>bonita-api-sp</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>deploy</id>
+			<modules>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+			</modules>
+            <properties>
+                <create.sources.jar>false</create.sources.jar>                                                                                                                                                                               
+            </properties>
+		</profile>
 		<profile>
 			<id>javadoc</id>
 			<modules>
@@ -33,12 +52,32 @@
 		<profile>
 			<id>tests</id>
 			<modules>
+		        <module>bonita-home</module>
+		        <module>bonita-external</module>
+		        <module>bonita-core</module>
+		        <module>bonita-common</module>
+		        <module>bonita-client</module>
+		        <module>bonita-server</module>
+		        <module>bonita-deploy</module>
+		        <module>bonita-util-sp</module>
+		        <module>bonita-synchro-repository-sp</module>
+		        <module>bonita-api-sp</module>
 				<module>bonita-bpm-integration-tests</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>package-all</id>
 			<modules>
+		        <module>bonita-home</module>
+		        <module>bonita-external</module>
+		        <module>bonita-core</module>
+		        <module>bonita-common</module>
+		        <module>bonita-client</module>
+		        <module>bonita-server</module>
+		        <module>bonita-deploy</module>
+		        <module>bonita-util-sp</module>
+		        <module>bonita-synchro-repository-sp</module>
+		        <module>bonita-api-sp</module>
 				<module>bonita-bpm-integration-tests</module>
 			</modules>
 		</profile>

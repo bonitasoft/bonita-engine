@@ -70,7 +70,7 @@
 							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
 							<createDependencyReducedPom>true</createDependencyReducedPom>
 							<keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
-							<createSourcesJar>true</createSourcesJar>
+							<createSourcesJar>${create.sources.jar}</createSourcesJar>
 						</configuration>
 					</execution>
 				</executions>
