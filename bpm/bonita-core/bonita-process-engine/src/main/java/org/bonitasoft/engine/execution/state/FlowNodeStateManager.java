@@ -40,8 +40,6 @@ public interface FlowNodeStateManager {
 
     FlowNodeState getNormalFinalState(SFlowNodeInstance flowNodeInstance);
 
-    FlowNodeState getInitialState(SFlowNodeInstance flowNodeInstance);
-
     Set<Integer> getUnstableStateIds();
 
     Set<Integer> getStableStateIds();

@@ -541,11 +541,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     @Override
-    public FlowNodeState getInitialState(final SFlowNodeInstance flowNodeInstance) {
-        return initializing;
-    }
-
-    @Override
     public Set<Integer> getUnstableStateIds() {
         return unstableStates;
     }
