@@ -11,6 +11,7 @@ CREATE TABLE business_app (
   lastUpdateDate NUMBER(19, 0) NOT NULL,
   updatedBy NUMBER(19, 0) NOT NULL,
   state VARCHAR2(30) NOT NULL,
+  homePageId NUMBER(19, 0),
   UNIQUE (tenantId, name, version),
   PRIMARY KEY (tenantId, id)
 );
