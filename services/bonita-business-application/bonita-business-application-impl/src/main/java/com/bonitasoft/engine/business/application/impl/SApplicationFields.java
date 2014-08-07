@@ -24,6 +24,8 @@ public class SApplicationFields {
 
     public static String NAME = "name";
 
+    public static String DISPLAY_NAME = "displayName";
+
     public static String VERSION = "version";
 
     public static String PATH = "path";

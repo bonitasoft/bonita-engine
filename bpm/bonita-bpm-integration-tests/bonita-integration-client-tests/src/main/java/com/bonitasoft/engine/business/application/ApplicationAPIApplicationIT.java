@@ -76,6 +76,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator creator = new ApplicationCreator("My Application", "1.0", "/myApplication");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
+        creator.setDisplayName("My application display name");
 
         //when
         final Application application = applicationAPI.createApplication(creator);
@@ -83,6 +84,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         //then
         assertThat(application).isNotNull();
         assertThat(application.getName()).isEqualTo("My Application");
+        assertThat(application.getDisplayName()).isEqualTo("My application display name");
         assertThat(application.getVersion()).isEqualTo("1.0");
         assertThat(application.getPath()).isEqualTo("/myApplication");
         assertThat(application.getId()).isGreaterThan(0);
@@ -192,6 +194,35 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         applicationAPI.deleteApplication(marketing.getId());
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search",
+            "filter on display name",
+    "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_display_name() throws Exception {
+        //given
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
+        hrCreator.setDisplayName("the only app with display name");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "the only app with display name");
+
+        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(1);
+        assertThat(applications.getResult()).containsExactly(hr);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on path",
     "no search term" })
     @Test
@@ -251,7 +282,8 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_can_use_search_term() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("My HR dashboard", "2.0", "/hr");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "2.0", "/hr");
+        hrCreator.setDisplayName("My HR dashboard");
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My Marketing dashboard", "2.0", "/marketing");
 

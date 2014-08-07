@@ -21,6 +21,8 @@ public interface SApplicationBuilderFactory {
 
     String getNameKey();
 
+    String getDisplayNameKey();
+
     String getVersionKey();
 
     String getPathKey();

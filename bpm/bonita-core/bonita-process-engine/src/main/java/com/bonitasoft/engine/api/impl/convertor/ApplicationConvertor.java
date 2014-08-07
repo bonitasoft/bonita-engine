@@ -37,6 +37,7 @@ public class ApplicationConvertor {
     public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ApplicationField.NAME);
+        final String displayName = (String) fields.get(ApplicationField.DISPLAY_NAME);
         final String version = (String) fields.get(ApplicationField.VERSION);
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String path = (String) fields.get(ApplicationField.PATH);
@@ -44,6 +45,7 @@ public class ApplicationConvertor {
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, version, path, creatorUserId);
         builder.setDescription(description);
         builder.setIconPath(iconPath);
+        builder.setDisplayName(displayName);
         return builder.done();
     }
 
@@ -51,6 +53,7 @@ public class ApplicationConvertor {
         final ApplicationImpl application = new ApplicationImpl(sApplication.getName(), sApplication.getVersion(), sApplication.getPath(),
                 sApplication.getDescription());
         application.setId(sApplication.getId());
+        application.setDisplayName(sApplication.getDisplayName());
         application.setCreatedBy(sApplication.getCreatedBy());
         application.setCreationDate(new Date(sApplication.getCreationDate()));
         application.setUpdatedBy(sApplication.getUpdatedBy());

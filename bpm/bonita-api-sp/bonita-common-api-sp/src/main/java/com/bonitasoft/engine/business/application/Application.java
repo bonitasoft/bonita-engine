@@ -28,6 +28,13 @@ public interface Application extends BaseElement {
     String getName();
 
     /**
+     * Retrieves the <code>Application</code> display name
+     *
+     * @return the <code>Application</code> display name
+     */
+    String getDisplayName();
+
+    /**
      * Retrieves the <code>Application</code> version
      *
      * @return the <code>Application</code> version

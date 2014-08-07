@@ -36,6 +36,11 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
     }
 
     @Override
+    public String getDisplayNameKey() {
+        return SApplicationFields.DISPLAY_NAME;
+    }
+
+    @Override
     public String getVersionKey() {
         return SApplicationFields.VERSION;
     }

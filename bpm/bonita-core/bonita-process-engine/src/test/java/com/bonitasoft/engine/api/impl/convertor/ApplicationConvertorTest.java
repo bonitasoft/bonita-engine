@@ -33,6 +33,7 @@ public class ApplicationConvertorTest {
     private static final String APP_PATH = "/app";
     private static final String APP_VERSION = "1.0";
     private static final String APP_NAME = "app";
+    private static final String APP_DISPLAY_NAME = "My application";
     private static final String APP_PAGE_NAME = "firstPage";
     private final ApplicationConvertor convertor = new ApplicationConvertor();
 
@@ -42,6 +43,7 @@ public class ApplicationConvertorTest {
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_VERSION, APP_PATH);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
+        creator.setDisplayName(APP_DISPLAY_NAME);
         final long userId = 10;
         final long before = System.currentTimeMillis();
 
@@ -51,6 +53,7 @@ public class ApplicationConvertorTest {
         //then
         assertThat(application).isNotNull();
         assertThat(application.getName()).isEqualTo(APP_NAME);
+        assertThat(application.getDisplayName()).isEqualTo(APP_DISPLAY_NAME);
         assertThat(application.getVersion()).isEqualTo(APP_VERSION);
         assertThat(application.getPath()).isEqualTo(APP_PATH);
         assertThat(application.getDescription()).isEqualTo(APP_DESC);
@@ -74,6 +77,7 @@ public class ApplicationConvertorTest {
         sApp.setTenantId(TENANT_ID);
         sApp.setIconPath(ICON_PATH);
         sApp.setHomePageId(HOME_PAGE_ID);
+        sApp.setDisplayName(APP_DISPLAY_NAME);
 
         //when
         final Application application = convertor.toApplication(sApp);
@@ -82,6 +86,7 @@ public class ApplicationConvertorTest {
         assertThat(application).isNotNull();
         assertThat(application.getId()).isEqualTo(ID);
         assertThat(application.getName()).isEqualTo(APP_NAME);
+        assertThat(application.getDisplayName()).isEqualTo(APP_DISPLAY_NAME);
         assertThat(application.getVersion()).isEqualTo(APP_VERSION);
         assertThat(application.getPath()).isEqualTo(APP_PATH);
         assertThat(application.getDescription()).isEqualTo(APP_DESC);

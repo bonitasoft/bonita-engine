@@ -31,11 +31,21 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private long updatedBy;
     private String state;
     private long homePageId;
+    private String displayName;
 
     public ApplicationImpl(final String name, final String version, final String path, final String description) {
         super(name, description);
         this.version = version;
         this.path = path;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(final String displayName) {
+        this.displayName = displayName;
     }
 
     @Override

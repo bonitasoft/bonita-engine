@@ -43,6 +43,8 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private long homePageId;
 
+    private String displayName;
+
     public SApplicationImpl() {
         super();
     }
@@ -67,6 +69,15 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(final String displayName) {
+        this.displayName = displayName;
     }
 
     @Override
@@ -138,6 +149,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (int) (creationDate ^ creationDate >>> 32);
         result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
@@ -172,6 +184,13 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
                 return false;
             }
         } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
             return false;
         }
         if (homePageId != other.homePageId) {
