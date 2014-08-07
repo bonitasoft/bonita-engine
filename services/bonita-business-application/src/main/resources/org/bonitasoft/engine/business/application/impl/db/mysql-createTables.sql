@@ -12,6 +12,7 @@ CREATE TABLE business_app (
   updatedBy BIGINT NOT NULL,
   state VARCHAR(30) NOT NULL,
   homePageId BIGINT,
+  displayName VARCHAR(255),
   UNIQUE (tenantId, name, version),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;

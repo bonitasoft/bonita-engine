@@ -12,6 +12,7 @@ CREATE TABLE business_app (
   updatedBy NUMERIC(19, 0) NOT NULL,
   state NVARCHAR(30) NOT NULL,
   homePageId NUMERIC(19, 0),
+  displayName NVARCHAR(255),
   UNIQUE (tenantId, name, version),
   PRIMARY KEY (tenantId, id)
 )
