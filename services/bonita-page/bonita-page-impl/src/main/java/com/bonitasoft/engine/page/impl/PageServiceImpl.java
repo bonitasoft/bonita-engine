@@ -576,6 +576,7 @@ public class PageServiceImpl implements PageService {
         if (active) {
             importProvidedPage("bonita-html-page-example.zip");
             importProvidedPage("bonita-groovy-page-example.zip");
+            importProvidedPage("bonita-home-page.zip");
         }
     }
 
