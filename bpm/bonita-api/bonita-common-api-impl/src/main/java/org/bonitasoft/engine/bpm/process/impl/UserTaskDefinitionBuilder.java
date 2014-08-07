@@ -65,4 +65,8 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
         return this;
     }
 
+    public ContractDefinitionBuilder addContract() {
+        return new ContractDefinitionBuilder(getProcessBuilder(), getContainer(), (UserTaskDefinitionImpl) getActivity());
+    }
+
 }

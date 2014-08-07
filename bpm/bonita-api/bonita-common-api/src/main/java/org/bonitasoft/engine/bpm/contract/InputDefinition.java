@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,20 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.flownode;
+package org.bonitasoft.engine.bpm.contract;
 
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
+import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
- * A User Task is a typical “workflow” Task where a human performer performs the Task with the assistance of a
- * software application and is scheduled through a task list manager of some sort
- *
- * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface UserTaskDefinition extends HumanTaskDefinition {
+public interface InputDefinition extends DescriptionElement {
 
-    ContractDefinition getContract();
+    String getType();
 
 }

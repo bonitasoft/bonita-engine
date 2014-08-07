@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,37 +11,34 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.flownode.impl.internal;
+package org.bonitasoft.engine.bpm.contract.impl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 
 /**
- * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
-public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements UserTaskDefinition {
+public class ContractDefinitionImpl implements ContractDefinition {
 
-    private static final long serialVersionUID = -8168685139931497082L;
+    private static final long serialVersionUID = 786706819903231008L;
 
-    private ContractDefinition contract;
+    private final List<InputDefinition> inputs;
 
-    public UserTaskDefinitionImpl(final String name, final String actorName) {
-        super(name, actorName);
-    }
-
-    public UserTaskDefinitionImpl(final long id, final String name, final String actorName) {
-        super(id, name, actorName);
-    }
-
-    public void setContract(final ContractDefinition contract) {
-        this.contract = contract;
+    public ContractDefinitionImpl() {
+        inputs = new ArrayList<InputDefinition>();
     }
 
     @Override
-    public ContractDefinition getContract() {
-        return contract;
+    public List<InputDefinition> getInputs() {
+        return inputs;
+    }
+
+    public void addInput(final InputDefinition input) {
+        inputs.add(input);
     }
 
 }

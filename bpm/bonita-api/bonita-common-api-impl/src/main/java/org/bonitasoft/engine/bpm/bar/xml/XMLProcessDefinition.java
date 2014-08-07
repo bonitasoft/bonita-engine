@@ -23,6 +23,8 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -338,6 +340,14 @@ public class XMLProcessDefinition {
 
     public static final String TRIGGERED_BY_EVENT = "triggeredByEvent";
 
+    public static final String CONTRACT_NODE = "contract";
+
+    public static final String CONTRACT_INPUT_NODE = "input";
+
+    public static final String TYPE = "type";
+
+    private static final String CONTRACT_INPUTS_NODE = "inputs";
+
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
     public static final class BEntry<K, V> implements Map.Entry<K, V> {
@@ -492,6 +502,9 @@ public class XMLProcessDefinition {
                     fillUserFilterNode(userFilterNode, humanTaskDefinition.getUserFilter());
                     activityNode.addChild(userFilterNode);
                 }
+                if (humanTaskDefinition instanceof UserTaskDefinition && ((UserTaskDefinition) humanTaskDefinition).getContract() != null) {
+                    activityNode.addChild(createContractNode(((UserTaskDefinition) humanTaskDefinition).getContract()));
+                }
             } else if (activity instanceof CallActivityDefinition) {
                 fillCallActivity((CallActivityDefinition) activity, activityNode);
             } else if (activity instanceof SubProcessDefinition) {
@@ -514,6 +527,28 @@ public class XMLProcessDefinition {
         createAndfillIntermediateCatchEvents(containerDefinition, flowNodes);
         createAndFillIntermediateThrowEvents(containerDefinition, flowNodes);
         createAndFillEndEvents(containerDefinition, flowNodes);
+    }
+
+    private XMLNode createContractNode(final ContractDefinition contract) {
+        final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
+        final List<InputDefinition> inputs = contract.getInputs();
+        if (!inputs.isEmpty()) {
+            final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
+            contractNode.addChild(inputsNode);
+
+            for (final InputDefinition input : inputs) {
+                inputsNode.addChild(createInputNode(input));
+            }
+        }
+        return contractNode;
+    }
+
+    private XMLNode createInputNode(final InputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
+        inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(TYPE, input.getType());
+        inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        return inputNode;
     }
 
     private void addBoundaryEventDefinitionsNode(final ActivityDefinition activity, final XMLNode activityNode) {
