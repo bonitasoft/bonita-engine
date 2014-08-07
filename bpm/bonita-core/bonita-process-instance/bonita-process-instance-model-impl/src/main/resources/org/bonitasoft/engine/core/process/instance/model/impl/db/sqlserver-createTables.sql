@@ -228,8 +228,7 @@ CREATE TABLE ref_biz_data_inst (
   	proc_inst_id NUMERIC(19, 0),
   	fn_inst_id NUMERIC(19, 0),
   	data_id NUMERIC(19, 0),
-  	data_classname NVARCHAR(255) NOT NULL,
-  	PRIMARY KEY (tenantid, id)
+  	data_classname NVARCHAR(255) NOT NULL
 )
 GO
 
