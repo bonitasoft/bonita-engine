@@ -217,6 +217,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         stateBehaviors.setProcessExecutor(processExecutor);
     }
 
+    @Override
+    public StateBehaviors getStateBehaviors() {
+        return stateBehaviors;
+    }
+
     private void defineTransitionsForAllNodesType() {
         defineTransitionsForAutomaticTask();
         defineTransitionsForUserTask();
