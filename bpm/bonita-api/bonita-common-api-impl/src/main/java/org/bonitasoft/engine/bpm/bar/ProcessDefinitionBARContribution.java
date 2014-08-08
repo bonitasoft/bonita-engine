@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -43,6 +43,7 @@ import org.bonitasoft.engine.bpm.bar.xml.CatchSignalEventTriggerDefinitionBindin
 import org.bonitasoft.engine.bpm.bar.xml.ConditionalExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionInputBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ContractDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationKeyBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationValueBinding;
@@ -60,6 +61,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.FlowElementBinding;
 import org.bonitasoft.engine.bpm.bar.xml.GatewayDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IncomingTransitionRefBinding;
+import org.bonitasoft.engine.bpm.bar.xml.InputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IntermediateCatchEventBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IntermediateThrowEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.LeftOperandBinding;
@@ -178,6 +180,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(TargetFlowNodeBinding.class);
         bindings.add(SubProcessDefinitionBinding.class);
         bindings.add(FlowElementBinding.class);
+        bindings.add(ContractDefinitionBinding.class);
+        bindings.add(InputDefinitionBinding.class);
 
         final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
         try {
@@ -241,18 +245,18 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     private void checkVersion(final File file) throws IOException, InvalidBusinessArchiveFormatException {
-        String content = IOUtil.read(file);
+        final String content = IOUtil.read(file);
         checkVersion(content);
     }
 
     void checkVersion(final String content) throws InvalidBusinessArchiveFormatException {
-        Pattern pattern = Pattern.compile("http://www\\.bonitasoft\\.org/ns/process/client/6.([0-9])");
-        Matcher matcher = pattern.matcher(content);
-        boolean find = matcher.find();
+        final Pattern pattern = Pattern.compile("http://www\\.bonitasoft\\.org/ns/process/client/6.([0-9])");
+        final Matcher matcher = pattern.matcher(content);
+        final boolean find = matcher.find();
         if (!find) {
             throw new InvalidBusinessArchiveFormatException("There is no bonitasoft process namespace declaration");
         }
-        String group = matcher.group();
+        final String group = matcher.group(1);
         if (!group.equals("3")) {
             throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, 6." + group
                     + " namespace is not compatible with your current version. Use the studio to update it.");

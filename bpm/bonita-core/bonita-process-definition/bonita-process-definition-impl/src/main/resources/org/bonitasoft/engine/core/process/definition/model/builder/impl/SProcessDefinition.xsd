@@ -239,6 +239,7 @@
 			<xs:extension base="definition:SActivityDefinition">
 				<xs:sequence>
 					<xs:element name="userFilter" type="definition:SUserFilterDefinition" minOccurs="0" maxOccurs="1" />
+					<xs:element name="contract" type="definition:SContractDefinition" minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="actorName" type="xs:string" />
 				<xs:attribute name="priority" type="xs:string" />
@@ -327,6 +328,26 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SContractDefinition">
+		<xs:sequence>
+			<xs:element name="inputs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="input" type="definition:SInputDefinition" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="SInputDefinition">
+		<xs:complexContent>
+			<xs:extension base="definition:SNamedElement">
+				<xs:attribute name="type" type="xs:string" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

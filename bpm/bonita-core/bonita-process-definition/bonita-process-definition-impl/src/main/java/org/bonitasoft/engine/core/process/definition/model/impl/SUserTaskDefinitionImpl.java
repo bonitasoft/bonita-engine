@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
@@ -29,6 +30,8 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
 
     private static final long serialVersionUID = 9039679250456947450L;
 
+    private SContractDefinition contract;
+
     public SUserTaskDefinitionImpl(final UserTaskDefinition userTaskDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
         super(userTaskDefinition, transitionsMap);
@@ -41,6 +44,18 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.USER_TASK;
+    }
+
+    @Override
+    public SContractDefinition getContract() {
+        if (contract == null) {
+            return new SContractDefinitionImpl();
+        }
+        return contract;
+    }
+
+    public void setContract(final SContractDefinition contract) {
+        this.contract = contract;
     }
 
 }

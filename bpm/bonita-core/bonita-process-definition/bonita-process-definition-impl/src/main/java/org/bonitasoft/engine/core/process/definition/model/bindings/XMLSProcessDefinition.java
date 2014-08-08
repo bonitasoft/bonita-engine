@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,11 +28,13 @@ import org.bonitasoft.engine.core.process.definition.model.SAutomaticTaskDefinit
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SManualTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCharacteristics;
@@ -43,6 +45,7 @@ import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
@@ -336,6 +339,14 @@ public class XMLSProcessDefinition {
 
     private static final String BUSINESS_DATA_DEFINITIONS_NODE = "businessDataDefinitions";
 
+    public static final String CONTRACT_NODE = "contract";
+
+    public static final String CONTRACT_INPUTS_NODE = "inputs";
+
+    public static final String CONTRACT_INPUT_NODE = "input";
+
+    public static final String TYPE = "type";
+
     private final Map<Object, String> objectToId = new HashMap<Object, String>();
 
     static final class BEntry<K, V> implements Map.Entry<K, V> {
@@ -518,6 +529,9 @@ public class XMLSProcessDefinition {
                     fillUserFilterNode(userFilterNode, humanTaskDefinition.getSUserFilterDefinition());
                     activityNode.addChild(userFilterNode);
                 }
+                if (humanTaskDefinition instanceof SUserTaskDefinition && ((SUserTaskDefinition) humanTaskDefinition).getContract() != null) {
+                    activityNode.addChild(createContractNode(((SUserTaskDefinition) humanTaskDefinition).getContract()));
+                }
             } else if (activity instanceof SCallActivityDefinition) {
                 fillCallActivity((SCallActivityDefinition) activity, activityNode);
             } else if (activity instanceof SSubProcessDefinition) {
@@ -540,6 +554,28 @@ public class XMLSProcessDefinition {
         createAndfillIntermediateCatchEvents(container.getIntermediateCatchEvents(), flowNodes);
         createAndfillIntermediatThrowEvents(container.getIntermdiateThrowEvents(), flowNodes);
         createAndfillEndEvents(container.getEndEvents(), flowNodes);
+    }
+
+    private XMLNode createContractNode(final SContractDefinition contract) {
+        final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
+        final List<SInputDefinition> inputs = contract.getInputs();
+        if (!inputs.isEmpty()) {
+            final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
+            contractNode.addChild(inputsNode);
+
+            for (final SInputDefinition input : inputs) {
+                inputsNode.addChild(createInputNode(input));
+            }
+        }
+        return contractNode;
+    }
+
+    private XMLNode createInputNode(final SInputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
+        inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(TYPE, input.getType());
+        inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        return inputNode;
     }
 
     private void addBoundaryEventDefinitionsNode(final SActivityDefinition activity, final XMLNode activityNode) {
