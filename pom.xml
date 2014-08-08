@@ -17,6 +17,7 @@
 		<hazelcast.version>3.0.3</hazelcast.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<create.sources.jar>true</create.sources.jar>
 	</properties>
 
 	<dependencyManagement>
@@ -84,6 +85,15 @@
 
 	<profiles>
 		<profile>
+			<id>deploy</id>
+			<modules>
+				<module>bpm</module>
+			</modules>
+            <properties>
+                <create.sources.jar>false</create.sources.jar>
+            </properties>
+		</profile>
+		<profile>
 			<id>developer</id>
 			<properties>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
@@ -104,9 +114,11 @@
 
 		<profile>
 			<id>package</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+            <activation>
+                <property>
+                    <name>!publishArtifacts</name>
+                </property>
+            </activation>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>

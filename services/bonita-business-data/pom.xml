@@ -13,8 +13,21 @@
 
 	<name>Bonita Business Data</name>
 
-	<modules>
-		<module>bonita-business-data-api</module>
-		<module>bonita-business-data-impl</module>
-	</modules>
+	<profiles>
+        <profile>
+            <id>package</id>
+            <activation>
+                <property>
+                    <name>!publishArtifacts</name>                                                                   
+                </property>
+            </activation>
+            <modules>
+		        <module>bonita-business-data-api</module>
+		        <module>bonita-business-data-impl</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tests</id>
+        </profile>
+    </profiles>
 </project>
