@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -47,6 +48,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -1254,7 +1256,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the assigned and pending human tasks for the specified user, on the specified root process definition, corresponding to the options.
-     * 
+     *
      * @param rootProcessDefinitionId
      *            The identifier of the root process definition
      * @param userId
@@ -1270,7 +1272,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search the assigned and pending human tasks for any user, on the specified root process definition, corresponding to the options.
-     * 
+     *
      * @param rootProcessDefinitionId
      *            The identifier of the root process definition
      * @param searchOptions
@@ -2266,7 +2268,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Search process definitions that have instances with assigned or pending human tasks for a specific user.
      * The tasks are in stable state, not in terminal/executing state.
-     * 
+     *
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
@@ -2282,7 +2284,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Search process definitions supervised by a specific user, that have instances with assigned or pending human tasks.
      * The tasks are in stable state, not in terminal/executing state.
-     * 
+     *
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
@@ -2298,7 +2300,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Search process definitions that have instances with assigned or pending human tasks.
      * The tasks are in stable state, not in terminal/executing state.
-     * 
+     *
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
@@ -2309,5 +2311,15 @@ public interface ProcessRuntimeAPI {
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Gets the contract of the user task.
+     *
+     * @param userTaskId the identifier of the user task.
+     * @return the contract of the user task
+     * @throws UserTaskNotFoundException
+     *         if identifier does not refer to a real user task.
+     */
+    ContractDefinition getUserTaskContract(long userTaskId) throws UserTaskNotFoundException;
 
 }
