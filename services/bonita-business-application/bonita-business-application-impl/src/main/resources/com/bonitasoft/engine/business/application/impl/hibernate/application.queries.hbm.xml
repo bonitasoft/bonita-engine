@@ -41,15 +41,15 @@
     <query name="getApplicationPageByNameAndApplicationId">
         SELECT applicationPage
         FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
-        WHERE applicationPage.name = :applicationPageName
-        AND applicationPage.applicationId = :applicationId
+        WHERE applicationPage.applicationId = :applicationId
+        AND applicationPage.name = :applicationPageName
     </query>
 
     <query name="getApplicationHomePage">
         SELECT applicationPage
         FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage, com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
-        WHERE applicationPage.applicationId = application.id 
-        AND applicationPage.id = application.homePageId
+        WHERE applicationPage.id = application.homePageId 
+        AND applicationPage.applicationId = application.id
         AND application.id = :applicationId
     </query>
 
