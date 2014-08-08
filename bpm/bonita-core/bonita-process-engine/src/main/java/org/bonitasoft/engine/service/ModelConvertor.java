@@ -1978,7 +1978,7 @@ public class ModelConvertor {
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
     }
 
-    public static ContractDefinition convertContract(final SContractDefinition sContract) {
+    public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
         for (final SInputDefinition input : sContract.getInputs()) {
             contract.addInput(new InputDefinitionImpl(input.getName(), input.getType(), input.getDescription()));

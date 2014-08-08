@@ -5898,7 +5898,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     taskInstance.getProcessDefinitionId());
             final SUserTaskDefinition userTask = (SUserTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
                     taskInstance.getFlowNodeDefinitionId());
-            return ModelConvertor.convertContract(userTask.getContract());
+            return ModelConvertor.toContract(userTask.getContract());
         } catch (final SActivityReadException sare) {
             throw new RetrieveException(sare);
         } catch (final SProcessDefinitionReadException spdre) {
