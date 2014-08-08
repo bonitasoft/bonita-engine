@@ -287,7 +287,6 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
@@ -5890,27 +5889,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ContractDefinition getUserTaskContract(final long userTaskId) throws UserTaskNotFoundException {
+    public ContractDefinition getUserTaskContract(final long userTaskInstanceId) throws UserTaskNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
-            final SHumanTaskInstance taskInstance = activityInstanceService.getHumanTaskInstance(userTaskId);
-            if (!(taskInstance instanceof SUserTaskInstance)) {
-                throw new UserTaskNotFoundException("Impossible to find a user task with id: " + userTaskId);
-            }
-            final SProcessDefinition processDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(
+            final SHumanTaskInstance taskInstance = activityInstanceService.getUserTaskInstance(userTaskInstanceId);
+            final SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(
                     taskInstance.getProcessDefinitionId());
             final SUserTaskDefinition userTask = (SUserTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
                     taskInstance.getFlowNodeDefinitionId());
             return ModelConvertor.convertContract(userTask.getContract());
         } catch (final SActivityReadException sare) {
-            throw new UserTaskNotFoundException(sare.getMessage());
-        } catch (final SActivityInstanceNotFoundException sainfe) {
-            throw new UserTaskNotFoundException(sainfe.getMessage());
-        } catch (final SProcessDefinitionNotFoundException spdnfe) {
-            throw new UserTaskNotFoundException(spdnfe.getMessage());
+            throw new RetrieveException(sare);
         } catch (final SProcessDefinitionReadException spdre) {
-            throw new UserTaskNotFoundException(spdre.getMessage());
+            throw new RetrieveException(spdre);
+        } catch (final SActivityInstanceNotFoundException sainfe) {
+            throw new UserTaskNotFoundException(sainfe);
+        } catch (final SProcessDefinitionNotFoundException spdnfe) {
+            throw new UserTaskNotFoundException(spdnfe);
         }
     }
 

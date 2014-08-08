@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,6 +40,7 @@ import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilderFactory;
@@ -248,11 +249,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         }
     }
 
-    /**
-     * @param humanTaskInstanceId
-     * @param queryOptions
-     * @return
-     */
     @Override
     public List<SPendingActivityMapping> getPendingMappings(final long humanTaskInstanceId, final QueryOptions queryOptions) throws SActivityReadException {
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("activityId", humanTaskInstanceId);
@@ -266,28 +262,29 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public SActivityInstance getActivityInstance(final long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
-        try {
-            final SActivityInstance activity = getPersistenceService().selectById(
-                    SelectDescriptorBuilder.getElementById(SActivityInstance.class, "SActivityInstance", activityInstanceId));
-            if (activity == null) {
-                throw new SActivityInstanceNotFoundException(activityInstanceId);
-            }
-            return activity;
-        } catch (final SBonitaReadException e) {
-            throw new SActivityReadException(e);
-        }
+        return getInstance(activityInstanceId, SActivityInstance.class);
     }
 
     @Override
-    public SHumanTaskInstance getHumanTaskInstance(final long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
-        final SelectByIdDescriptor<SHumanTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SHumanTaskInstance.class, "SHumanTaskInstance",
-                activityInstanceId);
+    public SHumanTaskInstance getHumanTaskInstance(final long humanTaskInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
+        return getInstance(humanTaskInstanceId, SHumanTaskInstance.class);
+    }
+
+    @Override
+    public SUserTaskInstance getUserTaskInstance(final long userTaskInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
+        return getInstance(userTaskInstanceId, SUserTaskInstance.class);
+    }
+
+    private <T extends SActivityInstance> T getInstance(final long instanceId, final Class<T> instanceClass)
+            throws SActivityInstanceNotFoundException, SActivityReadException {
+        final SelectByIdDescriptor<T> descriptor = SelectDescriptorBuilder.getElementById(instanceClass, instanceClass.getSimpleName(),
+                instanceId);
         try {
-            final SHumanTaskInstance humanTask = getPersistenceService().selectById(descriptor);
-            if (humanTask == null) {
-                throw new SActivityInstanceNotFoundException(activityInstanceId);
+            final T instance = getPersistenceService().selectById(descriptor);
+            if (instance == null) {
+                throw new SActivityInstanceNotFoundException(instanceId);
             }
-            return humanTask;
+            return instance;
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }
@@ -296,7 +293,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public List<SActivityInstance> getActivitiesWithStates(final long rootContainerId, final Set<Integer> stateIds, final int fromIndex, final int maxResults,
             final String sortingField, final OrderByType sortingOrder) throws SActivityReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("rootContainerId", rootContainerId);
         parameters.put("stateIds", stateIds);
         final SelectListDescriptor<SActivityInstance> elements = SelectDescriptorBuilder.getSpecificQueryWithParameters(SActivityInstance.class,
@@ -324,7 +321,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public SAActivityInstance getMostRecentArchivedActivityInstance(final long activityInstanceId) throws SActivityReadException,
-            SActivityInstanceNotFoundException {
+    SActivityInstanceNotFoundException {
         final ReadPersistenceService persistenceService = getArchiveService().getDefinitiveArchiveReadPersistenceService();
         final SelectOneDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getMostRecentArchivedActivityInstance(activityInstanceId);
         try {
@@ -410,8 +407,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public void assignHumanTask(final long userTaskId, final long userId) throws SFlowNodeNotFoundException, SFlowNodeReadException,
-            SActivityModificationException {
+    public void assignHumanTask(final long userTaskId, final long userId)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException {
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
         if (flowNodeInstance instanceof SHumanTaskInstance) {
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -451,8 +448,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId) throws SActivityReadException,
-            SActivityInstanceNotFoundException {
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId)
+            throws SActivityReadException, SActivityInstanceNotFoundException {
         final ReadPersistenceService persistenceService = getArchiveService().getDefinitiveArchiveReadPersistenceService();
         SAActivityInstance selectOne;
         try {
@@ -620,7 +617,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             final Map<Long, Long> userTaskNumbermap = new HashMap<Long, Long>();
             for (final Map<String, Long> record : result) {
                 userTaskNumbermap.put(record.get("userId"), record.get("numberOfTasks")); // "userId" and "numberOfTasks" are embed in mybatis/hibernate query
-                                                                                          // statements named "getNumbersOfOpenTasksForUsers"
+                // statements named "getNumbersOfOpenTasksForUsers"
             }
             // get number of pending tasks for each user
             for (final Long userId : userIds) {
@@ -687,7 +684,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             final Map<Long, Long> userTaskNumbermap = new HashMap<Long, Long>();
             for (final Map<Long, Long> record : result) {
                 userTaskNumbermap.put(record.get("userId"), record.get("numberOfTasks")); // "userId" and "numberOfTasks" are embed in mybatis/hibernate query
-                                                                                          // statements named "getNumbersOfOpenTasksForUsers"
+                // statements named "getNumbersOfOpenTasksForUsers"
             }
             // get number of pending overdue open tasks for each user
             for (final Long userId : userIds) {
@@ -772,7 +769,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
         descriptor
-                .addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances() + number);
+        .addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances() + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
         } catch (final SFlowNodeModificationException e) {

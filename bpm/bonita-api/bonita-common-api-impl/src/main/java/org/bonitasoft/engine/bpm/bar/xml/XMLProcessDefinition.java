@@ -342,11 +342,11 @@ public class XMLProcessDefinition {
 
     public static final String CONTRACT_NODE = "contract";
 
-    public static final String CONTRACT_INPUT_NODE = "input";
+    private static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
+
+    public static final String CONTRACT_INPUT_NODE = "inputDefinition";
 
     public static final String TYPE = "type";
-
-    private static final String CONTRACT_INPUTS_NODE = "inputs";
 
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 

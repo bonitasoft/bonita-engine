@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SUnhideableTaskException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -64,7 +66,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Create activityInstance in DB according to the given activityInstance object
-     * 
+     *
      * @param activityInstance
      *            an SActivityInstance object
      * @throws SActivityCreationException
@@ -73,7 +75,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Create manual user task in DB by given information. This is create sub task for the given user task.
-     * 
+     *
      * @param userTaskId
      *            identifier of user task, the user task is the parent of the created manual user task
      * @param name
@@ -95,7 +97,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Create a new pending activity mapping in DB
-     * 
+     *
      * @param mapping
      *            pending activity mapping object
      * @throws SActivityCreationException
@@ -104,7 +106,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * deletePendingMappings
-     * 
+     *
      * @param mapping
      *            pending activity mapping object
      * @throws SActivityModificationException
@@ -113,7 +115,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Delete all pending mappings for the connected tenant
-     * 
+     *
      * @throws SActivityModificationException
      * @since 6.1
      */
@@ -121,7 +123,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get activityInstance by its id
-     * 
+     *
      * @param activityInstanceId
      *            identifier of activityInstance
      * @return an SActivityInstance object with id corresponding to the parameter
@@ -132,19 +134,33 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     SActivityInstance getActivityInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
     /**
-     * Get humanTaskInstance by its id
-     * 
-     * @param activityInstanceId
-     *            identifier of humanTaskInstance
-     * @return an SHumanTaskInstance object with id corresponding to the parameter
+     * Returns the instance of the human task.
+     *
+     * @param humanTaskInstanceId
+     *        the identifier of human task
+     * @return the instance of the human task
      * @throws SActivityInstanceNotFoundException
+     *         if the identifier does not refer to an existing human task
      * @throws SActivityReadException
+     *         if an exception occurs when retrieving the instance
      */
     SHumanTaskInstance getHumanTaskInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
     /**
+     * Returns the instance of the user task.
+     *
+     * @param userTaskInstanceId the identifier of the instance of the user task
+     * @return the instance of the user task
+     * @throws SActivityInstanceNotFoundException
+     *         if the identifier does not refer to an existing user task
+     * @throws SActivityReadException
+     *         if an exception occurs when retrieving the instance
+     */
+    SUserTaskInstance getUserTaskInstance(long userTaskInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
+
+    /**
      * Get activities with specific states in the root container in specific order, this is used for pagination
-     * 
+     *
      * @param rootContainerId
      *            identifier of root container, it always is process definition id
      * @param fromIndex
@@ -165,7 +181,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get the most recent archived version of a specified activity instance
-     * 
+     *
      * @param activityInstanceId
      *            identifier of activity instance
      * @return an SAActivityInstance object
@@ -178,7 +194,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get pending tasks for the user in specific actors. This is used for pagination
-     * 
+     *
      * @param userId
      *            identifier of user
      * @param actorIds
@@ -199,7 +215,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get tasks assigned to the user. This is used for pagination
-     * 
+     *
      * @param userId
      *            identifier of user
      * @param fromIndex
@@ -218,7 +234,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get archived activity instances in the specific root container.
-     * 
+     *
      * @param rootContainerId
      *            identifier of root container, the root container can be process instance
      * @param queryOptions
@@ -230,7 +246,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get total number of open activity instances for the specific process instance
-     * 
+     *
      * @param processInstanceId
      *            identifier of process instance
      * @return the number of opened activity instances in the specific process instance
@@ -240,7 +256,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get all open activity instances in the specific process instance. This is used for pagination
-     * 
+     *
      * @param rootContainerId
      *            identifier of root container, the root container can be process instance
      * @param pageIndex
@@ -259,7 +275,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get all activity instances for the specific process instance
-     * 
+     *
      * @param rootContainerId
      *            identifier of root container, the root container can be process instance
      * @return a list of SActivityInstance objects
@@ -270,7 +286,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get all child instances for the specific parent activity instance.
-     * 
+     *
      * @param parentActivityInstanceId
      *            identifier of parent activity instance
      * @param fromIndex
@@ -284,7 +300,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Assign the specific human task to the user
-     * 
+     *
      * @param userTaskId
      *            identifier of human task instance
      * @param userId
@@ -297,7 +313,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Hides a task from a user's view.
-     * 
+     *
      * @param userId
      *            the ID of the user to hide the task from
      * @param activityInstanceId
@@ -313,7 +329,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Un-hides a task from a user's view.
-     * 
+     *
      * @param userId
      *            the ID of the user to un-hide the task from
      * @param activityInstanceId
@@ -328,7 +344,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Delete a hidden task-user association
-     * 
+     *
      * @param id
      *            the ID of the hidden task-user association object <code>SHiddenTask</code>
      * @throws STaskVisibilityException
@@ -339,7 +355,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Retrieve the Hidden tasks for a specific activity instance
-     * 
+     *
      * @param activityInstanceId
      *            the ID of the activity instance
      * @param fromIndex
@@ -355,7 +371,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get the number of UserTask instances assigned to a specific user
-     * 
+     *
      * @param userId
      *            the id of the user concerned
      * @return the number of UserTask instances assigned to this specific user
@@ -366,7 +382,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search UserTask instances assigned for a specific supervisor
-     * 
+     *
      * @param parameters
      *            a map of specific parameters of a query
      * @param parameters
@@ -379,7 +395,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search AUserTask instances archived for a specific supervisor
-     * 
+     *
      * @param queryOptions
      *            the object used to manage all the search parameters of a query
      * @param parameters
@@ -392,7 +408,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search UserTask instances assigned for a specific supervisor
-     * 
+     *
      * @param queryOptions
      *            the object used to manage all the search parameters of a query
      * @param parameters
@@ -405,7 +421,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search AUserTask instances archived for a specific supervisor
-     * 
+     *
      * @param queryOptions
      *            the object used to manage all the search parameters of a query
      * @param parameters
@@ -418,7 +434,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Gets the archive instance of the activity according to its identifier at a given state.
-     * 
+     *
      * @param activityId
      *            the activity identifier
      * @param stateId
@@ -434,7 +450,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search archived human tasks according to specific search criteria
-     * 
+     *
      * @param searchOptions
      *            the object used to manage all the search parameters of a query
      * @param persistenceService
@@ -446,7 +462,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get total number of archived tasks according to specific search criteria
-     * 
+     *
      * @param searchOptions
      *            the object used to manage all the search parameters of a query
      * @param persistenceService
@@ -458,7 +474,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get total number of assigned tasks managed by the specific manager
-     * 
+     *
      * @param managerUserId
      *            identifier of manager user
      * @param searchOptions
@@ -470,7 +486,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get all assigned tasks managed by the specific manager
-     * 
+     *
      * @param managerUserId
      *            identifier of manager user
      * @param searchOptions
@@ -481,7 +497,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * get the total number of archived tasks assigned to subordinates of specified manager.
-     * 
+     *
      * @param managerUserId
      *            the userId of the manager
      * @param searchOptions
@@ -496,7 +512,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * get the archived tasks assigned to subordinates of specified manager, limited to, sorted, paginated with the specifies QueryOptions
-     * 
+     *
      * @param managerUserId
      *            the userId of the manager
      * @param searchOptions
@@ -509,7 +525,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search all pending human task instances for the specific supervisor
-     * 
+     *
      * @param userId
      *            identifier of supervisor user
      * @param searchOptions
@@ -521,7 +537,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get total number of pending human task instances for the specific supervisor
-     * 
+     *
      * @param userId
      *            identifier of supervisor user
      * @param queryOptions
@@ -533,7 +549,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get number of human task instances according to the criteria
-     * 
+     *
      * @param queryOptions
      *            the search options to paginate, filter, sort ...
      * @return number of human task instances satisfied to the criteria
@@ -543,7 +559,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search all human task instances according to the criteria
-     * 
+     *
      * @param queryOptions
      *            the search options to paginate, filter, sort ...
      * @return a list of SHumanTaskInstance objects
@@ -553,7 +569,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get number of open tasks for each user
-     * 
+     *
      * @param userIds
      *            identifiers of users
      * @return a map containing user id and corresponding task number
@@ -563,7 +579,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search total number of pending tasks for the specific manager
-     * 
+     *
      * @param managerUserId
      *            identifier of manager user
      * @param searchOptions
@@ -575,7 +591,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search all pending tasks for the specific manager
-     * 
+     *
      * @param managerUserId
      *            identifier of manager user
      * @param searchOptions
@@ -587,7 +603,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Increase loopCounter(loopCount+1) for the specific loop instance
-     * 
+     *
      * @param loopInstance
      *            the loopCounter in which will be increased
      * @throws SActivityModificationException
@@ -596,7 +612,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get number of overdue open tasks for each user
-     * 
+     *
      * @param userIds
      *            identifiers of users
      * @return a map containing userId and corresponding number of tasks
@@ -606,7 +622,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Set max loop for the specific loopActvity
-     * 
+     *
      * @param loopActivity
      *            the loopActivity
      * @param result
@@ -617,7 +633,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Set LoopCardinality for the specific loopActvity
-     * 
+     *
      * @param flowNodeInstance
      *            the loopActvity
      * @param intLoopCardinality
@@ -628,7 +644,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Add number of activeInstances for the specific SMultiInstanceActivityInstance object
-     * 
+     *
      * @param flowNodeInstance
      *            an SMultiInstanceActivityInstance object
      * @param number
@@ -639,7 +655,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Add number of terminated activeInstances for the specific SMultiInstanceActivityInstance object
-     * 
+     *
      * @param flowNodeInstance
      *            an SMultiInstanceActivityInstance object
      * @param number
@@ -651,7 +667,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Add number of completed activeInstances for the specific SMultiInstanceActivityInstance object
-     * 
+     *
      * @param flowNodeInstance
      *            an SMultiInstanceActivityInstance object whose completed activity number will be updated
      * @param number
@@ -662,7 +678,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get total number of activity instances for the specific entity class
-     * 
+     *
      * @param entityClass
      *            to indicate which type of class will be retrieved
      * @param searchOptions
@@ -674,7 +690,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search all activity instances for the specific entity class
-     * 
+     *
      * @param entityClass
      *            to indicate which type of class will be retrieved
      * @param searchOptions
@@ -686,7 +702,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get total number of archived activity instances for the specific entity class
-     * 
+     *
      * @param entityClass
      *            to indicate which type of class will be retrieved
      * @param searchOptions
@@ -698,7 +714,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /***
      * Search all archived activity instances for the specific entity class
-     * 
+     *
      * @param entityClass
      *            to indicate which type of class will be retrieved
      * @param searchOptions
@@ -711,7 +727,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Set tokenCount for the specific activity instance
-     * 
+     *
      * @param activityInstance
      *            the activityInstance will be updated
      * @param tokenCount
@@ -722,7 +738,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get a <code>SHiddenTaskInstance</code> from its ID
-     * 
+     *
      * @param id
      *            the ID of the <code>SHiddenTaskInstance</code> to retrieve
      * @return the found element
@@ -736,7 +752,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Get a hidden task for a specific user & task
-     * 
+     *
      * @param userId
      *            the ID of the user to search for
      * @param activityInstanceId
@@ -750,7 +766,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Delete all hidden tasks for a given activity
-     * 
+     *
      * @param activityInstanceId
      *            the ID of the activity to delete
      * @throws STaskVisibilityException
@@ -761,7 +777,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Delete all hidden tasks for the connected tenant
-     * 
+     *
      * @throws STaskVisibilityException
      * @since 6.1
      */
@@ -860,7 +876,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
-     * 
+     *
      * @param supervisorId
      *            The identifier of the supervisor
      * @param entityClass
@@ -875,7 +891,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
-     * 
+     *
      * @param supervisorId
      *            The identifier of the supervisor
      * @param entityClass
@@ -887,12 +903,12 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      */
     List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass,
             QueryOptions queryOptions)
-            throws SBonitaSearchException;
+                    throws SBonitaSearchException;
 
     /**
      * Get total number of users according to specific query options, and who can start the task filtered with the search option
      * of the given process definition
-     * 
+     *
      * @param searchOptions
      *            The QueryOptions object containing some query conditions
      * @return
@@ -902,7 +918,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     /**
      * Search the users according to specific query options, and who can start the task filtered with the search option
      * of the given process definition
-     * 
+     *
      * @param searchOptions
      *            The QueryOptions object containing some query conditions
      * @return
@@ -912,7 +928,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     /**
      * Get the total number of the assigned and pending human tasks for the specified user, on the specified root process definition, corresponding to the
      * options.
-     * 
+     *
      * @param rootProcessDefinitionId
      *            The identifier of the root process definition
      * @param userId
@@ -926,7 +942,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search the assigned and pending human tasks for the specified user, on the specified root process definition, corresponding to the options.
-     * 
+     *
      * @param rootProcessDefinitionId
      *            The identifier of the root process definition
      * @param userId
@@ -942,7 +958,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     /**
      * Get the total number of the assigned and pending human tasks for any user, on the specified root process definition, corresponding to the
      * options.
-     * 
+     *
      * @param rootProcessDefinitionId
      *            The identifier of the root process definition
      * @param queryOptions
@@ -954,7 +970,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * Search the assigned and pending human tasks for any user, on the specified root process definition, corresponding to the options.
-     * 
+     *
      * @param rootProcessDefinitionId
      *            The identifier of the root process definition
      * @param queryOptions

@@ -17,17 +17,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
+import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -69,11 +73,11 @@ public class ActivityInstanceServiceImplTest {
 
     @Test
     public void getProcessInstanceId_should_return_taskInstance_processId_if_containerType_is_activity() throws Exception {
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
         when(flowNode.getParentProcessInstanceId()).thenReturn(1234L);
-        long activityInstanceId = 456L;
+        final long activityInstanceId = 456L;
         when(flowNode.getId()).thenReturn(activityInstanceId);
-        ActivityInstanceServiceImpl spy = spy(activityInstanceServiceImpl);
+        final ActivityInstanceServiceImpl spy = spy(activityInstanceServiceImpl);
         doReturn(flowNode).when(spy).getFlowNodeInstance(activityInstanceId);
         final long processInstanceId = spy.getProcessInstanceId(flowNode.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
 
@@ -112,9 +116,9 @@ public class ActivityInstanceServiceImplTest {
     @Test
     public void updateDisplayName_should_truncate_when_display_name_is_bigger_than_75_characters() throws Exception {
         // given
-        String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
-        String displayName = displayName75 + displayName75;
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
+        final String displayName = displayName75 + displayName75;
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName);
@@ -124,18 +128,18 @@ public class ActivityInstanceServiceImplTest {
         checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), displayName75);
     }
 
-    private void checkFlowNodeUpdate(String attributeKey, String expectedValue) throws SRecorderException {
-        ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+    private void checkFlowNodeUpdate(final String attributeKey, final String expectedValue) throws SRecorderException {
+        final ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), any(SUpdateEvent.class));
-        Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
+        final Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
         assertThat(actualValue).isEqualTo(expectedValue);
     }
 
     @Test
     public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_75_characters() throws Exception {
         // given
-        String displayName = "simple task";
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final String displayName = "simple task";
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName);
@@ -148,8 +152,8 @@ public class ActivityInstanceServiceImplTest {
     @Test
     public void updateDisplayName_should_not_change_value_when_display_name_is_75_characters_long() throws Exception {
         // given
-        String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName75);
@@ -162,13 +166,13 @@ public class ActivityInstanceServiceImplTest {
     @Test
     public void updateDisplayDescription_should_truncate_when_display_description_is_bigger_than_255_characters() throws Exception {
         // given
-        String displayDescr255 = "123456789 123456789 123456789 123456789 123456789 "
+        final String displayDescr255 = "123456789 123456789 123456789 123456789 123456789 "
                 + "123456789 123456789 123456789 123456789 123456789 "
                 + "123456789 123456789 123456789 123456789 123456789 "
                 + "123456789 123456789 123456789 123456789 123456789 "
                 + "123456789 123456789 123456789 123456789 123456789 12345";
-        String displayDescr = displayDescr255 + displayDescr255;
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final String displayDescr = displayDescr255 + displayDescr255;
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayDescription(flowNode, displayDescr);
@@ -323,4 +327,40 @@ public class ActivityInstanceServiceImplTest {
         // When
         activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
     }
+
+    @Test
+    public void getUserTaskInstanceReturnsTheInstanceOfTheUserTask() throws Exception {
+        //Given
+        final long userTaskInstanceId = 45L;
+        final SUserTaskInstance instance = mock(SUserTaskInstance.class);
+        final SelectByIdDescriptor<SUserTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SUserTaskInstance.class, "SUserTaskInstance",
+                userTaskInstanceId);
+        when(persistenceService.selectById(descriptor)).thenReturn(instance);
+
+        final SUserTaskInstance userTaskInstance = activityInstanceServiceImpl.getUserTaskInstance(userTaskInstanceId);
+        assertThat(userTaskInstance).isEqualTo(instance);
+    }
+
+    @Test(expected = SActivityInstanceNotFoundException.class)
+    public void getUserTaskInstanceThrowsAnExceptionWhenTheUserTaskIsNotFound() throws Exception {
+        //Given
+        final long userTaskInstanceId = 45L;
+        final SelectByIdDescriptor<SUserTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SUserTaskInstance.class, "SUserTaskInstance",
+                userTaskInstanceId);
+        when(persistenceService.selectById(descriptor)).thenReturn(null);
+
+        activityInstanceServiceImpl.getUserTaskInstance(userTaskInstanceId);
+    }
+
+    @Test(expected = SActivityReadException.class)
+    public void getUserTaskInstanceThrowsAnExceptionWhenTheReadingTheUserTask() throws Exception {
+        //Given
+        final long userTaskInstanceId = 45L;
+        final SelectByIdDescriptor<SUserTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SUserTaskInstance.class, "SUserTaskInstance",
+                userTaskInstanceId);
+        when(persistenceService.selectById(descriptor)).thenThrow(new SBonitaReadException("SOS"));
+
+        activityInstanceServiceImpl.getUserTaskInstance(userTaskInstanceId);
+    }
+
 }

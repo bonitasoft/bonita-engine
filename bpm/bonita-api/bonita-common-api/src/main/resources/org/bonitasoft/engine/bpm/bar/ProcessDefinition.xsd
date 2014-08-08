@@ -334,10 +334,10 @@
 
     <xs:complexType name="ContractDefinition">
         <xs:sequence>
-            <xs:element name="inputs" minOccurs="0">
+            <xs:element name="inputDefinitions" minOccurs="0">
             	<xs:complexType>
             		<xs:sequence>
-            			<xs:element name="input" type="definition:InputDefinition" minOccurs="0" maxOccurs="unbounded"/>
+            			<xs:element name="inputDefinition" type="definition:InputDefinition" minOccurs="0" maxOccurs="unbounded"/>
             		</xs:sequence>
             	</xs:complexType>
             </xs:element>

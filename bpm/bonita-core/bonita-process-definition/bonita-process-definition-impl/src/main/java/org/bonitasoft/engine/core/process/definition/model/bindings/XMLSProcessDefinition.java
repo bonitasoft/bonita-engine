@@ -341,9 +341,9 @@ public class XMLSProcessDefinition {
 
     public static final String CONTRACT_NODE = "contract";
 
-    public static final String CONTRACT_INPUTS_NODE = "inputs";
+    public static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
 
-    public static final String CONTRACT_INPUT_NODE = "input";
+    public static final String CONTRACT_INPUT_NODE = "inputDefinition";
 
     public static final String TYPE = "type";
 
