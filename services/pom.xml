@@ -13,16 +13,12 @@
 
 	<profiles>
 		<profile>
-			<id>deploy</id>
-			<modules>
-		        <module>bonita-business-data</module>
-			</modules>
-            <properties>
-                <create.sources.jar>false</create.sources.jar>                                                                                                                                                                               
-            </properties>
-		</profile>
-		<profile>
 			<id>package</id>
+            <activation>
+                <property>
+                    <name>!publishArtifacts</name>                                                                   
+                </property>
+            </activation>
 			<modules>
 		        <module>bonita-transaction</module>
 		        <module>bonita-archive</module>
@@ -48,50 +44,12 @@
 		<profile>
 			<id>tests</id>
 			<modules>
-		        <module>bonita-transaction</module>
-		        <module>bonita-archive</module>
-                <module>bonita-cache</module>
-                <module>bonita-classloader</module>
-		        <module>bonita-delete-batch</module>
-		        <module>bonita-events</module>
-                <module>bonita-lock</module>
-		        <module>bonita-log</module>
-		        <module>bonita-persistence</module>
-		        <module>bonita-scheduler</module>
-		        <module>bonita-work</module>
-		        <module>bonita-connector-executor-timedout</module>
-		        <module>bonita-authentication</module>
-		        <module>bonita-session</module>
-		        <module>bonita-platform-session</module>
-		        <module>bonita-monitoring</module>
-		        <module>bonita-builder-sp</module>
-		        <module>bonita-page</module>
-		        <module>bonita-business-data</module>
 				<module>bonita-services-integration-tests</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>package-all</id>
 			<modules>
-		        <module>bonita-transaction</module>
-		        <module>bonita-archive</module>
-                <module>bonita-cache</module>
-                <module>bonita-classloader</module>
-		        <module>bonita-delete-batch</module>
-		        <module>bonita-events</module>
-                <module>bonita-lock</module>
-		        <module>bonita-log</module>
-		        <module>bonita-persistence</module>
-		        <module>bonita-scheduler</module>
-		        <module>bonita-work</module>
-		        <module>bonita-connector-executor-timedout</module>
-		        <module>bonita-authentication</module>
-		        <module>bonita-session</module>
-		        <module>bonita-platform-session</module>
-		        <module>bonita-monitoring</module>
-		        <module>bonita-builder-sp</module>
-		        <module>bonita-page</module>
-		        <module>bonita-business-data</module>
 				<module>bonita-services-integration-tests</module>
 			</modules>
 		</profile>

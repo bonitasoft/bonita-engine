@@ -15,16 +15,12 @@
 
 	<profiles>
         <profile>
-            <id>deploy</id>
-            <modules>
-		        <module>bonita-business-data-api</module>
-            </modules>
-            <properties>
-                <create.sources.jar>false</create.sources.jar>                                                                                                                                                                               
-            </properties>
-        </profile>
-        <profile>
             <id>package</id>
+            <activation>
+                <property>
+                    <name>!publishArtifacts</name>                                                                   
+                </property>
+            </activation>
             <modules>
 		        <module>bonita-business-data-api</module>
 		        <module>bonita-business-data-impl</module>
@@ -32,10 +28,6 @@
         </profile>
         <profile>
             <id>tests</id>
-            <modules>
-		        <module>bonita-business-data-api</module>
-		        <module>bonita-business-data-impl</module>
-            </modules>
         </profile>
     </profiles>
 </project>
