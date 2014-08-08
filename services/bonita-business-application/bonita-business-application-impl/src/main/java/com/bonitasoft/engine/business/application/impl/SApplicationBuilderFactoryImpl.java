@@ -82,7 +82,7 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
 
     @Override
     public String getStateKey() {
-        return SApplicationFields.HOME_PAGE_ID;
+        return SApplicationFields.STATE;
     }
 
 }
