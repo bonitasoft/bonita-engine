@@ -13,18 +13,26 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.test.CommonAPILocalTest;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +43,8 @@ import org.junit.Test;
  */
 public class LocalTimerEventTest extends CommonAPILocalTest {
 
+    private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
+
     @Before
     public void setUp() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalLogger();
@@ -42,7 +52,7 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
 
     @After
     public void tearDown() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Test
@@ -55,28 +65,29 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
         definitionBuilder.addTransition(timerEventName, "auto");
 
         final ProcessDefinition processDefinition = deployAndEnableProcess(definitionBuilder.done());
-        assertTrue(containsTimerJob(processDefinition, timerEventName));
+        final String jobName = getJobName(processDefinition, timerEventName);
+        assertTrue(containsTimerJob(jobName));
 
         getProcessAPI().disableProcess(processDefinition.getId());
-        assertFalse(containsTimerJob(processDefinition, timerEventName));
+        assertFalse(containsTimerJob(jobName));
 
         getProcessAPI().enableProcess(processDefinition.getId());
-        assertTrue(containsTimerJob(processDefinition, timerEventName));
+        assertTrue(containsTimerJob(jobName));
 
         disableAndDeleteProcess(processDefinition.getId());
-        assertFalse(containsTimerJob(processDefinition, timerEventName));
+        assertFalse(containsTimerJob(jobName));
 
     }
 
-    private boolean containsTimerJob(final ProcessDefinition processDefinition, final String timerEventName) throws Exception {
+    private boolean containsTimerJob(final String jobName) throws Exception {
         setSessionInfo(getSession());
         final SchedulerService schedulerService = getPlatformAccessor().getSchedulerService();
-        TransactionService transactionService = getPlatformAccessor().getTransactionService();
+        final TransactionService transactionService = getPlatformAccessor().getTransactionService();
         transactionService.begin();
         try {
             final List<String> jobs = schedulerService.getJobs();
-            for (final String jobName : jobs) {
-                if (jobName.contains("Timer_Ev_" + processDefinition.getId() + timerEventName)) {
+            for (final String serverJobName : jobs) {
+                if (serverJobName.contains(jobName)) {
                     return true;
                 }
             }
@@ -84,6 +95,54 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
             transactionService.complete();
         }
         return false;
+    }
+
+    private String getJobName(final ProcessDefinition processDefinition, final String timerEventName) {
+        return TIMER_EVENT_PREFIX + processDefinition.getId() + timerEventName;
+    }
+
+    private String getJobName(final long eventInstanceId) {
+        return TIMER_EVENT_PREFIX + eventInstanceId;
+    }
+
+    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue, final String stepName)
+            throws BonitaException {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0");
+        processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue);
+        processDefinitionBuilder.addAutomaticTask(stepName);
+        processDefinitionBuilder.addEndEvent("end");
+        processDefinitionBuilder.addTransition("intermediateCatchEvent", stepName);
+        processDefinitionBuilder.addTransition(stepName, "end");
+
+        final ProcessDefinition definition = deployAndEnableProcess(processDefinitionBuilder.getProcess());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+        return definition;
+    }
+
+    @Test
+    public void cancelProcessInstanceWithTimerIntermediateCatchEvent() throws Exception {
+        //given
+        final int timerTrigger = 20000; // the timer intermediate catch event will wait 20 seconds
+        final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerTrigger);
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        final Long floNodeInstanceId = waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getWaitingState(), false);
+        final String jobName = getJobName(floNodeInstanceId);
+        assertThat(containsTimerJob(jobName)).isTrue();
+
+        //when
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+
+        //then
+        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getCancelledState(), false);
+        assertThat(containsTimerJob(jobName)).isFalse();
+
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
+        checkWasntExecuted(processInstance, "step");
+
+        disableAndDeleteProcess(definition);
     }
 
 }

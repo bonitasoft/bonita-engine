@@ -53,7 +53,8 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
         try {
             hostname = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
+            // Nothing to do
         }
 
         this.tenantId = tenantId;
