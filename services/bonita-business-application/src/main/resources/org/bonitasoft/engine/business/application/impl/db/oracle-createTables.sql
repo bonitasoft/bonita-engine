@@ -17,6 +17,8 @@ CREATE TABLE business_app (
   PRIMARY KEY (tenantId, id)
 );
 
+CREATE INDEX idx_app_name ON business_app (name, tenantid);
+
 CREATE TABLE business_app_page (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -26,4 +28,6 @@ CREATE TABLE business_app_page (
   UNIQUE (tenantId, applicationId, name),
   PRIMARY KEY (tenantId, id)
 );
+
+CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid);
 

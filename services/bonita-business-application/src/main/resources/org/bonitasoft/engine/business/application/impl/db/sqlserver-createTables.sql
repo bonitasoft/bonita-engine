@@ -18,6 +18,9 @@ CREATE TABLE business_app (
 )
 GO
 
+CREATE INDEX idx_app_name ON business_app (name, tenantid)
+GO
+
 CREATE TABLE business_app_page (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -27,6 +30,9 @@ CREATE TABLE business_app_page (
   UNIQUE (tenantId, applicationId, name),
   PRIMARY KEY (tenantId, id)
 )
+GO
+
+CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid)
 GO
 
 -- forein keys are create in bonita-persistence-db/postCreateStructure.sql

@@ -17,6 +17,8 @@ CREATE TABLE business_app (
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
 
+CREATE INDEX idx_app_name ON business_app (name, tenantid);
+
 CREATE TABLE business_app_page (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -26,5 +28,7 @@ CREATE TABLE business_app_page (
   UNIQUE (tenantId, applicationId, name),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
+
+CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid);
 
 -- forein keys are create in bonita-persistence-db/postCreateStructure.sql
