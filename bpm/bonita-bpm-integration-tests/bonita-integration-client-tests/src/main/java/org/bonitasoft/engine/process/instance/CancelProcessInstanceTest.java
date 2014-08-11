@@ -25,19 +25,12 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
@@ -112,51 +105,6 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
 
         disableAndDeleteProcess(callActivityProcDef);
         disableAndDeleteProcess(targetProcessDef);
-    }
-
-    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue, final String stepName)
-            throws BonitaException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0");
-        processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue);
-        processDefinitionBuilder.addAutomaticTask(stepName);
-        processDefinitionBuilder.addEndEvent("end");
-        processDefinitionBuilder.addTransition("intermediateCatchEvent", stepName);
-        processDefinitionBuilder.addTransition(stepName, "end");
-
-        final ProcessDefinition definition = deployAndEnableProcess(processDefinitionBuilder.getProcess());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        return definition;
-    }
-
-    @Test
-    public void cancelProcessInstanceWithTimerIntermediateCatchEvent() throws Exception {
-        final int timerTrigger = 2000; // the timer intermediate catch event will wait 2
-        final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerTrigger);
-        // seconds
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
-
-        getProcessAPI().cancelProcessInstance(processInstance.getId());
-
-        // FIXME: the exception only will be available in the logs. It will be necessary to add a new method in the API to get the list of available jobs
-        Thread.sleep(timerTrigger); // wait to be sure the timer will not be triggered.
-
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
-
-        // FIXME: comment out the lines below when intermediate catch events are archived
-        // final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        // searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForEvent.getResult().getId());
-        // searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getCancelledState());
-        // final SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
-        // searchOptionsBuilder.done());
-        // assertEquals(1, searchArchivedFlowNodeInstances.getCount());
-
-        checkWasntExecuted(processInstance, "step");
-
-        disableAndDeleteProcess(definition);
     }
 
     @SuppressWarnings("unchecked")

@@ -176,7 +176,7 @@ public class APITestUtil extends PlatformTestUtil {
         if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
-            DEFAULT_TIMEOUT = 7 * 60 * 1000;
+            DEFAULT_TIMEOUT = 2 * 60 * 1000;
         }
     }
 
@@ -909,9 +909,9 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(activityId);
     }
 
-    public void waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final String state,
+    public Long waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final String state,
             final boolean useRootProcessInstance) throws Exception {
-        waitForFlowNode(processInstance.getId(), state, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
+        return waitForFlowNode(processInstance.getId(), state, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
     }
 
     public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName, final String state) throws Exception {
