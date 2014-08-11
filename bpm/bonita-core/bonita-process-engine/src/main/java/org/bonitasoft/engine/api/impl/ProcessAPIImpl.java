@@ -892,24 +892,32 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        try {
-            executeFlowNode(0, flownodeInstanceId, true);
-        } catch (final SBonitaException e) {
-            throw new FlowNodeExecutionException(e);
-        }
+        executeFlowNode(0, flownodeInstanceId);
     }
 
     @CustomTransactions
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
+        executeFlowNode(userId, flownodeInstanceId, Collections.<String, Object> emptyMap());
+    }
+
+    @CustomTransactions
+    @Override
+    public void executeFlowNode(final long flownodeInstanceId, final Map<String, Object> parameters) throws FlowNodeExecutionException {
+        executeFlowNode(0, flownodeInstanceId, parameters);
+    }
+
+    @CustomTransactions
+    @Override
+    public void executeFlowNode(final long userId, final long flownodeInstanceId, final Map<String, Object> parameters) throws FlowNodeExecutionException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, true);
+            executeFlowNode(userId, flownodeInstanceId, true, parameters);
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction)
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> parameters)
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -923,7 +931,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     (SUserTaskInstance) flowNodeInstance);
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-            if (!isContractValid(contractDefinition, Collections.<String, Object> emptyMap())) {
+            if (!isContractValid(contractDefinition, parameters)) {
                 throw new SFlowNodeExecutionException("Contract is not valid");
             }
         }
@@ -5873,5 +5881,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(sbe);
         }
     }
+
 
 }
