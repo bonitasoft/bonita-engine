@@ -30,7 +30,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Zhao Na
  */
 public class EvaluateExpressionsInstanceLevelAndArchived extends AbstractEvaluateExpressionsInstance implements
-        TransactionContentWithResult<Map<String, Serializable>> {
+TransactionContentWithResult<Map<String, Serializable>> {
 
     private final Map<Expression, Map<String, Serializable>> expressions;
 
@@ -68,8 +68,8 @@ public class EvaluateExpressionsInstanceLevelAndArchived extends AbstractEvaluat
             context.setTime(time);
 
             final Set<Expression> exps = expressions.keySet();
-            for (Expression exp : exps) {
-                final Map<String, Serializable> partialContext = expressions.get(exp);
+            for (final Expression exp : exps) {
+                final Map<String, Serializable> partialContext = getPartialContext(expressions, exp);
                 context.setSerializableInputValues(partialContext);
                 final SExpression sexp = ServerModelConvertor.convertExpression(exp);
                 final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);

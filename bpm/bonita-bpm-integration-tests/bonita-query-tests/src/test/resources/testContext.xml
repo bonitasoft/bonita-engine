@@ -29,6 +29,9 @@
                
                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
                <value>/org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
+               
+               <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
+               <value>/org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
 
                
                <!-- GLUPSSSS Needed by process instance queries -->
@@ -74,6 +77,10 @@
    </bean>
 
    <bean id="flowNodeInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
+
+   <bean id="jobRepository" class="org.bonitasoft.engine.test.persistence.repository.JobRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
   

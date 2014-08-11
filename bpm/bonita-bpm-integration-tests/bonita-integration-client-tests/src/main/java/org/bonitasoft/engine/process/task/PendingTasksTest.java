@@ -56,7 +56,7 @@ public class PendingTasksTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         john = createUser(USERNAME, PASSWORD);
         jack = createUser(JACK, PASSWORD);
     }
@@ -181,11 +181,11 @@ public class PendingTasksTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
         final Date before = new Date();
-        Thread.sleep(100);
+        Thread.sleep(20);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("deliver", startProcess);
         final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
-        Thread.sleep(100);
+        Thread.sleep(20);
         final Date after = new Date();
         assertEquals(1, activityInstances.size());
         final HumanTaskInstance humanTaskInstance = activityInstances.get(0);

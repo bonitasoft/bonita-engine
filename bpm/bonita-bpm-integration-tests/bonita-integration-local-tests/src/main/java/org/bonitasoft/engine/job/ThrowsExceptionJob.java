@@ -17,13 +17,13 @@ public class ThrowsExceptionJob implements StatelessJob {
 
     @Override
     public String getDescription() {
-        return "Job to throw a exception";
+        return "Job that throws a exception";
     }
 
     @Override
     public void execute() throws SJobExecutionException {
         if (throwException) {
-            throw new SJobExecutionException("exception");
+            throw new SJobExecutionException("This job throws an arbitrary exception if parameter 'throwException' is provided.");
         }
     }
 

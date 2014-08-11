@@ -29,4 +29,6 @@ public interface SBusinessDataDefinition extends Serializable {
     String getClassName();
 
     SExpression getDefaultValueExpression();
+
+    boolean isMultiple();
 }

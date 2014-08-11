@@ -28,5 +28,8 @@ GO
 DELETE FROM breakpoint
 GO
 
+DELETE FROM multi_biz_data
+GO
+
 DELETE FROM ref_biz_data_inst
 GO

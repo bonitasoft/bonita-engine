@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,10 +17,15 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class SMigrationPlanDeletionException extends SBonitaException {
 
     private static final long serialVersionUID = 2516518174652732165L;
+
+    public SMigrationPlanDeletionException(final long id, final Exception e) {
+        super("Migration plan not found, id = " + id + ". ", e);
+    }
 
     public SMigrationPlanDeletionException(final long id) {
         super("migration plan not found, id = " + id);

@@ -2,28 +2,16 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  */
-@RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionBuilderTest {
-
-    @Mock
-    private DesignProcessDefinitionImpl process;
-
-    @InjectMocks
-    private ProcessDefinitionBuilder processDefinitionBuilder;
 
     // FIXME : Split all tests after, in several unit tests
     @Test(expected = InvalidProcessDefinitionException.class)
