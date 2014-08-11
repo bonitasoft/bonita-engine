@@ -2242,7 +2242,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, scommentService,
-                    identityService);
+                    identityService, tenantAccessor.getFlowNodeStateManager().getStateBehaviors());
             assignUserTask.execute();
         } catch (final SUserNotFoundException sunfe) {
             throw new UpdateException(sunfe);
@@ -3095,7 +3095,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
-            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(0, userTaskId, activityInstanceService, null, null);
+            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(0, userTaskId, activityInstanceService, null, null,tenantAccessor.getFlowNodeStateManager().getStateBehaviors() );
             assignUserTask.execute();
         } catch (final SUnreleasableTaskException e) {
             throw new UpdateException(e);

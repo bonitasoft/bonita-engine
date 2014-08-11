@@ -16,13 +16,12 @@ package org.bonitasoft.engine.api.impl.transaction.task;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
+import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.model.SUser;
 
 /**
  * @author Baptiste Mesta
@@ -39,13 +38,16 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
 
     private final IdentityService identityService;
 
+    private StateBehaviors stateBehaviors;
+
     public AssignOrUnassignUserTask(final long userId, final long userTaskId, final ActivityInstanceService activityInstanceService,
-            final SCommentService commentService, final IdentityService identityService) {
+            final SCommentService commentService, final IdentityService identityService, StateBehaviors stateBehaviors) {
         this.userId = userId;
         this.userTaskId = userTaskId;
         this.activityInstanceService = activityInstanceService;
         this.commentService = commentService;
         this.identityService = identityService;
+        this.stateBehaviors = stateBehaviors;
     }
 
     @Override
@@ -57,11 +59,7 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
         activityInstanceService.assignHumanTask(userTaskId, userId);
         if (userId > 0) {
             activityInstanceService.deleteHiddenTasksForActivity(activityInstance.getId());
-            final SUser user = identityService.getUser(userId);
-            if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)) {
-                commentService.addSystemComment(activityInstance.getRootContainerId(), "The task \"" + activityInstance.getDisplayName()
-                        + "\" is now assigned to " + user.getUserName());
-            }
+            stateBehaviors.addAssignmentSystemComment(activityInstance, userId);
         }
 
     }

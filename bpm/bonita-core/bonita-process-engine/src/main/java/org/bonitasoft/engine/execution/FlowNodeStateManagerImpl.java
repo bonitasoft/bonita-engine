@@ -217,6 +217,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         stateBehaviors.setProcessExecutor(processExecutor);
     }
 
+    @Override
+    public StateBehaviors getStateBehaviors() {
+        return stateBehaviors;
+    }
+
     private void defineTransitionsForAllNodesType() {
         defineTransitionsForAutomaticTask();
         defineTransitionsForUserTask();
@@ -538,11 +543,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     @Override
     public FlowNodeState getCanceledState(final SFlowNodeInstance flownNodeInstance) {
         return cancelled;
-    }
-
-    @Override
-    public FlowNodeState getInitialState(final SFlowNodeInstance flowNodeInstance) {
-        return initializing;
     }
 
     @Override
