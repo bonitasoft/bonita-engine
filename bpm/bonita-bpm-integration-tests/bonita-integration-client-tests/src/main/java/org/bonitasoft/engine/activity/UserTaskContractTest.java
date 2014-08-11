@@ -1,10 +1,12 @@
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -51,6 +53,28 @@ public class UserTaskContractTest extends CommonAPITest {
         assertThat(input.getDescription()).isNull();
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void getExceptionWhenContractIsNotValidUsingDefaultMethod() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null);
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("task1");
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
+
+        try {
+            getProcessAPI().executeFlowNode(userTask.getId());
+            fail("The contract is not enforced");
+        } catch (final FlowNodeExecutionException e) {
+            e.printStackTrace();
+
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
     }
 
 }
