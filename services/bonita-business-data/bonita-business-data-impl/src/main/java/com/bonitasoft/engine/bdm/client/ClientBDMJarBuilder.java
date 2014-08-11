@@ -10,8 +10,8 @@ package com.bonitasoft.engine.bdm.client;
 
 import java.io.File;
 
-import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import com.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
+import com.bonitasoft.engine.bdm.CodeGenerationException;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.compiler.JDTCompiler;
 
@@ -20,23 +20,24 @@ import com.bonitasoft.engine.compiler.JDTCompiler;
  */
 public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
 
-    public ClientBDMJarBuilder(final JDTCompiler compiler, final String dependencyPath) {
-        super(compiler, dependencyPath);
+    private ResourcesLoader resourcesLoader;
+
+    public ClientBDMJarBuilder(final JDTCompiler compiler, ResourcesLoader resourcesLoader, final String dependencyPath) {
+        super(new ClientBDMCodeGenerator(), compiler, dependencyPath);
+        this.resourcesLoader = resourcesLoader;
     }
 
     @Override
-    protected AbstractBDMCodeGenerator getBDMCodeGenerator(final BusinessObjectModel bom) {
-        return new ClientBDMCodeGenerator(bom);
+    protected void addSourceFilesToDirectory(BusinessObjectModel bom, File directory) throws CodeGenerationException {
+        super.addSourceFilesToDirectory(bom, directory);
+        addClientResources(directory);
     }
-
-    @Override
-    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) {
-        // DO NOTHING
+    
+    private void addClientResources(final File directory) throws CodeGenerationException {
+        try {
+            resourcesLoader.copyJavaFilesToDirectory("com.bonitasoft.engine.bdm.dao.client.resources", directory);
+        } catch (Exception e) {
+            throw new CodeGenerationException("Error when adding compilation dependencies to client jar", e);
+        }
     }
-
-    @Override
-    protected void addBOMFile(final File directory, final BusinessObjectModel bom) {
-        // DO NOTHING
-    }
-
 }

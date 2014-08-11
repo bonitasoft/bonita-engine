@@ -112,7 +112,7 @@ public class JPABusinessDataRepositoryImplITest {
         businessDataRepository.stop();
 
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);
-        for (String tableName : Arrays.asList("Person_nickNames", "Employee", "PERSON")) {
+        for (final String tableName : Arrays.asList("Person_nickNames", "Employee", "PERSON")) {
             try {
                 jdbcTemplate.update("drop table " + tableName);
             } catch (final Exception e) {
@@ -123,7 +123,8 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     private Employee addEmployeeToRepository(final Employee employee) {
-        return businessDataRepository.merge(employee);
+        businessDataRepository.persist(employee);
+        return employee;
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
@@ -148,7 +149,8 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void persistNewEmployeeShouldAddEmployeeInRepository() throws Exception {
-        final Employee employee = businessDataRepository.merge(anEmployee().build());
+        final Employee employee = anEmployee().build();
+        businessDataRepository.persist(employee);
 
         final Employee myEmployee = businessDataRepository.findById(Employee.class, employee.getPersistenceId());
         assertThat(myEmployee).isEqualTo(employee);
@@ -156,7 +158,7 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void persistANullEmployeeShouldDoNothing() throws Exception {
-        businessDataRepository.merge(null);
+        businessDataRepository.persist(null);
 
         final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
         assertThat(count).isEqualTo(0);
@@ -210,12 +212,9 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
-        Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
-
+        final Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
         originalEmployee.setLastName("NewLastName");
-        originalEmployee = businessDataRepository.merge(originalEmployee);
         originalEmployee.setFirstName("NewFirstName");
-        businessDataRepository.merge(originalEmployee);
 
         final Employee updatedEmployee = businessDataRepository.findById(Employee.class, originalEmployee.getPersistenceId());
         assertThat(updatedEmployee).isEqualTo(originalEmployee);
@@ -288,15 +287,15 @@ public class JPABusinessDataRepositoryImplITest {
     @Test
     public void findBasedOnAMultipleAttributeShouldReturnTheEntity() throws Exception {
         final Person person = new Person();
-        person.setNickNames(Arrays.asList("John", "James", "Jack"));
-        final Person expected = businessDataRepository.merge(person);
+        person.addTo("John");
+        person.addTo("James");
+        person.addTo("Jack");
+        businessDataRepository.persist(person);
 
-        final Person actual = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
-        assertThat(actual).isEqualTo(expected);
-
-        actual.removeFrom("James");
-
-        businessDataRepository.merge(actual);
+        final Person actual = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)",
+                null);
+        assertThat(actual).isEqualTo(person);
+        actual.getNickNames().remove("James");
 
         final Person actual2 = businessDataRepository.find(Person.class, "SELECT p FROM Person p WHERE 'James' IN ELEMENTS(p.nickNames)", null);
         assertThat(actual2).isNull();

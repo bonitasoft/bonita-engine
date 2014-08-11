@@ -8,10 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.model.builder.IndexBuilder.anIndex;
-import static com.bonitasoft.engine.bdm.model.builder.UniqueConstraintBuilder.aUniqueConstraint;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.IndexBuilder.anIndex;
+import static com.bonitasoft.engine.bdm.builder.UniqueConstraintBuilder.aUniqueConstraint;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -28,11 +28,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.model.UniqueConstraint;
-import com.bonitasoft.engine.bdm.model.builder.BusinessObjectBuilder;
 import com.bonitasoft.engine.bdm.validator.UniqueNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
@@ -54,33 +54,33 @@ public class UniqueNameValidationRuleTest {
         validationRule = new UniqueNameValidationRule(uniqueNameValidator);
     }
 
-    private BusinessObject aBoWithConstraints(UniqueConstraint... uniqueConstraints) {
+    private BusinessObject aBoWithConstraints(final UniqueConstraint... uniqueConstraints) {
         BusinessObjectBuilder boBuilder = aBO("aBoWithConstraints");
-        for (UniqueConstraint uniqueConstraint : uniqueConstraints) {
+        for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
             boBuilder = boBuilder.withUniqueConstraint(uniqueConstraint);
         }
         return boBuilder.build();
     }
 
-    private BusinessObject aBoWithIndexes(Index... indexes) {
+    private BusinessObject aBoWithIndexes(final Index... indexes) {
         BusinessObjectBuilder bo = aBO("aBoWithIndexes");
-        for (Index index : indexes) {
+        for (final Index index : indexes) {
             bo = bo.withIndex(index);
         }
         return bo.build();
     }
 
     private ValidationStatus anErrorStatus() {
-        ValidationStatus validationStatus = new ValidationStatus();
+        final ValidationStatus validationStatus = new ValidationStatus();
         validationStatus.addError("an error");
         return validationStatus;
     }
 
     @Test
     public void should_validate_names_unicity_for_unique_constraints() throws Exception {
-        UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("aUniqueConstraint").build();
-        UniqueConstraint uniqueConstraint2 = aUniqueConstraint().withName("anotherUniqueConstraint").build();
-        BusinessObject bo = aBoWithConstraints(uniqueConstraint, uniqueConstraint2);
+        final UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("aUniqueConstraint").build();
+        final UniqueConstraint uniqueConstraint2 = aUniqueConstraint().withName("anotherUniqueConstraint").build();
+        final BusinessObject bo = aBoWithConstraints(uniqueConstraint, uniqueConstraint2);
 
         validationRule.checkRule(aBOM().withBO(bo).build());
 
@@ -89,9 +89,9 @@ public class UniqueNameValidationRuleTest {
 
     @Test
     public void should_validate_names_unicity_for_indexes() throws Exception {
-        Index index = anIndex().withName("anIndex").build();
-        Index anotherIndex = anIndex().withName("anotherIndex").build();
-        BusinessObjectModel bom = aBOM().withBO(aBoWithIndexes(index, anotherIndex)).build();
+        final Index index = anIndex().withName("anIndex").build();
+        final Index anotherIndex = anIndex().withName("anotherIndex").build();
+        final BusinessObjectModel bom = aBOM().withBO(aBoWithIndexes(index, anotherIndex)).build();
 
         validationRule.checkRule(bom);
 
@@ -100,13 +100,13 @@ public class UniqueNameValidationRuleTest {
 
     @Test
     public void should_concatenate_validation_errors() throws Exception {
-        Index index = anIndex().withName("index").build();
-        UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("constraint").build();
-        BusinessObjectModel bom = aBOM().withBO((aBO("bo").withIndex(index).withUniqueConstraint(uniqueConstraint).build())).build();
+        final Index index = anIndex().withName("index").build();
+        final UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("constraint").build();
+        final BusinessObjectModel bom = aBOM().withBO(aBO("bo").withIndex(index).withUniqueConstraint(uniqueConstraint).build()).build();
         when(uniqueNameValidator.validate(eq(asList(index)), anyString())).thenReturn(anErrorStatus());
         when(uniqueNameValidator.validate(eq(asList(uniqueConstraint)), anyString())).thenReturn(anErrorStatus());
-        
-        ValidationStatus checkRule = validationRule.checkRule(bom);
+
+        final ValidationStatus checkRule = validationRule.checkRule(bom);
 
         assertThat(checkRule.getErrors()).hasSize(2);
     }

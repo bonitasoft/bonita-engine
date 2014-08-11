@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.model.assertion;
 
-import static com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
 
 import java.io.IOException;
 
@@ -18,9 +18,9 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 import org.xml.sax.SAXException;
 
+import com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.bdm.model.field.RelationField;
 
@@ -29,20 +29,20 @@ import com.bonitasoft.engine.bdm.model.field.RelationField;
  */
 public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, BusinessObject> {
 
-    protected BusinessObjectAssert(BusinessObject actual) {
+    protected BusinessObjectAssert(final BusinessObject actual) {
         super(actual, BusinessObjectAssert.class);
     }
 
-    public static BusinessObjectAssert assertThat(BusinessObject actual) {
+    public static BusinessObjectAssert assertThat(final BusinessObject actual) {
         return new BusinessObjectAssert(actual);
     }
 
     public BusinessObjectAssert canBeMarshalled() {
         try {
-            BusinessObjectModel bom = marshallUnmarshall(actual);
+            final BusinessObjectModel bom = marshallUnmarshall(actual);
             Assertions.assertThat(bom.getBusinessObjects().get(0)).isNotNull();
             isEqualTo(bom.getBusinessObjects().get(0));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             failWithMessage("Expected <%s> to be marshallizable : <%s>", actual, e.getCause());
         }
         return this;
@@ -52,20 +52,20 @@ public class BusinessObjectAssert extends AbstractAssert<BusinessObjectAssert, B
         try {
             marshallUnmarshall(actual);
             failWithMessage("Expected <%s> not to be marshallizable", actual);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // OK
         }
         return this;
     }
 
-    private BusinessObjectModel marshallUnmarshall(BusinessObject bo) throws JAXBException, IOException, SAXException {
-        BusinessObjectModelBuilder bom = aBOM().withBO(bo);
+    private BusinessObjectModel marshallUnmarshall(final BusinessObject bo) throws JAXBException, IOException, SAXException {
+        final BusinessObjectModelBuilder bom = aBOM().withBO(bo);
         addReferencedBoToBom(bo, bom);
         return Marshaller.marshallUnmarshall(bom.build());
     }
 
-    private void addReferencedBoToBom(BusinessObject bo, BusinessObjectModelBuilder bom) {
-        for (Field field : bo.getFields()) {
+    private void addReferencedBoToBom(final BusinessObject bo, final BusinessObjectModelBuilder bom) {
+        for (final Field field : bo.getFields()) {
             if (field instanceof RelationField && !bo.equals(((RelationField) field).getReference())) {
                 bom.withBO(((RelationField) field).getReference());
             }

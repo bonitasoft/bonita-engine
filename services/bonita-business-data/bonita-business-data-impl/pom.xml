@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -41,6 +42,11 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>	
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -167,5 +173,49 @@
 			<version>0.7.1.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-common-util-sp</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-business-data-client-resources</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.bonitasoft.engine.data</groupId>
+									<artifactId>bonita-business-data-client-resources</artifactId>
+									<version>${project.version}</version>
+									<classifier>sources</classifier>
+									<overWrite>false</overWrite>
+									<includes>**/*.java</includes>
+									<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

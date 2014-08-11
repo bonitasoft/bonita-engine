@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.execution;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -105,7 +106,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter)
-            throws SProcessInstanceCreationException {
+                    throws SProcessInstanceCreationException {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
@@ -122,16 +123,31 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
             for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
                 final SExpression expression = bdd.getDefaultValueExpression();
-                Long primaryKey = null;
-                if (expression != null) {
-                    Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
-                    businessData = businessDataRepository.merge(businessData);
-                    primaryKey = businessData.getPersistenceId();
+                if (bdd.isMultiple()) {
+                    final List<Long> dataIds = new ArrayList<Long>();
+                    if (expression != null) {
+                        final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
+                        for (final Entity entity : businessData) {
+                            final Entity tmp = businessDataRepository.merge(entity);
+                            dataIds.add(tmp.getPersistenceId());
+                        }
+                    }
+                    final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), dataIds, bdd.getClassName())
+                            .done();
+                    refBusinessDataService.addRefBusinessDataInstance(instance);
+                } else {
+                    Long primaryKey = null;
+                    if (expression != null) {
+                        Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                        businessData = businessDataRepository.merge(businessData);
+                        primaryKey = businessData.getPersistenceId();
+                    }
+                    final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
+                            .done();
+                    refBusinessDataService.addRefBusinessDataInstance(instance);
                 }
-                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
-                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
-                        .done();
-                refBusinessDataService.addRefBusinessDataInstance(instance);
             }
             createDocuments(sDefinition, sInstance, userId);
             if (connectors != null) {
@@ -157,7 +173,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     }
 
     private void initializeStringIndexes(final SProcessInstance sInstance, final SProcessDefinition sDefinition) throws SExpressionTypeUnknownException,
-            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
+    SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
         final SExpressionContext contextDependency = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 sDefinition.getId());
         boolean update = false;

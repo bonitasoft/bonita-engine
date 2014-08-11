@@ -1,0 +1,73 @@
+package com.bonitasoft.engine.api.impl.transaction.expression;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
+
+/**
+ * @author Romain Bioteau
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class EntityMergerTest {
+
+    @Mock
+    private BusinessDataRepository bdrService;
+
+    @Mock
+    private Entity testEntity;
+
+    private EntityMerger entityMerger;
+
+    @Before
+    public void setUp() throws Exception {
+        entityMerger = new EntityMerger(bdrService);
+    }
+
+    @Test
+    public void merge_an_single_entity_should_call_merge_on_bdrService() throws Exception {
+        entityMerger.merge(testEntity);
+        verify(bdrService).merge(testEntity);
+    }
+
+    @Test
+    public void merge_a_collection_of_entity_should_call_merge_on_bdrService_for_each_entity() throws Exception {
+        final List<Entity> listOfEntities = new ArrayList<Entity>();
+        listOfEntities.add(testEntity);
+        listOfEntities.add(testEntity);
+        listOfEntities.add(testEntity);
+        entityMerger.merge((Serializable) listOfEntities);
+        verify(bdrService, times(3)).merge(testEntity);
+    }
+
+    @Test
+    public void merge_a_simple_serializable_should_not_call_merge_on_bdrService() throws Exception {
+        final String hello = "Hello";
+        assertThat(entityMerger.merge("Hello")).isEqualTo(hello);
+        verifyZeroInteractions(bdrService);
+    }
+
+    @Test
+    public void merge_a_collection_of_simple_serializable_should_not_call_merge_on_bdrService() throws Exception {
+        final List<String> listOfEntities = new ArrayList<String>();
+        listOfEntities.add("Hello");
+        listOfEntities.add("Goodbye");
+        listOfEntities.add("Have a nice day");
+        entityMerger.merge((Serializable) listOfEntities);
+        verifyZeroInteractions(bdrService);
+    }
+
+}
