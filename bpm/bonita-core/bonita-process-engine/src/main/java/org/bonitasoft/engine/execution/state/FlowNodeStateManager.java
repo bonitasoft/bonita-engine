@@ -39,19 +39,7 @@ public interface FlowNodeStateManager {
 
     FlowNodeState getState(int stateId);
 
-    FlowNodeState getNormalFinalState(SFlowNodeInstance flowNodeInstance);
-
-    Set<Integer> getUnstableStateIds();
-
-    Set<Integer> getStableStateIds();
-
-    Set<Integer> getAllStates();
-
     Set<String> getSupportedState(FlowNodeType nodeType);
-
-    FlowNodeState getSkippedState(SFlowNodeInstance flownNodeInstance);
-
-    FlowNodeState getCanceledState(SFlowNodeInstance flownNodeInstance);
 
     void setProcessExecutor(ProcessExecutor processExecutor);
 

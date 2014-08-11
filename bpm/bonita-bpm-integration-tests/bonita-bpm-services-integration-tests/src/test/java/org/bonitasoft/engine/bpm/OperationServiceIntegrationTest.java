@@ -183,7 +183,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         transactionService.begin();
         dataInstanceService.createDataInstance(dataInstance);
-        dataInstanceService.createDataContainer(dataInstance.getContainerId(), dataInstance.getContainerType());
+        dataInstanceService.createDataContainer(dataInstance.getContainerId(), dataInstance.getContainerType(), true);
         transactionService.complete();
     }
 

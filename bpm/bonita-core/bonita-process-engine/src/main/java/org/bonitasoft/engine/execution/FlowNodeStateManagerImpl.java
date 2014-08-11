@@ -531,36 +531,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     }
 
     @Override
-    public FlowNodeState getNormalFinalState(final SFlowNodeInstance flowNodeInstance) {
-        return completed;
-    }
-
-    @Override
-    public FlowNodeState getSkippedState(final SFlowNodeInstance flownNodeInstance) {
-        return skipped;
-    }
-
-    @Override
-    public FlowNodeState getCanceledState(final SFlowNodeInstance flownNodeInstance) {
-        return cancelled;
-    }
-
-    @Override
-    public Set<Integer> getUnstableStateIds() {
-        return unstableStates;
-    }
-
-    @Override
-    public Set<Integer> getStableStateIds() {
-        return stableStates;
-    }
-
-    @Override
-    public Set<Integer> getAllStates() {
-        return allStates;
-    }
-
-    @Override
     public Set<String> getSupportedState(final FlowNodeType nodeType) {
         final SFlowNodeType type = SFlowNodeType.valueOf(nodeType.toString());
         final Map<Integer, FlowNodeState> states = normalTransitions.get(type);
