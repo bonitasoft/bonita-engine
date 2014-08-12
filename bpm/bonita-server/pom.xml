@@ -440,12 +440,6 @@
       <artifactId>bonita-process-document-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document</groupId>
-      <artifactId>bonita-process-document-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Process Instance -->
     <dependency>
       <groupId>com.bonitasoft.engine.core.process.instance</groupId>
@@ -822,8 +816,6 @@
                   <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
                   <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
                   <!-- Process Document -->
-                  <include>org.bonitasoft.engine.core.process.document:bonita-process-document-model</include>
-                  <include>org.bonitasoft.engine.core.process.document:bonita-process-document-model-impl</include>
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
                   <!-- Process Instance -->
