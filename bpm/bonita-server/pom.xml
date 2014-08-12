@@ -176,11 +176,6 @@
     <!-- Document Mapping -->
     <dependency>
       <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-      <artifactId>bonita-process-document-mapping-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
       <artifactId>bonita-process-document-mapping-api-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -729,8 +724,6 @@
                   <include>org.bonitasoft.engine.document:bonita-document-api</include>
                   <include>org.bonitasoft.engine.document:bonita-document-impl</include>
                   <!-- Document Mapping -->
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model</include>
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model-impl</include>
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
                   <!-- Event -->

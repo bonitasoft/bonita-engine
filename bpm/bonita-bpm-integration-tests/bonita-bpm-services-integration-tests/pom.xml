@@ -205,12 +205,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-			<artifactId>bonita-process-document-mapping-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.document</groupId>
 			<artifactId>bonita-process-document-impl</artifactId>
 			<version>${project.version}</version>
