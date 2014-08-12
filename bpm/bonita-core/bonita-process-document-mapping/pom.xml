@@ -17,7 +17,5 @@
 	<modules>
 		<module>bonita-process-document-mapping-api</module>
 		<module>bonita-process-document-mapping-api-impl</module>
-		<module>bonita-process-document-mapping-model</module>
-		<module>bonita-process-document-mapping-model-impl</module>
 	</modules>
 </project>
