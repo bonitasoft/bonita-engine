@@ -71,11 +71,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-            <artifactId>bonita-process-document-mapping-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-api</artifactId>
             <version>${project.version}</version>
