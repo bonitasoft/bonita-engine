@@ -77,6 +77,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ParameterDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ProcessDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.RightOperandBinding;
+import org.bonitasoft.engine.bpm.bar.xml.RuleDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.SendTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StartEventDefinitionBinding;
@@ -182,6 +183,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(FlowElementBinding.class);
         bindings.add(ContractDefinitionBinding.class);
         bindings.add(InputDefinitionBinding.class);
+        bindings.add(RuleDefinitionBinding.class);
 
         final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
         try {

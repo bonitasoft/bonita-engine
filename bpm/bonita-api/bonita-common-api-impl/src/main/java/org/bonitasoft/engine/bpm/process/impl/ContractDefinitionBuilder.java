@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 
@@ -35,6 +36,15 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     public ContractDefinitionBuilder addInput(final String name, final String type, final String description) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, type, description);
         contract.addInput(input);
+        return this;
+    }
+
+    public ContractDefinitionBuilder addRule(final String name, final String expression, final String explanation, final String... inputNames) {
+        final RuleDefinitionImpl rule = new RuleDefinitionImpl(name, expression, explanation);
+        for (final String inputName : inputNames) {
+            rule.addInputName(inputName);
+        }
+        contract.addRule(rule);
         return this;
     }
 

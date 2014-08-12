@@ -13,51 +13,55 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
-import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.io.xml.ElementBinding;
+import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ContractDefinitionBinding extends ElementBinding {
+public class RuleDefinitionBinding extends NamedElementBinding {
 
-    private final ContractDefinitionImpl contract;
+    private String expression;
 
-    public ContractDefinitionBinding() {
-        contract = new ContractDefinitionImpl();
-    }
+    private String explanation;
 
-    @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    private final List<String> inputNames;
+
+    public RuleDefinitionBinding() {
+        inputNames = new ArrayList<String>();
     }
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+        if (XMLProcessDefinition.RULE_EXPRESSION.equals(name)) {
+            expression = value;
+        } else if (XMLProcessDefinition.RULE_EXPLANATION.equals(name)) {
+            explanation = value;
+        } else if (XMLProcessDefinition.INPUT_NAME.equals(name)) {
+            inputNames.add(name);
+        }
     }
 
     @Override
     public void setChildObject(final String name, final Object value) throws XMLParseException {
-        if (XMLProcessDefinition.CONTRACT_INPUT_NODE.equals(name)) {
-            contract.addInput((InputDefinition) value);
-        }
-        if (XMLProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
-            contract.addRule((RuleDefinition) value);
-        }
     }
 
     @Override
     public Object getObject() {
-        return contract;
+        final RuleDefinitionImpl rule = new RuleDefinitionImpl(name, expression, explanation);
+        for (final String inputName : inputNames) {
+            rule.addInputName(inputName);
+        }
+        return rule;
     }
 
     @Override
     public String getElementTag() {
-        return XMLProcessDefinition.CONTRACT_NODE;
+        return XMLProcessDefinition.CONTRACT_RULE_NODE;
     }
 
 }

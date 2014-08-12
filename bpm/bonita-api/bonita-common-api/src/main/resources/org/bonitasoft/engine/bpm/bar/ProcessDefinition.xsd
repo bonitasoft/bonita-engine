@@ -341,6 +341,13 @@
             		</xs:sequence>
             	</xs:complexType>
             </xs:element>
+            <xs:element name="ruleDefinitions" minOccurs="0">
+            	<xs:complexType>
+            		<xs:sequence>
+            			<xs:element name="ruleDefinition" type="definition:RuleDefinition" minOccurs="0" maxOccurs="unbounded"/>
+            		</xs:sequence>
+            	</xs:complexType>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 
@@ -348,6 +355,24 @@
         <xs:complexContent>
             <xs:extension base="definition:NamedElement">
             	<xs:attribute name="type" type="xs:string" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+	<xs:complexType name="RuleDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+            	<xs:sequence>
+            		<xs:element name="expression" type="xs:string" />
+            		<xs:element name="explanation" type="xs:string" />
+            		<xs:element name="inputDefinitionNames">
+            			<xs:complexType>
+            				<xs:sequence>
+            					<xs:element name="inputDefinitionName" type="xs:string" />
+            				</xs:sequence>
+            			</xs:complexType>
+            		</xs:element>
+            	</xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

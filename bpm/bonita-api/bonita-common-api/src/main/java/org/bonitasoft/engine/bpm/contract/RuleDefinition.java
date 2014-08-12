@@ -15,15 +15,17 @@ package org.bonitasoft.engine.bpm.contract;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.BonitaObject;
+import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface ContractDefinition extends BonitaObject {
+public interface RuleDefinition extends NamedElement {
 
-    List<InputDefinition> getInputs();
+    String getExpression();
 
-    List<RuleDefinition> getRules();
+    String getExplanation();
+
+    List<String> getInputNames();
 
 }

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,8 +29,11 @@ public class ContractDefinitionImpl implements ContractDefinition {
 
     private final List<InputDefinition> inputs;
 
+    private final List<RuleDefinition> rules;
+
     public ContractDefinitionImpl() {
         inputs = new ArrayList<InputDefinition>();
+        rules = new ArrayList<RuleDefinition>();
     }
 
     @Override
@@ -42,10 +46,20 @@ public class ContractDefinitionImpl implements ContractDefinition {
     }
 
     @Override
+    public List<RuleDefinition> getRules() {
+        return rules;
+    }
+
+    public void addRule(final RuleDefinition rule) {
+        rules.add(rule);
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (inputs == null ? 0 : inputs.hashCode());
+        result = prime * result + (rules == null ? 0 : rules.hashCode());
         return result;
     }
 
@@ -66,6 +80,13 @@ public class ContractDefinitionImpl implements ContractDefinition {
                 return false;
             }
         } else if (!inputs.equals(other.inputs)) {
+            return false;
+        }
+        if (rules == null) {
+            if (other.rules != null) {
+                return false;
+            }
+        } else if (!rules.equals(other.rules)) {
             return false;
         }
         return true;

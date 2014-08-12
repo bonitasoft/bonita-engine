@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -348,6 +349,18 @@ public class XMLProcessDefinition {
 
     public static final String TYPE = "type";
 
+    public static final String CONTRACT_RULES_NODE = "ruleDefinitions";
+
+    public static final String CONTRACT_RULE_NODE = "ruleDefinition";
+
+    public static final String RULE_EXPRESSION = "expression";
+
+    public static final String RULE_EXPLANATION = "explanation";
+
+    public static final String INPUT_NAMES = "inputDefinitionNames";
+
+    public static final String INPUT_NAME = "inputDefinitionName";
+
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
     public static final class BEntry<K, V> implements Map.Entry<K, V> {
@@ -540,7 +553,29 @@ public class XMLProcessDefinition {
                 inputsNode.addChild(createInputNode(input));
             }
         }
+        final List<RuleDefinition> rules = contract.getRules();
+        if (!rules.isEmpty()) {
+            final XMLNode rulesNode = new XMLNode(CONTRACT_RULES_NODE);
+            contractNode.addChild(rulesNode);
+
+            for (final RuleDefinition rule : rules) {
+                rulesNode.addChild(createRuleNode(rule));
+            }
+        }
         return contractNode;
+    }
+
+    private XMLNode createRuleNode(final RuleDefinition rule) {
+        final XMLNode ruleNode = new XMLNode(CONTRACT_RULE_NODE);
+        ruleNode.addAttribute(NAME, rule.getName());
+        ruleNode.addChild(RULE_EXPRESSION, rule.getExpression());
+        ruleNode.addChild(RULE_EXPLANATION, rule.getExplanation());
+        final XMLNode namesNode = new XMLNode(INPUT_NAMES);
+        ruleNode.addChild(namesNode);
+        for (final String inputName : rule.getInputNames()) {
+            namesNode.addChild(INPUT_NAME, inputName);
+        }
+        return ruleNode;
     }
 
     private XMLNode createInputNode(final InputDefinition input) {
