@@ -107,18 +107,20 @@ import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentCreationException;
 import org.bonitasoft.engine.core.process.document.api.SProcessDocumentDeletionException;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.*;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.*;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
@@ -137,7 +139,9 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
+import org.bonitasoft.engine.document.model.SDocumentBuilderFactory;
 import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -4150,46 +4154,46 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType, final String url)
             throws DocumentAttachmentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         final long author = getUserId();
         try {
-            final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, processDocumentService, author);
+            final SDocumentMapping document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, documentService, author);
             return ModelConvertor.toDocument(document);
         } catch (final SBonitaException sbe) {
             throw new DocumentAttachmentException(sbe);
         }
     }
 
-    protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final String url, final ProcessDocumentService processDocumentService, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
-        return processDocumentService.attachDocumentToProcessInstance(attachment);
+    protected SDocumentMapping attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+            final String url, final DocumentService documentService, final long authorId) throws SBonitaException {
+        final SDocumentMapping attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
+        return documentService.attachDocumentToProcessInstance(attachment);
     }
 
-    private SProcessDocument buildExternalProcessDocumentReference(final long processInstanceId, final String documentName, final String fileName,
+    private SDocumentMapping buildExternalProcessDocumentReference(final long processInstanceId, final String documentName, final String fileName,
             final String mimeType, final long authorId, final String url) {
-        final SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
-        documentBuilder.setURL(url);
+        final SDocumentMappingBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
+        documentBuilder.setDocumentURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SProcessDocument buildProcessDocument(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
+    private SDocumentMapping buildProcessDocument(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
             final long authorId) {
-        final SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
+        final SDocumentMappingBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         return documentBuilder.done();
     }
 
-    private SProcessDocumentBuilder initDocumentBuilder(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
+    private SDocumentMappingBuilder initDocumentBuilder(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
             final long authorId) {
-        final SProcessDocumentBuilder documentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
-        documentBuilder.setName(documentName);
-        documentBuilder.setFileName(fileName);
-        documentBuilder.setContentMimeType(mimetype);
+        final SDocumentMappingBuilder documentBuilder = BuilderFactory.get(SDocumentMappingBuilderFactory.class).createNewInstance();
+        documentBuilder.setDocumentName(documentName);
+        documentBuilder.setDocumentContentFileName(fileName);
+        documentBuilder.setDocumentContentMimeType(mimetype);
         documentBuilder.setProcessInstanceId(processInstanceId);
-        documentBuilder.setAuthor(authorId);
-        documentBuilder.setCreationDate(System.currentTimeMillis());
+        documentBuilder.setDocumentAuthor(authorId);
+        documentBuilder.setDocumentCreationDate(System.currentTimeMillis());
         return documentBuilder;
     }
 
@@ -4197,10 +4201,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent) throws DocumentAttachmentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         final long authorId = getUserId();
         try {
-            final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, documentContent, processDocumentService,
+            final SDocumentMapping document = attachDocument(processInstanceId, documentName, fileName, mimeType, documentContent, documentService,
                     authorId);
             return ModelConvertor.toDocument(document);
         } catch (final SBonitaException sbe) {
@@ -4208,10 +4212,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final ProcessDocumentService processDocumentService, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
-        return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
+    protected SDocumentMapping attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+            final byte[] documentContent, final DocumentService documentService, final long authorId) throws SBonitaException {
+        final SDocumentMapping attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
+        return documentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
 
     @Override
@@ -4219,13 +4223,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             final String url) throws DocumentAttachmentException {
         getTenantAccessor();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         final long authorId = getUserId();
         try {
-            final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
-            final AttachDocumentVersion attachDocumentTransationContent = new AttachDocumentVersion(processDocumentService, attachment);
-            attachDocumentTransationContent.execute();
-            return ModelConvertor.toDocument(attachDocumentTransationContent.getResult());
+            final SDocumentMapping attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
+
+            return ModelConvertor.toDocument(documentService.updateDocumentOfProcessInstance(attachment));
         } catch (final SBonitaException sbe) {
             throw new DocumentAttachmentException(sbe);
         }
@@ -4235,15 +4238,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String contentFileName,
             final String contentMimeType, final byte[] documentContent) throws DocumentAttachmentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         final long authorId = getUserId();
         try {
-            final SProcessDocument attachment = buildProcessDocument(processInstanceId, documentName, contentFileName, contentMimeType, authorId);
-            final AttachDocumentVersionAndStoreContent attachDocumentTransationContent = new AttachDocumentVersionAndStoreContent(processDocumentService,
-                    attachment, documentContent);
-            attachDocumentTransationContent.execute();
-            return ModelConvertor.toDocument(attachDocumentTransationContent.getResult());
-        } catch (final SBonitaException sbe) {
+            final SDocumentMapping attachment = buildProcessDocument(processInstanceId, documentName, contentFileName, contentMimeType, authorId);
+            return ModelConvertor.toDocument(documentService.updateDocumentOfProcessInstance(attachment, documentContent));
+        } catch (final SProcessDocumentCreationException sbe) {
             throw new DocumentAttachmentException(sbe);
         }
     }
@@ -4251,9 +4251,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Document getDocument(final long documentId) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            return ModelConvertor.toDocument(processDocumentService.getDocument(documentId));
+            return ModelConvertor.toDocument(documentService.getDocument(documentId));
         } catch (SDocumentNotFoundException e) {
             throw new DocumentNotFoundException(e);
         }
@@ -4263,23 +4263,20 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<Document> getLastVersionOfDocuments(final long processInstanceId, final int pageIndex, final int numberPerPage,
             final DocumentCriterion pagingCriterion) throws DocumentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
 
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForDocument(pagingCriterion);
         try {
-            final GetDocumentsOfProcessInstance transationContent = new GetDocumentsOfProcessInstance(processDocumentService, processInstanceId, pageIndex,
-                    numberPerPage, orderAndField.getField(), orderAndField.getOrder());
-            transationContent.execute();
-            final List<SProcessDocument> attachments = transationContent.getResult();
+            final List<SDocumentMapping> attachments = documentService.getDocumentsOfProcessInstance(processInstanceId, pageIndex, numberPerPage, orderAndField.getField(), orderAndField.getOrder());
             if (attachments != null && !attachments.isEmpty()) {
                 final List<Document> result = new ArrayList<Document>(attachments.size());
-                for (final SProcessDocument attachment : attachments) {
+                for (final SDocumentMapping attachment : attachments) {
                     result.add(ModelConvertor.toDocument(attachment));
                 }
                 return result;
             }
             return Collections.emptyList();
-        } catch (final SBonitaException sbe) {
+        } catch (final SDocumentException sbe) {
             throw new DocumentException(sbe);
         }
     }
@@ -4287,26 +4284,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public byte[] getDocumentContent(final String documentStorageId) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            final GetDocumentContent transationContent = new GetDocumentContent(processDocumentService, documentStorageId);
-            transationContent.execute();
-            return transationContent.getResult();
-        } catch (final SBonitaException sbe) {
+            return documentService.getDocumentContent(documentStorageId);
+        } catch (final SProcessDocumentContentNotFoundException sbe) {
             throw new DocumentNotFoundException(sbe);
         }
     }
 
     @Override
-    public Document getLastDocument(final long processInstaneId, final String documentName) throws DocumentNotFoundException {
+    public Document getLastDocument(final long processInstanceId, final String documentName) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            final GetDocumentByName transationContent = new GetDocumentByName(processDocumentService, processInstaneId, documentName);
-            transationContent.execute();
-            final SProcessDocument attachment = transationContent.getResult();
-            return ModelConvertor.toDocument(attachment);
-        } catch (final SBonitaException sbe) {
+            return ModelConvertor.toDocument(documentService.getDocument(processInstanceId, documentName));
+        } catch (final SDocumentNotFoundException sbe) {
             throw new DocumentNotFoundException(sbe);
         }
     }
@@ -4314,13 +4306,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long getNumberOfDocuments(final long processInstanceId) throws DocumentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            final GetNumberOfDocumentsOfProcessInstance transationContent = new GetNumberOfDocumentsOfProcessInstance(processDocumentService, processInstanceId);
-            transationContent.execute();
-            return transationContent.getResult();
+            return documentService.getNumberOfDocumentsOfProcessInstance(processInstanceId);
 
-        } catch (final SBonitaException sbe) {
+        } catch (final SDocumentException sbe) {
             throw new DocumentException(sbe);
         }
     }
@@ -4328,16 +4318,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Document getDocumentAtProcessInstantiation(final long processInstanceId, final String documentName) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
         try {
-            final GetDocumentByNameAtProcessInstantiation transationContent = new GetDocumentByNameAtProcessInstantiation(processDocumentService,
+            final GetDocumentByNameAtProcessInstantiation transationContent = new GetDocumentByNameAtProcessInstantiation(documentService,
                     processInstanceService, searchEntitiesDescriptor, processInstanceId, documentName);
             transationContent.execute();
-            final SProcessDocument attachment = transationContent.getResult();
+            final SDocumentMapping attachment = transationContent.getResult();
             return ModelConvertor.toDocument(attachment);
         } catch (final SBonitaException sbe) {
             throw new DocumentNotFoundException(sbe);
@@ -4347,14 +4337,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Document getDocumentAtActivityInstanceCompletion(final long activityInstanceId, final String documentName) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
-            final GetDocumentByNameAtActivityCompletion transationContent = new GetDocumentByNameAtActivityCompletion(processDocumentService,
-                    activityInstanceId, documentName, activityInstanceService);
-            transationContent.execute();
-            final SProcessDocument attachment = transationContent.getResult();
-            return ModelConvertor.toDocument(attachment);
+            final SAActivityInstance instance = activityInstanceService.getMostRecentArchivedActivityInstance(activityInstanceId);
+            return ModelConvertor.toDocument(documentService.getDocument(instance.getRootContainerId(), documentName, instance.getArchiveDate()));
         } catch (final SBonitaException sbe) {
             throw new DocumentNotFoundException(sbe);
         }
@@ -4701,9 +4688,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
 
-        final SearchDocuments searchDocuments = new SearchDocuments(processDocumentService, searchEntitiesDescriptor.getSearchDocumentDescriptor(),
+        final SearchDocuments searchDocuments = new SearchDocuments(documentService, searchEntitiesDescriptor.getSearchDocumentDescriptor(),
                 searchOptions);
         try {
             searchDocuments.execute();
@@ -4718,9 +4705,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
 
-        final SearchDocumentsSupervisedBy searchDocuments = new SearchDocumentsSupervisedBy(processDocumentService,
+        final SearchDocumentsSupervisedBy searchDocuments = new SearchDocumentsSupervisedBy(documentService,
                 searchEntitiesDescriptor.getSearchDocumentDescriptor(), searchOptions, userId);
         try {
             searchDocuments.execute();
@@ -4735,8 +4722,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
-        final SearchArchivedDocuments searchDocuments = new SearchArchivedDocuments(processDocumentService,
+        final DocumentService documentService = tenantAccessor.getDocumentService();
+        final SearchArchivedDocuments searchDocuments = new SearchArchivedDocuments(documentService,
                 searchEntitiesDescriptor.getSearchArchivedDocumentDescriptor(), searchOptions);
         try {
             searchDocuments.execute();
@@ -4751,8 +4738,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
-        final SearchArchivedDocumentsSupervisedBy searchDocuments = new SearchArchivedDocumentsSupervisedBy(userId, processDocumentService,
+        final DocumentService documentService = tenantAccessor.getDocumentService();
+        final SearchArchivedDocumentsSupervisedBy searchDocuments = new SearchArchivedDocumentsSupervisedBy(userId, documentService,
                 searchEntitiesDescriptor.getSearchArchivedDocumentDescriptor(), searchOptions);
         try {
             searchDocuments.execute();
@@ -4798,25 +4785,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedDocument getArchivedVersionOfProcessDocument(final long sourceObjectId) throws ArchivedDocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
 
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
-        final GetArchivedDocument getArchivedDocument = new GetArchivedDocument(processDocumentService, sourceObjectId);
         try {
-            getArchivedDocument.execute();
-        } catch (final SBonitaException e) {
+            return ModelConvertor.toArchivedDocument(documentService.getArchivedVersionOfProcessDocument(sourceObjectId));
+        } catch (SDocumentNotFoundException e) {
             throw new ArchivedDocumentNotFoundException(e);
         }
-        return ModelConvertor.toArchivedDocument(getArchivedDocument.getResult());
     }
 
     @Override
     public ArchivedDocument getArchivedProcessDocument(final long archivedProcessDocumentId) throws ArchivedDocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            final SAProcessDocument archivedDocument = processDocumentService.getArchivedDocument(archivedProcessDocumentId);
-            return ModelConvertor.toArchivedDocument(archivedDocument);
+            return ModelConvertor.toArchivedDocument(documentService.getArchivedDocument(archivedProcessDocumentId));
         } catch (final SDocumentNotFoundException e) {
             throw new ArchivedDocumentNotFoundException(e);
         }
@@ -5707,10 +5690,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Document removeDocument(long documentId) throws DocumentNotFoundException, DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            SProcessDocument document = processDocumentService.getDocument(documentId);
-            processDocumentService.removeDocument(document);
+            SDocumentMapping document = documentService.getDocument(documentId);
+            documentService.removeDocument(document);
             return ModelConvertor.toDocument(document);
         } catch (final SDocumentNotFoundException e) {
             throw new DocumentNotFoundException("Unable to delete the document "+documentId+" because it does not exists", e);

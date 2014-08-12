@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bonitasoft.engine.document.DocumentService;
+import org.bonitasoft.engine.document.DocumentContentService;
 import org.bonitasoft.engine.document.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentStorageException;
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.document.model.SDocument;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class InMemoryTemporaryDocumentServiceImpl implements DocumentService {
+public class InMemoryTemporaryDocumentContentServiceImpl implements DocumentContentService {
 
     private final Map<String, SDocument> inMemoryDocStore = new HashMap<String, SDocument>();
 

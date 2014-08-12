@@ -37,8 +37,8 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -98,7 +98,7 @@ public class ProcessExecutorImplTest {
     private ContainerRegistry containerRegistry;
 
     @Mock
-    private SProcessDocumentBuilder documentBuilder;
+    private SDocumentMappingBuilder documentBuilder;
 
     @Mock
     private EventInstanceService eventInstanceService;
@@ -137,7 +137,7 @@ public class ProcessExecutorImplTest {
     private ProcessDefinitionService processDefinitionService;
 
     @Mock
-    private ProcessDocumentService processDocumentService;
+    private DocumentService documentService;
 
     @Mock
     private ProcessInstanceService processInstanceService;

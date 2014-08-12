@@ -63,11 +63,11 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.document.api.SProcessDocumentCreationException;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -166,7 +166,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final OperationService operationService;
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
     private final ReadSessionAccessor sessionAccessor;
 
@@ -182,7 +182,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final ExpressionResolverService expressionResolverService, final EventService eventService,
-            final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
+            final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
         super();
@@ -201,7 +201,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.classLoaderService = classLoaderService;
         this.operationService = operationService;
         this.expressionResolverService = expressionResolverService;
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -623,42 +623,42 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+    protected SDocumentMapping attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId) throws SProcessDocumentCreationException {
-        final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
-        return processDocumentService.attachDocumentToProcessInstance(attachment);
+        final SDocumentMapping attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
+        return documentService.attachDocumentToProcessInstance(attachment);
     }
 
-    protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+    protected SDocumentMapping attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent, final long authorId) throws SProcessDocumentCreationException {
-        final SProcessDocument attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
-        return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
+        final SDocumentMapping attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
+        return documentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
 
-    private SProcessDocument buildExternalProcessDocumentReference(final long processInstanceId, final String documentName, final String fileName,
+    private SDocumentMapping buildExternalProcessDocumentReference(final long processInstanceId, final String documentName, final String fileName,
             final String mimeType, final long authorId, final String url) {
-        final SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
-        documentBuilder.setURL(url);
+        final SDocumentMappingBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
+        documentBuilder.setDocumentURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SProcessDocument buildProcessDocument(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
+    private SDocumentMapping buildProcessDocument(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
             final long authorId) {
-        final SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
+        final SDocumentMappingBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         return documentBuilder.done();
     }
 
-    private SProcessDocumentBuilder initDocumentBuilder(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
+    private SDocumentMappingBuilder initDocumentBuilder(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
             final long authorId) {
-        final SProcessDocumentBuilder documentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
-        documentBuilder.setName(documentName);
-        documentBuilder.setFileName(fileName);
-        documentBuilder.setContentMimeType(mimetype);
+        final SDocumentMappingBuilder documentBuilder = BuilderFactory.get(SDocumentMappingBuilderFactory.class).createNewInstance();
+        documentBuilder.setDocumentName(documentName);
+        documentBuilder.setDocumentContentFileName(fileName);
+        documentBuilder.setDocumentContentMimeType(mimetype);
         documentBuilder.setProcessInstanceId(processInstanceId);
-        documentBuilder.setAuthor(authorId);
-        documentBuilder.setCreationDate(System.currentTimeMillis());
+        documentBuilder.setDocumentAuthor(authorId);
+        documentBuilder.setDocumentCreationDate(System.currentTimeMillis());
         return documentBuilder;
     }
 

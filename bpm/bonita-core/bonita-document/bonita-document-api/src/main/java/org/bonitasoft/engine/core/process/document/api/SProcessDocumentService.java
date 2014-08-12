@@ -16,7 +16,7 @@ package org.bonitasoft.engine.core.process.document.api;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.persistence.OrderByType;
 
 /**
@@ -24,10 +24,10 @@ import org.bonitasoft.engine.persistence.OrderByType;
  */
 public interface SProcessDocumentService {
 
-    SProcessDocument createDocumentForProcessDefinition(long processDefinitionId, String author, String fileName, String mimeType, byte[] content)
+    SDocumentMapping createDocumentForProcessDefinition(long processDefinitionId, String author, String fileName, String mimeType, byte[] content)
             throws SProcessDocumentCreationException, SProcessDocumentAlreadyExistsException, SProcessDocumentException;
 
-    SProcessDocument createDocumentForProcessInstance(long processDefinitionId, long processInstanceId, String author, String fileName, String mimeType,
+    SDocumentMapping createDocumentForProcessInstance(long processDefinitionId, long processInstanceId, String author, String fileName, String mimeType,
             byte[] content) throws SProcessDocumentCreationException, SProcessDocumentAlreadyExistsException, SProcessDocumentException;
 
     // The 2 following methods go into the BOS database to attach an existing document to another process or process definition. They do not call the doc
@@ -40,14 +40,14 @@ public interface SProcessDocumentService {
 
     // SearchResult search(DocumentSearchBuilder builder, int fromIndex, int maxResults);
 
-    SProcessDocument createNewVersion(String documentId, String author, String fileName, String mimeType, byte[] content)
+    SDocumentMapping createNewVersion(String documentId, String author, String fileName, String mimeType, byte[] content)
             throws SProcessDocumentCreationException, SProcessDocumentNotFoundException;
 
     void deleteDocument(String documentId) throws SProcessDocumentDeletionException, SProcessDocumentNotFoundException;
 
     // void deleteDocumentSeries(String documentId) throws SProcessDocumentDeletionException;
 
-    SProcessDocument getDocument(String documentId) throws SProcessDocumentNotFoundException, SProcessDocumentException;
+    SDocumentMapping getDocument(String documentId) throws SProcessDocumentNotFoundException, SProcessDocumentException;
 
     /**
      * Retrieve the different versions of a document. Does not retrieve the Process definition, process instance, activity information as a document can be
@@ -67,15 +67,15 @@ public interface SProcessDocumentService {
      * @throws SProcessDocumentNotFoundException
      * @throws SProcessDocumentException
      */
-    List<SProcessDocument> getVersionsInSeries(String documentId, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
+    List<SDocumentMapping> getVersionsInSeries(String documentId, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
             throws SProcessDocumentNotFoundException, SProcessDocumentException;
 
-    List<SProcessDocument> getLatestDocuments(int fromIndex, int maxResults, String sortFieldName, OrderByType order) throws SProcessDocumentException;
+    List<SDocumentMapping> getLatestDocuments(int fromIndex, int maxResults, String sortFieldName, OrderByType order) throws SProcessDocumentException;
 
-    List<SProcessDocument> getDocumentsForProcessDefinition(long processDefinitionId, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
+    List<SDocumentMapping> getDocumentsForProcessDefinition(long processDefinitionId, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
             throws SProcessDocumentException;
 
-    List<SProcessDocument> getDocumentsForProcessInstance(long processDefinitionId, long processInstanceId, int fromIndex, int maxResults,
+    List<SDocumentMapping> getDocumentsForProcessInstance(long processDefinitionId, long processInstanceId, int fromIndex, int maxResults,
             String sortFieldName, OrderByType order) throws SProcessDocumentException;
 
     // Not used for the moment:

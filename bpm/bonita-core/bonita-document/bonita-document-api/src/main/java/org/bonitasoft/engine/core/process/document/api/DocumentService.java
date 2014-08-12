@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingDeletionException;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface ProcessDocumentService {
+public interface DocumentService {
 
     /**
      * Save a document
@@ -42,18 +42,18 @@ public interface ProcessDocumentService {
      * @throws SProcessDocumentCreationException
      *             when the storage has failed
      */
-    SProcessDocument attachDocumentToProcessInstance(SProcessDocument document) throws SProcessDocumentCreationException;
+    SDocumentMapping attachDocumentToProcessInstance(SDocumentMapping document) throws SProcessDocumentCreationException;
 
     /**
      * Modify document information
      * 
      * @param document
      *            the document will be updated to
-     * @return the updated SProcessDocument object
+     * @return the updated SDocumentMapping object
      * @throws SProcessDocumentCreationException
      *             when the update has failed
      */
-    SProcessDocument updateDocumentOfProcessInstance(SProcessDocument document) throws SProcessDocumentCreationException;
+    SDocumentMapping updateDocumentOfProcessInstance(SDocumentMapping document) throws SProcessDocumentCreationException;
 
     /**
      * Store a document and its content
@@ -65,7 +65,7 @@ public interface ProcessDocumentService {
      * @return The stored document
      * @throws SProcessDocumentCreationException
      */
-    SProcessDocument attachDocumentToProcessInstance(SProcessDocument document, byte[] documentContent) throws SProcessDocumentCreationException;
+    SDocumentMapping attachDocumentToProcessInstance(SDocumentMapping document, byte[] documentContent) throws SProcessDocumentCreationException;
 
     /**
      * update the specific document, set it content as the specific content
@@ -77,7 +77,7 @@ public interface ProcessDocumentService {
      * @return the updated object
      * @throws SProcessDocumentCreationException
      */
-    SProcessDocument updateDocumentOfProcessInstance(SProcessDocument document, byte[] documentContent) throws SProcessDocumentCreationException;
+    SDocumentMapping updateDocumentOfProcessInstance(SDocumentMapping document, byte[] documentContent) throws SProcessDocumentCreationException;
 
     /**
      * remove the current version of the document but archive it before
@@ -104,10 +104,10 @@ public interface ProcessDocumentService {
      * 
      * @param documentId
      *            identifier of document
-     * @return an SProcessDocument object with id corresponding to the parameter
+     * @return an SDocumentMapping object with id corresponding to the parameter
      * @throws SDocumentNotFoundException
      */
-    SProcessDocument getDocument(long documentId) throws SDocumentNotFoundException;
+    SDocumentMapping getDocument(long documentId) throws SDocumentNotFoundException;
 
     /**
      * Get document by its name in the specific process instance
@@ -116,10 +116,10 @@ public interface ProcessDocumentService {
      *            identifier of process instance
      * @param documentName
      *            name of process document
-     * @return the corresponding SProcessDocument object
+     * @return the corresponding SDocumentMapping object
      * @throws SDocumentNotFoundException
      */
-    SProcessDocument getDocument(long processInstanceId, String documentName) throws SDocumentNotFoundException;
+    SDocumentMapping getDocument(long processInstanceId, String documentName) throws SDocumentNotFoundException;
 
     /**
      * Get a list of documents for specific process instance, this can be used for pagination
@@ -132,10 +132,10 @@ public interface ProcessDocumentService {
      *            Number of result we want to get. Maximum number of result returned
      * @param order
      * @param field
-     * @return a list of SProcessDocument objects
+     * @return a list of SDocumentMapping objects
      * @throws SDocumentException
      */
-    List<SProcessDocument> getDocumentsOfProcessInstance(long processInstanceId, int fromIndex, int numberPerPage, String field, OrderByType order)
+    List<SDocumentMapping> getDocumentsOfProcessInstance(long processInstanceId, int fromIndex, int numberPerPage, String field, OrderByType order)
             throws SDocumentException;
 
     /**
@@ -158,10 +158,10 @@ public interface ProcessDocumentService {
      *            name of document
      * @param time
      *            the archived time of document
-     * @return an SProcessDocument object archived in the specific time or not archived
+     * @return an SDocumentMapping object archived in the specific time or not archived
      * @throws SDocumentNotFoundException
      */
-    SProcessDocument getDocument(long processInstanceId, String documentName, long time) throws SDocumentNotFoundException;
+    SDocumentMapping getDocument(long processInstanceId, String documentName, long time) throws SDocumentNotFoundException;
 
     /**
      * Get total number of document according to the query criteria
@@ -178,10 +178,10 @@ public interface ProcessDocumentService {
      * 
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @return a list of SProcessDocument objects
+     * @return a list of SDocumentMapping objects
      * @throws SBonitaSearchException
      */
-    List<SProcessDocument> searchDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SDocumentMapping> searchDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of documents for the specific supervisor
@@ -202,10 +202,10 @@ public interface ProcessDocumentService {
      *            identifier of supervisor user
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @return a list of SProcessDocument objects
+     * @return a list of SDocumentMapping objects
      * @throws SBonitaSearchException
      */
-    List<SProcessDocument> searchDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SDocumentMapping> searchDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of archived documents according to the query criteria
@@ -222,10 +222,10 @@ public interface ProcessDocumentService {
      * 
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @return a list of SAProcessDocument objects
+     * @return a list of SADocumentMapping objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessDocument> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SADocumentMapping> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of archived documents for the specific supervisor
@@ -246,10 +246,10 @@ public interface ProcessDocumentService {
      *            identifier of supervisor user
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @return a list of SAProcessDocument objects
+     * @return a list of SADocumentMapping objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessDocument> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SADocumentMapping> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get the archived version corresponding to a document
@@ -260,7 +260,7 @@ public interface ProcessDocumentService {
      * @throws SDocumentNotFoundException
      *             when the document does not exist
      */
-    SAProcessDocument getArchivedVersionOfProcessDocument(long documentId) throws SDocumentNotFoundException;
+    SADocumentMapping getArchivedVersionOfProcessDocument(long documentId) throws SDocumentNotFoundException;
 
     /**
      * Retrieve an archived document
@@ -271,7 +271,7 @@ public interface ProcessDocumentService {
      * @throws SDocumentNotFoundException
      *             when the archive does not exist
      */
-    SAProcessDocument getArchivedDocument(long archivedProcessDocumentId) throws SDocumentNotFoundException;
+    SADocumentMapping getArchivedDocument(long archivedProcessDocumentId) throws SDocumentNotFoundException;
 
     /**
      * Remove documents
@@ -279,7 +279,7 @@ public interface ProcessDocumentService {
      * @param sProcessDocuments
      * @throws SProcessDocumentDeletionException
      */
-    void removeDocuments(List<SProcessDocument> sProcessDocuments) throws SProcessDocumentDeletionException;
+    void removeDocuments(List<SDocumentMapping> sProcessDocuments) throws SProcessDocumentDeletionException;
 
     /**
      * Remove document
@@ -287,7 +287,7 @@ public interface ProcessDocumentService {
      * @param sProcessDocument
      * @throws SProcessDocumentDeletionException
      */
-    void removeDocument(SProcessDocument sProcessDocument) throws SProcessDocumentDeletionException;
+    void removeDocument(SDocumentMapping sProcessDocument) throws SProcessDocumentDeletionException;
 
     /**
      * Delete documents from a specified process instance

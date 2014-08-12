@@ -16,21 +16,21 @@ package org.bonitasoft.engine.search;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
+import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Zhang Bole
  */
-public abstract class AbstractArchivedDocumentSearchEntity extends AbstractSearchEntity<ArchivedDocument, SAProcessDocument> {
+public abstract class AbstractArchivedDocumentSearchEntity extends AbstractSearchEntity<ArchivedDocument, SADocumentMapping> {
 
     public AbstractArchivedDocumentSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
     }
 
     @Override
-    public List<ArchivedDocument> convertToClientObjects(final List<SAProcessDocument> serverObjects) {
+    public List<ArchivedDocument> convertToClientObjects(final List<SADocumentMapping> serverObjects) {
         return ModelConvertor.toArchivedDocuments(serverObjects);
     }
 

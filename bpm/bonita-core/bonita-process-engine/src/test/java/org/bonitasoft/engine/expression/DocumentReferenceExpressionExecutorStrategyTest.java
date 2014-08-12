@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.Document;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
@@ -54,7 +54,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     public static final long A_LONG_TIME_AGO = 1234L;
 
     @Mock
-    ProcessDocumentService processDocumentService;
+    DocumentService documentService;
 
     @Mock
     FlowNodeInstanceService flownodeInstanceService;
@@ -63,13 +63,13 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     DocumentReferenceExpressionExecutorStrategy strategy;
 
     @Mock
-    SProcessDocument document;
+    SDocumentMapping document;
 
     @Mock
-    SProcessDocument parentDocument;
+    SDocumentMapping parentDocument;
 
     @Mock
-    SProcessDocument archivedDocument;
+    SDocumentMapping archivedDocument;
 
     @Mock
     SExpression expression;
@@ -81,9 +81,9 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     public void setUp() throws Exception {
         doReturn(flowNodeInstance).when(flownodeInstanceService).getFlowNodeInstance(PROCESS_INSTANCE_ID);
         doReturn(PARENT_PROCESS_INSTANCE_ID).when(flowNodeInstance).getParentProcessInstanceId();
-        doReturn(document).when(processDocumentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
-        doReturn(parentDocument).when(processDocumentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
-        doReturn(archivedDocument).when(processDocumentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString(), eq(A_LONG_TIME_AGO));
+        doReturn(document).when(documentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
+        doReturn(parentDocument).when(documentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
+        doReturn(archivedDocument).when(documentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString(), eq(A_LONG_TIME_AGO));
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
@@ -121,7 +121,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
-        doThrow(SDocumentNotFoundException.class).when(processDocumentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
+        doThrow(SDocumentNotFoundException.class).when(documentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
         final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
@@ -133,7 +133,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
-        doThrow(SDocumentNotFoundException.class).when(processDocumentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
+        doThrow(SDocumentNotFoundException.class).when(documentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
         final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");

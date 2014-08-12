@@ -21,7 +21,7 @@ import java.util.UUID;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.document.DocumentService;
+import org.bonitasoft.engine.document.DocumentContentService;
 import org.bonitasoft.engine.document.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentDeletionException;
 import org.bonitasoft.engine.document.SDocumentStorageException;
@@ -44,13 +44,13 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
  * @author Zhao Na
  * @author Celine Souchet
  */
-public class DocumentServiceImpl implements DocumentService {
+public class DocumentContentServiceImpl implements DocumentContentService {
 
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceService;
 
-    public DocumentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService) {
+    public DocumentContentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
     }

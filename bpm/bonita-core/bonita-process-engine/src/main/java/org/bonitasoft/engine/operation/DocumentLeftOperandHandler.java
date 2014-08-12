@@ -20,10 +20,10 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -44,7 +44,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  */
 public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
-    ProcessDocumentService processDocumentService;
+    DocumentService documentService;
 
     private final ActivityInstanceService activityInstanceService;
 
@@ -52,9 +52,9 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     private final SessionService sessionService;
 
-    public DocumentLeftOperandHandler(final ProcessDocumentService processDocumentService, final ActivityInstanceService activityInstanceService,
+    public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -81,7 +81,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
             if (newValue == null) {
                 // we just delete the current version
                 try {
-                    processDocumentService.removeCurrentVersion(processInstanceId, documentName);
+                    documentService.removeCurrentVersion(processInstanceId, documentName);
                 } catch (final SDocumentNotFoundException e) {
                     // nothing to do
                 }
@@ -98,23 +98,23 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
                 final boolean hasContent = documentValue.hasContent();
                 try {
                     // Let's check if the document already exists:
-                    processDocumentService.getDocument(processInstanceId, documentName);
+                    documentService.getDocument(processInstanceId, documentName);
 
                     // a document exist, update it with the new values
-                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
+                    final SDocumentMapping document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
                             documentValue.getUrl());
                     if (hasContent) {
-                        processDocumentService.updateDocumentOfProcessInstance(document, documentValue.getContent());
+                        documentService.updateDocumentOfProcessInstance(document, documentValue.getContent());
                     } else {
-                        processDocumentService.updateDocumentOfProcessInstance(document);
+                        documentService.updateDocumentOfProcessInstance(document);
                     }
                 } catch (final SDocumentNotFoundException e) {
-                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
+                    final SDocumentMapping document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
                             documentValue.getUrl());
                     if (hasContent) {
-                        processDocumentService.attachDocumentToProcessInstance(document, documentValue.getContent());
+                        documentService.attachDocumentToProcessInstance(document, documentValue.getContent());
                     } else {
-                        processDocumentService.attachDocumentToProcessInstance(document);
+                        documentService.attachDocumentToProcessInstance(document);
                     }
                 }
             }
@@ -125,17 +125,17 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     }
 
-    private SProcessDocument createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
+    private SDocumentMapping createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
             final boolean hasContent, final String documentUrl) {
-        final SProcessDocumentBuilder processDocumentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setName(documentName);
-        processDocumentBuilder.setFileName(documentValue.getFileName());
-        processDocumentBuilder.setContentMimeType(documentValue.getMimeType());
+        final SDocumentMappingBuilder processDocumentBuilder = BuilderFactory.get(SDocumentMappingBuilderFactory.class).createNewInstance();
+        processDocumentBuilder.setDocumentName(documentName);
+        processDocumentBuilder.setDocumentContentFileName(documentValue.getFileName());
+        processDocumentBuilder.setDocumentContentMimeType(documentValue.getMimeType());
         processDocumentBuilder.setProcessInstanceId(processInstanceId);
-        processDocumentBuilder.setAuthor(authorId);
-        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
+        processDocumentBuilder.setDocumentAuthor(authorId);
+        processDocumentBuilder.setDocumentCreationDate(System.currentTimeMillis());
         processDocumentBuilder.setHasContent(hasContent);
-        processDocumentBuilder.setURL(documentUrl);
+        processDocumentBuilder.setDocumentURL(documentUrl);
         return processDocumentBuilder.done();
     }
 

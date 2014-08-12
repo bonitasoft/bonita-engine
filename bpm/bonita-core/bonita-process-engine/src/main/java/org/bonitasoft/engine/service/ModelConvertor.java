@@ -158,8 +158,8 @@ import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -1495,52 +1495,52 @@ public class ModelConvertor {
         return supervisor;
     }
 
-    public static List<Document> toDocuments(final Collection<SProcessDocument> attachments) {
+    public static List<Document> toDocuments(final Collection<SDocumentMapping> attachments) {
         final List<Document> documents = new ArrayList<Document>();
-        for (final SProcessDocument sProcessDocument : attachments) {
-            final Document document = toDocument(sProcessDocument);
+        for (final SDocumentMapping sDocumentMapping : attachments) {
+            final Document document = toDocument(sDocumentMapping);
             documents.add(document);
         }
         return documents;
     }
 
-    public static Document toDocument(final SProcessDocument attachment) {
+    public static Document toDocument(final SDocumentMapping attachment) {
         final DocumentImpl documentImpl = new DocumentImpl();
         documentImpl.setId(attachment.getId());
         documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
-        documentImpl.setName(attachment.getName());
-        documentImpl.setAuthor(attachment.getAuthor());
-        documentImpl.setCreationDate(new Date(attachment.getCreationDate()));
-        documentImpl.setHasContent(attachment.hasContent());
-        documentImpl.setContentMimeType(attachment.getContentMimeType());
-        documentImpl.setFileName(attachment.getContentFileName());
+        documentImpl.setName(attachment.getDocumentName());
+        documentImpl.setAuthor(attachment.getDocumentAuthor());
+        documentImpl.setCreationDate(new Date(attachment.getDocumentCreationDate()));
+        documentImpl.setHasContent(attachment.documentHasContent());
+        documentImpl.setContentMimeType(attachment.getDocumentContentMimeType());
+        documentImpl.setFileName(attachment.getDocumentContentFileName());
         documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setUrl(attachment.getURL());
+        documentImpl.setUrl(attachment.getDocumentURL());
 
         return documentImpl;
     }
 
-    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAProcessDocument> attachments) {
+    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SADocumentMapping> attachments) {
         final List<ArchivedDocument> documents = new ArrayList<ArchivedDocument>();
-        for (final SAProcessDocument sAProcessDocument : attachments) {
-            final ArchivedDocument document = toArchivedDocument(sAProcessDocument);
+        for (final SADocumentMapping saDocumentMapping : attachments) {
+            final ArchivedDocument document = toArchivedDocument(saDocumentMapping);
             documents.add(document);
         }
         return documents;
     }
 
-    public static ArchivedDocument toArchivedDocument(final SAProcessDocument attachment) {
-        final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(attachment.getName());
+    public static ArchivedDocument toArchivedDocument(final SADocumentMapping attachment) {
+        final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(attachment.getDocumentName());
         documentImpl.setId(attachment.getId());
         documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
         documentImpl.setArchiveDate(new Date(attachment.getArchiveDate()));
         documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setDocumentAuthor(attachment.getAuthor());
-        documentImpl.setDocumentContentFileName(attachment.getContentFileName());
-        documentImpl.setDocumentContentMimeType(attachment.getContentMimeType());
-        documentImpl.setDocumentCreationDate(new Date(attachment.getCreationDate()));
-        documentImpl.setDocumentHasContent(attachment.hasContent());
-        documentImpl.setDocumentURL(attachment.getURL());
+        documentImpl.setDocumentAuthor(attachment.getDocumentAuthor());
+        documentImpl.setDocumentContentFileName(attachment.getDocumentContentFileName());
+        documentImpl.setDocumentContentMimeType(attachment.getDocumentContentMimeType());
+        documentImpl.setDocumentCreationDate(new Date(attachment.getDocumentCreationDate()));
+        documentImpl.setDocumentHasContent(attachment.documentHasContent());
+        documentImpl.setDocumentURL(attachment.getDocumentURL());
         documentImpl.setSourceObjectId(attachment.getSourceObjectId());
         return documentImpl;
     }

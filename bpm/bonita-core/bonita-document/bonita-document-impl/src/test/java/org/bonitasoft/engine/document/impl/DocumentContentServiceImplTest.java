@@ -31,23 +31,23 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class DocumentServiceImplTest {
+public class DocumentContentServiceImplTest {
 
     private Recorder recorder;
 
     private ReadPersistenceService persistence;
 
-    private DocumentServiceImpl documentServiceImpl;
+    private DocumentContentServiceImpl documentServiceImpl;
 
     @Before
     public void setUp() {
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
-        documentServiceImpl = new DocumentServiceImpl(recorder, persistence);
+        documentServiceImpl = new DocumentContentServiceImpl(recorder, persistence);
     }
 
     /**
-     * Test method for {@link DocumentServiceImpl#getContent(String)}.
+     * Test method for {@link DocumentContentServiceImpl#getContent(String)}.
      */
     @Test
     public final void getContent() throws SBonitaReadException, SDocumentContentNotFoundException, SDocumentException {

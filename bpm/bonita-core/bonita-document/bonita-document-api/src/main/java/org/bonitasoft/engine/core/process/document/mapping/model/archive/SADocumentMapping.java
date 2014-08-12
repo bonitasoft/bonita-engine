@@ -14,32 +14,14 @@
  */
 package org.bonitasoft.engine.core.process.document.mapping.model.archive;
 
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 
 /**
  * @author Nicolas Chabanoles
  * @author Matthieu Chaffotte
  */
-public interface SADocumentMapping extends ArchivedPersistentObject {
+public interface SADocumentMapping extends ArchivedPersistentObject,SDocumentMapping {
 
-    long getTenantId();
-
-    String getDocumentName();
-
-    long getProcessInstanceId();
-
-    String getContentStorageId();
-
-    long getDocumentAuthor();
-
-    long getDocumentCreationDate();
-
-    String getDocumentContentMimeType();
-
-    String getDocumentContentFileName();
-
-    boolean documentHasContent();
-
-    String getDocumentURL();
 
 }

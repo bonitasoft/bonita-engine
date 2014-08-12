@@ -23,7 +23,7 @@ import org.bonitasoft.engine.document.model.SDocument;
  * @author Celine Souchet
  * @since 6.0
  */
-public interface DocumentService {
+public interface DocumentContentService {
 
     /**
      * Get content for specific document

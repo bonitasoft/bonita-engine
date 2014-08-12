@@ -20,8 +20,8 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -40,13 +40,13 @@ import org.bonitasoft.engine.service.ModelConvertor;
  */
 public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    public DocumentReferenceExpressionExecutorStrategy(final ProcessDocumentService processDocumentService,
+    public DocumentReferenceExpressionExecutorStrategy(final DocumentService documentService,
             final FlowNodeInstanceService flowNodeInstanceService) {
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
@@ -84,11 +84,11 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     private Document getDocument(final long processInstanceId, final SExpression expression, final Long time) {
         try {
-            SProcessDocument document;
+            SDocumentMapping document;
             if (time != null) {
-                document = processDocumentService.getDocument(processInstanceId, expression.getContent(), time);
+                document = documentService.getDocument(processInstanceId, expression.getContent(), time);
             } else {
-                document = processDocumentService.getDocument(processInstanceId, expression.getContent());
+                document = documentService.getDocument(processInstanceId, expression.getContent());
             }
             return ModelConvertor.toDocument(document);
         } catch (final SDocumentNotFoundException e) {

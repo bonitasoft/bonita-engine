@@ -15,8 +15,8 @@ package org.bonitasoft.engine.search.document;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractDocumentSearchEntity;
@@ -28,25 +28,25 @@ import org.bonitasoft.engine.search.descriptor.SearchDocumentDescriptor;
  */
 public class SearchDocumentsSupervisedBy extends AbstractDocumentSearchEntity {
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
     private final long userId;
 
-    public SearchDocumentsSupervisedBy(final ProcessDocumentService processDocumentService, final SearchDocumentDescriptor searchDescriptor,
+    public SearchDocumentsSupervisedBy(final DocumentService documentService, final SearchDocumentDescriptor searchDescriptor,
             final SearchOptions options, final long userId) {
         super(searchDescriptor, options);
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.userId = userId;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.getNumberOfDocumentsSupervisedBy(userId, searchOptions);
+        return documentService.getNumberOfDocumentsSupervisedBy(userId, searchOptions);
     }
 
     @Override
-    public List<SProcessDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.searchDocumentsSupervisedBy(userId, searchOptions);
+    public List<SDocumentMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+        return documentService.searchDocumentsSupervisedBy(userId, searchOptions);
     }
 
 }

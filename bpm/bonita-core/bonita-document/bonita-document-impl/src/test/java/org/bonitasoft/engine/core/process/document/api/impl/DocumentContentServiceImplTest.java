@@ -19,8 +19,7 @@ import static org.mockito.Mockito.doReturn;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.document.DocumentService;
+import org.bonitasoft.engine.document.DocumentContentService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,10 +30,10 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Vincent Elcrin
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ProcessDocumentServiceImplTest {
+public class DocumentContentServiceImplTest {
 
     @Mock
-    private DocumentService documentService;
+    private DocumentContentService documentContentService;
 
     @Mock
     private DocumentMappingService documentServiceMapping;
@@ -47,11 +46,11 @@ public class ProcessDocumentServiceImplTest {
     @Mock
     private SADocumentMapping archivedDocumentMapping;
 
-    private ProcessDocumentServiceImpl processDocumentService;
+    private DocumentServiceImpl processDocumentService;
 
     @Before
     public void setUp() throws Exception {
-        processDocumentService = new ProcessDocumentServiceImpl(documentService, documentServiceMapping, urlProvider);
+        processDocumentService = new DocumentServiceImpl(documentContentService, documentServiceMapping, urlProvider);
         doReturn(documentMapping).when(documentServiceMapping).get(1L);
         doReturn(documentMapping).when(documentServiceMapping).get(1L, "document");
         doReturn(archivedDocumentMapping).when(documentServiceMapping).get(1L, "document", 1L);
@@ -69,9 +68,9 @@ public class ProcessDocumentServiceImplTest {
     public void getDocument_from_id_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
         doReturn(true).when(documentMapping).documentHasContent();
 
-        SProcessDocument document = processDocumentService.getDocument(1L);
+        SDocumentMapping document = processDocumentService.getDocument(1L);
 
-        assertEquals("url?fileName=document&contentStorageId=123", document.getURL());
+        assertEquals("url?fileName=document&contentStorageId=123", document.getDocumentURL());
     }
 
     @Test
@@ -79,44 +78,44 @@ public class ProcessDocumentServiceImplTest {
         doReturn(false).when(documentMapping).documentHasContent();
         doReturn("whateverurl").when(documentMapping).getDocumentURL();
 
-        SProcessDocument document = processDocumentService.getDocument(1L);
+        SDocumentMapping document = processDocumentService.getDocument(1L);
 
-        assertEquals("whateverurl", document.getURL());
+        assertEquals("whateverurl", document.getDocumentURL());
     }
 
     @Test
     public void getDocument_from_process_instance_and_name_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
         doReturn(true).when(documentMapping).documentHasContent();
 
-        SProcessDocument document = processDocumentService.getDocument(1L, "document");
+        SDocumentMapping document = processDocumentService.getDocument(1L, "document");
 
-        assertEquals("url?fileName=document&contentStorageId=123", document.getURL());
+        assertEquals("url?fileName=document&contentStorageId=123", document.getDocumentURL());
     }
 
     @Test
     public void getDocument_from_process_instance_and_name_should_return_a_document_url_when_is_external_url() throws Exception {
         doReturn(false).when(documentMapping).documentHasContent();
 
-        SProcessDocument document = processDocumentService.getDocument(1L, "document");
+        SDocumentMapping document = processDocumentService.getDocument(1L, "document");
 
-        assertEquals("whateverurl", document.getURL());
+        assertEquals("whateverurl", document.getDocumentURL());
     }
 
     @Test
     public void getDocument_from_process_instance_and_name_for_a_given_time_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
         doReturn(true).when(archivedDocumentMapping).documentHasContent();
 
-        SProcessDocument document = processDocumentService.getDocument(1L, "document", 1L);
+        SDocumentMapping document = processDocumentService.getDocument(1L, "document", 1L);
 
-        assertEquals("url?fileName=document&contentStorageId=123", document.getURL());
+        assertEquals("url?fileName=document&contentStorageId=123", document.getDocumentURL());
     }
 
     @Test
     public void getDocument_from_process_instance_and_name_for_a_given_time_should_return_a_document_url_when_is_external_url() throws Exception {
         doReturn(false).when(documentMapping).documentHasContent();
 
-        SProcessDocument document = processDocumentService.getDocument(1L, "document", 1L);
+        SDocumentMapping document = processDocumentService.getDocument(1L, "document", 1L);
 
-        assertEquals("whateverurl", document.getURL());
+        assertEquals("whateverurl", document.getDocumentURL());
     }
 }

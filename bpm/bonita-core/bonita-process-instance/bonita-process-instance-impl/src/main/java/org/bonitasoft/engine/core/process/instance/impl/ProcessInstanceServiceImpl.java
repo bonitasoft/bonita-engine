@@ -41,7 +41,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -142,7 +142,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final ClassLoaderService classLoaderService;
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
     private final SCommentService commentService;
 
@@ -152,7 +152,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final ActivityInstanceService activityService, final TechnicalLoggerService logger, final EventInstanceService bpmEventInstanceService,
             final DataInstanceService dataInstanceService, final ArchiveService archiveService, final TransitionService transitionService,
             final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ProcessDocumentService processDocumentService, final SCommentService commentService,
+            final ClassLoaderService classLoaderService, final DocumentService documentService, final SCommentService commentService,
             final TokenService tokenService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
@@ -162,7 +162,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.commentService = commentService;
         this.tokenService = tokenService;
         processInstanceKeyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
@@ -315,7 +315,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteArchivedFlowNodeInstances(processInstanceId);
             dataInstanceService.deleteLocalArchivedDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());
-            processDocumentService.deleteArchivedDocuments(processInstanceId);
+            documentService.deleteArchivedDocuments(processInstanceId);
             connectorInstanceService.deleteArchivedConnectorInstances(processInstanceId, SConnectorInstance.PROCESS_TYPE);
             transitionService.deleteArchivedTransitionsOfProcessInstance(processInstanceId);
             commentService.deleteArchivedComments(processInstanceId);
@@ -441,7 +441,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
         deleteFlowNodeInstances(processInstance.getId(), processDefinition);
         deleteDataInstancesIfNecessary(processInstance, processDefinition);
-        processDocumentService.deleteDocumentsFromProcessInstance(processInstance.getId());
+        documentService.deleteDocumentsFromProcessInstance(processInstance.getId());
         deleteConnectorInstancesIfNecessary(processInstance, processDefinition);
         commentService.deleteComments(processInstance.getId());
     }

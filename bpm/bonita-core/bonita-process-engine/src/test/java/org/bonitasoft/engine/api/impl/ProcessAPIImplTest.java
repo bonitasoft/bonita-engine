@@ -21,16 +21,14 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
-import org.bonitasoft.engine.bpm.document.impl.DocumentImpl;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.document.api.SProcessDocumentDeletionException;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.impl.SProcessDocumentImpl;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -408,21 +406,21 @@ public class ProcessAPIImplTest {
     @Test
     public void should_removeDocument_call_the_service() throws Exception {
         //given
-        ProcessDocumentService processDocumentService = mock(ProcessDocumentService.class);
-        when(tenantAccessor.getProcessDocumentService()).thenReturn(processDocumentService);
+        DocumentService documentService = mock(DocumentService.class);
+        when(tenantAccessor.getDocumentService()).thenReturn(documentService);
 
 
-        SProcessDocumentImpl sProcessDocument = new SProcessDocumentImpl();
+        SDocumentMappingImpl sProcessDocument = new SDocumentMappingImpl();
         sProcessDocument.setId(123l);
 
-        doReturn(sProcessDocument).when(processDocumentService).getDocument(123l);
+        doReturn(sProcessDocument).when(documentService).getDocument(123l);
 
         //when
         Document removeDocument = processAPI.removeDocument(123l);
 
         //then
         assertThat(ModelConvertor.toDocument(sProcessDocument)).isEqualTo(removeDocument);
-        verify(processDocumentService, times(1)).removeDocument(sProcessDocument);
+        verify(documentService, times(1)).removeDocument(sProcessDocument);
 
     }
 
@@ -430,9 +428,9 @@ public class ProcessAPIImplTest {
     @Test
     public void should_removeDocument_throw_DocumentNotFoundException() throws Exception {
         //given
-        ProcessDocumentService processDocumentService = mock(ProcessDocumentService.class);
-        when(tenantAccessor.getProcessDocumentService()).thenReturn(processDocumentService);
-        doThrow(SDocumentNotFoundException.class).when(processDocumentService).getDocument(123l);
+        DocumentService documentService = mock(DocumentService.class);
+        when(tenantAccessor.getDocumentService()).thenReturn(documentService);
+        doThrow(SDocumentNotFoundException.class).when(documentService).getDocument(123l);
 
         //when
         try {
@@ -442,19 +440,19 @@ public class ProcessAPIImplTest {
             //ok
         }
         //then
-        verify(processDocumentService, times(0)).removeDocument(any(SProcessDocument.class));
+        verify(documentService, times(0)).removeDocument(any(SDocumentMapping.class));
     }
 
 
     @Test
     public void should_removeDocument_throw_DeletionException() throws Exception {
         //given
-        ProcessDocumentService processDocumentService = mock(ProcessDocumentService.class);
-        when(tenantAccessor.getProcessDocumentService()).thenReturn(processDocumentService);
-        SProcessDocumentImpl sProcessDocument = new SProcessDocumentImpl();
+        DocumentService documentService = mock(DocumentService.class);
+        when(tenantAccessor.getDocumentService()).thenReturn(documentService);
+        SDocumentMappingImpl sProcessDocument = new SDocumentMappingImpl();
         sProcessDocument.setId(123l);
-        doReturn(sProcessDocument).when(processDocumentService).getDocument(123l);
-        doThrow(SProcessDocumentDeletionException.class).when(processDocumentService).removeDocument(sProcessDocument);
+        doReturn(sProcessDocument).when(documentService).getDocument(123l);
+        doThrow(SProcessDocumentDeletionException.class).when(documentService).removeDocument(sProcessDocument);
 
         //when
         try {

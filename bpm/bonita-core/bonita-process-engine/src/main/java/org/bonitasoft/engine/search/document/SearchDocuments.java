@@ -15,8 +15,8 @@ package org.bonitasoft.engine.search.document;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractDocumentSearchEntity;
@@ -28,21 +28,21 @@ import org.bonitasoft.engine.search.descriptor.SearchDocumentDescriptor;
  */
 public class SearchDocuments extends AbstractDocumentSearchEntity {
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
-    public SearchDocuments(final ProcessDocumentService processDocumentService, final SearchDocumentDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchDocuments(final DocumentService documentService, final SearchDocumentDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.getNumberOfDocuments(searchOptions);
+        return documentService.getNumberOfDocuments(searchOptions);
     }
 
     @Override
-    public List<SProcessDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.searchDocuments(searchOptions);
+    public List<SDocumentMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+        return documentService.searchDocuments(searchOptions);
     }
 
 }
