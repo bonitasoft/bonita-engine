@@ -218,9 +218,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final long startDate = processInstance.getStartDate().getTime();
         assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate, after >= startDate && startDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
-        assertTrue("expected 1 activity", new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
-        final ActivityInstance step1 = activities.get(0);
+        final ActivityInstance step1 = waitForUserTask("step1");
         before = new Date().getTime();
         assignAndExecuteStep(step1, user.getId());
         waitForProcessToFinish(processInstance);
