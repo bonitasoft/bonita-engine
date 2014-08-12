@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2012 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,11 +15,13 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 
 /**
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class SelectDescriptorBuilderExt extends SelectDescriptorBuilder {
 
@@ -33,6 +35,20 @@ public class SelectDescriptorBuilderExt extends SelectDescriptorBuilder {
         parameters.put("name", name);
         parameters.put("processInstanceId", processInstanceId);
         return new SelectOneDescriptor<SRefBusinessDataInstance>("getSRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
+    }
+
+    public static SelectOneDescriptor<SRefBusinessDataInstance> getSFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("name", name);
+        parameters.put("flowNodeInstanceId", flowNodeInstanceId);
+        return new SelectOneDescriptor<SRefBusinessDataInstance>("getSFlowNodeRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
+    }
+
+    public static SelectOneDescriptor<Integer> getNumberOfDataOfMultiRefBusinessData(final String name, final long processInstanceId) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("name", name);
+        parameters.put("processInstanceId", processInstanceId);
+        return new SelectOneDescriptor<Integer>("getNumberOfDataOfMultiRefBusinessData", parameters, SMultiRefBusinessDataInstance.class);
     }
 
 }
