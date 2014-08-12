@@ -66,8 +66,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.core.process.document</groupId>
-            <artifactId>bonita-process-document-api</artifactId>
+            <groupId>org.bonitasoft.engine.core.document</groupId>
+            <artifactId>bonita-document-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -298,8 +298,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.core.process.document</groupId>
-            <artifactId>bonita-process-document-impl</artifactId>
+            <groupId>org.bonitasoft.engine.core.document</groupId>
+            <artifactId>bonita-document-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
