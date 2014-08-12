@@ -25,7 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.document</groupId>
-			<artifactId>bonita-process-document-model-impl</artifactId>
+			<artifactId>bonita-process-document-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -17,7 +17,5 @@
 	<modules>
 		<module>bonita-process-document-api</module>
 		<module>bonita-process-document-impl</module>
-		<module>bonita-process-document-model</module>
-		<module>bonita-process-document-model-impl</module>
 	</modules>
 </project>
