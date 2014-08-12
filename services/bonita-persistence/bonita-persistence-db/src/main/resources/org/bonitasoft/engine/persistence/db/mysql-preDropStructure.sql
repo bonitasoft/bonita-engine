@@ -33,6 +33,7 @@ ALTER TABLE processsupervisor DROP FOREIGN KEY fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP FOREIGN KEY fk_profile_tenantId;
 ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_tenantId;
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_tenantId;
+ALTER TABLE multi_biz_data DROP FOREIGN KEY fk_multi_biz_data_tenantId;
 ALTER TABLE ref_biz_data_inst DROP FOREIGN KEY fk_ref_biz_data_inst_tenantId;
 ALTER TABLE role DROP FOREIGN KEY fk_role_tenantId;
 ALTER TABLE theme DROP FOREIGN KEY fk_theme_tenantId;

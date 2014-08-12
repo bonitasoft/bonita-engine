@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -220,7 +220,7 @@ public class XMLSProcessDefinition {
 
     public static final String BUSINESS_DATA_DEFINITION_CLASS = "className";
 
-    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "isMultiple";
+    public static final String BUSINESS_DATA_DEFINITION_IS_MULTIPLE = "multiple";
 
     public static final String DATA_DEFINITION_TRANSIENT = "transient";
 
@@ -442,12 +442,7 @@ public class XMLSProcessDefinition {
             connectorsNode.addChild(connectorNode);
         }
 
-        final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
-        flowElements.addChild(businessDataDefinitionsNode);
-        for (final SBusinessDataDefinition businessDataDefinition : container.getBusinessDataDefinitions()) {
-            final XMLNode businessDataDefinitionNode = createBusinessDataDefinitionNode(businessDataDefinition);
-            businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
-        }
+        addBusinessDataDefinitionNodes(container.getBusinessDataDefinitions(), flowElements);
 
         final XMLNode dataDefinitionsNode = new XMLNode(DATA_DEFINITIONS_NODE);
         flowElements.addChild(dataDefinitionsNode);
@@ -508,6 +503,7 @@ public class XMLSProcessDefinition {
             }
             fillFlowNode(activityNode, activity);
             addDataDefinitionNodes(activity, activityNode);
+            addBusinessDataDefinitionNodes(activity.getBusinessDataDefinitions(), activityNode);
             addOperationNodes(activity, activityNode);
             addLoopCharacteristics(activity, activityNode);
             addBoundaryEventDefinitionsNode(activity, activityNode);
@@ -540,6 +536,17 @@ public class XMLSProcessDefinition {
         createAndfillIntermediateCatchEvents(container.getIntermediateCatchEvents(), flowNodes);
         createAndfillIntermediatThrowEvents(container.getIntermdiateThrowEvents(), flowNodes);
         createAndfillEndEvents(container.getEndEvents(), flowNodes);
+    }
+
+    private void addBusinessDataDefinitionNodes(final List<SBusinessDataDefinition> businessDataDefinitions, final XMLNode containerNode) {
+        if (!businessDataDefinitions.isEmpty()) {
+            final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
+            containerNode.addChild(businessDataDefinitionsNode);
+            for (final SBusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                final XMLNode businessDataDefinitionNode = createBusinessDataDefinitionNode(businessDataDefinition);
+                businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+            }
+        }
     }
 
     private void addBoundaryEventDefinitionsNode(final SActivityDefinition activity, final XMLNode activityNode) {

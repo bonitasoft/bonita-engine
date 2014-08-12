@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SActivityDefinitionImpl;
@@ -37,27 +38,26 @@ public abstract class SActivityDefinitionBinding extends SFlowNodeDefinitionBind
 
     private final List<SBoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<SBoundaryEventDefinition>(1);
 
+    private final List<SBusinessDataDefinition> businessDataDefinitions = new ArrayList<SBusinessDataDefinition>(3);
+
     @Override
     public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.OPERATION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.OPERATION_NODE.equals(name)) {
             operations.add((SOperation) value);
-        }
-        if (XMLSProcessDefinition.STANDARD_LOOP_CHARACTERISTICS_NODE.equals(name)
+        } else if (XMLSProcessDefinition.STANDARD_LOOP_CHARACTERISTICS_NODE.equals(name)
                 || XMLSProcessDefinition.MULTI_INSTANCE_LOOP_CHARACTERISTICS_NODE.equals(name)) {
             loopCharacteristics = (SLoopCharacteristics) value;
-        }
-        if (XMLSProcessDefinition.BOUNDARY_EVENT_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.BOUNDARY_EVENT_NODE.equals(name)) {
             boundaryEventDefinitions.add((SBoundaryEventDefinition) value);
+        } else if (XMLSProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
+            businessDataDefinitions.add((SBusinessDataDefinition) value);
         }
     }
 
@@ -74,6 +74,9 @@ public abstract class SActivityDefinitionBinding extends SFlowNodeDefinitionBind
             activity.setLoopCharacteristics(loopCharacteristics);
             for (final SBoundaryEventDefinition boundaryEvent : boundaryEventDefinitions) {
                 activity.addBoundaryEventDefinition(boundaryEvent);
+            }
+            for (final SBusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                activity.addBusinessDataDefinition(businessDataDefinition);
             }
         }
     }

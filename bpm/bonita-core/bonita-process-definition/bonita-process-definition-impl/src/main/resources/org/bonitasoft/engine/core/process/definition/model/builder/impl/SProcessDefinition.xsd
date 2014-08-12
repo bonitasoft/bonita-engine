@@ -129,7 +129,7 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="businessDataDefinitions" minOccurs="0">
+			<xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element type="definition:SBusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="unbounded" />
@@ -188,6 +188,13 @@
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
+                    <xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                    <xs:element name="businessDataDefinition" minOccurs="0" maxOccurs="2" type="definition:SBusinessDataDefinition" />
+                             </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
 					<xs:element name="operations" maxOccurs="1">
 						<xs:complexType>
 							<xs:sequence>
@@ -407,7 +414,7 @@
 					<xs:element name="defaultValue" type="definition:SExpression" minOccurs="0" />
 				</xs:all>
  				<xs:attribute name="className" type="xs:string" />
- 				<xs:attribute name="isMultiple" type="xs:boolean" default="false" />
+ 				<xs:attribute name="multiple" type="xs:boolean" default="false" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

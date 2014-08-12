@@ -40,8 +40,7 @@ public class SOperationBinding extends ElementBinding {
     public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.OPERATION_RIGHT_OPERAND.equals(name)) {
             rightOperand = (SExpression) value;
-        }
-        if (XMLSProcessDefinition.OPERATION_LEFT_OPERAND.equals(name)) {
+        } else if (XMLSProcessDefinition.OPERATION_LEFT_OPERAND.equals(name)) {
             leftOperand = (SLeftOperand) value;
         }
     }

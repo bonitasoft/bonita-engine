@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,6 +40,7 @@ import org.bonitasoft.engine.operation.Operation;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class ServerModelConvertor {
 
@@ -116,6 +117,9 @@ public class ServerModelConvertor {
     }
 
     public static SBusinessDataDefinition convertBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        if (businessDataDefinition == null) {
+            return null;
+        }
         final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
         builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());

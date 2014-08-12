@@ -35,6 +35,7 @@ ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_tenantId;
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId;
+ALTER TABLE multi_biz_data DROP CONSTRAINT fk_multi_biz_data_tenantId;
 ALTER TABLE ref_biz_data_inst DROP CONSTRAINT fk_ref_biz_data_inst_tenantId;
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId;
 ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId;
