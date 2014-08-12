@@ -369,7 +369,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
 
             final SManualTaskInstance createManualUserTask = createManualUserTask(activityInstanceService, fields, taskPriority, humanTaskId);
-            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */);// put it in ready
+            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */, Collections.<String, Object> emptyMap());// put it in ready
             addActivityInstanceTokenCount(activityInstanceService, activityInstance);
 
             return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
