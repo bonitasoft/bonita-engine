@@ -18,8 +18,10 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,16 +32,21 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
 
     private final List<SInputDefinition> inputs;
 
+    private final List<SRuleDefinition> rules;
+
     public SContractDefinitionImpl() {
         super();
         inputs = new ArrayList<SInputDefinition>();
+        rules = new ArrayList<SRuleDefinition>();
     }
 
     public SContractDefinitionImpl(final ContractDefinition contract) {
-        super();
-        inputs = new ArrayList<SInputDefinition>();
+        this();
         for (final InputDefinition input : contract.getInputs()) {
             inputs.add(new SInputDefinitionImpl(input));
+        }
+        for (final RuleDefinition rule : contract.getRules()) {
+            rules.add(new SRuleDefinitionImpl(rule));
         }
     }
 
@@ -53,10 +60,20 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
     }
 
     @Override
+    public List<SRuleDefinition> getRules() {
+        return rules;
+    }
+
+    public void addRule(final SRuleDefinition rule) {
+        rules.add(rule);
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (inputs == null ? 0 : inputs.hashCode());
+        result = prime * result + (rules == null ? 0 : rules.hashCode());
         return result;
     }
 
@@ -77,6 +94,13 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
                 return false;
             }
         } else if (!inputs.equals(other.inputs)) {
+            return false;
+        }
+        if (rules == null) {
+            if (other.rules != null) {
+                return false;
+            }
+        } else if (!rules.equals(other.rules)) {
             return false;
         }
         return true;

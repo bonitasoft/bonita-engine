@@ -353,7 +353,7 @@ public class XMLProcessDefinition {
 
     public static final String CONTRACT_RULE_NODE = "ruleDefinition";
 
-    public static final String RULE_EXPRESSION = "expression";
+    public static final String RULE_EXPRESSION = "conditionalExpression";
 
     public static final String RULE_EXPLANATION = "explanation";
 

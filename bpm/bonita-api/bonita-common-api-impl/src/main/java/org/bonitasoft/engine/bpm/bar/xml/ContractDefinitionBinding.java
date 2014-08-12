@@ -44,8 +44,7 @@ public class ContractDefinitionBinding extends ElementBinding {
     public void setChildObject(final String name, final Object value) throws XMLParseException {
         if (XMLProcessDefinition.CONTRACT_INPUT_NODE.equals(name)) {
             contract.addInput((InputDefinition) value);
-        }
-        if (XMLProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
+        } else if (XMLProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
             contract.addRule((RuleDefinition) value);
         }
     }

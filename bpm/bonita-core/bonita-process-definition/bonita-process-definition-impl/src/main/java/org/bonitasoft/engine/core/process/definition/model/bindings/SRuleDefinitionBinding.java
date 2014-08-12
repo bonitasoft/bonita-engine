@@ -13,50 +13,55 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.xml.ElementBinding;
+import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SContractDefinitionBinding extends ElementBinding {
+public class SRuleDefinitionBinding extends SNamedElementBinding {
 
-    private final SContractDefinitionImpl contract;
+    private String expression;
 
-    public SContractDefinitionBinding() {
-        contract = new SContractDefinitionImpl();
-    }
+    private String explanation;
 
-    @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    private final List<String> inputNames;
+
+    public SRuleDefinitionBinding() {
+        inputNames = new ArrayList<String>();
     }
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
-    }
-
-    @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
-        if (XMLSProcessDefinition.CONTRACT_INPUT_NODE.equals(name)) {
-            contract.addInput((SInputDefinition) value);
-        } else if (XMLSProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
-            contract.addRule((SRuleDefinition) value);
+        if (XMLSProcessDefinition.RULE_EXPRESSION.equals(name)) {
+            expression = value;
+        } else if (XMLSProcessDefinition.RULE_EXPLANATION.equals(name)) {
+            explanation = value;
+        } else if (XMLSProcessDefinition.INPUT_NAME.equals(name)) {
+            inputNames.add(value);
         }
     }
 
     @Override
+    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    }
+
+    @Override
     public Object getObject() {
-        return contract;
+        final SRuleDefinitionImpl rule = new SRuleDefinitionImpl(name, expression, explanation);
+        for (final String inputName : inputNames) {
+            rule.addInputName(inputName);
+        }
+        return rule;
     }
 
     @Override
     public String getElementTag() {
-        return XMLSProcessDefinition.CONTRACT_NODE;
+        return XMLSProcessDefinition.CONTRACT_RULE_NODE;
     }
 
 }

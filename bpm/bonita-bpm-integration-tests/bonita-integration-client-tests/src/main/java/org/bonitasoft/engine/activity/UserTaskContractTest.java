@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -43,7 +44,8 @@ public class UserTaskContractTest extends CommonAPITest {
     public void createAContractAndGetIt() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null);
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -56,6 +58,13 @@ public class UserTaskContractTest extends CommonAPITest {
         assertThat(input.getName()).isEqualTo("numberOfDays");
         assertThat(input.getType()).isEqualTo(Integer.class.getName());
         assertThat(input.getDescription()).isNull();
+
+        assertThat(contract.getRules()).hasSize(1);
+        final RuleDefinition rule = contract.getRules().get(0);
+        assertThat(rule.getName()).isEqualTo("mandatory");
+        assertThat(rule.getExpression()).isEqualTo("numberOfDays != null");
+        assertThat(rule.getExplanation()).isEqualTo("numberOfDays must be set");
+        assertThat(rule.getInputNames()).containsExactly("numberOfDays");
 
         disableAndDeleteProcess(processDefinition);
     }

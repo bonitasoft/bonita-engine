@@ -42,7 +42,7 @@ public class RuleDefinitionBinding extends NamedElementBinding {
         } else if (XMLProcessDefinition.RULE_EXPLANATION.equals(name)) {
             explanation = value;
         } else if (XMLProcessDefinition.INPUT_NAME.equals(name)) {
-            inputNames.add(name);
+            inputNames.add(value);
         }
     }
 

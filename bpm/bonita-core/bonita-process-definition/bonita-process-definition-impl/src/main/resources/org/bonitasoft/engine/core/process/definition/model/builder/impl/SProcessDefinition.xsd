@@ -259,7 +259,7 @@
 			<xs:extension base="definition:SHumanTaskDefinition" />
 		</xs:complexContent>
 	</xs:complexType>
-	
+
 	<xs:complexType name="SReceiveTaskDefinition">
 		<xs:complexContent>
 			<xs:extension base="definition:SActivityDefinition">
@@ -269,7 +269,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	
+
 	<xs:complexType name="SSendTaskDefinition">
 		<xs:complexContent>
 			<xs:extension base="definition:SActivityDefinition">
@@ -337,10 +337,17 @@
 			<xs:element name="inputDefinitions" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="inputDefinition" type="definition:SInputDefinition" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="inputDefinition" type="definition:SInputDefinition" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="ruleDefinitions" minOccurs="0">
+            	<xs:complexType>
+            		<xs:sequence>
+            			<xs:element name="ruleDefinition" type="definition:SRuleDefinition" minOccurs="0" maxOccurs="unbounded"/>
+            		</xs:sequence>
+            	</xs:complexType>
+            </xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -348,6 +355,24 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:attribute name="type" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SRuleDefinition">
+		<xs:complexContent>
+			<xs:extension base="definition:SNamedElement">
+				<xs:sequence>
+					<xs:element name="conditionalExpression" type="xs:string" />
+					<xs:element name="explanation" type="xs:string" />
+					<xs:element name="inputDefinitionNames">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="inputDefinitionName" type="xs:string" />
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -419,7 +444,7 @@
 			<xs:element name="operation" minOccurs="0" maxOccurs="unbounded" type="definition:SOperation" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="SBusinessDataDefinition">
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
@@ -427,8 +452,8 @@
 					<xs:element name="description" type="xs:string" minOccurs="0" />
 					<xs:element name="defaultValue" type="definition:SExpression" minOccurs="0" />
 				</xs:all>
- 				<xs:attribute name="className" type="xs:string" />
- 				<xs:attribute name="isMultiple" type="xs:boolean" default="false" />
+				<xs:attribute name="className" type="xs:string" />
+				<xs:attribute name="isMultiple" type="xs:boolean" default="false" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

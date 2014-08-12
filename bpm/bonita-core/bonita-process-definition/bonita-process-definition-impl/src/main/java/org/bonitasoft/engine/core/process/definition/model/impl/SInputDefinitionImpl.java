@@ -32,7 +32,7 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
     }
 
     public SInputDefinitionImpl(final InputDefinition input) {
-        super(input.getName());
+        this(input.getName());
         description = input.getDescription();
         type = input.getType();
     }

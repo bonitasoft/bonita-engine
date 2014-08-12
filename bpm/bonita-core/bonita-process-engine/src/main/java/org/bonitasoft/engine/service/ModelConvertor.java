@@ -50,6 +50,7 @@ import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfo
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -162,6 +163,7 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -1982,6 +1984,13 @@ public class ModelConvertor {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
         for (final SInputDefinition input : sContract.getInputs()) {
             contract.addInput(new InputDefinitionImpl(input.getName(), input.getType(), input.getDescription()));
+        }
+        for (final SRuleDefinition sRule : sContract.getRules()) {
+            final RuleDefinitionImpl rule = new RuleDefinitionImpl(sRule.getName(), sRule.getExpression(), sRule.getExplanation());
+            for (final String inputName : sRule.getInputNames()) {
+                rule.addInputName(inputName);
+            }
+            contract.addRule(rule);
         }
         return contract;
     }

@@ -18,10 +18,12 @@ import java.util.List;
 /**
  * @author Matthieu Chaffotte
  */
-public interface SContractDefinition extends SBaseElement {
+public interface SRuleDefinition extends SNamedElement {
 
-    List<SInputDefinition> getInputs();
+    String getExpression();
 
-    List<SRuleDefinition> getRules();
+    String getExplanation();
+
+    List<String> getInputNames();
 
 }
