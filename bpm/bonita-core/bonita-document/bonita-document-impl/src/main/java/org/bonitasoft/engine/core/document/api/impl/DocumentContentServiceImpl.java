@@ -19,16 +19,15 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.core.document.DocumentContentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.core.document.exception.SDocumentDeletionException;
 import org.bonitasoft.engine.core.document.exception.SDocumentStorageException;
-import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentContent;
-import org.bonitasoft.engine.core.document.model.SDocumentContentBuilder;
-import org.bonitasoft.engine.core.document.model.SDocumentContentBuilderFactory;
+import org.bonitasoft.engine.core.document.model.SDocumentMapping;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentContentBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentContentBuilderFactory;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
@@ -61,7 +60,7 @@ public class DocumentContentServiceImpl implements DocumentContentService {
     }
 
     @Override
-    public SDocument storeDocumentContent(final SDocument sDocument, final byte[] documentContent) throws SDocumentStorageException {
+    public String storeDocumentContent(final SDocumentMapping sDocument, final byte[] documentContent) throws SDocumentStorageException {
         final String documentId = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
         final SDocumentContent sdocumentContent = createDocumentContent(documentId, documentContent);
         final InsertRecord insertRecord = new InsertRecord(sdocumentContent);
@@ -73,12 +72,7 @@ public class DocumentContentServiceImpl implements DocumentContentService {
         } catch (final SRecorderException re) {
             throw new SDocumentStorageException(re);
         }
-        try {
-            ClassReflector.invokeSetter(sDocument, "setId", String.class, documentId);
-        } catch (final Exception e) {
-            throw new SDocumentStorageException(e);
-        }
-        return sDocument;
+        return documentId;
     }
 
     @Override

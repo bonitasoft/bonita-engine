@@ -17,7 +17,7 @@ package org.bonitasoft.engine.core.document;
 import org.bonitasoft.engine.core.document.exception.SDocumentDeletionException;
 import org.bonitasoft.engine.core.document.exception.SDocumentException;
 import org.bonitasoft.engine.core.document.exception.SDocumentStorageException;
-import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 
 /**
  * Document Service
@@ -49,7 +49,7 @@ public interface DocumentContentService {
      * @throws org.bonitasoft.engine.core.document.exception.SDocumentStorageException
      *             Error thrown if has exception during the document content storage
      */
-    SDocument storeDocumentContent(SDocument sDocument, byte[] documentContent) throws SDocumentStorageException;
+    String storeDocumentContent(SDocumentMapping sDocument, byte[] documentContent) throws SDocumentStorageException;
 
     /**
      * Delete the document content

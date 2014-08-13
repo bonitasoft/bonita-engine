@@ -64,7 +64,7 @@ import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;

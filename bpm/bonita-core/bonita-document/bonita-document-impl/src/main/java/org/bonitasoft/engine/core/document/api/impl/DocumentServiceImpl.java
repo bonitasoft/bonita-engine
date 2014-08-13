@@ -22,9 +22,9 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentContentNotFoundException;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentCreationException;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentDeletionException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentDeletionException;
 import org.bonitasoft.engine.core.document.api.DocumentMappingService;
 import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionException;
 import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
@@ -36,9 +36,6 @@ import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder
 import org.bonitasoft.engine.core.document.DocumentContentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentException;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.SDocumentBuilder;
-import org.bonitasoft.engine.core.document.model.SDocumentBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -78,18 +75,17 @@ public class DocumentServiceImpl implements DocumentService {
     public SDocumentMapping attachDocumentToProcessInstance(final SDocumentMapping document, final byte[] documentContent)
             throws SProcessDocumentCreationException {
         try {
-            SDocument sDocument = toSDocument(document);
-            sDocument = documentContentService.storeDocumentContent(sDocument, documentContent);
-            SDocumentMapping docMapping = setStorageId(document, sDocument);
+            String storageId = documentContentService.storeDocumentContent(document, documentContent);
+            SDocumentMapping docMapping = setStorageId(document, storageId);
             return documentMappingService.create(docMapping);
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
     }
 
-    SDocumentMapping setStorageId(final SDocumentMapping document, final SDocument sDocument) {
+    SDocumentMapping setStorageId(final SDocumentMapping document, final String storageId) {
         final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
-        builder.setDocumentStorageId(sDocument.getStorageId());
+        builder.setDocumentStorageId(storageId);
         builder.setHasContent(true);
         return builder.done();
     }
@@ -371,16 +367,6 @@ public class DocumentServiceImpl implements DocumentService {
         return result;
     }
 
-    private SDocument toSDocument(final SDocumentMapping document) {
-        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        builder.setAuthor(document.getDocumentAuthor());
-        builder.setContentFileName(document.getDocumentContentFileName());
-        builder.setContentMimeType(document.getDocumentContentMimeType());
-        builder.setCreationDate(document.getDocumentCreationDate());
-        builder.setDocumentId(document.getContentStorageId());
-        return builder.done();
-    }
-
     @Override
     public SDocumentMapping updateDocumentOfProcessInstance(final SDocumentMapping document) throws SProcessDocumentCreationException {
         try {
@@ -396,10 +382,9 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             // will update documentBuilder, contentFileName, contentMimeType, author, documentContent, hasContent
             // based on processInstanceId, documentName
-            SDocument sDocument = toSDocument(document);
-            sDocument = documentContentService.storeDocumentContent(sDocument, documentContent);
+            String storageId = documentContentService.storeDocumentContent(document, documentContent);
             // we have the new document id (in the storage)
-            SDocumentMapping docMapping = setStorageId(document, sDocument);
+            SDocumentMapping docMapping = setStorageId(document, storageId);
             docMapping = documentMappingService.update(docMapping);
             return docMapping;
         } catch (final SBonitaException e) {

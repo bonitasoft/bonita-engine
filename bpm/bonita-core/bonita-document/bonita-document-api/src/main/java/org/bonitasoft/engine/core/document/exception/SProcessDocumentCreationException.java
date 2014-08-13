@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,23 +12,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.engine.core.document.model;
+package org.bonitasoft.engine.core.document.exception;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Nicolas Chabanoles
+ * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
-public interface SDocumentBuilder {
+public class SProcessDocumentCreationException extends SProcessDocumentException {
 
-    SDocumentBuilder setAuthor(long author);
+    private static final long serialVersionUID = -5246925639589489933L;
 
-    SDocumentBuilder setCreationDate(long creationDate);
+    public SProcessDocumentCreationException(final Throwable e) {
+        super(e);
+    }
 
-    SDocumentBuilder setContentMimeType(String contentMimeType);
+    public SProcessDocumentCreationException(final String message, final SBonitaException e) {
+        super(message, e);
+    }
 
-    SDocumentBuilder setContentFileName(String contentFileName);
-
-    SDocumentBuilder setDocumentId(String documentId);
-
-    SDocument done();
+    public SProcessDocumentCreationException(final String message) {
+        super(message);
+    }
 
 }

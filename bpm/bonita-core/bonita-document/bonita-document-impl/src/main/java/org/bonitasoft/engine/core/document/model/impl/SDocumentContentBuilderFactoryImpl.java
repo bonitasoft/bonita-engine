@@ -14,8 +14,8 @@
  */
 package org.bonitasoft.engine.core.document.model.impl;
 
-import org.bonitasoft.engine.core.document.model.SDocumentContentBuilder;
-import org.bonitasoft.engine.core.document.model.SDocumentContentBuilderFactory;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentContentBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentContentBuilderFactory;
 
 /**
  * @author Zhao Na

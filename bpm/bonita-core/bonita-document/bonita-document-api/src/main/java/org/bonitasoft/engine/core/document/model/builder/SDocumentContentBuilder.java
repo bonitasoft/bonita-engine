@@ -12,27 +12,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.engine.core.document.api;
+package org.bonitasoft.engine.core.document.model.builder;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.document.model.SDocumentContent;
 
 /**
- * @author Emmanuel Duchastenier
+ * @author Zhao Na
  */
-public class SProcessDocumentAlreadyExistsException extends SProcessDocumentException {
+public interface SDocumentContentBuilder {
 
-    private static final long serialVersionUID = -5246925639589489933L;
+    SDocumentContentBuilder setContent(byte[] content);
 
-    public SProcessDocumentAlreadyExistsException(final Throwable e) {
-        super(e);
-    }
+    SDocumentContentBuilder setStorageId(String documentId);
 
-    /**
-     * @param message
-     * @param e
-     */
-    public SProcessDocumentAlreadyExistsException(final String message, final SBonitaException e) {
-        super(message, e);
-    }
+    SDocumentContent done();
 
 }

@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.document.DocumentContentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.exception.SDocumentStorageException;
-import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 
 /**
  * Temporary implementation to run tests in memory
@@ -33,8 +33,6 @@ import org.bonitasoft.engine.core.document.model.SDocument;
  */
 public class InMemoryTemporaryDocumentContentServiceImpl implements DocumentContentService {
 
-    private final Map<String, SDocument> inMemoryDocStore = new HashMap<String, SDocument>();
-
     private final Map<String, byte[]> inMemoryContentStore = new HashMap<String, byte[]>();
 
     @Override
@@ -43,25 +41,14 @@ public class InMemoryTemporaryDocumentContentServiceImpl implements DocumentCont
     }
 
     @Override
-    public SDocument storeDocumentContent(final SDocument sDocument, final byte[] documentContent) throws SDocumentStorageException {
+    public String storeDocumentContent(final SDocumentMapping sDocument, final byte[] documentContent) throws SDocumentStorageException {
         final String documentId = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
-        inMemoryDocStore.put(documentId, sDocument);
         inMemoryContentStore.put(documentId, documentContent);
-        try {
-            sDocument.getClass().getMethod("setId", String.class).invoke(sDocument, documentId);
-            return sDocument;
-        } catch (final Exception e) {
-            inMemoryDocStore.remove(documentId);
-            inMemoryContentStore.remove(documentId);
-            throw new SDocumentStorageException(e);
-        }
+        return documentId;
     }
 
     @Override
     public void deleteDocumentContent(final String documentId) throws SDocumentContentNotFoundException, SDocumentNotFoundException {
-        if (inMemoryDocStore.remove(documentId) == null) {
-            throw new SDocumentNotFoundException(documentId);
-        }
         if (inMemoryContentStore.remove(documentId) == null) {
             throw new SDocumentContentNotFoundException(documentId);
         }

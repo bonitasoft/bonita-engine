@@ -25,7 +25,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentDeletionException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentDeletionException;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;

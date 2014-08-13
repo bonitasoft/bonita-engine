@@ -17,11 +17,9 @@ package org.bonitasoft.engine.core.document.api;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionException;
+import org.bonitasoft.engine.core.document.exception.*;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.core.document.exception.SDocumentException;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -39,7 +37,7 @@ public interface DocumentService {
      * @param document
      *            the document to store. The process id of the document has to be set.
      * @return The document image from database
-     * @throws SProcessDocumentCreationException
+     * @throws org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException
      *             when the storage has failed
      */
     SDocumentMapping attachDocumentToProcessInstance(SDocumentMapping document) throws SProcessDocumentCreationException;
@@ -279,7 +277,7 @@ public interface DocumentService {
      * Remove documents
      * 
      * @param sProcessDocuments
-     * @throws SProcessDocumentDeletionException
+     * @throws org.bonitasoft.engine.core.document.exception.SProcessDocumentDeletionException
      */
     void removeDocuments(List<SDocumentMapping> sProcessDocuments) throws SProcessDocumentDeletionException;
 

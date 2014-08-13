@@ -108,9 +108,9 @@ import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentContentNotFoundException;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentCreationException;
-import org.bonitasoft.engine.core.document.api.SProcessDocumentDeletionException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentDeletionException;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;

@@ -12,18 +12,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.engine.core.document.api;
+package org.bonitasoft.engine.core.document.exception;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class SProcessDocumentNotFoundException extends SProcessDocumentException {
+public class SProcessDocumentAlreadyExistsException extends SProcessDocumentException {
 
-    private static final long serialVersionUID = -1501286386852952410L;
+    private static final long serialVersionUID = -5246925639589489933L;
 
-    public SProcessDocumentNotFoundException(final Throwable e) {
+    public SProcessDocumentAlreadyExistsException(final Throwable e) {
         super(e);
     }
 
@@ -31,15 +31,8 @@ public class SProcessDocumentNotFoundException extends SProcessDocumentException
      * @param message
      * @param e
      */
-    public SProcessDocumentNotFoundException(final String message, final SBonitaException e) {
+    public SProcessDocumentAlreadyExistsException(final String message, final SBonitaException e) {
         super(message, e);
-    }
-
-    /**
-     * @param string
-     */
-    public SProcessDocumentNotFoundException(final String message) {
-        super(message);
     }
 
 }
