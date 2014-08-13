@@ -189,6 +189,12 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
             throw new BonitaRuntimeException(e);
         } catch (final TransformerConfigurationException e) {
             throw new BonitaRuntimeException(e);
+        } finally {
+            try {
+                schemaStream.close();
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -235,9 +241,8 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
         if (objectFromXML instanceof DesignProcessDefinition) {
             return (DesignProcessDefinition) objectFromXML;
-        } else {
-            throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
         }
+        throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
     }
 
     private void checkVersion(final File file) throws IOException, InvalidBusinessArchiveFormatException {

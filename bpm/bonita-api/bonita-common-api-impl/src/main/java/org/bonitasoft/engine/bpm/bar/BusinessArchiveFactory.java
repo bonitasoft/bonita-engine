@@ -52,9 +52,9 @@ public class BusinessArchiveFactory {
      * @return
      *         the business archived that was in the input stream
      * @throws IOException
-     *             in case of issue reading/writing on file system
+     *         in case of issue reading/writing on file system
      * @throws InvalidBusinessArchiveFormatException
-     *             if the inpu stream does not contains a valide business archive
+     *         if the inpu stream does not contains a valide business archive
      */
     public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
         final File barFolder = File.createTempFile("tempBusinessArchive", "tmp");
@@ -83,13 +83,13 @@ public class BusinessArchiveFactory {
      * Create a business archive from a valid file or folder
      * 
      * @param barOrFolder
-     *            the folder or file that contains the business archive to read
+     *        the folder or file that contains the business archive to read
      * @return
      *         the business archived that was in the file or folder
      * @throws IOException
-     *             in case of issue reading/writing on file system
+     *         in case of issue reading/writing on file system
      * @throws InvalidBusinessArchiveFormatException
-     *             if the input stream does not contains a valid business archive
+     *         if the input stream does not contains a valid business archive
      */
     public static BusinessArchive readBusinessArchive(final File barOrFolder) throws InvalidBusinessArchiveFormatException, IOException {
         if (!barOrFolder.exists()) {
@@ -103,13 +103,12 @@ public class BusinessArchiveFactory {
                 }
             }
             return businessArchive;
-        } else {
-            final FileInputStream inputStream = new FileInputStream(barOrFolder);
-            try {
-                return readBusinessArchive(inputStream);
-            } finally {
-                inputStream.close();
-            }
+        }
+        final FileInputStream inputStream = new FileInputStream(barOrFolder);
+        try {
+            return readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
         }
     }
 
@@ -119,9 +118,9 @@ public class BusinessArchiveFactory {
      * the written business archive the uncompressed version of {@link #writeBusinessArchiveToFile(BusinessArchive, File)}
      * 
      * @param businessArchive
-     *            the {@link BusinessArchive} to write
+     *        the {@link BusinessArchive} to write
      * @param folderPath
-     *            the folder into the business archive must be written
+     *        the folder into the business archive must be written
      * @throws IOException
      */
     public static void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath) throws IOException {
@@ -147,9 +146,9 @@ public class BusinessArchiveFactory {
      * this file can then be read using {@link #readBusinessArchive(File)}
      * 
      * @param businessArchive
-     *            the {@link BusinessArchive} to write
+     *        the {@link BusinessArchive} to write
      * @param folderPath
-     *            the folder into the business archive must be written
+     *        the folder into the business archive must be written
      * @throws IOException
      */
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {

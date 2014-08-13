@@ -97,7 +97,7 @@ public class VirtualClassLoader extends ClassLoader {
     
     public void release() {
         if (classloader != null) {
-            classloader.release();
+            classloader.destroy();
         }
     }
 

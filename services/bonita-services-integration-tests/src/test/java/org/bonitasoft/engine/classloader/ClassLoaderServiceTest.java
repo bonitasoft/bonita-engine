@@ -1,3 +1,17 @@
+/**
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.bonitasoft.engine.classloader;
 
 import static org.junit.Assert.assertEquals;
@@ -500,7 +514,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void testLoadResource() throws Exception {
+    public void loadResource() throws Exception {
         initializeClassLoaderService();
         getTransactionService().begin();
         final URL resourceFile = ClassLoaderServiceTest.class.getResource("resource.txt");
@@ -510,11 +524,10 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         createPlatformDependencyMapping(resourceId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         getTransactionService().complete();
 
-        // getTransactionService().begin();
         final ClassLoader virtualGlobalClassLoader = classLoaderService.getGlobalClassLoader();
         final InputStream resourceStream = virtualGlobalClassLoader.getResourceAsStream("resource.txt");
         assertEquals(resourceFileContent.length, IOUtil.getAllContentFrom(resourceStream).length);
-        // getTransactionService().complete();
+        resourceStream.close();
     }
 
     @Test

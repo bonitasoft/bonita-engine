@@ -21,6 +21,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
  */
 public interface SActorLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
+    @Override
     SActorLogBuilder createNewInstance();
-    
+
 }

@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,7 +29,6 @@ import org.junit.Test;
 
 /**
  * @author Julien Reboul
- *
  */
 public class VirtualClassLoaderITest {
 
@@ -46,12 +43,12 @@ public class VirtualClassLoaderITest {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest");
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.getPath(), BonitaClassLoader.class.getClassLoader());
+        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.setClassLoader(bonitaClassLoader);
         final Object objectToInvokeJavaMethodOn = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentRequest").getConstructors()[0].newInstance();
         final Object valueToSetObjectWith = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentInformation").getConstructors()[0].newInstance();
-        
+
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 
             @Override
@@ -63,6 +60,7 @@ public class VirtualClassLoaderITest {
         });
 
         Future<Object> jmiFuture = executor.submit(new Callable<Object>() {
+
             @Override
             public Object call() throws Exception {
                 try {

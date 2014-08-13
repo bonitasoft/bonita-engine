@@ -72,8 +72,7 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void invalidBOSHashIsRejected() throws Exception {
-        final File tempFolder = File.createTempFile("businessArchive", "folder");
-        tempFolder.delete();
+        final File tempFolder = createTempFile();
 
         try {
             final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
@@ -88,10 +87,25 @@ public class BusinessArchiveTest {
         }
     }
 
-    @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void barWithNoHashIsRejected() throws Exception {
+    private File createTempFile() throws IOException {
         final File tempFolder = File.createTempFile("businessArchive", "folder");
         tempFolder.delete();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (tempFolder != null) {
+                    deleteDir(tempFolder);
+                }
+            }
+        });
+        return tempFolder;
+    }
+
+    @Test(expected = InvalidBusinessArchiveFormatException.class)
+    public void barWithNoHashIsRejected() throws Exception {
+        final File tempFolder = createTempFile();
 
         try {
             final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
@@ -108,8 +122,7 @@ public class BusinessArchiveTest {
 
     @Test
     public void createBusinessArchiveFolder() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
@@ -125,8 +138,7 @@ public class BusinessArchiveTest {
 
     @Test
     public void createBusinessArchiveFileFromFolder() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
@@ -150,8 +162,7 @@ public class BusinessArchiveTest {
 
     @Test
     public void createBusinessArchiveFromFile() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
@@ -172,8 +183,7 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidBusinessArchive() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
@@ -264,6 +274,7 @@ public class BusinessArchiveTest {
     public void importOldBusinessArchiveFail() throws Exception {
         final InputStream resourceAsStream = this.getClass().getResourceAsStream("MyProcess--1.0.bar");
         BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
+        resourceAsStream.close();
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
@@ -1015,8 +1026,7 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidProcessFromBusinessArchive() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
@@ -1056,8 +1066,7 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidXMLProcessFromBusinessArchive() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 

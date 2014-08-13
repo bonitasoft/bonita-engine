@@ -49,9 +49,9 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      * Creates a JarFileClassLoader that is a child of the system class loader.
      * 
      * @param name
-     *            the name of this class loader
+     *        the name of this class loader
      * @param urls
-     *            a list of URLs from which classes and resources should be loaded
+     *        a list of URLs from which classes and resources should be loaded
      */
     public MonoParentJarFileClassLoader(String name, URL[] urls) {
         super(name, EMPTY_URLS);
@@ -63,11 +63,11 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      * Creates a JarFileClassLoader that is a child of the specified class loader.
      * 
      * @param name
-     *            the name of this class loader
+     *        the name of this class loader
      * @param urls
-     *            a list of URLs from which classes and resources should be loaded
+     *        a list of URLs from which classes and resources should be loaded
      * @param parent
-     *            the parent of this class loader
+     *        the parent of this class loader
      */
     public MonoParentJarFileClassLoader(String name, URL[] urls, ClassLoader parent) {
         super(name, EMPTY_URLS, parent);
@@ -88,7 +88,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      */
     @Override
     public void addURL(final URL url) {
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
             @Override
             public Object run() {
@@ -102,10 +102,10 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      * Adds an array of urls to the end of this class loader.
      * 
      * @param urls
-     *            the URLs to add
+     *        the URLs to add
      */
     protected void addURLs(final URL[] urls) {
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
             @Override
             public Object run() {
@@ -133,7 +133,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      */
     @Override
     public URL findResource(final String resourceName) {
-        return (URL) AccessController.doPrivileged(new PrivilegedAction() {
+        return (URL) AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
             @Override
             public Object run() {
@@ -146,13 +146,13 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      * {@inheritDoc}
      */
     @Override
-    public Enumeration findResources(final String resourceName) throws IOException {
+    public Enumeration<URL> findResources(final String resourceName) throws IOException {
         // TODO this is not right
         // first get the resources from the parent classloaders
         Enumeration<?> parentResources = super.findResources(resourceName);
 
         // get the classes from my urls
-        Enumeration myResources = (Enumeration) AccessController.doPrivileged(new PrivilegedAction() {
+        Enumeration<?> myResources = (Enumeration<?>) AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
             @Override
             public Object run() {
@@ -186,7 +186,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
         }
 
         // get a resource handle to the library
-        ResourceHandle resourceHandle = (ResourceHandle) AccessController.doPrivileged(new PrivilegedAction() {
+        ResourceHandle resourceHandle = (ResourceHandle) AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
             @Override
             public Object run() {

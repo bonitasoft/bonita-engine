@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import java.io.File;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -139,11 +140,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
 
-        // // Remove the temporary folder
-        // final String localTemporaryFolder = getLocalTemporaryFolder(type, id);
-        // // new File(localTemporaryFolder).deleteOnExit();
-        // deleteDirOnExit(new File(localTemporaryFolder));
-
         // Remove the class loader
         final String key = getKey(type, id);
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
@@ -157,30 +153,14 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    private static void deleteDirOnExit(File dir) {
-        // call deleteOnExit for the folder first, so it will get deleted last
-        dir.deleteOnExit();
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteDirOnExit(f);
-                }
-                else {
-                    f.deleteOnExit();
-                }
-            }
-        }
-    }
-
-    private String getGlobalTemporaryFolder() {
+    private URI getGlobalTemporaryFolder() {
         final StringBuffer stb = new StringBuffer(temporaryFolder);
         stb.append(File.separator);
         stb.append(GLOBAL_FOLDER);
-        return stb.toString();
+        return new File(stb.toString()).toURI();
     }
 
-    private String getLocalTemporaryFolder(final String artifactType, final long artifactId) {
+    private URI getLocalTemporaryFolder(final String artifactType, final long artifactId) {
         final StringBuffer stb = new StringBuffer(temporaryFolder);
         stb.append(File.separator);
         stb.append(LOCAL_FOLDER);
@@ -188,7 +168,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         stb.append(artifactType);
         stb.append(File.separator);
         stb.append(artifactId);
-        return stb.toString();
+        return new File(stb.toString()).toURI();
+
     }
 
     @Override
@@ -219,17 +200,21 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void refreshGlobalClassLoader(final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
-        virtualClassloader.release();
-        virtualClassloader.setClassLoader(new BonitaClassLoader(resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
-                ClassLoaderServiceImpl.class.getClassLoader()));
+        refreshLocalClassLoader(virtualClassloader, resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
+                ClassLoaderServiceImpl.class.getClassLoader());
     }
 
     @Override
     public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
-        virtualClassloader.release();
-        virtualClassloader.setClassLoader(new BonitaClassLoader(resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
-                getGlobalClassLoader(), parentClassLoaderResolver, this, type, id)));
+        refreshLocalClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
+                getGlobalClassLoader(), parentClassLoaderResolver, this, type, id));
     }
 
+    private void refreshLocalClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
+            final URI temporaryFolder, final ClassLoader parent) {
+        virtualClassloader.release();
+        final BonitaClassLoader classloader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
+        virtualClassloader.setClassLoader(classloader);
+    }
 }

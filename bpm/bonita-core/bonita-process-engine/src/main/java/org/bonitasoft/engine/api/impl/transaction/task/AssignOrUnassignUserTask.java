@@ -15,13 +15,11 @@ package org.bonitasoft.engine.api.impl.transaction.task;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.StateBehaviors;
-import org.bonitasoft.engine.identity.IdentityService;
 
 /**
  * @author Baptiste Mesta
@@ -34,19 +32,13 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final SCommentService commentService;
-
-    private final IdentityService identityService;
-
-    private StateBehaviors stateBehaviors;
+    private final StateBehaviors stateBehaviors;
 
     public AssignOrUnassignUserTask(final long userId, final long userTaskId, final ActivityInstanceService activityInstanceService,
-            final SCommentService commentService, final IdentityService identityService, StateBehaviors stateBehaviors) {
+            StateBehaviors stateBehaviors) {
         this.userId = userId;
         this.userTaskId = userTaskId;
         this.activityInstanceService = activityInstanceService;
-        this.commentService = commentService;
-        this.identityService = identityService;
         this.stateBehaviors = stateBehaviors;
     }
 

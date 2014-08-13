@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.tracking.csv;
 
 import static org.junit.Assert.assertEquals;
@@ -18,13 +31,13 @@ import org.junit.Test;
 
 public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
 
-    public void should_work_if_output_folder_is_a_folder() throws Exception {
+    public void should_work_if_output_folder_is_a_folder() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         new CSVFlushEventListener(logger, System.getProperty("java.io.tmpdir"), ";");
     }
 
     @Test(expected = RuntimeException.class)
-    public void should_fail_if_output_folder_unknown() throws Exception {
+    public void should_fail_if_output_folder_unknown() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         new CSVFlushEventListener(logger, "unknownFolder", ";");
     }
@@ -39,7 +52,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void testFlushedCsv() throws Exception {
+    public void flushedCsv() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(logger, System.getProperty("java.io.tmpdir"), ";");
         final List<CSVFlushEventListener> flushEventListeners = Collections.singletonList(csvFlushEventListener);

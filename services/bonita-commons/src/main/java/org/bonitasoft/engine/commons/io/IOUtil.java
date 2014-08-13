@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.w3c.dom.Document;
 
 /**
@@ -64,6 +66,8 @@ import org.w3c.dom.Document;
 public class IOUtil {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    private static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -84,8 +88,10 @@ public class IOUtil {
     public static List<String> getClassNameList(final byte[] jarContent) throws IOException {
         final List<String> classes = new ArrayList<String>(10);
         JarInputStream stream = null;
+        ByteArrayInputStream byteArrayInputStream = null;
         try {
-            stream = new JarInputStream(new ByteArrayInputStream(jarContent));
+            byteArrayInputStream = new ByteArrayInputStream(jarContent);
+            stream = new JarInputStream(byteArrayInputStream);
             JarEntry nextJarEntry = null;
             while ((nextJarEntry = stream.getNextJarEntry()) != null) {
                 final String name = nextJarEntry.getName();
@@ -97,6 +103,9 @@ public class IOUtil {
             if (stream != null) {
                 stream.close();
             }
+            if (byteArrayInputStream != null) {
+                byteArrayInputStream.close();
+            }
         }
         return classes;
     }
@@ -106,12 +115,27 @@ public class IOUtil {
     }
 
     public static File createTempFile(final String prefix, final String suffix, final File directory) throws IOException {
+        final File tmpFile = createTempFileUntilSuccess(prefix, suffix, directory);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (tmpFile != null) {
+                    deleteFile(tmpFile, 1, 0);
+                }
+            }
+        });
+        return tmpFile;
+    }
+
+    private static File createTempFileUntilSuccess(final String prefix, final String suffix, final File directory) throws IOException {
         // By-pass for the bug #6325169 on SUN JDK 1.5 on windows
         // The createTempFile could fail while creating a file with the same name of
         // an existing directory
         // So if the file creation fail, it retry (with a limit of 10 retry)
         // Rethrow the IOException if all retries failed
-        File tmpDir = null;
+        File tmpFile = null;
         final int retryNumber = 10;
         int j = 0;
         boolean succeded = false;
@@ -130,7 +154,8 @@ public class IOUtil {
                 }
 
                 /* Create the file */
-                tmpDir = File.createTempFile(fileName, suffix, directory);
+                tmpFile = File.createTempFile(fileName, suffix, directory);
+
                 succeded = true;
             } catch (final IOException e) {
                 if (j == retryNumber) {
@@ -143,7 +168,7 @@ public class IOUtil {
                 j++;
             }
         } while (!succeded);
-        return tmpDir;
+        return tmpFile;
     }
 
     public static void write(final File file, final byte[] fileContent) throws IOException {
@@ -188,7 +213,6 @@ public class IOUtil {
 
         ByteArrayOutputStream baos = null;
         JarOutputStream jarOutStream = null;
-
         try {
             baos = new ByteArrayOutputStream();
             jarOutStream = new JarOutputStream(new BufferedOutputStream(baos));
@@ -218,10 +242,11 @@ public class IOUtil {
 
         ByteArrayOutputStream baos = null;
         ZipOutputStream zipOutStream = null;
-
+        BufferedOutputStream bufferedOutputStream = null;
         try {
             baos = new ByteArrayOutputStream();
-            zipOutStream = new ZipOutputStream(new BufferedOutputStream(baos));
+            bufferedOutputStream = new BufferedOutputStream(baos);
+            zipOutStream = new ZipOutputStream(bufferedOutputStream);
             for (final Map.Entry<String, byte[]> resource : resources.entrySet()) {
                 zipOutStream.putNextEntry(new ZipEntry(resource.getKey()));
                 zipOutStream.write(resource.getValue());
@@ -235,6 +260,9 @@ public class IOUtil {
             if (baos != null) {
                 baos.close();
             }
+            if (bufferedOutputStream != null) {
+                bufferedOutputStream.close();
+            }
         }
 
         return baos.toByteArray();
@@ -246,10 +274,10 @@ public class IOUtil {
      * care!
      * 
      * @param in
-     *            the stream to read
+     *        the stream to read
      * @return the whole content of the stream in a single String.
      * @throws IOException
-     *             if an I/O exception occurs
+     *         if an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final InputStream in) throws IOException {
         if (in == null) {
@@ -285,7 +313,7 @@ public class IOUtil {
      * Read the contents from the given FileInputStream. Return the result as a String.
      * 
      * @param inputStream
-     *            the stream to read from
+     *        the stream to read from
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
@@ -326,10 +354,10 @@ public class IOUtil {
      * FileInputStream(file))};
      * 
      * @param file
-     *            the file to read
+     *        the file to read
      * @return the whole content of the file in a single String.
      * @throws IOException
-     *             If an I/O exception occurs
+     *         If an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final File file) throws IOException {
         InputStream in = null;
@@ -349,10 +377,10 @@ public class IOUtil {
      * care!
      * 
      * @param url
-     *            the URL to read
+     *        the URL to read
      * @return the whole content of the stream in a single String.
      * @throws IOException
-     *             if an I/O exception occurs
+     *         if an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final URL url) throws IOException {
         final InputStream in = url.openStream();
@@ -400,27 +428,6 @@ public class IOUtil {
         }
         return retries > 0;
     }
-
-    //
-    // public static String getFileContent(final byte[] textFileContent) {
-    // final StringBuilder sb = new StringBuilder();
-    // try {
-    // final BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(textFileContent));
-    // try {
-    // byte[] buff = new byte[256];
-    // int read = 0;
-    // while ((read = is.read(buff)) != 0) {
-    // sb.append(buff);
-    // }
-    // } finally {
-    // is.close();
-    // }
-    // } catch (final IOException ex) {
-    // ex.printStackTrace();
-    // }
-    //
-    // return sb.toString();
-    // }
 
     public static String getFileContent(final File file) {
         final StringBuilder sb = new StringBuilder();
@@ -551,8 +558,6 @@ public class IOUtil {
             IOException {
         try {
             final String entryName = zipEntry.getName();
-            // entryName = entryName.replace('/', File.separatorChar);
-            // entryName = entryName.replace('\\', File.separatorChar);
 
             // For each entry, a file is created in the output directory "folder"
             final File outputFile = new File(outputFolder.getAbsolutePath(), entryName);
@@ -571,8 +576,9 @@ public class IOUtil {
     private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
         // The input is a file. An FileOutputStream is created to write the content of the new file.
         mkdirs(outputFile.getParentFile());
-        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+
         try {
+            final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
             try {
                 // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
                 int bytesRead;
@@ -597,16 +603,35 @@ public class IOUtil {
         return true;
     }
 
-    public static File createTempDirectory(final String fileName) throws IOException {
-        final File temp = File.createTempFile(fileName, String.valueOf(System.currentTimeMillis()));
-        temp.setReadable(true);
-        temp.setWritable(true);
+    public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
+        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + String.valueOf(System.currentTimeMillis()));
+        createTempDirectory(tmpDir);
+        return tmpDir;
+    }
 
-        if (!temp.delete()) {
-            throw new IOException("Could not delete temporary file : " + temp.getAbsolutePath());
-        }
-        mkdirs(temp);
-        return temp;
+    public static File createTempDirectory(final URI directoryPath) {
+        final File tmpDir = new File(directoryPath);
+        createTempDirectory(tmpDir);
+        return tmpDir;
+    }
+
+    private static void createTempDirectory(final File tmpDir) {
+        tmpDir.setReadable(true);
+        tmpDir.setWritable(true);
+
+        mkdirs(tmpDir);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    deleteDir(tmpDir);
+                } catch (final IOException e) {
+                    throw new SBonitaRuntimeException(e);
+                }
+            }
+        });
     }
 
     public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {
@@ -695,6 +720,9 @@ public class IOUtil {
             }
             if (jis != null) {
                 jis.close();
+            }
+            if (bais != null) {
+                bais.close();
             }
         }
     }
