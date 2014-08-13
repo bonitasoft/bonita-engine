@@ -170,6 +170,7 @@ public class GatewayExecutionTest extends CommonAPITest {
      */
     @Test
     public void processWithParallelGatewayMerge() throws Exception {
+        //given
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
         .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
         .addAutomaticTask("step1").addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
@@ -178,19 +179,13 @@ public class GatewayExecutionTest extends CommonAPITest {
         .addTransition("gateway2", "step4").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        // test execution
+
+        // when
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 1, user);
-        assertTrue("there was no pending task for john (expected step4)", checkNbPendingTaskOf.waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
-        assertEquals(1, pendingTasks.size());
-        final HumanTaskInstance humanTaskInstance = pendingTasks.get(0);
-        assertEquals("step4", humanTaskInstance.getName());
-        getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
-        getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+
+        // then
+        waitForUserTaskAndExecuteIt("step4", processInstance, user);
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
