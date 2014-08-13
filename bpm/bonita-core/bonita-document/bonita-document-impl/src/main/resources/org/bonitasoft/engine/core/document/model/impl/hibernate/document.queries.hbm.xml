@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getDocContentByDocumentId">
+        SELECT docContent
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl AS docContent
+        WHERE docContent.documentId = :documentId
+    </query>
+
+    <!-- DocumentMapping -->
+
+
+    <query name="getNumberOfDocuments">
+        SELECT COUNT(docmapping)
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+    </query>
+
+    <query name="getDocumentMappings">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+    </query>
+
+    <query name="getDocumentMappingsforProcessInstance">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+        WHERE docmapping.processInstanceId = :processInstanceId
+    </query>
+
+    <query name="getDocumentMappingsforProcessInstanceOrderedById">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+        WHERE docmapping.processInstanceId = :processInstanceId
+        ORDER BY docmapping.id
+    </query>
+
+    <query name="getNumberOfDocumentMappingsforProcessInstance">
+        SELECT COUNT(docmapping)
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+        WHERE docmapping.processInstanceId = :processInstanceId
+    </query>
+
+    <query name="getDocumentMappingsforProcessInstanceAndName">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+        WHERE docmapping.processInstanceId = :processInstanceId
+        AND docmapping.documentName = :documentName
+    </query>
+
+    <query name="getNumberOfSDocumentMapping">
+        SELECT COUNT(docmapping)
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+    </query>
+
+    <query name="searchSDocumentMapping">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+    </query>
+
+    <query name="getNumberOfSDocumentMappingSupervisedBy">
+        SELECT COUNT(docmapping)
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping,
+        org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        WHERE docmapping.processInstanceId = p.id
+        AND p.processDefinitionId IN (
+        SELECT supervisor.processDefId
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+        WHERE (supervisor.userId = :userId)
+        OR (supervisor.id IN (
+        SELECT supervisor.id
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+        WHERE um.userId = :userId
+        AND (
+        (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId)
+        )
+        )
+        )
+        )
+    </query>
+
+    <query name="searchSDocumentMappingSupervisedBy">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping,
+        org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        WHERE docmapping.processInstanceId = p.id
+        AND p.processDefinitionId IN (
+        SELECT supervisor.processDefId
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+        WHERE (supervisor.userId = :userId)
+        OR (supervisor.id IN (
+        SELECT supervisor.id
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+        WHERE um.userId = :userId
+        AND (
+        (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId)
+        )
+        )
+        )
+        )
+    </query>
+
+</hibernate-mapping>

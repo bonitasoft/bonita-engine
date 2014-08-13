@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.core.process.document.mapping.model.archive.builder.SADocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
+import org.bonitasoft.engine.core.document.model.archive.builder.SADocumentMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**

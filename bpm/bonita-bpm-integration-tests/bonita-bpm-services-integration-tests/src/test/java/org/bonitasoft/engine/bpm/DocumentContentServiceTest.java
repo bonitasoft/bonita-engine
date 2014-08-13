@@ -22,11 +22,11 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.document.api.DocumentService;
-import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
-import org.bonitasoft.engine.document.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SDocumentMapping;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;

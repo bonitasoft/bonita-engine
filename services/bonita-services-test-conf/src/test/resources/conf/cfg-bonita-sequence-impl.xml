@@ -90,7 +90,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="10021" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
-				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl" value="10090" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" value="20050" />

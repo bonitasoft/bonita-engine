@@ -15,8 +15,8 @@ package org.bonitasoft.engine.search.document;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.document.api.DocumentService;
-import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchivedDocumentSearchEntity;

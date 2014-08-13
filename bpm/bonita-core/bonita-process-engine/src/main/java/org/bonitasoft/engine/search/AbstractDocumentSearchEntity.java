@@ -16,8 +16,8 @@ package org.bonitasoft.engine.search;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.Document;
-import org.bonitasoft.engine.core.process.document.api.DocumentService;
-import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
 

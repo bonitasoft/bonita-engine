@@ -23,7 +23,7 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
     public DefaultArchivingStrategy() {
         super();
         archives.put("org.bonitasoft.engine.core.process.comment.model.SComment", true);
-        archives.put("org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping", true);
+        archives.put("org.bonitasoft.engine.core.document.mapping.model.SDocumentMapping", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SProcessInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.STransitionInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance", true);
