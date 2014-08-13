@@ -218,14 +218,14 @@
 <!--                 <entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="read-write"/> -->

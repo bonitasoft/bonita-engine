@@ -75,7 +75,7 @@
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache
-		name="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl"
+		name="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl"
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache
@@ -129,7 +129,7 @@
 	<cache name="org.bonitasoft.engine.command.model.SCommandImpl"
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
-	<cache name="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl"
+	<cache name="org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl"
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache name="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl"
