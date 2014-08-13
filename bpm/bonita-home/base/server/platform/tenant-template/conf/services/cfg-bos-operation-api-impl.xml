@@ -44,7 +44,7 @@
 	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy" />
 
 	<bean id="documentLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentLeftOperandHandler">
-		<constructor-arg name="processDocumentService" ref="processDocumentService" />
+		<constructor-arg name="documentService" ref="documentService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
