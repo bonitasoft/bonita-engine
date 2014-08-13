@@ -21,6 +21,7 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.page.Page;
 
 /**
@@ -40,7 +41,7 @@ public interface ApplicationAPI {
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
      */
-    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException;
+    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException;
 
     /**
      * Retrieves an {@link Application} from its identifier.
@@ -78,7 +79,7 @@ public interface ApplicationAPI {
      * @throws AlreadyExistsException if the name is already used for another page on this application
      * @throws CreationException if an error occurs during the creation
      */
-    ApplicationPage createApplicationPage(long applicationId, long pagedId, String name) throws AlreadyExistsException, CreationException;
+    ApplicationPage createApplicationPage(long applicationId, long pagedId, String name) throws AlreadyExistsException, CreationException, InvalidNameException;
 
     /**
      * Retrieves the {@link ApplicationPage} for the given application name and application page name

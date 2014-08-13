@@ -29,6 +29,7 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -43,7 +44,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
-    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
+    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException {
         return getDelegate().createApplication(applicationCreator);
     }
 
@@ -91,7 +92,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-    CreationException {
+            CreationException, InvalidNameException {
         return getDelegate().createApplicationPage(applicationId, pagedId, name);
     }
 

@@ -53,6 +53,7 @@ import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.SInvalidNameException;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -109,6 +110,14 @@ public class ApplicationServiceImplTest {
 
         //when
         applicationService.createApplication(application);
+
+        //then exception
+    }
+
+    @Test(expected = SInvalidNameException.class)
+    public void createApplication_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
+        //when
+        applicationService.createApplication(buildApplication("name with spaces"));
 
         //then exception
     }
@@ -272,6 +281,18 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
         applicationPage.setId(15);
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+        //when
+        applicationService.createApplicationPage(applicationPage);
+
+        //then exception
+    }
+
+    @Test(expected = SInvalidNameException.class)
+    public void createApplicationPage_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
+        //given
+        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "name with spaces");
+        applicationPage.setId(15);
 
         //when
         applicationService.createApplicationPage(applicationPage);

@@ -73,7 +73,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("My Application", "1.0", "/myApplication");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "1.0", "/myApplication");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setDisplayName("My application display name");
@@ -83,7 +83,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
         //then
         assertThat(application).isNotNull();
-        assertThat(application.getName()).isEqualTo("My Application");
+        assertThat(application.getName()).isEqualTo("My-Application");
         assertThat(application.getDisplayName()).isEqualTo("My application display name");
         assertThat(application.getVersion()).isEqualTo("1.0");
         assertThat(application.getPath()).isEqualTo("/myApplication");
@@ -101,7 +101,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void getApplication_returns_application_with_the_given_id() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("My Application", "1.0", "/myApplication");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "1.0", "/myApplication");
         final Application createdApp = applicationAPI.createApplication(creator);
         assertThat(createdApp).isNotNull();
 
@@ -117,7 +117,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("My Application", "1.0", "/myApplication");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "1.0", "/myApplication");
         final Application createdApp = applicationAPI.createApplication(creator);
         assertThat(createdApp).isNotNull();
 
@@ -138,9 +138,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_without_filter_return_all_elements_based_on_pagination() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "1.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "1.0", "/marketing");
 
         final Application hr = applicationAPI.createApplication(hrCreator);
         final Application engineering = applicationAPI.createApplication(engineeringCreator);
@@ -172,9 +172,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_can_filter_on_name() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "1.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "1.0", "/marketing");
 
         final Application hr = applicationAPI.createApplication(hrCreator);
         final Application engineering = applicationAPI.createApplication(engineeringCreator);
@@ -182,7 +182,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationSearchDescriptor.NAME, "Engineering dashboard");
+        builder.filter(ApplicationSearchDescriptor.NAME, "Engineering-dashboard");
 
         final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
         assertThat(applications).isNotNull();
@@ -200,10 +200,10 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_can_filter_on_display_name() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "1.0", "/hr");
         hrCreator.setDisplayName("the only app with display name");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "1.0", "/marketing");
 
         final Application hr = applicationAPI.createApplication(hrCreator);
         final Application engineering = applicationAPI.createApplication(engineeringCreator);
@@ -228,9 +228,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_can_filter_on_path() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "1.0", "/hr");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "1.0", "/marketing");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "1.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "1.0", "/marketing");
 
         final Application hr = applicationAPI.createApplication(hrCreator);
         final Application engineering = applicationAPI.createApplication(engineeringCreator);
@@ -255,9 +255,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_can_filter_on_version() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "2.0", "/hr");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing dashboard", "2.0", "/marketing");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "2.0", "/hr");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "2.0", "/marketing");
 
         final Application hr = applicationAPI.createApplication(hrCreator);
         final Application engineering = applicationAPI.createApplication(engineeringCreator);
@@ -282,10 +282,10 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void searchApplications_can_use_search_term() throws Exception {
         //given
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR dashboard", "2.0", "/hr");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "2.0", "/hr");
         hrCreator.setDisplayName("My HR dashboard");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering dashboard", "1.0", "/engineering");
-        final ApplicationCreator marketingCreator = new ApplicationCreator("My Marketing dashboard", "2.0", "/marketing");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "1.0", "/engineering");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("My", "2.0", "/marketing");
 
         final Application hr = applicationAPI.createApplication(hrCreator);
         final Application engineering = applicationAPI.createApplication(engineeringCreator);

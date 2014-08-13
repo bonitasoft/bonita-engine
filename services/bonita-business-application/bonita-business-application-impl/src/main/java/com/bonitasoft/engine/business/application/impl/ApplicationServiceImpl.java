@@ -48,6 +48,7 @@ import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationPageLogBuilder;
+import com.bonitasoft.engine.business.application.SInvalidNameException;
 
 
 /**
@@ -69,23 +70,36 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException {
+    public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException,
+    SInvalidNameException {
         final String methodName = "createApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLog(ActionType.CREATED, "Creating application named " + application.getName());
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION)
-                .setObject(application).done();
         try {
-            if (hasApplicationWithName(application.getName())) {
-                throw new SObjectAlreadyExistsException("An application already exists with name '" + application.getName() + "'.");
-            }
+            validate(application);
+            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION)
+                    .setObject(application).done();
             recorder.recordInsert(new InsertRecord(application), insertEvent);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+        } catch (final SInvalidNameException e) {
+            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
         } catch (final SObjectAlreadyExistsException e) {
+            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw e;
         } catch (final SBonitaException e) {
             handleCreationException(application, logBuilder, e, methodName);
         }
         return application;
+    }
+
+    private void validate(final SApplication application) throws SInvalidNameException, SBonitaReadException, SObjectAlreadyExistsException {
+        if (!URLValidator.isValid(application.getName())) {
+            throw new SInvalidNameException(
+                    "Invalid application name: the name can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
+        }
+        if (hasApplicationWithName(application.getName())) {
+            throw new SObjectAlreadyExistsException("An application already exists with name '" + application.getName() + "'.");
+        }
     }
 
     private void handleCreationException(final PersistentObject persitentObject, final SPersistenceLogBuilder logBuilder, final Exception e, final String methodName)
@@ -202,22 +216,34 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException,
-    SObjectAlreadyExistsException {
+    public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
+    SInvalidNameException {
         final String methodName = "createApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLog(ActionType.CREATED, "Creating application page named " + applicationPage.getName());
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION_PAGE)
                 .setObject(applicationPage).done();
         try {
+            throwExceptionIfNameIsInvalid(applicationPage);
             throwAlreadyExistsExceptionIfAlreadyExists(applicationPage);
             recorder.recordInsert(new InsertRecord(applicationPage), insertEvent);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+        } catch (final SInvalidNameException e) {
+            log(applicationPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
         } catch (final SObjectAlreadyExistsException e) {
+            log(applicationPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw e;
         } catch (final SBonitaException e) {
             handleCreationException(applicationPage, logBuilder, e, methodName);
         }
         return applicationPage;
+    }
+
+    private void throwExceptionIfNameIsInvalid(final SApplicationPage applicationPage) throws SInvalidNameException {
+        if (!URLValidator.isValid(applicationPage.getName())) {
+            throw new SInvalidNameException(
+                    "Invalid application page name: the name can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
+        }
     }
 
     private void throwAlreadyExistsExceptionIfAlreadyExists(final SApplicationPage applicationPage) throws SBonitaReadException, SObjectAlreadyExistsException {

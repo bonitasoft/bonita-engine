@@ -39,6 +39,8 @@ import com.bonitasoft.engine.business.application.SApplicationPageBuilder;
 import com.bonitasoft.engine.business.application.SApplicationPageBuilderFactory;
 import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.SApplicationUpdateBuilderFactory;
+import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -62,7 +64,7 @@ public class ApplicationAPIDelegate {
         this.searchApplications = searchApplications;
     }
 
-    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
+    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException {
         try {
             final SApplication sApplication = applicationService.createApplication(convertor.buildSApplication(applicationCreator, loggedUserId));
             return convertor.toApplication(sApplication);
@@ -70,6 +72,8 @@ public class ApplicationAPIDelegate {
             throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (final SInvalidNameException e) {
+            throw new InvalidNameException(e.getMessage());
         }
     }
 
@@ -111,7 +115,8 @@ public class ApplicationAPIDelegate {
         }
     }
 
-    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,    CreationException {
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
+    CreationException, InvalidNameException {
         final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
         final SApplicationPageBuilder builder = factory.createNewInstance(applicationId, pagedId, name);
         SApplicationPage sAppPage;
@@ -122,6 +127,8 @@ public class ApplicationAPIDelegate {
             throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (final SInvalidNameException e) {
+            throw new InvalidNameException(e.getMessage());
         }
     }
 

@@ -37,11 +37,13 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplicationState;
+import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
+import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -140,6 +142,20 @@ public class ApplicationAPIDelegateTest {
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
+
+        //when
+        delegate.createApplication(creator);
+
+        //then exception
+    }
+
+    @Test(expected = InvalidNameException.class)
+    public void createApplication_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
+        final SApplicationImpl sApp = getDefaultApplication();
+        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(applicationService.createApplication(sApp)).willThrow(new SInvalidNameException(""));
 
         //when
         delegate.createApplication(creator);
@@ -291,6 +307,18 @@ public class ApplicationAPIDelegateTest {
         //given
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
         given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectAlreadyExistsException());
+
+        //when
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+
+        //then exception
+    }
+
+    @Test(expected = InvalidNameException.class)
+    public void createApplicationPage_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
+        //given
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        given(applicationService.createApplicationPage(sAppPage)).willThrow(new SInvalidNameException(""));
 
         //when
         delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
