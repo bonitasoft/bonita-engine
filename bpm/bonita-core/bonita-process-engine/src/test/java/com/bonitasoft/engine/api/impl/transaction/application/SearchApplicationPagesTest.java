@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api.impl.transaction.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,9 +19,6 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -30,12 +26,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
-import com.bonitasoft.engine.business.application.Application;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SearchApplicationsTest {
+public class SearchApplicationPagesTest {
 
     private static final int START_INDEX = 0;
 
@@ -45,76 +41,64 @@ public class SearchApplicationsTest {
     private ApplicationService applicationService;
 
     @Mock
-    private SearchEntityDescriptor descriptor;
-
-    @Mock
-    private SearchOptions options;
-
-    @Mock
     private ApplicationConvertor convertor;
 
     @InjectMocks
-    private SearchApplications searchApplications;
-
-    @Before
-    public void setUp() throws Exception {
-        when(options.getStartIndex()).thenReturn(START_INDEX);
-        when(options.getMaxResults()).thenReturn(MAX_RESULTS);
-    }
+    private SearchApplicationPages search;
 
     @Test
-    public void executeCount_should_return_result_of_applicationService_getNumberOfApplications() throws Exception {
+    public void executeCount_should_return_the_result_of_applicationService_getNumberOfApplicationPages() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
-        given(applicationService.getNumberOfApplications(options)).willReturn(10L);
+        given(applicationService.getNumberOfApplicationPages(options)).willReturn(8L);
 
         //when
-        final long count = searchApplications.executeCount(options);
+        final long count = search.executeCount(options);
 
         //then
-        assertThat(count).isEqualTo(10L);
+        assertThat(count).isEqualTo(8L);
     }
 
     @Test(expected = SBonitaSearchException.class)
     public void executeCount_should_throw_SBonitaSeachException_when_applicationService_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
-        given(applicationService.getNumberOfApplications(options)).willThrow(new SBonitaReadException(""));
+        given(applicationService.getNumberOfApplicationPages(options)).willThrow(new SBonitaReadException(""));
 
         //when
-        searchApplications.executeCount(options);
+        search.executeCount(options);
 
         //then exception
     }
 
     @Test
-    public void executeSearch_should_return_the_result_of_applicationService_searchApplications() throws Exception {
+    public void executeSearch_should_return_the_result_of_applicationService_searchApplicationPages() throws Exception {
         //given
         final QueryOptions queryOptions = new QueryOptions(START_INDEX, MAX_RESULTS);
-        final List<SApplication> applications = new ArrayList<SApplication>(1);
-        applications.add(mock(SApplication.class));
-        given(applicationService.searchApplications(queryOptions)).willReturn(applications);
+        final List<SApplicationPage> appPages = new ArrayList<SApplicationPage>(1);
+        appPages.add(mock(SApplicationPage.class));
+        given(applicationService.searchApplicationPages(queryOptions)).willReturn(appPages);
 
         //when
-        final List<SApplication> retrievedApplications = searchApplications.executeSearch(queryOptions);
+        final List<SApplicationPage> retrievedAppPages = search.executeSearch(queryOptions);
 
         //then
-        assertThat(retrievedApplications).isEqualTo(applications);
+        assertThat(retrievedAppPages).isEqualTo(appPages);
     }
 
     @Test
-    public void convetToClientObjects_should_return_result_of_convertor_toApplication() throws Exception {
+    public void convetToClientObjects_should_return_result_of_convertor_toApplicationPage() throws Exception {
         //given
-        final SApplication sApp = mock(SApplication.class);
-        final Application app = mock(Application.class);
-        final List<SApplication> sApplications = Arrays.asList(sApp);
-        given(convertor.toApplication(sApplications)).willReturn(Arrays.asList(app));
+        final SApplicationPage sAppPage = mock(SApplicationPage.class);
+        final ApplicationPage appPage = mock(ApplicationPage.class);
+        final List<SApplicationPage> sApplicationPages = Arrays.asList(sAppPage);
+        given(convertor.toApplicationPage(sApplicationPages)).willReturn(Arrays.asList(appPage));
 
         //when
-        final List<Application> applications = searchApplications.convertToClientObjects(sApplications);
+        final List<ApplicationPage> applicationPages = search.convertToClientObjects(sApplicationPages);
 
         //then
-        assertThat(applications).containsExactly(app);
+        assertThat(applicationPages).containsExactly(appPage);
     }
 
 }

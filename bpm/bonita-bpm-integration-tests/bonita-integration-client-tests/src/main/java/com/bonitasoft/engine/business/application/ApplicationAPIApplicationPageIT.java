@@ -27,6 +27,8 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -245,6 +247,138 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
 
         applicationAPI.deleteApplication(application.getId());
 
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+            "search", "no filters", "no search term" })
+    @Test
+    public void searchApplicationPages_without_filters_and_search_term_should_return_all_applicationPages_pagged() throws Exception {
+        //given
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final ApplicationPage appPage1 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+        final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "secondPage");
+        final ApplicationPage appPage3 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "thirdPage");
+
+        //when
+        final SearchResult<ApplicationPage> searchResultPage1 = applicationAPI.searchApplicationPages(buildSearchOptions(0, 2));
+        final SearchResult<ApplicationPage> searchResultPage2 = applicationAPI.searchApplicationPages(buildSearchOptions(2, 2));
+
+        //then
+        assertThat(searchResultPage1).isNotNull();
+        assertThat(searchResultPage1.getCount()).isEqualTo(3);
+        assertThat(searchResultPage1.getResult()).containsExactly(appPage1, appPage2);
+
+        assertThat(searchResultPage2).isNotNull();
+        assertThat(searchResultPage2.getCount()).isEqualTo(3);
+        assertThat(searchResultPage2.getResult()).containsExactly(appPage3);
+
+        applicationAPI.deleteApplication(application.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+            "search", "filter on name" })
+    @Test
+    public void searchApplicationPages_can_filter_on_name() throws Exception {
+        //given
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+        final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "secondPage");
+        applicationAPI.createApplicationPage(application.getId(), page.getId(), "thirdPage");
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationPageSearchDescriptor.NAME, "secondPage");
+        final SearchResult<ApplicationPage> searchResult = applicationAPI.searchApplicationPages(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(1);
+        assertThat(searchResult.getResult()).containsExactly(appPage2);
+
+        applicationAPI.deleteApplication(application.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+            "search", "filter on application id" })
+    @Test
+    public void searchApplicationPages_can_filter_on_applicationId() throws Exception {
+        //given
+        final Application application1 = applicationAPI.createApplication(new ApplicationCreator("app1", "1.0", "/app1"));
+        final Application application2 = applicationAPI.createApplication(new ApplicationCreator("app2", "1.0", "/app2"));
+        final ApplicationPage appPage1 = applicationAPI.createApplicationPage(application1.getId(), page.getId(), "firstPage");
+        applicationAPI.createApplicationPage(application2.getId(), page.getId(), "secondPage");
+        final ApplicationPage appPage3 = applicationAPI.createApplicationPage(application1.getId(), page.getId(), "thirdPage");
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, application1.getId());
+        final SearchResult<ApplicationPage> searchResult = applicationAPI.searchApplicationPages(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(2);
+        assertThat(searchResult.getResult()).containsExactly(appPage1, appPage3);
+
+        applicationAPI.deleteApplication(application1.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+            "search", "filter on page id" })
+    @Test
+    public void searchApplicationPages_can_filter_on_pageId() throws Exception {
+        //given
+        final Page page2 = createPage("custompage_MyPage2");
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+        final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page2.getId(), "secondPage");
+        final ApplicationPage appPage3 = applicationAPI.createApplicationPage(application.getId(), page2.getId(), "thirdPage");
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationPageSearchDescriptor.PAGE_ID, page2.getId());
+        final SearchResult<ApplicationPage> searchResult = applicationAPI.searchApplicationPages(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(2);
+        assertThat(searchResult.getResult()).containsExactly(appPage2, appPage3);
+
+        applicationAPI.deleteApplication(application.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
+            "search", "filter on id" })
+    @Test
+    public void searchApplicationPages_can_filter_on_id() throws Exception {
+        //given
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
+        final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "secondPage");
+        applicationAPI.createApplicationPage(application.getId(), page.getId(), "thirdPage");
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationPageSearchDescriptor.ID, appPage2.getId());
+        final SearchResult<ApplicationPage> searchResult = applicationAPI.searchApplicationPages(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(1);
+        assertThat(searchResult.getResult()).containsExactly(appPage2);
+
+        applicationAPI.deleteApplication(application.getId());
+    }
+
+    private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
+        final SearchOptions options = builder.done();
+        return options;
+    }
+
+    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
+        builder.sort(ApplicationPageSearchDescriptor.NAME, Order.ASC);
+        return builder;
     }
 
 }

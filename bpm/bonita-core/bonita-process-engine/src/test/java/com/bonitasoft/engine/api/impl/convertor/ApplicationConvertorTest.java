@@ -14,8 +14,10 @@ import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
 
@@ -132,6 +134,24 @@ public class ApplicationConvertorTest {
         assertThat(appPage.getApplicationId()).isEqualTo(APPLICATION_ID);
         assertThat(appPage.getPageId()).isEqualTo(PAGE_ID);
         assertThat(appPage.getName()).isEqualTo(APP_PAGE_NAME);
+    }
+
+    @Test
+    public void toApplicationPageList_should_call_toApplitionPage_for_each_element_and_return_the_list_of_converted_values() throws Exception {
+        //given
+        final SApplicationPageImpl sAppPage1 = new SApplicationPageImpl(10, 21, "appPage1");
+        final SApplicationPageImpl sAppPage2 = new SApplicationPageImpl(10, 21, "appPage2");
+        final ApplicationPageImpl appPage1 = new ApplicationPageImpl(10, 21, "appPage1");
+        final ApplicationPageImpl appPage2 = new ApplicationPageImpl(10, 21, "appPage2");
+        final ApplicationConvertor convertorMock = spy(convertor);
+        doReturn(appPage1).when(convertorMock).toApplicationPage(sAppPage1);
+        doReturn(appPage2).when(convertorMock).toApplicationPage(sAppPage2);
+
+        //when
+        final List<ApplicationPage> applicationPages = convertorMock.toApplicationPage(Arrays.<SApplicationPage> asList(sAppPage1, sAppPage2));
+
+        //then
+        assertThat(applicationPages).containsExactly(appPage1, appPage2);
     }
 
 }

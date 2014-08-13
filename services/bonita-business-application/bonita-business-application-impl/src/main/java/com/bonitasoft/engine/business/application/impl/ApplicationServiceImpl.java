@@ -313,14 +313,16 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException {
-        // TODO Auto-generated method stub
-        return 0;
+        return persistenceService.getNumberOfEntities(SApplicationPage.class, options, null);
     }
 
     @Override
     public List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return persistenceService.searchEntity(SApplicationPage.class, options, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
     }
 
 

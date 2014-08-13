@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
@@ -56,10 +57,16 @@ public class ApplicationAPIDelegateTest {
     private SearchApplications searchApplications;
 
     @Mock
+    private SearchApplicationPages searchApplicationPages;
+
+    @Mock
     private ApplicationService applicationService;
 
     @Mock
-    private SearchResult<Application> searchResult;
+    private SearchResult<Application> appSearchResult;
+
+    @Mock
+    private SearchResult<ApplicationPage> appPageSearchResult;
 
     private ApplicationAPIDelegate delegate;
 
@@ -84,7 +91,7 @@ public class ApplicationAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications);
+        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications, searchApplicationPages);
     }
 
     @Test
@@ -229,20 +236,20 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test
-    public void searchApplications_should_return_the_result_of_searchApplicatons_getResult() throws Exception {
+    public void searchApplications_should_return_the_result_of_searchApplications_getResult() throws Exception {
         //given
-        given(searchApplications.getResult()).willReturn(searchResult);
+        given(searchApplications.getResult()).willReturn(appSearchResult);
 
         //when
         final SearchResult<Application> retrievedSearchResult = delegate.searchApplications();
 
         //then
-        assertThat(retrievedSearchResult).isEqualTo(searchResult);
+        assertThat(retrievedSearchResult).isEqualTo(appSearchResult);
         verify(searchApplications, times(1)).execute();
     }
 
     @Test(expected = SearchException.class)
-    public void searchApplications_should_throw_SeachException_when_searchApplicatons_throws_SBonitaException() throws Exception {
+    public void searchApplications_should_throw_SearchException_when_searchApplications_throws_SBonitaException() throws Exception {
         //given
         doThrow(new SBonitaReadException("")).when(searchApplications).execute();
 
@@ -429,6 +436,30 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.getApplicationHomePage(APPLICATION_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void searchApplicationPages_should_return_the_result_of_searchApplicationPages_getResult() throws Exception {
+        //given
+        given(searchApplicationPages.getResult()).willReturn(appPageSearchResult);
+
+        //when
+        final SearchResult<ApplicationPage> retrievedSearchResult = delegate.searchApplicationPages();
+
+        //then
+        assertThat(retrievedSearchResult).isEqualTo(appPageSearchResult);
+        verify(searchApplicationPages, times(1)).execute();
+    }
+
+    @Test(expected = SearchException.class)
+    public void searchApplicationPages_should_throw_SearchException_when_searchApplicationPages_throws_SBonitaException() throws Exception {
+        //given
+        doThrow(new SBonitaReadException("")).when(searchApplicationPages).execute();
+
+        //when
+        delegate.searchApplicationPages();
 
         //then exception
     }

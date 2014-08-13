@@ -52,6 +52,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -218,7 +219,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void searchApplicatons_should_return_the_result_of_persitenceService_searchEntity() throws Exception {
+    public void searchApplications_should_return_the_result_of_persitenceService_searchEntity() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
         final List<SApplication> applications = new ArrayList<SApplication>(1);
@@ -233,7 +234,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public void searchApplicatons_should_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+    public void searchApplications_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
         given(applicationService.searchApplications(options)).willThrow(new SBonitaReadException(""));
@@ -362,8 +363,9 @@ public class ApplicationServiceImplTest {
     @Test
     public void updateApplicationPage_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField("name", "newName");
+        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance(new EntityUpdateDescriptor());
+        updateBuilder.updateHomePageId(150L);
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationId = 17;
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
@@ -424,6 +426,47 @@ public class ApplicationServiceImplTest {
 
         //when
         applicationService.getApplicationHomePage(100);
+
+        //then exception
+    }
+
+    @Test
+    public void getNumberOfApplicationPages_should_return_the_result_of_persitenceService_getNumberOfEntities() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        final long count = 7;
+        given(persistenceService.getNumberOfEntities(SApplicationPage.class, options, null)).willReturn(count);
+
+        //when
+        final long nbOfApp = applicationService.getNumberOfApplicationPages(options);
+
+        //then
+        assertThat(nbOfApp).isEqualTo(count);
+    }
+
+    @Test
+    public void searchApplicationPages_should_return_the_result_of_persitenceService_searchEntity() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        final List<SApplicationPage> applicationPages = new ArrayList<SApplicationPage>(1);
+        applicationPages.add(mock(SApplicationPage.class));
+        given(persistenceService.searchEntity(SApplicationPage.class, options, null)).willReturn(applicationPages);
+
+        //when
+        final List<SApplicationPage> retrievedAppPages = applicationService.searchApplicationPages(options);
+
+        //then
+        assertThat(retrievedAppPages).isEqualTo(applicationPages);
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void searchApplicationPages_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        given(applicationService.searchApplicationPages(options)).willThrow(new SBonitaReadException(""));
+
+        //when
+        applicationService.searchApplicationPages(options);
 
         //then exception
     }

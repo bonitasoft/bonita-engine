@@ -25,6 +25,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
@@ -50,9 +51,11 @@ public class ApplicationAPIDelegate {
     private final long loggedUserId;
     private final SearchApplications searchApplications;
     private final ApplicationService applicationService;
+    private final SearchApplicationPages searchApplicationPages;
 
     public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor, final long loggedUserId,
-            final SearchApplications searchApplications) {
+            final SearchApplications searchApplications, final SearchApplicationPages searchApplicationPages) {
+        this.searchApplicationPages = searchApplicationPages;
         applicationService = accessor.getApplicationService();
         this.convertor = convertor;
         this.loggedUserId = loggedUserId;
@@ -161,6 +164,15 @@ public class ApplicationAPIDelegate {
             throw new RetrieveException(e);
         } catch (final SObjectNotFoundException e) {
             throw new ApplicationPageNotFoundException(e.getMessage());
+        }
+    }
+
+    public SearchResult<ApplicationPage> searchApplicationPages() throws SearchException {
+        try {
+            searchApplicationPages.execute();
+            return searchApplicationPages.getResult();
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
         }
     }
 

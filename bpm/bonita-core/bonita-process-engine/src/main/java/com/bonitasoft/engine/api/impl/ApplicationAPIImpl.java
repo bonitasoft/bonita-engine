@@ -21,13 +21,16 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -49,11 +52,15 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
     private ApplicationAPIDelegate getDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SearchApplicationDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
+        final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
+        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
         final ApplicationConvertor convertor = new ApplicationConvertor();
-        final SearchApplications searchApplications = new SearchApplications(tenantAccessor.getApplicationService(), searchDescriptor, searchOptions, convertor);
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, convertor);
+        final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, convertor, appPageSearchDescriptor,
+                searchOptions);
         final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, convertor,
-                SessionInfos.getUserIdFromSession(), searchApplications);
+                SessionInfos.getUserIdFromSession(), searchApplications, searchApplicationPages);
         return delegate;
     }
 
@@ -95,8 +102,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
-        // TODO Auto-generated method stub
-        return null;
+        return getDelegate(searchOptions).searchApplicationPages();
     }
 
     @Override

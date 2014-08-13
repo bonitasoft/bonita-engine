@@ -79,4 +79,12 @@ public class ApplicationConvertor {
         return appPage;
     }
 
+    public List<ApplicationPage> toApplicationPage(final List<SApplicationPage> sApplicationPages) {
+        final List<ApplicationPage> appPages = new ArrayList<ApplicationPage>(sApplicationPages.size());
+        for (final SApplicationPage sApplicationPage : sApplicationPages) {
+            appPages.add(toApplicationPage(sApplicationPage));
+        }
+        return appPages;
+    }
+
 }
