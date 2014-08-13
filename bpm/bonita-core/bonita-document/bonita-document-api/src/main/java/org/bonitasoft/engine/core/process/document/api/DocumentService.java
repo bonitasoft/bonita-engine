@@ -262,6 +262,8 @@ public interface DocumentService {
      */
     SADocumentMapping getArchivedVersionOfProcessDocument(long documentId) throws SDocumentNotFoundException;
 
+    String generateDocumentURL(String name, String contentStorageId);
+
     /**
      * Retrieve an archived document
      * 

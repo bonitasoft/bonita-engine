@@ -11,7 +11,7 @@
 
     <artifactId>bonita-document-api</artifactId>
 
-    <name>Bonita Process Document: Service API</name>
+    <name>Bonita Document: Service API</name>
 
     <dependencies>
         <dependency>

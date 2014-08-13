@@ -22,7 +22,7 @@
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
-        <constructor-arg name="processDocumentService" ref="processDocumentService" />
+        <constructor-arg name="documentService" ref="documentService" />
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="tokenService" ref="tokenService" />
     </bean>

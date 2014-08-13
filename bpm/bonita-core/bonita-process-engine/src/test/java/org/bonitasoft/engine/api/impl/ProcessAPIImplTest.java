@@ -419,7 +419,7 @@ public class ProcessAPIImplTest {
         Document removeDocument = processAPI.removeDocument(123l);
 
         //then
-        assertThat(ModelConvertor.toDocument(sProcessDocument)).isEqualTo(removeDocument);
+        assertThat(ModelConvertor.toDocument(sProcessDocument, documentService)).isEqualTo(removeDocument);
         verify(documentService, times(1)).removeDocument(sProcessDocument);
 
     }

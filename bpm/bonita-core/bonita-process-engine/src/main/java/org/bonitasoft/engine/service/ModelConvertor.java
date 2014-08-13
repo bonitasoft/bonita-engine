@@ -158,6 +158,7 @@ import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
+import org.bonitasoft.engine.core.process.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -1495,18 +1496,22 @@ public class ModelConvertor {
         return supervisor;
     }
 
-    public static List<Document> toDocuments(final Collection<SDocumentMapping> attachments) {
+    public static List<Document> toDocuments(final Collection<SDocumentMapping> attachments, DocumentService documentService) {
         final List<Document> documents = new ArrayList<Document>();
         for (final SDocumentMapping sDocumentMapping : attachments) {
-            final Document document = toDocument(sDocumentMapping);
+            final Document document = toDocument(sDocumentMapping,documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static Document toDocument(final SDocumentMapping attachment) {
+    public static Document toDocument(final SDocumentMapping attachment, DocumentService documentService) {
         final DocumentImpl documentImpl = new DocumentImpl();
-        documentImpl.setId(attachment.getId());
+        if(attachment instanceof SADocumentMapping){
+            documentImpl.setId(((SADocumentMapping) attachment).getSourceObjectId());
+        }else{
+            documentImpl.setId(attachment.getId());
+        }
         documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
         documentImpl.setName(attachment.getDocumentName());
         documentImpl.setAuthor(attachment.getDocumentAuthor());
@@ -1515,7 +1520,11 @@ public class ModelConvertor {
         documentImpl.setContentMimeType(attachment.getDocumentContentMimeType());
         documentImpl.setFileName(attachment.getDocumentContentFileName());
         documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setUrl(attachment.getDocumentURL());
+        if(attachment.documentHasContent()){
+            documentImpl.setUrl(documentService.generateDocumentURL(attachment.getDocumentName(),attachment.getContentStorageId()));
+        }else{
+            documentImpl.setUrl(attachment.getDocumentURL());
+        }
 
         return documentImpl;
     }

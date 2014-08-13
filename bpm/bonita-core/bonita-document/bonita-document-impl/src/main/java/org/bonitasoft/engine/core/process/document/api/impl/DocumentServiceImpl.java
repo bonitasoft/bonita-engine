@@ -68,9 +68,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public SDocumentMapping attachDocumentToProcessInstance(final SDocumentMapping document) throws SProcessDocumentCreationException {
         try {
-            SDocumentMapping docMapping = toDocumentMapping(document);
-            docMapping = documentMappingService.create(docMapping);
-            return docMapping;
+            return documentMappingService.create(document);
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
@@ -82,15 +80,14 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             SDocument sDocument = toSDocument(document);
             sDocument = documentContentService.storeDocumentContent(sDocument, documentContent);
-            SDocumentMapping docMapping = buildDocumentMapping(document, sDocument);
-            docMapping = documentMappingService.create(docMapping);
-            return docMapping;
+            SDocumentMapping docMapping = setStorageId(document, sDocument);
+            return documentMappingService.create(docMapping);
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
     }
 
-    private SDocumentMapping buildDocumentMapping(final SDocumentMapping document, final SDocument sDocument) {
+    SDocumentMapping setStorageId(final SDocumentMapping document, final SDocument sDocument) {
         final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
         builder.setDocumentStorageId(sDocument.getStorageId());
         builder.setHasContent(true);
@@ -126,7 +123,8 @@ public class DocumentServiceImpl implements DocumentService {
         } while (!sProcessDocuments.isEmpty());
     }
 
-    private String generateDocumentURL(final String name, final String contentStorageId) {
+    @Override
+    public String generateDocumentURL(final String name, final String contentStorageId) {
         return urlProvider.generateURL(name, contentStorageId);
     }
 
@@ -185,8 +183,7 @@ public class DocumentServiceImpl implements DocumentService {
             }
             final SDocumentMapping processDocument;
             if (archDocMapping == null) {// no archive = still the current element
-                final SDocumentMapping docMapping = documentMappingService.get(processInstanceId, documentName);
-                processDocument = docMapping;
+                processDocument = documentMappingService.get(processInstanceId, documentName);
             } else {
                 processDocument = archDocMapping;
             }
@@ -200,7 +197,7 @@ public class DocumentServiceImpl implements DocumentService {
     public byte[] getDocumentContent(final String documentStorageId) throws SProcessDocumentContentNotFoundException {
         try {
             return documentContentService.getContent(documentStorageId);
-        } catch (final Exception e) {
+        } catch (final SDocumentException e) {
             throw new SProcessDocumentContentNotFoundException(e);
         }
     }
@@ -242,20 +239,6 @@ public class DocumentServiceImpl implements DocumentService {
         } catch (final SBonitaException e) {
             throw new SDocumentException("Unable to list documents of process instance: " + processInstanceId, e);
         }
-    }
-
-    private String getDocumentUrl(final SADocumentMapping docMapping) {
-        if (docMapping.documentHasContent()) {
-            return generateDocumentURL(docMapping.getDocumentContentFileName(), docMapping.getContentStorageId());
-        }
-        return docMapping.getDocumentURL();
-    }
-
-    private String getDocumentUrl(final SDocumentMapping docMapping) {
-        if (docMapping.documentHasContent()) {
-            return generateDocumentURL(docMapping.getDocumentContentFileName(), docMapping.getContentStorageId());
-        }
-        return docMapping.getDocumentURL();
     }
 
     @Override
@@ -388,13 +371,6 @@ public class DocumentServiceImpl implements DocumentService {
         return result;
     }
 
-    private SDocumentMapping toDocumentMapping(final SDocumentMapping document) {
-        final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
-        builder.setDocumentURL(document.getDocumentURL());
-        return builder.done();
-    }
-
-
     private SDocument toSDocument(final SDocumentMapping document) {
         final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
         builder.setAuthor(document.getDocumentAuthor());
@@ -408,10 +384,8 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public SDocumentMapping updateDocumentOfProcessInstance(final SDocumentMapping document) throws SProcessDocumentCreationException {
         try {
-            SDocumentMapping docMapping = toDocumentMapping(document);
-            docMapping = documentMappingService.update(docMapping);
-            return docMapping;
-        } catch (final SBonitaException e) {
+            return  documentMappingService.update(document);
+        } catch (final SDocumentMappingException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
     }
@@ -425,7 +399,7 @@ public class DocumentServiceImpl implements DocumentService {
             SDocument sDocument = toSDocument(document);
             sDocument = documentContentService.storeDocumentContent(sDocument, documentContent);
             // we have the new document id (in the storage)
-            SDocumentMapping docMapping = buildDocumentMapping(document, sDocument);
+            SDocumentMapping docMapping = setStorageId(document, sDocument);
             docMapping = documentMappingService.update(docMapping);
             return docMapping;
         } catch (final SBonitaException e) {

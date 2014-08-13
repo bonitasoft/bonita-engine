@@ -11,7 +11,7 @@
 
     <artifactId>bonita-document-impl</artifactId>
 
-    <name>Bonita Process Document: Service Implementation</name>
+    <name>Bonita Document: Service Implementation</name>
 
     <dependencies>
         <dependency>

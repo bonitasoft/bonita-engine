@@ -105,7 +105,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
-        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document, documentService));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
-        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(parentDocument));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(parentDocument, documentService));
     }
 
     @Test
@@ -152,6 +152,6 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
-        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument, documentService));
     }
 }

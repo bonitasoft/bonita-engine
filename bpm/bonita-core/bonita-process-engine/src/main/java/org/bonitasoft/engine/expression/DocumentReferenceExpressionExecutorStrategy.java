@@ -90,7 +90,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
             } else {
                 document = documentService.getDocument(processInstanceId, expression.getContent());
             }
-            return ModelConvertor.toDocument(document);
+            return ModelConvertor.toDocument(document, documentService);
         } catch (final SDocumentNotFoundException e) {
             return null;
         }

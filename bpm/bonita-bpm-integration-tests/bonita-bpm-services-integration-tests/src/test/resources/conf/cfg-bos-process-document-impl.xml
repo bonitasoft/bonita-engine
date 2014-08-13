@@ -1,8 +1,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="processDocumentService" class="org.bonitasoft.engine.core.process.document.api.impl.ProcessDocumentServiceImpl">
-		<constructor-arg name="documentService" ref="documentService" />
+	<bean id="documentService" class="org.bonitasoft.engine.core.process.document.api.impl.DocumentServiceImpl">
+		<constructor-arg name="documentContentService" ref="documentContentService" />
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 		<constructor-arg name="urlProvider" ref="documentURLProvider" />
 	</bean>
