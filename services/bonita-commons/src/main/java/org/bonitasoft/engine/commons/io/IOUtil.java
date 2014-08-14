@@ -55,7 +55,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.w3c.dom.Document;
 
 /**
@@ -67,7 +66,7 @@ public class IOUtil {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    private static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
+    public static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -410,8 +409,7 @@ public class IOUtil {
                 result = result && deleteFile(file, attempts, sleepTime);
             }
         }
-        result = result && deleteFile(dir, attempts, sleepTime);
-        return result;
+        return result && deleteFile(dir, attempts, sleepTime);
     }
 
     public static boolean deleteFile(final File file, final int attempts, final long sleepTime) {
@@ -628,7 +626,7 @@ public class IOUtil {
                 try {
                     deleteDir(tmpDir);
                 } catch (final IOException e) {
-                    throw new SBonitaRuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         });

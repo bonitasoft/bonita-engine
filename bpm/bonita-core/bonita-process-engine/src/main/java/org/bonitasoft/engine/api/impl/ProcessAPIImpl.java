@@ -805,6 +805,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return baos.toByteArray();
             } finally {
                 zos.close();
+                baos.close();
             }
         } catch (final IOException e) {
             throw new ProcessExportException(e);
@@ -2241,7 +2242,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SCommentService scommentService = tenantAccessor.getCommentService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor.getFlowNodeStateManager().getStateBehaviors());
+            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor
+                    .getFlowNodeStateManager().getStateBehaviors());
             assignUserTask.execute();
         } catch (final SUserNotFoundException sunfe) {
             throw new UpdateException(sunfe);
@@ -3094,7 +3096,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
-            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(0, userTaskId, activityInstanceService, tenantAccessor.getFlowNodeStateManager().getStateBehaviors() );
+            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(0, userTaskId, activityInstanceService, tenantAccessor
+                    .getFlowNodeStateManager().getStateBehaviors());
             assignUserTask.execute();
         } catch (final SUnreleasableTaskException e) {
             throw new UpdateException(e);
@@ -4224,7 +4227,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *            do we also want to retrieve tasks directly assigned to this user ?
+     *        do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)

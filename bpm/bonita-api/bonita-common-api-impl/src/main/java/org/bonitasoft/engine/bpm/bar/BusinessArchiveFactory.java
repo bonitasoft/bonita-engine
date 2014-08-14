@@ -57,11 +57,14 @@ public class BusinessArchiveFactory {
      *         if the inpu stream does not contains a valide business archive
      */
     public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
-        final File barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchive");
-        IOUtil.unzipToFolder(inputStream, barFolder);
+        File barFolder = null;
 
-        final BusinessArchive businessArchive = new BusinessArchive();
         try {
+            barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchive");
+            IOUtil.unzipToFolder(inputStream, barFolder);
+
+            final BusinessArchive businessArchive = new BusinessArchive();
+
             for (final BusinessArchiveContribution contribution : contributions) {
                 if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
                     throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
@@ -127,7 +130,7 @@ public class BusinessArchiveFactory {
                 throw new IOException("unable to create Business archive on a file " + folderPath);
             }
         } else {
-            folderPath.mkdir();
+            folderPath.mkdirs();
         }
         for (final BusinessArchiveContribution contribution : contributions) {
             contribution.saveToBarFolder(businessArchive, folderPath);
@@ -148,9 +151,12 @@ public class BusinessArchiveFactory {
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
         // FIXME put it in tmp folder of the bonita home
         final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchiveFolder");
-        writeBusinessArchiveToFolder(businessArchive, tempFile);
-        zipBarFolder(businessArchiveFile, tempFile);
-        IOUtil.deleteDir(tempFile);
+        try {
+            writeBusinessArchiveToFolder(businessArchive, tempFile);
+            zipBarFolder(businessArchiveFile, tempFile);
+        } finally {
+            IOUtil.deleteDir(tempFile);
+        }
     }
 
     /**
@@ -173,11 +179,14 @@ public class BusinessArchiveFactory {
         if (businessArchiveFile.exists()) {
             throw new IOException("The destination file already exists " + businessArchiveFile.getAbsolutePath());
         }
-        final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(businessArchiveFile));
+
+        final FileOutputStream fileOutput = new FileOutputStream(businessArchiveFile);
+        final ZipOutputStream zos = new ZipOutputStream(fileOutput);
         try {
             IOUtil.zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
         } finally {
             zos.close();
+            fileOutput.close();
         }
     }
 

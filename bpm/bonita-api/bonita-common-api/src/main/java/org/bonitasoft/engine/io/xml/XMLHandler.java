@@ -114,9 +114,8 @@ public class XMLHandler {
         }
         if (parentNode == null) {
             return element;
-        } else {
-            return parentNode.appendChild(element);
         }
+        return parentNode.appendChild(element);
     }
 
     private Document getDocument(final XMLNode rootNode) {
@@ -129,19 +128,24 @@ public class XMLHandler {
     }
 
     public Object getObjectFromXML(final File file) throws XMLParseException, FileNotFoundException, IOException {
-        final InputStreamReader isr = new InputStreamReader(new FileInputStream(file), ENCODING);
-        Object objectFromXML = null;
+        FileInputStream inputStream = null;
+        InputStreamReader isr = null;
         try {
-            objectFromXML = getObjectFromXML(isr);
+            inputStream = new FileInputStream(file);
+            isr = new InputStreamReader(inputStream, ENCODING);
+            return getObjectFromXML(isr);
         } finally {
-            isr.close();
+            if (isr != null) {
+                isr.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
-        return objectFromXML;
     }
 
     public Object getObjectFromXML(final Reader xmlReader) throws IOException, XMLParseException {
-        final BindingHandler handler;
-        handler = new BindingHandler(bindings);
+        final BindingHandler handler = new BindingHandler(bindings);
         final XMLParserErrorHandler errorhandler = new XMLParserErrorHandler();
         try {
             final XMLReader reader = XMLReaderFactory.createXMLReader();

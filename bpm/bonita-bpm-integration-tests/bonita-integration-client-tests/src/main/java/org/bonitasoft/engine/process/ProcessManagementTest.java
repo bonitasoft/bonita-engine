@@ -63,6 +63,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
@@ -563,11 +564,9 @@ public class ProcessManagementTest extends CommonAPITest {
         businessArchiveBuilder.addExternalResource(new BarResource(dummyFile, dummyText.getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource(documentFile, documentText.getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource("folder/image.jpg", "UNUSED".getBytes()));
-        final BusinessArchive businessArchive = businessArchiveBuilder.done();
-        final File tempFile = File.createTempFile("testbar", ".bar");
-        tempFile.deleteOnExit();
+        final File tempFile = IOUtil.createTempFile("testbar", ".bar", new File(IOUtil.TMP_DIRECTORY));
         tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
+        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchiveBuilder.done(), tempFile);
 
         // read from the file
         final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
@@ -583,6 +582,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final byte[] doc = resources.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + documentFile);
         assertTrue("File content not the expected", Arrays.equals(documentText.getBytes(), doc));
 
+        tempFile.delete();
         deleteProcess(processDefinition);
     }
 

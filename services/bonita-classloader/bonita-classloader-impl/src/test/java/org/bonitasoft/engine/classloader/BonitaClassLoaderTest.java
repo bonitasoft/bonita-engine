@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.Test;
 
 public class BonitaClassLoaderTest {
@@ -28,7 +29,7 @@ public class BonitaClassLoaderTest {
     public void releaseShouldRemoveAllScopeFolderAndItsContent() {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
-        final File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest" + System.currentTimeMillis());
+        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest");
 
         // given
         assertThat(tempDir).as("tempDir:%s should not exists before bonitaClassLoader init", tempDir.getAbsolutePath()).doesNotExist();

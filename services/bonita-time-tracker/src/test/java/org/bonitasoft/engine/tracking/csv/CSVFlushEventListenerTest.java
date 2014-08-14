@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractTimeTrackerTest;
 import org.bonitasoft.engine.tracking.FlushResult;
@@ -45,7 +46,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
     @Test(expected = RuntimeException.class)
     public void should_fail_if_outputfolder_is_a_file() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final File file = new File(System.getProperty("java.io.tmpdir"), "test.txt");
+        final File file = IOUtil.createTempFile("test", ".txt", new File(IOUtil.TMP_DIRECTORY));
         file.createNewFile();
 
         new CSVFlushEventListener(logger, file.getAbsolutePath(), ";");

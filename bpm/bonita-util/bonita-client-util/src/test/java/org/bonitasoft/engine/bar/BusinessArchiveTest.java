@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2011, 2013-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.bar;
 
 import static org.junit.Assert.assertEquals;
@@ -61,93 +74,93 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class BusinessArchiveTest {
 
     private static final String ASSIGN_OPERATOR = "=";
 
-    @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void invalidBOSHashIsRejected() throws Exception {
-        final File tempFolder = createTempFile();
+    private File tempFolder;
 
-        try {
-            final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
-            final DesignProcessDefinition process = processDefinitionBuilder.done();
-            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-            BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
-            final File infoFile = new File(tempFolder, ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
-            IOUtil.writeContentToFile("bad process infos", infoFile);
-            BusinessArchiveFactory.readBusinessArchive(tempFolder);
-        } finally {
-            deleteDir(tempFolder);
-        }
+    private File barFile;
+
+    @Before
+    public void before() throws IOException {
+        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("businessArchiveFolder");
+        tempFolder.delete();
+        barFile = IOUtil.createTempFileInDefaultTempDirectory("businessArchive", ".bar");
+        barFile.delete();
     }
 
-    private File createTempFile() throws IOException {
-        final File tempFolder = File.createTempFile("businessArchive", "folder");
-        tempFolder.delete();
+    @After
+    public void after() throws IOException {
+        IOUtil.deleteFile(barFile, 1, 0);
+        IOUtil.deleteDir(tempFolder);
+    }
 
+    @Test(expected = InvalidBusinessArchiveFormatException.class)
+    public void invalidBOSHashIsRejected() throws Exception {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
+        final DesignProcessDefinition process = processDefinitionBuilder.done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+        final File infoFile = getFile(ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
+        IOUtil.writeContentToFile("bad process infos", infoFile);
+        BusinessArchiveFactory.readBusinessArchive(tempFolder);
+    }
+
+    private File getFile(final String fileName) {
+        final File infoFile = new File(tempFolder, fileName);
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
-                if (tempFolder != null) {
-                    deleteDir(tempFolder);
+                if (infoFile != null) {
+                    IOUtil.deleteFile(infoFile, 1, 0);
                 }
             }
         });
-        return tempFolder;
+        return infoFile;
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void barWithNoHashIsRejected() throws Exception {
-        final File tempFolder = createTempFile();
-
-        try {
-            final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
-            final DesignProcessDefinition process = processDefinitionBuilder.done();
-            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-            BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
-            final File infoFile = new File(tempFolder, ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
-            infoFile.delete();
-            BusinessArchiveFactory.readBusinessArchive(tempFolder);
-        } finally {
-            deleteDir(tempFolder);
-        }
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
+        final DesignProcessDefinition process = processDefinitionBuilder.done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+        final File infoFile = getFile(ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
+        infoFile.delete();
+        BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
     @Test
     public void createBusinessArchiveFolder() throws Exception {
-        final File tempFile = createTempFile();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-        assertTrue(tempFile.exists());
-        assertTrue(tempFile.isDirectory());
-        final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+        assertTrue(tempFolder.exists());
+        assertTrue(tempFolder.isDirectory());
+        final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         assertTrue(file.exists());
         assertFalse(file.isDirectory());
-        deleteDir(tempFile);
     }
 
     @Test
     public void createBusinessArchiveFileFromFolder() throws Exception {
-        final File tempFile = createTempFile();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
 
-        BusinessArchiveFactory.businessArchiveFolderToFile(barFile, tempFile.getAbsolutePath());
+        BusinessArchiveFactory.businessArchiveFolderToFile(barFile, tempFolder.getAbsolutePath());
         assertTrue(barFile.exists());
 
         final InputStream inputStream = new FileInputStream(barFile);
@@ -156,55 +169,38 @@ public class BusinessArchiveTest {
         final ProcessDefinition result = businessArchive2.getProcessDefinition();
 
         assertEquals(process, result);
-        barFile.delete();
-        deleteDir(tempFile);
     }
 
     @Test
     public void createBusinessArchiveFromFile() throws Exception {
-        final File tempFile = createTempFile();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
 
-        BusinessArchiveFactory.businessArchiveFolderToFile(barFile, tempFile.getAbsolutePath());
+        BusinessArchiveFactory.businessArchiveFolderToFile(barFile, tempFolder.getAbsolutePath());
         assertTrue(barFile.exists());
         final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(barFile);
         final ProcessDefinition result = businessArchive2.getProcessDefinition();
 
         assertEquals(process, result);
-        barFile.delete();
-        deleteDir(tempFile);
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidBusinessArchive() throws Exception {
-        final File tempFile = createTempFile();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-        final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+        final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         file.delete();
-        file.createNewFile();
+        createNewFile(file);
         final FileWriter fileWriter = new FileWriter(file);
         fileWriter.write("test");
         fileWriter.flush();
         fileWriter.close();
-        try {
-            BusinessArchiveFactory.readBusinessArchive(tempFile);
-        } finally {
-            barFile.delete();
-            deleteDir(tempFile);
 
-        }
+        BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
     @Test(expected = IOException.class)
@@ -229,22 +225,17 @@ public class BusinessArchiveTest {
 
     @Test
     public void exportBusinessArchiveAsFile() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
         assertTrue(barFile.exists());
         assertFalse(barFile.isDirectory());
-        barFile.delete();
     }
 
     @Test(expected = IOException.class)
     public void exportBusinessArchiveAsFileOnExistingFile() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-
+        barFile = IOUtil.createTempFileInDefaultTempDirectory("exportBusinessArchiveAsFileOnExistingFile-businessArchive", ".bar");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
@@ -253,9 +244,6 @@ public class BusinessArchiveTest {
 
     @Test
     public void readBusinessArchive() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
@@ -267,20 +255,20 @@ public class BusinessArchiveTest {
         final ProcessDefinition result = businessArchive2.getProcessDefinition();
 
         assertEquals(process, result);
-        barFile.delete();
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void importOldBusinessArchiveFail() throws Exception {
         final InputStream resourceAsStream = this.getClass().getResourceAsStream("MyProcess--1.0.bar");
-        BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
-        resourceAsStream.close();
+        try {
+            BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
+        } finally {
+            resourceAsStream.close();
+        }
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void importOldBusinessArchiveFileFail() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
         final InputStream inputStream = this.getClass().getResourceAsStream("MyProcess--1.0.bar");
         final OutputStream out = new FileOutputStream(barFile);
         final byte buf[] = new byte[1024];
@@ -290,24 +278,7 @@ public class BusinessArchiveTest {
         }
         out.close();
         inputStream.close();
-        try {
-            BusinessArchiveFactory.readBusinessArchive(barFile);
-        } finally {
-            barFile.delete();
-        }
-    }
-
-    private static boolean deleteDir(final File dir) {
-        if (dir.isDirectory()) {
-            final String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                final boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-        return dir.delete();
+        BusinessArchiveFactory.readBusinessArchive(barFile);
     }
 
     @Test
@@ -318,15 +289,11 @@ public class BusinessArchiveTest {
                 .addExternalResource(new BarResource("dummy.txt", new byte[] { 'a', 'b', 'c', 'd' })).done();
 
         // Add a resource to the biz archive:
-        final File tempFile = File.createTempFile("testbar", ".bar");
-        tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
+        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         // read from the file
-        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
-        // final ProcessDefinition processDefinition = processAPI.deploy(readBusinessArchive);
+        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(barFile);
         assertTrue("Added resource not found in BusinessArchive", readBusinessArchive.getResources().containsKey("resources/dummy.txt"));
-        tempFile.delete();
     }
 
     @Test
@@ -338,23 +305,17 @@ public class BusinessArchiveTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                 .setActorMapping(xmlBytes).done();
 
-        final File tempFile = File.createTempFile("testbar", ".bar");
-        tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
+        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         // read from the file
-        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
+        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(barFile);
         // final ProcessDefinition processDefinition = processAPI.deploy(readBusinessArchive);
         assertTrue("Actor Mapping not found in BusinessArchive",
                 Arrays.equals(xmlBytes, readBusinessArchive.getResource(ActorMappingContribution.ACTOR_MAPPING_FILE)));
-        tempFile.delete();
     }
 
     @Test
     public void readProcessFromBusinessArchive() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
@@ -541,8 +502,6 @@ public class BusinessArchiveTest {
                 assertEquals(connectorDefinition.getFailAction(), nextResultConnector.getFailAction());
             }
         }
-
-        barFile.delete();
     }
 
     @Test
@@ -716,7 +675,6 @@ public class BusinessArchiveTest {
         assertEquals(true, loop2.isTestBefore());
         assertEquals("true", loop2.getLoopCondition().getContent());
         assertEquals("5", loop2.getLoopMax().getContent());
-
     }
 
     @Test
@@ -835,8 +793,7 @@ public class BusinessArchiveTest {
         opb.setOperator(ASSIGN_OPERATOR);
         opb.setRightOperand(rightOperand);
         opb.setType(OperatorType.ASSIGNMENT);
-        final Operation op = opb.done();
-        return op;
+        return opb.done();
     }
 
     private void checkProcessForCallActivity(final DesignProcessDefinition process, final DesignProcessDefinition result) {
@@ -955,9 +912,6 @@ public class BusinessArchiveTest {
     }
 
     private DesignProcessDefinition getDesignProcessDefinition(final ProcessDefinitionBuilder builder) throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final DesignProcessDefinition process = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
@@ -973,9 +927,6 @@ public class BusinessArchiveTest {
 
     @Test
     public void readProcessWithActorWithoutDescription() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcessTT", "1.0");
         processDefinitionBuilder.addActor("Truck Driver");
         processDefinitionBuilder.addStartEvent("start1");
@@ -1020,14 +971,13 @@ public class BusinessArchiveTest {
         assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
         assertEquals(process.getProcessContainer().getConnectors().size(), result.getProcessContainer().getConnectors().size());
         assertEquals(process.getProcessContainer().getConnectors().iterator().next(), result.getProcessContainer().getConnectors().iterator().next());
-
-        barFile.delete();
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidProcessFromBusinessArchive() throws Exception {
-        final File tempFile = createTempFile();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
+        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("readInvalidProcessFromBusinessArchive_businessArchiveFolder");
+        tempFolder.delete();
+        barFile = IOUtil.createTempFileInDefaultTempDirectory("readInvalidProcessFromBusinessArchive_businessArchive", ".bar");
         barFile.delete();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
@@ -1045,29 +995,24 @@ public class BusinessArchiveTest {
 
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
 
-        final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+        final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         String fileContent = IOUtil.read(file);
         fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
         fileContent = fileContent.replace("</processDefinition", "</porcessDefinition");
         file.delete();
-        file.createNewFile();
+        createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
-        try {
-            BusinessArchiveFactory.readBusinessArchive(tempFile);
-        } finally {
-            barFile.delete();
-            deleteDir(tempFile);
-
-        }
-        barFile.delete();
+        deleteDirOnExit();
+        BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidXMLProcessFromBusinessArchive() throws Exception {
-        final File tempFile = createTempFile();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
+        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("readInvalidXMLProcessFromBusinessArchive_businessArchiveFolder");
+        tempFolder.delete();
+        barFile = IOUtil.createTempFileInDefaultTempDirectory("readInvalidXMLProcessFromBusinessArchive_businessArchive", ".bar");
         barFile.delete();
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
@@ -1082,25 +1027,47 @@ public class BusinessArchiveTest {
         processDefinitionBuilder.addTransition("user1", "gate1");
         processDefinitionBuilder.addTransition("user1", "end1");
         processDefinitionBuilder.addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH);
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done())
+                .done();
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
 
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-
-        final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+        final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         String fileContent = IOUtil.read(file);
         fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
         file.delete();
-        file.createNewFile();
+        createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
-        try {
-            BusinessArchiveFactory.readBusinessArchive(tempFile);
-        } finally {
-            barFile.delete();
-            deleteDir(tempFile);
+        deleteDirOnExit();
+        BusinessArchiveFactory.readBusinessArchive(tempFolder);
+    }
 
-        }
-        barFile.delete();
+    private void createNewFile(final File file) throws IOException {
+        file.createNewFile();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (file != null) {
+                    IOUtil.deleteFile(file, 1, 0);
+                }
+            }
+        });
+    }
+
+    private void deleteDirOnExit() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (tempFolder != null) {
+                    try {
+                        IOUtil.deleteDir(tempFolder);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
@@ -1130,7 +1097,7 @@ public class BusinessArchiveTest {
     }
 
     @Test
-    public void testSubProcess() throws Exception {
+    public void subProcess() throws Exception {
         final Expression createdExpression = new ExpressionBuilder().createConstantBooleanExpression(false);
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
@@ -1145,10 +1112,7 @@ public class BusinessArchiveTest {
     }
 
     @Test
-    public void testGeneratingOutgoingDefaultTransitionShouldBeConformToProcessDefinitionXsd() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
+    public void generatingOutgoingDefaultTransitionShouldBeConformToProcessDefinitionXsd() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1");
@@ -1161,15 +1125,15 @@ public class BusinessArchiveTest {
         processDefinitionBuilder.addTransition("Gateway1", "end2");
         processDefinitionBuilder.addDefaultTransition("Gateway1", "end3");
 
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done())
+                .done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         BusinessArchiveFactory.readBusinessArchive(barFile);
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void testReadBarWithConnectorFailActionsFails() throws Exception {
+    public void readBarWithConnectorFailActionsFails() throws Exception {
         BusinessArchiveFactory.readBusinessArchive(BusinessArchiveTest.class.getResourceAsStream("testBuy_a_mini_extended--6.1.bar"));
     }
 
