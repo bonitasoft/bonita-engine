@@ -8,28 +8,24 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model.impl;
 
-import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SFlowNodeSimpleRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  */
-public abstract class SSimpleRefBusinessDataInstanceImpl extends SRefBusinessDataInstanceImpl implements SSimpleRefBusinessDataInstance {
+public class SFlowNodeSimpleRefBusinessDataInstanceImpl extends SSimpleRefBusinessDataInstanceImpl implements SFlowNodeSimpleRefBusinessDataInstance {
 
-    private static final long serialVersionUID = -6240483858780514216L;
+    private static final long serialVersionUID = 5486560338692349006L;
 
-    private Long dataId;
-
-    public SSimpleRefBusinessDataInstanceImpl() {
-        super();
-    }
+    private long flowNodeInstanceId;
 
     @Override
-    public Long getDataId() {
-        return dataId;
+    public long getFlowNodeInstanceId() {
+        return flowNodeInstanceId;
     }
 
-    public void setDataId(final Long dataId) {
-        this.dataId = dataId;
+    public void setFlowNodeInstanceId(final long flowNodeInstanceId) {
+        this.flowNodeInstanceId = flowNodeInstanceId;
     }
 
 }

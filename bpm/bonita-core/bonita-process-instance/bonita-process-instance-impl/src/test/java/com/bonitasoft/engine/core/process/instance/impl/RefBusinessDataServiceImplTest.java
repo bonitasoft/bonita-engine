@@ -27,6 +27,7 @@ import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDa
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.impl.SProcessSimpleRefBusinessDataInstanceImpl;
 import com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl;
 import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilderExt;
 
@@ -53,7 +54,7 @@ public class RefBusinessDataServiceImplTest {
     }
 
     private SSimpleRefBusinessDataInstanceImpl buildSRefBusinessDataInstance() {
-        final SSimpleRefBusinessDataInstanceImpl instance = new SSimpleRefBusinessDataInstanceImpl();
+        final SSimpleRefBusinessDataInstanceImpl instance = new SProcessSimpleRefBusinessDataInstanceImpl();
         instance.setName("myLeaveRequest");
         instance.setDataId(45l);
         instance.setDataClassName("org.bonitasoft.LeaveRequest");

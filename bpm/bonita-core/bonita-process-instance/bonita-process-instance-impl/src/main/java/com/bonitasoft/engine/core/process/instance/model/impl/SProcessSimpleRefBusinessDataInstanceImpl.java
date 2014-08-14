@@ -8,28 +8,24 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model.impl;
 
-import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SProcessSimpleRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  */
-public abstract class SSimpleRefBusinessDataInstanceImpl extends SRefBusinessDataInstanceImpl implements SSimpleRefBusinessDataInstance {
+public class SProcessSimpleRefBusinessDataInstanceImpl extends SSimpleRefBusinessDataInstanceImpl implements SProcessSimpleRefBusinessDataInstance {
 
-    private static final long serialVersionUID = -6240483858780514216L;
+    private static final long serialVersionUID = -1612711169274459075L;
 
-    private Long dataId;
-
-    public SSimpleRefBusinessDataInstanceImpl() {
-        super();
-    }
+    private long processInstanceId;
 
     @Override
-    public Long getDataId() {
-        return dataId;
+    public long getProcessInstanceId() {
+        return processInstanceId;
     }
 
-    public void setDataId(final Long dataId) {
-        this.dataId = dataId;
+    public void setProcessInstanceId(final long processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
 }

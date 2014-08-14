@@ -160,6 +160,9 @@
                 <entry key="com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl" />
 				<entry key="com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl" />
                 <entry key="com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SMultiRefBusinessDataInstanceImpl" />
+                <entry key="com.bonitasoft.engine.core.process.instance.model.SProcessSimpleRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SProcessSimpleRefBusinessDataInstanceImpl" />
+                <entry key="com.bonitasoft.engine.core.process.instance.model.SFlowNodeSimpleRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeSimpleRefBusinessDataInstanceImpl" />
+                <entry key="com.bonitasoft.engine.core.process.instance.model.SProcessMultiRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SProcessMultiRefBusinessDataInstanceImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="com.bonitasoft.engine.core.reporting.SReportImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />

@@ -78,6 +78,19 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
+    public SRefBusinessDataInstance getFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
+        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectDescriptorBuilderExt.getSFlowNodeRefBusinessDataInstance(name,
+                flowNodeInstanceId);
+        final SRefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
+        if (ref == null) {
+            //FIXME
+            throw new SRefBusinessDataInstanceNotFoundException(flowNodeInstanceId, name);
+        }
+        return ref;
+    }
+
+    @Override
     public SRefBusinessDataInstance addRefBusinessDataInstance(final SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException {
         final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUISNESS_DATA_INSTANCE_ADDED);
         final InsertRecord insertRecord = new InsertRecord(instance);
@@ -150,6 +163,13 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         } catch (final SRecorderException sre) {
             throw new SRefBusinessDataInstanceModificationException(sre);
         }
+    }
+
+    @Override
+    public int getNumberOfDataOfMultiRefBusinessData(final String name, final long processInstanceId) throws SBonitaReadException {
+        final SelectOneDescriptor<Integer> descriptor = SelectDescriptorBuilderExt.getNumberOfDataOfMultiRefBusinessData(name,
+                processInstanceId);
+        return persistenceRead.selectOne(descriptor);
     }
 
 }

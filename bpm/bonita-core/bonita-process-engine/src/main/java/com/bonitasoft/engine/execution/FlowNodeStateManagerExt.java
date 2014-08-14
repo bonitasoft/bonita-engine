@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -38,12 +38,14 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 
 /**
  * SP implementation of the activity state manager.
- * 
+ *
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
 
@@ -57,11 +59,15 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final ContainerRegistry containerRegistry, final ArchiveService archiveService, final TechnicalLoggerService logger,
             final DocumentMappingService documentMappingService, final SCommentService commentService,
             final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
+            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService,
+            final IdentityService identityService, final RefBusinessDataService refBusinessDataService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
                 operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
-                eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService);
+                eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService, new StateBehaviorsExt(bpmInstancesCreator,
+                        eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService, connectorInstanceService,
+                        expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService, containerRegistry,
+                        eventInstanceService, schedulerService, commentService, identityService, logger, tokenService, refBusinessDataService));
         this.breakpointService = breakpointService;
     }
 
@@ -74,7 +80,7 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
     }
 
     private FlowNodeState handleBreakPoints(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
-            final FlowNodeState flowNodeState, final FlowNodeState current, int nextState) throws SActivityExecutionException {
+            final FlowNodeState flowNodeState, final FlowNodeState current, final int nextState) throws SActivityExecutionException {
         try {
             if (!current.isInterrupting() && breakpointService.isBreakpointActive()) {
                 final SBreakpoint breakPointFor = breakpointService.getBreakPointFor(processDefinition.getId(), flowNodeInstance.getRootContainerId(),
