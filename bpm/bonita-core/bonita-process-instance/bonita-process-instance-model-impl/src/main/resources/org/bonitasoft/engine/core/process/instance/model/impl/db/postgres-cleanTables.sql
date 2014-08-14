@@ -1,3 +1,7 @@
+DELETE FROM multi_biz_data;
+
+DELETE FROM ref_biz_data_inst;
+
 DELETE FROM hidden_activity;
 
 DELETE FROM pending_mapping;
@@ -17,7 +21,3 @@ DELETE FROM token;
 DELETE FROM process_instance;
 
 DELETE FROM breakpoint;
-
-DELETE FROM multi_biz_data;
-
-DELETE FROM ref_biz_data_inst;

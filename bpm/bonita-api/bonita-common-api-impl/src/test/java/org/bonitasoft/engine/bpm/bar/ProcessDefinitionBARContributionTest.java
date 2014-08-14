@@ -51,7 +51,7 @@ public class ProcessDefinitionBARContributionTest {
         assertEquals(designProcessDefinition, resultDesignProcessDefinition);
 
         // Clean up
-        File[] listFiles = processDesignFolder.listFiles();
+        final File[] listFiles = processDesignFolder.listFiles();
         for (int i = 0; i < listFiles.length; i++) {
             listFiles[i].delete();
         }
@@ -69,9 +69,9 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addActor("actor2").addDescription(DESCRIPTION);
         processBuilder.addDescription(DESCRIPTION);
         processBuilder.addAutomaticTask("AutomaticTask").addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
-                .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
+        .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
         processBuilder.addUserTask("UserTask", ACTOR_NAME).addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0")
-                .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
+        .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
         processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
         processBuilder.addDocumentDefinition("Doc").addUrl("plop");
         processBuilder.addGateway("Gateway", GatewayType.PARALLEL).addDescription(DESCRIPTION);
@@ -88,8 +88,8 @@ public class ProcessDefinitionBARContributionTest {
     public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage("Wrong version");
-        String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
-        File createTempFile = File.createTempFile("old", "process.xml");
+        final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
+        final File createTempFile = File.createTempFile("old", "process.xml");
         IOUtil.writeContentToFile(allContentFrom, createTempFile);
         try {
             new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
@@ -102,7 +102,7 @@ public class ProcessDefinitionBARContributionTest {
     public void should_checkVersion_with_old_content_thrown_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception
-                .expectMessage("6.0 namespace is not compatible with your current version");
+        .expectMessage("6.0 namespace is not compatible with your current version");
 
         new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
 

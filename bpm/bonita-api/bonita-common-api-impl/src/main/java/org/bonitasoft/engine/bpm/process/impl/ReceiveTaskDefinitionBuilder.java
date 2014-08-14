@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,12 +31,12 @@ public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Adds a correlation on this receive task.
-     * <p> 
+     * <p>
      * It's possible to define up to five correlations. If more then five correlations are defined, the
      * process becomes invalid.
      * <p>
-     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization 
-     * 
+     * The expressions representing correlation key and correlation value are evaluated once during the flow node initialization
+     *
      * @param correlationKey expression representing the correlation key
      * @param value expression representing the correlation value
      * @return
@@ -52,13 +52,14 @@ public class ReceiveTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Adds the given operation on this message event. Operations added here can be used to initialize process data from message content.
-     * 
+     *
      * @param operation
      *            operation to be added
      * @return
      */
-    public void addMessageOperation(final Operation operation) {
+    public ReceiveTaskDefinitionBuilder addMessageOperation(final Operation operation) {
         getActivity().addMessageOperation(operation);
+        return this;
     }
 
     @Override

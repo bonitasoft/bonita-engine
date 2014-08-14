@@ -42,10 +42,6 @@ public class MultiInstanceLoopCharacteristics implements LoopCharacteristics {
         this.loopCardinality = loopCardinality;
     }
 
-    /**
-     * @param isSequential2
-     * @param loopDataInputRef2
-     */
     public MultiInstanceLoopCharacteristics(final boolean isSequential, final String loopDataInputRef) {
         this.isSequential = isSequential;
         this.loopDataInputRef = loopDataInputRef;
