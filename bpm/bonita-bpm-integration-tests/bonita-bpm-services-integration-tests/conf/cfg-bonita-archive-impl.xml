@@ -4,9 +4,9 @@
 	<bean id="archivingStrategy" class="com.bonitasoft.engine.archive.impl.ListArchivingStrategy">
 		<constructor-arg name="archives">
 			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="true" />
-        		<entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="true" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="true" />
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="true" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="true" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="true" />
