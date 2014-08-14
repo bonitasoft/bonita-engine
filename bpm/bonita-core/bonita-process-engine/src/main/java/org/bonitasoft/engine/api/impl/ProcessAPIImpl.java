@@ -252,7 +252,6 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
@@ -931,8 +930,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     (SUserTaskInstance) flowNodeInstance);
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-            if (!isContractValid(contractDefinition, parameters)) {
-                throw new SFlowNodeExecutionException("Contract is not valid");
+            final ContractValidator validator = new ContractValidator();
+            if (!validator.isValid(contractDefinition, parameters)) {
+                throw new SFlowNodeExecutionException("Contract is not valid: " + validator.getComments());
             }
         }
 
@@ -944,15 +944,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             lockService.unlock(lock, tenantAccessor.getTenantId());
         }
-    }
-
-    protected boolean isContractValid(final SContractDefinition contract, final Map<String, Object> parameters) {
-        for (final SInputDefinition input : contract.getInputs()) {
-            if (!parameters.containsKey(input.getName())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,

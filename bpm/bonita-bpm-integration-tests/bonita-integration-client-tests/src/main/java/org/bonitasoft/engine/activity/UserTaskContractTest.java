@@ -17,6 +17,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
@@ -102,7 +103,8 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("task1", ACTOR_NAME);
-        userTaskBuilder.addContract().addInput("numberOfDays", Integer.class.getName(), null);
+        userTaskBuilder.addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         builder.addUserTask("task2", ACTOR_NAME).addTransition("task1", "task2");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -114,6 +116,41 @@ public class UserTaskContractTest extends CommonAPITest {
         inputs.put("numberOfDays", 8);
         getProcessAPI().executeFlowNode(userTask.getId(), inputs);
         waitForUserTask("task2");
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void getExceptionWhenContractIsNotValidWithRules() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("task1");
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
+
+        try {
+            final Map<String, Object> inputs = new HashMap<String, Object>();
+            inputs.put("numberOfDays", null);
+            getProcessAPI().executeFlowNode(userTask.getId(), inputs);
+            fail("The contract is not enforced");
+        } catch (final FlowNodeExecutionException e) {
+            final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
+            assertThat(state).isEqualTo("ready");
+        }
+
+        try {
+            final Map<String, Object> inputs = new HashMap<String, Object>();
+            inputs.put("numberOfDay", 9);
+            getProcessAPI().executeFlowNode(userTask.getId(), inputs);
+            fail("The contract is not enforced");
+        } catch (final BonitaRuntimeException e) {
+            final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
+            assertThat(state).isEqualTo("ready");
+        }
 
         disableAndDeleteProcess(processDefinition);
     }
