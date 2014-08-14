@@ -34,6 +34,16 @@ public class JDTCompilerTest {
 
     private File createTempDirectory() throws IOException {
         final File outputdirectory = File.createTempFile("testFolder", "");
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (outputdirectory != null) {
+                    outputdirectory.delete();
+                }
+            }
+        });
+
         // in order to create a directory, we have to delete it first ... !!
         outputdirectory.delete();
         outputdirectory.mkdir();

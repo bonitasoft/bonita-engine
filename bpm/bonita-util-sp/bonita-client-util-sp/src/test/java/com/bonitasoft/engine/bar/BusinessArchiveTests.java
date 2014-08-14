@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -76,8 +77,7 @@ public class BusinessArchiveTests {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void invalidSPHashIsRejected() throws Exception {
-        final File tempFolder = File.createTempFile("businessArchive", "folder");
-        tempFolder.delete();
+        final File tempFolder = createTempFile();
 
         try {
             final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MySPProcess", "1.0");
@@ -92,10 +92,25 @@ public class BusinessArchiveTests {
         }
     }
 
-    @Test
-    public void validSPHashIsAccepted() throws Exception {
+    private File createTempFile() throws IOException {
         final File tempFolder = File.createTempFile("businessArchive", "folder");
         tempFolder.delete();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (tempFolder != null) {
+                    deleteDir(tempFolder);
+                }
+            }
+        });
+        return tempFolder;
+    }
+
+    @Test
+    public void validSPHashIsAccepted() throws Exception {
+        final File tempFolder = createTempFile();
 
         try {
             final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MySPProcess", "1.1");
@@ -113,8 +128,7 @@ public class BusinessArchiveTests {
 
     @Test
     public void validBOSHashIsAccepted() throws Exception {
-        final File tempFolder = File.createTempFile("businessArchive", "folder");
-        tempFolder.delete();
+        final File tempFolder = createTempFile();
 
         try {
             final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
@@ -498,8 +512,7 @@ public class BusinessArchiveTests {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidProcessFromBusinessArchive() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
@@ -540,8 +553,7 @@ public class BusinessArchiveTests {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidXMLProcessFromBusinessArchive() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
+        final File tempFile = createTempFile();
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
