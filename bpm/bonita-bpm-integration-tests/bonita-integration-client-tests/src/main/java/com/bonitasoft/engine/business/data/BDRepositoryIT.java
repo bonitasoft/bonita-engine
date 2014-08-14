@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +44,7 @@ import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -155,7 +164,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Before
     public void setUp() throws Exception {
-        clientFolder = com.bonitasoft.engine.io.IOUtils.createTempDirectory("bdr_it_client");
+        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
         loginOnDefaultTenantWithDefaultTechnicalLogger();
         matti = createUser("matti", "bpm");
 
