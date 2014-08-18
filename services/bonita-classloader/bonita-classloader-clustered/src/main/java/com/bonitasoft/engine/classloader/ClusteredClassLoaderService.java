@@ -85,7 +85,6 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     @Override
     public void removeAllLocalClassLoaders(final String type) {
         classLoaderService.removeAllLocalClassLoaders(type);
-
     }
 
     @Override
@@ -149,10 +148,12 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
     @Override
     public void start() throws SBonitaException {
+        classLoaderService.start();
     }
 
     @Override
     public void stop() throws SBonitaException {
+        classLoaderService.stop();
     }
 
     @Override
