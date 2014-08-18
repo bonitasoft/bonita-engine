@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -50,7 +51,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final String temporaryFolder;
 
-    private final VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
@@ -144,7 +145,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final String key = getKey(type, id);
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
-            localClassLoader.release();
+            localClassLoader.destroy();
             localClassLoaders.remove(key);
         }
 
@@ -183,7 +184,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             if (key.startsWith(application + SEPARATOR)) {
                 final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
                 if (localClassLoader != null) {
-                    localClassLoader.release();
+                    localClassLoader.destroy();
                 }
                 localClassLoaders.remove(key);
             }
@@ -213,8 +214,28 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private void refreshLocalClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
             final URI temporaryFolder, final ClassLoader parent) {
-        virtualClassloader.release();
+        virtualClassloader.destroy();
         final BonitaClassLoader classloader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
         virtualClassloader.setClassLoader(classloader);
+    }
+
+    @Override
+    public void start() throws SBonitaException {
+        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    }
+
+    @Override
+    public void stop() throws SBonitaException {
+        virtualGlobalClassLoader.destroy();
+    }
+
+    @Override
+    public void pause() throws SBonitaException {
+        // Nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // Nothing to do
     }
 }

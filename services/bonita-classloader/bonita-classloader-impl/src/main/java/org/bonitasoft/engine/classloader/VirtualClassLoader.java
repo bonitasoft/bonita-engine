@@ -86,7 +86,7 @@ public class VirtualClassLoader extends ClassLoader {
         }
         return getParent().getResource(name);
     }
-    
+
     @Override
     public Enumeration<URL> getResources(final String name) throws IOException {
         if (classloader != null) {
@@ -94,8 +94,8 @@ public class VirtualClassLoader extends ClassLoader {
         }
         return getParent().getResources(name);
     }
-    
-    public void release() {
+
+    public void destroy() {
         if (classloader != null) {
             classloader.destroy();
         }
