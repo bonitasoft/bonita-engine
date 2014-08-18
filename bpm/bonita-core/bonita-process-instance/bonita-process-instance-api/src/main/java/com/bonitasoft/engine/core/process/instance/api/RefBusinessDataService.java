@@ -28,8 +28,11 @@ public interface RefBusinessDataService {
 
     String REF_BUSINESS_DATA_INSTANCE = "REF_BUSINESS_DATA_INSTANCE";
 
-    SRefBusinessDataInstance getRefBusinessDataInstance(String name, long processInstanceId) throws SRefBusinessDataInstanceNotFoundException,
-    SBonitaReadException;
+    SRefBusinessDataInstance getRefBusinessDataInstance(String name, long processInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
+
+    SRefBusinessDataInstance getFlowNodeRefBusinessDataInstance(String name, long flowNodeInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
     SRefBusinessDataInstance addRefBusinessDataInstance(SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException;
 
@@ -38,5 +41,7 @@ public interface RefBusinessDataService {
 
     void updateRefBusinessDataInstance(SMultiRefBusinessDataInstance refBusinessDataInstance, List<Long> dataIds)
             throws SRefBusinessDataInstanceModificationException;
+
+    int getNumberOfDataOfMultiRefBusinessData(String name, long processInstanceId) throws SBonitaReadException;
 
 }

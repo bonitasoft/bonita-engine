@@ -19,4 +19,6 @@ public interface SRefBusinessDataInstanceBuilderFactory {
 
     SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, List<Long> dataIds, String dataClassName);
 
+    SRefBusinessDataInstanceBuilder createNewInstanceForFlowNode(String name, long flowNodeInstanceId, Long dataId, String dataClassName);
+
 }
