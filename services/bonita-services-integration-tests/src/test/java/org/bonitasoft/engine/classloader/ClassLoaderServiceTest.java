@@ -200,7 +200,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader classLoader = clazz.getClassLoader();
 
         // getTransactionService().complete();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
         assertSameClassloader(globalClassLoader, classLoader);
     }
 
@@ -211,7 +211,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.LocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderLocal(classLoader));
+        checkLocalClassLoader(classLoader);
 
         assertSameClassloader(localClassLoader, classLoader);
         // getTransactionService().complete();
@@ -224,7 +224,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
 
         assertNotSameClassloader(localClassLoader, classLoader);
         // getTransactionService().complete();
@@ -237,7 +237,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderLocal(classLoader));
+        checkLocalClassLoader(classLoader);
 
         assertSameClassloader(localClassLoader, classLoader);
         // getTransactionService().complete();
@@ -250,7 +250,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
 
         assertSameClassloader(globalClassLoader, classLoader);
         // getTransactionService().complete();
@@ -294,14 +294,14 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoaderP1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazzP1 = localClassLoaderP1.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazzP1.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
 
         assertFalse(localClassLoaderP1 == classLoader);
 
         final ClassLoader localClassLoaderP2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         final Class<?> clazzP2 = localClassLoaderP2.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader2 = clazzP2.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader2));
+        checkGlobalClassLoader(classLoader2);
 
         assertFalse(localClassLoaderP2 == classLoader2);
 
@@ -321,13 +321,13 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void testLoadSharedClassUsingUsingBadLocalClassLoader() throws Exception {
+    public void testLoadSharedClassUsingBadLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
         final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader2 = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader2));
+        checkGlobalClassLoader(classLoader2);
 
         assertNotSame(classLoader, classLoader2);
         // getTransactionService().complete();
@@ -377,7 +377,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         Thread.sleep(10); // to be sure classlaoder refresh does NOT occur.
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         final ClassLoader classLoader2 = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader2));
+        checkGlobalClassLoader(classLoader2);
 
         assertSameClassloader(globalClassLoader, classLoader2);
         getTransactionService().complete();
@@ -388,17 +388,17 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         initializeClassLoaderService();
         getTransactionService().begin();
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        assertTrue(isClassLoaderGlobal(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader()));
+        checkGlobalClassLoader(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
         final long dependencyId = createDependency(2L, TYPE1, "newlib", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
         createDependencyMapping(dependencyId, TYPE1, ID1);
 
         // check the refresh has been done using the service
-        assertTrue(isClassLoaderLocal(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
-                .getClassLoader()));
+        checkLocalClassLoader(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
+                .getClassLoader());
 
         // check the refresh has been done using the old reference
-        assertTrue(isClassLoaderLocal(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader()));
+        checkLocalClassLoader(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader());
 
         assertSameClassloader(localClassLoader, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
         getTransactionService().complete();
@@ -417,7 +417,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
         Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
         assertSameClassloader(globalClassLoader, classLoader);
 
         platformDependencyService.deleteDependencyMapping(mappingId);
@@ -437,7 +437,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
 
         assertSameClassloader(globalClassLoader, classLoader);
         // getTransactionService().complete();
@@ -451,7 +451,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
-        assertTrue(isClassLoaderGlobal(clazz.getClassLoader()));
+        checkGlobalClassLoader(clazz.getClassLoader());
         assertNotSameClassloader(localClassLoader, clazz.getClassLoader());
         assertSameClassloader(classLoaderService.getGlobalClassLoader(), clazz.getClassLoader());
         // getTransactionService().complete();
@@ -466,7 +466,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderLocal(classLoader));
+        checkLocalClassLoader(classLoader);
 
         assertSameClassloader(localClassLoader, classLoader);
         // getTransactionService().complete();
@@ -493,7 +493,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
 
         assertSameClassloader(globalClassLoader, classLoader);
         // getTransactionService().complete();
@@ -508,7 +508,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(classLoader));
+        checkGlobalClassLoader(classLoader);
 
         // getTransactionService().complete();
     }
@@ -540,21 +540,35 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final Class<?> bpmClazz = type1ClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final Class<?> casesClazz = type2ClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader type1ClassLoader2 = bpmClazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(type1ClassLoader2));
+        checkGlobalClassLoader(type1ClassLoader2);
         assertSameClassloader(classLoaderService.getGlobalClassLoader(), type1ClassLoader2);
 
         final ClassLoader type2ClassLoader2 = casesClazz.getClassLoader();
-        assertTrue(isClassLoaderGlobal(type2ClassLoader2));
+        checkGlobalClassLoader(type2ClassLoader2);
         assertSameClassloader(classLoaderService.getGlobalClassLoader(), type2ClassLoader2);
         // getTransactionService().complete();
     }
 
-    private boolean isClassLoaderGlobal(final ClassLoader classLoader) {
-        return classLoader instanceof BonitaClassLoader && ((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
+    private void checkGlobalClassLoader(final ClassLoader classLoader) {
+        final boolean isGlobal = classLoader instanceof BonitaClassLoader
+                && ((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
+        try {
+            assertTrue(isGlobal);
+        } catch (final AssertionError e) {
+            System.out.println("ClassLoader should be GLOBAL: " + classLoader.toString());
+            throw e;
+        }
     }
 
-    private boolean isClassLoaderLocal(final ClassLoader classLoader) {
-        return classLoader instanceof BonitaClassLoader && !((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
+    private void checkLocalClassLoader(final ClassLoader classLoader) {
+        final boolean isGlobal = classLoader instanceof BonitaClassLoader
+                && !((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
+        try {
+            assertTrue(isGlobal);
+        } catch (final AssertionError e) {
+            System.out.println("ClassLoader should be LOCAL: " + classLoader.toString());
+            throw e;
+        }
     }
 
     private boolean isBonitaClassLoader(final ClassLoader classLoader) {
