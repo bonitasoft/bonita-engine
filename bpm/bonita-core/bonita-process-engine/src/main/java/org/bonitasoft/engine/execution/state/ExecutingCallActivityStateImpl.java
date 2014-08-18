@@ -28,9 +28,6 @@ public class ExecutingCallActivityStateImpl implements FlowNodeState {
 
     private final StateBehaviors stateBehaviors;
 
-    /**
-     * @param stateBehaviors
-     */
     public ExecutingCallActivityStateImpl(final StateBehaviors stateBehaviors) {
         this.stateBehaviors = stateBehaviors;
     }

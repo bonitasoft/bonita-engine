@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -521,6 +521,24 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     @Override
+    public SBusinessDataDefinition getBusinessDataDefinition(final String name) {
+        if (name == null) {
+            return null;
+        }
+        boolean found = false;
+        SBusinessDataDefinition businessData = null;
+        final Iterator<SBusinessDataDefinition> iterator = sBusinessDataDefinitions.iterator();
+        while (iterator.hasNext() && !found) {
+            final SBusinessDataDefinition currentBusinessData = iterator.next();
+            if (currentBusinessData.getName().equals(name)) {
+                found = true;
+                businessData = currentBusinessData;
+            }
+        }
+        return businessData;
+    }
+
+    @Override
     public List<SDataDefinition> getDataDefinitions() {
         return sDataDefinitions;
     }
@@ -582,5 +600,6 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     public boolean containsInclusiveGateway() {
         return containsInclusiveGateway;
     }
+
 
 }

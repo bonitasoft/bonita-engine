@@ -377,7 +377,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
         .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
         builder.done();
     }
 
@@ -389,7 +389,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
         .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
         builder.done();
     }
 
@@ -401,7 +401,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
         .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
         builder.done();
     }
 

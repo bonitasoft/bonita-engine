@@ -43,8 +43,7 @@ public class SStandardLoopCharacteristicsBinding extends ElementBinding {
     public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.LOOP_CONDITION.equals(name)) {
             loopCondition = (SExpression) value;
-        }
-        if (XMLSProcessDefinition.LOOP_MAX.equals(name)) {
+        } else if (XMLSProcessDefinition.LOOP_MAX.equals(name)) {
             loopMax = (SExpression) value;
         }
     }

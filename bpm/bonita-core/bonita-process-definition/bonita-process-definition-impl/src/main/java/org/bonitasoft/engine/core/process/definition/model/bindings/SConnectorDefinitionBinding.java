@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -85,8 +85,7 @@ public class SConnectorDefinitionBinding extends SNamedElementBinding {
         if (XMLSProcessDefinition.CONNECTOR_INPUT.equals(name)) {
             final Entry<?, ?> entry = (Entry<?, ?>) value;
             inputs.put((String) entry.getKey(), (SExpression) entry.getValue());
-        }
-        if (XMLSProcessDefinition.OPERATION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.OPERATION_NODE.equals(name)) {
             outputs.add((SOperation) value);
         }
     }
