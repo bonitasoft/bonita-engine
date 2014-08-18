@@ -479,10 +479,10 @@ public class IOUtil {
                 // For each entry, a file is created in the output directory "folder"
                 final File outputFile = new File(outputFolder.getAbsolutePath(), zipEntry.getName());
 
-                // If the entry is a directory, it creates in the output folder, and we go to the next entry (return).
+                // If the entry is a directory, it creates in the output folder, and we go to the next entry (continue).
                 if (zipEntry.isDirectory()) {
                     mkdirs(outputFile);
-                    return;
+                    continue;
                 }
                 writeZipInputToFile(zipInputstream, outputFile);
             } finally {
