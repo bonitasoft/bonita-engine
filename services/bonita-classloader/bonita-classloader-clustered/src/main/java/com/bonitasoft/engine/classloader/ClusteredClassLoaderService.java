@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -26,9 +27,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class ClusteredClassLoaderService implements ClassLoaderService {
 
@@ -146,6 +145,24 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
             // TIMEOUT
             throw new SClassLoaderException(e);
         }
+    }
+
+    @Override
+    public void start() throws SBonitaException {
+    }
+
+    @Override
+    public void stop() throws SBonitaException {
+    }
+
+    @Override
+    public void pause() throws SBonitaException {
+        // Nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // Nothing to do
     }
 
 }
