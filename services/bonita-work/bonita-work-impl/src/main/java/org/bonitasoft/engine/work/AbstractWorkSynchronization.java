@@ -27,11 +27,11 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
 
     protected final BonitaExecutorService executorService;
 
-    private boolean executed = false;
+    protected final WorkService workService;
 
     private long tenantId;
 
-    public AbstractWorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor) {
+    public AbstractWorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor, final WorkService workService) {
         super();
         this.executorService = executorService;
         works = new HashSet<BonitaWork>();
@@ -42,6 +42,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
             // We are not in a tenant
             tenantId = -1L;
         }
+        this.workService = workService;
     }
 
     public long getTenantId() {
@@ -65,12 +66,9 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
             }
             executeRunnables(works);
         }
-        executed = true;
+        workService.removeSynchronization();
     }
 
     protected abstract void executeRunnables(Collection<BonitaWork> works);
 
-    public boolean isExecuted() {
-        return executed;
-    }
 }
