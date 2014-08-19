@@ -60,6 +60,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
+        final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
+        //        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bos-engine").toURI()).getAbsolutePath();
+        this.temporaryFolder = new File(temporaryFolderName, "bos-engine").getAbsolutePath();
+    }
+
+    private String buildTemporaryFolderName(final String temporaryFolder) {
         String temporaryFolderName = temporaryFolder;
         if (temporaryFolder.startsWith("${") && temporaryFolder.contains("}")) {
             final Pattern pattern = Pattern.compile("^(.*)\\$\\{(.*)\\}(.*)$");
@@ -71,8 +77,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             sb.append(matcher.group(3));
             temporaryFolderName = sb.toString();
         }
-
-        this.temporaryFolder = new File(temporaryFolderName, "bos-engine").getAbsolutePath();
+        return temporaryFolderName;
     }
 
     private static final class ClassLoaderServiceMutex {

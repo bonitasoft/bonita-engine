@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,16 +21,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
-
-import javax.xml.transform.stream.StreamSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.SValidationException;
 import org.bonitasoft.engine.xml.SXMLParseException;
 import org.bonitasoft.engine.xml.XMLSchemaValidator;
@@ -41,6 +39,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SAXParser implements Parser {
 
@@ -123,33 +122,8 @@ public class SAXParser implements Parser {
     }
 
     @Override
-    public void setSchema(final File xsdSchema) throws SInvalidSchemaException {
-        setSchema(new StreamSource(xsdSchema));
-    }
-
-    @Override
-    public void setSchema(final URI xmlURI) throws SInvalidSchemaException {
-        final File xmlFile = new File(xmlURI);
-        setSchema(new StreamSource(xmlFile));
-    }
-
-    @Override
-    public void setSchema(final String pathname) throws SInvalidSchemaException {
-        setSchema(new StreamSource(pathname));
-    }
-
-    @Override
-    public void setSchema(final InputStream xmlStream) throws SInvalidSchemaException {
-        setSchema(new StreamSource(xmlStream));
-    }
-
-    @Override
-    public void setSchema(final Reader xmlReader) throws SInvalidSchemaException {
-        setSchema(new StreamSource(xmlReader));
-    }
-
-    private void setSchema(final StreamSource source) throws SInvalidSchemaException {
-        validator.setSchemaSource(source);
+    public void setSchemaUrl(final URL schemaUrl) {
+        validator.setSchemaUrl(schemaUrl);
     }
 
     @Override

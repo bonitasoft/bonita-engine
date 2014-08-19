@@ -110,7 +110,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     @Override
     public void execute() throws SBonitaException {
         try {
-            parser.setSchema(this.getClass().getResourceAsStream("/bos-organization.xsd"));
+            parser.setSchemaUrl(this.getClass().getResource("/bos-organization.xsd"));
             parser.validate(new StringReader(organizationContent));
             final OrganizationCreator organization = (OrganizationCreator) parser.getObjectFromXML(new StringReader(organizationContent));
             final List<ExportedUser> users = organization.getUsers();

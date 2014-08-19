@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.core.migration.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,6 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -102,18 +101,8 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         final ElementBindingsFactory bindingsFactory = new SMigrationPlanElementBindings();
         parser = parserFactory.createParser(bindingsFactory);
         // the schema is in common-api
-        final InputStream schemaStream = this.getClass().getResourceAsStream("/org/bonitasoft/engine/bpm/migration/MigrationPlan.xsd");
-        try {
-            parser.setSchema(schemaStream);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException("Unable to configure Migration Plan Service", e);
-        } finally {
-            try {
-                schemaStream.close();
-            } catch (IOException e) {
-                throw new BonitaRuntimeException(e);
-            }
-        }
+        final URL schemaUrl = this.getClass().getResource("/org/bonitasoft/engine/bpm/migration/MigrationPlan.xsd");
+        parser.setSchemaUrl(schemaUrl);
     }
 
     @Override
