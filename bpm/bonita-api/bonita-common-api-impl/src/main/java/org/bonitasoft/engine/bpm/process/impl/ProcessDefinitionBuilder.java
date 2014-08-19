@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -116,6 +117,22 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateProcess(flowElementContainer, true);
         validateEventsSubProcess();
         validateActors();
+        validateBusinessData();
+    }
+
+    protected void validateBusinessData() {
+        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
+        final List<BusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
+        if (!businessDataDefinitions.isEmpty()) {
+            addError("It is not possible to use business data in the process");
+        }
+
+        for (final ActivityDefinition activity : processContainer.getActivities()) {
+            final List<BusinessDataDefinition> dataDefinitions = activity.getBusinessDataDefinitions();
+            if (!dataDefinitions.isEmpty()) {
+                addError("It is not possible to use business data in the activity " + activity.getName());
+            }
+        }
     }
 
     private void validateConnectors(final List<ConnectorDefinition> connectorDefinitions) {

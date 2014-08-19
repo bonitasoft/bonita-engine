@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
@@ -30,6 +31,8 @@ import org.bonitasoft.engine.operation.Operation;
 public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBinding {
 
     protected final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
+
+    private final List<BusinessDataDefinition> businessDataDefinitions = new ArrayList<BusinessDataDefinition>();
 
     protected final List<Operation> operations = new ArrayList<Operation>();
 
@@ -58,6 +61,9 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
         if (XMLProcessDefinition.BOUNDARY_EVENT_NODE.equals(name)) {
             boundaryEventDefinitions.add((BoundaryEventDefinition) value);
         }
+        if (XMLProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
+            businessDataDefinitions.add((BusinessDataDefinition) value);
+        }
     }
 
     @Override
@@ -74,6 +80,9 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
             activity.setLoopCharacteristics(loopCharacteristics);
             for (final BoundaryEventDefinition boundaryEvent : boundaryEventDefinitions) {
                 activity.addBoundaryEventDefinition(boundaryEvent);
+            }
+            for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                activity.addBusinessDataDefinition(businessDataDefinition);
             }
         }
     }

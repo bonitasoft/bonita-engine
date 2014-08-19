@@ -1,3 +1,7 @@
+DROP TABLE multi_biz_data
+GO
+DROP TABLE ref_biz_data_inst
+GO
 DROP TABLE pending_mapping
 GO
 DROP TABLE connector_instance
@@ -17,8 +21,4 @@ GO
 DROP TABLE token
 GO
 DROP TABLE breakpoint
-GO
-DROP TABLE multi_biz_data
-GO
-DROP TABLE ref_biz_data_inst
 GO

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -76,6 +76,7 @@ import org.bonitasoft.engine.operation.Operation;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class XMLProcessDefinition {
 
@@ -468,15 +469,9 @@ public class XMLProcessDefinition {
             fillConnectorNode(connectorNode, connector);
             connectorsNode.addChild(connectorNode);
         }
-        final List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
-        if (!businessDataDefinitions.isEmpty()) {
-            final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
-            flowElements.addChild(businessDataDefinitionsNode);
-            for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
-                final XMLNode businessDataDefinitionNode = getBusinessDataDefinitionNode(businessDataDefinition);
-                businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
-            }
-        }
+
+        addBusinessDataDefinitionNodes(containerDefinition.getBusinessDataDefinitions(), flowElements);
+
         final XMLNode dataDefinitionsNode = new XMLNode(DATA_DEFINITIONS_NODE);
         flowElements.addChild(dataDefinitionsNode);
         for (final DataDefinition dataDefinition : containerDefinition.getDataDefinitions()) {
@@ -505,6 +500,7 @@ public class XMLProcessDefinition {
             }
             fillFlowNode(activityNode, activity);
             addDataDefinitionNodes(activity, activityNode);
+            addBusinessDataDefinitionNodes(activity.getBusinessDataDefinitions(), activityNode);
             addOperationNodes(activity, activityNode);
             addLoopCharacteristics(activity, activityNode);
             addBoundaryEventDefinitionsNode(activity, activityNode);
@@ -584,6 +580,17 @@ public class XMLProcessDefinition {
         inputNode.addAttribute(TYPE, input.getType());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
         return inputNode;
+    }
+
+    private void addBusinessDataDefinitionNodes(final List<BusinessDataDefinition> businessDataDefinitions, final XMLNode containerNode) {
+        if (!businessDataDefinitions.isEmpty()) {
+            final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
+            containerNode.addChild(businessDataDefinitionsNode);
+            for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                final XMLNode businessDataDefinitionNode = getBusinessDataDefinitionNode(businessDataDefinition);
+                businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+            }
+        }
     }
 
     private void addBoundaryEventDefinitionsNode(final ActivityDefinition activity, final XMLNode activityNode) {
