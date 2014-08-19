@@ -8,7 +8,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -63,7 +61,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
@@ -298,8 +295,7 @@ public class ProcessManagementTest extends CommonAPITest {
         checkNbOfArchivedActivityInstances(processInstance2, 3 * 2);
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance1));
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
     @Ignore("Pb : ReachedStateDate has 0 for value for activities in state executing")
@@ -418,8 +414,7 @@ public class ProcessManagementTest extends CommonAPITest {
             assertEquals(activityInstance.getState(), TestStates.getReadyState());
         }
 
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
     @Test
@@ -450,7 +445,6 @@ public class ProcessManagementTest extends CommonAPITest {
 
         List<ActivityInstance> openedActivityInstances;
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(procInstance.getId(), 0, 200, ActivityInstanceCriterion.LAST_UPDATE_ASC);
-
         assertTrue(openedActivityInstances.get(0).getLastUpdateDate().compareTo(openedActivityInstances.get(1).getLastUpdateDate()) <= 0);
         assertTrue(openedActivityInstances.get(1).getLastUpdateDate().compareTo(openedActivityInstances.get(2).getLastUpdateDate()) <= 0);
 
@@ -552,9 +546,8 @@ public class ProcessManagementTest extends CommonAPITest {
     @Test
     public void getProcessResources() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition);
+                processDefinitionBuilder.done());
 
         // Add a resource to the biz archive:
         final String dummyText = "DUMMY";
@@ -564,15 +557,9 @@ public class ProcessManagementTest extends CommonAPITest {
         businessArchiveBuilder.addExternalResource(new BarResource(dummyFile, dummyText.getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource(documentFile, documentText.getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource("folder/image.jpg", "UNUSED".getBytes()));
-        final File tempFile = IOUtil.createTempFile("testbar", ".bar", new File(IOUtil.TMP_DIRECTORY));
-        tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchiveBuilder.done(), tempFile);
 
-        // read from the file
-        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
         // deploy the process to unzip the .bar in BONITA_HOME:
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(readBusinessArchive);
-        tempFile.delete();
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
         final Map<String, byte[]> resources = getProcessAPI().getProcessResources(processDefinition.getId(), ".*/.*\\.txt");
         assertEquals(2, resources.size());
         assertTrue("Searched resource not returned", resources.containsKey(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + dummyFile));
@@ -582,7 +569,6 @@ public class ProcessManagementTest extends CommonAPITest {
         final byte[] doc = resources.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + documentFile);
         assertTrue("File content not the expected", Arrays.equals(documentText.getBytes(), doc));
 
-        tempFile.delete();
         deleteProcess(processDefinition);
     }
 
