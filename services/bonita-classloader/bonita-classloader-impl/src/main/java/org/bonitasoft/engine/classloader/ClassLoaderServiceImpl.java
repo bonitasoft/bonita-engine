@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -61,8 +62,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
-        //        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bos-engine").toURI()).getAbsolutePath();
-        this.temporaryFolder = new File(temporaryFolderName, "bos-engine").getAbsolutePath();
+        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bos-engine").toURI()).getAbsolutePath();
     }
 
     private String buildTemporaryFolderName(final String temporaryFolder) {
