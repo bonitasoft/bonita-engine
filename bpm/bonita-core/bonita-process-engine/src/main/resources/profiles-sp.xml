@@ -136,7 +136,7 @@
 				<index>8</index>
 				<description>Applications</description>
 				<type>link</type>
-				<page>livingapplistingadmin</page>
+				<page>applicationslistingadmin</page>
 			</parentProfileEntry>
 		</profileEntries>
 	</profile>
